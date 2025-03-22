@@ -101,7 +101,7 @@ function MultiStepForm() {
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		console.log("submited");
+		console.log("submited", {formData});
 		// When final step is submitted, pass data upward
 		// onComplete(formData);
 	};
