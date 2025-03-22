@@ -1,10 +1,29 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import { Card, CardContent } from "@/components/ui/card";
 // import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+// import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
+import "./Form.css";
+
+interface Option {
+	value: string;
+	label: string;
+}
+
+const options: Option[] = [
+	{ value: "tops", label: "Tops" },
+	{ value: "bottoms", label: "Bottoms" },
+	{ value: "dresses", label: "Dresses" },
+	{ value: "coats", label: "Coats" },
+	{ value: "sweaters", label: "Sweaters" },
+	{ value: "lingerie", label: "Lingerie" },
+	{ value: "socks", label: "Socks" },
+	{ value: "underwear", label: "Underwear" },
+];
 
 // MULTI-STEP FORM
 // We store 8 fields in "formData" and show them one at a time in Step1..Step8.
@@ -25,7 +44,7 @@ interface FormData {
 // { onComplete}: { onComplete: (data: FormData) => void}
 function MultiStepForm() {
 	// Manage step-based progression
-	const [step, setStep] = React.useState(2);
+	const [step, setStep] = React.useState(1);
 
 	// Form data
 	const [formData, setFormData] = React.useState<FormData>({
@@ -82,174 +101,160 @@ function MultiStepForm() {
 	// Render each step conditionally
 	// We'll put them all inside a single <motion.form> for simplicity
 	return (
-		<motion.form
-			onSubmit={handleSubmit}
-			className="w-full max-w-lg mt-6 bg-blue-100 p-6 rounded-2xl"
-			initial={{ opacity: 0, scale: 0.8 }}
-			animate={{ opacity: 1, scale: 1 }}
-			transition={{ duration: 0.5 }}
-		>
-			{/* STEP 1: TYPE */}
-			{/* {step === 1 && (
-        <div className="mb-4">
-          <label>Type</label>
-          <Select
-            value={formData.type}
-            onValueChange={(val:any) => setFormData((p) => ({ ...p, type: val }))}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select clothing type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tops">Tops</SelectItem>
-              <SelectItem value="bottoms">Bottoms</SelectItem>
-              <SelectItem value="dresses">Dresses</SelectItem>
-              <SelectItem value="coats">Coats</SelectItem>
-              <SelectItem value="sweaters">Sweaters</SelectItem>
-              <SelectItem value="lingerie">Lingerie</SelectItem>
-              <SelectItem value="socks">Socks</SelectItem>
-              <SelectItem value="underwear">Underwear</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )} */}
+		<div className="form">
+			<motion.form
+				onSubmit={handleSubmit}
+				className="w-full max-w-lg mt-6 bg-blue-100 p-6 rounded-2xl"
+				initial={{ opacity: 0, scale: 0.8 }}
+				animate={{ opacity: 1, scale: 1 }}
+				transition={{ duration: 0.5 }}
+			>
+				{/* STEP 1: TYPE */}
+				{step === 1 && (
+					<div className="mb-4">
+						<label>Clothing Category</label>
 
-			{/* STEP 2: COLOR */}
-			{step === 2 && (
-				<div className="mb-4">
-					<label>Color</label>
-					<div className="flex flex-wrap gap-2 mt-2">
-						{colorOptions.map((c) => {
-							// If c is "white", we do black text; otherwise white text
-							const labelTextColor = c === "white" ? "#000" : "#fff";
-							return (
-								<label
-									key={c}
-									className="flex items-center space-x-1 px-2 py-1 rounded"
-									style={{
-										backgroundColor: c,
-										color: labelTextColor,
-									}}
-								>
-									<input
-										type="checkbox"
-										checked={formData.color === c}
-										onChange={() => toggleColor(c)}
-										className="hidden"
-										aria-label={c}
-									/>
-									<span>{c}</span>
+						<DropDownSelect options={options} />
+					</div>
+				)}
+
+				{/* STEP 2: COLOR */}
+				{step === 2 && (
+					<div className="mb-4">
+						<label>Color</label>
+						<div className="flex flex-wrap gap-2 mt-2">
+							{colorOptions.map((c) => {
+								// If c is "white", we do black text; otherwise white text
+								const labelTextColor = c === "white" ? "#000" : "#fff";
+								return (
+									<label
+										key={c}
+										className="flex items-center space-x-1 px-2 py-1 rounded"
+										style={{
+											backgroundColor: c,
+											color: labelTextColor,
+										}}
+									>
+										<input
+											type="checkbox"
+											checked={formData.color === c}
+											onChange={() => toggleColor(c)}
+											className="hidden"
+											aria-label={c}
+										/>
+										<span>{c}</span>
+									</label>
+								);
+							})}
+						</div>
+					</div>
+				)}
+
+				{/* STEP 3: SIZE */}
+				{step === 3 && (
+					<div className="mb-4">
+						<label>Size</label>
+						<div className="flex flex-wrap gap-2 mt-2">
+							{sizeOptions.map((s) => (
+								<label key={s} className="flex items-center space-x-1">
+									<input type="checkbox" checked={formData.size === s} onChange={() => toggleSize(s)} aria-label={s} />
+									<span>{s}</span>
 								</label>
-							);
-						})}
+							))}
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 
-			{/* STEP 3: SIZE */}
-			{step === 3 && (
-				<div className="mb-4">
-					<label>Size</label>
-					<div className="flex flex-wrap gap-2 mt-2">
-						{sizeOptions.map((s) => (
-							<label key={s} className="flex items-center space-x-1">
-								<input type="checkbox" checked={formData.size === s} onChange={() => toggleSize(s)} aria-label={s} />
-								<span>{s}</span>
-							</label>
-						))}
+				{/* STEP 4: BRAND */}
+				{step === 4 && (
+					<div className="mb-4">
+						<label>Brand</label>
+						<input
+							value={formData.brand}
+							onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
+							placeholder="e.g. Gucci, Zara..."
+						/>
 					</div>
-				</div>
-			)}
-
-			{/* STEP 4: BRAND */}
-			{step === 4 && (
-				<div className="mb-4">
-					<label>Brand</label>
-					<input
-						value={formData.brand}
-						onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
-						placeholder="e.g. Gucci, Zara..."
-					/>
-				</div>
-			)}
-
-			{/* STEP 5: MATERIAL */}
-			{step === 5 && (
-				<div className="mb-4">
-					<label>Materill</label>
-					<input
-						value={formData.material}
-						onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
-						placeholder="e.g. Cotton, Silk..."
-					/>
-				</div>
-			)}
-
-			{/* STEP 6: OCCASION */}
-			{step === 6 && (
-				<div className="mb-4">
-					<label>Occasiln</label>
-					<input
-						value={formData.occasion}
-						onChange={(e: any) => setFormData((p) => ({ ...p, occasion: e.target.value }))}
-						placeholder="e.g. Casual, Formal..."
-					/>
-				</div>
-			)}
-
-			{/* STEP 7: AGE */}
-			{step === 7 && (
-				<div className="mb-4">
-					<label>How oll</label>
-					<input
-						value={formData.age}
-						onChange={(e: any) => setFormData((p) => ({ ...p, age: e.target.value }))}
-						placeholder="e.g. 2 years"
-					/>
-				</div>
-			)}
-
-			{/* STEP 8: CARE */}
-			{step === 8 && (
-				<div className="mb-4">
-					<label>Care Ilstructions</label>
-					<input
-						value={formData.care}
-						onChange={(e: any) => setFormData((p) => ({ ...p, care: e.target.value }))}
-						placeholder="e.g. Dry clean only"
-					/>
-				</div>
-			)}
-
-			{/* NAVIGATION bUTTONS */}
-			<div className="flex justify-between mt-4">
-				{step > 1 && (
-					<button
-						onClick={(e: any) => {
-							e.preventDefault();
-							handleBack();
-						}}
-					>
-						Back
-					</button>
 				)}
-				{step < 8 && (
-					<button
-						onClick={(e: any) => {
-							e.preventDefault();
-							handleNext();
-						}}
-					>
-						Next
-					</button>
+
+				{/* STEP 5: MATERIAL */}
+				{step === 5 && (
+					<div className="mb-4">
+						<label>Materill</label>
+						<input
+							value={formData.material}
+							onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
+							placeholder="e.g. Cotton, Silk..."
+						/>
+					</div>
 				)}
+
+				{/* STEP 6: OCCASION */}
+				{step === 6 && (
+					<div className="mb-4">
+						<label>Occasiln</label>
+						<input
+							value={formData.occasion}
+							onChange={(e: any) => setFormData((p) => ({ ...p, occasion: e.target.value }))}
+							placeholder="e.g. Casual, Formal..."
+						/>
+					</div>
+				)}
+
+				{/* STEP 7: AGE */}
+				{step === 7 && (
+					<div className="mb-4">
+						<label>How oll</label>
+						<input
+							value={formData.age}
+							onChange={(e: any) => setFormData((p) => ({ ...p, age: e.target.value }))}
+							placeholder="e.g. 2 years"
+						/>
+					</div>
+				)}
+
+				{/* STEP 8: CARE */}
 				{step === 8 && (
-					<button type="submit" className="bg-green-500 hover:bg-green-600">
-						Submit
-					</button>
+					<div className="mb-4">
+						<label>Care Ilstructions</label>
+						<input
+							value={formData.care}
+							onChange={(e: any) => setFormData((p) => ({ ...p, care: e.target.value }))}
+							placeholder="e.g. Dry clean only"
+						/>
+					</div>
 				)}
-			</div>
-		</motion.form>
+
+				{/* NAVIGATION bUTTONS */}
+				<div className="flex justify-between mt-4">
+					{step > 1 && (
+						<button
+							onClick={(e: any) => {
+								e.preventDefault();
+								handleBack();
+							}}
+						>
+							Back
+						</button>
+					)}
+					{step < 8 && (
+						<button
+							onClick={(e: any) => {
+								e.preventDefault();
+								handleNext();
+							}}
+						>
+							Next
+						</button>
+					)}
+					{step === 8 && (
+						<button type="submit" className="bg-green-500 hover:bg-green-600">
+							Submit
+						</button>
+					)}
+				</div>
+			</motion.form>
+		</div>
 	);
 }
 

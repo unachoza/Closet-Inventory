@@ -19,19 +19,21 @@ function App() {
 					<img src={reactLogo} className="logo react" alt="React logo" />
 				</a>
 			</div>
-			<h1>Vite + React</h1>
 			{/* <ClosetCarousel /> */}
 			{/* Controls */}
 			<div className="mt-4">
 				<button onClick={() => setView("form")}>Add Item</button>
-				<button className="ml-2" onClick={() => setView("overview")}>
+				<button className="ml-2" onClick={() => setView("carousel")}>
 					View All Items
 				</button>
 			</div>
-      form here
+			form here
 			{view === "form" && <MultiStepForm />}
+			{/* {view === "carousel" && <ClosetCarousel />} */}
 		</>
 	);
 }
+
+
 
 export default App;
