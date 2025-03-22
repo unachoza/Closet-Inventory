@@ -1,20 +1,39 @@
 .form {
-	width: 100%; /* w-full */
-	max-width: 32rem; /* max-w-lg (default: 32rem) */
-	margin-top: 1.5rem; /* mt-6 (default: 1.5rem) */
-	background-color: #ebf8ff; /* bg-blue-100 */
-	padding: 1.5rem; /* p-6 (default: 1.5rem) */
-	border-radius: 1rem; /* rounded-2xl (default: 1rem) */
-	opacity: 1; /* inline style */
-	transform: none; /* inline style */
+	width: 100%;
+	max-width: 32rem;
+	margin-top: 1.5rem;
+	background-color: #84abc1;
+	padding: 1.5rem;
+	border-radius: 1rem;
+	opacity: 1;
+	transform: none;
 	opacity: 1;
 	flex-direction: column;
 	display: flex;
-	transform: none;
 	width: 500px;
-	text-align: center;
-	align-items: center;
 	align-content: center;
+}
+.options-container {
 	display: flex;
-	padding: 20px;
+	flex-wrap: wrap;
+	height: 170px;
+	width: 500px;
+}
+
+.checkbox-label {
+	display: flex; /* flex */
+	align-items: center; /* items-center */
+	gap: 0.25rem; /* space-x-1 (if using the gap property) */
+	padding: 0.25rem 0.5rem; /* py-1 (vertical 0.25rem) and px-2 (horizontal 0.5rem) */
+	border-radius: 0.25rem;
+}
+
+.field-label {
+	text-align: left;
+	margin-bottom: 1rem;
+}
+.form-controls {
+	display: flex; /* flex */
+	justify-content: space-around; /* justify-between */
+	margin-top: 1rem;
 }

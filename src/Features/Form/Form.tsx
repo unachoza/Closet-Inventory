@@ -1,10 +1,11 @@
-import React from "react";
+import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
-import { Card, CardContent } from "@/components/ui/card";
+import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
+// import { Card, CardContent } from "@/components/ui/card";
 // import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@/components/ui/label";
 // import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 import "./Form.css";
@@ -44,10 +45,11 @@ interface FormData {
 // { onComplete}: { onComplete: (data: FormData) => void}
 function MultiStepForm() {
 	// Manage step-based progression
-	const [step, setStep] = React.useState(1);
+	const [step, setStep] = useState(1);
+	const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
 	// Form data
-	const [formData, setFormData] = React.useState<FormData>({
+	const [formData, setFormData] = useState<FormData>({
 		type: "",
 		color: "",
 		size: "",
@@ -57,6 +59,11 @@ function MultiStepForm() {
 		age: "",
 		care: "",
 	});
+
+	const handleOptionSelect = (option: Option) => {
+		setSelectedOption(option);
+		// You can add any additional handling for form submission or state updates here
+	};
 
 	// For coloring checkboxes
 	const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green"];
@@ -92,8 +99,9 @@ function MultiStepForm() {
 		setStep((prev) => prev - 1);
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
+		console.log("submited");
 		// When final step is submitted, pass data upward
 		// onComplete(formData);
 	};
@@ -111,59 +119,18 @@ function MultiStepForm() {
 			>
 				{/* STEP 1: TYPE */}
 				{step === 1 && (
-					<div className="mb-4">
+					<div className="field-label">
 						<label>Clothing Category</label>
 
-						<DropDownSelect options={options} />
+						<DropDownSelect options={options} onOptionSelect={handleOptionSelect} />
 					</div>
 				)}
 
 				{/* STEP 2: COLOR */}
-				{step === 2 && (
-					<div className="mb-4">
-						<label>Color</label>
-						<div className="flex flex-wrap gap-2 mt-2">
-							{colorOptions.map((c) => {
-								// If c is "white", we do black text; otherwise white text
-								const labelTextColor = c === "white" ? "#000" : "#fff";
-								return (
-									<label
-										key={c}
-										className="flex items-center space-x-1 px-2 py-1 rounded"
-										style={{
-											backgroundColor: c,
-											color: labelTextColor,
-										}}
-									>
-										<input
-											type="checkbox"
-											checked={formData.color === c}
-											onChange={() => toggleColor(c)}
-											className="hidden"
-											aria-label={c}
-										/>
-										<span>{c}</span>
-									</label>
-								);
-							})}
-						</div>
-					</div>
-				)}
+				{step === 2 && <CheckboxCollection label="color" detailOptions={colorOptions} onToggleDetail={toggleColor} formData={formData} />}
 
 				{/* STEP 3: SIZE */}
-				{step === 3 && (
-					<div className="mb-4">
-						<label>Size</label>
-						<div className="flex flex-wrap gap-2 mt-2">
-							{sizeOptions.map((s) => (
-								<label key={s} className="flex items-center space-x-1">
-									<input type="checkbox" checked={formData.size === s} onChange={() => toggleSize(s)} aria-label={s} />
-									<span>{s}</span>
-								</label>
-							))}
-						</div>
-					</div>
-				)}
+				{step === 3 && <CheckboxCollection label="size" detailOptions={sizeOptions} onToggleDetail={toggleSize} formData={formData} />}
 
 				{/* STEP 4: BRAND */}
 				{step === 4 && (
@@ -226,7 +193,7 @@ function MultiStepForm() {
 				)}
 
 				{/* NAVIGATION bUTTONS */}
-				<div className="flex justify-between mt-4">
+				<div className="form-controls">
 					{step > 1 && (
 						<button
 							onClick={(e: any) => {

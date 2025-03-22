@@ -1,5 +1,8 @@
 label {
 	color: black;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
 }
 
 .dropdown {
@@ -7,7 +10,6 @@ label {
 	width: 200px;
 	font-family: Arial, sans-serif;
 	user-select: none;
-	padding: 20px;
 }
 
 .dropdown-header {

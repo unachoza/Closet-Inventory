@@ -1,0 +1,21 @@
+/* Hide the native checkbox appearance */
+.options-container label input[type="checkbox"] {
+    display: none;
+  }
+  
+  /* Style the span to look like a custom checkbox or button */
+  .options-container label span {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  
+  /* When the checkbox is checked, style the span to match a "selected" state */
+  .options-container label input[type="checkbox"]:checked + span {
+    background-color: #007bff; /* change this to your desired color */
+    color: #fff;
+    border-color: #007bff;
+  }

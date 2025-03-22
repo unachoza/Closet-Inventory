@@ -10,7 +10,7 @@ interface DropdownProps {
 	options: Option[];
 }
 
-function DropDownSelect({ options }: any) {
+function DropDownSelect({ options, onOptionSelect }: any) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selected, setSelected] = useState(options[0]);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -22,6 +22,10 @@ function DropDownSelect({ options }: any) {
 	const handleOptionClick = (option: Option) => {
 		setSelected(option);
 		setIsOpen(false);
+		// Call the callback if provided to pass the selection back up
+		if (onOptionSelect) {
+			onOptionSelect(option);
+		}
 	};
 
 	// Close the dropdown when clicking outside
