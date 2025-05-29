@@ -73,6 +73,7 @@
 	width: 800px;
 }
 .clothes-card {
+    border: solid black;
 	display: flex; /* flex */
 	flex-direction: column; /* flex-col */
 	align-items: center; /* items-center */

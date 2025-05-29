@@ -1,23 +1,13 @@
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import ClosetCarousel from "./Features/Carousel/Carousel";
-import ClosetInventoryApp from "./Features/Carousel/Carousel2";
+import ClosetInventory from "./Features/Carousel/Carousel2";
 import MultiStepForm from "./Features/Form/Form";
 import "./App.css";
 
 function App() {
-	const [count, setCount] = useState(0);
 	const [view, setView] = useState<"carousel" | "form" | "overview">("carousel");
 
 	return (
-		<>
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-			</div>
-			{/* <ClosetCarousel /> */}
+		<div>
 			{/* Controls */}
 			<div className="mt-4">
 				<button onClick={() => setView("form")}>Add Item</button>
@@ -26,9 +16,8 @@ function App() {
 				</button>
 			</div>
 			{view === "form" && <MultiStepForm />}
-			{/* {view === "carousel" && <ClosetCarousel />} */}
-			{view === "carousel" && <ClosetInventoryApp />}
-		</>
+			{view === "carousel" && <ClosetInventory />}
+		</div>
 	);
 }
 

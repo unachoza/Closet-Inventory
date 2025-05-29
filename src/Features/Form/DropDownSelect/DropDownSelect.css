@@ -1,26 +1,29 @@
 label {
+	font-weight: 600;
+	font-size: 24px;
 	color: black;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
+	margin-bottom: 10px;
+	justify-content: center;
+	border-radius: 5px;
+	display: flex;
 }
 
 .dropdown {
 	position: relative;
-	width: 200px;
 	font-family: Arial, sans-serif;
 	user-select: none;
 }
 
 .dropdown-header {
 	padding: 10px;
-	border: 1px solid #ccc;
-	background-color: #fff;
+	border: 1px solid #000000;
+	background-color: #0202022b;
+	border-radius: 5px;
 	cursor: pointer;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	color: black;
+	color: #000;
 }
 
 .dropdown-selected {
@@ -39,9 +42,9 @@ label {
 .dropdown-options {
 	position: absolute;
 	width: 100%;
-	border: 1px solid #ccc;
+	border: 1px solid #000;
 	border-top: none;
-	background-color: #fff;
+	background-color: #0202022b;
 	overflow: hidden;
 	max-height: 0;
 	transition: max-height 0.3s ease;
@@ -50,12 +53,12 @@ label {
 }
 
 .dropdown-options.open {
-	max-height: 200px; /* Adjust according to the number of options */
+	max-height: 300px; /* Adjust according to the number of options */
 }
 
 .dropdown-option {
 	padding: 10px;
-	border-top: 1px solid #ccc;
+	border-top: 1px solid #000;
 	cursor: pointer;
 }
 
