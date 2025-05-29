@@ -29,7 +29,7 @@ const options: Option[] = [
 // MULTI-STEP FORM
 // We store 8 fields in "formData" and show them one at a time in Step1..Step8.
 
-interface FormData {
+export interface ItemFormData {
 	type: string;
 	color: string; // single color
 	size: string; // single size
@@ -40,6 +40,16 @@ interface FormData {
 	care: string;
 }
 
+const item = {
+	type: "",
+	color: "",
+	size: "",
+	brand: "",
+	material: "",
+	occasion: "",
+	age: "",
+	care: "",
+};
 // TODO put back from AI
 //removing OnComplete, currently does nothing, passes data no where
 // { onComplete}: { onComplete: (data: FormData) => void}
@@ -49,16 +59,7 @@ function MultiStepForm() {
 	const [selectedOption, setSelectedOption] = useState<Option | null>(null);
 
 	// Form data
-	const [formData, setFormData] = useState<FormData>({
-		type: "",
-		color: "",
-		size: "",
-		brand: "",
-		material: "",
-		occasion: "",
-		age: "",
-		care: "",
-	});
+	const [formData, setFormData] = useState<ItemFormData>(item);
 
 	const handleOptionSelect = (option: Option) => {
 		setSelectedOption(option);
@@ -101,7 +102,7 @@ function MultiStepForm() {
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		console.log("submited", {formData});
+		console.log("submited", { formData });
 		// When final step is submitted, pass data upward
 		// onComplete(formData);
 	};
@@ -111,6 +112,7 @@ function MultiStepForm() {
 	return (
 		<div className="form">
 			<motion.form
+				layout
 				onSubmit={handleSubmit}
 				className="w-full max-w-lg mt-6 bg-blue-100 p-6 rounded-2xl"
 				initial={{ opacity: 0, scale: 0.8 }}
@@ -122,7 +124,7 @@ function MultiStepForm() {
 					<div className="field-label">
 						<label>Clothing Category</label>
 
-						<DropDownSelect options={options} onOptionSelect={handleOptionSelect} />
+						<DropDownSelect options={options} onOptionSelect={handleOptionSelect} formField="type" setFormData={setFormData} />
 					</div>
 				)}
 
@@ -171,7 +173,7 @@ function MultiStepForm() {
 				{/* STEP 7: AGE */}
 				{step === 7 && (
 					<div className="mb-4">
-						<label>How oll</label>
+						<label>How old</label>
 						<input
 							value={formData.age}
 							onChange={(e: any) => setFormData((p) => ({ ...p, age: e.target.value }))}
@@ -206,6 +208,7 @@ function MultiStepForm() {
 					)}
 					{step < 8 && (
 						<button
+							className="next-button"
 							onClick={(e: any) => {
 								e.preventDefault();
 								handleNext();

@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
+import { ItemFormData } from "../Form";
 import "./DropDownSelect.css";
 
 export interface Option {
@@ -8,15 +9,23 @@ export interface Option {
 
 interface DropdownProps {
 	options: Option[];
+	onOptionSelect: (option: Option) => void;
+	setFormData: Dispatch<SetStateAction<ItemFormData>>;
+	formField: string;
 }
 
-function DropDownSelect({ options, onOptionSelect }: any) {
+function DropDownSelect({ options, onOptionSelect, setFormData, formField }: DropdownProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selected, setSelected] = useState(options[0]);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const toggleDropdown = () => {
 		setIsOpen((prev) => !prev);
+	};
+	console.log({ formField });
+	const updateForm = (key: string, newValue: string) => {
+		console.log(key, newValue);
+		setFormData((prev: any) => ({ ...prev, [key]: newValue }));
 	};
 
 	const handleOptionClick = (option: Option) => {
@@ -26,6 +35,7 @@ function DropDownSelect({ options, onOptionSelect }: any) {
 		if (onOptionSelect) {
 			onOptionSelect(option);
 		}
+		updateForm(formField, selected.value);
 	};
 
 	// Close the dropdown when clicking outside
