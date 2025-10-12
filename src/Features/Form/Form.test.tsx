@@ -1,5 +1,12 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import ClosetInventoryApp from './Form.tsx';
+import { render, screen, fireEvent } from "@testing-library/react";
+import ClosetInventoryApp from "./Form.tsx";
+
+describe("Form Component", () => {
+	it("should have a multistep form with 8 steps", () => {});
+  it("should have back and next buttons at bottom of form for navigation", () => {})
+  it('Returns to carousel after adding an item', () => {})
+
+});
 
 /*
   ========================
@@ -71,42 +78,42 @@ import ClosetInventoryApp from './Form.tsx';
     NEW TESTS FOR MULTI-STEP LOGIC
     ================================
   */
-    test('Multi-step color selection is styled properly', () => {
-        render(<ClosetInventoryApp />);
-        fireEvent.click(screen.getByText('Add Item'));
-    
-        // Step 1: Type => skip
-        fireEvent.click(screen.getByText('Next'));
-    
-        // Step 2: Color
-        // Check 'red' => background red, text white
-        const redLabel = screen.getByLabelText('red').closest('label');
-        expect(redLabel).toHaveStyle('background-color: red');
-        // Select 'red'
-        fireEvent.click(screen.getByLabelText('red'));
-        expect(screen.getByLabelText('red')).toBeChecked();
-      });
-    
-      test('User can go back steps', () => {
-        render(<ClosetInventoryApp />);
-        fireEvent.click(screen.getByText('Add Item'));
-        // Step 1 => Next => Step 2 => Next => Step 3 => ...
-        fireEvent.click(screen.getByText('Next'));
-        fireEvent.click(screen.getByText('Next'));
-        // Now we are on Step 3
-        expect(screen.queryByText('Size')).toBeInTheDocument();
-    
-        // Go back => Step 2
-        fireEvent.click(screen.getByText('Back'));
-        expect(screen.queryByText('Color')).toBeInTheDocument();
-      });
-        // Fill out fields
-        fireEvent.change(screen.getByPlaceholderText('e.g. Red, Blue...'), { target: { value: 'Red' } });
-        fireEvent.change(screen.getByPlaceholderText('e.g. S, M, L...'), { target: { value: 'M' } });
-        // ... fill out other fields as needed
-    
-        // Submit the form
-        fireEvent.click(screen.getByText('Add Item'));
-    
-        // Expect an item added message
-        expect(screen.queryByText('Item added successfully!')).toBeInTheDocument();
+test("Multi-step color selection is styled properly", () => {
+	render(<ClosetInventoryApp />);
+	fireEvent.click(screen.getByText("Add Item"));
+
+	// Step 1: Type => skip
+	fireEvent.click(screen.getByText("Next"));
+
+	// Step 2: Color
+	// Check 'red' => background red, text white
+	const redLabel = screen.getByLabelText("red").closest("label");
+	expect(redLabel).toHaveStyle("background-color: red");
+	// Select 'red'
+	fireEvent.click(screen.getByLabelText("red"));
+	expect(screen.getByLabelText("red")).toBeChecked();
+});
+
+test("User can go back steps", () => {
+	render(<ClosetInventoryApp />);
+	fireEvent.click(screen.getByText("Add Item"));
+	// Step 1 => Next => Step 2 => Next => Step 3 => ...
+	fireEvent.click(screen.getByText("Next"));
+	fireEvent.click(screen.getByText("Next"));
+	// Now we are on Step 3
+	expect(screen.queryByText("Size")).toBeInTheDocument();
+
+	// Go back => Step 2
+	fireEvent.click(screen.getByText("Back"));
+	expect(screen.queryByText("Color")).toBeInTheDocument();
+});
+// Fill out fields
+fireEvent.change(screen.getByPlaceholderText("e.g. Red, Blue..."), { target: { value: "Red" } });
+fireEvent.change(screen.getByPlaceholderText("e.g. S, M, L..."), { target: { value: "M" } });
+// ... fill out other fields as needed
+
+// Submit the form
+fireEvent.click(screen.getByText("Add Item"));
+
+// Expect an item added message
+expect(screen.queryByText("Item added successfully!")).toBeInTheDocument();

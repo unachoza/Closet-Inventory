@@ -2,43 +2,13 @@ import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
-// import { Card, CardContent } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Label } from "@/components/ui/label";
-// import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { ItemFormData, Option } from "../../utils/types";
+import { colorOptions, sizeOptions, categoryOptions } from "../../utils/constants";
 
 import "./Form.css";
 
-interface Option {
-	value: string;
-	label: string;
-}
-
-const options: Option[] = [
-	{ value: "tops", label: "Tops" },
-	{ value: "bottoms", label: "Bottoms" },
-	{ value: "dresses", label: "Dresses" },
-	{ value: "coats", label: "Coats" },
-	{ value: "sweaters", label: "Sweaters" },
-	{ value: "lingerie", label: "Lingerie" },
-	{ value: "socks", label: "Socks" },
-	{ value: "underwear", label: "Underwear" },
-];
-
 // MULTI-STEP FORM
 // We store 8 fields in "formData" and show them one at a time in Step1..Step8.
-
-export interface ItemFormData {
-	type: string;
-	color: string; // single color
-	size: string; // single size
-	brand: string;
-	material: string;
-	occasion: string;
-	age: string;
-	care: string;
-}
 
 const item = {
 	type: "",
@@ -50,9 +20,11 @@ const item = {
 	age: "",
 	care: "",
 };
+
 // TODO put back from AI
 //removing OnComplete, currently does nothing, passes data no where
 // { onComplete}: { onComplete: (data: FormData) => void}
+
 function MultiStepForm() {
 	// Manage step-based progression
 	const [step, setStep] = useState(1);
@@ -65,10 +37,6 @@ function MultiStepForm() {
 		setSelectedOption(option);
 		// You can add any additional handling for form submission or state updates here
 	};
-
-	// For coloring checkboxes
-	const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green"];
-	const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
 
 	// Helper: single selection for color
 	const toggleColor = (value: string) => {
@@ -114,7 +82,6 @@ function MultiStepForm() {
 			<motion.form
 				layout
 				onSubmit={handleSubmit}
-				className="w-full max-w-lg mt-6 bg-blue-100 p-6 rounded-2xl"
 				initial={{ opacity: 0, scale: 0.8 }}
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
@@ -124,19 +91,28 @@ function MultiStepForm() {
 					<div className="field-label">
 						<label>Clothing Category</label>
 
-						<DropDownSelect options={options} onOptionSelect={handleOptionSelect} formField="type" setFormData={setFormData} />
+						<DropDownSelect
+							options={categoryOptions}
+							onOptionSelect={handleOptionSelect}
+							formField="type"
+							setFormData={setFormData}
+						/>
 					</div>
 				)}
 
 				{/* STEP 2: COLOR */}
-				{step === 2 && <CheckboxCollection label="color" detailOptions={colorOptions} onToggleDetail={toggleColor} formData={formData} />}
+				{step === 2 && (
+					<CheckboxCollection label="color" detailOptions={colorOptions} onToggleDetail={toggleColor} formData={formData} />
+				)}
 
 				{/* STEP 3: SIZE */}
-				{step === 3 && <CheckboxCollection label="size" detailOptions={sizeOptions} onToggleDetail={toggleSize} formData={formData} />}
+				{step === 3 && (
+					<CheckboxCollection label="size" detailOptions={sizeOptions} onToggleDetail={toggleSize} formData={formData} />
+				)}
 
 				{/* STEP 4: BRAND */}
 				{step === 4 && (
-					<div className="mb-4">
+					<div className="form-step">
 						<label>Brand</label>
 						<input
 							value={formData.brand}
@@ -148,8 +124,8 @@ function MultiStepForm() {
 
 				{/* STEP 5: MATERIAL */}
 				{step === 5 && (
-					<div className="mb-4">
-						<label>Materill</label>
+					<div className="form-step">
+						<label>Material</label>
 						<input
 							value={formData.material}
 							onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
@@ -160,8 +136,8 @@ function MultiStepForm() {
 
 				{/* STEP 6: OCCASION */}
 				{step === 6 && (
-					<div className="mb-4">
-						<label>Occasiln</label>
+					<div className="form-step">
+						<label>Occasion</label>
 						<input
 							value={formData.occasion}
 							onChange={(e: any) => setFormData((p) => ({ ...p, occasion: e.target.value }))}
@@ -172,7 +148,7 @@ function MultiStepForm() {
 
 				{/* STEP 7: AGE */}
 				{step === 7 && (
-					<div className="mb-4">
+					<div className="form-step">
 						<label>How old</label>
 						<input
 							value={formData.age}
@@ -184,7 +160,7 @@ function MultiStepForm() {
 
 				{/* STEP 8: CARE */}
 				{step === 8 && (
-					<div className="mb-4">
+					<div className="form-step">
 						<label>Care Ilstructions</label>
 						<input
 							value={formData.care}
@@ -198,6 +174,7 @@ function MultiStepForm() {
 				<div className="form-controls">
 					{step > 1 && (
 						<button
+							className="back-button"
 							onClick={(e: any) => {
 								e.preventDefault();
 								handleBack();
@@ -218,10 +195,7 @@ function MultiStepForm() {
 						</button>
 					)}
 					{step === 8 && (
-						<button type="submit" className="bg-green-500 hover:bg-green-600"
-						onClick={handleSubmit}
-						
-						>
+						<button type="submit" className="submit" onClick={handleSubmit}>
 							Submit
 						</button>
 					)}

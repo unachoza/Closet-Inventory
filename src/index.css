@@ -12,9 +12,13 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	background-image: url("https://sothebys-md.brightspotcdn.com/dims4/default/d74825c/2147483647/strip/true/crop/2000x1588+0+0/resize/800x635!/quality/90/?url=http%3A%2F%2Fsothebys-brightspot.s3.amazonaws.com%2Fmedia-desk%2Fwebnative%2Fimages%2Fbd%2F3a%2Fc8ce158041feac4dc32cbcbbb0d8%2Fn11753-cl3n7-t2-02-a.jpg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+*{
+	box-sizing: border-box;
 }
 
 a {
@@ -35,15 +39,18 @@ body {
 }
 
 h1 {
-	font-size: 3.2em;
+	font-size: 3em;
 	line-height: 1.1;
+	-webkit-text-stroke: 2px black;
+	paint-order: stroke;
+
 }
 
 button {
 	border-radius: 8px;
 	border: 1px solid transparent;
 	padding: 0.6em 1.2em;
-  margin: 10px;
+	margin: 10px;
 	font-size: 1em;
 	font-weight: 500;
 	font-family: inherit;
@@ -53,22 +60,22 @@ button {
 }
 
 button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
-  transition: all 0.2s;
+	transform: translateY(-3px);
+	box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+	transition: all 0.2s;
 }
 button::after {
-  transform: scaleX(1.4) scaleY(1.6);
-  opacity: 0;
-  transition: all 0.2s;
+	transform: scaleX(1.4) scaleY(1.6);
+	opacity: 0;
+	transition: all 0.2s;
 }
 
 button:active,
 button:focus {
-  outline: none;
-  transform: translateY(-1px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-  transition: all 0.2s;
+	outline: none;
+	transform: translateY(-1px);
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+	transition: all 0.2s;
 }
 button:hover {
 	border-color: #646cff;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ClosetInventory from "./Features/Carousel/Carousel2";
 import MultiStepForm from "./Features/Form/Form";
+import Header from "./Components/Header";
 import "./App.css";
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
 
 	return (
 		<div>
+			<Header />
 			{/* Controls */}
 			<div className="mt-4">
 				<button onClick={() => setView("form")}>Add Item</button>
