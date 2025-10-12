@@ -1,0 +1,31 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, it, expect, beforeEach, Mock } from "vitest";
+import TextInput from "./TextInput.tsx";
+import { InputProps } from "../../../utils/types";
+
+describe("TextInput Component", () => {
+	beforeEach(() => {
+		vi.spyOn(window, "alert");
+		const handleUpdatesMock: Mock<InputProps["handleChange"]> = vi.fn();
+		render(
+			<>
+				<TextInput
+					key={1}
+					type="textarea"
+					name="messageExample"
+					label="messageExample"
+					value=""
+					errorMessage="oops there was an error"
+					placeholder="placeholder text"
+					handleChange={handleUpdatesMock}
+				/>
+				<button type="submit">Submit</button>
+			</>
+		);
+	});
+	it("should have placeholder text", () => {});
+	it("should recieve user input", async () => {});
+	it("should add a new pill description if it doesn't already exist");
+	it("should allow users to remove pill with x", () => {});
+});

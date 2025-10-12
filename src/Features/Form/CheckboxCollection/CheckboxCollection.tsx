@@ -11,7 +11,7 @@ const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: 
 							<input
 								type="checkbox"
 								checked={formData[label] === detail}
-								onChange={() => onToggleDetail(detail)}
+								onChange={() => onToggleDetail(detail, label)}
 								className="hidden"
 								aria-label={detail}
 							/>

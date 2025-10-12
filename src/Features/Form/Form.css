@@ -9,7 +9,7 @@ form {
 	padding: 1.5rem;
 	overflow: hidden; /* important for max-height animations */
 	backdrop-filter: blur(5px);
-	background: #0000000d;
+	background: var(--background-form);
 	position: relative;
 	height: clamp(400px, 50vh, 900px);
 	border-radius: 16px;
@@ -20,6 +20,8 @@ form {
 
 .form-step{
 	height: clamp(400px, 50vh, 900px);
+	display: flex;
+	flex-direction: column;
 }
 
 

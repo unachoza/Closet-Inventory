@@ -1,0 +1,103 @@
+
+:root{
+      --text-color: black;
+      --Black: #000000;
+      --White: #FFFFFF;
+
+      --Focus: #27AE60;
+      --Background-color: #808000b3;
+
+
+      /* Spacing */
+      --spacing-50: .25rem;
+      --spacing-100: .5rem;
+      --spacing-200: 1rem;
+      --spacing-300: 1.5rem;
+      --spacing-400: 2rem;
+      --spacing-500: 2.5rem;
+      --spacing-600: 3rem;
+      --spacing-700: 3.5rem;
+      --spacing-800: 4rem;
+      --spacing-900: 4.5rem;
+      --spacing-1000: 5rem;
+      --spacing-1100: 5.25rem;
+}
+
+label {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      color: var(--White);
+      font: inherit;
+      letter-spacing: 0.125rem;
+      text-transform: uppercase;
+      gap: var(--spacing-100);
+}
+
+input {
+      box-sizing: border-box;
+      color: black;
+      background: var(--white);
+      height: 2.8125rem;
+      width: 100%;
+      padding: var(--spacing-100) var(--spacing-200);
+      border: 0.0625rem solid var(--White);
+      border-radius: 0.5rem;
+      transition: all .4s ease; 
+}
+
+input:hover{
+      cursor: pointer;
+}
+
+input[type="text"] {
+      color: var(--White);
+      font: inherit;
+      line-height: 130%;
+      font-feature-settings: 'liga' off, 'clig' off;
+      background: var(--white);
+      box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.875)
+}
+
+input::placeholder {
+      color: var(--White);
+      opacity: .95;
+      font: inherit;
+}
+
+input:focus {
+      outline: none;
+      border-radius: 0.5rem;
+      border: 0.0625rem solid olive;
+      background-color: var(--Background-color);
+}
+
+input:not(:focus):not(:placeholder-shown):invalid {
+      border-radius: 0.5rem;
+      border: 0.0625rem solid var(--input-errors);
+      background: var(--white);
+}
+
+input:user-invalid{
+      border: 0.0625rem solid var(--input-errors);
+      border-radius: 0.5rem;
+      background: var(--white);
+}
+
+.error-message {
+      color: var(--input-errors);
+      font: inherit;
+      line-height: 125%;
+      height: 0;
+      overflow: hidden;
+      transition: all .4s ease; 
+}
+
+input:user-invalid ~ .error-message {
+      height: .93rem;
+}
+
+#expDateM-error.error-message {
+      width: 200%;
+      text-align: left;
+}

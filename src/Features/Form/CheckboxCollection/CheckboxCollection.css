@@ -1,5 +1,12 @@
+:root {
+  --Checked-Green: #27AE60;
+  --Hover-Green: #35E07D;
+}
+
+
 .form-step label {
   text-transform: uppercase;
+  color: var(--White);
 }
 
 .options-container {
@@ -30,19 +37,19 @@
   content: "";
   width: 1em;
   height: 1em;
-  border: solid black;
+  border: solid var(--Black);
   border-radius: .15em;
   margin-right: .5em;
 }
 
 .options-container label span:hover::before, 
 .options-container input[type='checkbox']:hover + label span::before {
-  background-color: #35E07D;
+  background-color: var(--Hover-Green);
 }
 
 
 label input[type='checkbox']:focus + span::before  {
-  box-shadow: 0 0 20px black;
+  box-shadow: 0 0 20px var(--Black);
 }
 
 label input[type='checkbox']:disabled + span::before ,
@@ -53,29 +60,16 @@ label input[type='checkbox']:disabled + span::before ,
 
 label input[type='checkbox']:checked + span::before  {
   content: '\002714';
-  background-color: #27AE60;
+  background-color: var(--Checked-Green);
   display: flex;
   justify-content: center;
   align-items: center;
-  color: white;
+  color: var(--White)
 }
 
 .options-container input[type='checkbox']:disabled + label span::before {
   background-color: #ccc;
   border-color: #999;
 }
-
-
-
-  
-/* When the checkbox is checked, style the span to match a "selected" state */
-/* .options-container label input[type="checkbox"]:checked + span {
-  background-color: #007bff; /* change this to your desired color 
-  color: #fff;
-  border-color: #007bff;
-  align-items: center;
-} 
-*/
-
 
 /* transition */

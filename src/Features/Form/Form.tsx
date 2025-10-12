@@ -2,8 +2,9 @@ import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
+import TextInput from "./TextInput/TextInput";
 import { ItemFormData, Option } from "../../utils/types";
-import { colorOptions, sizeOptions, categoryOptions } from "../../utils/constants";
+import { colorOptions, sizeOptions, categoryOptions, clothesAges } from "../../utils/constants";
 
 import "./Form.css";
 
@@ -38,25 +39,10 @@ function MultiStepForm() {
 		// You can add any additional handling for form submission or state updates here
 	};
 
-	// Helper: single selection for color
-	const toggleColor = (value: string) => {
-		setFormData((prev) => {
-			if (prev.color === value) {
-				// uncheck same color
-				return { ...prev, color: "" };
-			}
-			// check new color
-			return { ...prev, color: value };
-		});
-	};
 
-	// Helper: single selection for size
-	const toggleSize = (value: string) => {
+	const toggleValue = (value: string, label: string) => {
 		setFormData((prev) => {
-			if (prev.size === value) {
-				return { ...prev, size: "" };
-			}
-			return { ...prev, size: value };
+			return { ...prev, [label]: value };
 		});
 	};
 
@@ -102,66 +88,62 @@ function MultiStepForm() {
 
 				{/* STEP 2: COLOR */}
 				{step === 2 && (
-					<CheckboxCollection label="color" detailOptions={colorOptions} onToggleDetail={toggleColor} formData={formData} />
+					<CheckboxCollection label="color" detailOptions={colorOptions} onToggleDetail={toggleValue} formData={formData} />
 				)}
 
 				{/* STEP 3: SIZE */}
 				{step === 3 && (
-					<CheckboxCollection label="size" detailOptions={sizeOptions} onToggleDetail={toggleSize} formData={formData} />
+					<CheckboxCollection label="size" detailOptions={sizeOptions} onToggleDetail={toggleValue} formData={formData} />
 				)}
 
 				{/* STEP 4: BRAND */}
 				{step === 4 && (
-					<div className="form-step">
-						<label>Brand</label>
-						<input
-							value={formData.brand}
-							onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
-							placeholder="e.g. Gucci, Zara..."
-						/>
-					</div>
+					<TextInput
+						label="brand"
+						name="brand"
+						type="text"
+						className="string"
+						value={formData.brand}
+						handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
+						placeholder="e.g. Gucci, Zara..."
+					/>
 				)}
 
 				{/* STEP 5: MATERIAL */}
 				{step === 5 && (
-					<div className="form-step">
-						<label>Material</label>
-						<input
-							value={formData.material}
-							onChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
-							placeholder="e.g. Cotton, Silk..."
-						/>
-					</div>
+					<TextInput
+						label="material"
+						name="material"
+						type="text"
+						className="string"
+						value={formData.material}
+						handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
+						placeholder="e.g. Cotton, Silk..."
+					/>
 				)}
 
 				{/* STEP 6: OCCASION */}
 				{step === 6 && (
-					<div className="form-step">
-						<label>Occasion</label>
-						<input
-							value={formData.occasion}
-							onChange={(e: any) => setFormData((p) => ({ ...p, occasion: e.target.value }))}
-							placeholder="e.g. Casual, Formal..."
-						/>
-					</div>
+					<TextInput
+						label="occasion"
+						name="occasion"
+						type="text"
+						className="string"
+						value={formData.occasion}
+						handleChange={(e: any) => setFormData((p) => ({ ...p, occasion: e.target.value }))}
+						placeholder="e.g. Casual, Formal..."
+					/>
 				)}
 
 				{/* STEP 7: AGE */}
 				{step === 7 && (
-					<div className="form-step">
-						<label>How old</label>
-						<input
-							value={formData.age}
-							onChange={(e: any) => setFormData((p) => ({ ...p, age: e.target.value }))}
-							placeholder="e.g. 2 years"
-						/>
-					</div>
+					<CheckboxCollection label="age" detailOptions={clothesAges} onToggleDetail={toggleValue} formData={formData} />
 				)}
 
 				{/* STEP 8: CARE */}
 				{step === 8 && (
 					<div className="form-step">
-						<label>Care Ilstructions</label>
+						<label>Care Instructions</label>
 						<input
 							value={formData.care}
 							onChange={(e: any) => setFormData((p) => ({ ...p, care: e.target.value }))}
