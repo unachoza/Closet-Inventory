@@ -218,7 +218,10 @@ function MultiStepForm() {
 						</button>
 					)}
 					{step === 8 && (
-						<button type="submit" className="bg-green-500 hover:bg-green-600">
+						<button type="submit" className="bg-green-500 hover:bg-green-600"
+						onClick={handleSubmit}
+						
+						>
 							Submit
 						</button>
 					)}
