@@ -24,16 +24,6 @@ form {
 	flex-direction: column;
 }
 
-
-
-.checkbox-label {
-	display: flex; /* flex */
-	align-items: center; /* items-center */
-	gap: 0.25rem; /* space-x-1 (if using the gap property) */
-	padding: 0.25rem 0.5rem; /* py-1 (vertical 0.25rem) and px-2 (horizontal 0.5rem) */
-	border-radius: 0.25rem;
-}
-
 .field-label {
 	text-align: left;
 	margin-bottom: 1rem;

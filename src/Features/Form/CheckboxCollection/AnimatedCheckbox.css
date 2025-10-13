@@ -1,0 +1,72 @@
+:root {
+      --Check-Blue: #2563eb
+}
+
+label.animated-checkbox {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-100);
+      cursor: pointer;
+      user-select: none;
+}
+
+.checkbox-root {
+      width: 2rem;
+      height: 2rem;
+      border-radius: .15em;
+      border: solid var(--Black);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: inherit;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.checkbox-root[data-state="checked"] {
+      background-color: var(--Check-Blue);
+}
+
+.checkbox-inner {
+      width: 1rem;
+      height: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+
+.checkbox-svg {
+      width: 30px;
+      height: 30px;
+      color: var(--White);
+}
+
+.checkbox-label {
+      display: flex;
+      align-items: center;
+      font-size: 26px;
+      border-radius: 0.25rem;
+      -webkit-text-stroke: 2px black;
+      paint-order: stroke;
+}
+
+.checkbox-root:hover {
+      border-color: var(--Check-Blue); 
+      box-shadow: 2px 2px 20px var(--Black);
+}
+ 
+button .checkbox-label:hover + .checkbox-root{
+      box-shadow: 10px 10px 20px var(--Check-Blue)
+
+}
+label > button:active,
+label > button:focus {
+      outline: 10px auto var(--background-green);
+}
+
+label > button:hover{
+      transform:translateY(0px)
+}
+
+label > button {
+      margin: .25rem;
+}

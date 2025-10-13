@@ -21,6 +21,8 @@
 
 *{
 	box-sizing: border-box;
+	-webkit-text-stroke: 2px black;
+	paint-order: stroke;
 }
 
 a {
@@ -82,9 +84,12 @@ button:focus {
 button:hover {
 	border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
-	outline: 4px auto -webkit-focus-ring-color;
+	outline: 10px auto -webkit-focus-ring-color;
+	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+
 }
 
 @media (prefers-color-scheme: light) {

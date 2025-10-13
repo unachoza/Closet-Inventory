@@ -39,7 +39,6 @@ function MultiStepForm() {
 		// You can add any additional handling for form submission or state updates here
 	};
 
-
 	const toggleValue = (value: string, label: string) => {
 		setFormData((prev) => {
 			return { ...prev, [label]: value };
@@ -98,15 +97,17 @@ function MultiStepForm() {
 
 				{/* STEP 4: BRAND */}
 				{step === 4 && (
-					<TextInput
-						label="brand"
-						name="brand"
-						type="text"
-						className="string"
-						value={formData.brand}
-						handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
-						placeholder="e.g. Gucci, Zara..."
-					/>
+					<div className="form-step">
+						<TextInput
+							label="brand"
+							name="brand"
+							type="text"
+							className="string"
+							value={formData.brand}
+							handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
+							placeholder="e.g. Gucci, Zara..."
+						/>
+					</div>
 				)}
 
 				{/* STEP 5: MATERIAL */}
@@ -188,6 +189,11 @@ function MultiStepForm() {
 }
 
 export default MultiStepForm;
+
+// https://examples.motion.dev/react/modal
+// https://examples.motion.dev/react/warp-overlay
+// https://examples.motion.dev/react/shared-layout-animation
+// https://examples.motion.dev/react/exit-animation
 
 // --------------------------------------------------------------------
 // MAIN CLOSET INVENTORY APP

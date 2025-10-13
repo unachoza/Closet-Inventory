@@ -1,4 +1,4 @@
-:root {
+ /* :root {
   --Checked-Green: #27AE60;
   --Hover-Green: #35E07D;
 }
@@ -31,9 +31,9 @@
   align-items: center;
   text-transform:none
 }
-  
+   */
 /* Style the span to look like a custom checkbox or button */
-.options-container label span::before {
+/* .options-container label span::before {
   content: "";
   width: 1em;
   height: 1em;
@@ -70,6 +70,6 @@ label input[type='checkbox']:checked + span::before  {
 .options-container input[type='checkbox']:disabled + label span::before {
   background-color: #ccc;
   border-color: #999;
-}
+} */
 
-/* transition */
+/* transition  */

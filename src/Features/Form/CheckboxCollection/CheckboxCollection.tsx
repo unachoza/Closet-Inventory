@@ -1,4 +1,5 @@
 import "./CheckboxCollection.css";
+import AnimatedCheckbox from "./RadixCheckbox";
 
 const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: any) => {
 	return (
@@ -7,16 +8,12 @@ const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: 
 			<div className="options-container">
 				{detailOptions.map((detail: any) => {
 					return (
-						<label key={detail} className="checkbox-label">
-							<input
-								type="checkbox"
-								checked={formData[label] === detail}
-								onChange={() => onToggleDetail(detail, label)}
-								className="hidden"
-								aria-label={detail}
-							/>
-							<span>{detail}</span>
-						</label>
+						<AnimatedCheckbox
+							key={detail}
+							label={detail}
+							checked={formData[label] === detail}
+							onCheckedChange={() => onToggleDetail(detail, label)}
+						/>
 					);
 				})}
 			</div>
@@ -25,3 +22,6 @@ const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: 
 };
 
 export default CheckboxCollection;
+
+// https://examples.motion.dev/react/radix-checkbox
+// https://examples.motion.dev/react/use-transform
