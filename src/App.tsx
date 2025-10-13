@@ -2,10 +2,15 @@ import { useState } from "react";
 import ClosetInventory from "./Features/Carousel/Carousel2";
 import MultiStepForm from "./Features/Form/Form";
 import Header from "./Components/Header";
+import ItemsOverview from "./Components/ItemsOverview";
+import Closet from "./Features/Closet/Closet";
+import { CategoryType, ViewType } from "./utils/types";
+import { MY_CLOSET_DATA } from "./utils/constants";
 import "./App.css";
 
 function App() {
-	const [view, setView] = useState<"carousel" | "form" | "overview">("carousel");
+	const [view, setView] = useState<ViewType>("carousel");
+	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 
 	return (
 		<div>
@@ -19,23 +24,11 @@ function App() {
 			</div>
 			{view === "form" && <MultiStepForm />}
 			{view === "carousel" && <ClosetInventory />}
+			{view === "carousel" && (
+				<ItemsOverview clothingItems={MY_CLOSET_DATA} category={selectedCategory} onBack={() => setView("overview")} />
+			)}
 		</div>
 	);
 }
 
 export default App;
-
-// {clothingItems.map((item: any) => (
-// 						<Card key={item.id} className="bg-black/30 text-white">
-// 							<CardContent>
-// 								<p>Type: {item.type}</p>
-// 								<p>Color: {item.color}</p>
-// 								<p>Size: {item.size}</p>
-// 								<p>Brand: {item.brand}</p>
-// 								<p>Material: {item.material}</p>
-// 								<p>Occasion: {item.occasion}</p>
-// 								<p>Age: {item.age}</p>
-// 								<p>Care Instructions: {item.care}</p>
-// 							</CardContent>
-// 						</Card>
-// 					))}

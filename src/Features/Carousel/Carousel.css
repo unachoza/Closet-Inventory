@@ -79,7 +79,7 @@
 	align-items: center; /* items-center */
 	justify-content: center; /* justify-center */
 	min-width: 100px; /* min-w-[100px] */
-	background-color: rgba(0, 0, 0, 0.3); /* bg-black/30 */
+	background-color: rgba(0, 0, 0, 0.53); /* bg-black/30 */
 	color: white; /* text-white */
 	padding: 1rem; /* p-4 */
 	border-radius: 1rem; /* rounded-2xl */

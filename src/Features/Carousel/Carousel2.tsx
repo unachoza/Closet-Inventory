@@ -41,7 +41,7 @@ function ClosetInventory() {
 
 	return (
 		<motion.div
-			className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-purple-900 via-green-900 to-brown-700 p-4"
+			className=""
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 0.8 }}

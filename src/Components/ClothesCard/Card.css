@@ -1,0 +1,101 @@
+.card {
+      width: 320px;
+      height: 331px;
+      perspective: 1000px;
+      cursor: pointer;
+      color: #fff;
+      transition: transform 0.2s ease;
+      box-shadow: 4px 4px 12px 4px #94be40;
+}
+
+.card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+
+.card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transform-style: preserve-3d;
+}
+
+.card.flipped .card-inner {
+      transform: rotateY(180deg);
+}
+
+/* Front + Back Shared Styles */
+.card-front,
+.card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      backface-visibility: hidden;
+}
+
+/* Front */
+.card-front {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #eaeaea;
+}
+
+.card-image img {
+      width: 100%;
+      height: 75%;
+      object-fit: cover;
+}
+
+.card-info {
+      padding: 1rem;
+      background: #fff;
+      border-top: 1px solid #ddd;
+}
+
+.card-category {
+      font-size: 0.9rem;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+}
+
+.card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111;
+      margin: 0;
+}
+
+/* Back */
+.card-back {
+      /* blue gradient */
+      /* background: #78acbf;
+      background: linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%); */
+
+      /* green gradiant */
+      background: #848a79;
+      background: linear-gradient(120deg, rgba(132, 138, 121, 1) 0%, rgba(112, 122, 92, 1) 64%, rgba(99, 130, 36, 1) 94%);
+      color: #222;
+      padding: 1.25rem;
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      font-size: 0.95rem;
+      text-align: left;
+}
+
+.card-back p {
+      margin: 0;
+}
+
+.card-back strong {
+      color: #000;
+}
