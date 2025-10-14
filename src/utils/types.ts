@@ -1,4 +1,4 @@
-import { SetStateAction } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 export type ClothingItem = {
 	id: string | number;
@@ -30,7 +30,7 @@ export interface ItemFormData {
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "socks" | "underwear" | null;
 
-export type ViewType = "carousel" | "form" | "overview"
+export type ViewType = "carousel" | "form" | "overview";
 
 export interface Option {
 	value: string;
@@ -48,4 +48,8 @@ export interface InputProps {
 	errorMessage?: string;
 	placeholder: string;
 	handleChange: SetStateAction<string | any>;
+}
+
+export interface CarouselProps {
+	setCategory: Dispatch<SetStateAction<CategoryType>>;
 }

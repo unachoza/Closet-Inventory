@@ -1,0 +1,17 @@
+/* === Layout Container === */
+.items-overview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 80rem;
+      margin: 0 auto;
+      padding: 1rem;
+}
+
+/* === Grid === */
+.items-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+}

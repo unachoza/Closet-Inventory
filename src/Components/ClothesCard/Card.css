@@ -6,6 +6,7 @@
       color: #fff;
       transition: transform 0.2s ease;
       box-shadow: 4px 4px 12px 4px #94be40;
+      border-radius: 24px;
 }
 
 .card:hover {
@@ -44,13 +45,15 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background: #eaeaea;
+      background: #2a302d;
+      border-radius: 10px;
+      padding: 1rem;
 }
 
 .card-image img {
       width: 100%;
       height: 75%;
-      object-fit: cover;
+      border-radius: 10px;
 }
 
 .card-info {
@@ -71,6 +74,7 @@
       font-weight: 600;
       color: #111;
       margin: 0;
+      text-align: center;
 }
 
 /* Back */

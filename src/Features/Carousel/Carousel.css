@@ -1,14 +1,8 @@
 .carousel-container {
-	position: relative; /* relative */
-	width: 100%; /* w-full */
-	max-width: 28rem; /* max-w-md */
-	padding: 1rem; /* p-4 */
-	display: flex; /* flex */
-	align-items: center; /* items-center */
+	display: flex;
 	justify-content: center;
-	height: 200px;
-	justify-content: space-between;
 }
+
 .carousel-card {
 	height: 100px;
 	width: 100px;
@@ -61,6 +55,10 @@
 	/* overflow-hidden */
 	width: 250px;
 }
+/* 
+.carousel-container{
+	text-align: center;
+} */
 
 .buttons-with-group {
 	position: relative; /* relative */
@@ -73,7 +71,7 @@
 	width: 800px;
 }
 .clothes-card {
-    border: solid black;
+	border: solid black;
 	display: flex; /* flex */
 	flex-direction: column; /* flex-col */
 	align-items: center; /* items-center */

@@ -3,20 +3,32 @@
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  width: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* === Button === */
+.back-button {
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.5rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.2s ease;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+.back-button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+.back-button:active {
+  transform: translateY(1px);
 }
+
 
 @keyframes logo-spin {
   from {

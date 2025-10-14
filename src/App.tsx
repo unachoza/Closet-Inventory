@@ -1,17 +1,15 @@
 import { useState } from "react";
-import ClosetInventory from "./Features/Carousel/Carousel2";
+import Carousel from "./Features/Carousel/Carousel2";
 import MultiStepForm from "./Features/Form/Form";
 import Header from "./Components/Header";
-import ItemsOverview from "./Components/ItemsOverview";
 import Closet from "./Features/Closet/Closet";
 import { CategoryType, ViewType } from "./utils/types";
-import { MY_CLOSET_DATA } from "./utils/constants";
 import "./App.css";
 
 function App() {
 	const [view, setView] = useState<ViewType>("carousel");
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
-
+	console.log({ selectedCategory });
 	return (
 		<div>
 			<Header />
@@ -23,10 +21,11 @@ function App() {
 				</button>
 			</div>
 			{view === "form" && <MultiStepForm />}
-			{view === "carousel" && <ClosetInventory />}
-			{view === "carousel" && (
-				<ItemsOverview clothingItems={MY_CLOSET_DATA} category={selectedCategory} onBack={() => setView("overview")} />
-			)}
+			{view === "carousel" && <Carousel setCategory={setSelectedCategory} />}
+			{view === "carousel" && <Closet selectedCategory={selectedCategory} />}
+			<button className="back-button" onClick={() => setView("overview")}>
+				Back to Carousel
+			</button>
 		</div>
 	);
 }
