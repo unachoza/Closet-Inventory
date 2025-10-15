@@ -6,17 +6,20 @@ import TextInput from "./TextInput/TextInput";
 import { ItemFormData, Option, ViewType } from "../../utils/types";
 import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem } from "../../utils/constants";
 import { useLocalStorageCloset } from "../../hooks/useLocalStorageCloset";
+import { useLocalStorage } from "../../hooks/useLocal";
 
 import "./Form.css";
 
 // MULTI-STEP FORM
 // We store 8 fields in "formData" and show them one at a time in Step1..Step8.
 
-export interface FormProps {
+interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 }
 
 const MultiStepForm = ({ setView }: FormProps) => {
+	const [myCloset, setMyCloset] = useLocalStorage("my_closet", []);
+
 	// Manage step-based progression
 	const [step, setStep] = useState(1);
 	const [selectedOption, setSelectedOption] = useState<Option | null>(null);
@@ -44,12 +47,8 @@ const MultiStepForm = ({ setView }: FormProps) => {
 	};
 
 	const handleSubmit = (e: FormEvent) => {
-		e.preventDefault();
-		addItem({
-			...formData,
-			id: crypto.randomUUID(),
-		});
-		console.log("submited; ✅ Item added to localStorage:", { formData });
+		console.log("submitting");
+		setMyCloset()
 		setFormData(formItem);
 		setStep(1);
 		setView("overview");
@@ -284,35 +283,7 @@ export default MultiStepForm;
 //         )}
 
 //         {/* Carousel View */}
-//         {view === 'carousel' && (
-//           <div className="relative w-full max-w-xl p-4 flex items-center justify-center">
-//             <button onClick={handlePrev} className="absolute left-0">◀</button>
-//             <div className="mx-4 overflow-hidden">
-//               <AnimatePresence mode="wait">
-//                 <motion.div
-//                   key={currentIndex}
-//                   className="flex space-x-4"
-//                   initial={{ opacity: 0, x: 100 }}
-//                   animate={{ opacity: 1, x: 0 }}
-//                   exit={{ opacity: 0, x: -100 }}
-//                   transition={{ duration: 0.3 }}
-//                 >
-//                   {visibleItems.map((item, i) => (
-//                     <motion.div
-//                       key={item.label + i}
-//                       className="flex flex-col items-center justify-center min-w-[100px] bg-black/30 text-white p-4 rounded-2xl shadow-lg cursor-pointer"
-//                       whileHover={{ scale: 1.05 }}
-//                     >
-//                       <div className="text-3xl mb-2">{item.icon}</div>
-//                       <div className="text-lg">{item.label}</div>
-//                     </motion.div>
-//                   ))}
-//                 </motion.div>
-//               </AnimatePresence>
-//             </div>
-//             <button onClick={handleNext} className="absolute right-0">▶</button>
-//           </div>
-//         )}
+//
 //       </motion.div>
 
 //       {/* Navigation buttons */}

@@ -4,7 +4,7 @@ import "./TextInput.css";
 
 const Input = ({ id, label, name, className, value, errorMessage, placeholder, handleChange }: InputProps) => {
 	return (
-		<label>
+		<label className="text-input-label">
 			{label && <span className="label-text">{label}</span>}
 			<input
 				id={id}

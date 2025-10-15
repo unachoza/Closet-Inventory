@@ -1,5 +1,5 @@
 import "./Card.css";
-import { ClothingItem } from "../../utils/types";
+import { ClothingItemType } from "../../utils/types";
 import { useState } from "react";
 
 interface CardProps {

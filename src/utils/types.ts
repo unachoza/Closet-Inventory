@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 
-export type ClothingItem = {
+export type ClothingItemType = {
 	id: string | number;
 	imageURL: string;
 	name: string;

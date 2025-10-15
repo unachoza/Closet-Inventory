@@ -1,8 +1,7 @@
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import ClothingCard from "../../Components/ClothesCard/Card";
 import { useLocalStorageCloset } from "../../hooks/useLocalStorageCloset";
-import { MY_CLOSET_DATA } from "../../utils/constants";
-import { ClothingItem } from "../../utils/types";
+import { ClothingItemType } from "../../utils/types";
 import "./Closet.css";
 
 interface ClosetProps {
@@ -10,7 +9,7 @@ interface ClosetProps {
 }
 
 const Closet = ({ selectedCategory }: ClosetProps) => {
-	const { closet, addItem, getCloset, clearCloset } = useLocalStorageCloset();
+	const { closet, getCloset } = useLocalStorageCloset();
 	const containerVariants: Variants = {
 		hidden: { opacity: 0 },
 		show: {
@@ -42,8 +41,8 @@ const Closet = ({ selectedCategory }: ClosetProps) => {
 	}
 
 	const normalizedCategory = selectedCategory.trim().toLowerCase();
-
-	const filteredItems = closet.filter((item) => {
+	console.log({ closet });
+	const filteredItems = getCloset().filter((item) => {
 		const itemCategory = (item.category || "").toString().toLowerCase();
 		return itemCategory.includes(normalizedCategory) || normalizedCategory.includes(itemCategory);
 	});
@@ -60,7 +59,7 @@ const Closet = ({ selectedCategory }: ClosetProps) => {
 					exit="exit"
 				>
 					{filteredItems.length > 0 ? (
-						filteredItems.slice(0, 6).map((item: ClothingItem) => (
+						filteredItems.slice(0, 6).map((item: ClothingItemType) => (
 							<motion.div key={item.id} variants={cardVariants}>
 								<ClothingCard item={item} />
 							</motion.div>

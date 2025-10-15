@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { ClothingItem } from "../App";
+import { ClothingItemType } from "../utils/types";
 
 interface AddItemFormProps {
 	onSubmitItem: (newItem: ClothingItem) => void;
@@ -23,7 +23,7 @@ function AddItemForm({ onSubmitItem, onCancel }: AddItemFormProps) {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		const newItem: ClothingItem = {
+		const newItem: ClothingItemType = {
 			id: Date.now(),
 			type,
 			color,

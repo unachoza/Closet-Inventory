@@ -1,14 +1,22 @@
- /* :root {
+/* :root {
   --Checked-Green: #27AE60;
   --Hover-Green: #35E07D;
 }
+*/
 
-
-.form-step label {
+.form-step > label {
   text-transform: uppercase;
   color: var(--White);
+  -webkit-text-stroke: 2px black;
+  paint-order: stroke;
+  letter-spacing: 0.125rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  
 }
 
+
+/*
 .options-container {
   display: flex;
   flex-direction: column;

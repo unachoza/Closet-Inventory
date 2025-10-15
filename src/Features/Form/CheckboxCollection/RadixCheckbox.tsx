@@ -32,7 +32,6 @@ const AnimatedCheckbox = ({ label, checked = false, onCheckedChange, id }: Anima
 	}
 
 	const color = isColorName(label.toLowerCase()) ? label.toLowerCase() : "inherit";
-	console.log({ color });
 
 	return (
 		<label className="animated-checkbox">

@@ -1,4 +1,5 @@
 import { Option } from "./types.ts";
+import { ClothingItemType } from "./types.ts";
 
 export const formItem = {
 	id: "",
@@ -51,38 +52,21 @@ export const categoryOptions: Option[] = [
 	{ value: "underwear", label: "Underwear" },
 ];
 
-export type ClothingItem = {
-	id: string | number;
-	imageURL: string;
-	name: string;
-	category: string;
-	color: string;
-	size: string;
-	brand: string;
-	price?: string;
-	material: string;
-	occasion: string;
-	age: string;
-	care: string | string[];
-	onSale?: boolean;
-	notes?: string | string[];
-};
-
-const ClothingItemPossibilities = {
-	id: "id number",
-	imageURL: "url to image of clothing",
-	name: " describe the clothing",
-	category: categoryOptions,
-	color: colorOptions,
-	size: sizeOptions,
-	brand: brandExamples,
-	price: "USD",
-	material: materialExamples,
-	occasion: occasionExamples,
-	age: clothesAgesOptions,
-	care: careExamples,
-	notes: "anything",
-};
+// const ClothingItemPossibilities = {
+// 	id: "id number",
+// 	imageURL: "url to image of clothing",
+// 	name: " describe the clothing",
+// 	category: categoryOptions,
+// 	color: colorOptions,
+// 	size: sizeOptions,
+// 	brand: brandExamples,
+// 	price: "USD",
+// 	material: materialExamples,
+// 	occasion: occasionExamples,
+// 	age: clothesAgesOptions,
+// 	care: careExamples,
+// 	notes: "anything",
+// };
 
 export const MY_CLOSET_DATA = [
 	{
@@ -334,7 +318,7 @@ export const CLOSET_DATA = [
 	},
 ];
 
-export const CHAT_CLOSET_DATA: ClothingItem[] = [
+export const CHAT_CLOSET_DATA: ClothingItemType[] = [
 	// --- Tops (≥10) ---
 	{
 		id: 1,
