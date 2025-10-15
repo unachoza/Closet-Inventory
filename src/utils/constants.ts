@@ -2,7 +2,7 @@ import { Option } from "./types.ts";
 
 export const formItem = {
 	id: "",
-	type: "",
+	category: "",
 	color: "",
 	size: "",
 	brand: "",

@@ -5,7 +5,8 @@ import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextInput from "./TextInput/TextInput";
 import { ItemFormData, Option, ViewType } from "../../utils/types";
 import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem } from "../../utils/constants";
-import { useLocalStorageCloset } from "../../hooks/useLocalStorageCloset";
+// import { useLocalStorageCloset } from "../../hooks/useLocalStorageCloset";
+import { useLocalStorageCloset } from "../../hooks/useLocalTryAgain";
 
 import "./Form.css";
 
@@ -45,14 +46,20 @@ const MultiStepForm = ({ setView }: FormProps) => {
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
+
+		// ✅ Post form data to localStorage
 		addItem({
 			...formData,
-			id: crypto.randomUUID(),
+			id: crypto.randomUUID(), // optional: generate a new ID
+			onSale: false,
+			name: "",
 		});
-		console.log("submited; ✅ Item added to localStorage:", { formData });
+
+		console.log("✅ Item added to localStorage:", formData);
+
+		// Reset form & step if needed
 		setFormData(formItem);
 		setStep(1);
-		setView("overview");
 	};
 
 	return (
@@ -72,7 +79,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 						<DropDownSelect
 							options={categoryOptions}
 							onOptionSelect={handleOptionSelect}
-							formField="type"
+							formField="category"
 							setFormData={setFormData}
 						/>
 					</div>

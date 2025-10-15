@@ -19,7 +19,7 @@ export type ClothingItem = {
 
 export interface ItemFormData {
 	id: string;
-	type: string;
+	category: string;
 	color: string; // single color
 	size: string; // single size
 	brand: string;
@@ -29,7 +29,7 @@ export interface ItemFormData {
 	care: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "socks" | "underwear" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
 export type ViewType = "carousel" | "form" | "overview";
 
