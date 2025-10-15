@@ -18,6 +18,7 @@ export type ClothingItem = {
 };
 
 export interface ItemFormData {
+	id: string;
 	type: string;
 	color: string; // single color
 	size: string; // single size

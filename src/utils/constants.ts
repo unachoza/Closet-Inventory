@@ -1,5 +1,17 @@
 import { Option } from "./types.ts";
 
+export const formItem = {
+	id: "",
+	type: "",
+	color: "",
+	size: "",
+	brand: "",
+	material: "",
+	occasion: "",
+	age: "",
+	care: "",
+};
+
 export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green"];
 
 export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];

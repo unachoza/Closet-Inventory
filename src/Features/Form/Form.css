@@ -28,6 +28,11 @@ form {
 	text-align: left;
 	margin-bottom: 1rem;
 }
+
+.field-label label {
+	-webkit-text-stroke: 2px black;
+	paint-order: stroke;
+}
 .form-controls {
 	display: flex; /* flex */
 	justify-content: space-around; /* justify-between */

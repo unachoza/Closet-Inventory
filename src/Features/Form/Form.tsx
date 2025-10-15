@@ -1,42 +1,32 @@
-import { useState, FormEvent } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, FormEvent, Dispatch, SetStateAction } from "react";
+import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextInput from "./TextInput/TextInput";
-import { ItemFormData, Option } from "../../utils/types";
-import { colorOptions, sizeOptions, categoryOptions, clothesAges } from "../../utils/constants";
+import { ItemFormData, Option, ViewType } from "../../utils/types";
+import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem } from "../../utils/constants";
+import { useLocalStorageCloset } from "../../hooks/useLocalStorageCloset";
 
 import "./Form.css";
 
 // MULTI-STEP FORM
 // We store 8 fields in "formData" and show them one at a time in Step1..Step8.
 
-const item = {
-	type: "",
-	color: "",
-	size: "",
-	brand: "",
-	material: "",
-	occasion: "",
-	age: "",
-	care: "",
-};
+export interface FormProps {
+	setView: Dispatch<SetStateAction<ViewType>>;
+}
 
-// TODO put back from AI
-//removing OnComplete, currently does nothing, passes data no where
-// { onComplete}: { onComplete: (data: FormData) => void}
-
-function MultiStepForm() {
+const MultiStepForm = ({ setView }: FormProps) => {
 	// Manage step-based progression
 	const [step, setStep] = useState(1);
 	const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+	const { addItem } = useLocalStorageCloset();
 
 	// Form data
-	const [formData, setFormData] = useState<ItemFormData>(item);
+	const [formData, setFormData] = useState<ItemFormData>(formItem);
 
 	const handleOptionSelect = (option: Option) => {
 		setSelectedOption(option);
-		// You can add any additional handling for form submission or state updates here
 	};
 
 	const toggleValue = (value: string, label: string) => {
@@ -55,13 +45,16 @@ function MultiStepForm() {
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		console.log("submited", { formData });
-		// When final step is submitted, pass data upward
-		// onComplete(formData);
+		addItem({
+			...formData,
+			id: crypto.randomUUID(),
+		});
+		console.log("submited; ✅ Item added to localStorage:", { formData });
+		setFormData(formItem);
+		setStep(1);
+		setView("overview");
 	};
 
-	// Render each step conditionally
-	// We'll put them all inside a single <motion.form> for simplicity
 	return (
 		<div className="form">
 			<motion.form
@@ -138,7 +131,7 @@ function MultiStepForm() {
 
 				{/* STEP 7: AGE */}
 				{step === 7 && (
-					<CheckboxCollection label="age" detailOptions={clothesAges} onToggleDetail={toggleValue} formData={formData} />
+					<CheckboxCollection label="age" detailOptions={clothesAgesOptions} onToggleDetail={toggleValue} formData={formData} />
 				)}
 
 				{/* STEP 8: CARE */}
@@ -186,7 +179,7 @@ function MultiStepForm() {
 			</motion.form>
 		</div>
 	);
-}
+};
 
 export default MultiStepForm;
 
@@ -273,16 +266,6 @@ export default MultiStepForm;
 //         transition={{ duration: 1.5 }}
 //       />
 
-//       {/* Edison lightbulbs (abstract, decorative) */}
-//       <motion.div
-//         className="absolute top-8 right-8 bg-yellow-200 w-6 h-12 rounded-b-full"
-//         animate={{ y: [0, 10, 0] }}
-//         transition={{ repeat: Infinity, duration: 2 }}
-//       />
-//       <motion.div
-//         className="absolute top-8 left-8 bg-yellow-200 w-6 h-12 rounded-b-full"
-//         animate={{ y: [0, 10, 0] }}
-//         transition={{ repeat: Infinity, duration: 2, delay: 1 }}
 //       />
 
 //       <motion.div className="z-10 w-full max-w-5xl flex flex-col items-center">

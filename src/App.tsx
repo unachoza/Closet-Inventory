@@ -9,7 +9,6 @@ import "./App.css";
 function App() {
 	const [view, setView] = useState<ViewType>("carousel");
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
-	console.log({ selectedCategory });
 	return (
 		<div>
 			<Header />
@@ -20,7 +19,7 @@ function App() {
 					View All Items
 				</button>
 			</div>
-			{view === "form" && <MultiStepForm />}
+			{view === "form" && <MultiStepForm setView={setView}/>}
 			{view === "carousel" && <Carousel setCategory={setSelectedCategory} />}
 			{view === "carousel" && <Closet selectedCategory={selectedCategory} />}
 			<button className="back-button" onClick={() => setView("overview")}>
