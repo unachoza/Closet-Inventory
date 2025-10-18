@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Carousel from "./Features/Carousel/Carousel2";
+import Carousel from "./Features/Carousel/Carousel";
 import MultiStepForm from "./Features/Form/Form";
 import Header from "./Components/Header";
 import Closet from "./Features/Closet/Closet";
@@ -9,6 +9,7 @@ import "./App.css";
 function App() {
 	const [view, setView] = useState<ViewType>("carousel");
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
+	
 	return (
 		<div>
 			<Header />
@@ -19,7 +20,7 @@ function App() {
 					View All Items
 				</button>
 			</div>
-			{view === "form" && <MultiStepForm setView={setView}/>}
+			{view === "form" && <MultiStepForm setView={setView} />}
 			{view === "carousel" && <Carousel setCategory={setSelectedCategory} />}
 			{view === "carousel" && <Closet selectedCategory={selectedCategory} />}
 			<button className="back-button" onClick={() => setView("overview")}>

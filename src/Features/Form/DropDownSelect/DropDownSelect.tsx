@@ -9,12 +9,11 @@ export interface Option {
 
 interface DropdownProps {
 	options: Option[];
-	onOptionSelect: (option: Option) => void;
 	setFormData: Dispatch<SetStateAction<ItemFormData>>;
 	formField: string;
 }
 
-function DropDownSelect({ options, onOptionSelect, setFormData, formField }: DropdownProps) {
+function DropDownSelect({ options, setFormData, formField }: DropdownProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selected, setSelected] = useState(options[0]);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,10 +28,6 @@ function DropDownSelect({ options, onOptionSelect, setFormData, formField }: Dro
 	const handleOptionClick = (option: Option) => {
 		setSelected(option);
 		setIsOpen(false);
-		// Call the callback if provided to pass the selection back up
-		if (onOptionSelect) {
-			onOptionSelect(option);
-		}
 		updateForm(formField, option.value);
 	};
 

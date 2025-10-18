@@ -47,6 +47,8 @@ const Closet = ({ selectedCategory }: ClosetProps) => {
 		return itemCategory.includes(normalizedCategory) || normalizedCategory.includes(itemCategory);
 	});
 
+	console.log("has closet updated", { closet });
+
 	return (
 		<div className="items-overview">
 			<AnimatePresence mode="wait">

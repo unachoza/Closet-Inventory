@@ -53,6 +53,8 @@ input:hover{
 input[type="text"] {
       color: var(--White);
       font: inherit;
+      font-size: 1.5rem;
+      height: 60px;
       line-height: 130%;
       font-feature-settings: 'liga' off, 'clig' off;
       background: var(--white);
@@ -68,7 +70,7 @@ input::placeholder {
 input:focus {
       outline: none;
       border-radius: 0.5rem;
-      border: 0.0625rem solid olive;
+      border: solid 2px var(--White);
       background-color: var(--Background-color);
 }
 

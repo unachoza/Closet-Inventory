@@ -22,7 +22,7 @@ export const brandExamples = ["aritzia", "zara", "gap", "express", "fenty", "lul
 
 export const materialExamples = ["cotton", "silk", "wool", "cashmier", "polyester", "modal", "lace"];
 
-export const occasionExamples = ["formal", "wedding", "cocktail", "going-out", "casual", "church", "picknic", "wear to work", "everyday", "vacation"];
+export const occasionExamples = ["formal", "wedding", "cocktail", "going-out", "casual", "church", "picknic", "wear to work", "everyday", "vacation", "holiday"];
 
 export const careExamples = ["dry clean only", "hand wash", "cold water", "hot water", "low heat", "hang dry", "lay flat dry"];
 

@@ -3,83 +3,45 @@
 	justify-content: center;
 }
 
-.carousel-card {
-	height: 100px;
-	width: 100px;
-	border: solid;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	display: flex; /* flex */
-	flex-direction: column; /* flex-col */
-	align-items: center; /* items-center */
-	justify-content: center; /* justify-center */
-	min-width: 100px; /* min-w-[100px] */
-	background-color: rgba(0, 0, 0, 0.3); /* bg-black/30 */
-	color: white; /* text-white */
-	padding: 1rem; /* p-4 */
-	border-radius: 1rem; /* rounded-2xl */
-	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-	cursor: pointer;
-	filter: drop-shadow(0 0 2em #61dafbaa);
-}
-.emoji {
-	font-size: 2rem; /* text-lg */
-	line-height: 1.75rem;
-}
-.emoji-text {
-	font-size: 1.125rem; /* text-lg */
-	line-height: 1.75rem;
-}
-.group-container {
-	display: flex;
-}
-.group {
-	/* display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	min-width: 100px;
-	color: white;
-	padding: 1rem;
-	border-radius: 1rem;
-	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); */
-}
-.three-horz {
-	margin-left: 1rem; /* mx-4 */
-	margin-right: 1rem; /* mx-4 */
-	display: flex; /* flex */
-	flex-direction: row; /* flex-row */
-	justify-content: center;
-	gap: 1rem; /* space-x-4 */
-	/* overflow-hidden */
-	width: 250px;
-}
-/* 
-.carousel-container{
-	text-align: center;
-} */
-
-.buttons-with-group {
-	position: relative; /* relative */
-	width: 100%; /* w-full */
-	max-width: 36rem; /* max-w-xl */
-	padding: 1rem; /* p-4 */
-	display: flex; /* flex */
-	align-items: center; /* items-center */
+.group-with-arrow-buttons {
+	position: relative; 
+	width: 100%; 
+	max-width: 39rem; 
+	padding: 1rem; 
+	display: flex; 
+	align-items: center; 
 	justify-content: space-between;
 	width: 800px;
 }
+
+.emoji {
+	font-size: 4rem; 
+}
+
+.emoji-text {
+	font-size: 1.5rem; 
+}
+
+.view-three {
+	margin-left: 1rem; 
+	margin-right: 1rem; 
+	display: flex; 
+	flex-direction: row; 
+	justify-content: center;
+	gap: 1rem; 
+	width: 250px;
+}
+
 .clothes-card {
 	border: solid black;
-	display: flex; /* flex */
-	flex-direction: column; /* flex-col */
-	align-items: center; /* items-center */
-	justify-content: center; /* justify-center */
-	min-width: 100px; /* min-w-[100px] */
-	background-color: rgba(0, 0, 0, 0.53); /* bg-black/30 */
-	color: white; /* text-white */
-	padding: 1rem; /* p-4 */
-	border-radius: 1rem; /* rounded-2xl */
-	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+	display: flex; 
+	flex-direction: column;
+	align-items: center; 
+	justify-content: center; 
+	min-width: 135px;
+	background-color: rgba(0, 0, 0, 0.53); 
+	color: white; 
+	padding: 1rem; 
+	border-radius: 1rem; 
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
 }
