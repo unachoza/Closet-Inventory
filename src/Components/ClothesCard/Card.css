@@ -5,7 +5,6 @@
       cursor: pointer;
       color: #fff;
       transition: transform 0.2s ease;
-      box-shadow: 4px 4px 12px 4px #94be40;
       border-radius: 24px;
 }
 
@@ -80,20 +79,15 @@
 /* Back */
 .card-back {
       /* blue gradient */
-      /* background: #78acbf;
-      background: linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%); */
+      background: #78acbf;
+      background: linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%);
 
-      /* green gradiant */
-      background: #848a79;
-      background: linear-gradient(120deg, rgba(132, 138, 121, 1) 0%, rgba(112, 122, 92, 1) 64%, rgba(99, 130, 36, 1) 94%);
       color: #222;
       padding: 1.25rem;
       transform: rotateY(180deg);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
       font-size: 0.95rem;
       text-align: left;
+      border: #2a302d 10px solid;
 }
 
 .card-back p {

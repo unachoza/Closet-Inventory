@@ -45,7 +45,7 @@ label {
 	border: 1px solid #000;
 	border-top: none;
 	background-color: #0202022b;
-	overflow: hidden;
+	overflow: scroll;
 	max-height: 0;
 	transition: max-height 0.3s ease;
 	z-index: 1000;

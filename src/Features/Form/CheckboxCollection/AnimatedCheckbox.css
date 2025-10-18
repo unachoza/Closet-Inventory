@@ -4,10 +4,12 @@
 
 label.animated-checkbox {
       display: flex;
+      flex-direction: row;
       align-items: center;
       gap: var(--spacing-100);
       cursor: pointer;
       user-select: none;
+      margin: 0;
 }
 
 .checkbox-root {
