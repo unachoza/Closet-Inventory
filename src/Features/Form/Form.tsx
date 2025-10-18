@@ -5,14 +5,11 @@ import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextInput from "./TextInput/TextInput";
 import { ItemFormData, Option, ViewType } from "../../utils/types";
 import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem } from "../../utils/constants";
-// import { useLocalStorageCloset } from "../../hooks/useLocalStorageCloset";
-import { useLocalStorageCloset } from "../../hooks/useLocalTryAgain";
+import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 
 import "./Form.css";
 
-// MULTI-STEP FORM
-// We store 8 fields in "formData" and show them one at a time in Step1..Step8.
-
+// MULTI-STEP(8) FORM
 export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 }
@@ -48,18 +45,16 @@ const MultiStepForm = ({ setView }: FormProps) => {
 		e.preventDefault();
 
 		// ✅ Post form data to localStorage
-		addItem({
-			...formData,
-			id: crypto.randomUUID(), // optional: generate a new ID
-			onSale: false,
-			name: "",
-		});
+		addItem(formData);
 
 		console.log("✅ Item added to localStorage:", formData);
 
 		// Reset form & step if needed
 		setFormData(formItem);
 		setStep(1);
+		setTimeout(() => {
+			setView("overview");
+		}, 0);
 	};
 
 	return (

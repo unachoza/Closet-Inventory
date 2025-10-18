@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 
 export type ClothingItem = {
 	id: string | number;
-	imageURL: string;
+	imageURL?: string;
 	name: string;
 	category: string;
 	color: string;
@@ -19,7 +19,7 @@ export type ClothingItem = {
 
 export interface ItemFormData {
 	id: string;
-	imageURL: string;
+	imageURL?: string;
 	category: string;
 	color: string; // single color
 	size: string; // single size
