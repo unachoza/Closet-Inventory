@@ -12,17 +12,17 @@ export const formItem = {
 	care: "",
 };
 
-export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green"];
+export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green", "orange", "yellow", "pink", "purple"];
 
 export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
 
 export const clothesAgesOptions = ["new", "1 month", "3 months", "6 months", "1 year", "18 months", "3 years", "vintage", "unknown"];
 
-export const brandExamples = ["aritzia", "zara", "gap", "express", "fenty", "lulu lemon"];
+export const brandExamples = ["aritzia", "anthropologie", "banana republic", "zara", "gap", "everland", "express", "forever 21", "fenty", "lulu lemon"];
 
-export const materialExamples = ["cotton", "silk", "wool", "cashmier", "polyester", "modal", "lace"];
+export const materialExamples = ["cotton", "silk", "wool", "linen", "modal", "lace", "chiffon", "cashmere", "polyester", "rayon", "nylon", "spandex"];
 
-export const occasionExamples = ["formal", "wedding", "cocktail", "going-out", "casual", "church", "picknic", "wear to work", "everyday", "vacation", "holiday"];
+export const occasionExamples = ["formal", "wedding", "cocktail", "going-out", "casual", "church", "picnic", "wear to work", "everyday", "vacation", "holiday"];
 
 export const careExamples = ["dry clean only", "hand wash", "cold water", "hot water", "low heat", "hang dry", "lay flat dry"];
 
@@ -68,7 +68,7 @@ export type ClothingItem = {
 	notes?: string | string[];
 };
 
-const ClothingItemPossibilities = {
+export const ClothingItemPossibilities = {
 	id: "id number",
 	imageURL: "url to image of clothing",
 	name: " describe the clothing",

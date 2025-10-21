@@ -1,0 +1,7 @@
+.pill-box {
+      width: fit-content;
+      border-radius: .15em;
+      border: solid var(--Black);
+      border-radius: 17px;
+      background-color: inherit;
+}
