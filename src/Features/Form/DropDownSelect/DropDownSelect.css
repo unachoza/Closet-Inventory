@@ -17,7 +17,7 @@ label {
 .dropdown-header {
 	padding: 10px;
 	border: 1px solid #000000;
-	background-color: #0202022b;
+	background-color: var(--Background-color);
 	border-radius: 5px;
 	cursor: pointer;
 	display: flex;
@@ -44,16 +44,16 @@ label {
 	width: 100%;
 	border: 1px solid #000;
 	border-top: none;
-	background-color: #0202022b;
-	overflow: scroll;
-	max-height: 0;
+	background-color: var(--Background-color);
+	overflow: hidden; /*important for dropdown affect */
+	max-height: 0; /*important for dropdown affect */
 	transition: max-height 0.3s ease;
 	z-index: 1000;
 	color: black;
 }
 
 .dropdown-options.open {
-	max-height: 300px; /* Adjust according to the number of options */
+	max-height: 405px; /* Adjust according to the number of options */
 }
 
 .dropdown-option {

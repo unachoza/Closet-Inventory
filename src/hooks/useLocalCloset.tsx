@@ -5,9 +5,6 @@ import useStockPhoto from "./useStockPhoto";
 
 const STORAGE_KEY = "my_closet_key";
 
-// You can replace this with your own image asset path or CDN URL
-const PLACEHOLDER_IMAGE = "https://placehold.co/300x400?text=No+Image";
-
 export function useLocalStorageCloset() {
 	const [closet, setCloset] = useLocalStorage(STORAGE_KEY, MY_CLOSET_DATA);
 

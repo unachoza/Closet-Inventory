@@ -2,6 +2,7 @@ import TextInput from "./TextInput";
 import CheckPill from "../CheckPill/CheckPill";
 import { InputProps, ItemFormData } from "../../../utils/types";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
+import "./TextInput.css";
 
 interface TextPillFieldProps extends Omit<InputProps, "value"> {
 	pillArray: string[];
@@ -12,7 +13,6 @@ interface TextPillFieldProps extends Omit<InputProps, "value"> {
 }
 
 const TextPillField = ({
-	id,
 	label,
 	name,
 	className,
@@ -39,10 +39,18 @@ const TextPillField = ({
 		}
 	};
 
+	console.log(multiSelect);
 	return (
-		<div>
+		<div className="text-pill-field-container">
+			<label className="label-text">{label}</label>
+			<div className="pill-container">
+				{pillArray.map((value) => {
+					const isActive = formData[label] === value;
+					return <CheckPill id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
+				})}
+			</div>
 			<TextInput
-				label={label}
+				label="Missing Something?"
 				name={name}
 				type="text"
 				className={className}
@@ -51,10 +59,6 @@ const TextPillField = ({
 				placeholder={placeholder}
 				onKeyDown={handleKeyDown}
 			/>
-			{pillArray.map((value) => {
-				const isActive = formData[label] === value;
-				return <CheckPill id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
-			})}
 		</div>
 	);
 };

@@ -13,7 +13,8 @@ form {
 	height: 85%;
 	border-radius: 16px;
 	box-shadow: 10px 11px 30px 12px rgba(0, 0, 0, 0.875);
-	border: solid white;
+	border: solid black;
+	background-color: #31341c59;
 }
 
 .form-step{

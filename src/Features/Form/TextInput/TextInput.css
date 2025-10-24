@@ -41,7 +41,7 @@ input {
       height: 2.8125rem;
       width: 100%;
       padding: var(--spacing-100) var(--spacing-200);
-      border: 0.0625rem solid var(--White);
+      border: 1px solid var(--White);
       border-radius: 0.5rem;
       transition: all .4s ease; 
 }
@@ -105,4 +105,5 @@ input:user-invalid ~ .error-message {
 .pill-container{
       display: flex;
       flex-wrap: wrap;
+      margin-bottom: 2rem;
 }

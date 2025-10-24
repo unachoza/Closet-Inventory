@@ -5,7 +5,16 @@ import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextInput from "./TextInput/TextInput";
 import TextPillField from "./TextInput/TextPillField";
 import { ItemFormData, ViewType } from "../../utils/types";
-import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem, materialExamples, brandExamples } from "../../utils/constants";
+import {
+	colorOptions,
+	sizeOptions,
+	categoryOptions,
+	clothesAgesOptions,
+	formItem,
+	materialExamples,
+	brandExamples,
+	careExamples,
+} from "../../utils/constants";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { useLocalStorage } from "../../hooks/uselocalStorage";
 import "./Form.css";
@@ -17,6 +26,7 @@ export interface FormProps {
 
 const MATERIAL_OPTIONS_KEY = "my_material_key";
 const BRAND_OPTIONS_KEY = "my_brands_key";
+const CARE_OPTIONS_KEY = "my_care_key";
 
 const MultiStepForm = ({ setView }: FormProps) => {
 	const [step, setStep] = useState(1);
@@ -24,6 +34,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 
 	const [materialoptions, setMaterialOptions] = useLocalStorage(MATERIAL_OPTIONS_KEY, materialExamples);
 	const [brandOptions, setBrandOptions] = useLocalStorage(BRAND_OPTIONS_KEY, brandExamples);
+	const [careOptions, setCareOptions] = useLocalStorage(CARE_OPTIONS_KEY, careExamples);
 
 	const { addItem } = useLocalStorageCloset();
 
@@ -54,7 +65,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 			setView("overview");
 		}, 0);
 	};
-
+	console.log({ formData });
 	return (
 		<div className="form">
 			<motion.form
@@ -90,7 +101,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 							label="brand"
 							name="brand"
 							className="string"
-							placeholder="... Gucci, Zara..."
+							placeholder="add more options"
 							pillArray={brandOptions}
 							onPillsChange={setBrandOptions}
 							handleFormUpdate={toggleValue}
@@ -105,7 +116,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 						label="material"
 						name="material"
 						className="string"
-						placeholder=" ... Cotton, Silk"
+						placeholder="add more options"
 						pillArray={materialoptions}
 						onPillsChange={setMaterialOptions}
 						handleFormUpdate={toggleValue}
@@ -135,11 +146,16 @@ const MultiStepForm = ({ setView }: FormProps) => {
 				{/* STEP 8: CARE */}
 				{step === 8 && (
 					<div className="form-step">
-						<label>Care Instructions</label>
-						<input
-							value={formData.care}
-							onChange={(e: any) => setFormData((p) => ({ ...p, care: e.target.value }))}
-							placeholder="e.g. Dry clean only"
+						<TextPillField
+							label="Care Instructions"
+							name="Care Instructions"
+							className="string"
+							placeholder="add more options"
+							pillArray={careOptions}
+							onPillsChange={setCareOptions}
+							handleFormUpdate={toggleValue}
+							formData={formData}
+							multiSelect={true}
 						/>
 					</div>
 				)}
