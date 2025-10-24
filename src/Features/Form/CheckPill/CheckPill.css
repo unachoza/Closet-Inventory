@@ -1,7 +1,25 @@
 .pill-box {
-      width: fit-content;
-      border-radius: .15em;
-      border: solid var(--Black);
-      border-radius: 17px;
-      background-color: inherit;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--Black);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  background-color: inherit;
+  color: #333;
+}
+
+.pill-box:hover {
+  border-color: #888;
+  transform: translateY(-1px);
+}
+
+.pill-box.active {
+  background-color: var(--active-color, #2a302d);
+  color: #fff;
+  border-color: var(--active-color, #2a302d);
+  box-shadow: 0 0 10px var(--active-color, #2a302d);
+}
+
+.checkbox-label {
+  pointer-events: none;
 }

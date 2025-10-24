@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, KeyboardEvent } from "react";
 
 export type ClothingItem = {
 	id: string | number;
@@ -41,7 +41,7 @@ export interface Option {
 
 export interface InputProps {
 	id?: string;
-	label?: string;
+	label: string;
 	min?: number;
 	name: string;
 	type?: string;
@@ -49,7 +49,8 @@ export interface InputProps {
 	value: string | number;
 	errorMessage?: string;
 	placeholder: string;
-	handleChange: SetStateAction<string | any>;
+	handleFormUpdate: SetStateAction<string | any>;
+	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export interface CarouselProps {
