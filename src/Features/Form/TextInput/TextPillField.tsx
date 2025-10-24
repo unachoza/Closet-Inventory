@@ -3,7 +3,7 @@ import CheckPill from "../CheckPill/CheckPill";
 import { InputProps, ItemFormData } from "../../../utils/types";
 import { ChangeEvent, KeyboardEvent, useState } from "react";
 
-interface TagInputProps extends Omit<InputProps, "value"> {
+interface TextPillFieldProps extends Omit<InputProps, "value"> {
 	pillArray: string[];
 	onPillsChange: (values: string[]) => void;
 	formData: ItemFormData;
@@ -11,7 +11,7 @@ interface TagInputProps extends Omit<InputProps, "value"> {
 	label: keyof ItemFormData;
 }
 
-const TagInput = ({
+const TextPillField = ({
 	id,
 	label,
 	name,
@@ -22,7 +22,7 @@ const TagInput = ({
 	onPillsChange,
 	formData,
 	multiSelect = false,
-}: TagInputProps) => {
+}: TextPillFieldProps) => {
 	const [pills, setPills] = useState<string[]>(pillArray);
 	const [inputValue, setInputValue] = useState<string>("");
 
@@ -53,10 +53,10 @@ const TagInput = ({
 			/>
 			{pillArray.map((value) => {
 				const isActive = formData[label] === value;
-				return <CheckPill id={value} label={label as string} value={value} onToggle={handleFormUpdate} checked={isActive} />;
+				return <CheckPill id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
 			})}
 		</div>
 	);
 };
 
-export default TagInput;
+export default TextPillField;

@@ -3,12 +3,13 @@
 import * as Checkbox from "@radix-ui/react-checkbox";
 import "./CheckPill.css";
 import { useEffect, useState } from "react";
+import { ItemFormData } from "../../../utils/types";
 
 interface CheckPillProps {
 	id?: string;
-	label: string;
+	label: keyof ItemFormData;
 	value: string;
-	onToggle: (value: string, label: string) => void;
+	onToggle: (value: string, field: keyof ItemFormData) => void;
 	checked?: boolean;
 }
 

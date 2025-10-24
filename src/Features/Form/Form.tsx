@@ -1,12 +1,13 @@
-import { useState, FormEvent, Dispatch, SetStateAction } from "react";
+import { useState, FormEvent, Dispatch, SetStateAction, ChangeEvent } from "react";
 import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextInput from "./TextInput/TextInput";
+import TextPillField from "./TextInput/TextPillField";
 import { ItemFormData, ViewType } from "../../utils/types";
-import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem } from "../../utils/constants";
+import { colorOptions, sizeOptions, categoryOptions, clothesAgesOptions, formItem, materialExamples, brandExamples } from "../../utils/constants";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
-
+import { useLocalStorage } from "../../hooks/uselocalStorage";
 import "./Form.css";
 
 // MULTI-STEP(8) FORM
@@ -14,17 +15,24 @@ export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 }
 
-const MultiStepForm = ({ setView }: FormProps) => {
-	// Manage step-based progression
-	const [step, setStep] = useState(1);
-	const { addItem } = useLocalStorageCloset();
+const MATERIAL_OPTIONS_KEY = "my_material_key";
+const BRAND_OPTIONS_KEY = "my_brands_key";
 
+const MultiStepForm = ({ setView }: FormProps) => {
+	const [step, setStep] = useState(1);
 	const [formData, setFormData] = useState<ItemFormData>(formItem);
 
+	const [materialoptions, setMaterialOptions] = useLocalStorage(MATERIAL_OPTIONS_KEY, materialExamples);
+	const [brandOptions, setBrandOptions] = useLocalStorage(BRAND_OPTIONS_KEY, brandExamples);
+
+	const { addItem } = useLocalStorageCloset();
+
 	const toggleValue = (value: string, label: string) => {
-		setFormData((prev) => {
-			return { ...prev, [label]: value };
-		});
+		setFormData((prev) => ({ ...prev, [label]: value }));
+	};
+
+	const handleInputChange = (e: ChangeEvent<HTMLInputElement>, label: string) => {
+		setFormData((previousValues) => ({ ...previousValues, [label]: e.target.value }));
 	};
 
 	const handleNext = () => {
@@ -78,28 +86,31 @@ const MultiStepForm = ({ setView }: FormProps) => {
 				{/* STEP 4: BRAND */}
 				{step === 4 && (
 					<div className="form-step">
-						<TextInput
+						<TextPillField
 							label="brand"
 							name="brand"
-							type="text"
 							className="string"
-							value={formData.brand}
-							handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, brand: e.target.value }))}
-							placeholder="e.g. Gucci, Zara..."
+							placeholder="... Gucci, Zara..."
+							pillArray={brandOptions}
+							onPillsChange={setBrandOptions}
+							handleFormUpdate={toggleValue}
+							formData={formData}
 						/>
 					</div>
 				)}
 
 				{/* STEP 5: MATERIAL */}
 				{step === 5 && (
-					<TextInput
+					<TextPillField
 						label="material"
 						name="material"
-						type="text"
 						className="string"
-						value={formData.material}
-						handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
-						placeholder="e.g. Cotton, Silk..."
+						placeholder=" ... Cotton, Silk"
+						pillArray={materialoptions}
+						onPillsChange={setMaterialOptions}
+						handleFormUpdate={toggleValue}
+						formData={formData}
+						multiSelect={true}
 					/>
 				)}
 
@@ -111,7 +122,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 						type="text"
 						className="string"
 						value={formData.occasion}
-						handleChange={(e: any) => setFormData((p) => ({ ...p, occasion: e.target.value }))}
+						handleFormUpdate={handleInputChange}
 						placeholder="e.g. Casual, Formal..."
 					/>
 				)}
