@@ -60,3 +60,24 @@ const TextPillField = ({
 };
 
 export default TextPillField;
+
+/////TODO/////
+/////REMOVE PILLS
+/////CREATE COMPOUND COMPONENT
+
+/*
+ const handlePillToggle = (pillToRemove: string) => {
+    const newPills = pills.filter(pill => pill !== pillToRemove);
+    setPills(newPills);
+    
+    if (onPillsChange) {
+      onPillsChange(newPills);
+    }
+  };
+*/
+
+
+{/* <TextPillField label="Brand" placeholder="Add a brand">
+  <TextPillField.Input />
+  <TextPillField.Pills options={["Zara", "Gucci"]} />
+</TextPillField> */}

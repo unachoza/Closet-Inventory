@@ -44,3 +44,29 @@
     animation: logo-spin infinite 20s linear;
   }
 }
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.6);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dialog-content {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--background-form, #fff);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to { opacity: 1 }
+}
