@@ -44,6 +44,7 @@ body {
 
 h1 {
 	font-size: 3em;
+	margin: 1rem 0;
 	line-height: 1.1;
 	-webkit-text-stroke: 2px black;
 	paint-order: stroke;

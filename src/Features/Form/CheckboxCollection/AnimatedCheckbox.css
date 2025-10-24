@@ -10,6 +10,7 @@ label.animated-checkbox {
       cursor: pointer;
       user-select: none;
       margin: 0;
+      font-size: .75rem;
 }
 
 .checkbox-root {
@@ -49,6 +50,7 @@ label.animated-checkbox {
       border-radius: 0.25rem;
       -webkit-text-stroke: 2px black;
       paint-order: stroke;
+      font-size: 1.35rem;
 }
 
 .checkbox-root:hover {
@@ -70,5 +72,5 @@ label > button:hover{
 }
 
 label > button {
-      margin: .25rem;
+      margin: .15rem;
 }

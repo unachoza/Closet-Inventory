@@ -9,9 +9,9 @@ import "./App.css";
 function App() {
 	const [view, setView] = useState<ViewType>("carousel");
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
-	
+
 	return (
-		<div>
+		<div className="main">
 			<Header />
 			{/* Controls */}
 			<div className="mt-4">
