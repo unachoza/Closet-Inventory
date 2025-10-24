@@ -53,8 +53,6 @@ input:hover{
 input[type="text"] {
       color: var(--White);
       font: inherit;
-      font-size: 1.5rem;
-      height: 60px;
       line-height: 130%;
       font-feature-settings: 'liga' off, 'clig' off;
       background: var(--white);
@@ -102,4 +100,9 @@ input:user-invalid ~ .error-message {
 #expDateM-error.error-message {
       width: 200%;
       text-align: left;
+}
+
+.pill-container{
+      display: flex;
+      flex-wrap: wrap;
 }

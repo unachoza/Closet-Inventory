@@ -11,6 +11,7 @@ label.animated-checkbox {
       user-select: none;
       margin: 0;
       font-size: .75rem;
+      width: fit-content;
 }
 
 .checkbox-root {

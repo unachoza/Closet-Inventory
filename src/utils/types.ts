@@ -41,7 +41,7 @@ export interface Option {
 
 export interface InputProps {
 	id?: string;
-	label: string;
+	label?: string;
 	min?: number;
 	name: string;
 	type?: string;

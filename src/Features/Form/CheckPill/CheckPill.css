@@ -6,6 +6,7 @@
   user-select: none;
   background-color: inherit;
   color: #333;
+ background-color: #808000b3;
 }
 
 .pill-box:hover {
@@ -22,4 +23,6 @@
 
 .checkbox-label {
   pointer-events: none;
+  color: white;
+
 }
