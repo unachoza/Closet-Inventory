@@ -30,7 +30,7 @@ export interface ItemFormData {
 	care: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear";
 
 export type ViewType = "carousel" | "form" | "overview";
 

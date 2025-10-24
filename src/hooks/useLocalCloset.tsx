@@ -1,6 +1,7 @@
 import { MY_CLOSET_DATA } from "../utils/constants";
-import type { ClothingItem, ItemFormData } from "../utils/types";
+import type { CategoryType, ClothingItem, ItemFormData } from "../utils/types";
 import { useLocalStorage } from "./uselocalStorage";
+import useStockPhoto from "./useStockPhoto";
 
 const STORAGE_KEY = "my_closet_key";
 
@@ -17,7 +18,7 @@ export function useLocalStorageCloset() {
 				{
 					...newItem,
 					id: crypto.randomUUID(),
-					imageURL: PLACEHOLDER_IMAGE,
+					imageURL: useStockPhoto(newItem.category as CategoryType),
 					name: newItem.brand ? `${newItem.brand} ${newItem.category}` : newItem.category,
 				},
 			];

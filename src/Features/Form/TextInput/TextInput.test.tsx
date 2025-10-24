@@ -7,7 +7,7 @@ import { InputProps } from "../../../utils/types";
 describe("TextInput Component", () => {
 	beforeEach(() => {
 		vi.spyOn(window, "alert");
-		const handleUpdatesMock: Mock<InputProps["handleChange"]> = vi.fn();
+		const handleUpdatesMock: Mock<InputProps["handleFormUpdate"]> = vi.fn();
 		render(
 			<>
 				<TextInput
@@ -18,7 +18,7 @@ describe("TextInput Component", () => {
 					value=""
 					errorMessage="oops there was an error"
 					placeholder="placeholder text"
-					handleChange={handleUpdatesMock}
+					handleFormUpdate={handleUpdatesMock}
 				/>
 				<button type="submit">Submit</button>
 			</>
