@@ -6,7 +6,7 @@ import useStockPhoto from "./useStockPhoto";
 const STORAGE_KEY = "my_closet_key";
 
 export function useLocalStorageCloset() {
-	const [closet, setCloset] = useLocalStorage(STORAGE_KEY, MY_CLOSET_DATA);
+	const [closet, setCloset] = useLocalStorage<ClothingItem[]>(STORAGE_KEY, MY_CLOSET_DATA);
 
 	const addItem = (newItem: ItemFormData) => {
 		setCloset((prev: any) => {
