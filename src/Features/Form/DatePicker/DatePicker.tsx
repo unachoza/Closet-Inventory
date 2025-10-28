@@ -110,3 +110,6 @@ function addMonths(date: Date, months: number) {
 }
 
 export default DatePicker;
+
+
+// https://www.storyly.io/post/best-user-experience-datepicker-examples-for-mobile-and-web

@@ -1,9 +1,9 @@
-import { useState, FormEvent, Dispatch, SetStateAction, ChangeEvent } from "react";
+import { useState, FormEvent, Dispatch, SetStateAction, ChangeEvent, MouseEvent } from "react";
 import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
-import TextInput from "./TextInput/TextInput";
 import TextPillField from "./TextInput/TextPillField";
+import DatePicker from "./DatePicker/DatePicker";
 import { ItemFormData, ViewType } from "../../utils/types";
 import {
 	colorOptions,
@@ -14,10 +14,13 @@ import {
 	materialExamples,
 	brandExamples,
 	careExamples,
+	occasionExamples,
 } from "../../utils/constants";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { useLocalStorage } from "../../hooks/uselocalStorage";
 import "./Form.css";
+import "../../Components/ProgressionTracker/ProgressionTracker.css";
+import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
 
 // MULTI-STEP(8) FORM
 export interface FormProps {
@@ -44,6 +47,32 @@ const MultiStepForm = ({ setView }: FormProps) => {
 
 	const handleInputChange = (e: ChangeEvent<HTMLInputElement>, label: string) => {
 		setFormData((previousValues) => ({ ...previousValues, [label]: e.target.value }));
+	};
+
+	const handleDateSelect = (date: Date) => {
+		const today = new Date();
+		let months = (today.getFullYear() - date.getFullYear()) * 12;
+		months += today.getMonth() - date.getMonth();
+
+		if (today.getDate() < date.getDate()) {
+			months -= 1;
+		}
+
+		// If less than 20 months, show in months
+		if (months < 20) {
+			setFormData((prev) => ({
+				...prev,
+				age: `${months} month${months > 1 ? "s" : ""}`,
+				purchaseDate: date.toISOString(),
+			}));
+		} else {
+			const years = Math.floor(months / 12);
+			setFormData((prev) => ({
+				...prev,
+				age: `${years} year${years > 1 ? "s" : ""}`,
+				purchaseDate: date.toISOString(),
+			}));
+		}
 	};
 
 	const handleNext = () => {
@@ -75,6 +104,8 @@ const MultiStepForm = ({ setView }: FormProps) => {
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
+				{/* <StepProgressTracker currentStep={step} onStepClick={setStep} /> */}
+				<StepTabsTracker currentStep={step} onStepClick={setStep} />
 				{/* STEP 1: CATEGORY */}
 				{step === 1 && (
 					<div className="field-label">
@@ -127,27 +158,48 @@ const MultiStepForm = ({ setView }: FormProps) => {
 
 				{/* STEP 6: OCCASION */}
 				{step === 6 && (
-					<TextInput
+					<CheckboxCollection
 						label="occasion"
-						name="occasion"
-						type="text"
-						className="string"
-						value={formData.occasion}
-						handleFormUpdate={handleInputChange}
-						placeholder="e.g. Casual, Formal..."
+						detailOptions={occasionExamples}
+						onToggleDetail={toggleValue}
+						formData={formData}
 					/>
 				)}
 
 				{/* STEP 7: AGE */}
+
 				{step === 7 && (
-					<CheckboxCollection label="age" detailOptions={clothesAgesOptions} onToggleDetail={toggleValue} formData={formData} />
+					<div className="form-step age-step">
+						<label className="step-label">Item Age</label>
+						<div className="age-options">
+							{/* Left: checkboxes */}
+							<div className="age-checkboxes">
+								<span className="option-label">Select Age</span>
+								<CheckboxCollection
+									label="age"
+									detailOptions={clothesAgesOptions}
+									onToggleDetail={toggleValue}
+									formData={formData}
+								/>
+							</div>
+							{/* Right: date picker */}
+							<div className="age-datepicker">
+								<span className="option-label">Or select purchase date</span>
+								<DatePicker
+									selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
+									onSelectDate={handleDateSelect}
+								/>
+							</div>
+						</div>
+					</div>
 				)}
 
 				{/* STEP 8: CARE */}
 				{step === 8 && (
 					<div className="form-step">
+						<label>Care Instructions</label>
 						<TextPillField
-							label="Care Instructions"
+							label="care"
 							name="Care Instructions"
 							className="string"
 							placeholder="add more options"
@@ -165,7 +217,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 					{step > 1 && (
 						<button
 							className="back-button"
-							onClick={(e: any) => {
+							onClick={(e: MouseEvent<HTMLButtonElement>) => {
 								e.preventDefault();
 								handleBack();
 							}}
@@ -176,7 +228,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 					{step < 8 && (
 						<button
 							className="next-button"
-							onClick={(e: any) => {
+							onClick={(e: MouseEvent<HTMLButtonElement>) => {
 								e.preventDefault();
 								handleNext();
 							}}

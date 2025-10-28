@@ -3,7 +3,7 @@ form {
 }
 
 .form {
-	max-width: 40rem;
+	max-width: 42rem;
 	margin: .5rem auto;
 	padding: 1.5rem;
 	overflow: hidden; /* important for max-height animations */
@@ -58,4 +58,100 @@ button.submit {
 }
 button.submit:hover {
 	background-color: #059669; 
+}
+  
+
+
+/* Step 7 - Age selection layout */
+.age-step {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.age-options {
+	display: flex;
+	gap: 2rem;
+	flex-wrap: wrap;
+}
+
+.age-checkboxes,
+.age-datepicker {
+	flex: 1 1 200px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.option-label {
+	text-align: left;
+	color: var(--White);
+}
+
+/* DatePicker styles */
+.age-datepicker .datepicker-container {
+	position: relative;
+}
+
+.age-datepicker input {
+	width: 200px;
+	padding: 6px 10px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	font-size: 0.9rem;
+}
+
+.age-datepicker input:focus {
+	outline: none;
+	border-color: #007aff;
+	box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+/* Checkbox collection label styling */
+.age-checkboxes .checkbox-label span {
+	cursor: pointer;
+}
+
+/* Popover / calendar styling */
+.age-datepicker .datepicker-popover {
+	position: absolute;
+	z-index: 50;
+	top: 36px;
+	left: 0;
+	background: white;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+	padding: 0.5rem;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* --- POPOVER TRANSITION --- */
+.datepicker-popover[data-state='open'] {
+	animation: popoverFadeIn 0.5s ease forwards;
+}
+
+.datepicker-popover[data-state='closed'] {
+	animation: popoverFadeOut 0.5s ease forwards;
+}
+
+@keyframes popoverFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes popoverFadeOut {
+	from {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
 }
