@@ -46,7 +46,7 @@ const TextPillField = ({
 			<div className="pill-container">
 				{pillArray.map((value) => {
 					const isActive = formData[label] === value;
-					return <CheckPill id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
+					return <CheckPill key={value} id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
 				})}
 			</div>
 			<TextInput

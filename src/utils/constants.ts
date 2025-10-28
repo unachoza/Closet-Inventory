@@ -9,6 +9,7 @@ export const formItem = {
 	material: "",
 	occasion: "",
 	age: "",
+	purchaseDate: "",
 	care: "",
 };
 
@@ -16,13 +17,36 @@ export const colorOptions = ["red", "brown", "black", "grey", "white", "floral",
 
 export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
 
-export const clothesAgesOptions = ["new", "1 month", "3 months", "6 months", "1 year", "18 months", "3 years", "vintage", "unknown"];
+export const clothesAgesOptions = ["new", "3 months", "6 months", "1 year", "18 months", "3 years", "vintage", "unknown"];
 
-export const brandExamples = ["aritzia", "anthropologie", "banana republic", "zara", "gap", "everland", "express", "forever 21", "fenty", "lulu lemon"];
+export const brandExamples = [
+	"aritzia",
+	"anthropologie",
+	"banana republic",
+	"zara",
+	"gap",
+	"everland",
+	"express",
+	"forever 21",
+	"fenty",
+	"lulu lemon",
+];
 
 export const materialExamples = ["cotton", "silk", "wool", "linen", "modal", "lace", "chiffon", "cashmere", "polyester", "rayon", "nylon", "spandex"];
 
-export const occasionExamples = ["formal", "wedding", "cocktail", "going-out", "casual", "church", "picnic", "wear to work", "everyday", "vacation", "holiday"];
+export const occasionExamples = [
+	"formal",
+	"wedding",
+	"cocktail",
+	"going-out",
+	"casual",
+	"church",
+	"picnic",
+	"wear to work",
+	"everyday",
+	"vacation",
+	"holiday",
+];
 
 export const careExamples = ["dry clean only", "hand wash", "cold water", "hot water", "low heat", "hang dry", "lay flat dry"];
 

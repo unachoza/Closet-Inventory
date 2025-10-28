@@ -27,6 +27,7 @@ export interface ItemFormData {
 	material: string;
 	occasion: string;
 	age: string;
+	purchaseDate?: string;
 	care: string;
 }
 

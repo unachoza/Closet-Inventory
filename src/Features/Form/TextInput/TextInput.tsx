@@ -25,16 +25,3 @@ const Input = ({ id, label, name, className, value, errorMessage, placeholder, h
 };
 
 export default memo(Input);
-
-{
-	/* <TextInputContainer
-						label="material"
-						name="material"
-						type="text"
-						className="string"
-						value={formData.material}
-						handleChange={(e: { target: { value: any } }) => setFormData((p) => ({ ...p, material: e.target.value }))}
-						placeholder="e.g. Cotton, Silk..."
-						pillArray={materialExamples}
-					/> */
-}
