@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, KeyboardEvent } from "react";
 
 export type ClothingItem = {
 	id: string | number;
-	imageURL?: string;
+	imageURL: string;
 	name: string;
 	category: string;
 	color: string;
@@ -38,6 +38,11 @@ export type ViewType = "carousel" | "form" | "overview";
 export interface Option {
 	value: string;
 	label: string;
+}
+
+export interface Step {
+	label: string;
+	step: number;
 }
 
 export interface InputProps {

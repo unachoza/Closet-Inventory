@@ -1,4 +1,4 @@
-import { Option } from "./types.ts";
+import { Option, Step, ClothingItem } from "./types.ts";
 
 export const formItem = {
 	id: "",
@@ -12,6 +12,19 @@ export const formItem = {
 	purchaseDate: "",
 	care: "",
 };
+
+export const stepsLabels: Step[] = [
+	{ step: 1, label: "Category" },
+	{ step: 2, label: "Color" },
+	{ step: 3, label: "Size" },
+	{ step: 4, label: "Brand" },
+	{ step: 5, label: "Material" },
+	{ step: 6, label: "Occasion" },
+	{ step: 7, label: "Age" },
+	{ step: 8, label: "Care" },
+];
+
+export const steps = ["Category", "Color", "Size", "Brand", "Material", "Occasion", "Age", "Care"];
 
 export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green", "orange", "yellow", "pink", "purple"];
 
@@ -42,7 +55,7 @@ export const occasionExamples = [
 	"casual",
 	"church",
 	"picnic",
-	"wear to work",
+	"work wear",
 	"everyday",
 	"vacation",
 	"holiday",
@@ -74,23 +87,6 @@ export const categoryOptions: Option[] = [
 	{ value: "socks", label: "Socks" },
 	{ value: "underwear", label: "Underwear" },
 ];
-
-export type ClothingItem = {
-	id: string | number;
-	imageURL: string;
-	name: string;
-	category: string;
-	color: string;
-	size: string;
-	brand: string;
-	price?: string;
-	material: string;
-	occasion: string;
-	age: string;
-	care: string | string[];
-	onSale?: boolean;
-	notes?: string | string[];
-};
 
 export const ClothingItemPossibilities = {
 	id: "id number",
