@@ -4,22 +4,22 @@
 
 .step-tabs-container {
       display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100%;
       background-color: transparent;
-      align-items: center;
-      justify-content: center;
       margin-bottom: 1.5rem;
 }
 
 .step-tabs-list {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
       width: 100%;
       max-width: 640px; /*// width of the form */
       margin: 0;
       padding: 0;
       text-transform: uppercase;
-      align-items: center;
-      justify-content: space-between;
       list-style: none;
 }
 

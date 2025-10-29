@@ -1,10 +1,10 @@
 label {
 	display: flex;
+	justify-content: center;
 	border-radius: var(--border-radius-ty);
 	color: var(--Black);
 	font-size: 1.5rem;
 	font-weight: 600;
-	justify-content: center;
 	margin-bottom: .5rem;
 }
 
@@ -16,14 +16,14 @@ label {
 
 .dropdown-header {
 	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	padding: .5rem;
 	border: var(--border-black-sm);
 	border-radius: var(--border-radius-ty);
 	background-color: var(--Background-color);
 	color: var(--Black);
-	cursor: pointer;
-	align-items: center;
-	justify-content: space-between;;
+	cursor: pointer;;
 }
 
 .dropdown-selected {

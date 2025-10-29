@@ -45,11 +45,11 @@
 /* Front */
 .card-front {
       display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       padding: 1rem;
       border-radius: var(--border-radius-sm);
       background: var(--Dark-Grey);
-      flex-direction: column;
-      justify-content: space-between;
 }
 .card-image {
       height: 100%;

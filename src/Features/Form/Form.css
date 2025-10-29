@@ -25,8 +25,8 @@ form {
 
 .form-step{
 	display: flex;
-	height: clamp(25rem, 50vh, 56.25rem);
 	flex-direction: column;
+	height: clamp(25rem, 50vh, 56.25rem);
 }
 
 .field-label {
@@ -84,8 +84,8 @@ button.submit:hover {
 .age-checkboxes,
 .age-datepicker {
 	display: flex;
-	flex: 1 1 200px;
 	flex-direction: column;
+	flex: 1 1 200px;
 	gap: 0.5rem;
 }
 

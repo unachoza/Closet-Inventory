@@ -4,26 +4,26 @@
 
 label.animated-checkbox {
       display: flex;
+      flex-direction: row;
+      align-items: center;
       width: fit-content;
       margin: 0;
       font-size: .75rem;
       cursor: pointer;
-      align-items: center;
-      flex-direction: row;
       gap: var(--spacing-100);
       user-select: none;
 }
 
 .checkbox-root {
       display: flex;
+      justify-content: center;
+      align-items: center;
       width: 2rem;
       height: 2rem;
       border: solid var(--Black);
       border-radius: .15em;
       background-color: inherit;
       transition: border-color 0.2s ease, background-color 0.2s ease;
-      align-items: center;
-      justify-content: center;
 }
 
 .checkbox-root[data-state="checked"] {
@@ -32,10 +32,10 @@ label.animated-checkbox {
 
 .checkbox-inner {
       display: flex;
+      justify-content: center;
+      align-items: center;
       width: 1rem;
       height: 1rem;
-      align-items: center;
-      justify-content: center;
 }
 
 .checkbox-svg {
@@ -46,10 +46,10 @@ label.animated-checkbox {
 
 .checkbox-label {
       display: flex;
+      align-items: center;
       border-radius: var(--border-radius-ty);
       font-size: 1.5rem;
       font-size: 1.35rem;
-      align-items: center;
       paint-order: stroke;
       -webkit-text-stroke: 2px black;
 }

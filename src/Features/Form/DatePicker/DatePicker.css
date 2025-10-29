@@ -1,7 +1,7 @@
 .datepicker-container {
       display: flex;
-      font-family: system-ui, sans-serif;
       flex-direction: column;
+      font-family: system-ui, sans-serif;
       gap: 6px;
 }
 
@@ -57,21 +57,21 @@
 /* Calendar Styles */
 .calendar {
       display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: var(--spacing-100);
       border-radius: var(--border-radius-md);
       background-color: var(--Background-color);
       box-shadow: var(--box-shadow);
       color: var(--White);
-      align-items: center;
-      flex-direction: column;
 }
 
 .calendar-header {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
       width: 200px;
       color: var(--White);
-      align-items: center;
-      justify-content: space-between;
       margin-bottom: var(--spacing-100);
 }
 
@@ -111,6 +111,8 @@
 /* --- SELECTED DATE STYLES --- */
 .calendar-day.selected {
       display: flex;
+      justify-content: center;
+      align-items: center;
       width: 2rem; /* ~15% larger than 26px */
       height: 2rem;
       border: none;
@@ -120,8 +122,6 @@
       color: var(--Background-color);
       font-weight: 600;
       transition: background-color 0.4s ease, color 0.4s ease, transform 0.4s ease;
-      align-items: center;
-      justify-content: center;
 }
 .calendar-day.selected:hover {
       transform: scale(1.15);

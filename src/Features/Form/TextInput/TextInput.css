@@ -5,11 +5,11 @@
 
 label {
       display: flex;
+      flex-direction: column;
+      align-items: flex-start;
       color: var(--White);
       text-transform: uppercase;
       letter-spacing: 0.125rem;
-      align-items: flex-start;
-      flex-direction: column;
       font: inherit;
       gap: var(--spacing-100);
 }

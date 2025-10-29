@@ -10,7 +10,7 @@
         {
           "groupName": "Display & Box Model",
           "properties": [
-            "display", "float", "clear", "overflow", "box-sizing",
+            "display", "flex-direction", "justify-content", "align-items", "align-content", "flex-wrap", "float", "clear", "overflow", "box-sizing",
             "width", "height", "max-width", "max-height", "min-width", "min-height",
             "margin", "padding", "border", "border-radius"
           ]
