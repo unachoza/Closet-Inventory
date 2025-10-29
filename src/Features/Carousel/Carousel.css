@@ -7,7 +7,7 @@
 	position: relative; 
 	display: flex; 
 	width: 100%;
-	width: 800px; 
+	width: 50rem; 
 	max-width: 39rem; 
 	padding: 1rem; 
 	align-items: center; 
@@ -24,7 +24,7 @@
 
 .view-three { 
 	display: flex; 
-	width: 250px; 
+	width: 15.625rem; 
 	flex-direction: row;
 	gap: 1rem; 
 	justify-content: center;
@@ -34,12 +34,12 @@
 
 .clothes-card {
 	display: flex; 
-	min-width: 135px; 
+	min-width: 8.4375rem;
 	padding: 1rem;
 	border: solid black; 
 	border-radius: var(--border-radius-md);
 	background-color: rgba(0, 0, 0, 0.53); 
-	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+	box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
 	color: var(--White);
 	align-items: center; 
 	flex-direction: column; 

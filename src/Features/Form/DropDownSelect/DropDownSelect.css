@@ -2,10 +2,10 @@ label {
 	display: flex;
 	border-radius: var(--border-radius-ty);
 	color: var(--Black);
-	font-size: 2rem;
+	font-size: 1.5rem;
 	font-weight: 600;
 	justify-content: center;
-	margin-bottom: 10px;
+	margin-bottom: .5rem;
 }
 
 .dropdown {
@@ -16,7 +16,7 @@ label {
 
 .dropdown-header {
 	display: flex;
-	padding: 10px;
+	padding: .5rem;
 	border: var(--border-black-sm);
 	border-radius: var(--border-radius-ty);
 	background-color: var(--Background-color);
@@ -57,7 +57,7 @@ label {
 }
 
 .dropdown-option {
-	padding: 10px;
+	padding: .5rem;
 	cursor: pointer;
 	border-top: 1px solid #000;
 }

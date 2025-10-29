@@ -39,15 +39,15 @@ label.animated-checkbox {
 }
 
 .checkbox-svg {
-      width: 30px;
-      height: 30px;
+      width: 2rem;
+      height: 2rem;
       color: var(--White);
 }
 
 .checkbox-label {
       display: flex;
       border-radius: var(--border-radius-ty);
-      font-size: 26px;
+      font-size: 1.5rem;
       font-size: 1.35rem;
       align-items: center;
       paint-order: stroke;
@@ -55,17 +55,17 @@ label.animated-checkbox {
 }
 
 .checkbox-root:hover { 
-      box-shadow: 2px 2px 20px var(--Black);
+      box-shadow: 2px 2px 1.25rem var(--Black);
       border-color: var(--Check-Blue);
 }
  
 button .checkbox-label:hover + .checkbox-root{
-      box-shadow: 10px 10px 20px var(--Check-Blue)
+      box-shadow: .5rem .5rem 1.25rem var(--Check-Blue)
 
 }
 label > button:active,
 label > button:focus {
-      outline: 10px auto var(--background-green);
+      outline: .5rem auto var(--background-green);
 }
 
 label > button:hover{

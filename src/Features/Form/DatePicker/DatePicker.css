@@ -20,10 +20,10 @@
 
 .datepicker-input {
       width: 200px;
-      padding: 8px 32px 8px 10px;
+      padding: .5rem 32px .5rem .5rem;
       border: var(--border-white-sm);
       border-radius: var(--border-radius-sm);
-      box-shadow: 3px 4px 20px 9px rgba(0, 0, 0, 0.875);
+      box-shadow: 3px 4px 1.25rem 9px rgba(0, 0, 0, 0.875);
       color: var(--White);
       font-size: 1.05rem;
       outline: none;
@@ -51,7 +51,7 @@
       border: var(--border-black-sm);;
       border-radius: var(--border-radius-md);
       background: var(--Background-color);
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0px 4px .5rem rgba(0, 0, 0, 0.15);
 }
 
 /* Calendar Styles */
@@ -91,8 +91,8 @@
 }
 
 .calendar-day {
-      width: 2rem;
-      height: 2rem;
+      width: 1.5rem;
+      height: 1.5rem;
       border: none;
       border-radius: var(--border-radius-ty);
       background: none;
@@ -103,7 +103,7 @@
 }
 
 .calendar-day:hover {
-      box-shadow: 2px 2px 20px var(--Black);
+      box-shadow: 2px 2px 1.25rem var(--Black);
       transform: none;
 
 }
@@ -111,12 +111,12 @@
 /* --- SELECTED DATE STYLES --- */
 .calendar-day.selected {
       display: flex;
-      width: 30px; /* ~15% larger than 26px */
-      height: 30px;
+      width: 2rem; /* ~15% larger than 26px */
+      height: 2rem;
       border: none;
       border-radius: var(--border-radius-circle);
       background-color: var(--White);
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      box-shadow: 0 0 .5rem rgba(255, 255, 255, 0.6);
       color: var(--Background-color);
       font-weight: 600;
       transition: background-color 0.4s ease, color 0.4s ease, transform 0.4s ease;

@@ -54,5 +54,5 @@
       height: 2px;
       border-radius: 2px;
       background-color: var(--White);
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 .5rem rgba(255, 255, 255, 0.8);
 }

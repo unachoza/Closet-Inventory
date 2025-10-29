@@ -6,15 +6,13 @@
 .card {
       width: var(--Card-width);
       height:  var(--Card-height);
-      border-radius: var(--border-radius-lg);
-      color: var(--White);
       cursor: pointer;
       transition: transform 0.2s ease;
       perspective: 1000px;
 }
 
 .card:hover {
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 .5rem 2rem rgba(0, 0, 0, 0.4);
       transform: translateY(-4px);
 }
 
@@ -40,7 +38,7 @@
       height: 100%;
       border-radius: var(--border-radius-md);
       background: #fff;
-      box-shadow: 0 8px 2rem rgba(0, 0, 0, 0.15);
+      box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, 0.15);
       backface-visibility: hidden;
 }
 
@@ -87,7 +85,7 @@
 /* Back */
 .card-back {
       padding: 1.25rem;
-      border: var(--Dark-Grey) 10px solid;
+      border: var(--Dark-Grey) .5rem solid;
       /* blue gradient */
       background: #78acbf;
       background: linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%);

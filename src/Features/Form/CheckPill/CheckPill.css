@@ -16,7 +16,7 @@
 
 .pill-box.active {
   background-color: var(--active-color, var(--Dark-Grey));
-  box-shadow: 0 0 10px var(--active-color, var(--Dark-Grey));
+  box-shadow: 0 0 .5rem var(--active-color, var(--Dark-Grey));
   color: var(--White);
   border-color: var(--active-color, var(--Dark-Grey));
 }
