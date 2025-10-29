@@ -15,23 +15,58 @@
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: cover;
+
+	/**** VARIABLES ****/
+
+	/* COLORS */
 	--background-green: #6e707036;
-	--box-shadow: 10px 11px 30px 12px rgba(0, 0, 0, 0.875)
+	--Black: #000000;
+	--Op-Black:#333;
+	--White: #FFFFFF;
+	--Dark-Grey: #2a302d;
+	--Medium-Grey: #777;
+	--Op-Light-Grey: #888;
+	--Focus: #27AE60;
+	--Background-color: #808000b3;
+
+	
+	/* FONTS */
+	
+	/* STYLES */
+	--blur: blur(.6rem);
+	--box-shadow: 10px 11px 30px 12px rgba(0, 0, 0, 0.875);
+	
+
+	--border-radius-ty: .25rem;
+	--border-radius-sm: .5rem;
+	--border-radius-md: 1rem;
+	--border-radius-lg: 2rem;
+	--border-radius-circle: 50%;
+
+	--padding-rectangle-sm: var(var(--spacing-100) var(var(--spacing-200)));
+
+	--border-black-sm: solid 1px var(--Black);
+	--border-white-sm: solid 1px var(--White);
+
+	/* SPACING */
+	--spacing-50: .25rem;
+	--spacing-100: .5rem;
+	--spacing-200: 1rem;
+	--spacing-300: 1.5rem;
+	--spacing-400: 2rem;
+	--spacing-500: 2.5rem;
+	--spacing-600: 3rem;
+	--spacing-700: 3.5rem;
+	--spacing-800: 4rem;
+	--spacing-900: 4.5rem;
+	--spacing-1000: 5rem;
+	--spacing-1100: 5.25rem;
 }
 
 *{
 	box-sizing: border-box;
 	/* -webkit-text-stroke: 2px black;
 	paint-order: stroke; */
-}
-
-a {
-	font-weight: 500;
-	color: #646cff;
-	text-decoration: inherit;
-}
-a:hover {
-	color: #535bf2;
 }
 
 body {
@@ -52,7 +87,7 @@ h1 {
 }
 
 button {
-	border-radius: 8px;
+	border-radius: var(--border-radius-sm);
 	border: 1px solid transparent;
 	padding: 0.6em 1.2em;
 	margin: 10px;
@@ -96,7 +131,7 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
 	:root {
 		color: #213547;
-		background-color: #ffffff;
+		background-color: var(--White);
 	}
 	a:hover {
 		color: #747bff;

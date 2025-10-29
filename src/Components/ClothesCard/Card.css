@@ -1,11 +1,16 @@
+:root {
+      --Card-width: 20rem;
+      --Card-height: 21rem;
+}
+
 .card {
-      width: 320px;
-      height: 331px;
+      width: var(--Card-width);
+      height:  var(--Card-height);
       perspective: 1000px;
       cursor: pointer;
-      color: #fff;
+      color: var(--White);
       transition: transform 0.2s ease;
-      border-radius: 24px;
+      border-radius: var(--border-radius-lg);
 }
 
 .card:hover {
@@ -32,10 +37,10 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      border-radius: 1.5rem;
+      border-radius: var(--border-radius-md);
       overflow: hidden;
       background: #fff;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 2rem rgba(0, 0, 0, 0.15);
       backface-visibility: hidden;
 }
 
@@ -44,8 +49,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      background: #2a302d;
-      border-radius: 10px;
+      background: var(--Dark-Grey);
+      border-radius: var(--border-radius-sm);
       padding: 1rem;
 }
 .card-image {
@@ -55,7 +60,7 @@
 .card-image img {
       width: 100%;
       height: 100%;
-      border-radius: 10px;
+      border-radius: var(--border-radius-sm);
 }
 
 .card-info {
@@ -66,7 +71,7 @@
 
 .card-category {
       font-size: 0.9rem;
-      color: #777;
+      color: var(--Medium-Grey);
       text-transform: uppercase;
       letter-spacing: 1px;
 }
@@ -90,7 +95,7 @@
       transform: rotateY(180deg);
       font-size: 0.95rem;
       text-align: left;
-      border: #2a302d 10px solid;
+      border: var(--Dark-Grey) 10px solid;
 }
 
 .card-back p {
@@ -98,5 +103,5 @@
 }
 
 .card-back strong {
-      color: #000;
+      color: var(--Black);;
 }

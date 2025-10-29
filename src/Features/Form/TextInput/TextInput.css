@@ -1,26 +1,6 @@
 
 :root{
-      --text-color: black;
-      --Black: #000000;
-      --White: #FFFFFF;
-
-      --Focus: #27AE60;
-      --Background-color: #808000b3;
-
-
-      /* Spacing */
-      --spacing-50: .25rem;
-      --spacing-100: .5rem;
-      --spacing-200: 1rem;
-      --spacing-300: 1.5rem;
-      --spacing-400: 2rem;
-      --spacing-500: 2.5rem;
-      --spacing-600: 3rem;
-      --spacing-700: 3.5rem;
-      --spacing-800: 4rem;
-      --spacing-900: 4.5rem;
-      --spacing-1000: 5rem;
-      --spacing-1100: 5.25rem;
+      --text-color: var(--Black);
 }
 
 label {
@@ -36,13 +16,13 @@ label {
 
 input {
       box-sizing: border-box;
-      color: black;
-      background: var(--white);
+      color: var(--Black);
+      background: var(--White);
       height: 2.8125rem;
       width: 100%;
       padding: var(--spacing-100) var(--spacing-200);
-      border: 1px solid var(--White);
-      border-radius: 0.5rem;
+      border: var(--border-white-sm);
+      border-radius: var(--border-radius-sm);
       transition: all .4s ease; 
 }
 
@@ -67,20 +47,20 @@ input::placeholder {
 
 input:focus {
       outline: none;
-      border-radius: 0.5rem;
+      border-radius: var(--border-radius-sm);
       border: solid 2px var(--White);
       background-color: var(--Background-color);
 }
 
 input:not(:focus):not(:placeholder-shown):invalid {
-      border-radius: 0.5rem;
+      border-radius: var(--border-radius-sm);
       border: 0.0625rem solid var(--input-errors);
       background: var(--white);
 }
 
 input:user-invalid{
       border: 0.0625rem solid var(--input-errors);
-      border-radius: 0.5rem;
+      border-radius: var(--border-radius-sm);
       background: var(--white);
 }
 

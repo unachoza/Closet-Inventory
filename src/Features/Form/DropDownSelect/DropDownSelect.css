@@ -1,10 +1,10 @@
 label {
 	font-weight: 600;
-	font-size: 24px;
-	color: black;
+	font-size: 2rem;
+	color: var(--Black);
 	margin-bottom: 10px;
 	justify-content: center;
-	border-radius: 5px;
+	border-radius: var(--border-radius-ty);
 	display: flex;
 }
 
@@ -16,14 +16,14 @@ label {
 
 .dropdown-header {
 	padding: 10px;
-	border: 1px solid #000000;
+	border: var(--border-black-sm);
 	background-color: var(--Background-color);
-	border-radius: 5px;
+	border-radius: var(--border-radius-ty);
 	cursor: pointer;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	color: #000;
+	color: var(--Black);;
 }
 
 .dropdown-selected {
@@ -42,14 +42,14 @@ label {
 .dropdown-options {
 	position: absolute;
 	width: 100%;
-	border: 1px solid #000;
+	border: var(--border-black-sm);
 	border-top: none;
 	background-color: var(--Background-color);
 	overflow: hidden; /*important for dropdown affect */
 	max-height: 0; /*important for dropdown affect */
 	transition: max-height 0.3s ease;
 	z-index: 1000;
-	color: black;
+	color: var(--Black);
 }
 
 .dropdown-options.open {
