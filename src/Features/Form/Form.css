@@ -4,9 +4,8 @@
 	--Form-padding: 1.5rem;
 }
 
-
 form {
-	height: clamp(400px, 50vh, 900px);
+	height: clamp(25rem, 50vh, 56.25rem);
 }
 
 .form {

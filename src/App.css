@@ -1,21 +1,21 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-  width: 100%;
-  height: 100vh
-}
 
 .main{
   height: 100%;
 }
+/**** VARIABLES ****/
+:root {
+  --button-backround-blue:  #2563eb;
+  --button-backround-blue-hover:#1d4ed8;
+  --button-backround-green: #808000;
+  --button-backround-green-hover: #676702;
 
-/* === Button === */
+}
+/**** COMPONENTS ****/
+
+/* Button */
 .back-button {
-  margin-top: 1.5rem;
   padding: 0.6rem 1.5rem;
-  background: #2563eb;
+  background: var(--button-backround-green);
   color: var(--White);
   border-radius: var(--border-radius-sm);
   font-size: 1rem;
@@ -25,7 +25,7 @@
 }
 
 .back-button:hover {
-  background: #1d4ed8;
+  background: var(--button-backround-green-hover);
   transform: translateY(-1px);
 }
 
@@ -34,14 +34,6 @@
 }
 
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {

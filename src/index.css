@@ -21,12 +21,17 @@
 	/* COLORS */
 	--background-green: #6e707036;
 	--Black: #000000;
+	--Soft-Black: #1a1a1a;
 	--Op-Black:#333;
+	--Trans-Black:#00000033;
 	--White: #FFFFFF;
 	--Dark-Grey: #2a302d;
 	--Medium-Grey: #777;
 	--Op-Light-Grey: #888;
-	--Focus: #27AE60;
+
+	--Focus-Blue: #4ab6f5;
+	--Outline-Blue: #646cff;
+	--Focus-Mustard: #bdbd13;
 	--Background-color: #808000b3;
 
 	
@@ -69,6 +74,15 @@
 	paint-order: stroke; */
 }
 
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+  height: 100vh
+}
+
 body {
 	margin: 0;
 	display: flex;
@@ -81,27 +95,27 @@ h1 {
 	font-size: 3em;
 	margin: 1rem 0;
 	line-height: 1.1;
-	-webkit-text-stroke: 2px black;
+	-webkit-text-stroke: 2px var(--Black);
 	paint-order: stroke;
 
 }
 
 button {
 	border-radius: var(--border-radius-sm);
-	border: 1px solid transparent;
+	border: var(--border-black-sm);
 	padding: 0.6em 1.2em;
-	margin: 10px;
+	margin: var(--spacing-100);
 	font-size: 1em;
 	font-weight: 500;
 	font-family: inherit;
-	background-color: #1a1a1a;
+	background-color: var(--Soft-Black);
 	cursor: pointer;
 	transition: border-color 0.25s;
 }
 
 button:hover {
 	transform: translateY(-3px);
-	box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+	box-shadow: 0 1rem 2rem var(--Trans-Black);
 	transition: all 0.2s;
 }
 button::after {
