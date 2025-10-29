@@ -1,29 +1,29 @@
 .pill-box {
   padding: var(--padding-rectangle-sm);
   border: var(--border-black-sm);
+  background-color: inherit;
+  background-color: var(--Background-color);
+  color: var(--Op-Black);
   cursor: pointer;
   transition: all 0.25s ease;
   user-select: none;
-  background-color: inherit;
-  color: var(--Op-Black);
-  background-color: var(--Background-color);
 }
 
 .pill-box:hover {
-  border-color: var(--Op-Light-Grey);
   transform: translateY(-1px);
+  border-color: var(--Op-Light-Grey);
 }
 
 .pill-box.active {
   background-color: var(--active-color, var(--Dark-Grey));
+  box-shadow: 0 0 10px var(--active-color, var(--Dark-Grey));
   color: var(--White);
   border-color: var(--active-color, var(--Dark-Grey));
-  box-shadow: 0 0 10px var(--active-color, var(--Dark-Grey));
 }
 
 .checkbox-label {
-  pointer-events: none;
   color: var(--White);
   font-size: 1.15rem;
+  pointer-events: none;
 
 }

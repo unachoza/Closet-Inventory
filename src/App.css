@@ -15,9 +15,9 @@
 /* Button */
 .back-button {
   padding: 0.6rem 1.5rem;
+  border-radius: var(--border-radius-sm);
   background: var(--button-backround-green);
   color: var(--White);
-  border-radius: var(--border-radius-sm);
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;

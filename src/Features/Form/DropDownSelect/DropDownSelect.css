@@ -1,11 +1,11 @@
 label {
-	font-weight: 600;
-	font-size: 2rem;
-	color: var(--Black);
-	margin-bottom: 10px;
-	justify-content: center;
-	border-radius: var(--border-radius-ty);
 	display: flex;
+	border-radius: var(--border-radius-ty);
+	color: var(--Black);
+	font-size: 2rem;
+	font-weight: 600;
+	justify-content: center;
+	margin-bottom: 10px;
 }
 
 .dropdown {
@@ -15,15 +15,15 @@ label {
 }
 
 .dropdown-header {
+	display: flex;
 	padding: 10px;
 	border: var(--border-black-sm);
-	background-color: var(--Background-color);
 	border-radius: var(--border-radius-ty);
+	background-color: var(--Background-color);
+	color: var(--Black);
 	cursor: pointer;
-	display: flex;
-	justify-content: space-between;
 	align-items: center;
-	color: var(--Black);;
+	justify-content: space-between;;
 }
 
 .dropdown-selected {
@@ -41,15 +41,15 @@ label {
 /* Options container with smooth transition */
 .dropdown-options {
 	position: absolute;
-	width: 100%;
-	border: var(--border-black-sm);
-	border-top: none;
-	background-color: var(--Background-color);
-	overflow: hidden; /*important for dropdown affect */
-	max-height: 0; /*important for dropdown affect */
-	transition: max-height 0.3s ease;
 	z-index: 1000;
+	overflow: hidden; /*important for dropdown affect */
+	width: 100%;
+	max-height: 0; /*important for dropdown affect */
+	border: var(--border-black-sm);
+	background-color: var(--Background-color);
 	color: var(--Black);
+	transition: max-height 0.3s ease;
+	border-top: none;
 }
 
 .dropdown-options.open {
@@ -58,8 +58,8 @@ label {
 
 .dropdown-option {
 	padding: 10px;
-	border-top: 1px solid #000;
 	cursor: pointer;
+	border-top: 1px solid #000;
 }
 
 .dropdown-option:hover {

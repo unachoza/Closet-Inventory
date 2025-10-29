@@ -1,0 +1,37 @@
+{
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "order/properties-order": [
+      [
+        {
+          "groupName": "Positioning",
+          "properties": ["position", "top", "right", "bottom", "left", "z-index"]
+        },
+        {
+          "groupName": "Display & Box Model",
+          "properties": [
+            "display", "float", "clear", "overflow", "box-sizing",
+            "width", "height", "max-width", "max-height", "min-width", "min-height",
+            "margin", "padding", "border", "border-radius"
+          ]
+        },
+        {
+          "groupName": "Visual",
+          "properties": ["background", "background-color", "background-image", "box-shadow", "color", "opacity"]
+        },
+        {
+          "groupName": "Typography",
+          "properties": [
+            "font-family", "font-size", "font-weight", "line-height", "text-align",
+            "text-decoration", "text-transform", "letter-spacing"
+          ]
+        },
+        {
+          "groupName": "Other",
+          "properties": ["cursor", "transition", "transform", "animation"]
+        }
+      ],
+      { "unspecified": "bottomAlphabetical" }
+    ]
+  }
+}

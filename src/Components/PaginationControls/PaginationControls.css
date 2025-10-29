@@ -2,18 +2,18 @@
 
 .pagination-controls {
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	gap: 1rem;
+	justify-content: center;
 	margin-top: 1.5rem;
 }
 
 .pagination-controls button {
-	background: #111;
-	color: var(--White);
 	padding: var(--padding-rectangle-sm);
 	border: var(--border-black-sm);
 	border-radius: var(--border-radius-ty);
+	background: #111;
+	color: var(--White);
 	cursor: pointer;
 	transition: background 0.2s ease;
 }

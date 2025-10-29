@@ -5,24 +5,24 @@
 
 label {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
       color: var(--White);
-      font: inherit;
-      letter-spacing: 0.125rem;
       text-transform: uppercase;
+      letter-spacing: 0.125rem;
+      align-items: flex-start;
+      flex-direction: column;
+      font: inherit;
       gap: var(--spacing-100);
 }
 
 input {
       box-sizing: border-box;
-      color: var(--Black);
-      background: var(--White);
-      height: 2.8125rem;
       width: 100%;
+      height: 2.8125rem;
       padding: var(--spacing-100) var(--spacing-200);
       border: var(--border-white-sm);
       border-radius: var(--border-radius-sm);
+      background: var(--White);
+      color: var(--Black);
       transition: all .4s ease; 
 }
 
@@ -31,12 +31,12 @@ input:hover{
 }
 
 input[type="text"] {
-      color: var(--White);
-      font: inherit;
-      line-height: 130%;
-      font-feature-settings: 'liga' off, 'clig' off;
       background: var(--white);
-      box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.875)
+      box-shadow: 0px 2px 10px 2px rgba(0, 0, 0, 0.875);
+      color: var(--White);
+      line-height: 130%;
+      font: inherit;
+      font-feature-settings: 'liga' off, 'clig' off
 }
 
 input::placeholder {
@@ -46,15 +46,15 @@ input::placeholder {
 }
 
 input:focus {
-      outline: none;
-      border-radius: var(--border-radius-sm);
       border: solid 2px var(--White);
+      border-radius: var(--border-radius-sm);
       background-color: var(--Background-color);
+      outline: none;
 }
 
 input:not(:focus):not(:placeholder-shown):invalid {
-      border-radius: var(--border-radius-sm);
       border: 0.0625rem solid var(--input-errors);
+      border-radius: var(--border-radius-sm);
       background: var(--white);
 }
 
@@ -65,12 +65,12 @@ input:user-invalid{
 }
 
 .error-message {
-      color: var(--input-errors);
-      font: inherit;
-      line-height: 125%;
-      height: 0;
       overflow: hidden;
-      transition: all .4s ease; 
+      height: 0;
+      color: var(--input-errors);
+      line-height: 125%;
+      transition: all .4s ease;
+      font: inherit; 
 }
 
 input:user-invalid ~ .error-message {

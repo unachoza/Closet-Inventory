@@ -3,37 +3,37 @@
 }
 
 .step-tabs-container {
-      width: 100%;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      width: 100%;
       background-color: transparent;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 1.5rem;
 }
 
 .step-tabs-list {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      list-style: none;
-      padding: 0;
-      margin: 0;
       width: 100%;
       max-width: 640px; /*// width of the form */
+      margin: 0;
+      padding: 0;
       text-transform: uppercase;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
 }
 
 .step-tab {
       /* min-width: 70px; TODO: MAKE TABS UNIFORM IN SIZE>??*/
       position: relative;
       padding: 0.5rem .75rem;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
       color: rgba(255, 255, 255, 0.6);
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
       transition: color 0.2s ease, transform 0.2s ease;
       user-select: none;
-      text-align: center;
 }
 
 .step-tab:hover {
@@ -48,11 +48,11 @@
 
 .step-tab-underline {
       position: absolute;
+      right: 0;
       bottom: -4px;
       left: 0;
-      right: 0;
       height: 2px;
-      background-color: var(--White);
       border-radius: 2px;
+      background-color: var(--White);
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
