@@ -4,6 +4,7 @@ import MultiStepForm from "./Features/Form/Form";
 import Header from "./Components/Header";
 import Closet from "./Features/Closet/Closet";
 import { CategoryType, ViewType } from "./utils/types";
+import { ToastProvider } from "./Components/Toast/Toast";
 import "./App.css";
 
 function App() {
@@ -12,20 +13,22 @@ function App() {
 
 	return (
 		<div className="main">
-			<Header />
-			{/* Controls */}
-			<div className="mt-4">
-				<button onClick={() => setView("form")}>Add Item</button>
-				<button className="ml-2" onClick={() => setView("carousel")}>
-					View All Items
+			<ToastProvider>
+				<Header />
+				{/* Controls */}
+				<div className="mt-4">
+					<button onClick={() => setView("form")}>Add Item</button>
+					<button className="ml-2" onClick={() => setView("carousel")}>
+						View All Items
+					</button>
+				</div>
+				{view === "form" && <MultiStepForm setView={setView} />}
+				{view === "carousel" && <Carousel setCategory={setSelectedCategory} />}
+				{view === "carousel" && <Closet selectedCategory={selectedCategory} />}
+				<button className="back-button" onClick={() => setView("overview")}>
+					Back to Carousel
 				</button>
-			</div>
-			{view === "form" && <MultiStepForm setView={setView} />}
-			{view === "carousel" && <Carousel setCategory={setSelectedCategory} />}
-			{view === "carousel" && <Closet selectedCategory={selectedCategory} />}
-			<button className="back-button" onClick={() => setView("overview")}>
-				Back to Carousel
-			</button>
+			</ToastProvider>
 		</div>
 	);
 }
