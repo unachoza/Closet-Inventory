@@ -48,7 +48,7 @@
 	--border-radius-lg: 2rem;
 	--border-radius-circle: 50%;
 
-	--padding-rectangle-sm: var(var(--spacing-100) var(var(--spacing-200)));
+	--padding-rectangle-sm: .5rem 1rem;
 
 	--border-black-sm: solid 1px var(--Black);
 	--border-white-sm: solid 1px var(--White);

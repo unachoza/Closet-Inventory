@@ -25,7 +25,8 @@
 }
 
 .back-button:hover {
-  background: var(--button-backround-green-hover);
+  filter: brightness(.8);
+
   transform: translateY(-1px);
 }
 

@@ -2,6 +2,7 @@
 	--background-form: #31341c59;
 	--Form-width: 42rem;
 	--Form-padding: 1.5rem;
+	--Submit-Green: #10B981;
 }
 
 form {
@@ -15,10 +16,9 @@ form {
 	max-width: var(--Form-width);
 	margin: .5rem auto;
 	padding: var(--Form-padding);
-	border: solid black;
+	border: var(--border-black-sm);
 	border-radius: var(--border-radius-md);
 	background: var(--background-form);
-	background-color: var(--background-form);
 	box-shadow: var(--box-shadow);
 	backdrop-filter: var(--blur)
 }
@@ -38,11 +38,13 @@ form {
 	paint-order: stroke;
 	-webkit-text-stroke: 2px black;
 }
+
 .form-controls {
 	display: flex; 
 	justify-content: space-around;
 	margin-top: 1rem;
 }
+
 .next-button {
 	position: absolute;
 	right: 1.25rem;
@@ -59,11 +61,11 @@ button.submit {
 	position: absolute;
 	right: 1.25rem;
 	bottom: 1.25rem;
-	background-color: #10B981;
-
+	background-color: var(--Submit-Green);
 }
+
 button.submit:hover {
-	background-color: #059669; 
+	filter: contrast(1.5);
 }
   
 
@@ -121,14 +123,14 @@ button.submit:hover {
 /* Popover / calendar styling */
 .age-datepicker .datepicker-popover {
 	position: absolute;
-	top: 36px;
+	top: 2.25rem;
 	left: 0;
 	z-index: 50;
 	padding: 0.5rem;
 	border:var(--border-white-sm);
 	border-radius: var(--border-radius-sm);
 	background: var(--White);
-	box-shadow: 0 4px .5rem rgba(0, 0, 0, 0.15);
+	box-shadow: 0 .25rem .5rem rgba(0, 0, 0, 0.15);
 }
 
 /* --- POPOVER TRANSITION --- */

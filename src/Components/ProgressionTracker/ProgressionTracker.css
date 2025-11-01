@@ -1,5 +1,5 @@
 :root {
-      /* --FORM-WIDTH: 20rem */
+      /* --FORM-WIDTH: 42rem */
 }
 
 .step-tabs-container {
@@ -15,8 +15,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
-      max-width: 640px; /*// width of the form */
+      max-width: calc(var(--Form-width) + 2rem); /*// width of the form */
       margin: 0;
       padding: 0;
       text-transform: uppercase;
