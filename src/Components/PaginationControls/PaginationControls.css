@@ -9,17 +9,17 @@
 }
 
 .pagination-controls button {
+	padding: var(--padding-rectangle-sm);
+	border: var(--border-black-sm);
+	border-radius: var(--border-radius-ty);
 	background: #111;
-	color: #fff;
-	padding: 0.5rem 1rem;
-	border: 1px solid #444;
-	border-radius: 4px;
+	color: var(--White);
 	cursor: pointer;
 	transition: background 0.2s ease;
 }
 
 .pagination-controls button:hover:not(:disabled) {
-	background: #333;
+	background: var(--Op-Black);
 }
 
 .pagination-controls button:disabled {

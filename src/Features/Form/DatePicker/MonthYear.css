@@ -1,0 +1,21 @@
+.dropdown-options {
+      position: absolute;
+      z-index: 1000;
+      overflow: scroll; /*important for dropdown affect */
+      width: 100%;
+      max-height: 0; /*important for dropdown affect */
+      border: var(--border-black-sm);
+      background-color: var(--Background-color);
+      color: var(--Black);
+      transition: max-height 0.3s ease;
+      border-top: none;
+}
+
+.dropdown-options.open {
+      max-height: 275px; /* Adjust according to the number of options */
+}
+
+.month-year-dd {
+      display: flex;
+      gap: .5rem
+}

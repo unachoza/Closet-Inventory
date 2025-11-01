@@ -2,6 +2,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  height: 300px;
   flex-wrap: wrap;
+  height: 18.75rem;
 }

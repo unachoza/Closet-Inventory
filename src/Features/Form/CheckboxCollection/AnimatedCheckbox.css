@@ -6,22 +6,22 @@ label.animated-checkbox {
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: var(--spacing-100);
-      cursor: pointer;
-      user-select: none;
+      width: fit-content;
       margin: 0;
       font-size: .75rem;
-      width: fit-content;
+      cursor: pointer;
+      gap: var(--spacing-100);
+      user-select: none;
 }
 
 .checkbox-root {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 2rem;
       height: 2rem;
-      border-radius: .15em;
       border: solid var(--Black);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      border-radius: .15em;
       background-color: inherit;
       transition: border-color 0.2s ease, background-color 0.2s ease;
 }
@@ -31,41 +31,41 @@ label.animated-checkbox {
 }
 
 .checkbox-inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 1rem;
       height: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
 }
 
 .checkbox-svg {
-      width: 30px;
-      height: 30px;
+      width: 2rem;
+      height: 2rem;
       color: var(--White);
 }
 
 .checkbox-label {
       display: flex;
       align-items: center;
-      font-size: 26px;
-      border-radius: 0.25rem;
-      -webkit-text-stroke: 2px black;
-      paint-order: stroke;
+      border-radius: var(--border-radius-ty);
+      font-size: 1.5rem;
       font-size: 1.35rem;
+      paint-order: stroke;
+      -webkit-text-stroke: 2px black;
 }
 
-.checkbox-root:hover {
-      border-color: var(--Check-Blue); 
-      box-shadow: 2px 2px 20px var(--Black);
+.checkbox-root:hover { 
+      box-shadow: 2px 2px 1.25rem var(--Black);
+      border-color: var(--Check-Blue);
 }
  
 button .checkbox-label:hover + .checkbox-root{
-      box-shadow: 10px 10px 20px var(--Check-Blue)
+      box-shadow: .5rem .5rem 1.25rem var(--Check-Blue)
 
 }
 label > button:active,
 label > button:focus {
-      outline: 10px auto var(--background-green);
+      outline: .5rem auto var(--background-green);
 }
 
 label > button:hover{
