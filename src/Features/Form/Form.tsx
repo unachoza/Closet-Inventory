@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextPillField from "./TextInput/TextPillField";
-import DatePicker from "./DatePicker/DatePicker";
 import { ItemFormData, ViewType } from "../../utils/types";
 import {
 	colorOptions,
@@ -21,6 +20,8 @@ import { useLocalStorage } from "../../hooks/uselocalStorage";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
+import MonthYearPicker from "./DatePicker/MonthYearPicker";
+import ImageUploaderInput from "./ImageUploader/ImageUploader";
 
 // MULTI-STEP(8) FORM
 export interface FormProps {
@@ -106,6 +107,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 			>
 				{/* <StepProgressTracker currentStep={step} onStepClick={setStep} /> */}
 				<StepTabsTracker currentStep={step} onStepClick={setStep} />
+
 				{/* STEP 1: CATEGORY */}
 				{step === 1 && (
 					<div className="field-label">
@@ -185,7 +187,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 							{/* Right: date picker */}
 							<div className="age-datepicker">
 								<span className="option-label">Or select purchase date</span>
-								<DatePicker
+								<MonthYearPicker
 									selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
 									onSelectDate={handleDateSelect}
 								/>
@@ -211,6 +213,16 @@ const MultiStepForm = ({ setView }: FormProps) => {
 						/>
 					</div>
 				)}
+				{/* STEP 8: IMAGE */}
+				{step === 9 && (
+					<div className="form-step">
+						<ImageUploaderInput
+							image={formData.image}
+							onImageSelect={(base64) => setFormData((prev) => ({ ...prev, image: base64 }))}
+							onImageRemove={() => setFormData((prev) => ({ ...prev, image: "" }))}
+						/>
+					</div>
+				)}
 
 				{/* NAVIGATION bUTTONS */}
 				<div className="form-controls">
@@ -225,7 +237,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 							Back
 						</button>
 					)}
-					{step < 8 && (
+					{step < 9 && (
 						<button
 							className="next-button"
 							onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -236,7 +248,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 							Next
 						</button>
 					)}
-					{step === 8 && (
+					{step === 9 && (
 						<button type="submit" className="submit" onClick={handleSubmit}>
 							Submit
 						</button>
