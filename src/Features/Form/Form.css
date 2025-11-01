@@ -70,17 +70,15 @@ button.submit:hover {
   
 
 
-/* Step 7 - Age selection layout */
-.age-step {
+.two-option-step {
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
 }
 
-.age-options {
+.double-options {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 2rem;
+	justify-content: space-evenly;
 }
 
 .age-checkboxes,

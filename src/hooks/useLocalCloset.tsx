@@ -9,13 +9,14 @@ export function useLocalStorageCloset() {
 	const [closet, setCloset] = useLocalStorage<ClothingItem[]>(STORAGE_KEY, MY_CLOSET_DATA);
 
 	const addItem = (newItem: ItemFormData) => {
-		setCloset((prev: any) => {
+		setCloset((prev: ClothingItem[]) => {
+			const photo = newItem.imageURL;
 			const updated = [
 				...prev,
 				{
 					...newItem,
 					id: crypto.randomUUID(),
-					imageURL: useStockPhoto(newItem.category as CategoryType),
+					imageURL: photo ? photo : useStockPhoto(newItem.category as CategoryType),
 					name: newItem.brand ? `${newItem.brand} ${newItem.category}` : newItem.category,
 				},
 			];

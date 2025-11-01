@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextPillField from "./TextInput/TextPillField";
-import { ItemFormData, ViewType } from "../../utils/types";
+import { CategoryType, ItemFormData, ViewType } from "../../utils/types";
 import {
 	colorOptions,
 	sizeOptions,
@@ -22,6 +22,7 @@ import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
 import MonthYearPicker from "./DatePicker/MonthYearPicker";
 import ImageUploaderInput from "./ImageUploader/ImageUploader";
+import useStockPhoto from "../../hooks/useStockPhoto";
 
 // MULTI-STEP(8) FORM
 export interface FormProps {
@@ -171,9 +172,9 @@ const MultiStepForm = ({ setView }: FormProps) => {
 				{/* STEP 7: AGE */}
 
 				{step === 7 && (
-					<div className="form-step age-step">
+					<div className="form-step two-option-step">
 						<label className="step-label">Item Age</label>
-						<div className="age-options">
+						<div className="double-options">
 							{/* Left: checkboxes */}
 							<div className="age-checkboxes">
 								<span className="option-label">Select Age</span>
@@ -215,12 +216,21 @@ const MultiStepForm = ({ setView }: FormProps) => {
 				)}
 				{/* STEP 8: IMAGE */}
 				{step === 9 && (
-					<div className="form-step">
-						<ImageUploaderInput
-							image={formData.image}
-							onImageSelect={(base64) => setFormData((prev) => ({ ...prev, image: base64 }))}
-							onImageRemove={() => setFormData((prev) => ({ ...prev, image: "" }))}
-						/>
+					<div className="form-step two-option-step">
+						<label className="step-label">Photo</label>
+						<div className="double-options">
+							<ImageUploaderInput
+								image={formData.imageURL}
+								onImageSelect={(base64) => setFormData((prev) => ({ ...prev, imageURL: base64 }))}
+								onImageRemove={() => setFormData((prev) => ({ ...prev, image: "" }))}
+							/>
+							<div className="image-uploader">
+								<label className="step-label">or use default image?</label>
+								<div className="image-uploader-box">
+									<img src={useStockPhoto(formData.category as CategoryType)} className="image-preview" alt="preview" />
+								</div>
+							</div>
+						</div>
 					</div>
 				)}
 
