@@ -29,6 +29,7 @@ export interface ItemFormData {
 	age: string;
 	purchaseDate?: string;
 	care: string;
+	image: string;
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear";

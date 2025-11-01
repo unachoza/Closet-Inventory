@@ -11,6 +11,7 @@ export const formItem = {
 	age: "",
 	purchaseDate: "",
 	care: "",
+	image: "",
 };
 
 export const stepsLabels: Step[] = [
@@ -24,7 +25,7 @@ export const stepsLabels: Step[] = [
 	{ step: 8, label: "Care" },
 ];
 
-export const steps = ["Category", "Color", "Size", "Brand", "Material", "Occasion", "Age", "Care"];
+export const steps = ["Category", "Color", "Size", "Brand", "Material", "Occasion", "Age", "Care", "Photo"];
 
 export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green", "orange", "yellow", "pink", "purple"];
 
@@ -53,6 +54,7 @@ export const occasionExamples = [
 	"cocktail",
 	"going-out",
 	"casual",
+	"sports",
 	"church",
 	"picnic",
 	"work wear",
