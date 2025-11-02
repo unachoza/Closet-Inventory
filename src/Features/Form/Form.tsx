@@ -23,6 +23,7 @@ import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTrac
 import MonthYearPicker from "./DatePicker/MonthYearPicker";
 import ImageUploaderInput from "./ImageUploader/ImageUploader";
 import useStockPhoto from "../../hooks/useStockPhoto";
+import { useToast } from "../../Components/Toast/Toast";
 
 // MULTI-STEP(8) FORM
 export interface FormProps {
@@ -42,6 +43,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 	const [careOptions, setCareOptions] = useLocalStorage(CARE_OPTIONS_KEY, careExamples);
 
 	const { addItem } = useLocalStorageCloset();
+	const { showToast } = useToast();
 
 	const toggleValue = (value: string, label: string) => {
 		setFormData((prev) => ({ ...prev, [label]: value }));
@@ -89,6 +91,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 		e.preventDefault();
 
 		addItem(formData);
+		showToast(`${formData.category} added to your closet!`);
 
 		setFormData(formItem);
 		setStep(1);
@@ -227,7 +230,11 @@ const MultiStepForm = ({ setView }: FormProps) => {
 							<div className="image-uploader">
 								<label className="step-label">or use default image?</label>
 								<div className="image-uploader-box">
-									<img src={useStockPhoto(formData.category as CategoryType)} className="image-preview" alt="preview" />
+									<img
+										src={useStockPhoto(formData.category as CategoryType)}
+										className="image-preview"
+										alt="preview"
+									/>
 								</div>
 							</div>
 						</div>
