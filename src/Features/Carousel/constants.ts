@@ -10,8 +10,24 @@ const categories = [
 	{ label: "Underwear", icon: "🩲" },
 ];
 
-export const closetImg =
+const decisionTree = {
+	tops: ["blouse", "knit", "turtleneck", "long sleave", "short sleave"],
+	neckline: ["v-neck", "cowl neck", "boat neck", "halter top", "cold shoulder"],
+	bottoms: ["jeans", "trousers", "skirts", "shorts", "skirt"],
+	hemline: ["pencil", "a line", "peplin", "bubble", "full", "mini", "asymetric"],
+};
+
+export const closetImg1 =
 	"https://images.unsplash.com/photo-1585914924626-15adac1e6402?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
+export const closetImg2 =
+	"https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mzl8fGNsb3RoZXMlMjByYWNrfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=900";
+
+export const closetImg3 =
+	"https://images.unsplash.com/photo-1760533091973-1262bf57d244?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=2070";
+
+export const closetImg4 =
+	"https://images.unsplash.com/photo-1584467331229-652facdb4345?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1740";
 
 export const artImages = {
 	standingInHeels: {

@@ -28,4 +28,5 @@ describe("TextInput Component", () => {
 	it("should recieve user input", async () => {});
 	it("should add a new pill description if it doesn't already exist");
 	it("should allow users to remove pill with x", () => {});
+	it("if used in pill input field, should post new pill to local storage")
 });

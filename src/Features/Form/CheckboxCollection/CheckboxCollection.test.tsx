@@ -35,7 +35,9 @@ describe("The Checkbox Component", () => {
 	});
 
 	it("should allow users to tab through inputs using their keyboard", async () => {})
-	it("if option is selected, it should no longer be inthe options list", () => {});
+	it("if option is selected, it should no longer be in the options list", () => {});
 	it("should have checkbox to the left and label to the right", () => {});
 	it("should show a focus state");
+	it("if color label, check should have background color match label", () =>{})
+	it("should allow only one value checked/ selected", () =>{})
 });

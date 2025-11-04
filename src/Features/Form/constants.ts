@@ -16,3 +16,12 @@ const options: Option[] = [
 	{ value: "socks", label: "Socks" },
 	{ value: "underwear", label: "Underwear" },
 ];
+
+//Fibers
+const materials = {
+	natural: ["wool", "linen", "cotton", "silk", "hemp", "cashmere", "bamboo", "ramie", "leather", "suede"], 
+	semiSynthetic: ["rayon", "viscos", "modal", "lyocell","tencel"],
+	//viscos and rayon when wet weaken
+	//modal and tencel -> Lenzing closed loop?
+	synthetic: ["polyester", "acrylic", "nylon", "spandex"]
+}

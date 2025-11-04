@@ -25,7 +25,7 @@ import ImageUploaderInput from "./ImageUploader/ImageUploader";
 import useStockPhoto from "../../hooks/useStockPhoto";
 import { useToast } from "../../Components/Toast/Toast";
 
-// MULTI-STEP(8) FORM
+// MULTI-STEP(9) FORM
 export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 }

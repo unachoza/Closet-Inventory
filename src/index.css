@@ -1,6 +1,15 @@
 :root {
 	background-color: #222c51;
-	background-image: url("https://sothebys-md.brightspotcdn.com/dims4/default/d74825c/2147483647/strip/true/crop/2000x1588+0+0/resize/800x635!/quality/90/?url=http%3A%2F%2Fsothebys-brightspot.s3.amazonaws.com%2Fmedia-desk%2Fwebnative%2Fimages%2Fbd%2F3a%2Fc8ce158041feac4dc32cbcbbb0d8%2Fn11753-cl3n7-t2-02-a.jpg");
+	/* background-image: url("https://sothebys-md.brightspotcdn.com/dims4/default/d74825c/2147483647/strip/true/crop/2000x1588+0+0/resize/800x635!/quality/90/?url=http%3A%2F%2Fsothebys-brightspot.s3.amazonaws.com%2Fmedia-desk%2Fwebnative%2Fimages%2Fbd%2F3a%2Fc8ce158041feac4dc32cbcbbb0d8%2Fn11753-cl3n7-t2-02-a.jpg"); */
+	/* 'https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001615/image_3_n4tvfn.webp' */
+	background-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001439/image_1_s0yql2.webp");
+	/* background-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001381/elegant_closet_yst0ec.webp"); */
+	
+	
+
+
+
+	
 	color: rgba(255, 255, 255, 0.87);
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
 	font-weight: 400;
