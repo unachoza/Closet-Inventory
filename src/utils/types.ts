@@ -34,7 +34,7 @@ export interface ItemFormData {
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear";
 
-export type ViewType = "carousel" | "form" | "overview";
+export type ViewType = "carousel" | "form" | "overview" | "travel";
 
 export interface Option {
 	value: string;
@@ -62,4 +62,22 @@ export interface InputProps {
 
 export interface CarouselProps {
 	setCategory: Dispatch<SetStateAction<CategoryType>>;
+}
+
+type OccasionType = "holiday" | "wedding" | "work"
+
+type ExpectedActivitesType = "dancing" | "sports" | "beach" | "hiking" | "conference" | "travel"
+
+type LuggageSizeType = "carryOn" | "checkbag" | "personalItem"
+
+type ModeOfTravelType = "driving" | "flying" | "train" | "bus" | "sail"
+
+export type TravelForm = {
+	location: string;
+	duration: number;
+	modeOfTravel: ModeOfTravelType;
+	occassion: OccasionType;
+	expectedActivites: ExpectedActivitesType[];
+	luggageSize: LuggageSizeType
+
 }

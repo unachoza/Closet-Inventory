@@ -1,4 +1,4 @@
-import { Option, Step, ClothingItem } from "./types.ts";
+import { Option, Step, ClothingItem, TravelForm } from "./types.ts";
 
 export const formItem = {
 	id: "",
@@ -339,6 +339,16 @@ export const MY_CLOSET_DATA = [
 		onSale: true,
 	},
 ];
+
+export const TRAVEL_FORM_DATA: TravelForm = {
+	location: "vegas",
+	duration: 2,
+	modeOfTravel: "driving",
+	occassion: "work",
+	expectedActivites: ["conference"],
+	luggageSize: "carryOn"
+
+}
 
 export const CLOSET_DATA = [
 	{

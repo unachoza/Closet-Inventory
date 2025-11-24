@@ -16,11 +16,10 @@ function App() {
 			<ToastProvider>
 				<Header />
 				{/* Controls */}
-				<div className="mt-4">
+				<div className="view-buttons">
 					<button onClick={() => setView("form")}>Add Item</button>
-					<button className="ml-2" onClick={() => setView("carousel")}>
-						View All Items
-					</button>
+					<button onClick={() => setView("carousel")}>View All Items</button>
+					<button onClick={() => setView("travel")}>Pack A Bag</button>
 				</div>
 				{view === "form" && <MultiStepForm setView={setView} />}
 				{view === "carousel" && <Carousel setCategory={setSelectedCategory} />}
