@@ -1,57 +1,116 @@
 # Closet-Inventory
 
-## Libraries Used
+Closet Inventory is a personal wardrobe management application that allows users to upload, categorize, and organize clothing items.
 
-### Framer Motion
+## Description
 
-### challenges
+Closet Inventory is designed to help users digitally catalog their wardrobe.  
+The app includes:
 
-React Race conditions, closing form and returning to overview before addItem posted to localStorage
-https://framermotion.framer.website/documentation/introduction
+- A **9-step guided item creation flow**
+- **Image upload + preview**
+- **LocalStorage persistence**
+- A **responsive closet overview grid**
+- Animated **toast notifications** for user actions
 
-when passing down props, is it better to write an inline function or create a function, and pass the function name
+## 📌 Features
 
-creating HOC / transposition
-TextInputContainer into a compound component, which keeps the API flexible, declarative, and easy to extend (for instance, if you add icons, help text, or other sub-components later).
+### 🪜 Multi-Step Item Creation Form
+- Custom progress tracker with step labels  
+- Steps include: **category, color, size, brand, material, occasion, age/date, image upload**
+- Reusable components: dropdowns, checkboxes, pill inputs
+- Multi-step flow resets automatically after submission
 
-//CSS organization
-positional formatting first,
-followed by layout parameters,
-then sizing
-then colors
-other text formatting properties.
+### 📸 Image Upload + Preview
+- File uploads via `<input type="file" />`
+- Base64 conversion for persistence
+- Live preview
+- Optionally auto-generates stock photos by category
 
-.example-selector {
-/_ Positioning _/
-position: absolute;
-top: 0;
-left: 0;
-z-index: 10;
+### 📅 Custom Date Picker + Intelligent Age Calculation
+- Radix-based Month/Year selector  
+- Automatic age conversion:
+  - `< 20 months → "X months"`
+  - `≥ 20 months → "Y years"`
 
-/_ Display & Box Model _/
-display: block;
-width: 100%;
-height: 200px;
-padding: 1.25rem;
-margin-bottom: 15px;
-border: 1px solid #ccc;
+### 🔔 Animated Toast Notifications
+- Radix UI + Framer Motion  
+- Context-driven system (`ToastProvider`)  
+- Alerts user when an item is successfully created
 
-/_ Visual Properties _/
-background-color: #f0f0f0;
-color: #333;
-box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+### 🗂️ Local Storage Persistence
+All saved items include:
+- UUID  
+- Normalized item payload  
+- Image thumbnail  
+- Auto-generated display name (brand + category)
 
-/_ Typography _/
-font-family: sans-serif;
-font-size: 16px;
-line-height: 1.5;
-text-align: center;
+### 👚 Closet Overview Grid
+- Responsive layout displaying all stored items  
+- Clean, minimal UI  
+- Ready for sort/filter expansion  
 
-/_ Other _/
-cursor: pointer;
-}
+---
 
 
-Inner Soft Shadow Effect
-https://www.codementor.io/@zara-z/how-to-make-an-inner-shadow-effect-with-css-1odkuw71cl
-box-shadow: inset 6px 6px 10px 0 rgb(0,0,0, .5), inset -6px -6px 10px 0 rgb(255,255,255, .5)
+## Project Structure
+src/
+ ├── Components/
+ │     ├── ProgressionTracker/
+ │     ├── DatePicker/
+ │     ├── ImageUploader/
+ │     ├── Closet/
+ │     └── Shared UI Components
+ ├── hooks/
+ │     ├── useLocalCloset.ts
+ │     ├── useLocalStorage.ts
+ │     └── useStockPhoto.ts
+ ├── utils/
+ │     ├── types.ts
+ │     ├── constants.ts
+ │     └── formatters.ts
+ ├── App.tsx
+ └── main.tsx
+
+## Installation & Setup
+
+git clone https://github.com/your-username/closet-inventory.git
+cd closet-inventory
+npm install
+npm run dev
+
+
+## Architecture Notes
+- Uses composable, reusable UI components.
+- Logic extracted into hooks for maintainability.
+- Date and age logic fully abstracted from UI.
+- LocalStorage interactions centralized in useLocalStorageCloset.
+- Toast system decoupled and reusable across the app.
+- Multi-step form automatically resets on submit.
+
+## Tech Stach Libraries Used
+| Area               | Technology                           |
+| ------------------ | ------------------------------------ |
+| Framework          | React (Typescript)                   |
+| Styling            | Custom CSS modules + theme variables |
+| Animations         | Framer Motion                        |
+| UI & Accessibility | Radix UI                             |
+| State & Data       | React hooks + localStorage           |
+| Testing            | Vitest + Testing Library             |
+| Build Tool         | Vite                                 |
+
+## ⚙️ Installation & Setup
+
+git clone https://github.com/your-username/closet-inventory.git
+cd closet-inventory
+npm install
+npm run dev
+
+## 🧠 Future Enhancements
+- Filtering by category, color, material, brand
+- Sorting by age and price
+- Auto-import clothing from shopping confirmation emails
+- "Pack a Bag" travel component
+- User authentication
+- Outfits Mode (build looks like Clueless)
+- Fabric care & clothing education page
