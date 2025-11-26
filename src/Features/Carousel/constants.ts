@@ -10,11 +10,15 @@ const categories = [
 	{ label: "Underwear", icon: "🩲" },
 ];
 
-const decisionTree = {
-	tops: ["blouse", "knit", "turtleneck", "long sleave", "short sleave"],
+export const decisionTree = {
+	tops: ["blouse", "tank", "strapless", "spagetti strap", "knit", "turtleneck", "mock turtleneck", "long sleave", "short sleave", "polo", "henley"],
+	coats: ["peacoat", "duster", "blazer", "trench coat", "rain coat", "puffer", "bomber jacket", "jean jacket", "parka", "wind breaker" ],
+	sweaters: ["cardigan", "cable knitt", "hoodie", "cowlneck", "grandpa"],
 	neckline: ["v-neck", "cowl neck", "boat neck", "halter top", "cold shoulder"],
-	bottoms: ["jeans", "trousers", "skirts", "shorts", "skirt"],
+	bottoms: ["jeans", "trousers", "skirts", "shorts", "skirt", "palazzo", "capris"],
 	hemline: ["pencil", "a line", "peplin", "bubble", "full", "mini", "asymetric"],
+	length: ["mini", "midi", "maxi"],
+	silhouette: ["bodycon", "shift", "sheath", "bouffont", "dropwaist", "a-line", "wrap", "empire", "babydoll", "sundress", "princess", "slip", "haulter", "mermaid"]
 };
 
 export const closetImg1 =
