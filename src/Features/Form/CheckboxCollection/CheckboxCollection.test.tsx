@@ -25,19 +25,18 @@ describe("The Checkbox Component", () => {
 		);
 
 		const checkboxes = screen.getAllByRole("checkbox");
-		const firstCheck = checkboxes[0];
-
-		expect(firstCheck).not.toBeChecked();
-		await userEvent.click(firstCheck);
+		const firstCheckbox = checkboxes[0];
+		expect(firstCheckbox).not.toBeChecked();
+		await userEvent.click(firstCheckbox);
 		// verifies that the click triggers the callback
-		expect(mockToggle).toHaveBeenCalledWith("red");
-		
+		expect(mockToggle).toHaveBeenCalledOnce();
+		expect(mockToggle).toHaveBeenCalledWith("red", "color");
 	});
 
-	it("should allow users to tab through inputs using their keyboard", async () => {})
+	it("should allow users to tab through inputs using their keyboard", async () => {});
 	it("if option is selected, it should no longer be in the options list", () => {});
 	it("should have checkbox to the left and label to the right", () => {});
 	it("should show a focus state");
-	it("if color label, check should have background color match label", () =>{})
-	it("should allow only one value checked/ selected", () =>{})
+	it("if color label, check should have background color match label", () => {});
+	it("should allow only one value checked/ selected", () => {});
 });

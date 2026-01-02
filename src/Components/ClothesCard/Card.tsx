@@ -10,7 +10,7 @@ const ClothingCard = ({ item }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
 
 	return (
-		<div className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
+		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
 			<div className="card-inner">
 				{/* Front */}
 				<div className="card-front">

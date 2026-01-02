@@ -101,7 +101,7 @@ const MultiStepForm = ({ setView }: FormProps) => {
 	};
 	console.log({ formData });
 	return (
-		<div className="form">
+		<div className="form" data-testid="multistep-form">
 			<motion.form
 				layout
 				onSubmit={handleSubmit}
