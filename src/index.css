@@ -4,6 +4,7 @@
 	/* 'https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001615/image_3_n4tvfn.webp' */
 	background-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001439/image_1_s0yql2.webp");
 	/* background-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001381/elegant_closet_yst0ec.webp"); */
+	background-attachment: fixed;
 	
 	
 
@@ -126,7 +127,9 @@ button:hover {
 	box-shadow: 0 1rem 2rem var(--Trans-Black);
 	transition: all 0.2s;
 	transform: translateY(-3px);
+	border-color: var(--Outline-Blue)
 }
+
 button::after {
 	opacity: 0;
 	transition: all 0.2s;
@@ -140,13 +143,9 @@ button:focus {
 	transform: translateY(-1px);
 	outline: none;
 }
-button:hover {
-	border-color: #646cff;
-}
 
 button:focus,
 button:focus-visible {
-	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 	outline: .5rem auto -webkit-focus-ring-color;
 
 }

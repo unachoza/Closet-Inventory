@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, beforeEach, Mock } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import CheckPill from "./CheckPill";
 import { ItemFormData } from "../../../utils/types";
 

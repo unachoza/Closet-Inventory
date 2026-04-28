@@ -37,6 +37,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 						{visibleIndices.map((index, i) => {
 							const item = carouselCategories[index];
 							return (
+								// TODO: Change the clothes cards to buttons that update the category state when clicked.
 								<motion.div
 									key={index}
 									initial={{ x: i === 2 ? 200 : -200, opacity: 0 }}
