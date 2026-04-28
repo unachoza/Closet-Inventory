@@ -9,7 +9,6 @@ import "./App.css";
 
 function App() {
 	const [view, setView] = useState<ViewType>("carousel");
-	//@ts-ignore
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 
 	return (
@@ -17,11 +16,9 @@ function App() {
 			<ToastProvider>
 				<Header />
 				{/* Controls */}
-				<div className="mt-4">
+				<div className="button-container">
 					<button onClick={() => setView("form")}>Add Item</button>
-					<button className="ml-2" onClick={() => setView("carousel")}>
-						View All Items
-					</button>
+					<button onClick={() => setView("overview")}>View All Items</button>
 				</div>
 				{view === "form" && <MultiStepForm setView={setView} />}
 				{view === "carousel" && (
@@ -34,7 +31,7 @@ function App() {
 						<Closet selectedCategory={selectedCategory} />
 					</div>
 				)}
-				<button className="back-button" onClick={() => setView("overview")}>
+				<button className="back-button" onClick={() => setView("carousel")}>
 					Back to Carousel
 				</button>
 			</ToastProvider>

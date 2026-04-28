@@ -32,7 +32,7 @@ export interface ItemFormData {
 	image: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear";
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
 export type ViewType = "carousel" | "form" | "overview";
 
@@ -63,3 +63,4 @@ export interface InputProps {
 export interface CarouselProps {
 	setCategory: Dispatch<SetStateAction<CategoryType>>;
 }
+

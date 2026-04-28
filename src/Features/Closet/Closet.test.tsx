@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, Mock } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ClothingItem } from "../../utils/types";
@@ -50,10 +50,10 @@ const mockUsePagination = (overrides = {}) => {
 describe("Closet Integration Tests with Mocks", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockUsePagination(); 
+		mockUsePagination();
 	});
 
-	it("only renders items that match the selected categroy", () => {
+	it("only renders items that match the selected category", () => {
 		vi.mocked(usePagination).mockImplementation((items) => ({
 			currentPage: 1,
 			currentPageData: items,
@@ -69,8 +69,6 @@ describe("Closet Integration Tests with Mocks", () => {
 		const cardText = cards.map((card) => card.textContent);
 
 		expect(cardText).toEqual(expect.arrayContaining(["black shirt", "white top"]));
-		console.log(mockCloset);
-		console.log({ cardText });
 		expect(cardText).not.toContain("black jeans");
 	});
 
@@ -100,4 +98,5 @@ describe("Closet Integration Tests with Mocks", () => {
 // 	it("Should see clothing cards, no more than 9 with cool animation", () => {});
 // 	it("Cards should be hoverable, to reveal details", () => {});
 // 	it("Cards should be clickable to reveal back, with MORE BUTTON", () => {});
+// 	it("should show all items when no category is selected, or when 'view all items' button is clicked", () => {});
 // });
