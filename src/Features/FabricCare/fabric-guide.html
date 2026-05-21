@@ -1,0 +1,2790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Complete Textile Compendium</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --warm-white: #FFFDF9;
+  --ink: #1C1A17;
+  --ink-60: #6B6659;
+  --ink-30: #C4BFB5;
+  --gold: #B8860B;
+  --gold-light: #E8C85A;
+  --gold-pale: #FDF4DC;
+  --terracotta: #C1622A;
+  --terra-pale: #FBF0E8;
+  --sage: #5A7A60;
+  --sage-pale: #EEF4EF;
+  --dusty-blue: #4A6B8A;
+  --blue-pale: #EEF3F8;
+  --mauve: #8B5A7A;
+  --mauve-pale: #F6EFF4;
+  --border: rgba(28,26,23,0.10);
+  --border-strong: rgba(28,26,23,0.20);
+  --shadow: 0 2px 20px rgba(28,26,23,0.06);
+  --shadow-lg: 0 8px 40px rgba(28,26,23,0.10);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 80px 48px 64px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 40px,
+    rgba(184,134,11,0.04) 40px,
+    rgba(184,134,11,0.04) 41px
+  );
+}
+.hero-inner { max-width: 960px; margin: 0 auto; position: relative; }
+.hero-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 700;
+  line-height: 1.08;
+  color: var(--warm-white);
+  margin-bottom: 24px;
+}
+.hero h1 em { font-style: italic; color: var(--gold-light); }
+.hero-sub {
+  font-size: 17px;
+  color: rgba(250,247,242,0.72);
+  max-width: 600px;
+  margin-bottom: 48px;
+  line-height: 1.6;
+}
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.hero-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--gold-light);
+  display: block;
+}
+.hero-stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: rgba(250,247,242,0.55);
+}
+
+/* ── NAV ── */
+.toc-nav {
+  background: var(--warm-white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.toc-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 48px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.toc-inner::-webkit-scrollbar { display: none; }
+.toc-link {
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-60);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.toc-link:hover { color: var(--ink); border-bottom-color: var(--gold); }
+.toc-link.active { color: var(--gold); border-bottom-color: var(--gold); }
+.toc-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  display: inline-block;
+}
+
+/* ── LAYOUT ── */
+.container { max-width: 960px; margin: 0 auto; padding: 0 48px; }
+
+/* ── SECTION TITLES ── */
+.section-header {
+  padding: 72px 0 48px;
+}
+.section-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+  max-width: 80px;
+}
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 16px;
+  color: var(--ink-60);
+  max-width: 640px;
+  line-height: 1.7;
+}
+
+/* ── FIBER CARDS ── */
+.fiber-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.fiber-card {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+.fiber-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.fiber-card-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+  background: var(--cream);
+}
+.fiber-card-img-placeholder {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+.fiber-card-body { padding: 20px 24px 24px; }
+.fiber-tag {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+.tag-animal { background: var(--terra-pale); color: var(--terracotta); }
+.tag-plant  { background: var(--sage-pale); color: var(--sage); }
+.tag-semi   { background: var(--blue-pale); color: var(--dusty-blue); }
+.tag-synth  { background: var(--mauve-pale); color: var(--mauve); }
+
+.fiber-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.fiber-source {
+  font-size: 12px;
+  color: var(--ink-60);
+  margin-bottom: 12px;
+  font-style: italic;
+}
+.fiber-card p {
+  font-size: 14px;
+  color: var(--ink-60);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+.fiber-props {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.fiber-prop {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fiber-prop-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--ink-30);
+  font-weight: 500;
+}
+.fiber-prop-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+.fiber-prop-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.8s ease;
+}
+
+/* ── KEY FACTS ── */
+.key-facts {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin: 24px 0;
+}
+.key-facts h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-60);
+  margin-bottom: 16px;
+}
+.key-facts ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.key-facts li {
+  font-size: 14px;
+  padding-left: 20px;
+  position: relative;
+  color: var(--ink-60);
+  line-height: 1.55;
+}
+.key-facts li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+  font-size: 8px;
+  top: 6px;
+}
+
+/* ── CARE CARDS ── */
+.care-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.care-card {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.care-icon { font-size: 24px; }
+.care-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--ink-60);
+  font-weight: 500;
+}
+.care-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 60px 0;
+}
+
+/* ── DETAIL PANEL (modal-like) ── */
+.detail-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(28,26,23,0.55);
+  z-index: 500;
+  padding: 40px 20px;
+  overflow-y: auto;
+}
+.detail-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+.detail-panel {
+  background: var(--warm-white);
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  margin: auto;
+}
+.detail-header {
+  padding: 32px 36px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.detail-close {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--ink-60);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.detail-close:hover { background: var(--cream); }
+.detail-body { padding: 32px 36px; }
+.detail-section { margin-bottom: 28px; }
+.detail-section h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-60);
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-section p { font-size: 15px; color: var(--ink-60); line-height: 1.7; }
+.detail-section ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.detail-section li {
+  font-size: 14px;
+  color: var(--ink-60);
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.55;
+}
+.detail-section li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--gold);
+}
+
+/* ── WEAVE SECTION ── */
+.weave-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.weave-tab {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-60);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  margin-bottom: -1px;
+}
+.weave-tab.active { color: var(--ink); border-bottom-color: var(--gold); }
+.weave-tab:hover:not(.active) { color: var(--ink); }
+.weave-panel { display: none; }
+.weave-panel.active { display: block; }
+
+.weave-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 640px) {
+  .weave-content { grid-template-columns: 1fr; }
+}
+.weave-diagram {
+  background: var(--cream);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.weave-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.weave-info .weave-desc {
+  font-size: 15px;
+  color: var(--ink-60);
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+.weave-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.weave-chip {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  color: var(--ink-60);
+}
+.weave-fabrics h5 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-60);
+  margin-bottom: 10px;
+}
+.weave-fabrics ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.weave-fabrics li {
+  font-size: 14px;
+  color: var(--ink-60);
+  padding-left: 16px;
+  position: relative;
+}
+.weave-fabrics li::before { content: '·'; position: absolute; left: 0; color: var(--gold); font-size: 20px; line-height: 1; top: -1px; }
+
+/* ── COMPARISON TABLE ── */
+.compare-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin: 32px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+thead { background: var(--ink); color: var(--cream); }
+thead th {
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+thead th:first-child { border-radius: 16px 0 0 0; }
+thead th:last-child { border-radius: 0 16px 0 0; }
+tbody tr { border-bottom: 1px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:nth-child(even) { background: var(--cream); }
+tbody td { padding: 12px 18px; color: var(--ink-60); vertical-align: middle; }
+tbody td:first-child { font-weight: 500; color: var(--ink); }
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.pill-high { background: var(--sage-pale); color: var(--sage); }
+.pill-med  { background: var(--gold-pale); color: var(--gold); }
+.pill-low  { background: var(--terra-pale); color: var(--terracotta); }
+
+/* ── FLOWCHART ── */
+.flowchart-wrap {
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 32px;
+  margin: 32px 0;
+  overflow-x: auto;
+}
+
+/* ── SOURCES ── */
+.sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 32px 0;
+}
+.source-card {
+  background: var(--warm-white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  text-decoration: none;
+  display: block;
+  transition: box-shadow 0.2s;
+}
+.source-card:hover { box-shadow: var(--shadow); }
+.source-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-30);
+  margin-bottom: 6px;
+}
+.source-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dusty-blue);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.source-url {
+  font-size: 12px;
+  color: var(--ink-30);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── CATEGORY BANNER ── */
+.cat-banner {
+  padding: 40px 48px;
+  margin: 0 0 48px;
+  border-radius: 20px;
+}
+.cat-banner-natural  { background: linear-gradient(135deg, #EFF7F1 0%, #E8F2E5 100%); border: 1px solid rgba(90,122,96,0.15); }
+.cat-banner-semi     { background: linear-gradient(135deg, #EEF3F8 0%, #E6F0F8 100%); border: 1px solid rgba(74,107,138,0.15); }
+.cat-banner-synth    { background: linear-gradient(135deg, #F6EFF4 0%, #F0E8F2 100%); border: 1px solid rgba(139,90,122,0.15); }
+.cat-banner h2 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+.cat-banner p  { font-size: 15px; color: var(--ink-60); max-width: 600px; line-height: 1.65; }
+.cat-banner-meta {
+  display: flex; gap: 24px; margin-top: 16px;
+}
+.cat-banner-meta span {
+  font-size: 13px; color: var(--ink-60);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ── FOOTER ── */
+.site-footer {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 60px 48px;
+  margin-top: 80px;
+}
+.footer-inner {
+  max-width: 960px;
+  margin: 0 auto;
+}
+.footer-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--warm-white);
+}
+.footer-sub { font-size: 14px; color: rgba(250,247,242,0.55); max-width: 480px; line-height: 1.6; }
+
+/* ── MISC ── */
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 32px 0;
+}
+.photo-item {
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  background: var(--cream);
+}
+.photo-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .hero, .container, .site-footer { padding-left: 24px; padding-right: 24px; }
+  .toc-inner { padding: 0 24px; }
+  .cat-banner { padding: 28px 24px; margin: 0 0 32px; }
+  .fiber-grid { grid-template-columns: 1fr; }
+  .photo-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-stats { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">A Textile Expert's Reference</p>
+    <h1>The Complete<br><em>Textile Compendium</em></h1>
+    <p class="hero-sub">An encyclopedic guide to fibers, fabrics, weaves, and garment care — from the raw fleece of a Cashmere goat to the engineered precision of modern synthetics.</p>
+    <div class="hero-stats">
+      <div>
+        <span class="hero-stat-num">30+</span>
+        <span class="hero-stat-label">Fibers covered</span>
+      </div>
+      <div>
+        <span class="hero-stat-num">3</span>
+        <span class="hero-stat-label">Fiber categories</span>
+      </div>
+      <div>
+        <span class="hero-stat-num">8</span>
+        <span class="hero-stat-label">Weave structures</span>
+      </div>
+      <div>
+        <span class="hero-stat-num">∞</span>
+        <span class="hero-stat-label">Care instructions</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NAV -->
+<nav class="toc-nav">
+  <div class="toc-inner">
+    <a class="toc-link" href="#natural"><span class="toc-dot" style="background:#5A7A60"></span> Natural Fibers</a>
+    <a class="toc-link" href="#semi"><span class="toc-dot" style="background:#4A6B8A"></span> Semi-Synthetic</a>
+    <a class="toc-link" href="#synthetic"><span class="toc-dot" style="background:#8B5A7A"></span> Synthetic</a>
+    <a class="toc-link" href="#weaves">Weave Structures</a>
+    <a class="toc-link" href="#compare">Comparison</a>
+    <a class="toc-link" href="#flowchart">Fiber Journey</a>
+    <a class="toc-link" href="#care">Care Guide</a>
+    <a class="toc-link" href="#sources">Sources</a>
+  </div>
+</nav>
+
+<!-- ══════════════ NATURAL FIBERS ══════════════ -->
+<section id="natural">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">Category One</p>
+    <h2 class="section-title">Natural Fibers</h2>
+    <p class="section-desc">Derived directly from plants and animals, natural fibers have clothed humanity for millennia. They are biodegradable, breathable, and often develop character with age.</p>
+  </div>
+
+  <!-- Animal sub-section -->
+  <div class="cat-banner cat-banner-natural">
+    <h2>🐑 Animal Fibers</h2>
+    <p>Protein-based fibers spun from animal coats, cocoons, and hair. They are thermally regulating, naturally moisture-wicking, and extraordinarily durable when cared for correctly.</p>
+    <div class="cat-banner-meta">
+      <span>📍 Protein-based (keratin or fibroin)</span>
+      <span>♻️ Biodegradable</span>
+      <span>🌡️ Temperature-regulating</span>
+    </div>
+  </div>
+
+  <div class="fiber-grid">
+
+    <!-- Merino Wool -->
+    <div class="fiber-card" onclick="openDetail('merino')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF4EF;">🐑</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Sheep</span>
+        <h3>Merino Wool</h3>
+        <p class="fiber-source">Merino sheep · Primarily Australia & New Zealand</p>
+        <p>The gold standard of wool. Merino's ultra-fine fibers (15–24 microns) make it remarkably soft — it does not itch like coarser wools. Naturally odor-resistant and temperature-regulating.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:90%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:75%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:85%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cashmere -->
+    <div class="fiber-card" onclick="openDetail('cashmere')">
+      <div class="fiber-card-img-placeholder" style="background:#FDF4DC;">🐐</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Cashmere Goat</span>
+        <h3>Cashmere</h3>
+        <p class="fiber-source">Capra hircus laniger · Inner Asia (Mongolia, Kashmir)</p>
+        <p>Combed from the soft undercoat of Cashmere goats, this is one of the world's most luxurious fibers. Warmer than wool by weight, incredibly lightweight, and develops a beautiful drape.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:80%;background:#B8860B"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:50%;background:#B8860B"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:97%;background:#B8860B"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:92%;background:#B8860B"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mohair -->
+    <div class="fiber-card" onclick="openDetail('mohair')">
+      <div class="fiber-card-img-placeholder" style="background:#FBF0E8;">🐐</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Angora Goat</span>
+        <h3>Mohair</h3>
+        <p class="fiber-source">Angora goat · South Africa, Texas, Turkey</p>
+        <p>Called the "Diamond Fiber," mohair has a brilliant luster unlike any other natural fiber. Highly durable and resilient — it doesn't felt or pill easily and takes dye in exceptionally vivid colors.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:78%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Luster</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:80%;background:#C1622A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Silk -->
+    <div class="fiber-card" onclick="openDetail('silk')">
+      <div class="fiber-card-img-placeholder" style="background:#F6EFF4;">🐛</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Silkworm</span>
+        <h3>Silk</h3>
+        <p class="fiber-source">Bombyx mori silkworm · China, India, Japan</p>
+        <p>A single silkworm cocoon can yield up to 1,000 meters of continuous fiber. The result is a naturally lustrous, hypoallergenic fabric with unparalleled drape and a cool-to-the-touch feel.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:65%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Luster</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:99%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:92%;background:#8B5A7A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alpaca -->
+    <div class="fiber-card" onclick="openDetail('alpaca')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF4EF;">🦙</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Alpaca</span>
+        <h3>Alpaca</h3>
+        <p class="fiber-source">Vicugna pacos · Andes of South America</p>
+        <p>Hypoallergenic because it lacks lanolin. Alpaca fiber is lighter, warmer, and stronger than sheep's wool with a silky feel. "Baby alpaca" refers to the finest grade, not young animals.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:82%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:80%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:85%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:94%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Angora -->
+    <div class="fiber-card" onclick="openDetail('angora')">
+      <div class="fiber-card-img-placeholder" style="background:#FDF4DC;">🐇</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Angora Rabbit</span>
+        <h3>Angora</h3>
+        <p class="fiber-source">Angora rabbit · China, Europe, Americas</p>
+        <p>Exceptionally fine and fluffy, angora fiber has a distinctive halo effect and is incredibly soft. It is often blended with other fibers for structure, as pure angora can shed.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:98%;background:#B8860B"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#B8860B"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:35%;background:#B8860B"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:60%;background:#B8860B"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vicuña -->
+    <div class="fiber-card" onclick="openDetail('vicuna')">
+      <div class="fiber-card-img-placeholder" style="background:#FBF0E8;">🦙</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Vicuña</span>
+        <h3>Vicuña</h3>
+        <p class="fiber-source">Vicugna vicugna · High Andes, Peru</p>
+        <p>The rarest and most expensive natural fiber in the world — a single animal yields only about 500g per year. At 12–14 microns, it is the finest fiber known. Once reserved for Incan royalty.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Fineness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:100%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Rarity</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:100%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:100%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:93%;background:#C1622A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qiviut -->
+    <div class="fiber-card" onclick="openDetail('qiviut')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF4EF;">🦬</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-animal">Animal · Musk Ox</span>
+        <h3>Qiviut</h3>
+        <p class="fiber-source">Ovibos moschatus · Arctic Alaska & Canada</p>
+        <p>The ultra-fine underfleece of the Arctic musk ox. Naturally shed each spring, qiviut is 8x warmer than wool and hypoallergenic. One of the rarest fibers — annual production is tiny.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:98%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:70%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Rarity</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:98%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /fiber-grid animal -->
+
+  <!-- Plant sub-section -->
+  <div class="cat-banner cat-banner-natural" style="margin-top:48px;">
+    <h2>🌿 Plant Fibers</h2>
+    <p>Cellulose-based fibers derived from seeds, stems, leaves, and bast. These fibers are cool, breathable, and often improve with repeated washing and wear.</p>
+    <div class="cat-banner-meta">
+      <span>📍 Cellulose-based</span>
+      <span>♻️ Fully biodegradable</span>
+      <span>❄️ Naturally cool</span>
+    </div>
+  </div>
+
+  <div class="fiber-grid">
+
+    <!-- Cotton -->
+    <div class="fiber-card" onclick="openDetail('cotton')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF4EF;">🌸</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-plant">Plant · Cotton Boll</span>
+        <h3>Cotton</h3>
+        <p class="fiber-source">Gossypium hirsutum · Global (USA, India, China)</p>
+        <p>The world's most-used natural fiber. Cotton is soft, breathable, absorbent, and machine washable. It grows softer with each wash and is hypoallergenic, making it ideal for everyday wear.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:90%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:80%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:82%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Absorbency</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linen -->
+    <div class="fiber-card" onclick="openDetail('linen')">
+      <div class="fiber-card-img-placeholder" style="background:#FDF4DC;">🌾</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-plant">Plant · Flax Stem</span>
+        <h3>Linen</h3>
+        <p class="fiber-source">Linum usitatissimum · Belgium, France, Ireland</p>
+        <p>One of the oldest textiles — found in Egyptian tombs 36,000 years ago. Linen is crisp, cool, and strongest when wet. It softens beautifully over time and is naturally antibacterial.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:65%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Coolness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:96%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hemp -->
+    <div class="fiber-card" onclick="openDetail('hemp')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF4EF;">🌿</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-plant">Plant · Hemp Stalk</span>
+        <h3>Hemp</h3>
+        <p class="fiber-source">Cannabis sativa · China, France, Romania</p>
+        <p>The most sustainable textile crop — requires no pesticides, enriches soil, uses minimal water, and yields 3x more fiber per acre than cotton. Incredibly strong and softens with wear.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:85%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:55%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:98%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ramie -->
+    <div class="fiber-card" onclick="openDetail('ramie')">
+      <div class="fiber-card-img-placeholder" style="background:#FBF0E8;">🪴</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-plant">Plant · Ramie Stem</span>
+        <h3>Ramie</h3>
+        <p class="fiber-source">Boehmeria nivea · China, Japan, Brazil</p>
+        <p>Known as "China grass," ramie is one of the strongest natural fibers — 8x stronger than cotton and even stronger when wet. Lustrous like silk with a natural white sheen.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Strength</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:93%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:45%;background:#C1622A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Luster</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:78%;background:#C1622A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jute -->
+    <div class="fiber-card" onclick="openDetail('jute')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF4EF;">🌿</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-plant">Plant · Jute Stalk</span>
+        <h3>Jute</h3>
+        <p class="fiber-source">Corchorus capsularis · Bangladesh, India</p>
+        <p>Second only to cotton in global production. Jute is coarse, strong, and completely biodegradable. Known as the "Golden Fiber," it is primarily used for sacks, rugs, and home textiles.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Strength</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:85%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:94%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:20%;background:#5A7A60"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:80%;background:#5A7A60"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /plant fiber-grid -->
+</div>
+</section>
+
+<!-- ══════════════ SEMI-SYNTHETIC ══════════════ -->
+<section id="semi">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">Category Two</p>
+    <h2 class="section-title">Semi-Synthetic Fibers</h2>
+    <p class="section-desc">Regenerated cellulose fibers: natural plant pulp is dissolved and re-extruded as fiber. They bridge natural comfort and synthetic consistency.</p>
+  </div>
+
+  <div class="cat-banner cat-banner-semi">
+    <h2>🌲 Regenerated Cellulose</h2>
+    <p>Starting with wood pulp from trees like eucalyptus, beech, and bamboo, these fibers are chemically processed into smooth, fluid textiles. Sustainability varies dramatically by production method.</p>
+    <div class="cat-banner-meta">
+      <span>📍 Plant-derived, chemically processed</span>
+      <span>♻️ Often biodegradable</span>
+      <span>💧 Excellent drape</span>
+    </div>
+  </div>
+
+  <div class="fiber-grid">
+
+    <!-- Viscose/Rayon -->
+    <div class="fiber-card" onclick="openDetail('viscose')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF3F8;">🌲</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-semi">Semi-Synthetic · Beech/Bamboo/Pine</span>
+        <h3>Viscose / Rayon</h3>
+        <p class="fiber-source">Wood pulp · Developed 1890s as "artificial silk"</p>
+        <p>The first generation of regenerated cellulose. Silky drape, excellent absorbency, soft feel. However, it weakens when wet and requires careful washing. The most common and affordable type.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Drape</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:83%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:45%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:40%;background:#4A6B8A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="fiber-card" onclick="openDetail('modal')">
+      <div class="fiber-card-img-placeholder" style="background:#E6F0F8;">🌳</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-semi">Semi-Synthetic · Beech Tree</span>
+        <h3>Modal</h3>
+        <p class="fiber-source">Beech wood pulp (Fagus sylvatica) · Austria (Lenzing)</p>
+        <p>A second-generation rayon with improved wet strength. Silkier, stronger, and more resistant to shrinkage than standard viscose. Stays soft wash after wash. Loved for underwear and loungewear.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Drape</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:90%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:68%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:90%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:65%;background:#4A6B8A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tencel / Lyocell -->
+    <div class="fiber-card" onclick="openDetail('tencel')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF3F8;">🌿</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-semi">Semi-Synthetic · Eucalyptus / Beech</span>
+        <h3>TENCEL™ / Lyocell</h3>
+        <p class="fiber-source">Eucalyptus & beech pulp · Lenzing AG, Austria</p>
+        <p>The most sustainable regenerated fiber. Made via a closed-loop process that recycles 99%+ of solvents. Stronger wet or dry than viscose, moisture-wicking, and breathable. The eco-premium choice.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:80%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:87%;background:#4A6B8A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bamboo -->
+    <div class="fiber-card" onclick="openDetail('bamboo')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF3F8;">🎋</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-semi">Semi-Synthetic · Bamboo Grass</span>
+        <h3>Bamboo</h3>
+        <p class="fiber-source">Moso bamboo (Phyllostachys edulis) · China</p>
+        <p>Often marketed as eco-friendly, most "bamboo fabric" is actually bamboo viscose — chemically processed. The plant grows remarkably fast (up to 90cm/day) but processing method matters enormously.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Moisture-Wick</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:88%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:58%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:55%;background:#4A6B8A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cupro -->
+    <div class="fiber-card" onclick="openDetail('cupro')">
+      <div class="fiber-card-img-placeholder" style="background:#EEF3F8;">🌸</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-semi">Semi-Synthetic · Cotton Linters</span>
+        <h3>Cupro (Bemberg™)</h3>
+        <p class="fiber-source">Cotton seed linters · Japan (Asahi Kasei)</p>
+        <p>Made from the short cotton fibers too small for spinning, dissolved in copper oxide solution. The resulting fabric has unmatched silk-like drape, is naturally antistatic, and is often used as luxury lining.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Drape</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:97%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:85%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:92%;background:#4A6B8A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:50%;background:#4A6B8A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /semi-synthetic fiber-grid -->
+</div>
+</section>
+
+<!-- ══════════════ SYNTHETIC ══════════════ -->
+<section id="synthetic">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">Category Three</p>
+    <h2 class="section-title">Synthetic Fibers</h2>
+    <p class="section-desc">Engineered from petrochemicals, synthetics dominate global fiber production at ~65%. They excel in performance, consistency, and specific applications — but carry environmental trade-offs.</p>
+  </div>
+
+  <div class="cat-banner cat-banner-synth">
+    <h2>⚗️ Petroleum-Derived Fibers</h2>
+    <p>Manufactured through chemical polymerization and melt-spinning, these fibers offer unprecedented performance characteristics. Polyester alone represents 57–65% of all textile fiber produced globally.</p>
+    <div class="cat-banner-meta">
+      <span>📍 Petroleum-based polymers</span>
+      <span>⚡ High performance</span>
+      <span>⚠️ Microplastic concern</span>
+    </div>
+  </div>
+
+  <div class="fiber-grid">
+
+    <!-- Polyester -->
+    <div class="fiber-card" onclick="openDetail('polyester')">
+      <div class="fiber-card-img-placeholder" style="background:#F6EFF4;">⚗️</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-synth">Synthetic · Petroleum / PET</span>
+        <h3>Polyester</h3>
+        <p class="fiber-source">Polyethylene terephthalate (PET) · Global</p>
+        <p>The world's most produced fiber. Wrinkle-resistant, colorfast, quick-drying, and resistant to stretching. Can now be made from recycled PET bottles. The workhorse of modern clothing.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Wrinkle-Res.</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:30%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Eco-Rating</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:20%;background:#8B5A7A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nylon -->
+    <div class="fiber-card" onclick="openDetail('nylon')">
+      <div class="fiber-card-img-placeholder" style="background:#F6EFF4;">🔬</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-synth">Synthetic · Polyamide</span>
+        <h3>Nylon</h3>
+        <p class="fiber-source">Polyamide · DuPont, 1938 (first fully synthetic fiber)</p>
+        <p>The first fully synthetic fiber ever created. Exceptional strength, abrasion resistance, and elasticity. Lighter and more flexible than polyester. The go-to for hosiery, activewear, and outdoor gear.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Strength</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Elasticity</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:85%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:38%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">UV Resistance</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:30%;background:#8B5A7A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spandex -->
+    <div class="fiber-card" onclick="openDetail('spandex')">
+      <div class="fiber-card-img-placeholder" style="background:#F6EFF4;">🤸</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-synth">Synthetic · Polyurethane</span>
+        <h3>Spandex / Lycra™</h3>
+        <p class="fiber-source">Polyurethane · DuPont, 1958</p>
+        <p>Can stretch 400–700% of its original length and return perfectly. Almost never used alone — blended at 2–25% with virtually any fiber. Revolutionized athletic and form-fitting clothing.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Elasticity</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:100%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Recovery</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:98%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:25%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:70%;background:#8B5A7A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acrylic -->
+    <div class="fiber-card" onclick="openDetail('acrylic')">
+      <div class="fiber-card-img-placeholder" style="background:#F6EFF4;">🧶</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-synth">Synthetic · Acrylonitrile</span>
+        <h3>Acrylic</h3>
+        <p class="fiber-source">Polyacrylonitrile · Commercial since 1950s</p>
+        <p>Designed to mimic wool: warm, lightweight, and soft. Holds vivid colors extremely well. Resists moths, mildew, and shrinkage. Significantly cheaper than wool but prone to pilling over time.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Warmth</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:82%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Color Retention</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:93%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:25%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Pilling Resist.</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:30%;background:#8B5A7A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Polypropylene -->
+    <div class="fiber-card" onclick="openDetail('polypropylene')">
+      <div class="fiber-card-img-placeholder" style="background:#F6EFF4;">🏋️</div>
+      <div class="fiber-card-body">
+        <span class="fiber-tag tag-synth">Synthetic · Polypropylene</span>
+        <h3>Polypropylene</h3>
+        <p class="fiber-source">Thermoplastic polymer · Global</p>
+        <p>The only common textile fiber lighter than water. Does not absorb moisture at all — instead moisture migrates along the fiber surface. Ideal for base layers and outdoor performance gear.</p>
+        <div class="fiber-props">
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Moisture-Wick</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:95%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Durability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:82%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Softness</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:48%;background:#8B5A7A"></div></div>
+          </div>
+          <div class="fiber-prop">
+            <span class="fiber-prop-label">Breathability</span>
+            <div class="fiber-prop-bar"><div class="fiber-prop-fill" style="width:50%;background:#8B5A7A"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /synthetic fiber-grid -->
+</div>
+</section>
+
+<!-- ══════════════ WEAVE STRUCTURES ══════════════ -->
+<section id="weaves">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">Structure & Construction</p>
+    <h2 class="section-title">Textile Weave Structures</h2>
+    <p class="section-desc">The way threads interlace determines a fabric's drape, strength, texture, and use. Three fundamental structures — plain, twill, and satin — form the foundation of all woven textiles.</p>
+  </div>
+
+  <div class="weave-tabs">
+    <button class="weave-tab active" onclick="showWeave('plain')">Plain Weave</button>
+    <button class="weave-tab" onclick="showWeave('twill')">Twill Weave</button>
+    <button class="weave-tab" onclick="showWeave('satin')">Satin Weave</button>
+    <button class="weave-tab" onclick="showWeave('jacquard')">Jacquard</button>
+    <button class="weave-tab" onclick="showWeave('knit')">Knit</button>
+    <button class="weave-tab" onclick="showWeave('dobby')">Dobby</button>
+    <button class="weave-tab" onclick="showWeave('pile')">Pile Weave</button>
+    <button class="weave-tab" onclick="showWeave('leno')">Leno Weave</button>
+  </div>
+
+  <!-- PLAIN -->
+  <div class="weave-panel active" id="weave-plain">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="24" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Plain Weave — Over 1 / Under 1</text>
+          <!-- Grid of squares -->
+          <g transform="translate(20,36)">
+          <!-- Row pattern: alternating W/B per row, offset -->
+          <!-- Row 1 -->
+          <rect x="0"   y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="32"  y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="64"  y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="96"  y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="128" y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="160" y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="192" y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="224" y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <!-- Row 2 -->
+          <rect x="0"   y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="32"  y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="64"  y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="96"  y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="128" y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="160" y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="192" y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="224" y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <!-- Row 3 -->
+          <rect x="0"   y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="32"  y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="64"  y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="96"  y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="128" y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="160" y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="192" y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="224" y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <!-- Row 4 -->
+          <rect x="0"   y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="32"  y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="64"  y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="96"  y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="128" y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="160" y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="192" y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="224" y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <!-- Row 5 -->
+          <rect x="0"   y="128" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="32"  y="128" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="64"  y="128" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="96"  y="128" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="128" y="128" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="160" y="128" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="192" y="128" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="224" y="128" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <!-- Legend -->
+          <rect x="0" y="178" width="14" height="14" rx="2" fill="#1C1A17" opacity=".85"/>
+          <text x="20" y="190" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">Warp (vertical)</text>
+          <rect x="130" y="178" width="14" height="14" rx="2" fill="#E8C85A" opacity=".8"/>
+          <text x="150" y="190" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">Weft (horizontal)</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Plain Weave</h3>
+        <p class="weave-desc">The simplest and oldest weave structure. Each warp thread passes alternately over and under each weft thread — a perfect checkerboard. Produces a flat, firm, and durable fabric with the most interlacing points of any weave, making it the strongest by thread count.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Most interlacing points</span>
+          <span class="weave-chip">No right/wrong side</span>
+          <span class="weave-chip">Firm & durable</span>
+          <span class="weave-chip">Wrinkles easily</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Muslin, Chambray, Chiffon (silk/poly)</li>
+            <li>Organza, Taffeta, Crepe</li>
+            <li>Canvas, Gauze, Voile</li>
+            <li>Most cotton shirting</li>
+          </ul>
+        </div>
+        <div style="margin-top:16px; padding:14px; background:var(--sage-pale); border-radius:10px;">
+          <p style="font-size:13px; color:#5A7A60; margin:0;"><strong>Compatible fibers:</strong> Cotton, linen, silk, polyester, wool — virtually all fibers. The most versatile weave structure.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TWILL -->
+  <div class="weave-panel" id="weave-twill">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="24" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Twill Weave — Diagonal Pattern</text>
+          <g transform="translate(20,36)">
+          <!-- 2/2 twill diagonal rows -->
+          <!-- Row 1: over2 under2 -->
+          <rect x="0"   y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="32"  y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="64"  y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="96"  y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="128" y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="160" y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="192" y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="224" y="0"  width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <!-- Row 2: shift 1 -->
+          <rect x="0"   y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="32"  y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="64"  y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="96"  y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="128" y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="160" y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="192" y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="224" y="32" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <!-- Row 3 -->
+          <rect x="0"   y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="32"  y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="64"  y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="96"  y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="128" y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="160" y="64" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="192" y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="224" y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <!-- Row 4 -->
+          <rect x="0"   y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="32"  y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="64"  y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="96"  y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="128" y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="160" y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="192" y="96" width="30" height="30" rx="3" fill="#E8C85A" opacity=".7"/>
+          <rect x="224" y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <!-- Diagonal line overlay -->
+          <line x1="0" y1="130" x2="258" y2="0" stroke="#B8860B" stroke-width="1.5" stroke-dasharray="6 4" opacity=".5"/>
+          <!-- Legend -->
+          <rect x="0" y="168" width="14" height="14" rx="2" fill="#1C1A17" opacity=".85"/>
+          <text x="20" y="180" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">Warp up</text>
+          <rect x="100" y="168" width="14" height="14" rx="2" fill="#E8C85A" opacity=".8"/>
+          <text x="120" y="180" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">Weft up</text>
+          <line x1="0" y1="198" x2="40" y2="198" stroke="#B8860B" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="48" y="202" font-family="DM Sans, sans-serif" font-size="11" fill="#B8860B">Diagonal rib</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Twill Weave</h3>
+        <p class="weave-desc">Threads pass over two or more threads before going under, with each row offset by one to create a characteristic diagonal rib. This diagonal interlacing distributes tension well, making twill one of the strongest and most durable weave structures. The diagonal also resists dirt and stains.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Diagonal ribbing</span>
+          <span class="weave-chip">High durability</span>
+          <span class="weave-chip">Drapes well</span>
+          <span class="weave-chip">Dirt-resistant</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Denim (3/1 twill) — cotton</li>
+            <li>Gabardine, Chino — cotton/wool</li>
+            <li>Herringbone, Houndstooth — wool</li>
+            <li>Drill, Serge, Tweed</li>
+          </ul>
+        </div>
+        <div style="margin-top:16px; padding:14px; background:var(--gold-pale); border-radius:10px;">
+          <p style="font-size:13px; color:var(--gold); margin:0;"><strong>Variants:</strong> 2/1, 2/2, 3/1 twill. Herringbone reverses the diagonal. Cavalry twill has a steep double rib.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SATIN -->
+  <div class="weave-panel" id="weave-satin">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="24" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Satin Weave — Long Floats</text>
+          <g transform="translate(20,36)">
+          <!-- 5-shaft satin: warp floats over 4 weft, under 1 -->
+          <!-- Row 1 -->
+          <rect x="0"   y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="32"  y="0"  width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="64"  y="0"  width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="96"  y="0"  width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="128" y="0"  width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="160" y="0"  width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="192" y="0"  width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="224" y="0"  width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <!-- Row 2 -->
+          <rect x="0"   y="32" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="32"  y="32" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="64"  y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="96"  y="32" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="128" y="32" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="160" y="32" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="192" y="32" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="224" y="32" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <!-- Row 3 -->
+          <rect x="0"   y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="32"  y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="64"  y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="96"  y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="128" y="64" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="160" y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="192" y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="224" y="64" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <!-- Row 4 -->
+          <rect x="0"   y="96" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="32"  y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="64"  y="96" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="96"  y="96" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="128" y="96" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="160" y="96" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <rect x="192" y="96" width="30" height="30" rx="3" fill="#1C1A17" opacity=".85"/>
+          <rect x="224" y="96" width="30" height="30" rx="3" fill="#8B5A7A" opacity=".6"/>
+          <!-- Float indicator -->
+          <rect x="32" y="3" width="94" height="24" rx="3" fill="none" stroke="#B8860B" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <text x="80" y="35" font-family="DM Sans, sans-serif" font-size="9" fill="#B8860B" text-anchor="middle">long float</text>
+          <!-- Legend -->
+          <rect x="0" y="168" width="14" height="14" rx="2" fill="#1C1A17" opacity=".85"/>
+          <text x="20" y="180" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">Warp (binding point)</text>
+          <rect x="0" y="188" width="14" height="14" rx="2" fill="#8B5A7A" opacity=".7"/>
+          <text x="20" y="200" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">Weft (long float)</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Satin Weave</h3>
+        <p class="weave-desc">Warp threads float over 4 or more weft threads before interlacing, creating long "floats" on the face of the fabric. Minimal interlacing points mean a smooth, lustrous, reflective surface — but also makes satin more prone to snags and less durable than plain or twill. True satin uses warp floats; sateen uses weft floats.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Maximum luster</span>
+          <span class="weave-chip">Smooth surface</span>
+          <span class="weave-chip">Snag-prone</span>
+          <span class="weave-chip">Right/wrong sides</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Satin — silk, polyester</li>
+            <li>Charmeuse — silk (light satin)</li>
+            <li>Sateen — cotton (weft floats)</li>
+            <li>Duchesse — stiff silk satin for bridal</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JACQUARD -->
+  <div class="weave-panel" id="weave-jacquard">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="22" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Jacquard — Individual warp control</text>
+          <!-- Loom representation -->
+          <g transform="translate(20,36)">
+          <!-- Simplified jacquard pattern grid - intricate motif -->
+          <rect x="0" y="0" width="240" height="150" rx="6" fill="#EEF4EF"/>
+          <!-- Stylized floral/geometric motif using colored cells -->
+          <!-- Background rows - plain weave base -->
+          <g opacity=".3">
+            <rect x="5" y="5"  width="18" height="18" rx="2" fill="#1C1A17"/>
+            <rect x="27" y="5" width="18" height="18" rx="2" fill="#E8C85A"/>
+            <rect x="49" y="5" width="18" height="18" rx="2" fill="#1C1A17"/>
+          </g>
+          <!-- Motif center - diamond -->
+          <rect x="90"  y="30"  width="60" height="18" rx="3" fill="#5A7A60" opacity=".8"/>
+          <rect x="72"  y="50"  width="96" height="18" rx="3" fill="#5A7A60" opacity=".8"/>
+          <rect x="58"  y="70"  width="124" height="18" rx="3" fill="#5A7A60" opacity=".9"/>
+          <rect x="72"  y="90"  width="96" height="18" rx="3" fill="#5A7A60" opacity=".8"/>
+          <rect x="90"  y="110" width="60" height="18" rx="3" fill="#5A7A60" opacity=".8"/>
+          <!-- Center highlight -->
+          <rect x="108" y="62" width="24" height="26" rx="4" fill="#B8860B" opacity=".9"/>
+          <!-- Corner accent -->
+          <rect x="5" y="28" width="50" height="26" rx="3" fill="#C1622A" opacity=".5"/>
+          <rect x="185" y="28" width="50" height="26" rx="3" fill="#C1622A" opacity=".5"/>
+          <rect x="5" y="88" width="50" height="26" rx="3" fill="#C1622A" opacity=".5"/>
+          <rect x="185" y="88" width="50" height="26" rx="3" fill="#C1622A" opacity=".5"/>
+          <!-- Label -->
+          <text x="120" y="138" font-family="DM Sans, sans-serif" font-size="10" fill="#6B6659" text-anchor="middle">Each column controlled individually</text>
+          <!-- Loom illustration below -->
+          <rect x="0" y="158" width="240" height="3" rx="1" fill="#1C1A17" opacity=".2"/>
+          <text x="0" y="178" font-family="DM Sans, sans-serif" font-size="11" fill="#5A7A60">▸ Invented by Joseph Marie Jacquard, 1804</text>
+          <text x="0" y="194" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">▸ Inspired Babbage's punch-card computing</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Jacquard Weave</h3>
+        <p class="weave-desc">The Jacquard loom (1804) allows each individual warp thread to be controlled independently, enabling virtually unlimited pattern complexity woven directly into the fabric structure. Patterns don't fade, pill, or peel because they are the fabric itself, not printed or embroidered on top.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Unlimited pattern complexity</span>
+          <span class="weave-chip">Pattern is structural</span>
+          <span class="weave-chip">High cost</span>
+          <span class="weave-chip">Durable patterns</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Brocade — silk, cotton, wool</li>
+            <li>Damask — silk, cotton, linen</li>
+            <li>Tapestry — wool, cotton</li>
+            <li>Matelassé (quilted appearance)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KNIT -->
+  <div class="weave-panel" id="weave-knit">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="22" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Knit — Interlocking loops</text>
+          <g transform="translate(20,36)">
+          <!-- Jersey stitch representation using arcs -->
+          <!-- Row 1 loops -->
+          <path d="M10,60 Q10,30 30,30 Q50,30 50,60" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M50,60 Q50,30 70,30 Q90,30 90,60" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M90,60 Q90,30 110,30 Q130,30 130,60" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M130,60 Q130,30 150,30 Q170,30 170,60" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M170,60 Q170,30 190,30 Q210,30 210,60" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M210,60 Q210,30 230,30 Q250,30 250,60" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <!-- Row 2 loops (offset, interlocking) -->
+          <path d="M30,100 Q30,70 50,70 Q70,70 70,100" fill="none" stroke="#C1622A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M70,100 Q70,70 90,70 Q110,70 110,100" fill="none" stroke="#C1622A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M110,100 Q110,70 130,70 Q150,70 150,100" fill="none" stroke="#C1622A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M150,100 Q150,70 170,70 Q190,70 190,100" fill="none" stroke="#C1622A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M190,100 Q190,70 210,70 Q230,70 230,100" fill="none" stroke="#C1622A" stroke-width="3" stroke-linecap="round"/>
+          <!-- Row 3 -->
+          <path d="M10,140 Q10,110 30,110 Q50,110 50,140" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M50,140 Q50,110 70,110 Q90,110 90,140" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M90,140 Q90,110 110,110 Q130,110 130,140" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M130,140 Q130,110 150,110 Q170,110 170,140" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M170,140 Q170,110 190,110 Q210,110 210,140" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M210,140 Q210,110 230,110 Q250,110 250,140" fill="none" stroke="#4A6B8A" stroke-width="3" stroke-linecap="round"/>
+          <!-- Note -->
+          <text x="0" y="168" font-family="DM Sans, sans-serif" font-size="10" fill="#6B6659">▸ Not technically woven — loops interlock</text>
+          <text x="0" y="182" font-family="DM Sans, sans-serif" font-size="10" fill="#6B6659">▸ Weft knit: horizontal; Warp knit: vertical</text>
+          <text x="0" y="196" font-family="DM Sans, sans-serif" font-size="10" fill="#5A7A60">▸ Naturally stretches in all directions</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Knit Structure</h3>
+        <p class="weave-desc">Technically not a weave — knit fabric is formed by interlocking loops of yarn rather than crossing warp and weft. This loop structure allows knit to stretch in multiple directions without special additions. Jersey (single knit), rib, interlock, and fleece are all knit constructions.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Natural 2-way stretch</span>
+          <span class="weave-chip">Drapes softly</span>
+          <span class="weave-chip">Can unravel (run)</span>
+          <span class="weave-chip">No selvedge edge</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Jersey — cotton, wool, synthetic</li>
+            <li>Rib knit — cotton, wool</li>
+            <li>Fleece / French Terry — cotton, poly</li>
+            <li>Performance mesh — polyester</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOBBY -->
+  <div class="weave-panel" id="weave-dobby">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="22" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Dobby — Small geometric repeats</text>
+          <g transform="translate(20,36)">
+          <!-- Diamond dobby pattern -->
+          <!-- Simplified geometric repeat -->
+          <rect x="0" y="0" width="240" height="155" rx="4" fill="#FBF0E8"/>
+          <!-- Pattern cells: diamond repeat -->
+          <!-- Row 0 -->
+          <rect x="10" y="8"  width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="50" y="8"  width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="90" y="8"  width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="130" y="8" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="170" y="8" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="210" y="8" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <!-- Row 1 -->
+          <rect x="10"  y="44" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="50"  y="44" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="90"  y="44" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="130" y="44" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="170" y="44" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="210" y="44" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <!-- Row 2 -->
+          <rect x="10"  y="80" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="50"  y="80" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="90"  y="80" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="130" y="80" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="170" y="80" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="210" y="80" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <!-- Row 3 -->
+          <rect x="10"  y="116" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="50"  y="116" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="90"  y="116" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="130" y="116" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <rect x="170" y="116" width="28" height="28" rx="3" fill="#C1622A" opacity=".7"/>
+          <rect x="210" y="116" width="28" height="28" rx="3" fill="#C1622A" opacity=".15"/>
+          <text x="120" y="150" font-family="DM Sans, sans-serif" font-size="10" fill="#6B6659" text-anchor="middle">Checkerboard / diamond repeat pattern</text>
+          <text x="0"   y="175" font-family="DM Sans, sans-serif" font-size="11" fill="#5A7A60">▸ Uses a dobby attachment on a standard loom</text>
+          <text x="0"   y="192" font-family="DM Sans, sans-serif" font-size="11" fill="#6B6659">▸ More complex than plain, simpler than Jacquard</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Dobby Weave</h3>
+        <p class="weave-desc">A dobby loom attachment allows groups of warp threads to be raised and lowered independently, creating small geometric repeat patterns — diamonds, dots, stripes — directly in the weave. More design capability than plain weave, but simpler and less expensive than Jacquard.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Small geometric patterns</span>
+          <span class="weave-chip">Subtle texture</span>
+          <span class="weave-chip">Mid-range cost</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Piqué — cotton (polo shirts)</li>
+            <li>Dobby shirting — cotton</li>
+            <li>Waffle cloth, Bird's eye</li>
+            <li>Madras, End-on-end</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PILE -->
+  <div class="weave-panel" id="weave-pile">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="22" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Pile Weave — Loops and cut loops</text>
+          <g transform="translate(20,40)">
+          <!-- Ground fabric -->
+          <rect x="0" y="120" width="240" height="28" rx="3" fill="#1C1A17" opacity=".2"/>
+          <text x="120" y="138" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#6B6659">Ground fabric (base weave)</text>
+          <!-- Loop pile (left half) -->
+          <text x="30" y="15" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#4A6B8A" font-weight="500">Loop pile</text>
+          <text x="30" y="27" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" fill="#6B6659">(Terry cloth)</text>
+          <!-- U-shape loops -->
+          <path d="M10,120 Q10,90 22,90 Q34,90 34,120" fill="none" stroke="#4A6B8A" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M34,120 Q34,80 46,80 Q58,80 58,120" fill="none" stroke="#4A6B8A" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M10,120 Q10,60 22,60 Q34,60 34,120" fill="none" stroke="#4A6B8A" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+          <!-- Cut pile (right half) -->
+          <text x="170" y="15" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#C1622A" font-weight="500">Cut pile</text>
+          <text x="170" y="27" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="9" fill="#6B6659">(Velvet)</text>
+          <!-- Individual cut tufts -->
+          <line x1="135" y1="120" x2="135" y2="70" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="148" y1="120" x2="148" y2="55" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="161" y1="120" x2="161" y2="65" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="174" y1="120" x2="174" y2="50" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="187" y1="120" x2="187" y2="62" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="200" y1="120" x2="200" y2="55" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="213" y1="120" x2="213" y2="68" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Divider -->
+          <line x1="118" y1="35" x2="118" y2="120" stroke="#C4BFB5" stroke-width="1" stroke-dasharray="4 3"/>
+          <!-- Notes -->
+          <text x="0"  y="170" font-family="DM Sans, sans-serif" font-size="10" fill="#4A6B8A">Loop pile: uncut → terry, toweling</text>
+          <text x="0"  y="185" font-family="DM Sans, sans-serif" font-size="10" fill="#C1622A">Cut pile: clipped → velvet, velour, corduroy</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Pile Weave</h3>
+        <p class="weave-desc">Extra yarns are woven into a base fabric and then either left as loops (loop pile) or cut (cut pile). The resulting surface stands up from the base, creating depth, softness, and a luxurious texture. Pile fabric has a directional "nap" — always cut and press pile fabrics in one direction.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Looped or cut</span>
+          <span class="weave-chip">Directional nap</span>
+          <span class="weave-chip">Plush texture</span>
+          <span class="weave-chip">Extra yarn</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Velvet — silk, cotton, rayon</li>
+            <li>Terry cloth / Toweling — cotton</li>
+            <li>Corduroy — cotton, stretch</li>
+            <li>Velour, Plush, Fleece</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LENO -->
+  <div class="weave-panel" id="weave-leno">
+    <div class="weave-content">
+      <div class="weave-diagram">
+        <svg viewBox="0 0 280 260" xmlns="http://www.w3.org/2000/svg" width="100%">
+          <rect width="280" height="260" fill="#FAF7F2"/>
+          <text x="140" y="22" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" fill="#6B6659" font-weight="500">Leno — Twisted warp open mesh</text>
+          <g transform="translate(20,40)">
+          <!-- Open mesh structure -->
+          <!-- Horizontal weft threads -->
+          <line x1="0" y1="30"  x2="240" y2="30"  stroke="#4A6B8A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="0" y1="65"  x2="240" y2="65"  stroke="#4A6B8A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="0" y1="100" x2="240" y2="100" stroke="#4A6B8A" stroke-width="2" stroke-linecap="round"/>
+          <line x1="0" y1="135" x2="240" y2="135" stroke="#4A6B8A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Twisted warp pairs (crossing) -->
+          <!-- Pair 1 -->
+          <path d="M20,0 Q24,17 20,30 Q16,47 20,65 Q24,82 20,100 Q16,117 20,135 Q24,152 20,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <path d="M30,0 Q26,17 30,30 Q34,47 30,65 Q26,82 30,100 Q34,117 30,135 Q26,152 30,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Pair 2 -->
+          <path d="M70,0 Q74,17 70,30 Q66,47 70,65 Q74,82 70,100 Q66,117 70,135 Q74,152 70,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <path d="M80,0 Q76,17 80,30 Q84,47 80,65 Q76,82 80,100 Q84,117 80,135 Q76,152 80,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Pair 3 -->
+          <path d="M120,0 Q124,17 120,30 Q116,47 120,65 Q124,82 120,100 Q116,117 120,135 Q124,152 120,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <path d="M130,0 Q126,17 130,30 Q134,47 130,65 Q126,82 130,100 Q134,117 130,135 Q126,152 130,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Pair 4 -->
+          <path d="M170,0 Q174,17 170,30 Q166,47 170,65 Q174,82 170,100 Q166,117 170,135 Q174,152 170,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <path d="M180,0 Q176,17 180,30 Q184,47 180,65 Q176,82 180,100 Q184,117 180,135 Q176,152 180,165" fill="none" stroke="#C1622A" stroke-width="2" stroke-linecap="round"/>
+          <!-- Open space indicator -->
+          <rect x="35" y="35" width="30" height="25" rx="2" fill="none" stroke="#B8860B" stroke-width="1" stroke-dasharray="3 2"/>
+          <text x="50" y="60" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="8" fill="#B8860B">open</text>
+          <!-- Legend -->
+          <text x="0"  y="185" font-family="DM Sans, sans-serif" font-size="11" fill="#4A6B8A">— Weft (horizontal)</text>
+          <text x="0"  y="200" font-family="DM Sans, sans-serif" font-size="11" fill="#C1622A">~ Twisted warp pairs</text>
+          </g>
+        </svg>
+      </div>
+      <div class="weave-info">
+        <h3>Leno Weave</h3>
+        <p class="weave-desc">Warp yarns are twisted in pairs around each weft thread, locking them in place despite the open gaps between them. This creates an extremely stable, sheer, net-like structure that resists distortion — the openings don't shift or stretch out of shape. Maximum breathability with structural integrity.</p>
+        <div class="weave-chips">
+          <span class="weave-chip">Open mesh structure</span>
+          <span class="weave-chip">Very breathable</span>
+          <span class="weave-chip">Stable / won't distort</span>
+          <span class="weave-chip">Sheer</span>
+        </div>
+        <div class="weave-fabrics">
+          <h5>Fabrics produced</h5>
+          <ul>
+            <li>Gauze bandaging — cotton</li>
+            <li>Cheesecloth, Mosquito netting</li>
+            <li>Marquisette (sheer curtains)</li>
+            <li>Some chiffon variations</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container weaves -->
+</section>
+
+<!-- ══════════════ COMPARISON TABLE ══════════════ -->
+<section id="compare">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">At a Glance</p>
+    <h2 class="section-title">Fiber Comparison</h2>
+    <p class="section-desc">Key properties side by side. Click any fiber card above for detailed care instructions.</p>
+  </div>
+
+  <div class="compare-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Fiber</th>
+          <th>Category</th>
+          <th>Source</th>
+          <th>Breathability</th>
+          <th>Durability</th>
+          <th>Eco-Rating</th>
+          <th>Approx. Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Merino Wool</td><td>Natural/Animal</td><td>Merino sheep</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">Good</span></td><td>$$–$$$</td></tr>
+        <tr><td>Cashmere</td><td>Natural/Animal</td><td>Cashmere goat</td><td><span class="pill pill-med">Medium</span></td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-med">Fair</span></td><td>$$$$</td></tr>
+        <tr><td>Mohair</td><td>Natural/Animal</td><td>Angora goat</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-med">Fair</span></td><td>$$$</td></tr>
+        <tr><td>Silk</td><td>Natural/Animal</td><td>Silkworm</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-med">Medium</span></td><td><span class="pill pill-low">Low</span></td><td>$$$$</td></tr>
+        <tr><td>Alpaca</td><td>Natural/Animal</td><td>Alpaca</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">Good</span></td><td>$$$</td></tr>
+        <tr><td>Cotton</td><td>Natural/Plant</td><td>Cotton plant</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-med">Fair</span></td><td>$</td></tr>
+        <tr><td>Linen</td><td>Natural/Plant</td><td>Flax plant</td><td><span class="pill pill-high">Very High</span></td><td><span class="pill pill-high">Very High</span></td><td><span class="pill pill-high">Good</span></td><td>$$</td></tr>
+        <tr><td>Hemp</td><td>Natural/Plant</td><td>Hemp plant</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-high">Very High</span></td><td><span class="pill pill-high">Excellent</span></td><td>$$</td></tr>
+        <tr><td>Viscose/Rayon</td><td>Semi-Synthetic</td><td>Wood pulp</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-low">Poor</span></td><td>$</td></tr>
+        <tr><td>Modal</td><td>Semi-Synthetic</td><td>Beech trees</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-med">Medium</span></td><td><span class="pill pill-med">Fair</span></td><td>$$</td></tr>
+        <tr><td>TENCEL™/Lyocell</td><td>Semi-Synthetic</td><td>Eucalyptus</td><td><span class="pill pill-high">High</span></td><td><span class="pill pill-med">Medium</span></td><td><span class="pill pill-high">Excellent</span></td><td>$$</td></tr>
+        <tr><td>Polyester</td><td>Synthetic</td><td>Petroleum</td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-high">Very High</span></td><td><span class="pill pill-low">Poor</span></td><td>$</td></tr>
+        <tr><td>Nylon</td><td>Synthetic</td><td>Petroleum</td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-high">Very High</span></td><td><span class="pill pill-low">Poor</span></td><td>$–$$</td></tr>
+        <tr><td>Spandex/Lycra</td><td>Synthetic</td><td>Petroleum</td><td><span class="pill pill-low">Very Low</span></td><td><span class="pill pill-med">Medium</span></td><td><span class="pill pill-low">Poor</span></td><td>$$</td></tr>
+        <tr><td>Acrylic</td><td>Synthetic</td><td>Petroleum</td><td><span class="pill pill-low">Low</span></td><td><span class="pill pill-med">Medium</span></td><td><span class="pill pill-low">Poor</span></td><td>$</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ FIBER JOURNEY FLOWCHART ══════════════ -->
+<section id="flowchart">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">How Fabric is Made</p>
+    <h2 class="section-title">The Fiber-to-Garment Journey</h2>
+    <p class="section-desc">From raw source to finished garment — how each category of fiber travels to become textile.</p>
+  </div>
+
+  <div class="flowchart-wrap">
+    <svg viewBox="0 0 860 520" xmlns="http://www.w3.org/2000/svg" width="100%">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Title row: 3 sources -->
+      <!-- Natural Animal -->
+      <rect x="30" y="20" width="180" height="52" rx="8" fill="#EEF4EF" stroke="#5A7A60" stroke-width="1"/>
+      <text x="120" y="42" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" font-weight="600" fill="#3D5E42">🐑 Natural Animal</text>
+      <text x="120" y="60" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#5A7A60">Wool, Silk, Cashmere…</text>
+
+      <!-- Natural Plant -->
+      <rect x="340" y="20" width="180" height="52" rx="8" fill="#EEF4EF" stroke="#5A7A60" stroke-width="1"/>
+      <text x="430" y="42" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" font-weight="600" fill="#3D5E42">🌿 Natural Plant</text>
+      <text x="430" y="60" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#5A7A60">Cotton, Linen, Hemp…</text>
+
+      <!-- Petroleum -->
+      <rect x="650" y="20" width="180" height="52" rx="8" fill="#F6EFF4" stroke="#8B5A7A" stroke-width="1"/>
+      <text x="740" y="42" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" font-weight="600" fill="#6B3D60">⚗️ Petroleum</text>
+      <text x="740" y="60" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="11" fill="#8B5A7A">Polyester, Nylon…</text>
+
+      <!-- Level 2: Raw processing -->
+      <rect x="30" y="130" width="180" height="52" rx="8" fill="#FBF0E8" stroke="#C1622A" stroke-width="1"/>
+      <text x="120" y="150" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="600" fill="#9A4B20">Shear / Reel / Card</text>
+      <text x="120" y="166" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#C1622A">Wash, sort, degum fibers</text>
+
+      <rect x="340" y="130" width="180" height="52" rx="8" fill="#FBF0E8" stroke="#C1622A" stroke-width="1"/>
+      <text x="430" y="150" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="600" fill="#9A4B20">Harvest & Ret</text>
+      <text x="430" y="166" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#C1622A">Gin (cotton) or water-ret (linen)</text>
+
+      <rect x="650" y="130" width="180" height="52" rx="8" fill="#F6EFF4" stroke="#8B5A7A" stroke-width="1"/>
+      <text x="740" y="150" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="600" fill="#6B3D60">Polymerization</text>
+      <text x="740" y="166" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#8B5A7A">Chemical synthesis of polymer</text>
+
+      <!-- Semi-synthetic branch joins here -->
+      <rect x="490" y="130" width="150" height="52" rx="8" fill="#EEF3F8" stroke="#4A6B8A" stroke-width="1"/>
+      <text x="565" y="150" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="600" fill="#3A5570">Wood Pulp Dissolve</text>
+      <text x="565" y="166" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#4A6B8A">Eucalyptus/Beech/Bamboo</text>
+
+      <!-- Level 3: Spinning / Extrusion -->
+      <rect x="185" y="250" width="200" height="52" rx="8" fill="#FDF4DC" stroke="#B8860B" stroke-width="1"/>
+      <text x="285" y="270" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="600" fill="#8A6200">Spinning into Yarn</text>
+      <text x="285" y="286" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#B8860B">Ring, rotor, or mule spinning</text>
+
+      <rect x="475" y="250" width="200" height="52" rx="8" fill="#FDF4DC" stroke="#B8860B" stroke-width="1"/>
+      <text x="575" y="270" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12" font-weight="600" fill="#8A6200">Melt / Solution Spinning</text>
+      <text x="575" y="286" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#B8860B">Extruded through spinneret</text>
+
+      <!-- Level 4: Weaving/Knitting -->
+      <rect x="300" y="360" width="260" height="52" rx="8" fill="#EEF4EF" stroke="#5A7A60" stroke-width="1"/>
+      <text x="430" y="380" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" font-weight="600" fill="#3D5E42">Weaving / Knitting</text>
+      <text x="430" y="396" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#5A7A60">Loom (woven) or needles/machine (knit)</text>
+
+      <!-- Level 5: Finishing -->
+      <rect x="300" y="452" width="260" height="52" rx="8" fill="#1C1A17" stroke="#1C1A17" stroke-width="1"/>
+      <text x="430" y="472" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="13" font-weight="600" fill="#FAF7F2">Finishing & Garment</text>
+      <text x="430" y="488" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="10" fill="#C4BFB5">Dyeing → cutting → sewing → press</text>
+
+      <!-- ARROWS -->
+      <!-- Natural Animal → Shear -->
+      <line x1="120" y1="72" x2="120" y2="128" stroke="#5A7A60" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Natural Plant → Harvest -->
+      <line x1="430" y1="72" x2="430" y2="128" stroke="#5A7A60" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Petroleum → Polymerization -->
+      <line x1="740" y1="72" x2="740" y2="128" stroke="#8B5A7A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Shear → Spinning -->
+      <line x1="180" y1="156" x2="260" y2="250" stroke="#C1622A" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Harvest → Spinning -->
+      <line x1="380" y1="182" x2="340" y2="250" stroke="#C1622A" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Wood Pulp → Solution Spinning -->
+      <line x1="565" y1="182" x2="575" y2="250" stroke="#4A6B8A" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Polymerization → Melt Spinning -->
+      <line x1="700" y1="182" x2="650" y2="250" stroke="#8B5A7A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Both spinnings → Weaving -->
+      <line x1="285" y1="302" x2="380" y2="358" stroke="#B8860B" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="575" y1="302" x2="480" y2="358" stroke="#B8860B" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Weaving → Finishing -->
+      <line x1="430" y1="412" x2="430" y2="450" stroke="#1C1A17" stroke-width="1.5" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ CARE GUIDE ══════════════ -->
+<section id="care">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">Fabric Care</p>
+    <h2 class="section-title">How to Care for Every Fiber</h2>
+    <p class="section-desc">Proper care extends garment life significantly. The most fundamental rule: always check the care label and follow the most delicate fiber in any blend.</p>
+  </div>
+
+  <!-- WOOL & CASHMERE CARE -->
+  <div style="margin-bottom:40px;">
+    <h3 style="font-family:'Playfair Display',serif; font-size:22px; margin-bottom:6px;">Wool, Cashmere & Mohair</h3>
+    <p style="color:var(--ink-60); font-size:14px; margin-bottom:16px;">Protein fibers. Sensitive to heat, agitation, and alkaline detergents. Never felt these.</p>
+    <div class="care-grid">
+      <div class="care-card">
+        <div class="care-icon">🫧</div>
+        <div class="care-label">Washing</div>
+        <div class="care-value">Hand wash cold or machine delicate. Use wool-specific or pH-neutral detergent (e.g. Eucalan, Woolite).</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">💨</div>
+        <div class="care-label">Drying</div>
+        <div class="care-value">Lay flat to dry — never hang (causes stretching). Never tumble dry (causes irreversible felting).</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🔥</div>
+        <div class="care-label">Ironing</div>
+        <div class="care-value">Cool iron with steam, or steam only. Press through a cloth. Never iron directly on cashmere.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">📦</div>
+        <div class="care-label">Storage</div>
+        <div class="care-value">Fold — never hang. Store in breathable cotton bag with cedar. Clean before storing to repel moths.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">⚡</div>
+        <div class="care-label">Pilling</div>
+        <div class="care-value">Use a cashmere comb or fabric shaver gently. Pilling is normal — especially in friction areas.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">✨</div>
+        <div class="care-label">Pro Tip</div>
+        <div class="care-value">Cashmere and mohair don't need frequent washing. Air between wears — hang in a well-ventilated space overnight.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SILK CARE -->
+  <div style="margin-bottom:40px;">
+    <h3 style="font-family:'Playfair Display',serif; font-size:22px; margin-bottom:6px;">Silk</h3>
+    <p style="color:var(--ink-60); font-size:14px; margin-bottom:16px;">Protein fiber. Loses up to 20% of strength when wet. Extremely sensitive to heat, sunlight, and alkaline chemicals.</p>
+    <div class="care-grid">
+      <div class="care-card">
+        <div class="care-icon">🫧</div>
+        <div class="care-label">Washing</div>
+        <div class="care-value">Hand wash in cold water with silk-specific detergent. Or dry clean. Never wring — gently squeeze out water.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">💨</div>
+        <div class="care-label">Drying</div>
+        <div class="care-value">Roll in a clean towel to absorb moisture, then hang in shade. Direct sunlight yellows and weakens silk.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🔥</div>
+        <div class="care-label">Ironing</div>
+        <div class="care-value">Iron slightly damp on the reverse side using a low/silk setting. Steam with care — water spots visible on some silks.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🚫</div>
+        <div class="care-label">Never</div>
+        <div class="care-value">Never bleach. Never machine wash (unless label says so). Never use deodorant directly against silk — alcohol damages it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- COTTON & LINEN CARE -->
+  <div style="margin-bottom:40px;">
+    <h3 style="font-family:'Playfair Display',serif; font-size:22px; margin-bottom:6px;">Cotton & Linen</h3>
+    <p style="color:var(--ink-60); font-size:14px; margin-bottom:16px;">Cellulose fibers. The most forgiving of all natural fibers. Strengthen when wet. Durable and easy-care.</p>
+    <div class="care-grid">
+      <div class="care-card">
+        <div class="care-icon">🫧</div>
+        <div class="care-label">Washing</div>
+        <div class="care-value">Machine wash warm or cold. Cold preserves colors and reduces shrinkage. Linen becomes softer with each wash.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">💨</div>
+        <div class="care-label">Drying</div>
+        <div class="care-value">Tumble dry low or line dry. Remove promptly to reduce wrinkles. Linen wrinkles readily — embrace it or iron damp.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🔥</div>
+        <div class="care-label">Ironing</div>
+        <div class="care-value">Cotton and linen can take high heat. Iron damp for best results. Linen irons beautifully — press while slightly wet.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">⚠️</div>
+        <div class="care-label">Shrinkage</div>
+        <div class="care-value">Pre-wash before sewing. Cotton can shrink 5–10%. Buy slightly larger if garment is not pre-washed/preshrunk.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- VISCOSE/RAYON/MODAL/TENCEL CARE -->
+  <div style="margin-bottom:40px;">
+    <h3 style="font-family:'Playfair Display',serif; font-size:22px; margin-bottom:6px;">Viscose, Rayon, Modal & TENCEL™</h3>
+    <p style="color:var(--ink-60); font-size:14px; margin-bottom:16px;">Regenerated cellulose. Viscose and standard rayon weaken significantly when wet. Modal and TENCEL™ are much more stable.</p>
+    <div class="care-grid">
+      <div class="care-card">
+        <div class="care-icon">🫧</div>
+        <div class="care-label">Viscose / Rayon</div>
+        <div class="care-value">Hand wash or dry clean. Never wring. Machine washing risks permanent distortion due to wet weakness.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🫧</div>
+        <div class="care-label">Modal & TENCEL™</div>
+        <div class="care-value">Machine wash cold on gentle cycle. Much more stable wet. Lay flat or hang to dry. Avoid high heat tumble drying.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🔥</div>
+        <div class="care-label">Ironing</div>
+        <div class="care-value">Low-medium heat. Steam is effective. These fabrics wrinkle easily but respond well to gentle steaming.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">✨</div>
+        <div class="care-label">Tip</div>
+        <div class="care-value">TENCEL™ and Modal are significantly more care-friendly than viscose. Worth the small price premium for ease of care.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SYNTHETIC CARE -->
+  <div style="margin-bottom:40px;">
+    <h3 style="font-family:'Playfair Display',serif; font-size:22px; margin-bottom:6px;">Polyester, Nylon & Synthetics</h3>
+    <p style="color:var(--ink-60); font-size:14px; margin-bottom:16px;">The most care-resilient category. Cold water is the primary rule — high heat can permanently warp synthetic fibers.</p>
+    <div class="care-grid">
+      <div class="care-card">
+        <div class="care-icon">🫧</div>
+        <div class="care-label">Washing</div>
+        <div class="care-value">Machine wash cold, gentle cycle. Most synthetics are very easy care — just avoid hot water, which can warp fibers and set stains.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">💨</div>
+        <div class="care-label">Drying</div>
+        <div class="care-value">Low heat or air dry. Never high heat — can permanently warp polyester. Nylon melts at high temperatures.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🌊</div>
+        <div class="care-label">Microplastics</div>
+        <div class="care-value">Use a Guppyfriend wash bag to capture microfibers. Wash less frequently to reduce environmental impact.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🚫</div>
+        <div class="care-label">Spandex</div>
+        <div class="care-value">Never bleach spandex blends — chlorine destroys elastane. Avoid fabric softener — it coats elastic fibers and reduces stretch recovery.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">🔥</div>
+        <div class="care-label">Ironing</div>
+        <div class="care-value">Use low/synthetic setting. Many synthetics don't need ironing. Always use a pressing cloth as synthetics can melt or develop shine.</div>
+      </div>
+      <div class="care-card">
+        <div class="care-icon">💡</div>
+        <div class="care-label">Odor</div>
+        <div class="care-value">Synthetics can trap odors. Add white vinegar to the rinse cycle. Technical sportswear detergents (Nikwax, Sport Wash) help significantly.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════ SOURCES ══════════════ -->
+<section id="sources">
+<div class="container">
+  <div class="section-header">
+    <p class="section-eyebrow">Research & References</p>
+    <h2 class="section-title">Sources</h2>
+    <p class="section-desc">This guide draws from textile industry sources, fiber producers, and academic references.</p>
+  </div>
+  <div class="sources-grid">
+    <a class="source-card" href="https://yanmaotextile.com/the-ultimate-guide-to-natural-fabrics-types-benefits-and-a-complete-list/" target="_blank" rel="noopener">
+      <div class="source-num">01</div>
+      <div class="source-title">Ultimate Guide to Natural Fabrics — Yanmao Textile</div>
+      <div class="source-url">yanmaotextile.com</div>
+    </a>
+    <a class="source-card" href="https://snsilk.com/what-are-natural-fabrics-an-ultimate-guide-to-eco-friendly-textiles/" target="_blank" rel="noopener">
+      <div class="source-num">02</div>
+      <div class="source-title">Natural Fabrics: Ultimate Guide — Sino Silk</div>
+      <div class="source-url">snsilk.com</div>
+    </a>
+    <a class="source-card" href="https://www.newenglandwoolens.com/blogs/articles/sustainable-fashion-a-guide-to-natural-fiber-choices" target="_blank" rel="noopener">
+      <div class="source-num">03</div>
+      <div class="source-title">Natural Fiber Choices in Sustainable Fashion — New England Woolens</div>
+      <div class="source-url">newenglandwoolens.com</div>
+    </a>
+    <a class="source-card" href="https://vnpolyfiber.com/synthetic-fibers-fabrics-complete-guide-to-types-properties-uses/" target="_blank" rel="noopener">
+      <div class="source-num">04</div>
+      <div class="source-title">Synthetic Fibers: Complete Guide — VNPOLYFIBER</div>
+      <div class="source-url">vnpolyfiber.com</div>
+    </a>
+    <a class="source-card" href="https://sewingtrip.com/list-of-synthetic-fabric-types/" target="_blank" rel="noopener">
+      <div class="source-num">05</div>
+      <div class="source-title">List of Synthetic Fabric Types — Sewing Trip</div>
+      <div class="source-url">sewingtrip.com</div>
+    </a>
+    <a class="source-card" href="https://www.naturalclothing.com/modal-rayon-lyocell-cupro-semi-synthetic-fabric/" target="_blank" rel="noopener">
+      <div class="source-num">06</div>
+      <div class="source-title">Semi-Synthetic Fabrics: Modal, Rayon, Lyocell, Cupro — Natural Clothing</div>
+      <div class="source-url">naturalclothing.com</div>
+    </a>
+    <a class="source-card" href="https://taihusnow.com/viscose-vs-tencel.html" target="_blank" rel="noopener">
+      <div class="source-num">07</div>
+      <div class="source-title">Tencel vs Viscose vs Modal vs Rayon — Taihu Snow</div>
+      <div class="source-url">taihusnow.com</div>
+    </a>
+    <a class="source-card" href="https://www.apexfashionlab.com/glossary/rayon-fabric" target="_blank" rel="noopener">
+      <div class="source-num">08</div>
+      <div class="source-title">Rayon Fabric Guide: Viscose, Modal, Lyocell — Apex Fashion Lab</div>
+      <div class="source-url">apexfashionlab.com</div>
+    </a>
+    <a class="source-card" href="https://anuprerna.com/blogs/a-designer-s-guide-to-types-of-twill-jacquard-honeycomb-more/9202606" target="_blank" rel="noopener">
+      <div class="source-num">09</div>
+      <div class="source-title">Designer's Guide to Weave Types — Anuprerna</div>
+      <div class="source-url">anuprerna.com</div>
+    </a>
+    <a class="source-card" href="https://snsilk.com/the-difference-between-plain-twill-and-satin-weave/" target="_blank" rel="noopener">
+      <div class="source-num">10</div>
+      <div class="source-title">Plain vs Twill vs Satin Weave — Sino Silk</div>
+      <div class="source-url">snsilk.com</div>
+    </a>
+    <a class="source-card" href="https://www.fibre2fashion.com/industry-article/3343/different-types-of-weaves" target="_blank" rel="noopener">
+      <div class="source-num">11</div>
+      <div class="source-title">Different Types of Weaves — Fibre2Fashion</div>
+      <div class="source-url">fibre2fashion.com</div>
+    </a>
+    <a class="source-card" href="https://rkcotweaving.com/blog/weaving-patterns-in-textile/" target="_blank" rel="noopener">
+      <div class="source-num">12</div>
+      <div class="source-title">Textile Weaving Patterns: Types & Applications — RKC Weaving</div>
+      <div class="source-url">rkcotweaving.com</div>
+    </a>
+    <a class="source-card" href="https://clothingdigest.com/caring-for-synthetic-fabrics/" target="_blank" rel="noopener">
+      <div class="source-num">13</div>
+      <div class="source-title">Complete Guide to Caring for Synthetic Fabrics — Clothing Digest</div>
+      <div class="source-url">clothingdigest.com</div>
+    </a>
+    <a class="source-card" href="https://idcustomapparel.com/synthetic-fibers-polyester-nylon-acrylic-spandex/" target="_blank" rel="noopener">
+      <div class="source-num">14</div>
+      <div class="source-title">4 Essential Synthetic Fibers — ID Custom Apparel</div>
+      <div class="source-url">idcustomapparel.com</div>
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-title">The Complete Textile Compendium</div>
+    <p class="footer-sub">A reference guide to fibers, fabrics, and textile construction — compiled from industry sources and textile science literature. For educational purposes.</p>
+    <p style="margin-top:24px; font-size:12px; color:rgba(250,247,242,0.3);">Natural · Semi-Synthetic · Synthetic · Weave Structures · Care Guide</p>
+  </div>
+</footer>
+
+<!-- DETAIL OVERLAY -->
+<div class="detail-overlay" id="detail-overlay" onclick="closeDetailIfBG(event)">
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <div>
+        <div id="detail-tag" style="margin-bottom:8px;"></div>
+        <h2 id="detail-title" style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;"></h2>
+        <p id="detail-subtitle" style="font-size:14px;color:var(--ink-60);font-style:italic;margin-top:4px;"></p>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<script>
+// ── FIBER DATA ──
+const fibers = {
+  merino: {
+    name: 'Merino Wool',
+    tag: '<span class="fiber-tag tag-animal">Animal · Merino Sheep</span>',
+    subtitle: 'Ovis aries (Merino breed) · Australia, New Zealand, Patagonia',
+    sections: [
+      { title: 'What makes it special', content: 'Merino fiber measures 15–24 microns in diameter — fine enough that it bends rather than pricks the skin. This prevents the itching sensation of coarser wools. The natural crimp creates millions of tiny air pockets, providing remarkable insulation while remaining breathable. It is naturally odor-resistant due to its protein structure, which binds odor molecules.' },
+      { title: 'Feel & handle', content: 'Silky smooth and soft against skin. Has a slight natural bounce and elasticity due to its crimp. Drapes fluidly in fine-gauge knits. Higher micron counts (22–24μm) are used for outerwear; finer (15–18μm) for next-to-skin garments.' },
+      { title: 'Key facts', list: ['Can absorb up to 35% of its weight in moisture without feeling wet', 'Naturally regulates temperature — warm in cold, cool in warmth', 'Biodegradable within months in soil conditions', 'Naturally flame-resistant — won\'t melt when burned', 'Mulesing-free certifications available (ZQ, RWS)'] },
+      { title: 'Care', list: ['Hand wash or machine wash on wool/delicate cycle', 'Cold water — max 30°C', 'Wool-specific detergent (Eucalan, Woolite, Perwoll)', 'Lay flat to dry — never tumble dry or hang', 'Store folded with cedar blocks. Clean before storing.'] }
+    ]
+  },
+  cashmere: {
+    name: 'Cashmere',
+    tag: '<span class="fiber-tag tag-animal">Animal · Cashmere Goat</span>',
+    subtitle: 'Capra hircus laniger · Mongolia, Inner Mongolia, Kashmir Region',
+    sections: [
+      { title: 'What makes it special', content: 'Cashmere is the downy undercoat of the Cashmere goat, combed (not sheared) during the spring molt. Each goat yields only 150–200g of combed fiber per year — requiring 3–5 goats to make one sweater. Its fineness (14–19 microns) and scales make it exceptionally soft with a natural warmth-to-weight ratio superior to regular wool.' },
+      { title: 'Feel & handle', content: 'Divinely soft and light. Has a characteristic warm, plush feel that becomes even softer with careful wearing and washing. It has less elasticity than merino and can lose shape over time. Quality is determined by fiber length (staple) and micron count — 14–15μm is premium.' },
+      { title: 'Key facts', list: ['8x warmer than sheep\'s wool by weight', 'Prone to pilling — especially grades 2 and 3. Premium grade 1 pills less', 'Price ranges from $80 to $3,000+ depending on grade and brand', 'Susceptible to moths — store with cedar or lavender', 'Mongolia produces ~70% of world\'s raw cashmere'] },
+      { title: 'Care', list: ['Hand wash in cool water, pH-neutral or baby shampoo', 'Gently squeeze — never wring or twist', 'Lay flat on a towel to dry in original shape', 'Steam rather than iron when possible', 'Depill with a cashmere comb or fine-toothed fabric shaver', 'Wash only when necessary — frequent washing weakens fibers'] }
+    ]
+  },
+  mohair: {
+    name: 'Mohair',
+    tag: '<span class="fiber-tag tag-animal">Animal · Angora Goat</span>',
+    subtitle: 'Capra hircus aegagrus (Angora breed) · South Africa, Texas, Turkey',
+    sections: [
+      { title: 'What makes it special', content: 'Called the "Diamond Fiber," mohair has a brilliant natural luster that no other protein fiber can match. Unlike cashmere, it is highly durable and resilient — it resists felting, pilling, and creasing. The fiber has a smooth, relatively scale-free surface, which gives it its characteristic sheen and makes it naturally stain-resistant.' },
+      { title: 'Feel & handle', content: 'Kid mohair (from young Angora goats) is silky-soft and fine; adult mohair is coarser and stronger. The fiber has a distinctive halo effect — fine filaments catch light and give garments a luminous glow. It takes dye in exceptionally vivid, saturated colors that last.' },
+      { title: 'Key facts', list: ['South Africa produces ~50% of the world\'s mohair supply', 'Kid mohair: 23–29 microns; adult: 30–40 microns', 'Highly resilient — can be bent 20,000 times without breaking', 'Often blended with wool or silk for combined properties', 'MOHAIR SA and IAMAB certify responsible production'] },
+      { title: 'Care', list: ['Hand wash or dry clean', 'Cool water only — use wool wash detergent', 'Never agitate — gently squeeze and rinse', 'Lay flat to dry to prevent stretching', 'Shake to restore the halo after drying'] }
+    ]
+  },
+  silk: {
+    name: 'Silk',
+    tag: '<span class="fiber-tag tag-animal">Animal · Silkworm</span>',
+    subtitle: 'Bombyx mori (silkworm) · China, India, Japan, Thailand',
+    sections: [
+      { title: 'What makes it special', content: 'Silk is the only natural fiber produced as a continuous filament — one silkworm cocoon contains up to 1,500 meters of thread. The resulting fiber is triangular in cross-section, which acts as a prism, refracting light into its characteristic shimmer. It is the strongest natural fiber (by diameter), hypoallergenic, and naturally thermoregulating.' },
+      { title: 'Feel & handle', content: 'Smooth, cool-to-the-touch, and with an unparalleled drape. The term "hand" refers to how fabric feels in the hand — silk has a fluid, almost liquid quality. Charmeuse is the most fluid; dupioni is crisp with slubs; raw silk is textured and matte.' },
+      { title: 'Key facts', list: ['China produces ~80% of world silk (sericiculture = silk farming)', '5,000+ years of cultivation history in China', 'Weakens by ~20% when wet — handle very gently', 'UV rays degrade silk — avoid prolonged sunlight storage', 'Momme weight (mm) measures silk density: 12mm = light, 22mm = heavy'] },
+      { title: 'Care', list: ['Hand wash in cool water with silk-specific detergent', 'Or dry clean — especially for structured silk garments', 'Never wring — roll in a towel to remove moisture', 'Dry in shade — sunlight yellows and weakens silk', 'Iron on silk/cool setting while slightly damp, on reverse', 'Avoid perfume and deodorant directly on silk'] }
+    ]
+  },
+  alpaca: {
+    name: 'Alpaca',
+    tag: '<span class="fiber-tag tag-animal">Animal · Alpaca</span>',
+    subtitle: 'Vicugna pacos · Peruvian, Bolivian & Chilean Andes (3,500–5,000m altitude)',
+    sections: [
+      { title: 'What makes it special', content: 'Alpaca fiber contains no lanolin, making it hypoallergenic and accessible to those sensitive to wool. The hollow structure of alpaca fiber creates exceptional warmth-to-weight ratio — warmer than wool and lighter too. It is naturally water-resistant and wicks moisture efficiently. "Baby alpaca" (the finest grade, 18–22 microns) is exceptionally soft.' },
+      { title: 'Feel & handle', content: 'Silky and lightweight with a distinct warmth. Less crimp than merino wool, so it drapes more readily but has less natural elasticity. It comes in 22 natural colors — from white to black through browns and grays — requiring less dyeing than other fibers.' },
+      { title: 'Key facts', list: ['Two breeds: Huacaya (fluffy, most common) and Suri (silky, less common)', 'Hypoallergenic — no lanolin means no common wool allergy trigger', 'One alpaca yields 2–4kg fiber per year', 'Fiber grades: Baby (<22μm), Fine (22–25.5μm), Medium (25.5–32μm)', 'Sustainable: low water use, soft hooves don\'t damage land'] },
+      { title: 'Care', list: ['Hand wash cold or machine delicate cycle', 'Lay flat to dry — alpaca can stretch if hung wet', 'Gentle wool detergent or baby shampoo', 'Rarely needs washing — air between wears', 'Store folded with cedar. Moths can damage alpaca.'] }
+    ]
+  },
+  angora: {
+    name: 'Angora',
+    tag: '<span class="fiber-tag tag-animal">Animal · Angora Rabbit</span>',
+    subtitle: 'Oryctolagus cuniculus (Angora breed) · China, France, Germany, Americas',
+    sections: [
+      { title: 'What makes it special', content: 'Angora fiber is the finest animal fiber commonly used in textiles, at 12–16 microns. It has a distinctive "halo" or cloud-like appearance due to its microscopic hollow structure and extreme fineness. This hollow core also makes it much lighter than wool at equivalent warmth — about 7x warmer per weight than sheep wool.' },
+      { title: 'Feel & handle', content: 'Extraordinarily soft, fluffy, and light. Has a tendency to shed unless the rabbit\'s fiber has been properly processed. For this reason, angora is most commonly blended at 20–70% with wool, nylon, or cotton to add structure and reduce shedding. Pure angora garments require very gentle handling.' },
+      { title: 'Key facts', list: ['China produces ~90% of commercial angora', 'English, French, Satin, and Giant varieties differ in fiber quality', 'Animal welfare concerns have led some brands to discontinue use', 'Prone to shedding — blends with nylon help significantly', 'Takes dye in pastel shades beautifully'] },
+      { title: 'Care', list: ['Hand wash only, very gently in cold water', 'Use baby shampoo or angora-specific wash', 'Never agitate or rub — the fine fibers tangle instantly', 'Dry flat on towel — never hang or tumble dry', 'Store in breathable bag. Cedar essential for moth prevention.'] }
+    ]
+  },
+  vicuna: {
+    name: 'Vicuña',
+    tag: '<span class="fiber-tag tag-animal">Animal · Vicuña</span>',
+    subtitle: 'Vicugna vicugna · Andes (Argentina, Bolivia, Chile, Peru) — protected species',
+    sections: [
+      { title: 'What makes it special', content: 'At 12–14 microns, vicuña fiber is the finest known natural fiber — finer even than cashmere or qiviut. The vicuña is a protected wild species related to the alpaca, and its fiber can only be collected through the traditional Andean "chaku" round-up where animals are herded, shorn, and released. Each animal yields only 200–400g of fiber per two-year shearing cycle.' },
+      { title: 'Feel & handle', content: 'Incomparably soft, warm, and featherlight. Has a natural reddish-gold color that is used unbleached to preserve quality. Because it cannot be chemically processed without damage, vicuña is never bleached or dyed by serious producers. It drapes with an almost impossibly delicate fluidity.' },
+      { title: 'Key facts', list: ['World\'s most expensive natural fiber: $400–$600/kg raw, $3,000+ per garment', 'Once reserved exclusively for Incan royalty under penalty of death', 'Listed under CITES — international trade strictly regulated', 'Peru holds ~80% of world\'s vicuña population (~400,000 animals)', 'Annual global production: ~5,000–6,000 kg'] },
+      { title: 'Care', list: ['Dry clean only — do not attempt home washing', 'Air gently after wearing — minimal washing needed', 'Store folded in acid-free tissue in cool, dry environment', 'Never expose to light for extended periods', 'Treat as a heirloom — proper care preserves it for decades'] }
+    ]
+  },
+  qiviut: {
+    name: 'Qiviut',
+    tag: '<span class="fiber-tag tag-animal">Animal · Musk Ox</span>',
+    subtitle: 'Ovibos moschatus · Arctic Alaska, Canada, Greenland',
+    sections: [
+      { title: 'What makes it special', content: 'Qiviut (pronounced "kiv-ee-oot") is the downy underfleece of the musk ox, naturally shed each spring. At 16–20 microns, it is finer than cashmere and approximately 8x warmer than wool by weight. It does not shrink or felt when washed, unlike most protein fibers — a remarkable property. It is hand-collected during the natural shedding season.' },
+      { title: 'Feel & handle', content: 'Extraordinarily soft, with a silky smooth drape unlike the typical "woolly" feel. Lightweight and airy despite its warmth. The natural color ranges from soft gray-brown to warm taupe. It has less elasticity than wool, making it best for accessories, lace, and fine knits rather than stretch garments.' },
+      { title: 'Key facts', list: ['8x warmer than sheep wool by weight', 'Does not felt or shrink — unique among protein fibers', 'Musk oxen range freely — fiber collected during natural moult', 'Supporting Alaskan Native communities: Oomingmak Musk Ox Producers\' Co-operative', 'Annual US production: very small — perhaps 1,000–2,000 kg total'] },
+      { title: 'Care', list: ['Hand wash in cool or lukewarm water with gentle soap', 'Rinse carefully and lay flat to dry', 'Remarkably easy care for a luxury fiber — does not felt', 'Will not shrink in water — but avoid heat', 'Fold and store in cool, dry location'] }
+    ]
+  },
+  cotton: {
+    name: 'Cotton',
+    tag: '<span class="fiber-tag tag-plant">Plant · Cotton Boll</span>',
+    subtitle: 'Gossypium hirsutum · USA, India, China, Brazil, Pakistan',
+    sections: [
+      { title: 'What makes it special', content: 'Cotton is the world\'s most-used natural fiber, accounting for about 25% of all fiber consumption. Its success comes from its combination of comfort, breathability, durability, easy care, and versatility. The fiber is 90% cellulose with a natural twist that aids spinning. It is hypoallergenic, soft, and gets softer with each wash.' },
+      { title: 'Key grades', list: ['Egyptian cotton: Gossypium barbadense — long staple, silky, premium', 'Pima cotton (Supima): Similar to Egyptian, grown in US Southwest', 'Upland cotton: Most common grade — everyday use', 'Organic cotton: Grown without synthetic pesticides or fertilizers'] },
+      { title: 'Key facts', list: ['Conventional cotton uses ~16% of world\'s insecticides on 2.5% of farmland', 'Organic cotton uses ~71% less water than conventional', 'Cotton bolls open when ripe — natural harvest timing', 'Wicks moisture but holds it (stays wet longer than synthetics)', 'Wrinkles easily — blending with polyester reduces wrinkling'] },
+      { title: 'Care', list: ['Machine wash warm or cold — cold preserves color and reduces shrinkage', 'Tumble dry low or line dry', 'High-heat iron — cotton can take it well', 'Use chlorine bleach only for white cotton, oxygen bleach for colors', 'Pre-wash new cotton items — can shrink 5–10%'] }
+    ]
+  },
+  linen: {
+    name: 'Linen',
+    tag: '<span class="fiber-tag tag-plant">Plant · Flax Stalk</span>',
+    subtitle: 'Linum usitatissimum · Belgium, France, Ireland, Netherlands',
+    sections: [
+      { title: 'What makes it special', content: 'Linen is the oldest textile in the world — flax fibers found in prehistoric caves and linen cloth discovered in Egyptian tombs dating to 36,000 years ago. The fiber comes from the stem of the flax plant through retting (steeping in water to separate fibers) and is stronger wet than dry. Uniquely, linen absorbs and releases moisture extremely quickly, keeping the body cool.' },
+      { title: 'Feel & handle', content: 'Crisp and slightly textured when new, developing a beautiful softness and drape through repeated washing and wearing. Linen wrinkles readily — this is considered part of its character by aficionados. European linen (Belgian, Irish, French) is considered the finest. The natural color ranges from ivory to tan.' },
+      { title: 'Key facts', list: ['Belgium and Northern France: world\'s finest flax growing regions', 'Naturally antibacterial and antifungal', 'Becomes softer, stronger, and more lustrous with each wash', 'Temperature regulation: cool in summer, warm in winter', 'The oldest linen cloth dates to ~6500 BC in Turkey (Çatalhöyük)'] },
+      { title: 'Care', list: ['Machine wash warm (40°C) or cold — it gets better with washing', 'Line dry or tumble dry low — remove promptly to reduce wrinkles', 'Iron damp with high heat — linen irons beautifully', 'Do not dry clean — unnecessary and damages over time', 'Embrace wrinkles — or iron damp for a crisp look'] }
+    ]
+  },
+  hemp: {
+    name: 'Hemp',
+    tag: '<span class="fiber-tag tag-plant">Plant · Hemp Stalk</span>',
+    subtitle: 'Cannabis sativa L. · China, France, Romania, Canada',
+    sections: [
+      { title: 'What makes it special', content: 'Hemp is arguably the most sustainable textile crop: it grows in 4 months without pesticides, requires minimal water (uses 50% less water than cotton), is naturally pest-resistant, improves soil health (phytoremediation), and yields 3x more fiber per acre than cotton. The resulting fiber is one of the strongest natural fibers, becoming stronger with each wash.' },
+      { title: 'Feel & handle', content: 'Initially coarser than cotton or linen, hemp softens significantly with washing and wear. Modern processing techniques (cottonization) produce much finer, softer hemp. Often blended with cotton, silk, or modal for a softer initial hand. The best hemp fabric has a drape similar to linen with a slight sheen.' },
+      { title: 'Key facts', list: ['Grows to harvestable height in 70–110 days', 'Sequesters more CO₂ than trees acre-for-acre', 'Naturally UV-resistant — blocks more UV rays than cotton', 'Retains heat better than cotton — natural insulation', 'Contains no THC in the fiber — hemp and marijuana are different cultivars'] },
+      { title: 'Care', list: ['Machine wash cold or warm — tough fiber handles it well', 'Tumble dry low or line dry', 'Softens with every wash — improve over time', 'Medium-high iron', 'Can be machine washed more frequently than many natural fibers'] }
+    ]
+  },
+  ramie: {
+    name: 'Ramie',
+    tag: '<span class="fiber-tag tag-plant">Plant · Ramie Stalk</span>',
+    subtitle: 'Boehmeria nivea · China, Japan, Brazil, Philippines',
+    sections: [
+      { title: 'What makes it special', content: 'Ramie, known as "China grass," is one of the strongest natural fibers — 8 times stronger than cotton and approximately 3 times stronger than wool. Uniquely, it becomes even stronger when wet. It has a natural brightness and luster, resists bacteria, mildew, and insect damage, and holds its shape well.' },
+      { title: 'Feel & handle', content: 'Crisp and somewhat stiff, with a natural sheen similar to silk. Pure ramie can feel rough and lacks drape, which is why it is almost always blended with cotton (for softness) or linen (for texture and strength). Ramie-cotton blends are popular for summer clothing in Asia.' },
+      { title: 'Key facts', list: ['One of the oldest fiber crops — cultivated in China for 6,000+ years', 'Does not shrink — dimensionally very stable', 'Naturally white — reduces dyeing requirements', 'Harvested 3–6 times per year from the same plant', 'Difficult to process — requires degumming to remove gummy resin'] },
+      { title: 'Care', list: ['Machine wash cold or lukewarm', 'Lay flat or hang to dry — avoid excessive heat', 'Iron on medium heat while damp for best results', 'Does not shrink — a major care advantage over cotton', 'Bleach only white ramie — others fade'] }
+    ]
+  },
+  jute: {
+    name: 'Jute',
+    tag: '<span class="fiber-tag tag-plant">Plant · Jute Stalk</span>',
+    subtitle: 'Corchorus capsularis & C. olitorius · Bangladesh, India, China',
+    sections: [
+      { title: 'What makes it special', content: 'Called the "Golden Fiber" for its golden-brown color and economic importance, jute is the second most produced natural fiber globally (after cotton). It is fully biodegradable, decomposes in months, and requires very little water or pesticide to grow. It is primarily used for sacking, rope, and home textiles rather than clothing due to its coarseness.' },
+      { title: 'Feel & handle', content: 'Coarse, rough, and strong — not suitable for skin-contact garments in pure form. Modern processing creates softer jute blends. Used primarily for home textiles (rugs, burlap), eco-packaging, and industrial applications. Naturally heat-insulating and naturally antistatic.' },
+      { title: 'Key facts', list: ['Bangladesh produces ~70% of world\'s raw jute', 'Completely biodegradable — decomposes in 1–2 seasons', 'Often used in eco-packaging as plastic alternative', 'Can be blended with silk for a "jute silk" blend — softer and shiny', 'Low moisture retention — suitable for dry goods packaging'] },
+      { title: 'Care', list: ['Hand wash gently in cold water if necessary', 'Line dry only — natural jute degrades in high heat', 'Do not machine wash or tumble dry coarse jute', 'Softer jute blends can be gentle machine washed cold', 'Avoid prolonged moisture exposure — can mildew'] }
+    ]
+  },
+  viscose: {
+    name: 'Viscose / Rayon',
+    tag: '<span class="fiber-tag tag-semi">Semi-Synthetic · Wood Pulp</span>',
+    subtitle: 'Regenerated cellulose — Developed 1890s as "artificial silk"',
+    sections: [
+      { title: 'What makes it special', content: 'Viscose was the first manufactured fiber and remains the most widely produced semi-synthetic. Wood pulp from beech, pine, bamboo, or eucalyptus is dissolved in sodium hydroxide and carbon disulfide, then extruded through a spinneret into an acid bath to form fibers. The result bridges natural breathability with synthetic consistency at affordable cost.' },
+      { title: 'Environmental note', content: 'Standard viscose production uses toxic chemicals (carbon disulfide) that pose health and environmental risks when not properly managed. Many factories, particularly in Asia, discharge waste chemicals. ECOVERO™ viscose (by Lenzing) is a more responsible alternative with lower environmental impact.' },
+      { title: 'Key facts', list: ['Weakens by 30–50% when wet — requires very gentle washing', 'Highly absorbent — one of the most moisture-absorbing fibers', 'Drapes beautifully — fluid and silk-like', 'Wrinkles easily and may shrink if heat-washed', 'Biodegradable (the raw material is), but processing chemicals are not'] },
+      { title: 'Care', list: ['Hand wash only in cool water, or dry clean', 'Mild detergent — handle extremely gently', 'Never wring or twist — very weak when wet', 'Lay flat on towel to dry — hanging can distort shape', 'Steam or iron on low setting while still slightly damp'] }
+    ]
+  },
+  modal: {
+    name: 'Modal',
+    tag: '<span class="fiber-tag tag-semi">Semi-Synthetic · Beech Tree</span>',
+    subtitle: 'Fagus sylvatica (beech) · Primarily Austria and Central Europe (Lenzing)',
+    sections: [
+      { title: 'What makes it special', content: 'Modal is a second-generation rayon produced via a modified viscose process that includes additional stretching of fibers during production. This creates a fiber that is significantly stronger, more resistant to shrinkage, more stable when wet, and softer than standard viscose. Beech trees require 20x less water than cotton to grow and thrive on land unsuitable for food crops.' },
+      { title: 'Feel & handle', content: 'Exceptionally silky-smooth and soft — often described as feeling like a second skin. Lightweight with beautiful drape. Retains color excellently through multiple washes. Particularly popular for underwear, loungewear, and activewear due to its softness and moisture management.' },
+      { title: 'Key facts', list: ['50% more water-absorbent than cotton', 'Maintains softness and shape through many washes', 'Stronger wet than dry unlike standard viscose', 'Biodegradable and made from renewable beech forests', 'MicroModal is an even finer, more luxurious variant (half the diameter of silk)'] },
+      { title: 'Care', list: ['Machine wash cold or warm on gentle cycle', 'Tumble dry low or lay flat/hang to dry', 'Iron on low-medium heat', 'Far more forgiving than standard viscose', 'Avoid high heat — can cause shrinkage'] }
+    ]
+  },
+  tencel: {
+    name: 'TENCEL™ / Lyocell',
+    tag: '<span class="fiber-tag tag-semi">Semi-Synthetic · Eucalyptus & Beech</span>',
+    subtitle: 'Eucalyptus globulus · Lenzing AG, Austria (TENCEL™ brand name)',
+    sections: [
+      { title: 'What makes it special', content: 'Lyocell represents the third generation of regenerated cellulose and the most eco-responsible. The production uses a closed-loop process — the solvent (N-methylmorpholine N-oxide / NMMO) is non-toxic and 99%+ is recovered and recycled. Eucalyptus trees grow without irrigation, pesticides, or fertilizer. The resulting fiber uses nanotechnology (nanofibril structure) for superior moisture management.' },
+      { title: 'Sustainability credentials', content: 'TENCEL™ is the gold standard in sustainable textiles. Eucalyptus requires 5–10x less water than cotton and can grow on non-arable land. The closed-loop process has virtually zero chemical waste. The fiber is certified biodegradable and compostable (OK Compost, OEKO-TEX). It is the best choice for environmentally-conscious consumers.' },
+      { title: 'Key facts', list: ['50% more breathable than cotton according to Lenzing studies', 'Smooth nanofibril surface prevents bacterial growth', 'Maintains strength when wet (unlike standard viscose)', 'Naturally wrinkle-resistant — less ironing needed', 'Can be blended with cotton, silk, wool, and most fibers'] },
+      { title: 'Care', list: ['Machine wash cold or warm on gentle cycle — much more robust than viscose', 'Tumble dry low or hang/lay flat to dry', 'Low heat iron', 'TENCEL™ denim can be machine washed in cold water', 'One of the easiest semi-synthetics to care for'] }
+    ]
+  },
+  bamboo: {
+    name: 'Bamboo',
+    tag: '<span class="fiber-tag tag-semi">Semi-Synthetic · Bamboo Grass</span>',
+    subtitle: 'Phyllostachys edulis (Moso bamboo) · Primarily China',
+    sections: [
+      { title: 'What makes it special', content: 'Bamboo grows incredibly fast — Moso bamboo can grow 90cm per day and reaches harvestable height in 3–5 years without replanting. It requires no pesticides and little water. However, most "bamboo fabric" is actually bamboo viscose, produced via the same chemical-intensive process as standard viscose. The marketing of bamboo fabric as inherently eco-friendly is often misleading.' },
+      { title: 'Labeling note', content: 'The US FTC requires that bamboo fabric made via viscose process be labeled "bamboo rayon" or "bamboo viscose" — not simply "bamboo." True mechanically processed bamboo linen (rare and expensive) retains more of the original fiber\'s properties. Check labels carefully.' },
+      { title: 'Key facts', list: ['Most bamboo fabric is bamboo viscose — similar care and properties to regular viscose', 'Bamboo viscose is soft, moisture-wicking, and breathable', 'The plant itself is sustainable; the processing is often not', 'Naturally antimicrobial claims are often lost in processing', 'Bamboo linen (mechanical processing) is rare and stiff but more sustainable'] },
+      { title: 'Care', list: ['Hand wash or gentle machine wash cold — treat like viscose', 'Lay flat or hang to dry', 'Low-medium heat iron', 'Avoid high heat — can cause shrinkage', 'Handle gently when wet — weaker than cotton'] }
+    ]
+  },
+  cupro: {
+    name: 'Cupro (Bemberg™)',
+    tag: '<span class="fiber-tag tag-semi">Semi-Synthetic · Cotton Linters</span>',
+    subtitle: 'Short cotton linters (cottonseed) · Asahi Kasei (Japan) — Bemberg™ brand',
+    sections: [
+      { title: 'What makes it special', content: 'Cupro is made from the very short cotton fibers (linters) that cling to cottonseed after ginning — waste material that would otherwise be discarded. These are dissolved in a copper oxide/ammonia solution and extruded into fiber. The result is a uniquely smooth, antistatic, silk-like fabric used almost exclusively as luxury lining in high-end garments.' },
+      { title: 'Feel & handle', content: 'Extraordinarily fluid drape — considered by many to be the finest lining fabric. Naturally antistatic (doesn\'t cling), breathable, and cool to the touch. Bemberg™ (the leading brand) is used by major luxury fashion houses including Loro Piana, Brioni, and numerous haute couture houses as their preferred lining.' },
+      { title: 'Key facts', list: ['Uses a waste product (cotton linters) — relatively sustainable raw material', 'Antistatic — unlike most lining materials', 'Biodegradable, unlike polyester lining (the common alternative)', 'Copper must be properly managed in production — closed-loop systems exist', 'OEKO-TEX Standard 100 certified in responsible production'] },
+      { title: 'Care', list: ['Hand wash cold with delicate detergent', 'Can also be dry cleaned', 'Lay flat or hang to dry — no wringing', 'Low iron setting, steam works well', 'Avoid high temperatures'] }
+    ]
+  },
+  polyester: {
+    name: 'Polyester',
+    tag: '<span class="fiber-tag tag-synth">Synthetic · PET Polymer</span>',
+    subtitle: 'Polyethylene terephthalate — First commercial production 1941 (ICI, UK)',
+    sections: [
+      { title: 'What makes it special', content: 'Polyester is the world\'s most produced fiber at 57–65% of global output. It is made by polymerizing terephthalic acid and ethylene glycol, then melt-spinning through a spinneret. The result is a fiber of remarkable consistency that resists wrinkles, holds color, does not shrink, and is exceptionally durable. Recycled polyester (rPET) from plastic bottles is a growing segment.' },
+      { title: 'Environmental reality', content: 'Polyester manufacturing generates approximately 700 million metric tons of CO₂-equivalent annually. Each synthetic wash releases microplastic fibers — a Guppyfriend wash bag captures ~86% of these. Polyester is not biodegradable and can persist for hundreds of years. Recycled polyester has ~30–50% lower carbon footprint than virgin polyester.' },
+      { title: 'Key facts', list: ['Can be made from recycled PET bottles (rPET)', 'Microplastic shedding: ~1,900 fibers per wash cycle', 'Retains heat — less comfortable in warm weather', 'Can trap odors, especially in activewear', 'Wrinkle-resistant — major advantage for travel clothing'] },
+      { title: 'Care', list: ['Machine wash cold — most polyester is easy care', 'Tumble dry low — high heat can warp fibers permanently', 'No bleach on colored polyester — use oxygen bleach for whites', 'Use a Guppyfriend bag to reduce microplastic release', 'Avoid fabric softener — coats fibers and reduces performance properties'] }
+    ]
+  },
+  nylon: {
+    name: 'Nylon',
+    tag: '<span class="fiber-tag tag-synth">Synthetic · Polyamide</span>',
+    subtitle: 'Polyamide — DuPont, 1938 (world\'s first fully synthetic fiber)',
+    sections: [
+      { title: 'What makes it special', content: 'Nylon was the first fully synthetic fiber, introduced by DuPont in 1938. Made by polymerizing adipic acid and hexamethylenediamine (Nylon 6,6) or caprolactam (Nylon 6), it offers remarkable strength, abrasion resistance, and elasticity. It is lighter and more flexible than polyester. Its smooth surface makes it the preferred choice for activewear, hosiery, and technical fabrics.' },
+      { title: 'Feel & handle', content: 'Smooth, silky surface with a slight sheen. Very lightweight with excellent drape and a close fit when used in sportswear. Can feel slightly plasticky in lower grades. High-quality nylon in activewear has a premium, almost silk-like hand. ECONYL® is recycled nylon made from ocean plastic and waste.' },
+      { title: 'Key facts', list: ['UV radiation degrades nylon over time — fades and weakens outdoors', 'Excellent abrasion resistance — outlasts polyester in high-wear applications', 'Static electricity — attracts dust and lint', 'Lower melting point than polyester — iron with more care', 'ECONYL® recycled nylon from ocean plastic is a sustainable alternative'] },
+      { title: 'Care', list: ['Machine wash cold or warm on gentle cycle', 'Tumble dry low or air dry', 'Iron on very low heat or avoid ironing', 'Avoid high heat — lower melting point than polyester', 'No chlorine bleach'] }
+    ]
+  },
+  spandex: {
+    name: 'Spandex / Lycra™ / Elastane',
+    tag: '<span class="fiber-tag tag-synth">Synthetic · Polyurethane</span>',
+    subtitle: 'Polyurethane — DuPont, 1958 (trade name: Lycra™)',
+    sections: [
+      { title: 'What makes it special', content: 'Spandex can stretch 400–700% of its original length and return to its original shape almost perfectly. Made from a segmented polyurethane polymer using solution spinning, it is almost always used as a blend at 2–25% to add stretch to other fibers. At 2%, it adds comfort stretch. At 15–25%, it creates form-fitting performance fabrics for yoga, cycling, and swimwear.' },
+      { title: 'Blending', content: 'Spandex is rarely used alone. Common combinations: Cotton + 4% spandex = stretch jeans. Nylon + 20% spandex = performance leggings. Polyester + 15% spandex = swimwear. These blends combine the host fiber\'s properties with the elasticity and recovery of spandex.' },
+      { title: 'Key facts', list: ['DuPont created spandex in 1958 — originally called "Fiber K"', '"Spandex" is the US term; "elastane" is used in Europe; Lycra™ is a DuPont brand', 'Degrades with chlorine (pool water) and repeated heat exposure', 'Not biodegradable — a microplastic contributor', 'Can stretch 500–600% and recover — compared to rubber at 100%'] },
+      { title: 'Care', list: ['Machine wash cold — heat damages elastic properties', 'Air dry or tumble dry very low heat', 'Never chlorine bleach — destroys elastane fibers rapidly', 'Avoid fabric softener — coats fibers and reduces stretch recovery', 'Keep away from velcro — snags instantly and permanently'] }
+    ]
+  },
+  acrylic: {
+    name: 'Acrylic',
+    tag: '<span class="fiber-tag tag-synth">Synthetic · Acrylonitrile</span>',
+    subtitle: 'Polyacrylonitrile — Commercial production since 1950s',
+    sections: [
+      { title: 'What makes it special', content: 'Acrylic was designed specifically to replicate wool\'s warmth and soft appearance at a fraction of the cost. Made by polymerizing acrylonitrile via solution spinning, it produces a soft, warm, lightweight fiber that holds vivid colors extremely well. It resists moths and mildew (unlike wool), doesn\'t shrink in washing, and is hypoallergenic.' },
+      { title: 'Limitations', content: 'Acrylic is prone to pilling, especially in areas of friction. It retains static electricity and has poor breathability compared to natural fibers. It is not biodegradable and sheds microplastics during washing. In activewear contexts, synthetic-specific detergents help manage odor retention.' },
+      { title: 'Key facts', list: ['Lightweight — can be 10–15% lighter than equivalent wool', 'Holds dye exceptionally well — prints and colors stay vivid', 'Moth and mildew resistant — advantage over wool for storage', 'Microplastic shedder — similar environmental concerns to polyester', 'Often used as lining in winter boots and outerwear'] },
+      { title: 'Care', list: ['Machine wash warm or cold on gentle cycle', 'Lay flat to dry to prevent stretching — or tumble dry low', 'Use low heat iron — acrylic can melt or glaze', 'Remove pilling with a fabric shaver', 'No bleach — damages the fiber'] }
+    ]
+  },
+  polypropylene: {
+    name: 'Polypropylene',
+    tag: '<span class="fiber-tag tag-synth">Synthetic · Polypropylene Polymer</span>',
+    subtitle: 'Thermoplastic polymer — Used in technical textiles since 1970s',
+    sections: [
+      { title: 'What makes it special', content: 'Polypropylene is the only common textile fiber lighter than water (specific gravity 0.91). It does not absorb moisture at all — instead, moisture migrates along the surface of the fiber through capillary action, keeping the wearer feeling dry. This makes it exceptional for base layers and performance sports where staying dry is critical.' },
+      { title: 'Feel & handle', content: 'Has a slightly waxy or plastic feel in lower grades. Higher-quality polypropylene fabrics for sportswear are engineered to be softer. Not as comfortable as merino or cotton against skin for extended wear, but functionally superior for high-intensity activity due to moisture non-absorption.' },
+      { title: 'Key facts', list: ['Does not absorb water — 0% moisture absorption', 'Lightest common textile fiber (lighter than water)', 'Excellent thermal insulation when used in layered systems', 'Resistant to most chemicals, mold, and bacteria', 'Low melting point — cannot be ironed and requires careful care'] },
+      { title: 'Care', list: ['Machine wash cold only — low melting point is the main constraint', 'Air dry only — cannot tumble dry (heat distorts)', 'Never iron — will melt or permanently deform', 'Check label carefully — some finishes require special care', 'Very durable and easy care otherwise'] }
+    ]
+  }
+};
+
+function openDetail(id) {
+  const fiber = fibers[id];
+  if (!fiber) return;
+  document.getElementById('detail-tag').innerHTML = fiber.tag;
+  document.getElementById('detail-title').textContent = fiber.name;
+  document.getElementById('detail-subtitle').textContent = fiber.subtitle;
+  let html = '';
+  fiber.sections.forEach(s => {
+    html += `<div class="detail-section"><h4>${s.title}</h4>`;
+    if (s.content) html += `<p>${s.content}</p>`;
+    if (s.list) {
+      html += '<ul>';
+      s.list.forEach(li => { html += `<li>${li}</li>`; });
+      html += '</ul>';
+    }
+    html += '</div>';
+  });
+  document.getElementById('detail-body').innerHTML = html;
+  document.getElementById('detail-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeDetailIfBG(e) {
+  if (e.target === document.getElementById('detail-overlay')) closeDetail();
+}
+
+// ── WEAVE TABS ──
+function showWeave(id) {
+  document.querySelectorAll('.weave-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.weave-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('weave-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── NAV ACTIVE STATE ──
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.toc-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.2 });
+sections.forEach(s => observer.observe(s));
+
+// ── KEYBOARD CLOSE ──
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+</script>
+</body>
+</html>
