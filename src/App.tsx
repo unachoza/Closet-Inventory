@@ -6,6 +6,7 @@ import Closet from "./Features/Closet/Closet";
 import { CategoryType, ViewType } from "./utils/types";
 import { ToastProvider } from "./Components/Toast/Toast";
 import FabricCare from "./Features/FabricCare/FabricCare";
+import TextileGuildInteractive from "./Features/FabricCare/TextileGuildInteractive";
 import "./App.css";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 
 	return (
+		// <TextileGuildInteractive/>
 		<div className="main">
 			<ToastProvider>
 				<Header />
@@ -35,7 +37,6 @@ function App() {
 				)}
 				{view === "more" && (
 					<div className="more-features">
-					
 						<FabricCare care={["Machine wash cold", "Tumble dry low", "Do not bleach"]} />
 						{/* Add more feature components here as they are developed */}
 					</div>

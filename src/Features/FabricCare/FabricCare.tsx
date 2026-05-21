@@ -1,6 +1,8 @@
 import ContentCard from "../../Components/ContentCard/ContentCard";
 import { AnimatePresence, motion } from "framer-motion";
 import { moreFeatures } from "../../utils/constants";
+import TextileGuildInteractive from "./TextileGuildInteractive";
+import { useState } from "react";
 
 import "./FabricCare.css";
 
@@ -9,6 +11,7 @@ interface FabricCareProps {
 }
 
 const FabricCare = ({ care }: FabricCareProps) => {
+	const [showGuide, setShowGuide] = useState(false);
 	if (!care || (Array.isArray(care) && care.length === 0)) {
 		return null; // Don't render anything if care is empty
 	}
@@ -22,11 +25,14 @@ const FabricCare = ({ care }: FabricCareProps) => {
 				exit={{ opacity: 0, y: 20 }}
 				transition={{ duration: 0.3 }}
 			>
-				{moreFeatures.map((feature) => (
-					<ContentCard key={feature.title} title={feature.title}>
-						{feature.children}
-					</ContentCard>
-				))}
+				<button onClick={() => setShowGuide(true)}>Open Textile Guide</button>
+				{showGuide && <TextileGuildInteractive />}
+				{!showGuide &&
+					moreFeatures.map((feature) => (
+						<ContentCard key={feature.title} title={feature.title}>
+							{feature.children}
+						</ContentCard>
+					))}
 
 				{typeof care === "string" ? (
 					<p>{care}</p>

@@ -54,6 +54,7 @@ export const occasionExamples = [
 	"cocktail",
 	"going-out",
 	"casual",
+	"basics",
 	"sports",
 	"church",
 	"picnic",
@@ -425,16 +426,16 @@ const trade = {
 	children: "Information on clothing swaps and sustainable shopping.",
 };
 const wardrobeAnalytics = {
-      title: "Wardrobe Analytics",
-      children: "Insights into your wardrobe patterns.",
+	title: "Wardrobe Analytics",
+	children: "Insights into your wardrobe patterns.",
 };
 
 const fashionHistory = {
-      title: "Fashion History",
-      children: "Explore the history of fashion and iconic styles.",
+	title: "Fashion History",
+	children: "Explore the history of fashion and iconic styles.",
 };
 const wardrobePlanning = {
-      title: "Wardrobe Planning",
-      children: "Tools to help you plan your outfits and wardrobe.",
-}; 
+	title: "Wardrobe Planning",
+	children: "Tools to help you plan your outfits and wardrobe.",
+};
 export const moreFeatures = [garmentCare, travel, trade, wardrobeAnalytics, fashionHistory, wardrobePlanning];
