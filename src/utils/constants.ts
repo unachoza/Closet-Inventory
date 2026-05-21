@@ -1,4 +1,4 @@
-import { Option, Step, ClothingItem } from "./types.ts";
+import { Option, Step } from "./types.ts";
 
 export const formItem = {
 	id: "",
@@ -361,3 +361,80 @@ export const CLOSET_DATA = [
 		care: "wash like colors",
 	},
 ];
+
+export const FABRIC_CARE_ICONS: Record<string, string> = {
+	"machine wash cold": "🧼",
+	"tumble dry low": "🌀",
+	"do not bleach": "🚫",
+	"hand wash": "🤲",
+	"hang dry": "🧺",
+	"lay flat dry": "📏",
+	"dry clean only": "🧴",
+};
+
+export const FABRIC_CARE_DESCRIPTIONS: Record<string, string> = {
+	"machine wash cold": "Wash in cold water to prevent shrinking and color fading.",
+	"tumble dry low": "Dry on a low heat setting to protect the fabric.",
+	"do not bleach": "Avoid using bleach to maintain the integrity of the fabric.",
+	"hand wash": "Gently wash by hand to preserve delicate fabrics.",
+	"hang dry": "Hang to dry to prevent damage from heat.",
+	"lay flat dry": "Lay flat to dry to maintain shape and avoid stretching.",
+	"dry clean only": "Professional dry cleaning is recommended for this item.",
+};
+
+export const FABRIC_CARE_COLORS: Record<string, string> = {
+	"machine wash cold": "#4A90E2",
+	"tumble dry low": "#50E3C2",
+	"do not bleach": "#D0021B",
+	"hand wash": "#F5A623",
+	"hang dry": "#9013FE",
+	"lay flat dry": "#7ED321",
+	"dry clean only": "#B8E986",
+};
+
+export const FABRIC_CARE_ICONS_DESCRIPTIONS: Record<string, { icon: string; description: string; color: string }> = Object.fromEntries(
+	Object.entries(FABRIC_CARE_ICONS).map(([key, icon]) => [
+		key,
+		{
+			icon,
+			description: FABRIC_CARE_DESCRIPTIONS[key],
+			color: FABRIC_CARE_COLORS[key],
+		},
+	]),
+);
+
+export const FABRIC_CARE_OPTIONS: Option[] = Object.keys(FABRIC_CARE_ICONS).map((key) => ({
+	value: key,
+	label: `${FABRIC_CARE_ICONS[key]} ${key}`,
+}));
+
+export const linksToFabricCareInfo = "https://textileengineering.net/natural-fibres-types-classification-properties-and-uses/";
+
+const garmentCare = {
+	title: "Garment Care",
+	children: "Tips for maintaining your clothing items and care instructions for your garments.",
+};
+
+const travel = {
+	title: "Travel",
+	children: "Packing tips and travel-friendly outfit ideas.",
+};
+
+const trade = {
+	title: "Trade",
+	children: "Information on clothing swaps and sustainable shopping.",
+};
+const wardrobeAnalytics = {
+      title: "Wardrobe Analytics",
+      children: "Insights into your wardrobe patterns.",
+};
+
+const fashionHistory = {
+      title: "Fashion History",
+      children: "Explore the history of fashion and iconic styles.",
+};
+const wardrobePlanning = {
+      title: "Wardrobe Planning",
+      children: "Tools to help you plan your outfits and wardrobe.",
+}; 
+export const moreFeatures = [garmentCare, travel, trade, wardrobeAnalytics, fashionHistory, wardrobePlanning];

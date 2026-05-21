@@ -34,7 +34,7 @@ export interface ItemFormData {
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
-export type ViewType = "carousel" | "form" | "overview";
+export type ViewType = "carousel" | "form" | "overview" | "more";
 
 export interface Option {
 	value: string;
