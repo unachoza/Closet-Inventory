@@ -72,5 +72,5 @@ export function useLocalStorageCloset() {
 		setCloset([]);
 	};
 
-	return { closet, addItem, removeItem, getCloset, clearCloset };
+	return { closet, addItem, removeItem, updateItem, getCloset, clearCloset };
 }

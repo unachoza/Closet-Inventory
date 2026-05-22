@@ -29,13 +29,13 @@ export interface ItemFormData {
 	occasion: string;
 	age: string;
 	purchaseDate?: string;
-	care: string;
+	care: string | string[];
 	image: string;
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
-export type ViewType = "carousel" | "form" | "overview";
+export type ViewType = "carousel" | "form" | "overview"| "edit";
 
 export interface Option {
 	value: string;
@@ -57,6 +57,7 @@ export interface InputProps {
 	value: string | number;
 	errorMessage?: string;
 	placeholder: string;
+	onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
 	handleFormUpdate: SetStateAction<string | any>;
 	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
