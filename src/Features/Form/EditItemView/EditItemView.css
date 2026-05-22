@@ -1,0 +1,60 @@
+.edit-form {
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border-radius: var(--border-radius-sm);
+      background: var(--Dark-Grey);
+      background: linear-gradient(180deg, rgb(120 172 191 / 70%) 0%, rgb(103 131 133 / 76%) 50%);
+      position: relative;
+      overflow: hidden; /* important for max-height animations */
+      height: 75%;
+      max-width: var(--Form-width);
+      margin: .5rem auto;
+      padding: var(--Form-padding);
+      border: var(--Dark-Grey) .5rem solid;
+      border-radius: var(--border-radius-md);
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+}
+.edit-form.form > form > form > div > label {
+      flex-direction: row;
+      text-align: left;
+      margin-bottom: 1rem;
+      display: flex;
+      width: 40%;
+      font-size: .8rem;
+      margin: 0;
+      box-shadow: none;
+      margin-bottom: .5rem;
+}
+
+.edit-form.form > form {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      height: 95%;
+}
+.form-fields{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+}
+
+input[type="text"] {
+      box-shadow: none;
+      height: 2.5rem;
+}
+
+form > form {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      height: 100%;
+}
+
+.edit-form.form > form > form > div > label > span {
+      height: 100%;
+      display: flex;
+      align-items: center;
+}
