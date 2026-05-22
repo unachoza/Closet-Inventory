@@ -1,5 +1,10 @@
 import "./Card.css";
 import { ClothingItem } from "../../utils/types";
+import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
+
+interface CardProps {
+	item: ClothingItem;
+}
 import { useState } from "react";
 
 interface CardProps {
@@ -8,6 +13,8 @@ interface CardProps {
 
 const ClothingCard = ({ item }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
+	const { removeItem } = useLocalStorageCloset();
+	console.log({ item });
 
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
@@ -47,6 +54,14 @@ const ClothingCard = ({ item }: CardProps) => {
 					<p>
 						<strong>Care:</strong> {item.care}
 					</p>
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							removeItem(item.id);
+						}}
+					>
+						Remove
+					</button>
 				</div>
 			</div>
 		</div>

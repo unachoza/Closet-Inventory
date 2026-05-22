@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
 
 export type ClothingItem = {
-	id: string | number;
+	//TODO: change back id to string or number?
+	id: string;
 	imageURL: string;
 	name: string;
 	category: string;
@@ -63,4 +64,3 @@ export interface InputProps {
 export interface CarouselProps {
 	setCategory: Dispatch<SetStateAction<CategoryType>>;
 }
-

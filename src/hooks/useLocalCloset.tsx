@@ -25,6 +25,16 @@ export function useLocalStorageCloset() {
 		});
 	};
 
+	const removeItem = (id: string) => {
+		setCloset((prev: ClothingItem[]) => {
+			const updated = prev.filter((item) => item.id !== id);
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			return updated;
+		});
+		console.log("Removed item with id:", id);
+		console.log("Current closet:", closet);
+	};
+
 	const getCloset = (): ClothingItem[] => {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
@@ -39,5 +49,5 @@ export function useLocalStorageCloset() {
 		setCloset([]);
 	};
 
-	return { closet, addItem, getCloset, clearCloset };
+	return { closet, addItem, removeItem, getCloset, clearCloset };
 }
