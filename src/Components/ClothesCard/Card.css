@@ -67,6 +67,19 @@
       border-top: 1px solid #ddd;
 }
 
+.card-details{
+      /* display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem; */
+}
+
+.controls-container {
+      display: flex;
+      justify-content: space-evenly;
+      gap: 1.5rem;
+}
+
 .card-category {
       color: var(--Medium-Grey);
       font-size: 0.9rem;
@@ -95,6 +108,9 @@
       font-size: 0.95rem;
       text-align: left;
       transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 }
 
 .card-back p {
@@ -104,4 +120,8 @@
 
 .card-back strong {
       color: var(--Black);;
+}
+
+.card-back button{
+      margin: 0;
 }

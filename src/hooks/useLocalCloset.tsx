@@ -35,6 +35,29 @@ export function useLocalStorageCloset() {
 		console.log("Current closet:", closet);
 	};
 
+	const getItem = (id: string): ClothingItem | undefined => {
+		return closet.find((item) => item.id === id);
+	}
+
+	const updateItem = (id: string, updatedData: Partial<ItemFormData>) => {
+		setCloset((prev: ClothingItem[]) => {
+			const updated = prev.map((item) => {
+				if (item.id === id) {
+					const updatedItem = { ...item, ...updatedData };
+					if (updatedData.imageURL) {
+						updatedItem.imageURL = updatedData.imageURL;
+					} else if (updatedData.category) {
+						updatedItem.imageURL = useStockPhoto(updatedData.category as CategoryType);
+					}
+					return updatedItem;
+				}
+				return item;
+			});
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			return updated;
+		});
+	}
+
 	const getCloset = (): ClothingItem[] => {
 		try {
 			const stored = localStorage.getItem(STORAGE_KEY);
