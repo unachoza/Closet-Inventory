@@ -50,8 +50,8 @@ label.animated-checkbox {
       border-radius: var(--border-radius-ty);
       font-size: 1.5rem;
       font-size: 1.35rem;
-      paint-order: stroke;
-      -webkit-text-stroke: 2px black;
+      font-weight: 800;
+ 
 }
 
 .checkbox-root:hover { 

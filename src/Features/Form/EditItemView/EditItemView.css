@@ -27,25 +27,30 @@
       font-size: .8rem;
       margin: 0;
       box-shadow: none;
-      margin-bottom: .5rem;
+      margin-bottom: 0;
 }
 
 .edit-form.form > form {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
-      height: 100%
+      height: 100%;
+      justify-content: space-between;
 }
 .form-fields{
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-around;
+      justify-content: space-between;
+      color: black;
 }
 
 input[type="text"] {
       box-shadow: none;
       height: 2.5rem;
       width: 9rem;
+      text-transform: capitalize;
+      color: black;
+      border: solid black 2px;
 }
 
 form > form {
@@ -59,4 +64,32 @@ form > form {
       height: 100%;
       display: flex;
       align-items: center;
+      font-weight: 600;
+
+}
+#root > div > div.edit-form.form > form > div > label >span {
+      color: black;
+      font-weight: 600;
+      font-size: .8rem;
+}
+
+form > div > label.animated-checkbox  {
+      display: flex;
+      flex-direction:column-reverse;
+      width: 9rem;;
+      align-items: flex-start;
+}
+
+form > div > label.animated-checkbox  .checkbox-label {
+      paint-order: none;
+      -webkit-text-stroke: none;
+      align-items: flex-start;
+}
+
+.animated-checkbox  span.checkbox-label  {
+      color: black !important;
+}
+
+label.animated-checkbox button.checkbox-root {
+      border: solid black 2px;
 }
