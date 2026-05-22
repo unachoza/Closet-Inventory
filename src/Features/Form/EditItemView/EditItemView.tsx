@@ -7,7 +7,7 @@ import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { ChangeEvent, useState } from "react";
 import { motion } from "framer-motion";
-import { i } from "framer-motion/client";
+import { i, label, textarea } from "framer-motion/client";
 
 interface EditItemViewProps {
 	item: ClothingItem;
@@ -26,7 +26,7 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 	}
 	console.log({ item });
 	const { id, imageURL, onSale, notes, ...remaining } = item;
-	const inputsToSeperate = { id, imageURL, onSale, notes };
+	const inputsToSeperate = { id, onSale, notes };
 	console.log({ inputsToSeperate });
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
@@ -58,6 +58,7 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 	};
 
 	const separateFeilds = () => {
+		console.log("working");
 		return Object.entries(inputsToSeperate).map(([key, value]) => {
 			if (key === "imageURL") {
 				return (
@@ -74,15 +75,16 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 				return <AnimatedCheckbox key={key} label={key} checked={key === value} onCheckedChange={() => onToggleDetail(key, value)} />;
 			} else if (key === "notes") {
 				return (
-					<Input
-						type="textarea"
-						label={key}
-						name={key}
-						value={normalizeToString(value)}
-						placeholder={!value ? `Enter ${key}` : ""}
-						handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-						onChange={handleChange}
-					/>
+					<label>
+						{key}
+						<textarea
+							name={key}
+							value={normalizeToString(value)}
+							placeholder={!value ? `Enter ${key}` : ""}
+							handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+							onChange={handleChange}
+						></textarea>
+					</label>
 				);
 			}
 		});
