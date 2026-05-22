@@ -9,10 +9,11 @@ import "./Closet.css";
 
 interface ClosetProps {
 	selectedCategory: string | null;
+	onEditItem?: (item: ClothingItem) => void;
 }
 
 const ITEMS_PER_PAGE = 6;
-const Closet = ({ selectedCategory }: ClosetProps) => {
+const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	const { closet } = useLocalStorageCloset();
 
 	const normalizedCategory = selectedCategory?.trim().toLowerCase() || "";
@@ -59,28 +60,28 @@ const Closet = ({ selectedCategory }: ClosetProps) => {
 	if (selectedCategory === null) {
 		return (
 			<div className="items-overview">
-			<AnimatePresence mode="wait">
-				<motion.div
-					key={`${normalizedCategory}-${currentPage}`} // <--- important: remounts when category changes
-					className="items-grid"
-					variants={containerVariants}
-					initial="hidden"
-					animate="show"
-					exit="exit"
-				>
-					{closet.length > 0 ? (
-						paginatedItems.map((item: ClothingItem) => (
-							<motion.div key={item.id} variants={cardVariants}>
-								<ClothingCard item={item} />
-							</motion.div>
-						))
-					) : (
-						<p className="no-results">No items found for “{selectedCategory}”</p>
-					)}
-				</motion.div>
-			</AnimatePresence>
-			<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
-		</div>
+				<AnimatePresence mode="wait">
+					<motion.div
+						key={`${normalizedCategory}-${currentPage}`} // <--- important: remounts when category changes
+						className="items-grid"
+						variants={containerVariants}
+						initial="hidden"
+						animate="show"
+						exit="exit"
+					>
+						{closet.length > 0 ? (
+							paginatedItems.map((item: ClothingItem) => (
+								<motion.div key={item.id} variants={cardVariants}>
+									<ClothingCard item={item} onEditItem={onEditItem} />
+								</motion.div>
+							))
+						) : (
+							<p className="no-results">No items found for “{selectedCategory}”</p>
+						)}
+					</motion.div>
+				</AnimatePresence>
+				<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
+			</div>
 		);
 	}
 
