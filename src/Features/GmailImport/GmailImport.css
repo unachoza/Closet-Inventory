@@ -141,7 +141,6 @@
 .display-email-preview-panel{
 	border: solid 3px rgb(255, 0, 251);
 	display: flex;
-	/* flex-direction: column; */
 	justify-content: space-between;
 }
 .display-email-preview-panel > .gmail-list-panel {

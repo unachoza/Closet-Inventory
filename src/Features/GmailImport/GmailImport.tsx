@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { useGmailAuth } from "../../hooks/useGmailAuth";
-import { useGmailSearch } from "../../hooks/useGmailSearch";
-import type { GmailEmail } from "../../hooks/useGmailSearch";
+import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
+import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ItemFormData } from "../../utils/types";
+import type { AdvancedSearchParams } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
+import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
@@ -13,20 +15,50 @@ interface GmailImportProps {
 }
 
 export default function GmailImport({ onImport }: GmailImportProps) {
-	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
-	const { emails, isSearching, error: searchError, searchEmails } = useGmailSearch();
+	const {
+		accessToken,
+		isAuthenticated,
+		error: authError,
+		isLoading: authLoading,
+		login,
+		logout,
+	} = useGmailAuth();
+
+	const {
+		emails,
+		isSearching,
+		error: searchError,
+		searchEmails,
+		fetchNextPage,
+		hasNextPage,
+	} = useAdvancedSearch();
+
 	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
 
-	const selectedEmail: GmailEmail | undefined = emails.find((e) => e.id === selectedEmailId);
+	const selectedEmail: GmailEmail | undefined = emails.find(
+		(e) => e.id === selectedEmailId
+	);
 
+	// Auto-search with defaults on first login
 	useEffect(() => {
 		if (accessToken && isAuthenticated) {
 			searchEmails(accessToken);
 		}
 	}, [accessToken, isAuthenticated, searchEmails]);
 
-	const handleSearch = useCallback(() => {
+	const handleAdvancedSearch = useCallback(
+		(params: AdvancedSearchParams) => {
+			if (accessToken) {
+				setSelectedEmailId(null);
+				searchEmails(accessToken, params);
+			}
+		},
+		[accessToken, searchEmails]
+	);
+
+	const handleDefaultSearch = useCallback(() => {
 		if (accessToken) {
+			setSelectedEmailId(null);
 			searchEmails(accessToken);
 		}
 	}, [accessToken, searchEmails]);
@@ -38,9 +70,17 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 	const handleConfirmImport = useCallback(() => {
 		if (!selectedEmail) return;
 
-		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from);
+		const prefilled = parseEmailToFormData(
+			selectedEmail.subject,
+			selectedEmail.body,
+			selectedEmail.from
+		);
 		onImport(prefilled);
 	}, [selectedEmail, onImport]);
+
+	const handleNextPage = useCallback(() => {
+		fetchNextPage();
+	}, [fetchNextPage]);
 
 	const error = authError ?? searchError;
 
@@ -50,9 +90,15 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 				<div className="gmail-auth-section">
 					<h2 className="gmail-title">Import from Gmail</h2>
 					<p className="gmail-description">
-						Connect your Gmail account to find order confirmation emails and import clothing items into your closet.
+						Connect your Gmail account to find order confirmation emails and
+						import clothing items into your closet.
 					</p>
-					<button className="gmail-login-btn" onClick={login} disabled={authLoading} type="button">
+					<button
+						className="gmail-login-btn"
+						onClick={login}
+						disabled={authLoading}
+						type="button"
+					>
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
 					{error && <p className="gmail-error">{error}</p>}
@@ -66,14 +112,32 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 			<div className="gmail-header-bar">
 				<h2 className="gmail-title">Import from Gmail</h2>
 				<div className="gmail-header-actions">
-					<button className="gmail-search-btn" onClick={handleSearch} disabled={isSearching} type="button">
-						{isSearching ? "Searching..." : emails.length > 0 ? "Search Again" : "Search Emails"}
+					<button
+						className="gmail-search-btn"
+						onClick={handleDefaultSearch}
+						disabled={isSearching}
+						type="button"
+					>
+						{isSearching
+							? "Searching..."
+							: emails.length > 0
+								? "Search Again"
+								: "Search Emails"}
 					</button>
-					<button className="gmail-logout-btn" onClick={logout} type="button">
+					<button
+						className="gmail-logout-btn"
+						onClick={logout}
+						type="button"
+					>
 						Disconnect
 					</button>
 				</div>
 			</div>
+
+			<AdvancedSearchUI
+				onSearch={handleAdvancedSearch}
+				loading={isSearching}
+			/>
 
 			{error && <p className="gmail-error">{error}</p>}
 
@@ -84,16 +148,42 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 			)}
 
 			{!isSearching && emails.length > 0 && (
-				<div className={selectedEmail ? "display-email-preview-panel" : "gmail-results"}>
+				<div
+					className={
+						selectedEmail
+							? "display-email-preview-panel"
+							: "gmail-results"
+					}
+				>
 					<div className="gmail-list-panel">
 						<h3 className="gmail-section-title">
-							Found {emails.length} email{emails.length !== 1 ? "s" : ""}
+							Found {emails.length} email
+							{emails.length !== 1 ? "s" : ""}
 						</h3>
-						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} />
+						<EmailList
+							emails={emails}
+							selectedEmailId={selectedEmailId}
+							onToggleSelect={handleToggleSelect}
+						/>
+						{hasNextPage && (
+							<button
+								className="gmail-search-btn"
+								onClick={handleNextPage}
+								disabled={isSearching}
+								type="button"
+								style={{ marginTop: "var(--spacing-100)", width: "100%" }}
+							>
+								Load More
+							</button>
+						)}
 					</div>
+
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
-							<EmailPreview email={selectedEmail} onConfirmImport={handleConfirmImport} />
+							<EmailPreview
+								email={selectedEmail}
+								onConfirmImport={handleConfirmImport}
+							/>
 						</div>
 					)}
 				</div>

@@ -1,4 +1,4 @@
-import type { GmailEmail } from "../../../hooks/useGmailSearch";
+import type { GmailEmail } from "../../../hooks/useAdvancedSearch";
 import "./EmailPreviewPanel.css";
 
 interface EmailPreviewProps {
