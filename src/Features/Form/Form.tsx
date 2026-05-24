@@ -28,15 +28,19 @@ import { useToast } from "../../Components/Toast/Toast";
 // MULTI-STEP(9) FORM
 export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
+	initialData?: Partial<ItemFormData>;
 }
 
 const MATERIAL_OPTIONS_KEY = "my_material_key";
 const BRAND_OPTIONS_KEY = "my_brands_key";
 const CARE_OPTIONS_KEY = "my_care_key";
 
-const MultiStepForm = ({ setView }: FormProps) => {
+const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	const [step, setStep] = useState(1);
-	const [formData, setFormData] = useState<ItemFormData>(formItem);
+	const [formData, setFormData] = useState<ItemFormData>({
+		...formItem,
+		...initialData,
+	});
 
 	const [materialoptions, setMaterialOptions] = useLocalStorage(MATERIAL_OPTIONS_KEY, materialExamples);
 	const [brandOptions, setBrandOptions] = useLocalStorage(BRAND_OPTIONS_KEY, brandExamples);
