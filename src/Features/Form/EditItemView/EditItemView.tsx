@@ -16,17 +16,9 @@ interface EditItemViewProps {
 }
 
 const EditItemView = ({ item, toast }: EditItemViewProps) => {
-	if (!item) {
-		return (
-			<div className="edit-form-error">
-				<h2>Error: No item selected for editing.</h2>
-				<p>Please select an item to edit.</p>
-			</div>
-		);
-	}
-	console.log({ item });
 	const { id, imageURL, onSale, notes, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
+	const { updateItem } = useLocalStorageCloset();
 	console.log({ inputsToSeperate });
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
@@ -42,7 +34,6 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 		notes: item.notes,
 		imageURL: item.imageURL,
 	});
-	const { updateItem } = useLocalStorageCloset();
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
@@ -89,6 +80,14 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 			}
 		});
 	};
+	if (!item) {
+		return (
+			<div className="edit-form-error">
+				<h2>Error: No item selected for editing.</h2>
+				<p>Please select an item to edit.</p>
+			</div>
+		);
+	}
 
 	// TODO: fix imageURL
 	return (
