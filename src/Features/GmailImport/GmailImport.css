@@ -9,7 +9,14 @@
 	background: rgba(0, 0, 0, 0.45);
 	backdrop-filter: var(--blur);
 	text-align: left;
+	border: solid blueviolet 2px;
 }
+
+.gmail-container:has(.display-email-preview-panel){
+	/* background-color: red; */
+	max-width: 1050px;
+}
+
 
 /* Auth section */
 .gmail-auth-section {
@@ -125,7 +132,27 @@
 	/* display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: var(--spacing-200); */
+	border: solid 3px red;
 }
+.gmail-list-panel{
+	border: solid 3px rgb(255, 145, 0);
+}
+
+.display-email-preview-panel{
+	border: solid 3px rgb(255, 0, 251);
+	display: flex;
+	/* flex-direction: column; */
+	justify-content: space-between;
+}
+.display-email-preview-panel > .gmail-list-panel {
+	width: 40%;
+}
+
+.display-email-preview-panel > .gmail-preview-panel{
+	width: 59%;
+	background: #818b8c85;
+}
+
 
 @media (max-width: 768px) {
 	.gmail-results {
@@ -137,7 +164,7 @@
 	margin: 0 0 var(--spacing-100);
 	font-size: 0.95rem;
 	font-weight: 500;
-	color: var(--Op-Light-Grey);
+	color: var(--Lightest-Grey);
 }
 
 /* Email list */
@@ -177,6 +204,10 @@
 .gmail-email-label--selected {
 	background: rgba(37, 99, 235, 0.2);
 	outline: 1px solid var(--button-backround-blue);
+}
+.gmail-email-label--selected:hover {
+	background: rgba(37, 100, 235, 0.387);
+	outline: 2px solid var(--button-backround-blue);
 }
 
 .gmail-email-checkbox {
@@ -274,7 +305,7 @@
 }
 
 .gmail-preview-body {
-	max-height: 350px;
+	/* max-height: 350px; */
 	overflow-y: auto;
 	padding: var(--spacing-100);
 	border-radius: var(--border-radius-sm);
@@ -321,4 +352,15 @@
 
 .gmail-import-btn:hover {
 	filter: brightness(0.8);
+}
+
+.gmail-preview-panel{
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-200);
+	padding: var(--spacing-200);
+	overflow-y: auto;
+	max-height: 500px;
+	border: solid 8px rgb(117 219 15 / 80%);
+
 }

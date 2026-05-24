@@ -24,19 +24,14 @@ function extractSenderName(from: string): string {
 	return match ? match[1].trim() : from;
 }
 
-export default function EmailList({
-	emails,
-	selectedEmailId,
-	onToggleSelect,
-}: EmailListProps) {
+export default function EmailList({ emails, selectedEmailId, onToggleSelect }: EmailListProps) {
+	// console.log("Emails in EmailList:", emails.length);
+	// console.log("Selected Email ID:", selectedEmailId);
 	if (emails.length === 0) {
 		return (
 			<div className="gmail-empty">
 				<p>No order confirmation emails found.</p>
-				<p className="gmail-empty-hint">
-					Try checking if your purchase confirmations use different subject
-					lines.
-				</p>
+				<p className="gmail-empty-hint">Try checking if your purchase confirmations use different subject lines.</p>
 			</div>
 		);
 	}
@@ -47,9 +42,7 @@ export default function EmailList({
 				const isSelected = email.id === selectedEmailId;
 				return (
 					<li key={email.id} className="gmail-email-item">
-						<label
-							className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}
-						>
+						<label className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}>
 							<input
 								type="checkbox"
 								checked={isSelected}
@@ -59,12 +52,8 @@ export default function EmailList({
 							/>
 							<div className="gmail-email-content">
 								<div className="gmail-email-header">
-									<span className="gmail-email-sender">
-										{extractSenderName(email.from)}
-									</span>
-									<span className="gmail-email-date">
-										{formatDate(email.date)}
-									</span>
+									<span className="gmail-email-sender">{extractSenderName(email.from)}</span>
+									<span className="gmail-email-date">{formatDate(email.date)}</span>
 								</div>
 								<div className="gmail-email-subject">{email.subject}</div>
 								<div className="gmail-email-snippet">{email.snippet}</div>
