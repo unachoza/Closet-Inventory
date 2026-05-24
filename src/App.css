@@ -8,6 +8,7 @@
   --button-backround-blue-hover:#1d4ed8;
   --button-backround-green: #808000;
   --button-backround-green-hover: #676702;
+  --background-grey-blue:   rgba(120, 172, 191, 0.632) ;
 
 }
 /**** COMPONENTS ****/
@@ -16,7 +17,7 @@
 .back-button {
   padding: 0.6rem 1.5rem;
   border-radius: var(--border-radius-sm);
-  background: var(--button-backround-green);
+  background: var(--background-grey-blue);
   color: var(--White);
   font-size: 1rem;
   font-weight: 500;
