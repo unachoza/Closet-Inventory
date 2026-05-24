@@ -24,7 +24,7 @@
 .checkbox-label {
   color: var(--White);
   font-size: 1.15rem;
-  pointer-events: none;
   text-transform: capitalize;
+  pointer-events: none;
 
 }

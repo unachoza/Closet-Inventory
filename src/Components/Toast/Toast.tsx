@@ -46,16 +46,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 	);
 }
 
-const Toast = forwardRef<ComponentRef<typeof RadixToast.Root>, { onClose: () => void; text: string }>(function Toast({ onClose, text }, forwardedRef) {
+const Toast = forwardRef<ComponentRef<typeof RadixToast.Root>, { onClose: () => void; text: string }>(function Toast(
+	{ onClose, text },
+	forwardedRef,
+) {
 	const width = 320;
 	const margin = 16;
 
 	return (
-		<RadixToast.Root ref={forwardedRef} asChild forceMount onOpenChange={onClose} duration={5500}>
+		<RadixToast.Root ref={forwardedRef} asChild forceMount onOpenChange={onClose} duration={9500}>
 			<motion.li
 				layout
 				initial={{ x: width + margin }}
-				animate={{ x: 0 }}
+				animate={{ x: 50 }}
 				exit={{
 					opacity: 0,
 					zIndex: -1,
@@ -68,7 +71,7 @@ const Toast = forwardRef<ComponentRef<typeof RadixToast.Root>, { onClose: () => 
 					stiffness: 200,
 				}}
 				style={{ width, WebkitTapHighlightColor: "transparent" }}
-			> 
+			>
 				<div className="toast-item">
 					<RadixToast.Description className="toast-text">{text}</RadixToast.Description>
 					<RadixToast.Close className="toast-close">

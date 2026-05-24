@@ -4,7 +4,7 @@ import Carousel from "./Features/Carousel/Carousel";
 import MultiStepForm from "./Features/Form/Form";
 import Header from "./Components/Header";
 import Closet from "./Features/Closet/Closet";
-import { CategoryType, ViewType } from "./utils/types";
+import { CategoryType, ClothingItem, ViewType } from "./utils/types";
 import { ToastProvider } from "./Components/Toast/Toast";
 import "./App.css";
 import EditItemView from "./Features/Form/EditItemView/EditItemView";
@@ -12,9 +12,9 @@ import EditItemView from "./Features/Form/EditItemView/EditItemView";
 function App() {
 	const [view, setView] = useState<ViewType>("carousel");
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
-	const [editItem, setEditItem] = useState<any>(null);
+	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 
-	const handleEditItem = (item: any) => {
+	const handleEditItem = (item: ClothingItem) => {
 		setEditItem(item);
 		setView("edit");
 	};

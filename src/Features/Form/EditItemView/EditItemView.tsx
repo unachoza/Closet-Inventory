@@ -9,9 +9,6 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
 import close from "../../../assets/close.svg";
-import { i, label, textarea } from "framer-motion/client";
-import { D } from "vitest/dist/chunks/reporters.d.CqBhtcTq.js";
-import { set } from "date-fns";
 
 interface EditItemViewProps {
 	item: ClothingItem;
@@ -41,7 +38,6 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
-		console.log(name, value);
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
@@ -52,7 +48,6 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (updateItem) {
-			console.log("estoy actualizando el item", { id, formData });
 			updateItem(item.id, formData);
 			showToast(`${formData.name} updated`);
 			setTimeout(() => {

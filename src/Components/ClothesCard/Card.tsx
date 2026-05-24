@@ -13,7 +13,6 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
 
 	const { removeItem } = useLocalStorageCloset();
-	console.log({ item });
 
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>

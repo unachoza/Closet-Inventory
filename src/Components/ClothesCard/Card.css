@@ -95,6 +95,9 @@
 
 /* Back */
 .card-back {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       padding: 1.25rem;
       border: var(--Dark-Grey) .5rem solid;
       background: #78acbf;
@@ -104,9 +107,6 @@
       font-size: 0.95rem;
       text-align: left;
       transform: rotateY(180deg);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
 }
 
 .card-back p {
@@ -119,6 +119,6 @@
 }
 
 .card-back button{
-      margin: 0;
 	width: 6.25rem;
+      margin: 0;
 }

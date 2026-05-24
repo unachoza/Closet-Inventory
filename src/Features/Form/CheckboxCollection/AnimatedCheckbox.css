@@ -12,6 +12,8 @@ label.animated-checkbox {
       cursor: pointer;
       gap: var(--spacing-100);
       user-select: none;
+      paint-order: stroke;
+      -webkit-text-stroke: 2px black;
 }
 
 .checkbox-root {

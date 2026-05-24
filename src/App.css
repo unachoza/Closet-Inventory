@@ -25,9 +25,9 @@
 }
 
 .back-button:hover {
-  filter: brightness(.8);
 
   transform: translateY(-1px);
+  filter: brightness(.8);
 }
 
 .back-button:active {
