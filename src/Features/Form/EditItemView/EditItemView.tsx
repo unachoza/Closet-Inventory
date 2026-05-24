@@ -70,6 +70,7 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 						{key}
 						<textarea
 							name={key}
+							className="textarea"
 							value={normalizeToString(value)}
 							placeholder={!value ? `Enter ${key}` : ""}
 							handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}

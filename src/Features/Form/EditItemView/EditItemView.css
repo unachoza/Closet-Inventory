@@ -1,55 +1,38 @@
 .edit-form {
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      border-radius: var(--border-radius-sm);
       background: var(--Dark-Grey);
       background: linear-gradient(180deg, rgb(120 172 191 / 70%) 0%, rgb(103 131 133 / 76%) 50%);
       position: relative;
       overflow: hidden; /* important for max-height animations */
       height: 75%;
       max-width: var(--Form-width);
-      margin: .5rem auto;
-      padding: var(--Form-padding);
+      margin: .2rem auto;
       border: var(--Dark-Grey) .5rem solid;
-      border-radius: var(--border-radius-md);
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-}
-
-.edit-form.form > form > form > div > label {
-      flex-direction: row;
-      text-align: left;
-      margin-bottom: 1rem;
-      display: flex;
-      justify-content: space-between;
-      width: 40%;
-      font-size: .8rem;
-      margin: 0;
-      box-shadow: none;
-      margin-bottom: 0;
 }
 
 .edit-form.form > form {
+      height: 100%;
       display: flex;
       flex-direction: column;
-      flex-wrap: wrap;
-      height: 100%;
       justify-content: space-between;
 }
 
 .form-fields{
       display: flex;
       flex-wrap: wrap;
-      color: black;
-      column-gap: 1.5rem;
+      column-gap: 1rem;
+      height: 100%;
+}
+
+.edit-form.form label{
+      margin:0;
+      gap: .25rem
+      
 }
 
 input[type="text"] {
       box-shadow: none;
       height: 2.5rem;
-      width: 9rem;
+      width: 13rem;
       text-transform: capitalize;
       color: black;
       border: solid black 2px;
@@ -58,20 +41,23 @@ input[type="text"] {
 //TODO:Doesn't work with the current structure of the form, but it is meant to target the label text when the input is focused. It should be adjusted to fit the actual structure of the form.
 span.label-text:has(input:focus),
 span.label-text:has(+ input:focus) {
-      white: #1976d2; 
+      color: white;
       font-weight: 600;
       font-size: .8rem;
       transition: color 0.2s;
-}
-
-span.label-text:has(+ input:focus) {
-      color: white;
-}
+}   
 
 .edit-form input:focus-visible {
       background: none;
       outline: -webkit-focus-ring-color auto 2px;
       background: linear-gradient(180deg, rgba(142, 205, 228, 0.7) 0%, rgba(132, 170, 172, 0.76) 50%);
+}
+
+label:has(.textarea) {
+      color: black;
+      font-weight: 600;
+      font-size: .8rem;
+      height: 125px;
 }
 
 textarea {
@@ -83,35 +69,17 @@ textarea {
       border: solid black 2px;
       width: 41rem;
       box-shadow: none;
-      height: 5rem;
+      height: 9rem;
       text-transform: capitalize;
       color: black;
-      border: solid black 2px;
+      font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+      padding: var(--spacing-100) var(--spacing-200);
+      font-size: 1rem;
       border-radius: var(--border-radius-sm);
       background: none;
 }
 
-label:has(textarea) {
-      color: black;
-      font-weight: 600;
-      font-size: .8rem;
-}
-
-form > form {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-}
-
-.edit-form.form > form > form > div > label > span {
-      height: 100%;
-      display: flex;
-      align-items: center;
-      font-weight: 600;
-
-}
-#root > div > div.edit-form.form > form > div > label >span {
+.edit-form.form label >span {
       color: black;
       font-weight: 600;
       font-size: .8rem;
