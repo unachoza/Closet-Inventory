@@ -99,7 +99,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 					{paginatedItems.length > 0 ? (
 						paginatedItems.map((item: ClothingItem) => (
 							<motion.div key={item.id} variants={cardVariants}>
-								<ClothingCard item={item} />
+								<ClothingCard item={item} onEditItem={onEditItem} />
 							</motion.div>
 						))
 					) : (

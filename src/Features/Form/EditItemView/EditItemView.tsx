@@ -1,25 +1,29 @@
 import "./EditItemView.css";
-import { ClothingItem } from "../../../utils/types";
+import { ClothingItem, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
-import Input from "../TextInput/TextInput";
+import TextInput from "../TextInput/TextInput";
 import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 
 import { normalizeToString } from "../../../utils/normalizeToString";
-import { ChangeEvent, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { motion } from "framer-motion";
+import { useToast } from "../../../Components/Toast/Toast";
+import close from "../../../assets/close.svg";
 import { i, label, textarea } from "framer-motion/client";
+import { D } from "vitest/dist/chunks/reporters.d.CqBhtcTq.js";
+import { set } from "date-fns";
 
 interface EditItemViewProps {
 	item: ClothingItem;
 	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
-	toast?: (message: string) => void;
+	setView: Dispatch<SetStateAction<ViewType>>;
 }
 
-const EditItemView = ({ item, toast }: EditItemViewProps) => {
+const EditItemView = ({ item, setView }: EditItemViewProps) => {
 	const { id, imageURL, onSale, notes, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
 	const { updateItem } = useLocalStorageCloset();
-	console.log({ inputsToSeperate });
+	const { showToast } = useToast();
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
 		name: item.name,
@@ -37,48 +41,58 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
+		console.log(name, value);
 		setFormData((prev) => ({ ...prev, [name]: value }));
+	};
+
+	const onToggleDetail = (key: string, value: any) => {
+		setFormData((prev) => ({ ...prev, [key]: !value }));
 	};
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (updateItem) {
+			console.log("estoy actualizando el item", { id, formData });
 			updateItem(item.id, formData);
-			if (toast) toast("Item updated successfully!");
+			showToast(`${formData.name} updated`);
+			setTimeout(() => {
+				setView("carousel");
+			});
 		}
 	};
 
 	const separateFeilds = () => {
-		console.log("working");
 		return Object.entries(inputsToSeperate).map(([key, value]) => {
 			if (key === "imageURL") {
 				return (
-					<Input
+					<TextInput
+						key={key}
 						name={key}
 						label={key}
-						value={normalizeToString(value)}
+						value={normalizeToString(formData[key] ?? value)}
 						placeholder={!value ? `Enter ${key}` : ""}
-						handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-						onChange={handleChange}
+						handleFormUpdate={handleChange}
 					/>
 				);
 			} else if (key === "onSale") {
-				return <AnimatedCheckbox key={key} label={key} checked={key === value} onCheckedChange={() => onToggleDetail(key, value)} />;
+				return (
+					<AnimatedCheckbox key={key} label={key} checked={!!formData[key]} onCheckedChange={() => onToggleDetail(key, value)} />
+				);
 			} else if (key === "notes") {
 				return (
-					<label>
+					<label key={key}>
 						{key}
 						<textarea
 							name={key}
 							className="textarea"
-							value={normalizeToString(value)}
+							value={normalizeToString(formData[key] ?? value)}
 							placeholder={!value ? `Enter ${key}` : ""}
-							handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
 							onChange={handleChange}
 						></textarea>
 					</label>
 				);
 			}
+			return null;
 		});
 	};
 	if (!item) {
@@ -93,6 +107,7 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 	// TODO: fix imageURL
 	return (
 		<div className="edit-form form">
+			<img src={close} className="close-icon" onClick={() => setView("carousel")} alt="close icon" data-testid="close-icon" />
 			<motion.form
 				layout
 				onSubmit={handleSubmit}
@@ -103,17 +118,17 @@ const EditItemView = ({ item, toast }: EditItemViewProps) => {
 				<h2 className="card-title">{item.name}</h2>
 				<div className="form-fields">
 					{/* // TODO: Refactor to remove imageURL field and add image upload functionality, onSale field should be a checkbox, and notes field should be a textarea */}
-					{Object.entries(remaining).map((field) => (
-						<Input
-							name={field[0]}
-							label={field[0]}
-							value={normalizeToString(field[1])}
-							placeholder={!field[1] ? `Enter ${field[0]}` : ""}
-							handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-							onChange={handleChange}
+					{Object.entries(remaining).map(([key, value]) => (
+						<TextInput
+							key={key}
+							name={key}
+							label={key}
+							value={normalizeToString(formData[key] ?? value)}
+							placeholder={!value ? `Enter ${key}` : ""}
+							handleFormUpdate={handleChange}
 						/>
 					))}
-					{separateFeilds(inputsToSeperate)}
+					{separateFeilds()}
 				</div>
 				<button type="submit">Save Changes</button>
 			</motion.form>

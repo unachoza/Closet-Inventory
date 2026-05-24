@@ -1,21 +1,17 @@
 import "./Card.css";
 import { ClothingItem } from "../../utils/types";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
-import EditItemView from "../../Features/Form/EditItemView/EditItemView";
+
+import { useState } from "react";
 
 interface CardProps {
 	item: ClothingItem;
 	onEditItem?: (item: ClothingItem) => void;
 }
-import { useState } from "react";
-
-interface CardProps {
-	item: ClothingItem;
-}
 
 const ClothingCard = ({ item, onEditItem }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
-	const [showEditView, setShowEditView] = useState<boolean>(false);
+
 	const { removeItem } = useLocalStorageCloset();
 	console.log({ item });
 
@@ -68,20 +64,19 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 						>
 							Remove
 						</button>
-						       <button onClick={(e) => {
-							       e.stopPropagation();
-							       if (onEditItem) {
-								       onEditItem(item);
-							       } else {
-								       setShowEditView(true);
-							       }
-						       }}>
-							       Edit
-						       </button>
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								if (onEditItem) {
+									onEditItem(item);
+								}
+							}}
+						>
+							Edit
+						</button>
 					</div>
 				</div>
 			</div>
-			   {showEditView && <EditItemView item={item} />}
 		</div>
 	);
 };
