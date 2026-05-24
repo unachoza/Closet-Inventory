@@ -30,4 +30,4 @@ export const GMAIL_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
 export const GMAIL_API_BASE = "https://www.googleapis.com/gmail/v1/users/me";
 
-export const MAX_EMAIL_RESULTS = 60;
+export const MAX_EMAIL_RESULTS = 50;

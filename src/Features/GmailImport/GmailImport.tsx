@@ -11,13 +11,22 @@ import "./GmailImport.css";
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ItemFormData>) => void;
 }
-
+const MY_EMAILS_KEY = "my_emails_key";
 export default function GmailImport({ onImport }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
 	const { emails, isSearching, error: searchError, searchEmails } = useGmailSearch();
 	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
 
 	const selectedEmail: GmailEmail | undefined = emails.find((e) => e.id === selectedEmailId);
+
+	const getemails = (): GmailEmail[] => {
+		try {
+			const stored = localStorage.getItem(MY_EMAILS_KEY);
+			return stored ? (JSON.parse(stored) as GmailEmail[]) : [];
+		} catch {
+			return [];
+		}
+	};
 
 	useEffect(() => {
 		if (accessToken && isAuthenticated) {
@@ -45,6 +54,8 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 	const error = authError ?? searchError;
 
 	if (!isAuthenticated) {
+		console.log(getemails());
+		console.log("not auth");
 		return (
 			<div className="gmail-container">
 				<div className="gmail-auth-section">
@@ -56,6 +67,28 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
 					{error && <p className="gmail-error">{error}</p>}
+				</div>
+			</div>
+		);
+	}
+
+	if (getemails().length > 0) {
+		console.log(isAuthenticated);
+		return (
+			<div>
+				already stored emails
+				<div className={selectedEmail ? "display-email-preview-panel" : "gmail-results"}>
+					<div className="gmail-list-panel">
+						<h3 className="gmail-section-title">
+							Found {emails.length} email{emails.length !== 1 ? "s" : ""}
+						</h3>
+						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} />
+					</div>
+					{selectedEmail && (
+						<div className="gmail-preview-panel">
+							<EmailPreview email={selectedEmail} onConfirmImport={handleConfirmImport} />
+						</div>
+					)}
 				</div>
 			</div>
 		);

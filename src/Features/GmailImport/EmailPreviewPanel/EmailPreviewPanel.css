@@ -4,5 +4,55 @@
       gap: var(--spacing-200);
       padding: var(--spacing-200);
       overflow-y: auto;
-      
+      max-height: 500px;
+      border: solid 1px rgba(117, 219, 15, 0.1);
+}
+
+.gmail-preview-body{
+      border: solid red;
+}
+
+[class*="product"] { 
+      border: solid blue;
+      /* background-color: red; */
+}
+tbody:has(td:nth-child(3):last-child) {
+      /* Your styles here */
+      background-color: solid blue;
+      border: solid pink;
+}
+
+tbody > tr:has(td:nth-child(3):last-child) {
+      /* Your styles here */
+      /* background: grey; */
+      border: solid pink 4px
+}
+
+tr:has(td:first-child:has(img) + td + td) {
+      background: blue;
+      border: solid pink 4px
+}
+
+/* td:has(img){
+      background: red;
+      border: solid green 5px;
+} */
+
+tbody > tr:has(td:nth-child(1):has(img)) {
+      background: black
+}
+
+/* td:first-child:has(img){
+      background: rgba(137, 43, 226, 0.321);
+} */
+tr:has(> td:nth-child(3):last-child):has(> td:first-child img){
+      background: green;
+      border: solid 8px rgb(117 219 15 / 80%);
+}
+
+tbody:has(th.float_left) {
+      /* Your styles here */
+      background: blue;
+
+      border: solid 8px rgb(117 219 15 / 80%);
 }

@@ -86,9 +86,9 @@ export function parseEmailToFormData(
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
 
-	console.log(body, 'anything?')
-	console.log("Extracted Brand:", extractBrand(combinedText, from));
-	console.log("Extracted Category:", extractCategory(combinedText));	
+	// console.log(body, 'anything?')
+	// console.log("Extracted Brand:", extractBrand(combinedText, from));
+	// console.log("Extracted Category:", extractCategory(combinedText));	
 
 	return {
 		...formItem,

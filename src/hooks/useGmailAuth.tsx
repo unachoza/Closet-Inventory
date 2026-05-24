@@ -1,22 +1,29 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useLocalStorage } from "./uselocalStorage";
+import { useToast } from "../Components/Toast/Toast";
 
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
+const AUTH_STORAGE_KEY = "gmail_auth";
 
 export interface GmailAuthState {
 	accessToken: string | null;
 	isAuthenticated: boolean;
 	error: string | null;
 	isLoading: boolean;
+	expiresAt?: number | null; // unix ms
 }
-
 export function useGmailAuth() {
-	const [authState, setAuthState] = useState<GmailAuthState>({
+	const { showToast } = useToast();
+	const [storedAuth, setStoredAuth] = useLocalStorage<GmailAuthState>(AUTH_STORAGE_KEY, {
 		accessToken: null,
 		isAuthenticated: false,
 		error: null,
 		isLoading: false,
+		expiresAt: null,
 	});
+	const [authState, setAuthState] = useState<GmailAuthState>(storedAuth);
+	const logoutTimer = useRef<NodeJS.Timeout | null>(null);
 
 	const login = useGoogleLogin({
 		scope: GMAIL_SCOPE,
@@ -27,6 +34,7 @@ export function useGmailAuth() {
 				error: null,
 				isLoading: false,
 			});
+			setStoredAuth(authState)
 		},
 		onError: (error) => {
 			setAuthState({
