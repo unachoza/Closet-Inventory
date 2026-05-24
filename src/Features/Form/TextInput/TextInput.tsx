@@ -17,9 +17,11 @@ const Input = ({ id, label, name, className, value, errorMessage, placeholder, h
 				onKeyDown={onKeyDown}
 				required
 			/>
-			<div className="error-message" role="alert" id={`${name}-error`}>
-				{errorMessage}
-			</div>
+			{errorMessage && (
+				<div className="error-message" role="alert" id={`${name}-error`}>
+					{errorMessage}
+				</div>
+			)}
 		</label>
 	);
 };

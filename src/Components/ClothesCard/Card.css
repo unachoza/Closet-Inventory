@@ -67,6 +67,16 @@
       border-top: 1px solid #ddd;
 }
 
+.card-details{
+
+}
+
+.controls-container {
+      display: flex;
+      justify-content: space-evenly;
+      gap: 1.5rem;
+}
+
 .card-category {
       color: var(--Medium-Grey);
       font-size: 0.9rem;
@@ -87,7 +97,6 @@
 .card-back {
       padding: 1.25rem;
       border: var(--Dark-Grey) .5rem solid;
-      /* blue gradient */
       background: #78acbf;
       background: linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%);
 
@@ -95,6 +104,9 @@
       font-size: 0.95rem;
       text-align: left;
       transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
 }
 
 .card-back p {
@@ -104,4 +116,9 @@
 
 .card-back strong {
       color: var(--Black);;
+}
+
+.card-back button{
+      margin: 0;
+	width: 6.25rem;
 }

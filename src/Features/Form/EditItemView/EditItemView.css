@@ -1,0 +1,121 @@
+.edit-form {
+      background: var(--Dark-Grey);
+      background: linear-gradient(180deg, rgb(120 172 191 / 70%) 0%, rgb(103 131 133 / 76%) 50%);
+      position: relative;
+      overflow: hidden; /* important for max-height animations */
+      height: 75%;
+      max-width: var(--Form-width);
+      margin: .2rem auto;
+      border: var(--Dark-Grey) .5rem solid;
+}
+
+.edit-form.form > form {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+}
+
+.form-fields{
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 1rem;
+      height: 100%;
+}
+
+.edit-form.form label{
+      margin:0;
+      gap: .25rem
+      
+}
+
+input[type="text"] {
+      box-shadow: none;
+      height: 2.5rem;
+      width: 13rem;
+      text-transform: capitalize;
+      color: black;
+      border: solid black 2px;
+}
+
+//TODO:Doesn't work with the current structure of the form, but it is meant to target the label text when the input is focused. It should be adjusted to fit the actual structure of the form.
+span.label-text:has(input:focus),
+span.label-text:has(+ input:focus) {
+      color: white;
+      font-weight: 600;
+      font-size: .8rem;
+      transition: color 0.2s;
+}   
+
+.edit-form input:focus-visible {
+      background: none;
+      outline: -webkit-focus-ring-color auto 2px;
+      background: linear-gradient(180deg, rgba(142, 205, 228, 0.7) 0%, rgba(132, 170, 172, 0.76) 50%);
+}
+
+label:has(.textarea) {
+      color: black;
+      font-weight: 600;
+      font-size: .8rem;
+      height: 125px;
+}
+
+textarea {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .5rem;
+      color: black;
+      border: solid black 2px;
+      width: 41rem;
+      box-shadow: none;
+      height: 9rem;
+      text-transform: capitalize;
+      color: black;
+      font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+      padding: var(--spacing-100) var(--spacing-200);
+      font-size: 1rem;
+      border-radius: var(--border-radius-sm);
+      background: none;
+}
+
+.edit-form.form label >span {
+      color: black;
+      font-weight: 600;
+      font-size: .8rem;
+}
+
+form > div > label.animated-checkbox  {
+      display: flex;
+      flex-direction:column-reverse;
+      width: 9rem;;
+      align-items: flex-start;
+}
+
+form > div > label.animated-checkbox  .checkbox-label {
+      paint-order: none;
+      -webkit-text-stroke: none;
+      align-items: flex-start;
+}
+
+.animated-checkbox  span.checkbox-label  {
+      color: black !important;
+}
+
+label.animated-checkbox button.checkbox-root {
+      border: solid black 2px;
+}
+
+.close-icon {
+      float: right;
+      color: white;
+      position: relative;
+      top: 15px;
+      right: 15px;
+      cursor: pointer;
+      height: 35px;
+      border: solid #2a2929 2px;
+      border-radius: 50%;
+      padding: 3px;
+      margin: -18px;
+}
