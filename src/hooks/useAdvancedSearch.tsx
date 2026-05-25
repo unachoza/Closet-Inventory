@@ -19,6 +19,7 @@ export interface GmailEmailMeta {
 	readonly from: string;
 	readonly date: string;
 	readonly snippet: string;
+	readonly body?: string;
 }
 
 // Full email with body (fetched lazily on select)
@@ -58,9 +59,7 @@ interface GmailMessagePart {
 // ── Helpers ──────────────────────────────────────────────
 
 function getHeader(headers: GmailHeader[], name: string): string {
-	const header = headers.find(
-		(h) => h.name.toLowerCase() === name.toLowerCase()
-	);
+	const header = headers.find((h) => h.name.toLowerCase() === name.toLowerCase());
 	return header?.value ?? "";
 }
 
@@ -71,7 +70,7 @@ function decodeBase64Url(data: string): string {
 		atob(base64 + padding)
 			.split("")
 			.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-			.join("")
+			.join(""),
 	);
 }
 
@@ -92,10 +91,7 @@ function extractBody(payload: GmailMessageResponse["payload"]): string {
 	return "";
 }
 
-function findPart(
-	parts: GmailMessagePart[],
-	mimeType: string
-): GmailMessagePart | undefined {
+function findPart(parts: GmailMessagePart[], mimeType: string): GmailMessagePart | undefined {
 	for (const part of parts) {
 		if (part.mimeType === mimeType) return part;
 		if (part.parts) {
@@ -114,11 +110,7 @@ function delay(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchJson<T>(
-	url: string,
-	accessToken: string,
-	retries = MAX_RETRIES
-): Promise<T> {
+async function fetchJson<T>(url: string, accessToken: string, retries = MAX_RETRIES): Promise<T> {
 	const response = await fetch(url, {
 		headers: { Authorization: `Bearer ${accessToken}` },
 	});
@@ -136,10 +128,7 @@ async function fetchJson<T>(
 	return response.json() as Promise<T>;
 }
 
-async function fetchInBatches<TInput, TOutput>(
-	items: TInput[],
-	processFn: (item: TInput) => Promise<TOutput>
-): Promise<TOutput[]> {
+async function fetchInBatches<TInput, TOutput>(items: TInput[], processFn: (item: TInput) => Promise<TOutput>): Promise<TOutput[]> {
 	const results: TOutput[] = [];
 
 	for (let i = 0; i < items.length; i += BATCH_SIZE) {
@@ -167,26 +156,19 @@ function isCacheValid(envelope: CacheEnvelope | null): boolean {
 
 // ── Client-side filtering ────────────────────────────────
 
-function filterEmails(
-	emails: GmailEmailMeta[],
-	params: AdvancedSearchParams
-): GmailEmailMeta[] {
+function filterEmails(emails: GmailEmailMeta[], params: AdvancedSearchParams): GmailEmailMeta[] {
 	return emails.filter((email) => {
 		// Subject filter
 		if (params.subjects.length > 0) {
 			const lowerSubject = email.subject.toLowerCase();
-			const matchesSubject = params.subjects.some((s) =>
-				lowerSubject.includes(s.toLowerCase())
-			);
+			const matchesSubject = params.subjects.some((s) => lowerSubject.includes(s.toLowerCase()));
 			if (!matchesSubject) return false;
 		}
 
 		// Excluded senders
 		if (params.excludedSenders.length > 0) {
 			const lowerFrom = email.from.toLowerCase();
-			const isExcluded = params.excludedSenders.some((s) =>
-				lowerFrom.includes(s.toLowerCase())
-			);
+			const isExcluded = params.excludedSenders.some((s) => lowerFrom.includes(s.toLowerCase()));
 			if (isExcluded) return false;
 		}
 
@@ -211,9 +193,7 @@ function filterEmails(
 		// Body keywords filter against snippet (body is lazy-loaded)
 		if (params.bodyKeywords.length > 0) {
 			const lowerSnippet = email.snippet.toLowerCase();
-			const matchesKeyword = params.bodyKeywords.some((kw) =>
-				lowerSnippet.includes(kw.toLowerCase())
-			);
+			const matchesKeyword = params.bodyKeywords.some((kw) => lowerSnippet.includes(kw.toLowerCase()));
 			if (!matchesKeyword) return false;
 		}
 
@@ -230,14 +210,8 @@ const EMPTY_CACHE: CacheEnvelope = {
 };
 
 export function useAdvancedSearch() {
-	const [cache, setCache] = useLocalStorage<CacheEnvelope>(
-		GMAIL_CACHE_KEY,
-		EMPTY_CACHE
-	);
-	const [bodiesCache, setBodiesCache] = useLocalStorage<Record<string, string>>(
-		GMAIL_CACHE_BODIES_KEY,
-		{}
-	);
+	const [cache, setCache] = useLocalStorage<CacheEnvelope>(GMAIL_CACHE_KEY, EMPTY_CACHE);
+	const [bodiesCache, setBodiesCache] = useLocalStorage<Record<string, string>>(GMAIL_CACHE_BODIES_KEY, {});
 
 	const [filteredEmails, setFilteredEmails] = useState<GmailEmailMeta[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -246,56 +220,46 @@ export function useAdvancedSearch() {
 	const [hasNextPage, setHasNextPage] = useState(false);
 
 	// Fetch email metadata list from API (headers + snippets, no bodies)
-	const fetchEmailList = useCallback(
-		async (accessToken: string, pageToken?: string) => {
-			const query = `(${buildSubjectQuery()})`;
-			let url = `${GMAIL_API_BASE}/messages?q=${encodeURIComponent(query)}&maxResults=${MAX_EMAIL_RESULTS}`;
-			if (pageToken) {
-				url += `&pageToken=${pageToken}`;
-			}
+	const fetchEmailList = useCallback(async (accessToken: string, pageToken?: string) => {
+		const query = `(${buildSubjectQuery()})`;
+		let url = `${GMAIL_API_BASE}/messages?q=${encodeURIComponent(query)}&maxResults=${MAX_EMAIL_RESULTS}`;
+		if (pageToken) {
+			url += `&pageToken=${pageToken}`;
+		}
 
-			const listResponse = await fetchJson<{
-				messages?: { id: string; threadId: string }[];
-				nextPageToken?: string;
-			}>(url, accessToken);
+		const listResponse = await fetchJson<{
+			messages?: { id: string; threadId: string }[];
+			nextPageToken?: string;
+		}>(url, accessToken);
 
-			const nextToken = listResponse.nextPageToken ?? null;
+		const nextToken = listResponse.nextPageToken ?? null;
 
-			if (!listResponse.messages?.length) {
-				return { emails: [] as GmailEmailMeta[], nextToken };
-			}
+		if (!listResponse.messages?.length) {
+			return { emails: [] as GmailEmailMeta[], nextToken };
+		}
 
-			// Fetch metadata in batches of 5 to avoid 429 rate limits
-			const emailMetas = await fetchInBatches(
-				listResponse.messages,
-				async (msg) => {
-					const detail = await fetchJson<GmailMessageResponse>(
-						`${GMAIL_API_BASE}/messages/${msg.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date`,
-						accessToken
-					);
-					return {
-						id: detail.id,
-						threadId: detail.threadId,
-						subject: getHeader(detail.payload.headers, "Subject"),
-						from: getHeader(detail.payload.headers, "From"),
-						date: getHeader(detail.payload.headers, "Date"),
-						snippet: detail.snippet,
-					};
-				}
+		// Fetch metadata in batches of 5 to avoid 429 rate limits
+		const emailMetas = await fetchInBatches(listResponse.messages, async (msg) => {
+			const detail = await fetchJson<GmailMessageResponse>(
+				`${GMAIL_API_BASE}/messages/${msg.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date`,
+				accessToken,
 			);
+			return {
+				id: detail.id,
+				threadId: detail.threadId,
+				subject: getHeader(detail.payload.headers, "Subject"),
+				from: getHeader(detail.payload.headers, "From"),
+				date: getHeader(detail.payload.headers, "Date"),
+				snippet: detail.snippet,
+			};
+		});
 
-			return { emails: emailMetas, nextToken };
-		},
-		[]
-	);
+		return { emails: emailMetas, nextToken };
+	}, []);
 
 	// Main search: check cache first, fetch from API if expired
 	const searchEmails = useCallback(
-		async (
-			accessToken: string,
-			params?: AdvancedSearchParams,
-			forceRefresh = false
-		) => {
+		async (accessToken: string, params?: AdvancedSearchParams, forceRefresh = false) => {
 			const searchParams = params ?? DEFAULT_SEARCH_PARAMS;
 			setIsSearching(true);
 			setError(null);
@@ -310,8 +274,7 @@ export function useAdvancedSearch() {
 				}
 
 				// Cache miss or force refresh — fetch from API
-				const { emails: newEmails, nextToken } =
-					await fetchEmailList(accessToken);
+				const { emails: newEmails, nextToken } = await fetchEmailList(accessToken);
 
 				const updatedCache: CacheEnvelope = {
 					timestamp: Date.now(),
@@ -324,14 +287,13 @@ export function useAdvancedSearch() {
 				setFilteredEmails(filtered);
 				setHasNextPage(nextToken !== null);
 			} catch (err) {
-				const message =
-					err instanceof Error ? err.message : "Failed to search emails";
+				const message = err instanceof Error ? err.message : "Failed to search emails";
 				setError(message);
 			} finally {
 				setIsSearching(false);
 			}
 		},
-		[cache, fetchEmailList, setCache]
+		[cache, fetchEmailList, setCache],
 	);
 
 	// Load more: appends to cache, doesn't replace
@@ -343,10 +305,7 @@ export function useAdvancedSearch() {
 			setError(null);
 
 			try {
-				const { emails: newEmails, nextToken } = await fetchEmailList(
-					accessToken,
-					cache.nextPageToken
-				);
+				const { emails: newEmails, nextToken } = await fetchEmailList(accessToken, cache.nextPageToken);
 
 				// Append to cache (immutable update)
 				const updatedCache: CacheEnvelope = {
@@ -359,21 +318,18 @@ export function useAdvancedSearch() {
 				// Re-filter with appended data — React reconciles with stable keys
 				setFilteredEmails((prev) => {
 					const existingIds = new Set(prev.map((e) => e.id));
-					const newFiltered = newEmails.filter(
-						(e) => !existingIds.has(e.id)
-					);
+					const newFiltered = newEmails.filter((e) => !existingIds.has(e.id));
 					return [...prev, ...newFiltered];
 				});
 				setHasNextPage(nextToken !== null);
 			} catch (err) {
-				const message =
-					err instanceof Error ? err.message : "Failed to load more emails";
+				const message = err instanceof Error ? err.message : "Failed to load more emails";
 				setError(message);
 			} finally {
 				setIsSearching(false);
 			}
 		},
-		[cache, fetchEmailList, setCache]
+		[cache, fetchEmailList, setCache],
 	);
 
 	// Lazy fetch a single email body (cached in localStorage)
@@ -386,25 +342,21 @@ export function useAdvancedSearch() {
 
 			setIsFetchingBody(true);
 			try {
-				const detail = await fetchJson<GmailMessageResponse>(
-					`${GMAIL_API_BASE}/messages/${emailId}?format=full`,
-					accessToken
-				);
+				const detail = await fetchJson<GmailMessageResponse>(`${GMAIL_API_BASE}/messages/${emailId}?format=full`, accessToken);
 				const body = extractBody(detail.payload);
 
 				// Cache the body (immutable update)
 				setBodiesCache((prev) => ({ ...prev, [emailId]: body }));
 				return body;
 			} catch (err) {
-				const message =
-					err instanceof Error ? err.message : "Failed to fetch email body";
+				const message = err instanceof Error ? err.message : "Failed to fetch email body";
 				setError(message);
 				return "";
 			} finally {
 				setIsFetchingBody(false);
 			}
 		},
-		[bodiesCache, setBodiesCache]
+		[bodiesCache, setBodiesCache],
 	);
 
 	// Re-filter cached emails with new params (zero API calls)
@@ -413,7 +365,7 @@ export function useAdvancedSearch() {
 			const filtered = filterEmails(cache.emails, params);
 			setFilteredEmails(filtered);
 		},
-		[cache.emails]
+		[cache.emails],
 	);
 
 	return {
