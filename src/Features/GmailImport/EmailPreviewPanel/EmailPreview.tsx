@@ -9,6 +9,7 @@ interface EmailPreviewProps {
 	email: GmailEmail;
 	onConfirmImport: () => void;
 	onImportProduct: (product: ExtractedProduct) => void;
+	onImportAllProducts?: (products: ExtractedProduct[]) => void;
 }
 
 function createSanitizedHtml(html: string): string {
@@ -35,6 +36,7 @@ export default function EmailPreview({
 	email,
 	onConfirmImport,
 	onImportProduct,
+	onImportAllProducts,
 }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
@@ -54,10 +56,21 @@ export default function EmailPreview({
 			</div>
 
 			{extractedProducts.length > 0 && (
-				<ProductCardList
-					products={extractedProducts}
-					onImportProduct={onImportProduct}
-				/>
+				<>
+					<ProductCardList
+						products={extractedProducts}
+						onImportProduct={onImportProduct}
+					/>
+					{extractedProducts.length > 1 && onImportAllProducts && (
+						<button
+							className="gmail-import-all-btn"
+							onClick={() => onImportAllProducts(extractedProducts)}
+							type="button"
+						>
+							Import All {extractedProducts.length} Items
+						</button>
+					)}
+				</>
 			)}
 
 			<div className="gmail-preview-body">

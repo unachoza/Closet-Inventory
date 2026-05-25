@@ -16,10 +16,30 @@ export interface EditItemViewProps {
 	mode?: "edit" | "create";
 	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
 	setView: Dispatch<SetStateAction<ViewType>>;
+	/** Return to the Gmail email preview the user imported from */
+	onReturnToEmail?: () => void;
+	/** Skip this item in a batch import queue */
+	onSkipItem?: () => void;
+	/** Called after item is added to closet in batch mode (advances queue) */
+	onItemAdded?: () => void;
+	/** Current position in import queue (1-based) */
+	queuePosition?: number;
+	/** Total items in import queue */
+	queueTotal?: number;
 }
 
-const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
+const EditItemView = ({
+	item,
+	mode = "edit",
+	setView,
+	onReturnToEmail,
+	onSkipItem,
+	onItemAdded,
+	queuePosition,
+	queueTotal,
+}: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
+	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
 	const { id, imageURL, onSale, notes, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
 	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
@@ -74,6 +94,12 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 				notes: formData.notes ?? "",
 			});
 			showToast(`${displayName} added to your closet!`);
+
+			// In batch mode, advance to next item instead of going to carousel
+			if (isInBatchMode && onItemAdded) {
+				setTimeout(() => onItemAdded());
+				return;
+			}
 		} else {
 			updateItem(item.id, formData);
 			showToast(`${formData.name} updated`);
@@ -82,6 +108,13 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 		setTimeout(() => {
 			setView("carousel");
 		});
+	};
+
+	const handleSkip = () => {
+		if (onSkipItem) {
+			showToast("Item skipped");
+			onSkipItem();
+		}
 	};
 
 	const separateFeilds = () => {
@@ -142,6 +175,26 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 					{isCreateMode ? "Import Item" : item.name}
 				</h2>
 
+				{/* Queue progress indicator for batch imports */}
+				{isInBatchMode && (
+					<div className="edit-form-queue-progress">
+						<span className="edit-form-queue-badge">
+							Item {queuePosition} of {queueTotal}
+						</span>
+					</div>
+				)}
+
+				{/* Return to email button for create mode */}
+				{isCreateMode && onReturnToEmail && (
+					<button
+						className="edit-form-return-btn"
+						onClick={onReturnToEmail}
+						type="button"
+					>
+						&larr; Return to Email Preview
+					</button>
+				)}
+
 				{/* Image preview for create mode */}
 				{isCreateMode && formData.imageURL && (
 					<div className="edit-form-image-preview">
@@ -166,9 +219,21 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 					))}
 					{separateFeilds()}
 				</div>
-				<button type="submit">
-					{isCreateMode ? "Add to Closet" : "Save Changes"}
-				</button>
+
+				<div className="edit-form-actions">
+					<button type="submit">
+						{isCreateMode ? "Add to Closet" : "Save Changes"}
+					</button>
+					{isInBatchMode && onSkipItem && (
+						<button
+							className="edit-form-skip-btn"
+							onClick={handleSkip}
+							type="button"
+						>
+							Do NOT Add This Item
+						</button>
+					)}
+				</div>
 			</motion.form>
 		</div>
 	);
