@@ -132,8 +132,9 @@ function parseNameCell(td: Element): ParsedNameCell {
 }
 
 /**
- * Strategy 1: Find <tr> rows that contain a product image, then read
- * sibling <td> cells for size, color, price, etc.
+ * Strategy 2: Find <tr> rows with 4+ cells that contain a product image,
+ * then read sibling <td> cells for size, color, price, etc.
+ * Common for Aritzia, Nordstrom, and other traditional retailers.
  */
 function extractFromTableRows(doc: Document): ExtractedProduct[] {
 	const allRows = doc.querySelectorAll("tr");
@@ -253,7 +254,7 @@ function parsePriceFromUnitLine(text: string): string {
 }
 
 /**
- * Strategy 2: Div-based layouts (Zara, etc.).
+ * Strategy 3: Div-based layouts (Zara, etc.).
  *
  * Zara uses <td> cells containing a product image followed by sequential
  * <div> elements for name, color+SKU, qty+price, and size.
@@ -383,8 +384,133 @@ function extractFromDivLayout(doc: Document): ExtractedProduct[] {
 }
 
 /**
- * Strategy 3: Fallback for non-table layouts. Find product images and
- * read nearby text.
+ * Parse "Size Sm Sleeveless Top" → { size: "Sm", name: "Sleeveless Top" }
+ * Also handles "Size 6 Midi Dress", "Size XS Tank Top", etc.
+ */
+function parseSizeAndName(text: string): { size: string; name: string } {
+	const match = text.match(/^Size\s+(\S+)\s+(.+)$/i);
+	if (match) {
+		return { size: match[1], name: match[2].trim() };
+	}
+	return { size: "", name: text.trim() };
+}
+
+/**
+ * Strategy 1: Nested two-cell table rows (ThredUp, Poshmark, etc.).
+ *
+ * ThredUp uses a 2-cell <tr>: one <td> for the product image, and a sibling
+ * <td> containing deeply nested tables with <a> links for:
+ *   link 1: Brand (e.g., "Reformation")
+ *   link 2: Size + Category (e.g., "Size Sm Sleeveless Top")
+ *   link 3: Price (e.g., "$44.99")
+ *
+ * This strategy runs first because it is the most specific — it requires
+ * the "Size X ProductName" link pattern unique to resale marketplaces.
+ *
+ * If the product image can't be loaded (e.g. CORS), the item is still
+ * detected — the user can add/upload an image later in the EditItemView form.
+ */
+function extractFromNestedTables(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	const allRows = doc.querySelectorAll("tr");
+
+	for (const row of allRows) {
+		const cells = Array.from(row.querySelectorAll(":scope > td"));
+		// Target rows with exactly 2 cells (image + details)
+		if (cells.length !== 2) continue;
+
+		// Identify which cell has the product image and which has details.
+		// The image cell contains an <img>; the details cell has nested <a> links.
+		let imageUrl = "";
+		let detailsCell: Element | null = null;
+
+		for (const cell of cells) {
+			const img = cell.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+			} else {
+				detailsCell = cell;
+			}
+		}
+
+		// Details cell is required; image is optional (user can add later)
+		if (!detailsCell) continue;
+
+		// Extract text from all <a> links in the details cell
+		const links = Array.from(detailsCell.querySelectorAll("a"));
+		const linkTexts = links
+			.map((a) => (a.textContent ?? "").trim())
+			.filter((t) => t.length > 0);
+
+		if (linkTexts.length < 2) continue;
+
+		let brand = "";
+		let name = "";
+		let size = "";
+		let price = "";
+		let hasSizePattern = false;
+
+		for (const text of linkTexts) {
+			const trimmed = text.trim();
+
+			// Price: starts with $
+			if (/^\$\s*\d/.test(trimmed) && !price) {
+				price = trimmed.replace(/\s+/g, "");
+				continue;
+			}
+
+			// Size + Name pattern: "Size Sm Sleeveless Top"
+			if (/^size\s+/i.test(trimmed) && !name) {
+				const parsed = parseSizeAndName(trimmed);
+				size = parsed.size;
+				name = parsed.name;
+				hasSizePattern = true;
+				continue;
+			}
+
+			// First unmatched text is the brand
+			if (!brand) {
+				brand = trimmed;
+				continue;
+			}
+
+			// If we still don't have a name, use this text
+			if (!name) {
+				name = trimmed;
+			}
+		}
+
+		// This strategy requires the "Size X Name" pattern to avoid false
+		// positives on generic 2-cell layout rows in other email formats.
+		if (!hasSizePattern) continue;
+
+		if (!name && !brand) continue;
+		if (!name) name = brand;
+
+		// Deduplicate by name+brand (handles case where image is missing/same)
+		const dedupeKey = `${brand}|${name}`.toLowerCase();
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: brand !== name ? brand : "",
+			price,
+			color: "",
+			size,
+			itemNumber: "",
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy 4 (Fallback): Find product images and read nearby text.
+ * Used when no structured format is detected.
  */
 function extractFromImages(doc: Document): ExtractedProduct[] {
 	const images = Array.from(doc.querySelectorAll("img")).filter((img) => isProductImage(img as HTMLImageElement));
@@ -440,14 +566,22 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 
-	// Try table-row extraction first (most common for retailer emails)
+	// Strategy order: most-specific first to avoid false positives from layout rows.
+	//
+	// 1. Nested two-cell tables (ThredUp, Poshmark) — very specific: 2-cell <tr>
+	//    with <a> links containing brand + "Size X Name" + "$price"
+	// 2. Table rows with 4+ cells (Aritzia, Nordstrom) — common retailer format
+	// 3. Div-based layouts (Zara) — product image + sequential <div> elements
+	// 4. Image fallback — find product images and read nearby text
+
+	const nestedProducts = extractFromNestedTables(doc);
+	if (nestedProducts.length > 0) return nestedProducts;
+
 	const tableProducts = extractFromTableRows(doc);
 	if (tableProducts.length > 0) return tableProducts;
 
-	// Try div-based extraction (Zara, etc.)
 	const divProducts = extractFromDivLayout(doc);
 	if (divProducts.length > 0) return divProducts;
 
-	// Fallback to image-based extraction
 	return extractFromImages(doc);
 }

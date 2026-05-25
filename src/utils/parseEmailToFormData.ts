@@ -23,6 +23,9 @@ const BRAND_PATTERNS: Record<string, string> = {
 	shein: "shein",
 	"free people": "free people",
 	reformation: "reformation",
+	thredup: "thredup",
+	"thred up": "thredup",
+	poshmark: "poshmark",
 };
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
