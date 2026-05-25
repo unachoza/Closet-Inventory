@@ -13,14 +13,18 @@ import "./GmailImport.css";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
+	/** When returning from EditItemView, re-open this email's preview */
+	initialSelectedEmailId?: string | null;
+	/** Notify parent of which email the user is importing from */
+	onSourceEmailChange?: (emailId: string | null) => void;
 }
 
-export default function GmailImport({ onImport }: GmailImportProps) {
+export default function GmailImport({ onImport, initialSelectedEmailId, onSourceEmailChange }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
 
 	const { emails, isSearching, error: searchError, searchEmails, fetchNextPage, hasNextPage, fetchEmailBody } = useAdvancedSearch();
 
-	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(initialSelectedEmailId ?? null);
 
 	// Find the selected email and ensure it has a body (fetch if needed)
 	const [selectedEmail, setSelectedEmail] = useState<GmailEmail | undefined>(undefined);
@@ -83,9 +87,10 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 	const handleConfirmImport = useCallback(() => {
 		if (!selectedEmail) return;
 
+		onSourceEmailChange?.(selectedEmailId);
 		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from);
 		onImport(prefilled);
-	}, [selectedEmail, onImport]);
+	}, [selectedEmail, selectedEmailId, onImport, onSourceEmailChange]);
 
 	const handleImportProduct = useCallback(
 		(product: ExtractedProduct) => {
@@ -93,12 +98,8 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 			const emailSubject = selectedEmail?.subject ?? "";
 
 			// Use parseEmailToFormData for brand/category detection from email context
-			const emailData = parseEmailToFormData(
-				emailSubject,
-				product.name,
-				emailFrom,
-			);
-
+			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
+			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
 				imageURL: product.imageUrl,
@@ -111,7 +112,7 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 				age: "new",
 			});
 		},
-		[selectedEmail, onImport],
+		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
 	);
 
 	const handleNextPage = useCallback(() => {
@@ -184,7 +185,11 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
-							<EmailPreview email={selectedEmail} onConfirmImport={handleConfirmImport} onImportProduct={handleImportProduct} />
+							<EmailPreview
+								email={selectedEmail}
+								onConfirmImport={handleConfirmImport}
+								onImportProduct={handleImportProduct}
+							/>
 						</div>
 					)}
 				</div>

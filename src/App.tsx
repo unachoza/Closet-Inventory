@@ -16,6 +16,8 @@ function App() {
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
 	const [prefilledFormData, setPrefilledFormData] = useState<Partial<ItemFormData> | undefined>(undefined);
+	// Gmail import state
+	const [gmailSourceEmailId, setGmailSourceEmailId] = useState<string | null>(null);
 
 	const handleEditItem = (item: ClothingItem) => {
 		setEditItem(item);
@@ -47,8 +49,18 @@ function App() {
 		setView("edit");
 	}, []);
 
+	// Return to email preview from EditItemView
+	const handleReturnToEmail = useCallback(() => {
+		setView("gmail");
+	}, []);
+
+	const handleSourceEmailChange = useCallback((emailId: string | null) => {
+		setGmailSourceEmailId(emailId);
+	}, []);
+
 	const handleAddItem = useCallback(() => {
 		setPrefilledFormData(undefined);
+		setGmailSourceEmailId(null);
 		setView("form");
 	}, []);
 
@@ -63,7 +75,13 @@ function App() {
 						<button onClick={() => setView("gmail")}>Import from Gmail</button>
 					</div>
 					{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
-					{view === "gmail" && <GmailImport onImport={handleGmailImport} />}
+					{view === "gmail" && (
+						<GmailImport
+							onImport={handleGmailImport}
+							initialSelectedEmailId={gmailSourceEmailId}
+							onSourceEmailChange={handleSourceEmailChange}
+						/>
+					)}
 					{view === "carousel" && (
 						<div data-testid="carousel">
 							<Carousel setCategory={setSelectedCategory as any} />
@@ -75,7 +93,12 @@ function App() {
 						</div>
 					)}
 					{view === "edit" && editItem && (
-						<EditItemView item={editItem} mode={editMode} setView={setView} />
+						<EditItemView
+							item={editItem}
+							mode={editMode}
+							setView={setView}
+							onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
+						/>
 					)}
 					<button className="back-button" onClick={() => setView("carousel")}>
 						Back to Carousel
