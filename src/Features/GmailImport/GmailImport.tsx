@@ -10,6 +10,7 @@ import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
+import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "./constants";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -25,6 +26,12 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 	// Find the selected email and ensure it has a body (fetch if needed)
 	const [selectedEmail, setSelectedEmail] = useState<GmailEmail | undefined>(undefined);
 
+	// Clear Gmail email and bodies cache from localStorage
+	const handleClearCache = useCallback(() => {
+		localStorage.removeItem(GMAIL_CACHE_KEY);
+		localStorage.removeItem(GMAIL_CACHE_BODIES_KEY);
+		window.location.reload(); // Reload to reflect cleared cache
+	}, []);
 	useEffect(() => {
 		let isMounted = true;
 		async function loadBody() {
@@ -93,11 +100,7 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 			const emailSubject = selectedEmail?.subject ?? "";
 
 			// Use parseEmailToFormData for brand/category detection from email context
-			const emailData = parseEmailToFormData(
-				emailSubject,
-				product.name,
-				emailFrom,
-			);
+			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
 
 			onImport({
 				...emailData,
@@ -148,6 +151,9 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 					<button className="gmail-logout-btn" onClick={logout} type="button">
 						Disconnect
 					</button>
+					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button" style={{ marginLeft: 8 }}>
+						Clear Email Cache
+					</button>
 				</div>
 			</div>
 
@@ -184,7 +190,11 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
-							<EmailPreview email={selectedEmail} onConfirmImport={handleConfirmImport} onImportProduct={handleImportProduct} />
+							<EmailPreview
+								email={selectedEmail}
+								onConfirmImport={handleConfirmImport}
+								onImportProduct={handleImportProduct}
+							/>
 						</div>
 					)}
 				</div>

@@ -94,11 +94,7 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 
 	return (
 		<div className="advanced-search">
-			<button
-				className="advanced-search-toggle"
-				onClick={() => setIsExpanded((prev) => !prev)}
-				type="button"
-			>
+			<button className="advanced-search-toggle" onClick={() => setIsExpanded((prev) => !prev)} type="button">
 				{isExpanded ? "Hide" : "Show"} Advanced Search
 			</button>
 
@@ -131,11 +127,7 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 								placeholder="Add subject pattern..."
 								className="advanced-search-input"
 							/>
-							<button
-								type="button"
-								className="advanced-search-add-btn"
-								onClick={handleAddSubject}
-							>
+							<button type="button" className="advanced-search-add-btn" onClick={handleAddSubject}>
 								Add
 							</button>
 						</div>
@@ -158,9 +150,7 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 									</button>
 								</span>
 							))}
-							{excludedSenders.length === 0 && (
-								<span className="advanced-search-hint">No senders excluded</span>
-							)}
+							{excludedSenders.length === 0 && <span className="advanced-search-hint">No senders excluded</span>}
 						</div>
 						<div className="advanced-search-input-row">
 							<input
@@ -171,11 +161,7 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 								placeholder="e.g. noreply@uber.com"
 								className="advanced-search-input"
 							/>
-							<button
-								type="button"
-								className="advanced-search-add-btn"
-								onClick={handleAddExcludedSender}
-							>
+							<button type="button" className="advanced-search-add-btn" onClick={handleAddExcludedSender}>
 								Add
 							</button>
 						</div>
@@ -208,11 +194,7 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 								placeholder="Add body keyword..."
 								className="advanced-search-input"
 							/>
-							<button
-								type="button"
-								className="advanced-search-add-btn"
-								onClick={handleAddBodyKeyword}
-							>
+							<button type="button" className="advanced-search-add-btn" onClick={handleAddBodyKeyword}>
 								Add
 							</button>
 						</div>
@@ -250,11 +232,7 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 						</label>
 					</div>
 
-					<button
-						type="submit"
-						className="advanced-search-submit"
-						disabled={loading}
-					>
+					<button type="submit" className="advanced-search-submit" disabled={loading}>
 						{loading ? "Searching..." : "Search with Filters"}
 					</button>
 				</form>

@@ -265,6 +265,19 @@ export function useAdvancedSearch() {
 			setError(null);
 
 			try {
+
+
+///NOT SURE WHICH LOGIC TO USE HERE. SIMPLER TO ALWAYS FETCH IF PARAMS ARE PASSED, OTHERWISE CACHE LOGIC GETS TRICKY (DO WE MERGE NEW API RESULTS WITH CACHE? DO WE REPLACE? DO WE RE-FILTER CACHE WITH NEW PARAMS? ETC). FOR SIMPLICITY, JUST ALWAYS FETCH IF PARAMS ARE PASSED. CAN STILL USE CACHE FOR PAGINATION AND BODY FETCHING.
+				// If params are provided and differ from cache, always force refresh
+				// (simple: always fetch if params are passed)
+				// if (!params && isCacheValid(cache) && !forceRefresh) {
+				// 	const filtered = filterEmails(cache.emails, searchParams);
+				// 	setFilteredEmails(filtered);
+				// 	setHasNextPage(cache.nextPageToken !== null);
+				// 	return;
+				// }
+
+				// Always fetch from API if params are provided (new search)
 				// Use cache if valid and not forcing refresh
 				if (isCacheValid(cache) && !forceRefresh) {
 					const filtered = filterEmails(cache.emails, searchParams);
