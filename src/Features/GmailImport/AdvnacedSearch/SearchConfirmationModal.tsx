@@ -1,5 +1,5 @@
-import type { AdvancedSearchParams } from "./AdvancedSearchUI";
-import type { SearchMode } from "./AdvancedSearchUI";
+import Modal from "../../../components/Modal/Modal";
+import type { AdvancedSearchParams, SearchMode } from "./AdvancedSearchUI";
 import "./SearchConfirmationModal.css";
 
 interface SearchConfirmationModalProps {
@@ -56,42 +56,12 @@ export default function SearchConfirmationModal({
 		params.before.trim() !== "";
 
 	return (
-		<div className="scm-overlay" onClick={onCancel}>
-			<div className="scm-modal" onClick={(e) => e.stopPropagation()}>
-				<h3 className="scm-title">Confirm Search</h3>
-
-				<div className={`scm-mode-badge ${isFetch ? "scm-mode-badge--fetch" : "scm-mode-badge--filter"}`}>
-					{isFetch
-						? "Fetching new emails from Gmail"
-						: `Filtering ${cachedCount} cached email${cachedCount !== 1 ? "s" : ""}`}
-				</div>
-
-				{isFetch && (
-					<p className="scm-mode-hint">
-						Subjects, sender, and date range will be sent to the Gmail API.
-						Body keywords and excluded senders will filter the results locally.
-					</p>
-				)}
-				{!isFetch && (
-					<p className="scm-mode-hint">
-						All filters will be applied to your already-fetched emails. No API calls.
-					</p>
-				)}
-
-				{!hasAnyFilter && <p className="scm-empty">No filters set — all emails will be shown.</p>}
-
-				{hasAnyFilter && (
-					<div className="scm-filters">
-						<FilterSection label="Subjects" items={params.subjects} />
-						<FilterField label="From sender" value={params.from} />
-						<FilterField label="After" value={params.after} />
-						<FilterField label="Before" value={params.before} />
-						<FilterSection label="Body keywords" items={params.bodyKeywords} />
-						<FilterSection label="Excluded senders" items={params.excludedSenders} />
-					</div>
-				)}
-
-				<div className="scm-actions">
+		<Modal
+			isOpen
+			onClose={onCancel}
+			title="Confirm Search"
+			footer={
+				<>
 					<button className="scm-btn scm-btn--confirm" onClick={onConfirm} type="button">
 						{isFetch ? "Fetch & Search" : "Filter Now"}
 					</button>
@@ -101,8 +71,39 @@ export default function SearchConfirmationModal({
 					<button className="scm-btn scm-btn--cancel" onClick={onCancel} type="button">
 						Cancel
 					</button>
-				</div>
+				</>
+			}
+		>
+			<div className={`scm-mode-badge ${isFetch ? "scm-mode-badge--fetch" : "scm-mode-badge--filter"}`}>
+				{isFetch
+					? "Fetching new emails from Gmail"
+					: `Filtering ${cachedCount} cached email${cachedCount !== 1 ? "s" : ""}`}
 			</div>
-		</div>
+
+			{isFetch && (
+				<p className="scm-mode-hint">
+					Subjects, sender, and date range will be sent to the Gmail API.
+					Body keywords and excluded senders will filter the results locally.
+				</p>
+			)}
+			{!isFetch && (
+				<p className="scm-mode-hint">
+					All filters will be applied to your already-fetched emails. No API calls.
+				</p>
+			)}
+
+			{!hasAnyFilter && <p className="scm-empty">No filters set — all emails will be shown.</p>}
+
+			{hasAnyFilter && (
+				<div className="scm-filters">
+					<FilterSection label="Subjects" items={params.subjects} />
+					<FilterField label="From sender" value={params.from} />
+					<FilterField label="After" value={params.after} />
+					<FilterField label="Before" value={params.before} />
+					<FilterSection label="Body keywords" items={params.bodyKeywords} />
+					<FilterSection label="Excluded senders" items={params.excludedSenders} />
+				</div>
+			)}
+		</Modal>
 	);
 }
