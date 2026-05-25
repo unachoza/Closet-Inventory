@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from "react";
 import { useGmailAuth } from "../../hooks/useGmailAuth";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
-import type { ItemFormData } from "../../utils/types";
+import type { ClothingItem } from "../../utils/types";
+import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import type { AdvancedSearchParams } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
 import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
@@ -11,7 +12,7 @@ import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
 
 interface GmailImportProps {
-	onImport: (prefilled: Partial<ItemFormData>) => void;
+	onImport: (prefilled: Partial<ClothingItem>) => void;
 }
 
 export default function GmailImport({ onImport }: GmailImportProps) {
@@ -86,6 +87,32 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 		onImport(prefilled);
 	}, [selectedEmail, onImport]);
 
+	const handleImportProduct = useCallback(
+		(product: ExtractedProduct) => {
+			const emailFrom = selectedEmail?.from ?? "";
+			const emailSubject = selectedEmail?.subject ?? "";
+
+			// Use parseEmailToFormData for brand/category detection from email context
+			const emailData = parseEmailToFormData(
+				emailSubject,
+				product.name,
+				emailFrom,
+			);
+
+			onImport({
+				...emailData,
+				imageURL: product.imageUrl,
+				name: product.name,
+				brand: product.brand || emailData.brand,
+				category: emailData.category,
+				color: product.color,
+				size: product.size,
+				age: "new",
+			});
+		},
+		[selectedEmail, onImport],
+	);
+
 	const handleNextPage = useCallback(() => {
 		if (accessToken) fetchNextPage(accessToken);
 	}, [fetchNextPage, accessToken]);
@@ -156,7 +183,7 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
-							<EmailPreview email={selectedEmail} onConfirmImport={handleConfirmImport} onImportProduct={() => {}} />
+							<EmailPreview email={selectedEmail} onConfirmImport={handleConfirmImport} onImportProduct={handleImportProduct} />
 						</div>
 					)}
 				</div>

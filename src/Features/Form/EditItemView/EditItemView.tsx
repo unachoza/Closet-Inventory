@@ -1,6 +1,7 @@
 import "./EditItemView.css";
-import { ClothingItem, ViewType } from "../../../utils/types";
+import type { ClothingItem, CategoryType, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
+import useStockPhoto from "../../../hooks/useStockPhoto";
 import TextInput from "../TextInput/TextInput";
 import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 
@@ -21,7 +22,7 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const { id, imageURL, onSale, notes, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
-	const { updateItem, addItem } = useLocalStorageCloset();
+	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
@@ -53,20 +54,26 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 		e.preventDefault();
 
 		if (isCreateMode) {
-			addItem({
+			const imageURL = formData.imageURL || useStockPhoto(formData.category as CategoryType);
+			const displayName = formData.name || (formData.brand ? `${formData.brand} ${formData.category}` : formData.category) || "New Item";
+
+			addFullItem({
 				id: item.id || crypto.randomUUID(),
+				imageURL,
+				name: displayName,
 				category: formData.category ?? "",
 				color: formData.color ?? "",
 				size: formData.size ?? "",
 				brand: formData.brand ?? "",
+				price: formData.price ?? "",
 				material: formData.material ?? "",
 				occasion: formData.occasion ?? "",
 				age: formData.age ?? "",
 				care: formData.care ?? "",
-				image: "",
-				imageURL: formData.imageURL,
+				onSale: formData.onSale ?? false,
+				notes: formData.notes ?? "",
 			});
-			showToast(`${formData.name || formData.category} added to your closet!`);
+			showToast(`${displayName} added to your closet!`);
 		} else {
 			updateItem(item.id, formData);
 			showToast(`${formData.name} updated`);
