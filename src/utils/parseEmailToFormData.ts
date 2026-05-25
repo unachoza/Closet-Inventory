@@ -78,17 +78,9 @@ function stripHtml(html: string): string {
 	return doc.body.textContent ?? "";
 }
 
-export function parseEmailToFormData(
-	subject: string,
-	body: string,
-	from: string
-): Partial<ItemFormData> {
+export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
-
-	console.log(body, 'anything?')
-	console.log("Extracted Brand:", extractBrand(combinedText, from));
-	console.log("Extracted Category:", extractCategory(combinedText));	
 
 	return {
 		...formItem,

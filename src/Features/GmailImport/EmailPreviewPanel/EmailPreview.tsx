@@ -1,16 +1,23 @@
+import { useMemo } from "react";
 import type { GmailEmail } from "../../../hooks/useAdvancedSearch";
+import type { ExtractedProduct } from "../../../utils/parseProductsFromEmail";
+import { parseProductsFromEmail } from "../../../utils/parseProductsFromEmail";
+import ProductCardList from "../ProductCard/ProductCard";
 import "./EmailPreviewPanel.css";
 
 interface EmailPreviewProps {
 	email: GmailEmail;
 	onConfirmImport: () => void;
+	onImportProduct: (product: ExtractedProduct) => void;
 }
 
 function createSanitizedHtml(html: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 
-	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) => el.remove());
+	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) =>
+		el.remove()
+	);
 
 	doc.querySelectorAll("a").forEach((anchor) => {
 		anchor.setAttribute("target", "_blank");
@@ -24,8 +31,17 @@ function isHtml(text: string): boolean {
 	return /<[a-z][\s\S]*>/i.test(text);
 }
 
-export default function EmailPreview({ email, onConfirmImport }: EmailPreviewProps) {
+export default function EmailPreview({
+	email,
+	onConfirmImport,
+	onImportProduct,
+}: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
+
+	const extractedProducts = useMemo(
+		() => parseProductsFromEmail(email.body),
+		[email.body]
+	);
 
 	return (
 		<div className="gmail-preview">
@@ -36,6 +52,13 @@ export default function EmailPreview({ email, onConfirmImport }: EmailPreviewPro
 					<span>Date: {email.date}</span>
 				</p>
 			</div>
+
+			{extractedProducts.length > 0 && (
+				<ProductCardList
+					products={extractedProducts}
+					onImportProduct={onImportProduct}
+				/>
+			)}
 
 			<div className="gmail-preview-body">
 				{htmlContent ? (
@@ -51,8 +74,12 @@ export default function EmailPreview({ email, onConfirmImport }: EmailPreviewPro
 			</div>
 
 			<div className="gmail-preview-actions">
-				<button className="gmail-import-btn" onClick={onConfirmImport} type="button">
-					Import to Closet
+				<button
+					className="gmail-import-btn"
+					onClick={onConfirmImport}
+					type="button"
+				>
+					Import Entire Email
 				</button>
 			</div>
 		</div>
