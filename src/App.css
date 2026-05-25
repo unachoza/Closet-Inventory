@@ -23,6 +23,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease;
+  position: fixed;
 }
 
 .back-button:hover {

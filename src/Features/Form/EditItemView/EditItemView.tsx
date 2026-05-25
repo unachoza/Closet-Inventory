@@ -1,6 +1,7 @@
 import "./EditItemView.css";
-import { ClothingItem, ViewType } from "../../../utils/types";
+import type { ClothingItem, CategoryType, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
+import useStockPhoto from "../../../hooks/useStockPhoto";
 import TextInput from "../TextInput/TextInput";
 import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 
@@ -10,16 +11,18 @@ import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
 import close from "../../../assets/close.svg";
 
-interface EditItemViewProps {
+export interface EditItemViewProps {
 	item: ClothingItem;
+	mode?: "edit" | "create";
 	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
 	setView: Dispatch<SetStateAction<ViewType>>;
 }
 
-const EditItemView = ({ item, setView }: EditItemViewProps) => {
+const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
+	const isCreateMode = mode === "create";
 	const { id, imageURL, onSale, notes, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
-	const { updateItem } = useLocalStorageCloset();
+	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
@@ -34,6 +37,8 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 		onSale: item.onSale,
 		notes: item.notes,
 		imageURL: item.imageURL,
+		category: item.category,
+		color: item.color,
 	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -47,13 +52,36 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (updateItem) {
+
+		if (isCreateMode) {
+			const imageURL = formData.imageURL || useStockPhoto(formData.category as CategoryType);
+			const displayName = formData.name || (formData.brand ? `${formData.brand} ${formData.category}` : formData.category) || "New Item";
+
+			addFullItem({
+				id: item.id || crypto.randomUUID(),
+				imageURL,
+				name: displayName,
+				category: formData.category ?? "",
+				color: formData.color ?? "",
+				size: formData.size ?? "",
+				brand: formData.brand ?? "",
+				price: formData.price ?? "",
+				material: formData.material ?? "",
+				occasion: formData.occasion ?? "",
+				age: formData.age ?? "",
+				care: formData.care ?? "",
+				onSale: formData.onSale ?? false,
+				notes: formData.notes ?? "",
+			});
+			showToast(`${displayName} added to your closet!`);
+		} else {
 			updateItem(item.id, formData);
 			showToast(`${formData.name} updated`);
-			setTimeout(() => {
-				setView("carousel");
-			});
 		}
+
+		setTimeout(() => {
+			setView("carousel");
+		});
 	};
 
 	const separateFeilds = () => {
@@ -90,6 +118,7 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 			return null;
 		});
 	};
+
 	if (!item) {
 		return (
 			<div className="edit-form-error">
@@ -99,7 +128,6 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 		);
 	}
 
-	// TODO: fix imageURL
 	return (
 		<div className="edit-form form">
 			<img src={close} className="close-icon" onClick={() => setView("carousel")} alt="close icon" data-testid="close-icon" />
@@ -110,9 +138,22 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h2 className="card-title">{item.name}</h2>
+				<h2 className="card-title">
+					{isCreateMode ? "Import Item" : item.name}
+				</h2>
+
+				{/* Image preview for create mode */}
+				{isCreateMode && formData.imageURL && (
+					<div className="edit-form-image-preview">
+						<img
+							src={formData.imageURL}
+							alt={formData.name ?? "Product"}
+							className="edit-form-preview-img"
+						/>
+					</div>
+				)}
+
 				<div className="form-fields">
-					{/* // TODO: Refactor to remove imageURL field and add image upload functionality, onSale field should be a checkbox, and notes field should be a textarea */}
 					{Object.entries(remaining).map(([key, value]) => (
 						<TextInput
 							key={key}
@@ -125,7 +166,9 @@ const EditItemView = ({ item, setView }: EditItemViewProps) => {
 					))}
 					{separateFeilds()}
 				</div>
-				<button type="submit">Save Changes</button>
+				<button type="submit">
+					{isCreateMode ? "Add to Closet" : "Save Changes"}
+				</button>
 			</motion.form>
 		</div>
 	);

@@ -25,6 +25,14 @@ export function useLocalStorageCloset() {
 		});
 	};
 
+	const addFullItem = (newItem: ClothingItem) => {
+		setCloset((prev: ClothingItem[]) => {
+			const updated = [...prev, newItem];
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			return updated;
+		});
+	};
+
 	const removeItem = (id: string) => {
 		setCloset((prev: ClothingItem[]) => {
 			const updated = prev.filter((item) => item.id !== id);
@@ -72,5 +80,5 @@ export function useLocalStorageCloset() {
 		setCloset([]);
 	};
 
-	return { closet, addItem, removeItem, updateItem, getCloset, clearCloset };
+	return { closet, addItem, addFullItem, removeItem, updateItem, getCloset, clearCloset };
 }
