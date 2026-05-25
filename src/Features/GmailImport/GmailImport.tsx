@@ -104,6 +104,7 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 				imageURL: product.imageUrl,
 				name: product.name,
 				brand: product.brand || emailData.brand,
+				price: product.price,
 				category: emailData.category,
 				color: product.color,
 				size: product.size,
