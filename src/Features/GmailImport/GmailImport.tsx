@@ -2,8 +2,9 @@ import { useState, useCallback, useEffect } from "react";
 import { useGmailAuth } from "../../hooks/useGmailAuth";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
-import type { ItemFormData } from "../../utils/types";
+import type { ClothingItem } from "../../utils/types";
 import type { AdvancedSearchParams } from "./AdvnacedSearch/AdvancedSearchUI";
+import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
 import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
 import EmailList from "./EmailList";
@@ -11,7 +12,7 @@ import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
 
 interface GmailImportProps {
-	onImport: (prefilled: Partial<ItemFormData>) => void;
+	onImport: (prefilled: Partial<ClothingItem>) => void;
 }
 
 export default function GmailImport({ onImport }: GmailImportProps) {
@@ -27,17 +28,25 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 	const {
 		emails,
 		isSearching,
+		isFetchingBody,
 		error: searchError,
 		searchEmails,
 		fetchNextPage,
+		fetchEmailBody,
+		filterCachedEmails,
 		hasNextPage,
+		cacheAge,
 	} = useAdvancedSearch();
 
 	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+	const [selectedEmailBody, setSelectedEmailBody] = useState<string | null>(null);
 
-	const selectedEmail: GmailEmail | undefined = emails.find(
-		(e) => e.id === selectedEmailId
-	);
+	// Build a full GmailEmail when body is loaded
+	const selectedMeta = emails.find((e) => e.id === selectedEmailId);
+	const selectedEmail: GmailEmail | undefined =
+		selectedMeta && selectedEmailBody !== null
+			? { ...selectedMeta, body: selectedEmailBody }
+			: undefined;
 
 	// Auto-search with defaults on first login
 	useEffect(() => {
@@ -46,20 +55,38 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 		}
 	}, [accessToken, isAuthenticated, searchEmails]);
 
+	// Lazy-fetch body when an email is selected
+	useEffect(() => {
+		if (selectedEmailId && accessToken) {
+			setSelectedEmailBody(null);
+			fetchEmailBody(accessToken, selectedEmailId).then((body) => {
+				setSelectedEmailBody(body);
+			});
+		}
+	}, [selectedEmailId, accessToken, fetchEmailBody]);
+
 	const handleAdvancedSearch = useCallback(
 		(params: AdvancedSearchParams) => {
-			if (accessToken) {
-				setSelectedEmailId(null);
-				searchEmails(accessToken, params);
-			}
+			setSelectedEmailId(null);
+			setSelectedEmailBody(null);
+			filterCachedEmails(params);
 		},
-		[accessToken, searchEmails]
+		[filterCachedEmails]
 	);
 
 	const handleDefaultSearch = useCallback(() => {
 		if (accessToken) {
 			setSelectedEmailId(null);
+			setSelectedEmailBody(null);
 			searchEmails(accessToken);
+		}
+	}, [accessToken, searchEmails]);
+
+	const handleForceRefresh = useCallback(() => {
+		if (accessToken) {
+			setSelectedEmailId(null);
+			setSelectedEmailBody(null);
+			searchEmails(accessToken, undefined, true);
 		}
 	}, [accessToken, searchEmails]);
 
@@ -78,11 +105,49 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 		onImport(prefilled);
 	}, [selectedEmail, onImport]);
 
+	const handleImportProduct = useCallback(
+		(product: ExtractedProduct) => {
+			const senderBrand = selectedEmail
+				? parseEmailToFormData(
+						selectedEmail.subject,
+						selectedEmail.body,
+						selectedEmail.from
+					).brand
+				: "";
+
+			onImport({
+				id: crypto.randomUUID(),
+				imageURL: product.imageUrl,
+				name: `${product.brand} ${product.name}`.trim(),
+				category: "",
+				color: product.color.toLowerCase(),
+				size: product.size,
+				brand: product.brand || senderBrand || "",
+				price: product.price,
+				material: "",
+				occasion: "",
+				age: "new",
+				care: "",
+			});
+		},
+		[selectedEmail, onImport]
+	);
+
 	const handleNextPage = useCallback(() => {
-		fetchNextPage();
-	}, [fetchNextPage]);
+		if (accessToken) {
+			fetchNextPage(accessToken);
+		}
+	}, [accessToken, fetchNextPage]);
 
 	const error = authError ?? searchError;
+
+	const cacheAgeLabel = cacheAge !== null
+		? cacheAge < 60_000
+			? "just now"
+			: cacheAge < 3_600_000
+				? `${Math.round(cacheAge / 60_000)}m ago`
+				: `${Math.round(cacheAge / 3_600_000)}h ago`
+		: null;
 
 	if (!isAuthenticated) {
 		return (
@@ -125,6 +190,15 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 								: "Search Emails"}
 					</button>
 					<button
+						className="gmail-search-btn gmail-refresh-btn"
+						onClick={handleForceRefresh}
+						disabled={isSearching}
+						type="button"
+						title="Force refresh from Gmail (bypass cache)"
+					>
+						Refresh
+					</button>
+					<button
 						className="gmail-logout-btn"
 						onClick={logout}
 						type="button"
@@ -133,6 +207,12 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 					</button>
 				</div>
 			</div>
+
+			{cacheAgeLabel && (
+				<p className="gmail-cache-label">
+					Cached {cacheAgeLabel} &middot; {emails.length} email{emails.length !== 1 ? "s" : ""}
+				</p>
+			)}
 
 			<AdvancedSearchUI
 				onSearch={handleAdvancedSearch}
@@ -167,22 +247,30 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 						/>
 						{hasNextPage && (
 							<button
-								className="gmail-search-btn"
+								className="gmail-search-btn gmail-load-more-btn"
 								onClick={handleNextPage}
 								disabled={isSearching}
 								type="button"
-								style={{ marginTop: "var(--spacing-100)", width: "100%" }}
 							>
 								Load More
 							</button>
 						)}
 					</div>
 
+					{selectedEmailId && !selectedEmail && isFetchingBody && (
+						<div className="gmail-preview-panel">
+							<div className="gmail-loading">
+								<p>Loading email content...</p>
+							</div>
+						</div>
+					)}
+
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
 							<EmailPreview
 								email={selectedEmail}
 								onConfirmImport={handleConfirmImport}
+								onImportProduct={handleImportProduct}
 							/>
 						</div>
 					)}

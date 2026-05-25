@@ -14,16 +14,37 @@ function App() {
 	const [view, setView] = useState<ViewType>("carousel");
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
+	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
 	const [prefilledFormData, setPrefilledFormData] = useState<Partial<ItemFormData> | undefined>(undefined);
 
 	const handleEditItem = (item: ClothingItem) => {
 		setEditItem(item);
+		setEditMode("edit");
 		setView("edit");
 	};
 
-	const handleGmailImport = useCallback((prefilled: Partial<ItemFormData>) => {
-		setPrefilledFormData(prefilled);
-		setView("form");
+	const handleGmailImport = useCallback((prefilled: Partial<ClothingItem>) => {
+		// Build a full ClothingItem shape for EditItemView create mode
+		const newItem: ClothingItem = {
+			id: prefilled.id || crypto.randomUUID(),
+			imageURL: prefilled.imageURL ?? "",
+			name: prefilled.name ?? "",
+			category: prefilled.category ?? "",
+			color: prefilled.color ?? "",
+			size: prefilled.size ?? "",
+			brand: prefilled.brand ?? "",
+			price: prefilled.price ?? "",
+			material: prefilled.material ?? "",
+			occasion: prefilled.occasion ?? "",
+			age: prefilled.age ?? "new",
+			care: prefilled.care ?? "",
+			onSale: prefilled.onSale ?? false,
+			notes: prefilled.notes ?? "",
+		};
+
+		setEditItem(newItem);
+		setEditMode("create");
+		setView("edit");
 	}, []);
 
 	const handleAddItem = useCallback(() => {
@@ -53,7 +74,9 @@ function App() {
 							<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
 						</div>
 					)}
-					{view === "edit" && editItem && <EditItemView item={editItem} setView={setView}  />}
+					{view === "edit" && editItem && (
+						<EditItemView item={editItem} mode={editMode} setView={setView} />
+					)}
 					<button className="back-button" onClick={() => setView("carousel")}>
 						Back to Carousel
 					</button>

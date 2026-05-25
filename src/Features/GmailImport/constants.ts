@@ -20,7 +20,7 @@ export const GMAIL_SEARCH_BODY_KEYWORDS = [
 	"Order Subtotal",
 ];
 
-export const GMAIL_SEARCH_DATE_RANGE_DAYS = 90; // Search emails from the last 90 days
+export const GMAIL_SEARCH_DATE_RANGE_DAYS = 120; // Search emails from the last 90 days
 
 export const GMAIL_AUTH_SCOPES = ["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/userinfo.email"];
 
@@ -30,4 +30,8 @@ export const GMAIL_TOKEN_URL = "https://oauth2.googleapis.com/token";
 
 export const GMAIL_API_BASE = "https://www.googleapis.com/gmail/v1/users/me";
 
-export const MAX_EMAIL_RESULTS = 20;
+export const MAX_EMAIL_RESULTS = 50;
+
+export const GMAIL_CACHE_KEY = "gmail_emails_cache";
+export const GMAIL_CACHE_BODIES_KEY = "gmail_email_bodies_cache";
+export const GMAIL_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
