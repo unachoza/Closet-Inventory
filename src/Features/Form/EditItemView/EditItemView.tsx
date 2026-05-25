@@ -16,9 +16,11 @@ export interface EditItemViewProps {
 	mode?: "edit" | "create";
 	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
 	setView: Dispatch<SetStateAction<ViewType>>;
+	/** Return to the Gmail email preview the user imported from */
+	onReturnToEmail?: () => void;
 }
 
-const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
+const EditItemView = ({ item, onReturnToEmail, mode = "edit", setView }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const { id, imageURL, onSale, notes, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
@@ -138,18 +140,18 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h2 className="card-title">
-					{isCreateMode ? "Import Item" : item.name}
-				</h2>
+				<h2 className="card-title">{isCreateMode ? "Import Item" : item.name}</h2>
 
+				{/* Return to email button for create mode */}
+				{isCreateMode && onReturnToEmail && (
+					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
+						&larr; Return to Email Preview
+					</button>
+				)}
 				{/* Image preview for create mode */}
 				{isCreateMode && formData.imageURL && (
 					<div className="edit-form-image-preview">
-						<img
-							src={formData.imageURL}
-							alt={formData.name ?? "Product"}
-							className="edit-form-preview-img"
-						/>
+						<img src={formData.imageURL} alt={formData.name ?? "Product"} className="edit-form-preview-img" />
 					</div>
 				)}
 
@@ -166,9 +168,7 @@ const EditItemView = ({ item, mode = "edit", setView }: EditItemViewProps) => {
 					))}
 					{separateFeilds()}
 				</div>
-				<button type="submit">
-					{isCreateMode ? "Add to Closet" : "Save Changes"}
-				</button>
+				<button type="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
 			</motion.form>
 		</div>
 	);
