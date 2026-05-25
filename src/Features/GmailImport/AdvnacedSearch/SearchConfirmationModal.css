@@ -1,0 +1,152 @@
+.scm-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+}
+
+.scm-modal {
+	width: 90%;
+	max-width: 480px;
+	max-height: 80vh;
+	overflow-y: auto;
+	padding: var(--spacing-300, 1.5rem);
+	border-radius: var(--border-radius-sm);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	background: var(--Dark-Grey, #1a1a1a);
+	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.scm-title {
+	margin: 0 0 var(--spacing-200, 1rem);
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--White, #fff);
+}
+
+/* Mode badge */
+.scm-mode-badge {
+	display: inline-block;
+	padding: 0.3rem 0.8rem;
+	border-radius: var(--border-radius-ty, 4px);
+	font-size: 0.82rem;
+	font-weight: 500;
+	margin-bottom: var(--spacing-100, 0.5rem);
+}
+
+.scm-mode-badge--fetch {
+	background: rgba(37, 99, 235, 0.2);
+	color: #93bbfd;
+	border: 1px solid rgba(37, 99, 235, 0.35);
+}
+
+.scm-mode-badge--filter {
+	background: rgba(16, 185, 129, 0.2);
+	color: #6ee7b7;
+	border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.scm-mode-hint {
+	margin: 0 0 var(--spacing-200, 1rem);
+	font-size: 0.8rem;
+	color: var(--Medium-Grey, #888);
+	line-height: 1.4;
+}
+
+.scm-empty {
+	color: var(--Medium-Grey, #888);
+	font-size: 0.85rem;
+	font-style: italic;
+}
+
+/* Filter summary */
+.scm-filters {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-100, 0.5rem);
+	margin-bottom: var(--spacing-200, 1rem);
+	padding: var(--spacing-100, 0.5rem) var(--spacing-200, 1rem);
+	border-radius: var(--border-radius-ty, 4px);
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.scm-section {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.scm-label {
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--Op-Light-Grey, #aaa);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.scm-value {
+	font-size: 0.85rem;
+	color: var(--White, #fff);
+}
+
+.scm-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.scm-pill {
+	padding: 0.15rem 0.5rem;
+	border-radius: var(--border-radius-ty, 4px);
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--White, #fff);
+	font-size: 0.78rem;
+}
+
+/* Action buttons */
+.scm-actions {
+	display: flex;
+	gap: var(--spacing-100, 0.5rem);
+	justify-content: flex-end;
+	margin-top: var(--spacing-200, 1rem);
+}
+
+.scm-btn {
+	padding: 0.45rem 1rem;
+	border: none;
+	border-radius: var(--border-radius-ty, 4px);
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	margin: 0;
+	transition: filter 0.15s ease;
+}
+
+.scm-btn:hover {
+	filter: brightness(0.85);
+}
+
+.scm-btn--confirm {
+	background: var(--button-backround-blue, #2563eb);
+	color: var(--White, #fff);
+}
+
+.scm-btn--edit {
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--White, #fff);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.scm-btn--cancel {
+	background: transparent;
+	color: var(--Medium-Grey, #888);
+}
+
+.scm-btn--cancel:hover {
+	color: var(--White, #fff);
+}

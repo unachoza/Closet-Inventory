@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { GMAIL_SEARCH_SUBJECTS, GMAIL_SEARCH_BODY_KEYWORDS } from "../constants";
+import SearchConfirmationModal from "./SearchConfirmationModal";
 import "./AdvancedSearch.css";
+
+export type SearchMode = "fetch" | "filter";
 
 export interface AdvancedSearchParams {
 	readonly subjects: readonly string[];
@@ -21,11 +24,12 @@ export const DEFAULT_SEARCH_PARAMS: AdvancedSearchParams = {
 };
 
 interface AdvancedSearchUIProps {
-	onSearch: (params: AdvancedSearchParams) => void;
-	loading: boolean;
+	readonly onSearch: (params: AdvancedSearchParams, mode: SearchMode) => void;
+	readonly loading: boolean;
+	readonly cachedCount: number;
 }
 
-export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUIProps) {
+export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: AdvancedSearchUIProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [from, setFrom] = useState("");
 	const [after, setAfter] = useState("");
@@ -36,6 +40,20 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 	const [bodyKeywords, setBodyKeywords] = useState<string[]>([...GMAIL_SEARCH_BODY_KEYWORDS]);
 	const [subjects, setSubjects] = useState<string[]>([...GMAIL_SEARCH_SUBJECTS]);
 	const [subjectInput, setSubjectInput] = useState("");
+
+	// Confirmation modal state
+	const [pendingMode, setPendingMode] = useState<SearchMode | null>(null);
+
+	const buildParams = useCallback((): AdvancedSearchParams => ({
+		subjects,
+		excludedSenders,
+		bodyKeywords,
+		from,
+		after,
+		before,
+	}), [subjects, excludedSenders, bodyKeywords, from, after, before]);
+
+	// ── Pill add/remove handlers ───────────────────────────
 
 	const handleAddExcludedSender = () => {
 		const trimmed = excludedSenderInput.trim();
@@ -73,18 +91,6 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 		setSubjects((prev) => prev.filter((s) => s !== subject));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		onSearch({
-			subjects,
-			excludedSenders,
-			bodyKeywords,
-			from,
-			after,
-			before,
-		});
-	};
-
 	const handleKeyDown = (e: React.KeyboardEvent, addFn: () => void) => {
 		if (e.key === "Enter") {
 			e.preventDefault();
@@ -92,14 +98,40 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 		}
 	};
 
+	// ── Search flow: button → modal → confirm ──────────────
+
+	const handleRequestSearch = (mode: SearchMode) => {
+		setPendingMode(mode);
+	};
+
+	const handleConfirmSearch = () => {
+		if (pendingMode) {
+			onSearch(buildParams(), pendingMode);
+			setPendingMode(null);
+		}
+	};
+
+	const handleEditFilters = () => {
+		setPendingMode(null);
+		// Keep form open so user can edit
+	};
+
+	const handleCancelModal = () => {
+		setPendingMode(null);
+	};
+
 	return (
 		<div className="advanced-search">
-			<button className="advanced-search-toggle" onClick={() => setIsExpanded((prev) => !prev)} type="button">
+			<button
+				className="advanced-search-toggle"
+				onClick={() => setIsExpanded((prev) => !prev)}
+				type="button"
+			>
 				{isExpanded ? "Hide" : "Show"} Advanced Search
 			</button>
 
 			{isExpanded && (
-				<form className="advanced-search-form" onSubmit={handleSubmit}>
+				<form className="advanced-search-form" onSubmit={(e) => e.preventDefault()}>
 					{/* Subject patterns */}
 					<fieldset className="advanced-search-fieldset">
 						<legend>Subject line patterns</legend>
@@ -117,6 +149,9 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 									</button>
 								</span>
 							))}
+							{subjects.length === 0 && (
+								<span className="advanced-search-hint">No subject filters — all subjects will match</span>
+							)}
 						</div>
 						<div className="advanced-search-input-row">
 							<input
@@ -150,7 +185,9 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 									</button>
 								</span>
 							))}
-							{excludedSenders.length === 0 && <span className="advanced-search-hint">No senders excluded</span>}
+							{excludedSenders.length === 0 && (
+								<span className="advanced-search-hint">No senders excluded</span>
+							)}
 						</div>
 						<div className="advanced-search-input-row">
 							<input
@@ -184,6 +221,9 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 									</button>
 								</span>
 							))}
+							{bodyKeywords.length === 0 && (
+								<span className="advanced-search-hint">No body keyword filters</span>
+							)}
 						</div>
 						<div className="advanced-search-input-row">
 							<input
@@ -232,10 +272,40 @@ export default function AdvancedSearchUI({ onSearch, loading }: AdvancedSearchUI
 						</label>
 					</div>
 
-					<button type="submit" className="advanced-search-submit" disabled={loading}>
-						{loading ? "Searching..." : "Search with Filters"}
-					</button>
+					{/* Two action buttons */}
+					<div className="advanced-search-actions">
+						<button
+							type="button"
+							className="advanced-search-submit advanced-search-submit--fetch"
+							disabled={loading}
+							onClick={() => handleRequestSearch("fetch")}
+						>
+							{loading ? "Searching..." : "New Search"}
+						</button>
+						<button
+							type="button"
+							className="advanced-search-submit advanced-search-submit--filter"
+							disabled={loading || cachedCount === 0}
+							onClick={() => handleRequestSearch("filter")}
+						>
+							{loading
+								? "Filtering..."
+								: `Filter Existing (${cachedCount})`}
+						</button>
+					</div>
 				</form>
+			)}
+
+			{/* Confirmation modal */}
+			{pendingMode !== null && (
+				<SearchConfirmationModal
+					params={buildParams()}
+					mode={pendingMode}
+					cachedCount={cachedCount}
+					onConfirm={handleConfirmSearch}
+					onEdit={handleEditFilters}
+					onCancel={handleCancelModal}
+				/>
 			)}
 		</div>
 	);

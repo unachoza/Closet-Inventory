@@ -4,7 +4,7 @@ import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
-import type { AdvancedSearchParams } from "./AdvnacedSearch/AdvancedSearchUI";
+import type { AdvancedSearchParams, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
 import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
 import EmailList from "./EmailList";
@@ -19,26 +19,35 @@ interface GmailImportProps {
 export default function GmailImport({ onImport }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
 
-	const { emails, isSearching, error: searchError, searchEmails, fetchNextPage, hasNextPage, fetchEmailBody } = useAdvancedSearch();
+	const {
+		emails,
+		isSearching,
+		error: searchError,
+		searchEmails,
+		fetchNextPage,
+		hasNextPage,
+		fetchEmailBody,
+		filterCachedEmails,
+		cachedCount,
+		searchMode,
+	} = useAdvancedSearch();
 
 	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-
-	// Find the selected email and ensure it has a body (fetch if needed)
 	const [selectedEmail, setSelectedEmail] = useState<GmailEmail | undefined>(undefined);
 
 	// Clear Gmail email and bodies cache from localStorage
 	const handleClearCache = useCallback(() => {
 		localStorage.removeItem(GMAIL_CACHE_KEY);
 		localStorage.removeItem(GMAIL_CACHE_BODIES_KEY);
-		window.location.reload(); // Reload to reflect cleared cache
+		window.location.reload();
 	}, []);
+
 	useEffect(() => {
 		let isMounted = true;
 		async function loadBody() {
 			if (selectedEmailId) {
 				const meta = emails.find((e) => e.id === selectedEmailId);
 				if (meta && accessToken) {
-					// If already has body, cast to GmailEmail
 					if (typeof meta.body === "string") {
 						setSelectedEmail(meta as GmailEmail);
 					} else if (typeof meta.body === "undefined" && typeof fetchEmailBody === "function") {
@@ -66,20 +75,23 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 		}
 	}, [accessToken, isAuthenticated, searchEmails]);
 
+	// Advanced search: routes to fetch or filter based on user's choice
 	const handleAdvancedSearch = useCallback(
-		(params: AdvancedSearchParams) => {
-			if (accessToken) {
-				setSelectedEmailId(null);
-				searchEmails(accessToken, params);
+		(params: AdvancedSearchParams, mode: SearchMode) => {
+			setSelectedEmailId(null);
+			if (mode === "fetch" && accessToken) {
+				searchEmails(accessToken, params, true);
+			} else {
+				filterCachedEmails(params);
 			}
 		},
-		[accessToken, searchEmails],
+		[accessToken, searchEmails, filterCachedEmails],
 	);
 
 	const handleDefaultSearch = useCallback(() => {
 		if (accessToken) {
 			setSelectedEmailId(null);
-			searchEmails(accessToken);
+			searchEmails(accessToken, undefined, true);
 		}
 	}, [accessToken, searchEmails]);
 
@@ -99,7 +111,6 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 			const emailFrom = selectedEmail?.from ?? "";
 			const emailSubject = selectedEmail?.subject ?? "";
 
-			// Use parseEmailToFormData for brand/category detection from email context
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
 
 			onImport({
@@ -151,17 +162,38 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 					<button className="gmail-logout-btn" onClick={logout} type="button">
 						Disconnect
 					</button>
-					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button" style={{ marginLeft: 8 }}>
+					<button
+						className="gmail-clear-cache-btn"
+						onClick={handleClearCache}
+						type="button"
+						style={{ marginLeft: 8 }}
+					>
 						Clear Email Cache
 					</button>
 				</div>
 			</div>
 
-			<AdvancedSearchUI onSearch={handleAdvancedSearch} loading={isSearching} />
+			<AdvancedSearchUI onSearch={handleAdvancedSearch} loading={isSearching} cachedCount={cachedCount} />
 
 			{error && <p className="gmail-error">{error}</p>}
 
-			{isSearching && (
+			{/* Search mode indicator */}
+			{isSearching && searchMode && (
+				<div className="gmail-loading">
+					{searchMode === "fetch" ? (
+						<p className="advanced-search-status advanced-search-status--fetch">
+							Fetching new emails from Gmail...
+						</p>
+					) : (
+						<p className="advanced-search-status advanced-search-status--filter">
+							Filtering cached emails...
+						</p>
+					)}
+				</div>
+			)}
+
+			{/* Fallback loading without mode */}
+			{isSearching && !searchMode && (
 				<div className="gmail-loading">
 					<p>Searching your inbox for order confirmations...</p>
 				</div>
@@ -173,6 +205,9 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 						<h3 className="gmail-section-title">
 							Found {emails.length} email
 							{emails.length !== 1 ? "s" : ""}
+							{cachedCount > 0 && emails.length !== cachedCount && (
+								<span className="gmail-cache-hint"> (of {cachedCount} cached)</span>
+							)}
 						</h3>
 						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} />
 						{hasNextPage && (

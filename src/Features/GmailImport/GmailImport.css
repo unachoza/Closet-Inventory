@@ -390,6 +390,11 @@
 	padding: var(--spacing-200);
 	overflow-y: auto;
 	max-height: 540px;
-	/* border: solid 8px rgb(117 219 15 / 80%); */
+}
 
+/* Cache hint next to email count */
+.gmail-cache-hint {
+	font-weight: 400;
+	color: var(--Medium-Grey);
+	font-size: 0.82rem;
 }
