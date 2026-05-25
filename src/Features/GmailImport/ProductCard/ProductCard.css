@@ -12,6 +12,7 @@
 	color: var(--Op-Light-Grey);
 	font-size: 0.9rem;
 	font-weight: 500;
+	color: var(--Focus-Mustard);
 }
 
 .product-card {
@@ -87,7 +88,7 @@
 	padding: 0.35rem 0.8rem;
 	border: none;
 	border-radius: var(--border-radius-ty);
-	background: var(--button-backround-green);
+	background: var(--button-background-blue-grey);
 	color: var(--White);
 	font-size: 0.8rem;
 	font-weight: 500;
