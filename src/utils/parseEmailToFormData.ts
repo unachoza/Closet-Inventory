@@ -26,6 +26,10 @@ const BRAND_PATTERNS: Record<string, string> = {
 	thredup: "thredup",
 	"thred up": "thredup",
 	poshmark: "poshmark",
+	cuup: "cuup",
+	cider: "cider",
+	"princess polly": "princess polly",
+	princesspolly: "princess polly",
 };
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
@@ -53,6 +57,16 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	underwear: "underwear",
 	legging: "active",
 	sports: "active",
+	bodysuit: "body",
+	jumpsuit: "body",
+	skort: "bottoms",
+	balconette: "lingerie",
+	plunge: "lingerie",
+	thong: "underwear",
+	bikini: "lingerie",
+	intimate: "lingerie",
+	boots: "shoes",
+	loafers: "shoes"
 };
 
 function extractBrand(text: string, from: string): string {

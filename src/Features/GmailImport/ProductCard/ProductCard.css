@@ -95,6 +95,11 @@
 	font-size: 0.78rem;
 }
 
+.product-card-sale {
+	color: #ff6b6b;
+	font-weight: 600;
+}
+
 .product-card-import-btn {
 	flex-shrink: 0;
 	padding: 0.35rem 0.8rem;

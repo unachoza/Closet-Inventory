@@ -131,6 +131,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				category: emailData.category,
 				color: product.color,
 				size: product.size,
+				material: product.material,
+				onSale: product.onSale,
 				age: "new",
 			});
 		},
@@ -156,6 +158,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					category: emailData.category,
 					color: product.color,
 					size: product.size,
+					material: product.material,
+					onSale: product.onSale,
 					age: "new",
 				} as Partial<ClothingItem>;
 			});

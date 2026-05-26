@@ -17,9 +17,7 @@ function createSanitizedHtml(html: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 
-	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) =>
-		el.remove()
-	);
+	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) => el.remove());
 
 	doc.querySelectorAll("a").forEach((anchor) => {
 		anchor.setAttribute("target", "_blank");
@@ -56,25 +54,14 @@ async function enrichProductColors(products: readonly ExtractedProduct[]): Promi
 	return enriched;
 }
 
-export default function EmailPreview({
-	email,
-	onConfirmImport,
-	onImportProduct,
-	onImportAllProducts,
-}: EmailPreviewProps) {
+export default function EmailPreview({ email, onConfirmImport, onImportProduct, onImportAllProducts }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
 	// Step 1: synchronous parse
-	const parsedProducts = useMemo(
-		() => parseProductsFromEmail(email.body),
-		[email.body],
-	);
+	const parsedProducts = useMemo(() => parseProductsFromEmail(email.body), [email.body]);
 
 	// DOMParser + sanitization is expensive — only re-run when email body changes
-	const sanitizedBody = useMemo(
-		() => (htmlContent ? createSanitizedHtml(email.body) : ""),
-		[email.body, htmlContent],
-	);
+	const sanitizedBody = useMemo(() => (htmlContent ? createSanitizedHtml(email.body) : ""), [email.body, htmlContent]);
 
 	// Step 2: async color enrichment
 	const [enrichedProducts, setEnrichedProducts] = useState<ExtractedProduct[]>(parsedProducts);
@@ -106,19 +93,12 @@ export default function EmailPreview({
 				</p>
 			</div>
 
-			{extractedProducts.length > 0 && (
+			{enrichedProducts.length > 0 && (
 				<>
-					<ProductCardList
-						products={extractedProducts}
-						onImportProduct={onImportProduct}
-					/>
-					{extractedProducts.length > 1 && onImportAllProducts && (
-						<button
-							className="gmail-import-all-btn"
-							onClick={() => onImportAllProducts(extractedProducts)}
-							type="button"
-						>
-							Import All {extractedProducts.length} Items
+					<ProductCardList products={enrichedProducts} onImportProduct={onImportProduct} />
+					{enrichedProducts.length > 1 && onImportAllProducts && (
+						<button className="gmail-import-all-btn" onClick={() => onImportAllProducts(enrichedProducts)} type="button">
+							Import All {enrichedProducts.length} Items
 						</button>
 					)}
 				</>
@@ -126,21 +106,14 @@ export default function EmailPreview({
 
 			<div className="gmail-preview-body">
 				{htmlContent ? (
-					<div
-						className="gmail-preview-html"
-						dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-					/>
+					<div className="gmail-preview-html" dangerouslySetInnerHTML={{ __html: sanitizedBody }} />
 				) : (
 					<pre className="gmail-preview-text">{email.body}</pre>
 				)}
 			</div>
 
 			<div className="gmail-preview-actions">
-				<button
-					className="gmail-import-btn"
-					onClick={onConfirmImport}
-					type="button"
-				>
+				<button className="gmail-import-btn" onClick={onConfirmImport} type="button">
 					Import Entire Email
 				</button>
 			</div>

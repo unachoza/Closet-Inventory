@@ -54,8 +54,10 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 				<h4 className="product-card-name">{product.name}</h4>
 				<div className="product-card-meta">
 					{product.price && <span className="product-card-price">{product.price}</span>}
+					{product.onSale && <span className="product-card-tag product-card-sale">Sale</span>}
 					{product.size && <span className="product-card-tag">Size: {product.size}</span>}
 					{product.color && <span className="product-card-tag">Color: {product.color}</span>}
+					{product.material && <span className="product-card-tag">Material: {product.material}</span>}
 				</div>
 			</div>
 			<button className="product-card-import-btn" onClick={() => onImport(product)} type="button">
