@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { GmailEmail } from "../../../hooks/useAdvancedSearch";
 import type { ExtractedProduct } from "../../../utils/parseProductsFromEmail";
 import { parseProductsFromEmail } from "../../../utils/parseProductsFromEmail";
+import { detectDominantColor } from "../../../utils/detectColorFromImage";
 import ProductCardList from "../ProductCard/ProductCard";
 import "./EmailPreviewPanel.css";
 
@@ -32,6 +33,29 @@ function isHtml(text: string): boolean {
 	return /<[a-z][\s\S]*>/i.test(text);
 }
 
+/**
+ * For products missing a color, attempt canvas-based dominant color detection.
+ * Returns a new array with colors filled in where possible.
+ * TODO// make sure extracting color from text before checking image"
+ */
+async function enrichProductColors(products: readonly ExtractedProduct[]): Promise<ExtractedProduct[]> {
+	const needsColor = products.some((p) => !p.color && p.imageUrl);
+	if (!needsColor) return [...products];
+
+	const enriched = await Promise.all(
+		products.map(async (product) => {
+			if (product.color || !product.imageUrl) return product;
+
+			const detectedColor = await detectDominantColor(product.imageUrl);
+			if (!detectedColor) return product;
+
+			return { ...product, color: detectedColor };
+		}),
+	);
+
+	return enriched;
+}
+
 export default function EmailPreview({
 	email,
 	onConfirmImport,
@@ -40,7 +64,8 @@ export default function EmailPreview({
 }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
-	const extractedProducts = useMemo(
+	// Step 1: synchronous parse
+	const parsedProducts = useMemo(
 		() => parseProductsFromEmail(email.body),
 		[email.body],
 	);
@@ -50,6 +75,26 @@ export default function EmailPreview({
 		() => (htmlContent ? createSanitizedHtml(email.body) : ""),
 		[email.body, htmlContent],
 	);
+
+	// Step 2: async color enrichment
+	const [enrichedProducts, setEnrichedProducts] = useState<ExtractedProduct[]>(parsedProducts);
+
+	useEffect(() => {
+		let cancelled = false;
+
+		// Start with parsed products immediately (no delay for color detection)
+		setEnrichedProducts(parsedProducts);
+
+		if (parsedProducts.length > 0) {
+			enrichProductColors(parsedProducts).then((result) => {
+				if (!cancelled) setEnrichedProducts(result);
+			});
+		}
+
+		return () => {
+			cancelled = true;
+		};
+	}, [parsedProducts]);
 
 	return (
 		<div className="gmail-preview">
