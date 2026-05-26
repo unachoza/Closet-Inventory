@@ -49,6 +49,48 @@ export interface EditItemViewProps {
 	queueTotal?: number;
 }
 
+
+const EditItemView = ({ item, onReturnToEmail, mode = "edit", setView }: EditItemViewProps) => {
+	const isCreateMode = mode === "create";
+	const { id, imageURL, onSale, notes, ...remaining } = item;
+	const inputsToSeperate = { id, onSale, notes };
+	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
+	const { showToast } = useToast();
+
+	const [formData, setFormData] = useState<Partial<ClothingItem>>({
+		name: item.name,
+		size: item.size,
+		brand: item.brand,
+		material: item.material,
+		occasion: item.occasion,
+		age: item.age,
+		care: item.care,
+		price: item.price,
+		onSale: item.onSale,
+		notes: item.notes,
+		imageURL: item.imageURL,
+		category: item.category,
+		color: item.color,
+	};
+}
+
+export interface EditItemViewProps {
+	item: ClothingItem;
+	mode?: "edit" | "create";
+	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
+	setView: Dispatch<SetStateAction<ViewType>>;
+	/** Return to the Gmail email preview the user imported from */
+	onReturnToEmail?: () => void;
+	/** Skip this item in a batch import queue */
+	onSkipItem?: () => void;
+	/** Called after item is added to closet in batch mode (advances queue) */
+	onItemAdded?: () => void;
+	/** Current position in import queue (1-based) */
+	queuePosition?: number;
+	/** Total items in import queue */
+	queueTotal?: number;
+}
+
 const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
@@ -194,6 +236,12 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					</button>
 				)}
 
+				{/* Return to email button for create mode */}
+				{isCreateMode && onReturnToEmail && (
+					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
+						&larr; Return to Email Preview
+					</button>
+				)}
 				{/* Image preview for create mode */}
 
 				{isCreateMode && formData.imageURL && (

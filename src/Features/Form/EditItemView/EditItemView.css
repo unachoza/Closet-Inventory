@@ -190,6 +190,11 @@ label.animated-checkbox button.checkbox-root {
       color: #b91c1c;
 }
 
+.edit-form-return-btn:hover {
+      background: rgba(0, 0, 0, 0.15);
+}
+
+
 .close-icon {
       position: relative;
       top: 15px;

@@ -119,8 +119,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			const emailFrom = selectedEmail?.from ?? "";
 			const emailSubject = selectedEmail?.subject ?? "";
 
+			// Use parseEmailToFormData for brand/category detection from email context
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
-
 			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,

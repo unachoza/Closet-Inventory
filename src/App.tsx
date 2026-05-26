@@ -35,6 +35,8 @@ function App() {
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
 	const [prefilledFormData, setPrefilledFormData] = useState<Partial<ItemFormData> | undefined>(undefined);
+	// Gmail import state
+	const [gmailSourceEmailId, setGmailSourceEmailId] = useState<string | null>(null);
 
 	// Gmail import state
 	const [gmailSourceEmailId, setGmailSourceEmailId] = useState<string | null>(null);
