@@ -11,7 +11,7 @@ export const formItem = {
 	age: "",
 	purchaseDate: "",
 	care: "",
-	image: "",
+	imageURL: "",
 };
 
 export const stepsLabels: Step[] = [

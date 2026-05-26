@@ -14,9 +14,14 @@ import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "./constants";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
+	onImportAll?: (items: Partial<ClothingItem>[]) => void;
+	/** When returning from EditItemView, re-open this email's preview */
+	initialSelectedEmailId?: string | null;
+	/** Notify parent of which email the user is importing from */
+	onSourceEmailChange?: (emailId: string | null) => void;
 }
 
-export default function GmailImport({ onImport }: GmailImportProps) {
+export default function GmailImport({ onImport, onImportAll, initialSelectedEmailId, onSourceEmailChange }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
 
 	const {
@@ -32,7 +37,9 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 		searchMode,
 	} = useAdvancedSearch();
 
-	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
+	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(initialSelectedEmailId ?? null);
+
+	// Find the selected email and ensure it has a body (fetch if needed)
 	const [selectedEmail, setSelectedEmail] = useState<GmailEmail | undefined>(undefined);
 
 	// Clear Gmail email and bodies cache from localStorage
@@ -102,9 +109,10 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 	const handleConfirmImport = useCallback(() => {
 		if (!selectedEmail) return;
 
+		onSourceEmailChange?.(selectedEmailId);
 		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from);
 		onImport(prefilled);
-	}, [selectedEmail, onImport]);
+	}, [selectedEmail, selectedEmailId, onImport, onSourceEmailChange]);
 
 	const handleImportProduct = useCallback(
 		(product: ExtractedProduct) => {
@@ -113,6 +121,7 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
 
+			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
 				imageURL: product.imageUrl,
@@ -125,7 +134,35 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 				age: "new",
 			});
 		},
-		[selectedEmail, onImport],
+		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
+	);
+
+	const handleImportAllProducts = useCallback(
+		(products: ExtractedProduct[]) => {
+			if (!onImportAll) return;
+			const emailFrom = selectedEmail?.from ?? "";
+			const emailSubject = selectedEmail?.subject ?? "";
+
+			onSourceEmailChange?.(selectedEmailId);
+
+			const items = products.map((product) => {
+				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
+				return {
+					...emailData,
+					imageURL: product.imageUrl,
+					name: product.name,
+					brand: product.brand || emailData.brand,
+					price: product.price,
+					category: emailData.category,
+					color: product.color,
+					size: product.size,
+					age: "new",
+				} as Partial<ClothingItem>;
+			});
+
+			onImportAll(items);
+		},
+		[selectedEmail, selectedEmailId, onImportAll, onSourceEmailChange],
 	);
 
 	const handleNextPage = useCallback(() => {
@@ -229,6 +266,7 @@ export default function GmailImport({ onImport }: GmailImportProps) {
 								email={selectedEmail}
 								onConfirmImport={handleConfirmImport}
 								onImportProduct={handleImportProduct}
+								onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
 							/>
 						</div>
 					)}

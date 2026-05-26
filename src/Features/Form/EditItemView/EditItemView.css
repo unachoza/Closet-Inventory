@@ -1,7 +1,7 @@
 .edit-form {
       position: relative;
       overflow: hidden; /* important for max-height animations */
-      height: 75%;
+      height: 100%;
       max-width: var(--Form-width);
       margin: .2rem auto;
       border: var(--Dark-Grey) .5rem solid;
@@ -109,17 +109,85 @@ label.animated-checkbox button.checkbox-root {
 
 /* Image preview for create mode */
 .edit-form-image-preview {
-	display: flex;
-	justify-content: center;
-	margin-bottom: var(--spacing-200);
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--spacing-200);
 }
 
 .edit-form-preview-img {
-	max-width: 120px;
-	max-height: 120px;
-	border-radius: var(--border-radius-sm);
-	object-fit: cover;
-	border: 2px solid rgba(0, 0, 0, 0.2);
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: var(--border-radius-sm);
+      object-fit: cover;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Queue progress badge */
+.edit-form-queue-progress {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--spacing-100, 0.5rem);
+}
+
+.edit-form-queue-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: var(--border-radius-ty, 4px);
+      background: rgba(37, 99, 235, 0.2);
+      color: #93bbfd;
+      border: 1px solid rgba(37, 99, 235, 0.35);
+      font-size: 0.82rem;
+      font-weight: 500;
+}
+
+/* Return to email button */
+.edit-form-return-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-bottom: var(--spacing-200, 1rem);
+      padding: 0.35rem 0.8rem;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      border-radius: var(--border-radius-ty, 4px);
+      background: rgba(19, 17, 146, 0.291);
+      /* border: solid 1px; */
+      color: #1a1a1a;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      position: absolute;
+}
+
+.edit-form-return-btn:hover {
+      background: rgba(0, 0, 0, 0.15);
+}
+
+/* Action buttons row (Add to Closet + Skip) */
+.edit-form-actions {
+      display: flex;
+      gap: var(--spacing-100, 0.5rem);
+      align-items: center;
+      flex-wrap: wrap;
+}
+
+/* Skip / "Do NOT add" button */
+.edit-form-skip-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      border-radius: var(--border-radius-sm);
+      background: rgba(0, 0, 0, 0.06);
+      color: #1a1a1a;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease;
+}
+
+.edit-form-skip-btn:hover {
+      background: rgba(220, 38, 38, 0.12);
+      border-color: rgba(220, 38, 38, 0.3);
+      color: #b91c1c;
 }
 
 .close-icon {

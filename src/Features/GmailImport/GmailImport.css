@@ -383,6 +383,24 @@
 	filter: brightness(0.8);
 }
 
+.gmail-import-all-btn {
+	width: 100%;
+	padding: 0.6rem 1.5rem;
+	margin-top: var(--spacing-100);
+	border: none;
+	border-radius: var(--border-radius-sm);
+	background: var(--button-backround-blue, #2563eb);
+	color: var(--White);
+	font-size: 0.9rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: filter 0.2s ease;
+}
+
+.gmail-import-all-btn:hover {
+	filter: brightness(0.85);
+}
+
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;

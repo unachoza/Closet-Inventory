@@ -70,6 +70,12 @@ export default function EmailPreview({
 		[email.body],
 	);
 
+	// DOMParser + sanitization is expensive — only re-run when email body changes
+	const sanitizedBody = useMemo(
+		() => (htmlContent ? createSanitizedHtml(email.body) : ""),
+		[email.body, htmlContent],
+	);
+
 	// Step 2: async color enrichment
 	const [enrichedProducts, setEnrichedProducts] = useState<ExtractedProduct[]>(parsedProducts);
 
@@ -100,19 +106,19 @@ export default function EmailPreview({
 				</p>
 			</div>
 
-			{enrichedProducts.length > 0 && (
+			{extractedProducts.length > 0 && (
 				<>
 					<ProductCardList
-						products={enrichedProducts}
+						products={extractedProducts}
 						onImportProduct={onImportProduct}
 					/>
-					{enrichedProducts.length > 1 && onImportAllProducts && (
+					{extractedProducts.length > 1 && onImportAllProducts && (
 						<button
 							className="gmail-import-all-btn"
-							onClick={() => onImportAllProducts(enrichedProducts)}
+							onClick={() => onImportAllProducts(extractedProducts)}
 							type="button"
 						>
-							Import All {enrichedProducts.length} Items
+							Import All {extractedProducts.length} Items
 						</button>
 					)}
 				</>
@@ -122,9 +128,7 @@ export default function EmailPreview({
 				{htmlContent ? (
 					<div
 						className="gmail-preview-html"
-						dangerouslySetInnerHTML={{
-							__html: createSanitizedHtml(email.body),
-						}}
+						dangerouslySetInnerHTML={{ __html: sanitizedBody }}
 					/>
 				) : (
 					<pre className="gmail-preview-text">{email.body}</pre>
