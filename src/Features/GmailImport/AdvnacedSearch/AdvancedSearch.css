@@ -186,6 +186,31 @@
 	border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
+.advanced-search-clear-btn {
+	padding: 0.5rem 1.2rem;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: var(--border-radius-sm);
+	background: transparent;
+	color: var(--Op-Light-Grey);
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	margin: 0;
+	margin-left: auto;
+	transition: all 0.15s ease;
+}
+
+.advanced-search-clear-btn:hover {
+	border-color: #ff6b6b;
+	color: #ff6b6b;
+	background: rgba(220, 38, 38, 0.1);
+}
+
+.advanced-search-clear-btn:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 /* Search status indicator */
 .advanced-search-status {
 	display: inline-flex;

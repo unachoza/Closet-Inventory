@@ -91,6 +91,18 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 		setSubjects((prev) => prev.filter((s) => s !== subject));
 	};
 
+	const handleClearAll = useCallback(() => {
+		setSubjects([]);
+		setBodyKeywords([]);
+		setExcludedSenders([]);
+		setFrom("");
+		setAfter("");
+		setBefore("");
+		setSubjectInput("");
+		setBodyKeywordInput("");
+		setExcludedSenderInput("");
+	}, []);
+
 	const handleKeyDown = (e: React.KeyboardEvent, addFn: () => void) => {
 		if (e.key === "Enter") {
 			e.preventDefault();
@@ -272,7 +284,7 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 						</label>
 					</div>
 
-					{/* Two action buttons */}
+					{/* Action buttons */}
 					<div className="advanced-search-actions">
 						<button
 							type="button"
@@ -291,6 +303,14 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 							{loading
 								? "Filtering..."
 								: `Filter Existing (${cachedCount})`}
+						</button>
+						<button
+							type="button"
+							className="advanced-search-clear-btn"
+							onClick={handleClearAll}
+							disabled={loading}
+						>
+							Clear All Filters
 						</button>
 					</div>
 				</form>
