@@ -4,6 +4,7 @@ import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
 import useStockPhoto from "../../../hooks/useStockPhoto";
 import TextInput from "../TextInput/TextInput";
 import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
+import { formItem } from "../../../utils/constants";
 
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -36,7 +37,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 
-	console.log(queuePosition, item.name, item);
+	console.log({ formItem });
+	console.log(isCreateMode);
+	console.log(queuePosition, item.name, { item });
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
 		name: item.name,
 		size: item.size,
@@ -94,6 +97,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			}
 		} else {
 			updateItem(item.id, formData);
+			setFormData(formItem);
 			showToast(`${formData.name} updated`);
 		}
 
@@ -106,6 +110,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		if (onSkipItem) {
 			showToast("Item skipped");
 			onSkipItem();
+			setFormData(formItem);
 		}
 	};
 
@@ -152,7 +157,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			</div>
 		);
 	}
-
+	{
+		console.log("image", isCreateMode && formData.imageURL);
+	}
 	return (
 		<div className="edit-form form">
 			<img src={close} className="close-icon" onClick={() => setView("carousel")} alt="close icon" data-testid="close-icon" />
@@ -182,6 +189,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				)}
 
 				{/* Image preview for create mode */}
+
 				{isCreateMode && formData.imageURL && (
 					<div className="edit-form-image-preview">
 						<img src={formData.imageURL} alt={formData.name ?? "Product"} className="edit-form-preview-img" />
