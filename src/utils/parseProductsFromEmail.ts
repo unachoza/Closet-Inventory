@@ -509,7 +509,165 @@ function extractFromNestedTables(doc: Document): ExtractedProduct[] {
 }
 
 /**
- * Strategy 4 (Fallback): Find product images and read nearby text.
+ * Parse size/color from lines like "US 4 / DUSTY PINK" or "S / Black".
+ * Returns size and color separately.
+ */
+function parseSizeColorLine(text: string): { size: string; color: string } {
+	// Remove QTY portion if present (e.g. "US 4 / DUSTY PINKQTY: 1")
+	const cleaned = text.replace(/QTY\s*:?\s*\d+/i, "").trim();
+
+	// "US 4 / DUSTY PINK", "S / Black", "XL / Navy"
+	const match = cleaned.match(/^(?:US\s+)?(\S+)\s*\/\s*(.+)$/i);
+	if (match) {
+		return {
+			size: match[1].trim(),
+			color: match[2].trim().toLowerCase(),
+		};
+	}
+	return { size: "", color: "" };
+}
+
+/**
+ * Extract text lines from an element, splitting on <br> tags.
+ * DOMParser's textContent ignores <br>, so we process innerHTML instead.
+ */
+function getTextLines(el: Element): string[] {
+	return el.innerHTML
+		.replace(/<br\s*\/?>/gi, "\n")
+		.replace(/<[^>]*>/g, " ")
+		.replace(/&nbsp;/gi, " ")
+		.replace(/ /g, " ")
+		.split("\n")
+		.map((line) => line.trim().replace(/\s+/g, " "))
+		.filter((line) => line.length > 0);
+}
+
+/**
+ * Strategy 2: Two-cell table rows with paragraph-based details
+ * (Princess Polly, Shopify/Klaviyo DTC brand emails).
+ *
+ * Uses a 2-cell <tr>: one <td> with the product image, another <td>
+ * with <p> elements for product name, size/color, and price.
+ *
+ * Sale price detection: if a <span style="text-decoration:line-through">
+ * is present, the non-strikethrough number is the current sale price.
+ *
+ * If the product image can't be loaded (e.g. CORS), the item is still
+ * detected — the user can add an image later in the EditItemView form.
+ */
+function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seenNames = new Set<string>();
+
+	const allRows = doc.querySelectorAll("tr");
+
+	for (const row of allRows) {
+		const cells = Array.from(row.querySelectorAll(":scope > td"));
+		if (cells.length !== 2) continue;
+
+		// Identify image cell and details cell
+		let imageUrl = "";
+		let imgAlt = "";
+		let detailsCell: Element | null = null;
+
+		for (const cell of cells) {
+			const img = cell.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+				imgAlt = img.getAttribute("alt") ?? "";
+			} else {
+				detailsCell = cell;
+			}
+		}
+
+		if (!detailsCell) continue;
+
+		// This strategy requires <p> elements for product info
+		const paragraphs = Array.from(detailsCell.querySelectorAll("p"));
+		if (paragraphs.length < 2) continue;
+
+		let name = "";
+		let size = "";
+		let color = "";
+		let price = "";
+
+		for (const p of paragraphs) {
+			const lines = getTextLines(p);
+
+			// Check for sale price: <span style="text-decoration:line-through">
+			const strikeSpan = p.querySelector("span[style*='line-through']");
+			if (strikeSpan && !price) {
+				const strikeText = (strikeSpan.textContent ?? "").trim();
+				const fullText = (p.textContent ?? "").trim().replace(/\s+/g, " ");
+				// Remove the strikethrough original price, extract remaining sale price
+				const remaining = fullText.replace(strikeText, "").trim();
+				const priceMatch = remaining.match(/(\d{1,5}(?:\.\d{2})?)/);
+				if (priceMatch) {
+					price = `$${priceMatch[1]}`;
+					continue;
+				}
+			}
+
+			for (const line of lines) {
+				// Skip QTY lines
+				if (/^QTY/i.test(line)) continue;
+
+				// Size/color: "US 4 / DUSTY PINK" or "S / Black"
+				if (!size && line.includes("/")) {
+					const parsed = parseSizeColorLine(line);
+					if (parsed.size) {
+						size = parsed.size;
+						color = parsed.color;
+						continue;
+					}
+				}
+
+				// Regular price (no strikethrough): standalone number like "$71.25" or "71.25"
+				if (!price) {
+					const priceMatch = line.match(/^\$?\s*(\d{1,5}(?:\.\d{2})?)\s*$/);
+					if (priceMatch) {
+						price = `$${priceMatch[1]}`;
+						continue;
+					}
+				}
+
+				// First substantial text is the product name
+				if (!name && line.length > 3) {
+					name = line;
+				}
+			}
+		}
+
+		// Fallback: use image alt text for product name
+		if (!name && imgAlt.length > 3) {
+			name = imgAlt;
+		}
+
+		if (!name) continue;
+
+		// Require at least size or price to confirm this is a product row
+		// (avoids matching generic 2-cell layout rows with just text + image)
+		if (!size && !price) continue;
+
+		if (seenNames.has(name.toLowerCase())) continue;
+		seenNames.add(name.toLowerCase());
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy 5 (Fallback): Find product images and read nearby text.
  * Used when no structured format is detected.
  */
 function extractFromImages(doc: Document): ExtractedProduct[] {
@@ -560,6 +718,39 @@ function extractFromImages(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Extract a brand name suggestion from the email sender field.
+ * Used as a fallback when no brand is detected from the email HTML.
+ *
+ * Prefers the display name (e.g. "Princess Polly" from "Princess Polly <no-reply@...>").
+ * Falls back to the email domain (e.g. "princesspolly" from "no-reply@princesspolly.com").
+ * The user can edit this suggestion in the EditItemView form.
+ */
+export function extractBrandFromSender(from: string): string {
+	if (!from) return "";
+
+	// Try display name: "Princess Polly <noreply@princesspolly.com>" → "Princess Polly"
+	const displayMatch = from.match(/^([^<]+)/);
+	if (displayMatch) {
+		const display = displayMatch[1].trim();
+		// Skip generic/automated sender names
+		if (display && !/^(no-?reply|info|support|orders?|hello|team|mail|notification)/i.test(display)) {
+			return display.toLowerCase();
+		}
+	}
+
+	// Fall back to email domain: "noreply@princesspolly.com" → "princesspolly"
+	const domainMatch = from.match(/@([^.]+)/);
+	if (domainMatch) {
+		const domain = domainMatch[1].toLowerCase();
+		if (!/^(gmail|yahoo|outlook|hotmail|mail|email)/.test(domain)) {
+			return domain;
+		}
+	}
+
+	return "";
+}
+
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	if (!html.trim()) return [];
 
@@ -568,14 +759,19 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 
 	// Strategy order: most-specific first to avoid false positives from layout rows.
 	//
-	// 1. Nested two-cell tables (ThredUp, Poshmark) — very specific: 2-cell <tr>
-	//    with <a> links containing brand + "Size X Name" + "$price"
-	// 2. Table rows with 4+ cells (Aritzia, Nordstrom) — common retailer format
-	// 3. Div-based layouts (Zara) — product image + sequential <div> elements
-	// 4. Image fallback — find product images and read nearby text
+	// 1. Nested two-cell tables (ThredUp, Poshmark) — 2-cell <tr> with <a> links
+	//    containing brand + "Size X Name" + "$price"
+	// 2. Paragraph-based two-cell rows (Princess Polly, Shopify/Klaviyo DTC brands)
+	//    — 2-cell <tr> with <p> elements for name, "US X / COLOR", price
+	// 3. Table rows with 4+ cells (Aritzia, Nordstrom) — common retailer format
+	// 4. Div-based layouts (Zara) — product image + sequential <div> elements
+	// 5. Image fallback — find product images and read nearby text
 
 	const nestedProducts = extractFromNestedTables(doc);
 	if (nestedProducts.length > 0) return nestedProducts;
+
+	const paragraphProducts = extractFromParagraphLayout(doc);
+	if (paragraphProducts.length > 0) return paragraphProducts;
 
 	const tableProducts = extractFromTableRows(doc);
 	if (tableProducts.length > 0) return tableProducts;
