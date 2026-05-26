@@ -39,13 +39,11 @@ export function useLocalStorageCloset() {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
-		console.log("Removed item with id:", id);
-		console.log("Current closet:", closet);
 	};
 
 	const getItem = (id: string): ClothingItem | undefined => {
 		return closet.find((item) => item.id === id);
-	}
+	};
 
 	const updateItem = (id: string, updatedData: Partial<ItemFormData>) => {
 		setCloset((prev: ClothingItem[]) => {
@@ -64,7 +62,7 @@ export function useLocalStorageCloset() {
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
-	}
+	};
 
 	const getCloset = (): ClothingItem[] => {
 		try {

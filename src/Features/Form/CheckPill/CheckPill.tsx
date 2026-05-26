@@ -2,7 +2,7 @@
 
 import * as Checkbox from "@radix-ui/react-checkbox";
 import "./CheckPill.css";
-import { useEffect, useState } from "react";
+import { memo } from "react";
 import { ItemFormData } from "../../../utils/types";
 
 interface CheckPillProps {
@@ -13,23 +13,19 @@ interface CheckPillProps {
 	checked?: boolean;
 }
 
-const CheckPill = ({ id, label, value, checked = false, onToggle }: CheckPillProps) => {
-	const [isChecked, setIsChecked] = useState(checked);
-
-	useEffect(() => {
-		setIsChecked(checked);
-	}, [checked]);
-
-	const handleToggle = () => {
-		setIsChecked((prev) => !prev);
-		onToggle(value, label);
-	};
-
+/** Controlled pill — parent owns the checked state via the `checked` prop.
+ *  No internal state = no sync useEffect = no double-render on toggle. */
+const CheckPill = memo(function CheckPill({ id, label, value, checked = false, onToggle }: CheckPillProps) {
 	return (
-		<Checkbox.Root id={id} className={`pill-box ${isChecked ? "active" : ""}`} checked={isChecked} onCheckedChange={handleToggle}>
+		<Checkbox.Root
+			id={id}
+			className={`pill-box ${checked ? "active" : ""}`}
+			checked={checked}
+			onCheckedChange={() => onToggle(value, label)}
+		>
 			<span className="checkbox-label">{value}</span>
 		</Checkbox.Root>
 	);
-};
+});
 
 export default CheckPill;

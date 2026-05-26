@@ -42,7 +42,13 @@ export default function EmailPreview({
 
 	const extractedProducts = useMemo(
 		() => parseProductsFromEmail(email.body),
-		[email.body]
+		[email.body],
+	);
+
+	// DOMParser + sanitization is expensive — only re-run when email body changes
+	const sanitizedBody = useMemo(
+		() => (htmlContent ? createSanitizedHtml(email.body) : ""),
+		[email.body, htmlContent],
 	);
 
 	return (
@@ -77,9 +83,7 @@ export default function EmailPreview({
 				{htmlContent ? (
 					<div
 						className="gmail-preview-html"
-						dangerouslySetInnerHTML={{
-							__html: createSanitizedHtml(email.body),
-						}}
+						dangerouslySetInnerHTML={{ __html: sanitizedBody }}
 					/>
 				) : (
 					<pre className="gmail-preview-text">{email.body}</pre>

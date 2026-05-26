@@ -39,7 +39,6 @@ const TextPillField = ({
 		}
 	};
 
-	console.log(multiSelect);
 	return (
 		<div className="text-pill-field-container">
 			<label className="label-text">{label}</label>

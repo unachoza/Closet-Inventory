@@ -7,7 +7,7 @@ import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import { formItem } from "../../../utils/constants";
 
 import { normalizeToString } from "../../../utils/normalizeToString";
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
 import close from "../../../assets/close.svg";
@@ -57,23 +57,22 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 
+	// Parent renders <EditItemView key={item.id} ...> so React remounts the
+	// component for each new item, reinitializing useState with fresh data.
+	// No useEffect needed — key-based remount is the React-idiomatic approach.
 	const [formData, setFormData] = useState<Partial<ClothingItem>>(() => buildFormDataFromItem(item));
 
-	// Sync form data when the item prop changes (e.g. batch import queue advances).
-	// The parent also sets key={item.id} to force a remount, but this useEffect
-	// is a safety net in case the component is reused without a key change.
-	useEffect(() => {
-		setFormData(buildFormDataFromItem(item));
-	}, [item.id]);
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	// Stable ref — uses functional update so it never needs formData in deps.
+	// TextInput is wrapped in memo(), so a stable handleChange means only the
+	// TextInput whose value actually changed will re-render (not all 10+).
+	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
-	};
+	}, []);
 
-	const onToggleDetail = (key: string, value: any) => {
+	const onToggleDetail = useCallback((key: string, value: any) => {
 		setFormData((prev) => ({ ...prev, [key]: !value }));
-	};
+	}, []);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -157,9 +156,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			return null;
 		});
 	};
-	{
-		console.log("image", isCreateMode && formData.imageURL);
-	}
+
 	if (!item) {
 		return (
 			<div className="edit-form-error">
