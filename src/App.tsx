@@ -133,7 +133,7 @@ function App() {
 					)}
 					{view === "edit" && editItem && (
 						<EditItemView
-							item={editItem}
+							item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
 							mode={editMode}
 							setView={setView}
 							onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}

@@ -28,16 +28,7 @@ export interface EditItemViewProps {
 	queueTotal?: number;
 }
 
-const EditItemView = ({
-	item,
-	mode = "edit",
-	setView,
-	onReturnToEmail,
-	onSkipItem,
-	onItemAdded,
-	queuePosition,
-	queueTotal,
-}: EditItemViewProps) => {
+const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
 	const { id, imageURL, onSale, notes, ...remaining } = item;
@@ -45,6 +36,7 @@ const EditItemView = ({
 	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 
+	console.log(queuePosition, item.name, item);
 	const [formData, setFormData] = useState<Partial<ClothingItem>>({
 		name: item.name,
 		size: item.size,
@@ -171,9 +163,7 @@ const EditItemView = ({
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h2 className="card-title">
-					{isCreateMode ? "Import Item" : item.name}
-				</h2>
+				<h2 className="card-title">{isCreateMode ? "Import Item" : item.name}</h2>
 
 				{/* Queue progress indicator for batch imports */}
 				{isInBatchMode && (
@@ -186,11 +176,7 @@ const EditItemView = ({
 
 				{/* Return to email button for create mode */}
 				{isCreateMode && onReturnToEmail && (
-					<button
-						className="edit-form-return-btn"
-						onClick={onReturnToEmail}
-						type="button"
-					>
+					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
 						&larr; Return to Email Preview
 					</button>
 				)}
@@ -198,11 +184,7 @@ const EditItemView = ({
 				{/* Image preview for create mode */}
 				{isCreateMode && formData.imageURL && (
 					<div className="edit-form-image-preview">
-						<img
-							src={formData.imageURL}
-							alt={formData.name ?? "Product"}
-							className="edit-form-preview-img"
-						/>
+						<img src={formData.imageURL} alt={formData.name ?? "Product"} className="edit-form-preview-img" />
 					</div>
 				)}
 
@@ -221,15 +203,9 @@ const EditItemView = ({
 				</div>
 
 				<div className="edit-form-actions">
-					<button type="submit">
-						{isCreateMode ? "Add to Closet" : "Save Changes"}
-					</button>
+					<button type="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
 					{isInBatchMode && onSkipItem && (
-						<button
-							className="edit-form-skip-btn"
-							onClick={handleSkip}
-							type="button"
-						>
+						<button className="edit-form-skip-btn" onClick={handleSkip} type="button">
 							Do NOT Add This Item
 						</button>
 					)}
