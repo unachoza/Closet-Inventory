@@ -133,6 +133,7 @@ function App() {
 					)}
 					{view === "edit" && editItem && (
 						<EditItemView
+							key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
 							item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
 							mode={editMode}
 							setView={setView}
