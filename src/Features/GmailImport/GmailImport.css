@@ -401,6 +401,30 @@
 	filter: brightness(0.85);
 }
 
+.gmail-preview-image-notice {
+	padding: var(--spacing-100) var(--spacing-200);
+	border-radius: var(--border-radius-sm);
+	background: rgba(251, 191, 36, 0.12);
+	border: 1px solid rgba(251, 191, 36, 0.3);
+	padding: var(--spacing-100) var(--spacing-200);
+	border-radius: var(--border-radius-sm);
+	background: rgb(251 191 36 / 52%);
+	border: 1px solid rgb(245 204 98);
+}
+
+.gmail-preview-image-notice p {
+	font-size: 1rem;
+	margin: 0;
+	color: var(--Op-Light-Grey);
+	line-height: 1.5;
+	color: white;
+	text-align: center;
+}
+
+.gmail-preview-image-notice strong {
+	color: var(--Focus-Mustard);
+}
+
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;

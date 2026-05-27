@@ -30,6 +30,10 @@ const BRAND_PATTERNS: Record<string, string> = {
 	cider: "cider",
 	"princess polly": "princess polly",
 	princesspolly: "princess polly",
+	temu: "temu",
+	depop: "depop",
+	ebay: "ebay",
+	amazon: "amazon",
 };
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
@@ -66,7 +70,13 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	bikini: "lingerie",
 	intimate: "lingerie",
 	boots: "shoes",
-	loafers: "shoes"
+	loafers: "shoes",
+	slipper: "shoes",
+	sandal: "shoes",
+	sneaker: "shoes",
+	heel: "shoes",
+	flat: "shoes",
+	mule: "shoes",
 };
 
 function extractBrand(text: string, from: string): string {

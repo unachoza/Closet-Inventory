@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import type { GmailEmail } from "../../../hooks/useAdvancedSearch";
 import type { ExtractedProduct } from "../../../utils/parseProductsFromEmail";
-import { parseProductsFromEmail } from "../../../utils/parseProductsFromEmail";
+import { parseProductsFromEmail, detectImageBasedRetailer } from "../../../utils/parseProductsFromEmail";
 import { detectDominantColor } from "../../../utils/detectColorFromImage";
 import ProductCardList from "../ProductCard/ProductCard";
 import "./EmailPreviewPanel.css";
@@ -63,17 +63,22 @@ export default function EmailPreview({ email, onConfirmImport, onImportProduct, 
 	// DOMParser + sanitization is expensive — only re-run when email body changes
 	const sanitizedBody = useMemo(() => (htmlContent ? createSanitizedHtml(email.body) : ""), [email.body, htmlContent]);
 
+	// Always run image-based retailer detection (e.g. Temu renders products as PNGs).
+	// When detected, parsed products are false positives from the image fallback strategy.
+	const imageBasedRetailer = useMemo(() => detectImageBasedRetailer(email.body, email.from), [email.body, email.from]);
+
+	const effectiveProducts = useMemo(() => (imageBasedRetailer ? [] : parsedProducts), [imageBasedRetailer, parsedProducts]);
+
 	// Step 2: async color enrichment
-	const [enrichedProducts, setEnrichedProducts] = useState<ExtractedProduct[]>(parsedProducts);
+	const [enrichedProducts, setEnrichedProducts] = useState<ExtractedProduct[]>(effectiveProducts);
 
 	useEffect(() => {
 		let cancelled = false;
 
-		// Start with parsed products immediately (no delay for color detection)
-		setEnrichedProducts(parsedProducts);
+		setEnrichedProducts(effectiveProducts);
 
-		if (parsedProducts.length > 0) {
-			enrichProductColors(parsedProducts).then((result) => {
+		if (effectiveProducts.length > 0) {
+			enrichProductColors(effectiveProducts).then((result) => {
 				if (!cancelled) setEnrichedProducts(result);
 			});
 		}
@@ -81,7 +86,7 @@ export default function EmailPreview({ email, onConfirmImport, onImportProduct, 
 		return () => {
 			cancelled = true;
 		};
-	}, [parsedProducts]);
+	}, [effectiveProducts]);
 
 	return (
 		<div className="gmail-preview">
@@ -92,6 +97,16 @@ export default function EmailPreview({ email, onConfirmImport, onImportProduct, 
 					<span>Date: {email.date}</span>
 				</p>
 			</div>
+
+			{imageBasedRetailer && (
+				<div className="gmail-preview-image-notice">
+					<p>
+						<strong>{imageBasedRetailer}</strong> renders product details as images, so items can&apos;t be auto-detected. Use{" "}
+						<strong>Import Entire Email</strong> below to start a blank item with the brand pre-filled, then add details
+						manually.
+					</p>
+				</div>
+			)}
 
 			{enrichedProducts.length > 0 && (
 				<>

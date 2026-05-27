@@ -444,9 +444,7 @@ function extractFromNestedTables(doc: Document): ExtractedProduct[] {
 
 		// Extract text from all <a> links in the details cell
 		const links = Array.from(detailsCell.querySelectorAll("a"));
-		const linkTexts = links
-			.map((a) => (a.textContent ?? "").trim())
-			.filter((t) => t.length > 0);
+		const linkTexts = links.map((a) => (a.textContent ?? "").trim()).filter((t) => t.length > 0);
 
 		if (linkTexts.length < 2) continue;
 
@@ -952,8 +950,185 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/** Returns true if text looks like a size value rather than a color name. */
+function looksLikeSize(text: string): boolean {
+	const t = text.trim();
+	// Number or range: "8", "8.5", "8.5-9", "38-40"
+	if (/^\d[\d.\-/]*$/.test(t)) return true;
+	// Letter sizes: "S", "M", "L", "XS", "XL", "XXL", etc.
+	if (/^(XXXS|XXS|XS|XL|XXL|XXXL|S|M|L)$/i.test(t)) return true;
+	if (/^one\s*size$/i.test(t)) return true;
+	return false;
+}
+
 /**
- * Strategy 7: Text-only product rows without images (Express, etc.).
+ * Strategy 6: Order-ID container with 3-column product rows.
+ *
+ * Emails that contain an "Order ID:" / "Order #:" marker and nearby
+ * 3-column <tr> rows: image, product details (name + "size / color"),
+ * and price. This is a common pattern for Chinese marketplace retailers
+ * (e.g. AliExpress, Wish, Shein) and some Shopify stores.
+ *
+ * Guard: requires "Order" marker text AND at least one product image,
+ * so it won't fire on image-based emails (Temu) where products are PNGs.
+ */
+function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
+	// Quick check: does this email contain an order marker?
+	const bodyText = doc.body.textContent ?? "";
+	const hasOrderMarker = /order\s*(id|#|number)\s*:?\s*/i.test(bodyText);
+	if (!hasOrderMarker) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenNames = new Set<string>();
+
+	const allRows = doc.querySelectorAll("tr");
+
+	for (const row of allRows) {
+		const cols = Array.from(row.querySelectorAll(":scope > td"));
+		// Need exactly 3 columns (image, details, price)
+		if (cols.length !== 3) continue;
+
+		// Identify image, details, and price columns
+		let imageUrl = "";
+		let detailsCol: Element | null = null;
+		let priceCol: Element | null = null;
+
+		for (const col of cols) {
+			const img = col.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement) && !imageUrl) {
+				imageUrl = img.getAttribute("src") ?? "";
+				continue;
+			}
+
+			const text = getCellText(col);
+
+			// Price column: contains a dollar amount
+			if (/\$\d/.test(text) && !priceCol) {
+				priceCol = col;
+				continue;
+			}
+
+			// Details column: has substantial text (product name)
+			if (text.length > 5 && !detailsCol) {
+				detailsCol = col;
+			}
+		}
+
+		// Require image + details to confirm product row
+		if (!imageUrl || !detailsCol) continue;
+
+		// Extract product name — prefer bold/styled text
+		const bold = detailsCol.querySelector(
+			"strong, b, span[style*='bold'], p[style*='bold'], [style*='font-weight:700'], [style*='font-weight: 700']",
+		);
+		let name = bold ? (bold.textContent ?? "").trim() : "";
+
+		if (!name) {
+			const lines = getTextLines(detailsCol);
+			name = lines.find((l) => l.length > 3 && !/^[×x]\d|^qty/i.test(l)) ?? "";
+		}
+
+		if (!name || name.length < 3) continue;
+
+		// Extract size/color from "8.5-9 / black" or "Khaki / 8.5-9" patterns
+		let size = "";
+		let color = "";
+		const detailLines = getTextLines(detailsCol);
+
+		for (const line of detailLines) {
+			if (line === name) continue;
+			// Skip quantity lines: "×1", "x1", "qty: 1"
+			if (/^[×x]\d|^qty/i.test(line)) continue;
+
+			// "size / color" or "color / size" pattern
+			if (line.includes("/") && !size && !color) {
+				const parts = line.split("/").map((p) => p.trim());
+				if (parts.length === 2 && parts[0].length > 0 && parts[1].length > 0) {
+					for (const part of parts) {
+						if (looksLikeSize(part) && !size) {
+							size = part;
+						} else if (!color) {
+							color = part.toLowerCase();
+						}
+					}
+					continue;
+				}
+			}
+
+			// Labeled fields: "Color: Black", "Size: M"
+			const colorMatch = line.match(/^Color\s*:?\s*(.+)/i);
+			if (colorMatch && !color) {
+				color = colorMatch[1].trim().toLowerCase();
+				continue;
+			}
+			const sizeMatch = line.match(/^Size\s*:?\s*(.+)/i);
+			if (sizeMatch && !size) {
+				size = sizeMatch[1].trim();
+				continue;
+			}
+		}
+
+		// Extract price
+		let price = "";
+		let onSale = false;
+		if (priceCol) {
+			const strikeEl = priceCol.querySelector("[style*='line-through'], s, strike, del");
+			if (strikeEl) onSale = true;
+
+			const allPrices = extractPrices(priceCol.textContent ?? "");
+			if (allPrices.length > 0) {
+				price = allPrices[allPrices.length - 1];
+				if (allPrices.length >= 2) {
+					const first = parseFloat(allPrices[0].replace("$", ""));
+					const last = parseFloat(price.replace("$", ""));
+					if (last < first) onSale = true;
+				}
+			}
+		}
+
+		if (seenNames.has(name.toLowerCase())) continue;
+		seenNames.add(name.toLowerCase());
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Detect emails where the product list is rendered as a server-side image
+ * rather than structured HTML. Temu is the primary example — they bake
+ * all product details into a single PNG to prevent scraping.
+ *
+ * Returns the retailer name (e.g. "Temu") or empty string if not detected.
+ */
+export function detectImageBasedRetailer(html: string, from: string): string {
+	const lowerHtml = html.toLowerCase();
+	const lowerFrom = from.toLowerCase();
+
+	const hasTemu = lowerFrom.includes("temu") || lowerHtml.includes("temu.com");
+	const hasKwcdn = lowerHtml.includes("kwcdn.com");
+	const hasTemuFile = lowerHtml.includes("pfs-u.file.temu.com");
+
+	if (hasTemu || hasKwcdn || hasTemuFile) {
+		return "Temu";
+	}
+
+	return "";
+}
+
+/**
+ * Strategy 8: Text-only product rows without images (Express, etc.).
  *
  * Some retailers use simple table rows with just product name, quantity,
  * and price — no images, no color/size fields. Each product is often
@@ -1128,26 +1303,232 @@ export function extractBrandFromSender(from: string): string {
 	return "";
 }
 
+/**
+ * Pre-processing: remove DOM content after order total markers.
+ *
+ * Many emails (especially Amazon) include "recommended" or "continue shopping"
+ * product sections AFTER the order summary. These get falsely detected as
+ * purchased items. Cutting the DOM at the first "Grand Total" / "Order Total" /
+ * "Subtotal" marker prevents strategies from seeing that content.
+ */
+function removePostTotalContent(doc: Document): void {
+	const strongPattern = /\b(grand\s*total|order\s*total)\b/i;
+	const weakPattern = /\bsub\s*total\b/i;
+
+	const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+
+	while (walker.nextNode()) {
+		const text = walker.currentNode.textContent ?? "";
+
+		let isTotal = false;
+
+		if (strongPattern.test(text)) {
+			isTotal = true;
+		} else if (weakPattern.test(text)) {
+			// "Subtotal" often appears as a column header (Aritzia uses
+			// <td>subtotal</td> in its header row). Only treat it as an
+			// end-of-order marker when the containing row also has a
+			// dollar amount — real summary rows pair the label with a price.
+			const row = walker.currentNode.parentElement?.closest("tr");
+			const rowText = row ? (row.textContent ?? "") : "";
+			if (/\$\d/.test(rowText)) {
+				isTotal = true;
+			}
+		}
+
+		if (!isTotal) continue;
+
+		// Skip <th> / <thead> column headers
+		let inHeader = false;
+		let check: Element | null = walker.currentNode.parentElement;
+		while (check) {
+			if (check.tagName === "TH" || check.tagName === "THEAD") {
+				inHeader = true;
+				break;
+			}
+			if (check.tagName === "TR" || check.tagName === "TABLE") break;
+			check = check.parentElement;
+		}
+		if (inHeader) continue;
+
+		// Remove all content that follows this text node in document order
+		let el: Element | null = walker.currentNode.parentElement;
+		while (el && el !== doc.body) {
+			while (el.nextSibling) {
+				el.nextSibling.remove();
+			}
+			el = el.parentElement;
+		}
+		return;
+	}
+}
+
+/**
+ * Parse Amazon's `<sup>$</sup>14<sup>99</sup>` price format into "$14.99".
+ * Falls back to standard $XX.XX regex if no <sup> pattern found.
+ */
+function parseAmazonSupPrice(container: Element): string {
+	const sups = container.querySelectorAll("sup");
+	for (const sup of sups) {
+		if ((sup.textContent ?? "").trim() !== "$") continue;
+
+		const parent = sup.parentElement;
+		if (!parent) continue;
+
+		const children = Array.from(parent.childNodes);
+		const supIndex = children.indexOf(sup);
+
+		let dollars = "";
+		let cents = "00";
+
+		for (let i = supIndex + 1; i < children.length; i++) {
+			const node = children[i];
+			if (node.nodeType === Node.TEXT_NODE) {
+				const t = (node.textContent ?? "").trim();
+				if (/^\d+$/.test(t) && !dollars) {
+					dollars = t;
+				}
+			} else if (node.nodeType === Node.ELEMENT_NODE && (node as Element).tagName === "SUP") {
+				const t = (node.textContent ?? "").trim();
+				if (/^\d{1,2}$/.test(t)) {
+					cents = t;
+				}
+				break;
+			}
+		}
+
+		if (dollars) {
+			return `$${dollars}.${cents}`;
+		}
+	}
+
+	const prices = extractPrices(container.textContent ?? "");
+	return prices.length > 0 ? prices[prices.length - 1] : "";
+}
+
+/**
+ * Strategy: Amazon MJML column layout.
+ *
+ * Amazon emails use MJML-generated inline-block <div> columns:
+ * - `mj-column-per-25` contains the product image (`img.productImage`)
+ * - `mj-column-per-75` contains name (<a> tag) and price (<sup> format)
+ *
+ * Guard: requires at least one `img.productImage` or `td.productImageTd`
+ * to avoid false positives on non-Amazon emails.
+ */
+function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = doc.querySelectorAll("img.productImage, td.productImageTd img");
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenNames = new Set<string>();
+
+	for (const img of productImgs) {
+		if (!isProductImage(img as HTMLImageElement)) continue;
+		const imageUrl = img.getAttribute("src") ?? "";
+
+		// Walk up to find the mj-column container div
+		let columnDiv: Element | null = img as Element;
+		while (columnDiv && columnDiv !== doc.body) {
+			const cls = columnDiv.getAttribute("class") ?? "";
+			if (cls.includes("mj-column")) break;
+			columnDiv = columnDiv.parentElement;
+		}
+
+		let detailsContainer: Element | null = null;
+
+		if (columnDiv && (columnDiv.getAttribute("class") ?? "").includes("mj-column")) {
+			// MJML layout: find sibling mj-column div with product details
+			const parent = columnDiv.parentElement;
+			if (parent) {
+				for (const child of Array.from(parent.children)) {
+					if (child === columnDiv) continue;
+					const cls = child.getAttribute("class") ?? "";
+					if (cls.includes("mj-column") && (child.textContent ?? "").trim().length > 5) {
+						detailsContainer = child;
+						break;
+					}
+				}
+			}
+		}
+
+		if (!detailsContainer) {
+			// Fallback: table cell layout — find sibling <td> with text
+			const td = (img as Element).closest("td");
+			if (td) {
+				const row = td.closest("tr");
+				if (row) {
+					const cells = Array.from(row.querySelectorAll(":scope > td"));
+					for (const cell of cells) {
+						if (cell === td) continue;
+						if ((cell.textContent ?? "").trim().length > 10) {
+							detailsContainer = cell;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		if (!detailsContainer) continue;
+
+		// Extract product name from <a> tag
+		let name = "";
+		const links = detailsContainer.querySelectorAll("a");
+		for (const link of links) {
+			const linkText = (link.textContent ?? "").trim();
+			if (linkText.length > 5 && !linkText.startsWith("$")) {
+				name = linkText;
+				break;
+			}
+		}
+
+		if (!name || name.length < 3) continue;
+
+		const price = parseAmazonSupPrice(detailsContainer);
+
+		if (seenNames.has(name.toLowerCase())) continue;
+		seenNames.add(name.toLowerCase());
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color: "",
+			size: "",
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	if (!html.trim()) return [];
 
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 
-	// Strategy order: most-specific first to avoid false positives from layout rows.
+	// Pre-process: strip content after order total markers so suggested/
+	// recommended product sections don't produce false positive detections.
+	////////TODO maybe rethink this
+	removePostTotalContent(doc);
+
+	// Strategy order: most-specific first to avoid false positives.
 	//
-	// 1. Nested two-cell tables (ThredUp, Poshmark) — 2-cell <tr> with <a> links
-	//    containing brand + "Size X Name" + "$price"
-	// 2. Labeled-field <th> layout (CUUP, Demandware) — <th> children + bold span
-	//    + "Color:"/"Size:"/"Price:" text fields
-	// 3. React Email sections (Cider) — data-id="react-email-section" + labeled
-	//    Color/Size spans + strikethrough sale detection
-	// 4. Paragraph-based two-cell rows (Princess Polly, Shopify/Klaviyo DTC brands)
-	//    — 2-cell <tr> with <p> elements for name, "US X / COLOR", price
-	// 5. Table rows with 4+ cells (Aritzia, Nordstrom) — common retailer format
-	// 6. Div-based layouts (Zara) — product image + sequential <div> elements
-	// 7. Text-only product rows (Express) — no images, name + qty + price cells
-	// 8. Image fallback — find product images and read nearby text
+	//  1. Nested two-cell tables (ThredUp) — "Size X Name" link pattern
+	//  2. Labeled-field <th> layout (CUUP) — bold span + Color:/Size:/Price:
+	//  3. React Email sections (Cider) — data-id="react-email-section"
+	//  4. Amazon MJML columns — img.productImage + mj-column divs
+	//  5. Paragraph-based two-cell rows (Princess Polly) — <p> elements
+	//  6. Table rows with 4+ cells (Aritzia, Nordstrom)
+	//  7. Order-ID container 3-column rows (AliExpress, Wish)
+	//  8. Div-based layouts (Zara)
+	//  9. Text-only product rows (Express) — no images, ≥2 matches
+	// 10. Image fallback
 
 	const nestedProducts = extractFromNestedTables(doc);
 	if (nestedProducts.length > 0) return nestedProducts;
@@ -1158,11 +1539,17 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	const reactEmailProducts = extractFromReactEmailLayout(doc);
 	if (reactEmailProducts.length > 0) return reactEmailProducts;
 
+	const amazonProducts = extractFromAmazonLayout(doc);
+	if (amazonProducts.length > 0) return amazonProducts;
+
 	const paragraphProducts = extractFromParagraphLayout(doc);
 	if (paragraphProducts.length > 0) return paragraphProducts;
 
 	const tableProducts = extractFromTableRows(doc);
 	if (tableProducts.length > 0) return tableProducts;
+
+	const orderContainerProducts = extractFromOrderContainerRows(doc);
+	if (orderContainerProducts.length > 0) return orderContainerProducts;
 
 	const divProducts = extractFromDivLayout(doc);
 	if (divProducts.length > 0) return divProducts;
