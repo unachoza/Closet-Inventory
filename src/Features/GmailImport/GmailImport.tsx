@@ -203,12 +203,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					<button className="gmail-logout-btn" onClick={logout} type="button">
 						Disconnect
 					</button>
-					<button
-						className="gmail-clear-cache-btn"
-						onClick={handleClearCache}
-						type="button"
-						style={{ marginLeft: 8 }}
-					>
+					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button" style={{ marginLeft: 8 }}>
 						Clear Email Cache
 					</button>
 				</div>
@@ -222,13 +217,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			{isSearching && searchMode && (
 				<div className="gmail-loading">
 					{searchMode === "fetch" ? (
-						<p className="advanced-search-status advanced-search-status--fetch">
-							Fetching new emails from Gmail...
-						</p>
+						<p className="advanced-search-status advanced-search-status--fetch">Fetching new emails from Gmail...</p>
 					) : (
-						<p className="advanced-search-status advanced-search-status--filter">
-							Filtering cached emails...
-						</p>
+						<p className="advanced-search-status advanced-search-status--filter">Filtering cached emails...</p>
 					)}
 				</div>
 			)}
@@ -274,6 +265,14 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 							/>
 						</div>
 					)}
+				</div>
+			)}
+			{!isSearching && emails.length < 1 && (
+				<div className="gmail-empty">
+					<p>No order confirmation emails found.</p>
+					<p className="gmail-empty-hint">
+						Try checking if your purchase confirmations use different subject lines or adjusting your search dates.
+					</p>
 				</div>
 			)}
 		</div>
