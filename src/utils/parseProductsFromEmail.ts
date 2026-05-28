@@ -52,6 +52,16 @@ const SKIP_IMG_PATTERNS = [
 	"rating",
 ];
 
+/**
+ * Select direct child elements by tag name.
+ * Replaces `el.querySelectorAll(":scope > TAG")` which is unreliable
+ * in some DOM implementations (notably jsdom used by Vitest).
+ */
+function directChildren(parent: Element, tag: string): Element[] {
+	const upper = tag.toUpperCase();
+	return Array.from(parent.children).filter((c) => c.tagName === upper);
+}
+
 function isProductImage(img: HTMLImageElement): boolean {
 	const src = img.getAttribute("src") ?? "";
 	if (!src || src.startsWith("data:")) return false;
@@ -144,7 +154,7 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 	const seenItems = new Set<string>();
 
 	for (const row of allRows) {
-		const cells = Array.from(row.querySelectorAll(":scope > td"));
+		const cells = directChildren(row, "td");
 		if (cells.length < 4) continue;
 
 		// Find a cell with a product image
@@ -421,7 +431,7 @@ function extractFromNestedTables(doc: Document): ExtractedProduct[] {
 	const allRows = doc.querySelectorAll("tr");
 
 	for (const row of allRows) {
-		const cells = Array.from(row.querySelectorAll(":scope > td"));
+		const cells = directChildren(row, "td");
 		// Target rows with exactly 2 cells (image + details)
 		if (cells.length !== 2) continue;
 
@@ -566,7 +576,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 	const allRows = doc.querySelectorAll("tr");
 
 	for (const row of allRows) {
-		const cells = Array.from(row.querySelectorAll(":scope > td"));
+		const cells = directChildren(row, "td");
 		if (cells.length !== 2) continue;
 
 		// Identify image cell and details cell
@@ -692,7 +702,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 	const allRows = doc.querySelectorAll("tr");
 
 	for (const row of allRows) {
-		const ths = Array.from(row.querySelectorAll(":scope > th"));
+		const ths = directChildren(row, "th");
 		if (ths.length !== 2) continue;
 
 		// Identify image th and details th
@@ -831,7 +841,7 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 		const rows = section.querySelectorAll("tr");
 
 		for (const row of rows) {
-			const cols = Array.from(row.querySelectorAll(":scope > td"));
+			const cols = directChildren(row, "td");
 			if (cols.length < 3) continue;
 
 			// Column 1: product image
@@ -984,7 +994,7 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 	const allRows = doc.querySelectorAll("tr");
 
 	for (const row of allRows) {
-		const cols = Array.from(row.querySelectorAll(":scope > td"));
+		const cols = directChildren(row, "td");
 		// Need exactly 3 columns (image, details, price)
 		if (cols.length !== 3) continue;
 
@@ -1147,7 +1157,7 @@ function extractFromTextOnlyRows(doc: Document): ExtractedProduct[] {
 	const allRows = doc.querySelectorAll("tr");
 
 	for (const row of allRows) {
-		const cells = Array.from(row.querySelectorAll(":scope > td"));
+		const cells = directChildren(row, "td");
 		if (cells.length < 3) continue;
 
 		// Skip rows that have product images (handled by other strategies)
@@ -1458,7 +1468,7 @@ function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
 			if (td) {
 				const row = td.closest("tr");
 				if (row) {
-					const cells = Array.from(row.querySelectorAll(":scope > td"));
+					const cells = directChildren(row, "td");
 					for (const cell of cells) {
 						if (cell === td) continue;
 						if ((cell.textContent ?? "").trim().length > 10) {
@@ -1514,7 +1524,6 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 
 	// Pre-process: strip content after order total markers so suggested/
 	// recommended product sections don't produce false positive detections.
-	////////TODO maybe rethink this
 	removePostTotalContent(doc);
 
 	// Strategy order: most-specific first to avoid false positives.

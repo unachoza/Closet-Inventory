@@ -1,4 +1,4 @@
-import Modal from "../../../components/Modal/Modal";
+import Modal from "../../../Components/Modal/Modal";
 import type { AdvancedSearchParams, SearchMode } from "./AdvancedSearchUI";
 import "./SearchConfirmationModal.css";
 
@@ -37,14 +37,7 @@ function FilterField({ label, value }: { readonly label: string; readonly value:
 	);
 }
 
-export default function SearchConfirmationModal({
-	params,
-	mode,
-	cachedCount,
-	onConfirm,
-	onEdit,
-	onCancel,
-}: SearchConfirmationModalProps) {
+export default function SearchConfirmationModal({ params, mode, cachedCount, onConfirm, onEdit, onCancel }: SearchConfirmationModalProps) {
 	const isFetch = mode === "fetch";
 
 	const hasAnyFilter =
@@ -75,22 +68,16 @@ export default function SearchConfirmationModal({
 			}
 		>
 			<div className={`scm-mode-badge ${isFetch ? "scm-mode-badge--fetch" : "scm-mode-badge--filter"}`}>
-				{isFetch
-					? "Fetching new emails from Gmail"
-					: `Filtering ${cachedCount} cached email${cachedCount !== 1 ? "s" : ""}`}
+				{isFetch ? "Fetching new emails from Gmail" : `Filtering ${cachedCount} cached email${cachedCount !== 1 ? "s" : ""}`}
 			</div>
 
 			{isFetch && (
 				<p className="scm-mode-hint">
-					Subjects, sender, and date range will be sent to the Gmail API.
-					Body keywords and excluded senders will filter the results locally.
+					Subjects, sender, and date range will be sent to the Gmail API. Body keywords and excluded senders will filter the
+					results locally.
 				</p>
 			)}
-			{!isFetch && (
-				<p className="scm-mode-hint">
-					All filters will be applied to your already-fetched emails. No API calls.
-				</p>
-			)}
+			{!isFetch && <p className="scm-mode-hint">All filters will be applied to your already-fetched emails. No API calls.</p>}
 
 			{!hasAnyFilter && <p className="scm-empty">No filters set — all emails will be shown.</p>}
 
