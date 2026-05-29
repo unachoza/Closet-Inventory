@@ -188,11 +188,11 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				)}
 
 				{/* Return to email button for create mode */}
-				{isCreateMode && onReturnToEmail && (
+				{/* {isCreateMode && onReturnToEmail && (
 					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
 						&larr; Return to Email Preview
 					</button>
-				)}
+				)} */}
 
 				{/* Return to email button for create mode */}
 				{isCreateMode && onReturnToEmail && (

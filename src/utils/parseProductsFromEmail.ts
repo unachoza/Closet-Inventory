@@ -22,6 +22,8 @@ export interface ExtractedProduct {
 }
 
 const PRICE_REGEX = /\$\d{1,5}(?:\.\d{2})?/g;
+// "29.99 USD" / "69.90 EUR" — numeric amount followed by currency code (no $ prefix)
+const CURRENCY_CODE_PRICE_REGEX = /(\d{1,5}\.\d{2})\s*(?:&nbsp;)?\s*(USD|EUR|GBP|CAD|AUD)/gi;
 const ITEM_NUMBER_REGEX = /item\s*(?:no|number|#)\s*:?\s*(\d+)/i;
 
 // Images smaller than this are spacers/tracking pixels
@@ -76,7 +78,13 @@ function isProductImage(img: HTMLImageElement): boolean {
 }
 
 function extractPrices(text: string): string[] {
-	return Array.from(text.matchAll(PRICE_REGEX)).map((m) => m[0]);
+	// First try $-prefixed prices
+	const dollarPrices = Array.from(text.matchAll(PRICE_REGEX)).map((m) => m[0]);
+	if (dollarPrices.length > 0) return dollarPrices;
+
+	// Fall back to "29.99 USD" / "69.90 EUR" format
+	const codePrices = Array.from(text.matchAll(CURRENCY_CODE_PRICE_REGEX)).map((m) => `$${m[1]}`);
+	return codePrices;
 }
 
 function getSalePrice(td: Element): string {
@@ -168,16 +176,30 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 		const imageUrl = img.getAttribute("src") ?? "";
 
 		// Find the name/description cell — it's typically the widest text cell
-		// or the one with the most content after the image
+		// or the one with the most content after the image.
+		// Some retailers (Zara) put the image AND product name in the same <td>,
+		// so also consider imgCell when it has substantial text.
+		const imgCellText = getCellText(imgCell);
 		const textCells = cells.filter((td) => {
 			const text = getCellText(td);
 			return text.length > 10 && td !== imgCell;
 		});
 
-		if (textCells.length === 0) continue;
-
-		// The name cell is usually the one with the most text content
-		const nameCell = textCells.reduce((best, td) => (getCellText(td).length > getCellText(best).length ? td : best));
+		// When imgCell itself has substantial text (image + name in same cell),
+		// prefer it as the name source over other cells (which may be SKU/reference).
+		// Detect SKU-like strings (e.g. "0/4331/014/600/04") so they aren't mistaken for names.
+		const looksLikeSku = (t: string) => /^\d[\d/\-]+$/.test(t.trim());
+		const imgTextLooksLikeName = imgCellText.length > 5 && !looksLikeSku(imgCellText);
+		const textCellsAreSkus = textCells.length > 0 && textCells.every((td) => looksLikeSku(getCellText(td)));
+		let nameCell: Element;
+		if (imgTextLooksLikeName && (textCells.length === 0 || textCellsAreSkus)) {
+			nameCell = imgCell;
+		} else if (textCells.length > 0) {
+			// The name cell is usually the one with the most text content
+			nameCell = textCells.reduce((best, td) => (getCellText(td).length > getCellText(best).length ? td : best));
+		} else {
+			continue;
+		}
 
 		const { brand, name, itemNumber } = parseNameCell(nameCell);
 
