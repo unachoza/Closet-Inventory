@@ -1,7 +1,8 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
 
 export type ClothingItem = {
-	id: string | number;
+	//TODO: change back id to string or number?
+	id: string;
 	imageURL: string;
 	name: string;
 	category: string;
@@ -15,6 +16,7 @@ export type ClothingItem = {
 	care: string | string[];
 	onSale?: boolean;
 	notes?: string | string[];
+	[key: string]: any;
 };
 
 export interface ItemFormData {
@@ -28,13 +30,13 @@ export interface ItemFormData {
 	occasion: string;
 	age: string;
 	purchaseDate?: string;
-	care: string;
+	care: string | string[];
 	image: string;
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
-export type ViewType = "carousel" | "form" | "overview" | "more";
+export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric"
 
 export interface Option {
 	value: string;
@@ -56,6 +58,7 @@ export interface InputProps {
 	value: string | number;
 	errorMessage?: string;
 	placeholder: string;
+	onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
 	handleFormUpdate: SetStateAction<string | any>;
 	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
@@ -63,4 +66,3 @@ export interface InputProps {
 export interface CarouselProps {
 	setCategory: Dispatch<SetStateAction<CategoryType>>;
 }
-

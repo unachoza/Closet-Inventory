@@ -270,6 +270,13 @@ npm install
 npm run dev
 
 ## 🗺️ Roadmap
+- v1 - Currently Working on 
+
+Edit Item and adding details view
+Visual Cohesion
+Navigation / User Journey
+Material Percentages
+
 - v1.1 – Enhanced Filtering & Sorting
 
  Filter by category, color, brand, material, occasion
@@ -282,6 +289,7 @@ npm run dev
  "Pack a Bag" travel mode for trip planning
  Outfit builder (inspired by Clueless)
  Weather-based outfit suggestions
+ Closet Analytics
 
 - v1.3 – User Experience
 

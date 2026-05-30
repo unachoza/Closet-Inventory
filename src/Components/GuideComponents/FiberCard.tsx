@@ -1,5 +1,5 @@
 import "../../Features/FabricCare/TextileGuide.css";
-import { Fiber, FiberCategory } from "../../utils/Content/Fabric&Fiber";
+import { Fiber, FiberCategory } from "../../Content/Fabric&Fiber";
 
 function PropBar({ label, value, color }: { label: string; value: number; color: string }) {
 	return (

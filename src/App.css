@@ -8,26 +8,32 @@
   --button-backround-blue-hover:#1d4ed8;
   --button-backround-green: #808000;
   --button-backround-green-hover: #676702;
-
+  --button-background-blue-grey: #1f44a8d0;
 }
 /**** COMPONENTS ****/
+
+.button-container{
+  display: flex;
+  justify-content: center;
+}
 
 /* Button */
 .back-button {
   padding: 0.6rem 1.5rem;
   border-radius: var(--border-radius-sm);
-  background: var(--button-backround-green);
+  background: var(--button-background-blue-grey);
   color: var(--White);
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease;
+  position: fixed;
 }
 
 .back-button:hover {
-  filter: brightness(.8);
 
   transform: translateY(-1px);
+  filter: brightness(.8);
 }
 
 .back-button:active {
