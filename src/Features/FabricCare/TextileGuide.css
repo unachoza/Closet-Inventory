@@ -37,7 +37,7 @@
 }
 
 body {
-      background: var(--cream);
+      /* background: var(--cream); */
       color: var(--ink);
       font-family: 'DM Sans', sans-serif;
       font-size: 16px;
@@ -68,8 +68,9 @@ body {
 }
 
 .hero-inner {
-      max-width: 960px;
-      margin: 0 auto;
+      max-width: 900px;
+      /* margin: 0 auto; */
+      padding: 0 1.2rem;
       position: relative;
 }
 
@@ -136,7 +137,7 @@ body {
 }
 
 .toc-inner {
-      max-width: 960px;
+      /* max-width: 960px; */
       margin: 0 auto;
       padding: 0 48px;
       display: flex;
@@ -154,6 +155,7 @@ button.toc-link{
       border: none;
       border-bottom: solid 3px;
       border-bottom-color: var(--gold) solid 3px;
+      border-radius: 0;
       /* background-color: none; */
 }
 
@@ -185,8 +187,26 @@ button.toc-link:hover{
 .toc-link.active {
       color: var(--gold);
       border-bottom-color: var(--gold);
+      outline: none;
 }
 
+button.toc-link.active:focus  button.toc-link.active:focus-visible{
+      outline: none;
+}
+
+button:focus .toc-link{
+      outline: none;
+}
+button:focus-visible .toc-link {
+      outline: none;
+}
+
+button:focus .toc-link.active{
+      outline: none;
+}
+button:focus-visible .toc-link.active {
+      outline: none;
+}
 .toc-dot {
       width: 8px;
       height: 8px;
@@ -196,7 +216,7 @@ button.toc-link:hover{
 
 /* ── LAYOUT ── */
 .container {
-      max-width: 960px;
+      /* max-width: 960px; */
       margin: 0 auto;
       padding: 0 48px;
       background: color-mix(in srgb, var(--warm-white) 70%, transparent);
@@ -560,6 +580,8 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
       background-color: red;
       transform: none;
       translate: none;
+      border-radius: 0;
+
 
 }
 .weave-tabs {
@@ -582,6 +604,7 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s;
+      border-radius: 0;
 }
 
 .weave-tab:hover{
