@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, Search, Filter, Spool, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import SearchBar from "../../Features/SearchCloset/SearchBar/SearchBar";
 import "./NavBar.css";
 
 const NavBar = () => {
@@ -14,14 +15,15 @@ const NavBar = () => {
 			</div>
 
 			<div className="search-container">
-				<Search size={18} className="search-icon" />
+				<SearchBar />
+				{/* <Search size={18} className="search-icon" />
 				<input
 					type="text"
 					placeholder="Search items, brands, colors..."
 					className="search-input"
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-				/>
+				/> */}
 			</div>
 
 			<div className="nav-actions">
