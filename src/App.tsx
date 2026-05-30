@@ -1,14 +1,15 @@
 import { useState, useCallback } from "react";
 import { EditProvider } from "./Features/Form/EditContext";
-import Carousel from "./Features/Carousel/Carousel";
-import MultiStepForm from "./Features/Form/Form";
 import Header from "./Components/Header";
+import { ToastProvider } from "./Components/Toast/Toast";
+import EditItemView from "./Features/Form/EditItemView/EditItemView";
+import MultiStepForm from "./Features/Form/Form";
+import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
+import { Menu, Search, Filter, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
-import { ToastProvider } from "./Components/Toast/Toast";
 import "./App.css";
-import EditItemView from "./Features/Form/EditItemView/EditItemView";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -106,9 +107,16 @@ function App() {
 				<ToastProvider>
 					<Header />
 					<div className="button-container">
-						<button onClick={handleAddItem}>Add Item</button>
-						<button onClick={() => setView("overview")}>View All Items</button>
-						<button onClick={() => setView("gmail")}>Import from Gmail</button>
+						<button onClick={handleAddItem}>
+							<Plus size={16} />
+							Add Item</button>
+						<button onClick={() => setView("overview")}>
+							<LayoutGrid size={16} />
+							View Closet
+						</button>
+						<button onClick={() => setView("gmail")}>
+							<Download size={16} />
+							Import from Gmail</button>
 					</div>
 					{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
 					{view === "gmail" && (

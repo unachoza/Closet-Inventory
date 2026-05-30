@@ -4,7 +4,7 @@ import {
 	detectImageBasedRetailer,
 	extractBrandFromSender,
 	type ExtractedProduct,
-} from "./parseProductsFromEmail";
+} from "../parseProductsFromEmail";
 
 // ---------------------------------------------------------------------------
 // Helpers
