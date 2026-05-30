@@ -23,9 +23,11 @@
       --mauve: #8B5A7A;
       --mauve-pale: #F6EFF4;
       --border: rgba(28, 26, 23, 0.10);
+      --border-radius: .75rem;
       --border-strong: rgba(28, 26, 23, 0.20);
       --shadow: 0 2px 20px rgba(28, 26, 23, 0.06);
       --shadow-lg: 0 8px 40px rgba(28, 26, 23, 0.10);
+
 }
 
 * {
@@ -123,6 +125,7 @@ body {
 }
 
 /* ── NAV ── */
+/* ── Table of Contents ── */
 .toc-nav {
       background: var(--warm-white);
       border-bottom: 1px solid var(--border);
@@ -405,7 +408,7 @@ button.toc-link:hover{
 .care-card {
       background: var(--warm-white);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--border-radius);
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -532,6 +535,15 @@ button.toc-link:hover{
 }
 
 /* ── WEAVE SECTION ── */
+#weaves > div > div.weave-tabs.toc-nav > button.weave-tab.active
+#weaves > div > div.weave-tabs.toc-nav > button:nth-child(1)
+
+div.weave-tabs.toc-nav > button.weave-tab:hover{
+      background-color: red;
+      transform: none;
+      translate: none;
+
+}
 .weave-tabs {
       display: flex;
       gap: 4px;
@@ -570,12 +582,21 @@ button.toc-link:hover{
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       align-items: start;
+      background: color-mix(in srgb, var(--warm-white) 70%, transparent);;
+      border-radius: var(--border-radius);
+      margin: 1rem;
 }
 
 .weave-diagram {
       background: var(--cream);
-      border-radius: 12px;
+      border-radius: var(--border-radius);
       overflow: hidden;
+}
+
+.weave-info {
+      background-color: rgb(250, 247, 242);
+      border-radius: var(--border-radius);
+      background: var(--cream);
 }
 
 .weave-info h3 {
@@ -719,7 +740,7 @@ tbody td:first-child {
 .source-card {
       background: var(--warm-white);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--border-radius);
       padding: 18px 20px;
       text-decoration: none;
       display: block;
@@ -749,6 +770,12 @@ tbody td:first-child {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+}
+
+/* ── SECTIONS  ── */
+.section-header {
+      background-color: #B8860BB3;
+      border: solid black 1px;
 }
 
 /* ── CATEGORY BANNERS ── */
@@ -838,7 +865,7 @@ tbody td:first-child {
 }
 
 .photo-item {
-      border-radius: 12px;
+      border-radius: var(--border-radius);
       overflow: hidden;
       aspect-ratio: 4/3;
       background: var(--cream);

@@ -233,7 +233,7 @@ const TextileGuildInteractive = () => {
 						</p>
 					</div>
 
-					<div className="weave-tabs">
+					<div className="weave-tabs toc-nav">
 						{WEAVE_TYPES.map((w) => (
 							<button
 								key={w.id}
