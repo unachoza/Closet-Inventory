@@ -384,7 +384,7 @@ const TextileGuildInteractive = () => {
 						// TODO FIX THIS REPEATING FRAGMENT KEY WARNING
 						<React.Fragment key={group.title}>
 							{gi > 0 && <div className="divider" />}
-							<div style={{ marginBottom: 40 }}>
+							<div className="care-section-header">
 								<h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, marginBottom: 6 }}>
 									{group.title}
 								</h3>

@@ -51,6 +51,7 @@ body {
       padding: 80px 48px 64px;
       position: relative;
       overflow: hidden;
+      text-align: left;
 }
 
 .hero::before {
@@ -149,9 +150,9 @@ body {
 }
 
 button.toc-link{
-      border: none;
       background-color: transparent;
-      box-shadow: none;
+      border: none;
+      border-bottom: solid 3px;
       border-bottom-color: var(--gold) solid 3px;
       /* background-color: none; */
 }
@@ -198,6 +199,8 @@ button.toc-link:hover{
       max-width: 960px;
       margin: 0 auto;
       padding: 0 48px;
+      background: color-mix(in srgb, var(--warm-white) 70%, transparent);
+
 }
 
 /* ── SECTION TITLES ── */
@@ -238,6 +241,10 @@ button.toc-link:hover{
       color: var(--ink-60);
       max-width: 640px;
       line-height: 1.7;
+}
+
+.section-header ~ .cat-banner {
+      text-align: left;
 }
 
 /* ── FIBER CARDS ── */
@@ -398,11 +405,22 @@ button.toc-link:hover{
 }
 
 /* ── CARE CARDS ── */
+.divider ~ div {
+      text-align: left;
+}
+
 .care-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 16px;
       margin: 24px 0;
+}
+
+.care-section-header{
+      background: color-mix(in srgb, var(--warm-white) 70%, transparent);
+      margin-bottom: 2rem;
+      /* margin: 2rem; */
+      padding: 2rem;
 }
 
 .care-card {
@@ -564,8 +582,13 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s;
-      margin-bottom: -1px;
 }
+
+.weave-tab:hover{
+      transform: none;
+      translate: none;
+}
+
 
 .weave-tab.active {
       color: var(--ink);
@@ -582,20 +605,27 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       align-items: start;
-      background: color-mix(in srgb, var(--warm-white) 70%, transparent);;
-      border-radius: var(--border-radius);
+      background: color-mix(in srgb, var(--warm-white) 70%, transparent);
+      /* border-radius: var(--border-radius); */
+      padding: 2rem;
       margin: 1rem;
 }
 
 .weave-diagram {
       background: var(--cream);
-      border-radius: var(--border-radius);
+      /* border-radius: var(--border-radius); */
       overflow: hidden;
+}
+/* #weaves > div > div.weave-content > div.weave-diagram > svg */
+.weave-diagram > svg {
+      border-radius: none;
+      padding: 1.5rem;
 }
 
 .weave-info {
       background-color: rgb(250, 247, 242);
-      border-radius: var(--border-radius);
+      /* border-radius: var(--border-radius); */
+      padding: 1.5rem;
       background: var(--cream);
 }
 
@@ -678,6 +708,11 @@ table {
 thead {
       background: var(--ink);
       color: var(--cream);
+}
+
+.compare-table-wrap tbody {
+      /* background-color: var(--cream); */
+      background: color-mix(in srgb, var(--warm-white) 70%, transparent);
 }
 
 thead th {
@@ -774,15 +809,23 @@ tbody td:first-child {
 
 /* ── SECTIONS  ── */
 .section-header {
-      background-color: #B8860BB3;
+      /* background-color: #B8860BB3; */
+      background: color-mix(in srgb, var(--warm-white) 70%, transparent);
       border: solid black 1px;
+      /* border-radius: var(--border-radius); */
+      padding: var(--spacing-900) var(--spacing-600);
+      text-align: left;
+}
+
+.section-header ~ div {
+      text-align: left;
 }
 
 /* ── CATEGORY BANNERS ── */
 .cat-banner {
       padding: 40px 48px;
       margin: 0 0 48px;
-      border-radius: 20px;
+      /* border-radius: 20px; */
 }
 
 .cat-banner-natural {
