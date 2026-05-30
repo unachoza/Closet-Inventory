@@ -7,7 +7,8 @@ import MultiStepForm from "./Features/Form/Form";
 import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
-import { Menu, Search, Filter, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
+import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
+import { Menu, Search, Filter, Spool, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
 import "./App.css";
 
@@ -102,6 +103,7 @@ function App() {
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
+		// <TextileGuildInteractive/>
 		<div className="main">
 			<EditProvider>
 				<ToastProvider>
@@ -109,14 +111,20 @@ function App() {
 					<div className="button-container">
 						<button onClick={handleAddItem}>
 							<Plus size={16} />
-							Add Item</button>
+							Add Item
+						</button>
 						<button onClick={() => setView("overview")}>
 							<LayoutGrid size={16} />
 							View Closet
 						</button>
 						<button onClick={() => setView("gmail")}>
 							<Download size={16} />
-							Import from Gmail</button>
+							Import from Gmail
+						</button>
+						<button onClick={() => setView("fabric")}>
+							<Spool size={16} />
+							Fabric Guide{" "}
+						</button>
 					</div>
 					{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
 					{view === "gmail" && (
@@ -127,6 +135,7 @@ function App() {
 							onSourceEmailChange={handleSourceEmailChange}
 						/>
 					)}
+					{view === "fabric" && <InteractiveGuide />}
 					{view === "carousel" && (
 						<div data-testid="carousel">
 							<Carousel setCategory={setSelectedCategory as any} />
