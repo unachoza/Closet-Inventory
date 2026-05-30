@@ -11,7 +11,7 @@ export const formItem = {
 	age: "",
 	purchaseDate: "",
 	care: "",
-	image: "",
+	imageURL: "",
 };
 
 export const stepsLabels: Step[] = [
@@ -76,6 +76,9 @@ export const carouselCategories = [
 	{ label: "Lingerie", icon: "🎀" },
 	{ label: "Socks", icon: "🧦" },
 	{ label: "Underwear", icon: "🩲" },
+	{ label: "body", icon: "🕴️" },
+	{ label: "Shoes", icon: "👠" },
+	{ label: "Sleep", icon: "😴" },
 ];
 
 export const categoryOptions: Option[] = [

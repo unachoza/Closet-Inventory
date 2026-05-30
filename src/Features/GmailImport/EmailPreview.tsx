@@ -9,9 +9,7 @@ function createSanitizedHtml(html: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 
-	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) =>
-		el.remove()
-	);
+	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) => el.remove());
 
 	doc.querySelectorAll("a").forEach((anchor) => {
 		anchor.setAttribute("target", "_blank");
@@ -25,10 +23,7 @@ function isHtml(text: string): boolean {
 	return /<[a-z][\s\S]*>/i.test(text);
 }
 
-export default function EmailPreview({
-	email,
-	onConfirmImport,
-}: EmailPreviewProps) {
+export default function EmailPreview({ email, onConfirmImport }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
 	return (
@@ -55,11 +50,7 @@ export default function EmailPreview({
 			</div>
 
 			<div className="gmail-preview-actions">
-				<button
-					className="gmail-import-btn"
-					onClick={onConfirmImport}
-					type="button"
-				>
+				<button className="gmail-import-btn" onClick={onConfirmImport} type="button">
 					Import to Closet
 				</button>
 			</div>

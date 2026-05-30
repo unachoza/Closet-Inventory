@@ -13,6 +13,9 @@ lots of form inputs re renders use memo for performance
 Resize Observer
 https://medium.com/@chamaraS/resizeobserver-for-react-developers-a91df3608944
 
+Temu anti email scrapping pattern 
+Because the product data is baked into an image (not HTML elements), no DOM parser can extract individual items from this email format. This is a deliberate anti-scraping pattern Temu uses.
+
 //CSS organization
 positional formatting first,
 followed by layout parameters,

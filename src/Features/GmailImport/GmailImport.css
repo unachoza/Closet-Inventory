@@ -383,6 +383,48 @@
 	filter: brightness(0.8);
 }
 
+.gmail-import-all-btn {
+	width: 100%;
+	padding: 0.6rem 1.5rem;
+	margin-top: var(--spacing-100);
+	border: none;
+	border-radius: var(--border-radius-sm);
+	background: var(--button-backround-blue, #2563eb);
+	color: var(--White);
+	font-size: 0.9rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: filter 0.2s ease;
+}
+
+.gmail-import-all-btn:hover {
+	filter: brightness(0.85);
+}
+
+.gmail-preview-image-notice {
+	padding: var(--spacing-100) var(--spacing-200);
+	border-radius: var(--border-radius-sm);
+	background: rgba(251, 191, 36, 0.12);
+	border: 1px solid rgba(251, 191, 36, 0.3);
+	padding: var(--spacing-100) var(--spacing-200);
+	border-radius: var(--border-radius-sm);
+	background: rgb(251 191 36 / 52%);
+	border: 1px solid rgb(245 204 98);
+}
+
+.gmail-preview-image-notice p {
+	font-size: 1rem;
+	margin: 0;
+	color: var(--Op-Light-Grey);
+	line-height: 1.5;
+	color: white;
+	text-align: center;
+}
+
+.gmail-preview-image-notice strong {
+	color: var(--Focus-Mustard);
+}
+
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;
@@ -390,6 +432,11 @@
 	padding: var(--spacing-200);
 	overflow-y: auto;
 	max-height: 540px;
-	/* border: solid 8px rgb(117 219 15 / 80%); */
+}
 
+/* Cache hint next to email count */
+.gmail-cache-hint {
+	font-weight: 400;
+	color: var(--Medium-Grey);
+	font-size: 0.82rem;
 }

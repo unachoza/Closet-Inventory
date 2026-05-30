@@ -23,6 +23,17 @@ const BRAND_PATTERNS: Record<string, string> = {
 	shein: "shein",
 	"free people": "free people",
 	reformation: "reformation",
+	thredup: "thredup",
+	"thred up": "thredup",
+	poshmark: "poshmark",
+	cuup: "cuup",
+	cider: "cider",
+	"princess polly": "princess polly",
+	princesspolly: "princess polly",
+	temu: "temu",
+	depop: "depop",
+	ebay: "ebay",
+	amazon: "amazon",
 };
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
@@ -50,6 +61,22 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	underwear: "underwear",
 	legging: "active",
 	sports: "active",
+	bodysuit: "body",
+	jumpsuit: "body",
+	skort: "bottoms",
+	balconette: "lingerie",
+	plunge: "lingerie",
+	thong: "underwear",
+	bikini: "lingerie",
+	intimate: "lingerie",
+	boots: "shoes",
+	loafers: "shoes",
+	slipper: "shoes",
+	sandal: "shoes",
+	sneaker: "shoes",
+	heel: "shoes",
+	flat: "shoes",
+	mule: "shoes",
 };
 
 function extractBrand(text: string, from: string): string {

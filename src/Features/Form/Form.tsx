@@ -103,7 +103,6 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 			setView("overview");
 		}, 0);
 	};
-	console.log({ formData });
 	return (
 		<div className="form" data-testid="multistep-form">
 			<motion.form

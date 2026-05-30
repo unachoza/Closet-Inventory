@@ -44,6 +44,18 @@
 	object-fit: cover;
 }
 
+.product-card-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.05);
+}
+
+.product-card-placeholder svg {
+	width: 36px;
+	height: 36px;
+}
+
 .product-card-details {
 	flex: 1;
 	min-width: 0;
@@ -81,6 +93,11 @@
 .product-card-tag {
 	color: var(--Op-Light-Grey);
 	font-size: 0.78rem;
+}
+
+.product-card-sale {
+	color: #ff6b6b;
+	font-weight: 600;
 }
 
 .product-card-import-btn {
