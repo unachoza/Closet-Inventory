@@ -120,7 +120,7 @@ function App() {
 							<Download size={16} />
 							Import from Gmail
 						</button>
-						<button onClick={() => setView("gmail")}>
+						<button onClick={() => setView("fabric")}>
 							<Spool size={16} />
 							Fabric Guide{" "}
 						</button>

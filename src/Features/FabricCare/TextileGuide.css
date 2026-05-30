@@ -145,6 +145,20 @@ body {
       display: none;
 }
 
+button.toc-link{
+      border: none;
+      background-color: transparent;
+      box-shadow: none;
+      border-bottom-color: var(--gold) solid 3px;
+      /* background-color: none; */
+}
+
+button.toc-link:hover{
+      transition: none;
+      transform: none;
+}
+
+
 .toc-link {
       padding: 14px 20px;
       font-size: 13px;
