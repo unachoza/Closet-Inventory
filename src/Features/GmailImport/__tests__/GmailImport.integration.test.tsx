@@ -11,12 +11,12 @@
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useState, useCallback } from "react";
-import GmailImport from "./GmailImport";
-import EditItemView from "../Form/EditItemView/EditItemView";
-import { EditProvider } from "../Form/EditContext";
-import { ToastProvider } from "../../Components/Toast/Toast";
-import type { ClothingItem, ViewType } from "../../utils/types";
-import { ZARA_EMAIL_BODY } from "./__tests__/__mocks__/emailDataMocks";
+import GmailImport from "../GmailImport";
+import EditItemView from "../../Form/EditItemView/EditItemView";
+import { EditProvider } from "../../Form/EditContext";
+import { ToastProvider } from "../../../Components/Toast/Toast";
+import type { ClothingItem, ViewType } from "../../../utils/types";
+import { ZARA_EMAIL_BODY } from "./__mocks__/emailDataMocks";
 
 const ZARA_EMAIL = {
 	id: "zara-001",
@@ -39,7 +39,7 @@ const mockFetchNextPage = vi.fn();
 const mockLogin = vi.fn();
 const mockLogout = vi.fn();
 
-vi.mock("../../hooks/useGmailAuth", () => ({
+vi.mock("../../../hooks/useGmailAuth", () => ({
 	useGmailAuth: () => ({
 		accessToken: "mock-token",
 		isAuthenticated: true,
@@ -50,7 +50,7 @@ vi.mock("../../hooks/useGmailAuth", () => ({
 	}),
 }));
 
-vi.mock("../../hooks/useAdvancedSearch", () => ({
+vi.mock("../../../hooks/useAdvancedSearch", () => ({
 	useAdvancedSearch: () => ({
 		emails: [ZARA_EMAIL],
 		isSearching: false,
@@ -70,7 +70,7 @@ const mockUpdateItem = vi.fn();
 const mockAddItem = vi.fn();
 const mockAddFullItem = vi.fn();
 
-vi.mock("../../hooks/useLocalCloset", () => ({
+vi.mock("../../../hooks/useLocalCloset", () => ({
 	useLocalStorageCloset: () => ({
 		updateItem: mockUpdateItem,
 		addItem: mockAddItem,

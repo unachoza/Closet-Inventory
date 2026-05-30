@@ -12,11 +12,16 @@
 }
 /**** COMPONENTS ****/
 
+.button-container{
+  display: flex;
+  justify-content: center;
+}
+
 /* Button */
 .back-button {
   padding: 0.6rem 1.5rem;
   border-radius: var(--border-radius-sm);
-  background: var(--background-grey-blue);
+  background: var(--button-background-blue-grey);
   color: var(--White);
   font-size: 1rem;
   font-weight: 500;

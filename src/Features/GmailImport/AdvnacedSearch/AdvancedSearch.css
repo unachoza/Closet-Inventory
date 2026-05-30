@@ -49,6 +49,7 @@
 	flex-wrap: wrap;
 	gap: var(--spacing-50);
 	margin-bottom: var(--spacing-100);
+	
 }
 
 .advanced-search-pill {
@@ -61,6 +62,7 @@
 	color: var(--White);
 	font-size: 0.78rem;
 	line-height: 1.4;
+	border: solid 1px black;
 }
 
 .advanced-search-pill--excluded {
