@@ -1,0 +1,46 @@
+.content-card {
+      padding: 20px;
+      max-width: 50%;
+      /* margin: 0 auto; */
+      text-align: left;
+      background: #333;
+      color: white;
+      border: solid 2px #9d00ff;
+      border-radius: 10px;
+      margin: 15px;
+      width: 45%;
+}
+.content-card h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+}
+.content-card p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+}
+.content-card .button-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+}
+.content-card .button-container button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+}
+.content-card .button-container button:hover {
+      background-color: #0056b3;
+}
+.content-card .carousel-view,
+.content-card .overview-view {
+      margin-top: 20px;
+}
+.content-card .back-button {
+      margin-top: 20px;  
+}

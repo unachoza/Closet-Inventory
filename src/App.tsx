@@ -103,6 +103,7 @@ function App() {
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
+		// <TextileGuildInteractive/>
 		<div className="main">
 			<EditProvider>
 				<ToastProvider>

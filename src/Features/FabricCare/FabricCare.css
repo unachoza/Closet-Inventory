@@ -1,0 +1,16 @@
+.content-container{
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #33333378;
+      color: white;
+      border-radius: 10px;
+      border: solid 2px #007bff;
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+}
+
+ul{
+      list-style-type: none
+}
