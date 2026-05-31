@@ -441,3 +441,65 @@
 	color: var(--Medium-Grey);
 	font-size: 0.82rem;
 }
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .gmail-container {
+    margin: 0.5rem;
+    padding: var(--spacing-100);
+    border-radius: var(--border-radius-sm);
+  }
+
+  /* Collapse the side-by-side email list + preview panel to stacked */
+  .display-email-preview-panel {
+    flex-direction: column;
+  }
+
+  .display-email-preview-panel > .gmail-list-panel {
+    width: 100%;
+  }
+
+  .display-email-preview-panel > .gmail-preview-panel {
+    width: 100%;
+    max-height: 400px;
+  }
+
+  /* Tighten up the header actions so they don't overflow */
+  .gmail-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-100);
+  }
+
+  .gmail-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .gmail-header-actions button {
+    flex: 1 1 auto;
+  }
+
+  /* Shorter email list on mobile since preview is below */
+  .gmail-email-list {
+    max-height: 280px;
+  }
+
+  .gmail-preview-panel {
+    max-height: 380px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gmail-auth-section {
+    padding: var(--spacing-200);
+  }
+
+  .gmail-title {
+    font-size: 1.2rem;
+  }
+
+  .gmail-email-date {
+    display: none; /* too cramped on very small screens */
+  }
+}

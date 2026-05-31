@@ -122,3 +122,24 @@
       width: 6.25rem;
       margin: 0;
 }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --Card-width: 15rem;
+    --Card-height: 17rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    /* Two cards per row on small phones */
+    --Card-width: calc(50vw - 1.5rem);
+    --Card-height: 14rem;
+  }
+
+  .card-image img {
+    object-fit: cover;
+  }
+}

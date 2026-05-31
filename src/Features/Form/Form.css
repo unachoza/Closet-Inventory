@@ -161,3 +161,45 @@ button.submit:hover {
 		transform: translateY(-6px);
 	}
 }
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --Form-width: calc(100vw - 1rem);
+    --Form-padding: 1rem;
+  }
+
+  .form {
+    margin: 0.25rem;
+    border-radius: var(--border-radius-sm);
+  }
+
+  .double-options {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .age-checkboxes,
+  .age-datepicker {
+    flex: unset;
+    width: 100%;
+  }
+
+  .age-datepicker input {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --Form-padding: 0.75rem;
+  }
+
+  form {
+    height: clamp(28rem, 70vh, 56.25rem);
+  }
+
+  .form-step {
+    height: clamp(28rem, 70vh, 56.25rem);
+  }
+}
