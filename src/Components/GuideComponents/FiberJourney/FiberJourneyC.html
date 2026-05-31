@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiber Journey — Option C: Dark Flowchart</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #141210;
+  --surface: #1E1C19;
+  --surface-2: #252320;
+  --border: rgba(255,255,255,.08);
+  --border-hover: rgba(255,255,255,.18);
+  --text: #F0EDE8;
+  --text-muted: #8C897F;
+  --text-dim: #4A4844;
+  --gold: #E8C85A;
+  --gold-dim: rgba(232,200,90,.15);
+  /* Phase accent colors — warm tones on dark BG */
+  --c1: #7AB882;  /* sage green  — sourcing */
+  --c2: #D4A843;  /* amber       — spinning */
+  --c3: #6B9FBF;  /* steel blue  — construction */
+  --c4: #D4724A;  /* terracotta  — wet processing */
+  --c5: #B87AAA;  /* mauve       — assembly */
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; }
+
+/* HEADER */
+.page-header {
+  padding: 48px 60px 40px;
+  border-bottom: 1px solid var(--border);
+  display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:24px;
+}
+.option-label {
+  display:inline-block;
+  background:var(--gold);color:#141210;
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.15em;
+  text-transform:uppercase;padding:4px 14px;border-radius:100px;margin-bottom:14px;
+}
+.page-header h1 {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(26px,4vw,52px);color:var(--text);font-weight:700;line-height:1.1;
+}
+.page-header h1 em { font-style:italic; color:var(--gold); }
+.header-legend {
+  display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+}
+.legend-item { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-muted); }
+.legend-dot { width:10px;height:10px;border-radius:50%; }
+
+/* MAIN */
+.main-wrap { max-width:1160px; margin:0 auto; padding:56px 60px 80px; }
+
+/* PHASE COLUMNS — horizontal swimlane */
+.swimlanes {
+  display:grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap:16px;
+  align-items:start;
+}
+
+/* Phase column */
+.phase-col { display:flex; flex-direction:column; gap:0; }
+
+/* Phase header node */
+.phase-header-node {
+  padding:16px 18px;
+  border-radius:14px 14px 0 0;
+  border:1px solid;
+  border-bottom:none;
+  display:flex; flex-direction:column; gap:8px;
+}
+.phase-num {
+  font-family:'DM Mono',monospace;
+  font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+  opacity:.7;
+}
+.phase-name {
+  font-family:'Playfair Display',serif;
+  font-size:17px;font-weight:600;line-height:1.2;
+}
+.phase-icon-row { font-size:22px; }
+
+/* Step nodes */
+.step-node {
+  padding:14px 18px;
+  border-left:1px solid;
+  border-right:1px solid;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background .15s;
+  position:relative;
+}
+.step-node:hover { background:rgba(255,255,255,.03); }
+.step-node:last-of-type { border-radius:0 0 14px 14px; border-bottom:1px solid; }
+
+.step-node-title {
+  font-size:13px;font-weight:500;color:var(--text);
+  margin-bottom:4px;line-height:1.3;
+  display:flex;align-items:center;gap:8px;
+}
+.step-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0; }
+.step-node-preview {
+  font-size:12px;color:var(--text-muted);line-height:1.5;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.step-expand-hint {
+  position:absolute;top:12px;right:14px;
+  font-size:10px;color:var(--text-dim);
+  opacity:0;transition:opacity .15s;
+}
+.step-node:hover .step-expand-hint { opacity:1; }
+
+/* CONNECTOR ARROWS between columns */
+.col-connector {
+  display:none; /* handled by grid gap */
+}
+
+/* MODAL */
+.modal-backdrop {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.7); z-index:600;
+  padding:40px 20px; overflow-y:auto;
+  align-items:flex-start; justify-content:center;
+}
+.modal-backdrop.open { display:flex; }
+.modal {
+  background:var(--surface);
+  border-radius:20px; max-width:600px; width:100%; margin:auto;
+  overflow:hidden;
+  border:1px solid var(--border-hover);
+  box-shadow:0 24px 80px rgba(0,0,0,.5);
+  animation: mIn .28s cubic-bezier(.34,1.46,.64,1) both;
+}
+@keyframes mIn {
+  from { opacity:0; transform:scale(.93) translateY(16px); }
+  to { opacity:1; transform:scale(1) translateY(0); }
+}
+.modal-header {
+  padding:28px 32px 22px;
+  border-bottom:1px solid var(--border);
+  display:flex; justify-content:space-between; align-items:flex-start;
+}
+.modal-header-left { display:flex; flex-direction:column; gap:4px; }
+.modal-phase-label {
+  font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+}
+.modal-step-title {
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--text);
+}
+.modal-close {
+  background:none;border:1px solid var(--border);border-radius:50%;
+  width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--text-muted);flex-shrink:0;
+  transition:border-color .15s;
+}
+.modal-close:hover { border-color:var(--border-hover); }
+.modal-body { padding:24px 32px 30px; }
+.modal-text {
+  font-size:15px;color:var(--text-muted);line-height:1.75;margin-bottom:20px;
+}
+.modal-sources { display:flex; flex-wrap:wrap; gap:6px; }
+.modal-source {
+  font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;
+  border-radius:100px;border:1px solid var(--border-hover);
+  color:var(--text-muted);text-decoration:none;letter-spacing:.04em;
+  transition:border-color .15s, color .15s;
+}
+.modal-source:hover { border-color:var(--gold);color:var(--gold); }
+
+/* KEY BAR at bottom */
+.key-bar {
+  display:flex; gap:0; border-top:1px solid var(--border); overflow-x:auto;
+}
+.key-segment {
+  flex:1; padding:16px 18px; display:flex; flex-direction:column; gap:4px;
+  border-right:1px solid var(--border); min-width:120px;
+}
+.key-segment:last-child { border-right:none; }
+.key-seg-num { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.12em; text-transform:uppercase; }
+.key-seg-name { font-size:12px; font-weight:500; color:var(--text-muted); }
+
+@media (max-width:900px) {
+  .swimlanes { grid-template-columns:1fr; }
+  .phase-col { margin-bottom:24px; }
+  .phase-header-node { border-radius:14px 14px 0 0; }
+  .main-wrap { padding:36px 20px 60px; }
+  .page-header { padding:36px 24px 32px; }
+  .header-legend { align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div>
+    <div class="option-label">Option C</div>
+    <h1>Fiber to <em>Garment</em></h1>
+  </div>
+  <div class="header-legend">
+    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;">Phase color key</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c1)"></span>Fiber Sourcing</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c2)"></span>Yarn Spinning</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c3)"></span>Fabric Construction</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c4)"></span>Wet Processing</div>
+    <div class="legend-item"><span class="legend-dot" style="background:var(--c5)"></span>Garment Assembly</div>
+  </div>
+</header>
+
+<main class="main-wrap">
+  <div class="swimlanes" id="swimlanes"></div>
+</main>
+
+<div class="key-bar" id="key-bar"></div>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeBG(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-phase-label" id="m-phase-label"></div>
+        <div class="modal-step-title" id="m-step-title"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-text" id="m-text"></p>
+      <div class="modal-sources" id="m-sources"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CSS_VARS = ['--c1','--c2','--c3','--c4','--c5'];
+const phases = [
+  {
+    name:'Fiber Sourcing', icon:'🌱', cssVar:'--c1',
+    steps:[
+      { title:'Plant Cellulosic', preview:'Cotton bolls, flax retting, hemp stripping', body:'Cotton fibers are harvested from bolls. Flax stems are retted — soaked in water — to create linen. Hemp fibers are mechanically stripped from plant stalks. All three are pure cellulose.', sources:[{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'},{l:'Ecosilky',u:'https://www.ecosilky.com.vn/en/which-natural-materials-are-used-to-obtain-fibres/'}] },
+      { title:'Animal Protein', preview:'Shear sheep · unravel silk cocoons · comb goat undercoats', body:'Wool is sheared from sheep. Silk is painstakingly unraveled from silkworm cocoons — one cocoon yields up to 1,500 m of continuous thread. Cashmere and mohair are combed from the soft undercoats of goats.', sources:[{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'}] },
+      { title:'Synthetic Petrochemical', preview:'Petroleum polymers extruded through a spinneret', body:'Polymers like PET (polyester) and nylon are synthesized from petroleum chemicals, melted, and extruded at high pressure through a spinneret — a metal plate with tiny holes — to form continuous, uniform filaments.', sources:[{l:'Fibreguard: Polyester',u:'https://fibreguard.com/sell/blog/the-ins-and-outs-of-polyester-fibres-and-fabrics'}] },
+      { title:'Regenerated Semi-Synthetic', preview:'Wood pulp dissolved and re-extruded as fiber', body:'Wood pulp from eucalyptus, beech, or bamboo is chemically dissolved into a viscous solution, then extruded and solidified. Creates rayon (viscose), modal, and lyocell (TENCEL™). Plant-derived, chemically processed.', sources:[{l:'Goyal Textiles',u:'https://thegoyaltextiles.com/blog/the-journey-of-fabric-from-fiber-to-fashion/'},{l:'Artisan Stitch',u:'https://www.artisanstitch.co.uk/man-made-fibres/'}] },
+    ]
+  },
+  {
+    name:'Yarn Spinning', icon:'🧵', cssVar:'--c2',
+    steps:[
+      { title:'Opening & Cleaning', preview:'Loosen bales, remove seeds, dust, and debris', body:'Bales of raw fiber are broken open and fed through opening machines that loosen, separate, and remove impurities like seeds (cotton), vegetable matter (wool), and dust. The fiber emerges as a fluffy cloud called a lap.' },
+      { title:'Carding & Drawing', preview:'Align fibers into a continuous sliver rope', body:'The lap is combed through fine wire rollers (carding) to align fibers parallel to each other, producing a continuous rope called a sliver. Multiple slivers are drafted and combined to improve evenness.', sources:[{l:'Toyota Industries',u:'https://www.toyota-industries.com/products/relation/textile_process/'}] },
+      { title:'Drafting & Twisting', preview:'Thin, twist, and bind fibers into strong yarn', body:'The sliver is progressively thinned and twisted on a spinning frame. Twisting binds fibers together through friction, creating yarn. More twist = stronger but stiffer; less twist = softer but weaker.', sources:[{l:'Ethically Dressed',u:'https://ethically-dressed.com/how-clothes-are-made-the-entire-production-process/'}] },
+      { title:'Filament vs. Spun Yarn', preview:'Synthetic filaments: smooth or texturized', body:'Synthetic fibers can be used directly as filament yarn (smooth, lustrous), cut and re-spun to mimic natural fiber textures, or air-jet texturized to add bulk and softness — depending on the end use.', sources:[{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'}] },
+    ]
+  },
+  {
+    name:'Fabric Construction', icon:'🪡', cssVar:'--c3',
+    steps:[
+      { title:'Weaving', preview:'Warp + weft interlaced on a loom', body:'A loom interlaces two perpendicular yarns: warp (held taut lengthwise) and weft (passed over and under). Plain, twill, and satin are the three fundamental structures — producing stable, non-stretch fabrics. Jacquard looms weave intricate patterns into the fabric structure.', sources:[{l:'Scribd: Types of Fabrics',u:'https://www.scribd.com/document/469107812/Types-of-Fabrics'}] },
+      { title:'Knitting', preview:'Interlooped yarn on needles — naturally stretchy', body:'A single continuous yarn is interlooped using needles on industrial circular or flat machines. The loop structure creates natural stretch and comfort. Jersey, rib, interlock, and French terry are all knit constructions.', sources:[{l:'Scribd: Types of Fabrics',u:'https://www.scribd.com/document/469107812/Types-of-Fabrics'}] },
+      { title:'Non-Woven', preview:'Fibers bonded — no spinning or weaving', body:'Fibers are bonded directly into a sheet without being spun into yarn first. Bonding methods: needle-punching (mechanical), heat fusing (thermal), adhesive bonding (chemical). Examples: felt, interfacing, medical and industrial textiles.' },
+    ]
+  },
+  {
+    name:'Wet Processing', icon:'🎨', cssVar:'--c4',
+    steps:[
+      { title:'Desizing & Scouring', preview:'Remove starch, wax, and processing oils', body:'Greige cloth contains sizing agents (starches added during weaving), natural waxes, and processing oils. Desizing removes starch; scouring uses alkaline detergents at high temperature to remove all remaining impurities, leaving absorbent fabric ready for dyeing.', sources:[{l:'Fadfay: Stages in Textiles',u:'https://fadfay.com/blogs/blogs/what-are-the-stages-in-textiles-from-scratch-to-end-product-a-comprehensive-guide'}] },
+      { title:'Bleaching', preview:'Hydrogen peroxide removes natural pigmentation', body:'Most natural fibers have a natural yellowish or off-white color. Bleaching — typically with hydrogen peroxide — removes natural pigments to produce a clean white base, critical for consistent, accurate dye colors.' },
+      { title:'Dyeing & Printing', preview:'Piece dye, screen print, or yarn-dye', body:'Color is applied to fabric, yarn, or fiber. Piece dyeing (submerging the fabric roll) produces solid color. Screen or digital printing applies patterns. Yarn-dyed fabrics like denim are woven from pre-colored yarns.', sources:[{l:'Global Textile Times',u:'https://www.globaltextiletimes.com/textile/key-insights-into-the-global-textile-industry-today/'}] },
+      { title:'Finishing & Coating', preview:'DWR, wrinkle-resist, mercerize, soften', body:'Functional coatings and treatments are applied to the finished fabric: DWR coating (water-repellency), resin finishing (wrinkle-resistance), mercerizing (cotton luster and dye uptake), calendering (sheen via heated rollers), enzymatic softening.', sources:[{l:'Juniper Publishers',u:'https://juniperpublishers.com/ctftte/CTFTTE.MS.ID.555601.php'}] },
+    ]
+  },
+  {
+    name:'Garment Assembly', icon:'✂️', cssVar:'--c5',
+    steps:[
+      { title:'Grading & Marking', preview:'Scale patterns across all sizes, optimize cut layout', body:'A base pattern is graded mathematically into a full size range. The nested patterns are digitally optimized on the fabric (marking) to maximize yield and minimize offcut waste. Every percentage point of efficiency gained is significant at production scale.', sources:[{l:'Fadfay: Stages in Textiles',u:'https://fadfay.com/blogs/blogs/what-are-the-stages-in-textiles-from-scratch-to-end-product-a-comprehensive-guide'}] },
+      { title:'Cutting', preview:'CNC or hand knives through layered fabric', body:'Fabric is spread in multiple layers (a "lay") and cut through all layers simultaneously using straight knives, band knives, or computer-controlled CNC cutters. A 1 mm error multiplied across thousands of garments creates significant waste and quality problems.', sources:[{l:'Kute Tailor',u:'https://www.kutetailor.com/blog/the-ultimate-definitive-guide-to-clothing-manufacturing.html'}] },
+      { title:'Sewing & Assembly', preview:'20–100+ individual stitch operations per garment', body:'Operators each perform one or two specific stitch types in a production line. Lockstitch, overlock, coverstitch — each seam type has different strength and stretch properties. A single garment may require 20–100+ individual sewing operations.', sources:[{l:'Common Objective',u:'https://www.commonobjective.co/article/apparel-production-fibre-to-fabric-to-fashion'}] },
+      { title:'QC & Packaging', preview:'Inspect, press, tag, and prepare for distribution', body:'Hardware (buttons, zippers, rivets), labels, and hang tags are attached. Garments are pressed, steamed, and inspected against technical specifications. Passing pieces are folded or hung, packaged, and shipped to distribution.', sources:[{l:'Common Objective',u:'https://www.commonobjective.co/article/apparel-production-fibre-to-fabric-to-fashion'}] },
+    ]
+  },
+];
+
+function getCssColor(cssVar) {
+  return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+}
+
+function render() {
+  const lanes = document.getElementById('swimlanes');
+  const keyBar = document.getElementById('key-bar');
+  lanes.innerHTML = '';
+  keyBar.innerHTML = '';
+
+  phases.forEach((phase, pi) => {
+    const color = getCssColor(phase.cssVar);
+
+    // Column
+    const col = document.createElement('div');
+    col.className = 'phase-col';
+
+    // Header node
+    const header = document.createElement('div');
+    header.className = 'phase-header-node';
+    header.style.borderColor = color + '60';
+    header.style.background = color + '14';
+    header.innerHTML = `
+      <div class="phase-num" style="color:${color}">${String(pi+1).padStart(2,'0')} ·</div>
+      <div class="phase-icon-row">${phase.icon}</div>
+      <div class="phase-name" style="color:${color}">${phase.name}</div>
+    `;
+    col.appendChild(header);
+
+    // Step nodes
+    phase.steps.forEach((step, si) => {
+      const node = document.createElement('div');
+      node.className = 'step-node';
+      node.style.borderColor = color + '35';
+      if (si === phase.steps.length - 1) {
+        node.style.borderBottomColor = color + '60';
+      }
+      node.innerHTML = `
+        <div class="step-node-title">
+          <span class="step-dot" style="background:${color}"></span>
+          ${step.title}
+        </div>
+        <div class="step-node-preview">${step.preview}</div>
+        <span class="step-expand-hint">tap ↗</span>
+      `;
+      node.addEventListener('click', () => openModal(phase, step, color));
+      col.appendChild(node);
+    });
+
+    lanes.appendChild(col);
+
+    // Key bar segment
+    const seg = document.createElement('div');
+    seg.className = 'key-segment';
+    seg.innerHTML = `
+      <div class="key-seg-num" style="color:${color}">${String(pi+1).padStart(2,'0')}</div>
+      <div class="key-seg-name">${phase.name}</div>
+    `;
+    keyBar.appendChild(seg);
+  });
+}
+
+function openModal(phase, step, color) {
+  const color_ = color || getCssColor(phase.cssVar);
+  document.getElementById('m-phase-label').textContent = phase.name;
+  document.getElementById('m-phase-label').style.color = color_;
+  document.getElementById('m-step-title').textContent = step.title;
+  document.getElementById('m-text').textContent = step.body;
+  const srcEl = document.getElementById('m-sources');
+  srcEl.innerHTML = step.sources
+    ? step.sources.map(s=>`<a class="modal-source" href="${s.u}" target="_blank" rel="noopener">${s.l} ↗</a>`).join('')
+    : '';
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeBG(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+render();
+</script>
+</body>
+</html>

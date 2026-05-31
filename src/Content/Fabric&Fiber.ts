@@ -1292,3 +1292,8 @@ export const SOURCES: Source[] = [
 		domain: "idcustomapparel.com",
 	},
 ];
+
+
+// Sources
+// https://www.commonobjective.co/article/cellulosic-fibres-and-preferred-cellulosics
+// https://www.commonobjective.co/

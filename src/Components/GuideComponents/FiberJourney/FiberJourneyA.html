@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiber Journey — Option A: Illustrated</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #FAF7F2;
+  --warm-white: #FFFDF9;
+  --ink: #1C1A17;
+  --ink-60: #6B6659;
+  --ink-30: #C4BFB5;
+  --gold: #B8860B;
+  --gold-light: #E8C85A;
+  --border: rgba(28,26,23,0.10);
+  --border-strong: rgba(28,26,23,0.20);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: var(--ink);
+  padding: 48px 48px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.page-header::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background: repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(184,134,11,.04) 40px,rgba(184,134,11,.04) 41px);
+}
+.page-header-inner { max-width: 1100px; margin:0 auto; position:relative; display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:24px; }
+.page-header h1 { font-family:'Playfair Display',serif; font-size:clamp(28px,4vw,52px); color:#FFFDF9; font-weight:700; line-height:1.1; }
+.page-header h1 em { font-style:italic; color:var(--gold-light); }
+.header-badge { display:flex; align-items:center; gap:8px; padding:8px 18px; border:1px solid rgba(232,200,90,.3); border-radius:100px; }
+.header-badge span { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:rgba(232,200,90,.7); }
+
+.option-label {
+  display:inline-block;
+  background: var(--gold);
+  color: var(--warm-white);
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  padding:4px 14px;
+  border-radius:100px;
+  margin-bottom:14px;
+}
+
+/* ── CANVAS AREA ── */
+.canvas-wrap {
+  max-width:1100px;
+  margin: 0 auto;
+  padding: 56px 48px 80px;
+}
+
+.canvas-hint {
+  text-align:center;
+  margin-bottom:56px;
+}
+.canvas-hint p {
+  font-size:13px;
+  color:var(--ink-60);
+  letter-spacing:.05em;
+}
+.canvas-hint::before {
+  content:'';
+  display:block;
+  width:40px;
+  height:1px;
+  background:var(--border-strong);
+  margin:0 auto 12px;
+}
+
+/* ── PHASE TRACK ── */
+.phase-track {
+  display:flex;
+  align-items:center;
+  gap:0;
+  justify-content:center;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:8px;
+}
+
+/* ── CONNECTOR ── */
+.connector {
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:0;
+  padding: 0 8px;
+}
+.connector svg { display:block; }
+
+/* ── PHASE NODE ── */
+.phase-node {
+  flex-shrink:0;
+  width:160px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  cursor:pointer;
+  position:relative;
+}
+
+.node-illustration {
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  border:2px solid var(--border-strong);
+  background:var(--warm-white);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, border-color .25s ease;
+  overflow:hidden;
+}
+
+.phase-node:hover .node-illustration {
+  transform:scale(1.07) translateY(-4px);
+  box-shadow:0 12px 40px rgba(28,26,23,.12);
+}
+
+.node-number {
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'DM Mono',monospace;
+  font-size:11px;
+  font-weight:400;
+  color: var(--warm-white);
+  z-index:2;
+}
+
+.node-short-label {
+  margin-top:14px;
+  font-size:11px;
+  font-family:'DM Mono',monospace;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-60);
+  text-align:center;
+  transition:color .2s;
+}
+.phase-node:hover .node-short-label { color:var(--ink); }
+
+/* ── SVG ILLUSTRATIONS ── */
+.illus-svg { display:block; }
+
+/* ── MODAL ── */
+.modal-backdrop {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(28,26,23,.55);
+  z-index:600;
+  padding:40px 20px;
+  overflow-y:auto;
+  align-items:flex-start;
+  justify-content:center;
+}
+.modal-backdrop.open { display:flex; }
+
+.modal {
+  background:var(--warm-white);
+  border-radius:20px;
+  max-width:680px;
+  width:100%;
+  margin:auto;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(28,26,23,.18);
+  animation: modalIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes modalIn {
+  from { opacity:0; transform:scale(.94) translateY(12px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding:32px 36px 24px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+}
+.modal-header-left { display:flex; align-items:center; gap:16px; }
+.modal-phase-icon {
+  width:52px; height:52px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; flex-shrink:0;
+}
+.modal-header h2 { font-family:'Playfair Display',serif; font-size:24px; font-weight:700; color:var(--ink); }
+.modal-phase-num { font-family:'DM Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:4px; }
+.modal-close {
+  background:none; border:1px solid var(--border); border-radius:50%;
+  width:36px; height:36px; cursor:pointer; display:flex; align-items:center;
+  justify-content:center; font-size:16px; color:var(--ink-60); flex-shrink:0;
+  transition:background .15s;
+}
+.modal-close:hover { background:var(--cream); }
+
+.modal-summary {
+  padding:24px 36px 0;
+  font-size:15px;
+  color:var(--ink-60);
+  line-height:1.7;
+  font-style:italic;
+  border-bottom:1px solid var(--border);
+  padding-bottom:24px;
+}
+
+.modal-steps { padding:24px 36px 32px; display:flex; flex-direction:column; gap:20px; }
+
+.step-card {
+  background:var(--cream);
+  border-radius:12px;
+  padding:18px 20px 16px;
+  border:1px solid var(--border);
+}
+.step-title {
+  font-size:13px;
+  font-weight:500;
+  color:var(--ink);
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.step-dot {
+  width:6px; height:6px; border-radius:50%; flex-shrink:0;
+}
+.step-body {
+  font-size:14px;
+  color:var(--ink-60);
+  line-height:1.65;
+  margin-bottom:10px;
+}
+.step-sources { display:flex; flex-wrap:wrap; gap:6px; }
+.step-source {
+  display:inline-block;
+  font-family:'DM Mono',monospace;
+  font-size:10px;
+  padding:2px 8px;
+  border-radius:100px;
+  border:1px solid var(--border-strong);
+  color:var(--ink-60);
+  text-decoration:none;
+  transition:background .15s;
+}
+.step-source:hover { background:var(--border); color:var(--ink); }
+
+@media (max-width:900px) {
+  .phase-track { flex-direction:column; align-items:center; }
+  .connector { transform:rotate(90deg); }
+  .canvas-wrap { padding:40px 24px 60px; }
+  .page-header { padding:36px 24px 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="option-label">Option A</div>
+      <h1>Fiber to<br><em>Garment</em></h1>
+    </div>
+    <div class="header-badge">
+      <span>Tap any phase to explore</span>
+    </div>
+  </div>
+</header>
+
+<!-- CANVAS -->
+<main class="canvas-wrap">
+  <div class="canvas-hint">
+    <p>tap · click · explore</p>
+  </div>
+
+  <div class="phase-track" id="phase-track">
+    <!-- Phases + connectors injected by JS -->
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeIfBG(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-phase-icon" id="modal-icon"></div>
+        <div>
+          <div class="modal-phase-num" id="modal-num"></div>
+          <h2 id="modal-title"></h2>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    </div>
+    <p class="modal-summary" id="modal-summary"></p>
+    <div class="modal-steps" id="modal-steps"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────
+const phases = [
+  {
+    id:'sourcing', number:1, name:'Fiber Sourcing', shortLabel:'Raw fiber',
+    accent:'#5A7A60', accentLight:'#EEF4EF',
+    summary:'The journey begins by extracting or synthesizing the raw materials that will eventually become thread, then fabric, then clothing.',
+    steps:[
+      { title:'Plant (Cellulosic)', body:'Cotton fibers are harvested from fluffy bolls on the cotton plant. Flax stems are retted — soaked in water to separate fibers — to create linen. Hemp fibers are mechanically stripped from plant stalks. All three are pure cellulose.', sources:[{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'},{l:'Ecosilky: Natural Materials',u:'https://www.ecosilky.com.vn/en/which-natural-materials-are-used-to-obtain-fibres/'}] },
+      { title:'Animal (Protein)', body:'Wool is sheared from sheep once or twice a year. Silk is painstakingly unraveled from the cocoons of silkworms — a single cocoon yields up to 1,500 m of continuous thread. Cashmere and mohair are combed from the soft undercoats of Cashmere and Angora goats.', sources:[{l:'Ethically Dressed',u:'https://ethically-dressed.com/how-clothes-are-made-the-entire-production-process/'},{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'}] },
+      { title:'Synthetic (Petrochemical)', body:'Polymers like polyester (PET) and nylon are created by melting down petroleum-based chemicals. The molten polymer is extruded at high pressure through a spinneret — a metal plate with tiny holes — to form continuous, uniform filaments that cool and solidify.', sources:[{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'},{l:'Fibreguard: Polyester',u:'https://fibreguard.com/sell/blog/the-ins-and-outs-of-polyester-fibres-and-fabrics'}] },
+      { title:'Regenerated (Semi-Synthetic)', body:'Natural polymers — primarily wood pulp (cellulose) from eucalyptus, beech, or bamboo — are chemically dissolved into a viscous solution, then extruded and solidified. This creates rayon (viscose), modal, and lyocell (TENCEL™). Plant-derived but chemically processed.', sources:[{l:'Goyal Textiles',u:'https://thegoyaltextiles.com/blog/the-journey-of-fabric-from-fiber-to-fashion/'},{l:'Artisan Stitch',u:'https://www.artisanstitch.co.uk/man-made-fibres/'}] },
+    ]
+  },
+  {
+    id:'spinning', number:2, name:'Yarn Spinning', shortLabel:'Spin yarn',
+    accent:'#B8860B', accentLight:'#FDF4DC',
+    summary:'Raw fibers — whether from plants, animals, or chemical processes — are transformed into long, continuous, workable threads called yarn.',
+    steps:[
+      { title:'Opening & Cleaning', body:'Bales of raw fiber are broken open and fed through opening machines that loosen, separate, and remove impurities like seeds (cotton), vegetable matter (wool), and dust. The fiber emerges as a fluffy, cloud-like mass called a lap.' },
+      { title:'Carding & Drawing', body:'The lap is combed through fine wire rollers (carding) to align fibers parallel to each other, producing a soft rope called a sliver. Multiple slivers are drafted (drawn out) to improve evenness and fiber alignment.', sources:[{l:'Toyota Industries',u:'https://www.toyota-industries.com/products/relation/textile_process/'}] },
+      { title:'Drafting & Twisting', body:'The sliver is progressively thinned and twisted on a spinning frame. Twisting binds fibers together through friction, creating a strong, durable yarn. More twist = stronger but stiffer; less twist = softer but weaker.', sources:[{l:'Ethically Dressed',u:'https://ethically-dressed.com/how-clothes-are-made-the-entire-production-process/'}] },
+      { title:'Synthetic & Filament Yarn', body:'Synthetic fibers begin as long continuous filaments. They can be used directly as filament yarn (smooth, lustrous), cut and re-spun to mimic cotton or wool, or air-jet texturized to add bulk and softness.', sources:[{l:'ACS: Fiber to Fabric',u:'https://www.acs.org/education/celebrating-chemistry-editions/2022-ncw/fiber-to-fabric.html'}] },
+    ]
+  },
+  {
+    id:'construction', number:3, name:'Fabric Construction', shortLabel:'Make fabric',
+    accent:'#4A6B8A', accentLight:'#EEF3F8',
+    summary:'Yarn is interlaced, looped, or bonded to create usable fabric — at this stage often called "greige cloth" — before any dyeing or finishing.',
+    steps:[
+      { title:'Weaving', body:'Performed on a loom, weaving interlaces two sets of perpendicular yarns: the warp (held taut lengthwise) and the weft (passed over and under). Plain, twill, and satin are the three fundamental structures. Jacquard looms weave intricate patterns directly into the cloth.', sources:[{l:'Scribd: Types of Fabrics',u:'https://www.scribd.com/document/469107812/Types-of-Fabrics'}] },
+      { title:'Knitting', body:'A single continuous yarn is interlooped using needles on circular or flat industrial machines. Knit fabrics are naturally stretchy and comfortable. Jersey, rib, interlock, and French terry are all knit constructions.', sources:[{l:'Scribd: Types of Fabrics',u:'https://www.scribd.com/document/469107812/Types-of-Fabrics'}] },
+      { title:'Non-Woven', body:'Fibers are bonded directly into a sheet without spinning or weaving. Bonding methods: mechanical (needle-punching), thermal (heat fusing), and chemical (adhesive). Examples: felt, interfacing, medical textiles.', sources:[{l:'Scribd: Types of Fabrics',u:'https://www.scribd.com/document/469107812/Types-of-Fabrics'}] },
+    ]
+  },
+  {
+    id:'wetprocessing', number:4, name:'Wet Processing', shortLabel:'Dye & finish',
+    accent:'#C1622A', accentLight:'#FBF0E8',
+    summary:'The unfinished greige cloth undergoes chemical and mechanical treatments — cleaning, colouring, and finishing — to prepare it for garment use.',
+    steps:[
+      { title:'Preparation: Desizing & Scouring', body:'Greige cloth contains sizing agents (starches from weaving), natural waxes, and processing oils. Desizing removes starch; scouring uses alkaline detergents at high temperatures to remove all remaining impurities, leaving a clean, absorbent fabric.', sources:[{l:'Fadfay: Stages in Textiles',u:'https://fadfay.com/blogs/blogs/what-are-the-stages-in-textiles-from-scratch-to-end-product-a-comprehensive-guide'}] },
+      { title:'Bleaching', body:'Most natural fibers have a natural off-white or yellowish color. Bleaching (usually with hydrogen peroxide) removes natural pigments to produce a clean white base for consistent, true color in the dyeing step.' },
+      { title:'Dyeing & Printing', body:'Color is applied to fiber, yarn, or finished fabric. Piece dyeing (submerging the roll) produces solid color. Screen or digital printing applies patterns. Yarn-dyed fabrics like denim are woven from pre-colored yarns.', sources:[{l:'Global Textile Times',u:'https://www.globaltextiletimes.com/textile/key-insights-into-the-global-textile-industry-today/'}] },
+      { title:'Finishing', body:'Coatings and treatments give fabric specific performance properties. Examples: calendering (rollers for sheen), mercerizing (luster & dye uptake), DWR coating (water-repellency), resin finishing (wrinkle-resistance), enzymatic softening.', sources:[{l:'Juniper Publishers',u:'https://juniperpublishers.com/ctftte/CTFTTE.MS.ID.555601.php'}] },
+    ]
+  },
+  {
+    id:'assembly', number:5, name:'Garment Assembly', shortLabel:'Sew garment',
+    accent:'#8B5A7A', accentLight:'#F6EFF4',
+    summary:'The finished textile is transformed into a wearable garment through grading, cutting, sewing, and quality control.',
+    steps:[
+      { title:'Grading & Pattern Marking', body:'A base pattern is mathematically graded into a full size range. The nested patterns are laid out digitally onto the fabric — optimized to maximize yield and minimize waste (offcuts). Efficiency here directly impacts cost and sustainability.', sources:[{l:'Fadfay: Stages in Textiles',u:'https://fadfay.com/blogs/blogs/what-are-the-stages-in-textiles-from-scratch-to-end-product-a-comprehensive-guide'}] },
+      { title:'Cutting', body:'Fabric is spread in multiple layers (a "lay") and cut through all layers simultaneously using straight knives, band knives, or computer-controlled CNC cutters. A 1 mm error multiplied across thousands of garments creates significant waste and quality issues.', sources:[{l:'Kute Tailor: Manufacturing Guide',u:'https://www.kutetailor.com/blog/the-ultimate-definitive-guide-to-clothing-manufacturing.html'}] },
+      { title:'Sewing & Assembly', body:'Cut pieces are sewn together by operators — each performing one or two specific stitch types in a production line. Different stitches (lockstitch, overlock, coverstitch) are used for different seams. A single garment may require 20–100+ individual sewing operations.', sources:[{l:'Common Objective',u:'https://www.commonobjective.co/article/apparel-production-fibre-to-fabric-to-fashion'}] },
+      { title:'Finishing, QC & Packaging', body:'Hardware (buttons, zippers, rivets), labels, and tags are attached. Garments are pressed, steamed, inspected against specifications, then folded or hung, tagged, and packaged for distribution.', sources:[{l:'Common Objective',u:'https://www.commonobjective.co/article/apparel-production-fibre-to-fabric-to-fashion'},{l:'Fadfay: Stages in Textiles',u:'https://fadfay.com/blogs/blogs/what-are-the-stages-in-textiles-from-scratch-to-end-product-a-comprehensive-guide'}] },
+    ]
+  },
+];
+
+// ── SVG ILLUSTRATIONS ── each 110×110 viewBox ─
+function getIllustration(id, accent) {
+  const il = {
+    sourcing: `
+      <svg viewBox="0 0 110 110" width="100" height="100" class="illus-svg" aria-hidden="true">
+        <!-- soil ground -->
+        <ellipse cx="55" cy="90" rx="38" ry="8" fill="${accent}" opacity=".18"/>
+        <!-- cotton plant stem -->
+        <line x1="55" y1="88" x2="55" y2="52" stroke="${accent}" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- branches -->
+        <line x1="55" y1="72" x2="36" y2="60" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+        <line x1="55" y1="65" x2="72" y2="56" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+        <!-- cotton bolls -->
+        <circle cx="33" cy="57" r="9" fill="${accent}" opacity=".25"/>
+        <circle cx="33" cy="57" r="6" fill="white" opacity=".9"/>
+        <circle cx="33" cy="57" r="3" fill="${accent}" opacity=".4"/>
+        <circle cx="72" cy="54" r="9" fill="${accent}" opacity=".25"/>
+        <circle cx="72" cy="54" r="6" fill="white" opacity=".9"/>
+        <circle cx="72" cy="54" r="3" fill="${accent}" opacity=".4"/>
+        <!-- sheep silhouette -->
+        <ellipse cx="55" cy="38" rx="14" ry="10" fill="white" stroke="${accent}" stroke-width="1.5"/>
+        <circle cx="55" cy="27" r="7" fill="white" stroke="${accent}" stroke-width="1.5"/>
+        <!-- sheep legs -->
+        <line x1="46" y1="46" x2="44" y2="54" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="50" y1="47" x2="50" y2="55" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="60" y1="47" x2="60" y2="55" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="64" y1="46" x2="66" y2="54" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- silkworm -->
+        <ellipse cx="40" cy="80" rx="7" ry="4" fill="${accent}" opacity=".4" transform="rotate(-20,40,80)"/>
+        <circle cx="46" cy="76" r="3" fill="${accent}" opacity=".5"/>
+        <!-- spinneret dots (synthetic) -->
+        <circle cx="78" cy="78" r="2" fill="${accent}" opacity=".5"/>
+        <circle cx="83" cy="81" r="2" fill="${accent}" opacity=".5"/>
+        <circle cx="78" cy="85" r="2" fill="${accent}" opacity=".5"/>
+        <circle cx="83" cy="75" r="2" fill="${accent}" opacity=".5"/>
+      </svg>`,
+    spinning: `
+      <svg viewBox="0 0 110 110" width="100" height="100" class="illus-svg" aria-hidden="true">
+        <!-- spinning wheel outer ring -->
+        <circle cx="55" cy="55" r="36" fill="none" stroke="${accent}" stroke-width="2" opacity=".3"/>
+        <circle cx="55" cy="55" r="26" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".2"/>
+        <!-- spokes -->
+        <line x1="55" y1="19" x2="55" y2="91" stroke="${accent}" stroke-width="1.5" opacity=".35"/>
+        <line x1="19" y1="55" x2="91" y2="55" stroke="${accent}" stroke-width="1.5" opacity=".35"/>
+        <line x1="29" y1="29" x2="81" y2="81" stroke="${accent}" stroke-width="1.5" opacity=".35"/>
+        <line x1="81" y1="29" x2="29" y2="81" stroke="${accent}" stroke-width="1.5" opacity=".35"/>
+        <!-- hub -->
+        <circle cx="55" cy="55" r="8" fill="${accent}" opacity=".8"/>
+        <circle cx="55" cy="55" r="4" fill="white" opacity=".9"/>
+        <!-- yarn tail spiraling out -->
+        <path d="M55 55 Q70 40 80 50 Q90 60 78 72 Q65 84 52 78 Q38 70 42 58 Q47 44 58 44"
+              fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" opacity=".7"/>
+        <!-- yarn ball -->
+        <circle cx="85" cy="28" r="12" fill="${accent}" opacity=".15"/>
+        <circle cx="85" cy="28" r="10" fill="${accent}" opacity=".2"/>
+        <path d="M78 22 Q85 18 92 24" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M76 28 Q85 24 93 30" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M78 34 Q85 30 91 36" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>`,
+    construction: `
+      <svg viewBox="0 0 110 110" width="100" height="100" class="illus-svg" aria-hidden="true">
+        <!-- loom frame -->
+        <rect x="22" y="20" width="66" height="70" rx="4" fill="none" stroke="${accent}" stroke-width="2" opacity=".4"/>
+        <!-- warp threads vertical -->
+        <line x1="32" y1="20" x2="32" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <line x1="40" y1="20" x2="40" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <line x1="48" y1="20" x2="48" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <line x1="56" y1="20" x2="56" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <line x1="64" y1="20" x2="64" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <line x1="72" y1="20" x2="72" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <line x1="80" y1="20" x2="80" y2="90" stroke="${accent}" stroke-width="1.5" opacity=".5"/>
+        <!-- weft threads horizontal (woven) -->
+        <path d="M22 35 Q28 32 32 35 Q36 38 40 35 Q44 32 48 35 Q52 38 56 35 Q60 32 64 35 Q68 38 72 35 Q76 32 80 35 Q84 38 88 35" fill="none" stroke="${accent}" stroke-width="2" opacity=".7"/>
+        <path d="M22 45 Q28 48 32 45 Q36 42 40 45 Q44 48 48 45 Q52 42 56 45 Q60 48 64 45 Q68 42 72 45 Q76 48 80 45 Q84 42 88 45" fill="none" stroke="${accent}" stroke-width="2" opacity=".7"/>
+        <path d="M22 55 Q28 52 32 55 Q36 58 40 55 Q44 52 48 55 Q52 58 56 55 Q60 52 64 55 Q68 58 72 55 Q76 52 80 55 Q84 58 88 55" fill="none" stroke="${accent}" stroke-width="2" opacity=".7"/>
+        <path d="M22 65 Q28 68 32 65 Q36 62 40 65 Q44 68 48 65 Q52 62 56 65 Q60 68 64 65 Q68 62 72 65 Q76 68 80 65 Q84 62 88 65" fill="none" stroke="${accent}" stroke-width="2" opacity=".7"/>
+        <!-- shuttle -->
+        <rect x="58" y="71" width="28" height="10" rx="5" fill="${accent}" opacity=".8"/>
+        <circle cx="62" cy="76" r="3" fill="white" opacity=".8"/>
+      </svg>`,
+    wetprocessing: `
+      <svg viewBox="0 0 110 110" width="100" height="100" class="illus-svg" aria-hidden="true">
+        <!-- dye vat -->
+        <path d="M25 50 Q22 90 30 92 L80 92 Q88 90 85 50 Z" fill="${accent}" opacity=".18"/>
+        <path d="M25 50 Q22 90 30 92 L80 92 Q88 90 85 50 Z" fill="none" stroke="${accent}" stroke-width="2"/>
+        <!-- vat rim -->
+        <ellipse cx="55" cy="50" rx="30" ry="8" fill="${accent}" opacity=".25"/>
+        <ellipse cx="55" cy="50" rx="30" ry="8" fill="none" stroke="${accent}" stroke-width="2"/>
+        <!-- liquid inside -->
+        <ellipse cx="55" cy="52" rx="26" ry="5" fill="${accent}" opacity=".4"/>
+        <!-- fabric going in -->
+        <path d="M40 20 Q50 30 40 42 Q50 48 55 50" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"/>
+        <!-- bubbles -->
+        <circle cx="44" cy="68" r="3" fill="${accent}" opacity=".3"/>
+        <circle cx="55" cy="72" r="4" fill="${accent}" opacity=".25"/>
+        <circle cx="66" cy="65" r="2.5" fill="${accent}" opacity=".3"/>
+        <!-- color swatches beside vat -->
+        <rect x="82" y="25" width="14" height="10" rx="3" fill="${accent}" opacity=".8"/>
+        <rect x="82" y="38" width="14" height="10" rx="3" fill="${accent}" opacity=".55"/>
+        <rect x="82" y="51" width="14" height="10" rx="3" fill="${accent}" opacity=".35"/>
+        <!-- steam -->
+        <path d="M30 30 Q33 24 30 18" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+        <path d="M40 26 Q43 20 40 14" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+        <path d="M50 24 Q53 18 50 12" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+      </svg>`,
+    assembly: `
+      <svg viewBox="0 0 110 110" width="100" height="100" class="illus-svg" aria-hidden="true">
+        <!-- garment silhouette (shirt) -->
+        <path d="M35 30 L20 55 L32 58 L32 85 L78 85 L78 58 L90 55 L75 30 L65 38 Q55 44 45 38 Z"
+              fill="${accent}" opacity=".15" stroke="${accent}" stroke-width="2" stroke-linejoin="round"/>
+        <!-- collar detail -->
+        <path d="M45 38 Q55 48 65 38" fill="none" stroke="${accent}" stroke-width="1.5"/>
+        <!-- scissors -->
+        <g transform="translate(60,20) rotate(30)">
+          <line x1="0" y1="0" x2="18" y2="0" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+          <line x1="0" y1="4" x2="18" y2="4" stroke="${accent}" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+          <circle cx="0" cy="2" r="4" fill="none" stroke="${accent}" stroke-width="1.5" opacity=".8"/>
+        </g>
+        <!-- needle and thread -->
+        <path d="M18 25 Q22 40 18 55" fill="none" stroke="${accent}" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 2" opacity=".6"/>
+        <line x1="20" y1="23" x2="16" y2="27" stroke="${accent}" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="18" cy="24" r="2" fill="none" stroke="${accent}" stroke-width="1.5"/>
+        <!-- stitch marks on garment -->
+        <line x1="55" y1="60" x2="55" y2="80" stroke="${accent}" stroke-width="1" stroke-dasharray="3 2" opacity=".5"/>
+        <!-- tag -->
+        <rect x="58" y="86" width="14" height="9" rx="2" fill="white" stroke="${accent}" stroke-width="1.2"/>
+        <line x1="58" y1="90" x2="72" y2="90" stroke="${accent}" stroke-width=".8" opacity=".5"/>
+      </svg>`,
+  };
+  return il[id] || `<div style="font-size:36px">${phases.find(p=>p.id===id)?.icon||'⬡'}</div>`;
+}
+
+// ── RENDER TRACK ──────────────────────────────
+function renderTrack() {
+  const track = document.getElementById('phase-track');
+  track.innerHTML = '';
+  phases.forEach((phase, i) => {
+    // Phase node
+    const node = document.createElement('div');
+    node.className = 'phase-node';
+    node.setAttribute('role','button');
+    node.setAttribute('tabindex','0');
+    node.setAttribute('aria-label', `Phase ${phase.number}: ${phase.name}`);
+    node.innerHTML = `
+      <div class="node-illustration" style="border-color:${phase.accent}40;">
+        <div class="node-number" style="background:${phase.accent};">${phase.number}</div>
+        ${getIllustration(phase.id, phase.accent)}
+      </div>
+      <span class="node-short-label">${phase.shortLabel}</span>
+    `;
+    node.addEventListener('click', () => openModal(phase));
+    node.addEventListener('keydown', (e) => { if(e.key==='Enter'||e.key===' ') openModal(phase); });
+    track.appendChild(node);
+
+    // Connector (except after last)
+    if (i < phases.length - 1) {
+      const conn = document.createElement('div');
+      conn.className = 'connector';
+      conn.innerHTML = `
+        <svg width="48" height="20" viewBox="0 0 48 20">
+          <defs>
+            <marker id="ah${i}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#C4BFB5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <line x1="4" y1="10" x2="40" y2="10" stroke="#C4BFB5" stroke-width="1.5" marker-end="url(#ah${i})" stroke-dasharray="4 3"/>
+        </svg>`;
+      track.appendChild(conn);
+    }
+  });
+}
+
+// ── MODAL ─────────────────────────────────────
+function openModal(phase) {
+  document.getElementById('modal-icon').style.background = phase.accentLight;
+  document.getElementById('modal-icon').textContent = phase.icon || '⬡';
+  document.getElementById('modal-num').textContent = `Phase ${phase.number}`;
+  document.getElementById('modal-num').style.color = phase.accent;
+  document.getElementById('modal-title').textContent = phase.name;
+  document.getElementById('modal-summary').textContent = phase.summary;
+
+  const stepsEl = document.getElementById('modal-steps');
+  stepsEl.innerHTML = '';
+  phase.steps.forEach(step => {
+    const card = document.createElement('div');
+    card.className = 'step-card';
+    const sourcesHTML = step.sources
+      ? `<div class="step-sources">${step.sources.map(s=>`<a class="step-source" href="${s.u}" target="_blank" rel="noopener">${s.l} ↗</a>`).join('')}</div>`
+      : '';
+    card.innerHTML = `
+      <div class="step-title">
+        <span class="step-dot" style="background:${phase.accent}"></span>
+        ${step.title}
+      </div>
+      <p class="step-body">${step.body}</p>
+      ${sourcesHTML}
+    `;
+    stepsEl.appendChild(card);
+  });
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeIfBG(e) {
+  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// ── INIT ──────────────────────────────────────
+renderTrack();
+</script>
+</body>
+</html>

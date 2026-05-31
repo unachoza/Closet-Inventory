@@ -1,0 +1,74 @@
+/* ── Fiber Journey: Variant Switcher ── */
+
+@import "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap";
+
+.fiber-journey {
+  width: 100%;
+}
+
+.fj-variant-nav {
+  display: flex;
+  gap: 8px;
+  padding: 16px 24px;
+  background: #1c1a17;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+}
+
+.fj-variant-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: #8c897f;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+  white-space: nowrap;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+}
+
+.fj-variant-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #f0ede8;
+}
+
+.fj-variant-btn--active {
+  background: rgba(232, 200, 90, 0.15);
+  border-color: #e8c85a;
+  color: #e8c85a;
+}
+
+.fj-variant-btn__key {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.fj-variant-btn--active .fj-variant-btn__key {
+  background: #e8c85a;
+  color: #141210;
+}
+
+.fj-variant-btn__label {
+  font-weight: 500;
+}
+
+.fj-variant-content {
+  width: 100%;
+}
