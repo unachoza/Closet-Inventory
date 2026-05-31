@@ -24,43 +24,56 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 		const result = {} as FilterOptions;
 
 		for (const dim of FILTER_DIMENSIONS) {
-			const counts = new Map<string, number>();
+			const counts = new Map<string, { value: string; count: number }>();
 
 			for (const item of closet) {
-				const val = item[dim];
+				const raw = item[dim];
+
+				const values: string[] = [];
 
 				// string
-				if (typeof val === "string" && val.trim()) {
-					console.log("yes str");
-					counts.set(val, (counts.get(val) ?? 0) + 1);
+				if (typeof raw === "string") {
+					values.push(raw);
 				}
 
-				// array (ex: array of material objects)
-				else if (Array.isArray(val)) {
-					console.log("yes arr");
-					for (const entry of val) {
-						const label = typeof entry === "object" ? Object.values(entry).join(" ") : String(entry);
-
-						if (label.trim()) {
-							counts.set(label, (counts.get(label) ?? 0) + 1);
+				// array
+				else if (Array.isArray(raw)) {
+					raw.forEach((entry) => {
+						if (typeof entry === "string") {
+							values.push(entry);
+						} else if (entry && typeof entry === "object") {
+							values.push(Object.values(entry).join(" "));
 						}
-					}
+					});
 				}
 
 				// object
-				else if (val && typeof val === "object") {
-					console.log("yes obj");
-					const label = Object.values(val).join(" ");
+				else if (raw && typeof raw === "object") {
+					values.push(Object.values(raw).join(" "));
+				}
 
-					if (label.trim()) {
-						counts.set(label, (counts.get(label) ?? 0) + 1);
+				for (const val of values) {
+					const trimmed = val.trim();
+					if (!trimmed) continue;
+
+					// normalize for counting
+					const key = trimmed.toLowerCase();
+
+					const existing = counts.get(key);
+
+					if (existing) {
+						existing.count += 1;
+					} else {
+						// save display version (Title Case)
+						counts.set(key, {
+							value: trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase(),
+							count: 1,
+						});
 					}
 				}
 			}
 
-			result[dim] = Array.from(counts.entries())
-				.map(([value, count]) => ({ value, count }))
-				.sort((a, b) => a.value.localeCompare(b.value));
+			result[dim] = Array.from(counts.values()).sort((a, b) => a.value.localeCompare(b.value));
 		}
 
 		return result;
@@ -107,3 +120,8 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 		clearAll,
 	};
 };
+
+//TODO
+// color pills per category
+// fix filter thing on according
+// combine colors

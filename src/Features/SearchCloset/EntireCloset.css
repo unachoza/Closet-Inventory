@@ -441,8 +441,14 @@
 /* ── Results meta ── */
 .entire-closet__meta {
 	padding: var(--spacing-100) var(--spacing-200);
-	font-size: 0.82rem;
-	color: var(--Op-Light-Grey, #aaa);
+    font-size: 0.82rem;
+    color: white;
+    background: #0000008c;
+    width: fit-content;
+    margin: 5px auto;
+    border-radius: 5px;
+    border: solid black;
+    color: var(--Op-Light-Grey, #999797);
 }
 
 /* ── Items grid ── */
