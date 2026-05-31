@@ -121,28 +121,75 @@ describe("SearchSortBar", () => {
 	});
 });
 
-// ── Filter Dropdown ────────────────────────────────────────────────────────────
+// ── Filter Side Panel ──────────────────────────────────────────────────────────
 
-describe("FilterDropdown", () => {
-	it("filter panel is hidden by default", () => {
+describe("FilterSidePanel", () => {
+	it("filter panel is hidden by default (aria-hidden)", () => {
 		renderView();
-		expect(screen.queryByRole("group", { name: /filter options/i })).not.toBeInTheDocument();
+		expect(screen.queryByRole("dialog", { name: /filter options/i })).not.toBeInTheDocument();
 	});
 
-	it("clicking Filters button opens the filter panel", async () => {
+	it("clicking Filters button opens the side panel", async () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
-		expect(screen.getByRole("group", { name: /filter options/i })).toBeInTheDocument();
+		expect(screen.getByRole("dialog", { name: /filter options/i })).toBeInTheDocument();
 	});
 
-	it("filter panel contains category checkboxes", async () => {
+	it("open panel contains accordion section headers per dimension", async () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
-		// Should have checkboxes for tops, dresses, shoes
+		// Accordion headers are buttons that toggle each dimension
+		expect(screen.getByRole("button", { name: /^category/i })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /^color/i })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /^brand/i })).toBeInTheDocument();
+	});
+
+	it("accordions are expanded by default, exposing checkboxes", async () => {
+		const user = userEvent.setup();
+		renderView();
+		await user.click(screen.getByRole("button", { name: /filters/i }));
 		expect(screen.getByRole("checkbox", { name: /tops/i })).toBeInTheDocument();
 		expect(screen.getByRole("checkbox", { name: /dresses/i })).toBeInTheDocument();
+	});
+
+	it("clicking an accordion header collapses its options", async () => {
+		const user = userEvent.setup();
+		renderView();
+		await user.click(screen.getByRole("button", { name: /filters/i }));
+		const categoryHeader = screen.getByRole("button", { name: /^category/i });
+		expect(categoryHeader).toHaveAttribute("aria-expanded", "true");
+		await user.click(categoryHeader);
+		expect(categoryHeader).toHaveAttribute("aria-expanded", "false");
+		// Its checkbox should no longer be present
+		expect(screen.queryByRole("checkbox", { name: /tops/i })).not.toBeInTheDocument();
+	});
+
+	it("close (X) button closes the panel", async () => {
+		const user = userEvent.setup();
+		renderView();
+		await user.click(screen.getByRole("button", { name: /filters/i }));
+		expect(screen.getByRole("dialog", { name: /filter options/i })).toBeInTheDocument();
+		await user.click(screen.getByRole("button", { name: /close filters/i }));
+		expect(screen.queryByRole("dialog", { name: /filter options/i })).not.toBeInTheDocument();
+	});
+
+	it("'Done' button closes the panel", async () => {
+		const user = userEvent.setup();
+		renderView();
+		await user.click(screen.getByRole("button", { name: /filters/i }));
+		await user.click(screen.getByRole("button", { name: /^done$/i }));
+		expect(screen.queryByRole("dialog", { name: /filter options/i })).not.toBeInTheDocument();
+	});
+
+	it("Escape key closes the panel", async () => {
+		const user = userEvent.setup();
+		renderView();
+		await user.click(screen.getByRole("button", { name: /filters/i }));
+		expect(screen.getByRole("dialog", { name: /filter options/i })).toBeInTheDocument();
+		await user.keyboard("{Escape}");
+		expect(screen.queryByRole("dialog", { name: /filter options/i })).not.toBeInTheDocument();
 	});
 
 	it("toggling Filters button closes the panel", async () => {
@@ -150,9 +197,9 @@ describe("FilterDropdown", () => {
 		renderView();
 		const btn = screen.getByRole("button", { name: /filters/i });
 		await user.click(btn);
-		expect(screen.getByRole("group", { name: /filter options/i })).toBeInTheDocument();
+		expect(screen.getByRole("dialog", { name: /filter options/i })).toBeInTheDocument();
 		await user.click(btn);
-		expect(screen.queryByRole("group", { name: /filter options/i })).not.toBeInTheDocument();
+		expect(screen.queryByRole("dialog", { name: /filter options/i })).not.toBeInTheDocument();
 	});
 });
 
@@ -186,14 +233,16 @@ describe("FilterPillsRow", () => {
 		expect(screen.queryByLabelText(/active filters/i)).not.toBeInTheDocument();
 	});
 
-	it("'Clear all' button removes all active filters", async () => {
+	it("pills-row 'Clear all' button removes all active filters", async () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
 		await user.click(screen.getByRole("checkbox", { name: /blue/i }));
 
-		await user.click(screen.getByRole("button", { name: /clear all/i }));
+		// Scope to the pills row to avoid matching the panel-footer clear button
+		const pillsRow = screen.getByLabelText(/active filters/i);
+		await user.click(within(pillsRow).getByRole("button", { name: /clear all/i }));
 
 		expect(screen.queryByLabelText(/active filters/i)).not.toBeInTheDocument();
 	});

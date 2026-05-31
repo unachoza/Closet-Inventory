@@ -3,7 +3,7 @@ import { FilterDimension, FilterOptions, FilterState } from "../../hooks/useClos
 import { SortKey } from "../../hooks/useClosetSort";
 import SearchSortBar from "./SearchSortBar";
 import FilterPillsRow from "./FilterPillsRow";
-import FilterDropdown from "./FilterDropdown";
+import FilterSidePanel from "./FilterSidePanel";
 import "./EntireCloset.css";
 
 interface StickyTopBarProps {
@@ -48,15 +48,15 @@ const StickyTopBar = ({
 				onRemove={onToggleFilter}
 				onClearAll={onClearAll}
 			/>
-			{showFilters && (
-				<div id="filter-dropdown-panel">
-					<FilterDropdown
-						filters={filters}
-						filterOptions={filterOptions}
-						onToggle={onToggleFilter}
-					/>
-				</div>
-			)}
+			<FilterSidePanel
+				open={showFilters}
+				onClose={() => setShowFilters(false)}
+				filters={filters}
+				filterOptions={filterOptions}
+				activeFilterCount={activeFilterCount}
+				onToggle={onToggleFilter}
+				onClearAll={onClearAll}
+			/>
 		</div>
 	);
 };
