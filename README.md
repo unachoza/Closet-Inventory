@@ -281,10 +281,11 @@ npm run dev
 
 - v1 - Currently Working on
 
-✅ Edit Item and adding details view
 Visual Cohesion
 Navigation / User Journey
 Material Percentages
+view more - expand hidden details
+✅ Edit Item and adding details view
 
 - v1.1 – Enhanced Filtering & Sorting
 
@@ -293,16 +294,30 @@ Sort by age, price, date added
 ✅ Search functionality with fuzzy matching
 Dark mode support
 add pill for dry clean only clothes
+Item name visible onHover or toggle all closet option
 
--v1.2 - Auto Import
+V1.2 - Closet Analytics Dashboard
+
+Dashboard-style stats: most-worn category, average price, cost-per-wear, brand distribution, seasonal breakdown.
+Add a totalSpend and avgCostPerWear to the Analytics dashboard
+Use recharts
+Price range distribution
+Category counts (pie/bar chart)
+Brand frequency
+Average item age
+Occasion coverage gaps
+computed from localStorage data
+
+-v1.3 - Auto Import
 
 ✅ Email parsing for auto-import from shopping confirmations
 Hotmail Oauth for autoimport from online shopping, parsing emails
 Most common retails parse: Amazon, Shien, Temu
 Parse email without image - can add later in edit mode
+items withouth image - search camera roll feature to add
+items withouth image - search web feature - presented with three options
 
 v2.1 - Mobile
-
 Responsive to mobile phones - Apple & Andriod
 
 v2.2 - Mobile Camera Roll import
@@ -310,34 +325,54 @@ image parsing
 import from camera roll folder
 parse camera roll for clothes/ outfit centric photo
 
-v3.1 - Database
+V3.1 - User Oboarding
+From Empty Closet New Users can decide style of closet
+Choose background closet image
+Choose accent color (used for buttons, labels, pill, clothes card border etc)
+
+V3.2 - Oboarding Tour
+
+popup modals explaining main features to user
+user clicks confirm or skip on each explanation step
+
+v4.1 - Database
 make fullstack with database / backend
 save data to database
 option to save closet locally/ server
 work offline option
 
-- v4.1 – Advanced Features - Travel
+- v5.1 – Advanced Features - Travel
 
 "Pack a Bag" travel mode for trip planning
 select luggage size and trip length
 calculate how many clothes needed
+UI: trip form (destination type, days) → checklist of suggested items → user checks/unchecks → "export list" button
 
-- v4.2 – Advanced Features - Travel - Carry On Support
+- v5.2 – Advanced Features - Travel - Carry On Support
   calculate weight allowance for bag type  
+   Closet Analytics
+
+- v6 - Outfit Builder
   Outfit builder (inspired by Clueless)
   Weather-based outfit suggestions
-  Closet Analytics
+  Get user location via navigator.geolocation.getCurrentPosition()
+  Map weather codes → occasion tags: rain → waterproof, <10°C → "coats/layers", sunny+warm → "casual/beach"
+  Filter closet by matched occasion + show 3 outfit suggestions
 
-- v5 – User Experience - Sharing clothes
+- v6 – User Experience - Sharing clothes
 
 User authentication (optional cloud sync)
 Multi-device sync
 Access to friends closets via invitation link
 text sent request to borrow
 
-- v6 – Education & Care
+- v7 – Education & Care
 
 ✅ Fabric care guide and washing instructions
-Sustainability metrics (wear frequency, cost per wear)
 Clothing lifespan tracking
 Repair and alteration logs
+
+v8 - Sustainability
+Sustainability metrics (wear frequency, cost per wear)
+Show users which items are "worth it" — price paid ÷ number of times worn.
+Sustainability score: items with wornCount > 20 get a 🌱 badge
