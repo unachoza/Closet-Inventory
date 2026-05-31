@@ -14,6 +14,50 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 
 	const { removeItem } = useLocalStorageCloset();
 
+	const renderMaterial = ({ material }: any) => {
+		if (!material) return null;
+
+		// if material is a string
+		if (typeof material === "string") {
+			return (
+				<>
+					<strong>Material:</strong> {material}
+				</>
+			);
+		}
+
+		// if material is an array
+		if (Array.isArray(material)) {
+			return (
+				<>
+					<strong>Material:</strong> {console.log({ material }, "has more")}
+					{material.map((item, index) => {
+						console.log(item, index);
+						return (
+							<span key={index}>
+								{item.material}: {item.percentage}%{index < material.length - 1 ? ", " : ""}
+							</span>
+						);
+					})}
+				</>
+			);
+		}
+
+		// if material is an object
+		if (typeof material === "object") {
+			return (
+				<>
+					<strong>Material:</strong>{" "}
+					{Object.entries(material)
+						.map(([key, value]) => `${key}: ${value}`)
+						.join(", ")}
+				</>
+			);
+		}
+
+		return null;
+	};
+
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
 			<div className="card-inner">
@@ -42,7 +86,13 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 							<strong>Brand:</strong> {item.brand}
 						</p>
 						<p>
-							<strong>Material:</strong> {item.material}
+							{/* <strong>Material:</strong> {item.material} */}
+							{/* {item.materials.map((mat: any, idx: any) => (
+								<span key={idx}>
+									{mat.material} - {mat.percentage}%{" "}
+								</span>
+							))} */}
+							{renderMaterial(item)}
 						</p>
 						<p>
 							<strong>Occasion:</strong> {item.occasion}
