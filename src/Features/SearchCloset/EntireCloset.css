@@ -487,6 +487,9 @@
 	padding: var(--spacing-400) 0;
 	color: var(--Op-Light-Grey, #aaa);
 	text-align: center;
+	    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: var(--blur, blur(12px));
+	
 }
 
 .filtered-item-grid__empty-hint {
