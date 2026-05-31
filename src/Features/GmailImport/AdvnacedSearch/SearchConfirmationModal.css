@@ -9,15 +9,15 @@
 }
 
 .scm-mode-badge--fetch {
-	background: rgba(37, 99, 235, 0.2);
-	color: #93bbfd;
-	border: 1px solid rgba(37, 99, 235, 0.35);
+	background: var(--color-primary-muted);
+	color: var(--color-focus);
+	border: 1px solid var(--color-primary-muted-hover);
 }
 
 .scm-mode-badge--filter {
-	background: rgba(16, 185, 129, 0.2);
-	color: #6ee7b7;
-	border: 1px solid rgba(16, 185, 129, 0.35);
+	background: var(--color-success-muted);
+	color: var(--color-success-text);
+	border: 1px solid var(--color-success-border);
 }
 
 .scm-mode-hint {
@@ -94,8 +94,8 @@
 }
 
 .scm-btn--confirm {
-	background: var(--button-backround-blue, #2563eb);
-	color: var(--White, #fff);
+	background: var(--color-primary);
+	color: var(--color-white);
 }
 
 .scm-btn--edit {

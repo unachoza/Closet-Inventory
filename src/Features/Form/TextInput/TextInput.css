@@ -1,8 +1,4 @@
 
-:root{
-      --text-color: var(--Black);
-}
-
 label {
       display: flex;
       flex-direction: column;

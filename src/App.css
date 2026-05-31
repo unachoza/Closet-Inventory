@@ -2,14 +2,6 @@
 .main{
   height: 100%;
 }
-/**** VARIABLES ****/
-:root {
-  --button-backround-blue:  #2563eb;
-  --button-backround-blue-hover:#1d4ed8;
-  --button-backround-green: #808000;
-  --button-backround-green-hover: #676702;
-  --button-background-blue-grey: #1f44a8d0;
-}
 /**** COMPONENTS ****/
 
 .button-container{

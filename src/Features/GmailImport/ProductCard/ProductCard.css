@@ -96,7 +96,7 @@
 }
 
 .product-card-sale {
-	color: #ff6b6b;
+	color: var(--color-danger-light);
 	font-weight: 600;
 }
 

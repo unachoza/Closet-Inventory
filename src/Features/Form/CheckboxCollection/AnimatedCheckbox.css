@@ -1,7 +1,3 @@
-:root {
-      --Check-Blue: #2563eb
-}
-
 label.animated-checkbox {
       display: flex;
       flex-direction: row;
@@ -29,7 +25,7 @@ label.animated-checkbox {
 }
 
 .checkbox-root[data-state="checked"] {
-      background-color: var(--Check-Blue);
+      background-color: var(--color-primary);
 }
 
 .checkbox-inner {
@@ -58,11 +54,11 @@ label.animated-checkbox {
 
 .checkbox-root:hover { 
       box-shadow: 2px 2px 1.25rem var(--Black);
-      border-color: var(--Check-Blue);
+      border-color: var(--color-primary);
 }
  
 button .checkbox-label:hover + .checkbox-root{
-      box-shadow: .5rem .5rem 1.25rem var(--Check-Blue)
+      box-shadow: .5rem .5rem 1.25rem var(--color-primary)
 
 }
 label > button:active,

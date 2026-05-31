@@ -58,15 +58,15 @@
 	gap: 4px;
 	padding: 0.2rem 0.6rem;
 	border-radius: var(--border-radius-ty);
-	background: rgba(37, 99, 235, 0.25);
-	color: var(--White);
+	background: var(--color-primary-muted);
+	color: var(--color-white);
 	font-size: 0.78rem;
 	line-height: 1.4;
-	border: solid 1px black;
+	border: solid 1px var(--color-black);
 }
 
 .advanced-search-pill--excluded {
-	background: rgba(220, 38, 38, 0.25);
+	background: var(--color-danger-muted);
 }
 
 .advanced-search-pill-remove {
@@ -184,8 +184,8 @@
 }
 
 .advanced-search-submit--filter {
-	background: rgba(16, 185, 129, 0.3);
-	border: 1px solid rgba(16, 185, 129, 0.4);
+	background: var(--color-success-muted);
+	border: 1px solid var(--color-success-border);
 }
 
 .advanced-search-clear-btn {
@@ -203,9 +203,9 @@
 }
 
 .advanced-search-clear-btn:hover {
-	border-color: #ff6b6b;
-	color: #ff6b6b;
-	background: rgba(220, 38, 38, 0.1);
+	border-color: var(--color-danger-light);
+	color: var(--color-danger-light);
+	background: var(--color-danger-muted);
 }
 
 .advanced-search-clear-btn:disabled {
@@ -226,13 +226,13 @@
 }
 
 .advanced-search-status--fetch {
-	background: rgba(37, 99, 235, 0.15);
-	color: #93bbfd;
+	background: var(--color-primary-muted);
+	color: var(--color-focus);
 }
 
 .advanced-search-status--filter {
-	background: rgba(16, 185, 129, 0.15);
-	color: #6ee7b7;
+	background: var(--color-success-muted);
+	color: var(--color-success-text);
 }
 
 @keyframes pulse-status {

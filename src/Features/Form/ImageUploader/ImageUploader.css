@@ -1,7 +1,3 @@
-:root {
-      --Remove-Red: #ff6b6b
-}
-
 .image-uploader {
       display: flex;
       flex-direction: column;
@@ -48,7 +44,7 @@
 }
 
 .remove{
-      background: var(--Remove-Red)
+      background: var(--color-danger-light)
 }
 
 .remove:hover {

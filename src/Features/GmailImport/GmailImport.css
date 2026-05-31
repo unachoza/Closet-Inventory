@@ -115,8 +115,8 @@
 	margin: var(--spacing-100) 0;
 	padding: var(--spacing-100) var(--spacing-200);
 	border-radius: var(--border-radius-sm);
-	background: rgba(220, 38, 38, 0.2);
-	color: #fca5a5;
+	background: var(--color-danger-muted);
+	color: var(--color-danger-text);
 	font-size: 0.9rem;
 }
 
@@ -231,12 +231,12 @@
 }
 
 .gmail-email-label--selected {
-	background: rgba(37, 99, 235, 0.2);
-	outline: 1px solid var(--button-backround-blue);
+	background: var(--color-primary-muted);
+	outline: 1px solid var(--color-primary);
 }
 .gmail-email-label--selected:hover {
-	background: rgba(37, 100, 235, 0.387);
-	outline: 2px solid var(--button-backround-blue);
+	background: var(--color-primary-muted-hover);
+	outline: 2px solid var(--color-primary);
 }
 
 .gmail-email-checkbox {
@@ -244,7 +244,7 @@
 	width: 18px;
 	height: 18px;
 	margin-top: 2px;
-	accent-color: var(--button-backround-blue);
+	accent-color: var(--color-primary);
 	cursor: pointer;
 }
 
@@ -389,7 +389,7 @@
 	margin-top: var(--spacing-100);
 	border: none;
 	border-radius: var(--border-radius-sm);
-	background: var(--button-backround-blue, #2563eb);
+	background: var(--color-primary);
 	color: var(--White);
 	font-size: 0.9rem;
 	font-weight: 500;
@@ -404,20 +404,15 @@
 .gmail-preview-image-notice {
 	padding: var(--spacing-100) var(--spacing-200);
 	border-radius: var(--border-radius-sm);
-	background: rgba(251, 191, 36, 0.12);
-	border: 1px solid rgba(251, 191, 36, 0.3);
-	padding: var(--spacing-100) var(--spacing-200);
-	border-radius: var(--border-radius-sm);
-	background: rgb(251 191 36 / 52%);
-	border: 1px solid rgb(245 204 98);
+	background: var(--color-warning);
+	border: 1px solid var(--color-warning-border);
 }
 
 .gmail-preview-image-notice p {
-	font-size: 1rem;
 	margin: 0;
-	color: var(--Op-Light-Grey);
+	color: var(--color-white);
+	font-size: 1rem;
 	line-height: 1.5;
-	color: white;
 	text-align: center;
 }
 
