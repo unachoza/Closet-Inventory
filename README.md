@@ -277,102 +277,279 @@ cd closet-inventory
 npm install
 npm run dev
 
+---
+
+## 👤 User Persona
+
+### Maya — "The Overwhelmed Fashionista"
+
+> *"I keep buying things I already own, and I still feel like I have nothing to wear."*
+
+| | |
+|---|---|
+| **Age** | 26 |
+| **Occupation** | Marketing Coordinator |
+| **Location** | Urban — NYC, LA, Chicago |
+| **Devices** | iPhone, MacBook |
+| **Tech Comfort** | High — uses 10+ apps daily |
+
+**Lifestyle**
+Maya shops frequently (online and in-store), follows trends on TikTok and Pinterest, and rotates between professional, casual, and going-out wardrobes. She genuinely cares about sustainability but struggles to resist fast fashion.
+
+**Pain Points**
+- Opens her closet in the morning and feels overwhelmed — takes 20+ minutes to decide
+- Has bought the same type of white sneaker three times because she forgot she owned one
+- Can't remember if she paid $40 or $200 for something, making it hard to know when to replace it
+- Travels often and always over-packs because there's no system
+- Has "guilt items" — pieces she bought and never wore — but can't track which ones
+
+**Goals**
+- Know exactly what she owns without digging through physical piles
+- Get dressed faster with less decision fatigue
+- Shop smarter — buy things that actually fill gaps, not duplicates
+- Feel good about her wardrobe choices, not guilty about waste
+
+**What She Values in an App**
+- Beautiful, visual UI — feels like *her* closet, not a spreadsheet
+- Fast to use — logging a new item should take under a minute
+- Smart suggestions, not manual work — surface the right items for the context
+- Privacy — her wardrobe is personal; no social pressure by default
+
+---
+
 ## 🗺️ Roadmap
 
-- v1 - Currently Working on
+> ✅ = Shipped &nbsp;|&nbsp; 🔲 = Planned
 
-Visual Cohesion
-Navigation / User Journey
-Material Percentages
-view more - expand hidden details
-✅ Edit Item and adding details view
+---
 
-- v1.1 – Enhanced Filtering & Sorting
+### v1.0 — Foundation Polish *(current)*
 
-Filter by category, color, brand, material, occasion
-Sort by age, price, date added
-✅ Search functionality with fuzzy matching
-Dark mode support
-add pill for dry clean only clothes
-Item name visible onHover or toggle all closet option
+**UI**
+- ✅ Edit item with full detail view
+- Visual cohesion across all views (consistent spacing, color, typography)
+- Improved navigation and user journey between screens
+- "View more" expand/collapse to reveal hidden item details
 
-V1.2 - Closet Analytics Dashboard
+**Business Logic / Functionality**
+- Material percentage breakdown (e.g. 80% cotton, 20% polyester)
+- Consistent field normalization across all saved items
 
-Dashboard-style stats: most-worn category, average price, cost-per-wear, brand distribution, seasonal breakdown.
-Add a totalSpend and avgCostPerWear to the Analytics dashboard
-Use recharts
-Price range distribution
-Category counts (pie/bar chart)
-Brand frequency
-Average item age
-Occasion coverage gaps
-computed from localStorage data
+---
 
--v1.3 - Auto Import
+### v1.1 — Search, Filter & Sort
 
-✅ Email parsing for auto-import from shopping confirmations
-Hotmail Oauth for autoimport from online shopping, parsing emails
-Most common retails parse: Amazon, Shien, Temu
-Parse email without image - can add later in edit mode
-items withouth image - search camera roll feature to add
-items withouth image - search web feature - presented with three options
+**UI**
+- ✅ Fuzzy search bar with debounce and match highlighting
+- ✅ Filter side panel (slide-in from left) with collapsible accordion sections per dimension
+- ✅ Active filter pills row with individual remove and "Clear all"
+- Sort dropdown (date added, price, age, name A–Z)
+- Dark mode toggle (CSS custom property swap, button in nav)
+- "Dry clean only" quick-filter pill
+- Item name visible on card hover (or global toggle to show all names)
 
-v2.1 - Mobile
-Responsive to mobile phones - Apple & Andriod
+**Business Logic / Functionality**
+- ✅ OR logic within a filter dimension, AND across dimensions
+- ✅ Dynamic option counts update as filters are applied
+- ✅ Sort: price (strip non-numeric), age (ordinal map), name (alphabetical)
+- ✅ Fuse.js fuzzy match (threshold 0.4, ignoreLocation, 300ms debounce)
 
-v2.2 - Mobile Camera Roll import
-image parsing
-import from camera roll folder
-parse camera roll for clothes/ outfit centric photo
+---
 
-V3.1 - User Oboarding
-From Empty Closet New Users can decide style of closet
-Choose background closet image
-Choose accent color (used for buttons, labels, pill, clothes card border etc)
+### v1.2 — Closet Analytics Dashboard
 
-V3.2 - Oboarding Tour
+**UI**
+- Dashboard screen with summary stats cards (total items, total spend, avg cost-per-wear)
+- Category breakdown — pie or bar chart via `recharts`
+- Brand frequency chart
+- Price range distribution histogram
+- Occasion coverage gap indicator (e.g. "You have no formal wear")
+- Sustainability score badge 🌱 on items worn 20+ times
 
-popup modals explaining main features to user
-user clicks confirm or skip on each explanation step
+**Business Logic / Functionality**
+- `useClosetStats` hook — pure computation over `ClothingItem[]`, no backend needed
+- `costPerWear` = `parsedPrice / wornCount` (guard divide-by-zero)
+- `totalSpend`, `avgCostPerWear`, `mostWornCategory` derived from localStorage
+- Wear count tracking: `wornCount: number` field on each item, incremented via "Log a Wear" button
+- Sustainability score: `wornCount > 20` → 🌱 badge; score = `wornCount / (parsedPrice / 10)`
 
-v4.1 - Database
-make fullstack with database / backend
-save data to database
-option to save closet locally/ server
-work offline option
+---
 
-- v5.1 – Advanced Features - Travel
+### v1.3 — Auto Import (Email)
 
-"Pack a Bag" travel mode for trip planning
-select luggage size and trip length
-calculate how many clothes needed
-UI: trip form (destination type, days) → checklist of suggested items → user checks/unchecks → "export list" button
+**UI**
+- ✅ Gmail OAuth import screen (parse shopping confirmation emails)
+- Connect Hotmail / Outlook account for email import
+- Retailer logo shown during parsing (Amazon, Shein, Temu, ASOS)
+- Items parsed without images displayed with placeholder + prompt to add photo later
+- "Find image" flow: search camera roll, or search web → presented with 3 image options to pick
 
-- v5.2 – Advanced Features - Travel - Carry On Support
-  calculate weight allowance for bag type  
-   Closet Analytics
+**Business Logic / Functionality**
+- ✅ Gmail API OAuth + email thread parsing
+- Hotmail OAuth integration (Microsoft identity platform)
+- Retailer-specific email parsers for: Amazon, Shein, Temu (note: Temu embeds product data in images — OCR required or skip image, add in edit mode)
+- Structured item extraction: name, price, brand, category from email HTML
+- Deduplication check — skip import if item UUID already exists in localStorage
 
-- v6 - Outfit Builder
-  Outfit builder (inspired by Clueless)
-  Weather-based outfit suggestions
-  Get user location via navigator.geolocation.getCurrentPosition()
-  Map weather codes → occasion tags: rain → waterproof, <10°C → "coats/layers", sunny+warm → "casual/beach"
-  Filter closet by matched occasion + show 3 outfit suggestions
+---
 
-- v6 – User Experience - Sharing clothes
+### v2.0 — Mobile
 
-User authentication (optional cloud sync)
-Multi-device sync
-Access to friends closets via invitation link
-text sent request to borrow
+**UI**
+- Responsive layout adapted for iPhone and Android screen sizes
+- Touch-friendly tap targets (min 44×44px), swipe gestures on cards
+- Bottom navigation bar on mobile (replaces sidebar nav)
 
-- v7 – Education & Care
+**Business Logic / Functionality**
+- Viewport breakpoint strategy — `min-width` media queries, no separate mobile codebase
+- Image upload via `<input type="file" capture="environment">` to open camera directly on mobile
 
-✅ Fabric care guide and washing instructions
-Clothing lifespan tracking
-Repair and alteration logs
+---
 
-v8 - Sustainability
-Sustainability metrics (wear frequency, cost per wear)
-Show users which items are "worth it" — price paid ÷ number of times worn.
-Sustainability score: items with wornCount > 20 get a 🌱 badge
+### v2.1 — Camera Roll Import
+
+**UI**
+- "Import from Camera Roll" button on the add-item flow
+- Gallery picker — photo grid for selecting multiple images
+- AI clothing detection overlay — highlights identified clothing items in the photo
+
+**Business Logic / Functionality**
+- Image parsing via Vision API (e.g. OpenAI GPT-4o) — send image, receive structured metadata (category, color, approximate brand)
+- Filter camera roll for clothing/outfit-centric photos (ML confidence threshold)
+- Pre-fill item form fields from detected metadata; user reviews before saving
+
+---
+
+### v3.0 — Onboarding & Personalization
+
+**UI**
+- First-launch onboarding flow for empty closet
+  - Choose closet background image (curated set or upload own)
+  - Choose accent color — applied to buttons, labels, pills, card borders
+- Visual preview updates in real time as user picks options
+
+**Business Logic / Functionality**
+- Persist theme preferences (`accentColor`, `closetBackground`) in localStorage
+- CSS custom property injection at runtime (`document.documentElement.style.setProperty(...)`)
+- Onboarding completion flag — skip flow on subsequent launches
+
+---
+
+### v3.1 — Onboarding Tour
+
+**UI**
+- Step-by-step feature walkthrough via popup modals (tooltips anchored to UI elements)
+- "Confirm" / "Skip" on each step; "Skip tour" exits early
+- Progress indicator (Step 1 of 5)
+
+**Business Logic / Functionality**
+- Tour state machine: array of steps with target element selector, title, description
+- `tourCompleted` flag in localStorage prevents re-showing
+- Scroll-into-view for anchored tooltips; highlight overlay on target element
+
+---
+
+### v4.0 — Backend & Database
+
+**UI**
+- Account creation / login screen (email + password, or Google OAuth)
+- "Sync" status indicator in nav (synced, syncing, offline)
+- Option to keep closet local-only (no account required)
+
+**Business Logic / Functionality**
+- REST API or tRPC backend — CRUD endpoints for closet items
+- Database: PostgreSQL (items, users, outfits, packing lists)
+- Offline-first: localStorage as cache layer, sync on reconnect
+- Conflict resolution: last-write-wins with `updatedAt` timestamps
+- Multi-device sync via WebSocket or polling
+
+---
+
+### v5.0 — Travel: Pack a Bag
+
+**UI**
+- Trip setup form: destination type (beach, business, hiking, city), duration (days), luggage size (carry-on / checked)
+- Suggested packing checklist — items pulled from user's closet, grouped by category
+- User checks/unchecks items; can swap suggestions
+- "Carry-on weight" indicator for v5.1
+
+**Business Logic / Functionality**
+- `usePackingList` hook — filter closet by occasion tag, group by category, limit quantity by trip length
+- Luggage capacity rules: carry-on = 7kg / 22L, checked = 23kg; each item has estimated weight (default by category)
+- Packing lists saved to localStorage: `{ id, tripName, itemIds[], packed[] }`
+- No new clothing data model needed — reads existing `occasion` and `category` fields
+
+---
+
+### v5.1 — Travel: Carry-On Weight Calculator
+
+**UI**
+- Weight progress bar on the packing list screen (e.g. "4.2kg / 7kg")
+- Per-item weight shown as a small chip; editable inline
+- Warning indicator when approaching the limit
+
+**Business Logic / Functionality**
+- Default weight estimates per category (shirt ~200g, jeans ~600g, shoes ~800g)
+- User can override per-item weight; stored on the `ClothingItem`
+- Running total computed from selected packing list items
+
+---
+
+### v6.0 — Outfit Builder
+
+**UI**
+- Split-pane interface: left = closet grid (filterable), right = outfit canvas
+- Drag items onto the canvas into category slots: Top, Bottom, Shoes, Accessory, Outerwear
+- Canvas renders items as layered cards; supports reorder and swap
+- Save outfit with a name and occasion tag; view saved outfits in an Outfits gallery
+
+**Business Logic / Functionality**
+- Drag-and-drop via `@dnd-kit/core`
+- `Outfit` data model: `{ id, name, occasion, itemIds: string[], createdAt }`
+- `useOutfits` hook — CRUD in localStorage
+- Weather-based suggestions: fetch Open-Meteo API (no API key) via `navigator.geolocation`, map weather codes → occasion tags, auto-filter closet to matching items
+
+---
+
+### v6.1 — Social & Sharing
+
+**UI**
+- "Share closet" invite link — opens a read-only view of a friend's closet
+- "Request to borrow" button on items in a shared closet
+- Borrow request notification (in-app + SMS)
+
+**Business Logic / Functionality**
+- Requires v4.0 (backend) — shared closets are server-side, not localStorage
+- Invite link generates a signed token with read-only scope
+- Borrow request: push notification via SMS (Twilio) or email
+- Privacy controls: user chooses which items/categories are visible in shared view
+
+---
+
+### v7.0 — Education & Care
+
+**UI**
+- ✅ Fabric care guide with washing instructions per material
+- Clothing lifespan tracker — "estimated wears remaining" based on item age and wear count
+- Repair and alteration log — accordion in edit view (date, description, cost)
+
+**Business Logic / Functionality**
+- ✅ Material-to-care-instructions mapping
+- Lifespan model: average lifespan per category (jeans ~300 wears, cotton tee ~100 wears) minus `wornCount`
+- `repairs: { date: string, note: string, cost?: string }[]` field on `ClothingItem`
+
+---
+
+### v8.0 — Sustainability
+
+**UI**
+- Sustainability score displayed on each item card (🌱 badge at 20+ wears)
+- "Cost per wear" visible on card hover or in detail view
+- "Worth It" leaderboard — top 5 most cost-effective items in the closet
+- "Guilt Items" filter — items with 0 wears and age > 6 months, prompted with "donate or sell?" CTA
+
+**Business Logic / Functionality**
+- `costPerWear` = `parsedPrice / wornCount`
+- `sustainabilityScore` = weighted formula: `wornCount × 0.6 + (lifespan / age) × 0.4`
+- "Guilt items" query: `wornCount === 0 && monthsOld > 6`
+- All computed client-side from existing `ClothingItem` fields + `wornCount`
