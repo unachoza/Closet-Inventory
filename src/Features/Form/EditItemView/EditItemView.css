@@ -208,3 +208,22 @@ label.animated-checkbox button.checkbox-root {
       color: white;
       cursor: pointer;
 }
+
+/* ── Material blend section ──────────────────────────────────────────── */
+.edit-form-material {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0.75rem 0.25rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 0.25rem 0;
+}
+
+.edit-form-material__label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.5);
+}
