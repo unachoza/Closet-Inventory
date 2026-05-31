@@ -82,16 +82,17 @@
 }
 
 /* Swimlanes grid */
-.jc-swimlanes {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  align-items: start;
+.jc-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .jc-phase-col {
   display: flex;
   flex-direction: column;
+  width: 450px;
 }
 
 /* Phase header node */

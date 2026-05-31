@@ -265,3 +265,6 @@ export const PHASES: Phase[] = [
 		],
 	},
 ];
+
+// sources
+// https://revolutionfibers.com/blogs/discover/the-complete-beginners-illustrated-guide-to-drop-spindle-spinning?srsltid=AfmBOopoFVlXweJYAfCjtwtIIavy86LiuU7Dq3OYehGMLbIv4E0NbsAd
