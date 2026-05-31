@@ -9,6 +9,7 @@ import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
+import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { Menu, Search, Filter, Spool, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
 import "./App.css";
@@ -131,6 +132,10 @@ function App() {
 								<Spool size={16} />
 								Fabric Guide{" "}
 							</button>
+							<button onClick={() => setView("entireCloset")}>
+								<Search size={16} />
+								Search Closet
+							</button>
 						</div>
 						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
 						{view === "gmail" && (
@@ -142,6 +147,7 @@ function App() {
 							/>
 						)}
 						{view === "fabric" && <InteractiveGuide />}
+						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
 						{view === "carousel" && (
 							<div data-testid="carousel">
 								<Carousel setCategory={setSelectedCategory as any} />
