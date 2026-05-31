@@ -16,15 +16,19 @@ Closet Inventory empowers users to create a comprehensive digital wardrobe with 
 ## 🚀 Quick Start Installation & Setup
 
 ### Clone the repository
+
 git clone https://github.com/your-username/closet-inventory.git
 
 ### Navigate to project directory
+
 cd closet-inventory
 
 ### Install dependencies
+
 npm install
 
 ### Start development server
+
 npm run dev
 
 ## 📌 Features
@@ -115,11 +119,12 @@ npm run dev
 
 ## Tech Stach Libraries Used
 
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run test         # Run test suite
-npm run lint         # Lint codebase
+npm run dev # Start development server
+npm run build # Build for production
+npm run preview # Preview production build
+npm run test # Run test suite
+npm run lint # Lint codebase
+
 ```
 
 ---
@@ -196,27 +201,29 @@ Each saved item includes:
 
 ## 🏗️ Project Structure
 ```
+
 src/
 ├── components/
-│   ├── ProgressionTracker/    # Multi-step form progress UI
-│   ├── DatePicker/             # Custom month/year selector
-│   ├── ImageUploader/          # File upload + preview component
-│   ├── Closet/                 # Grid view and item cards
-│   ├── Toast/                  # Notification system
-│   └── ui/                     # Shared UI primitives (Button, Input, etc.)
+│ ├── ProgressionTracker/ # Multi-step form progress UI
+│ ├── DatePicker/ # Custom month/year selector
+│ ├── ImageUploader/ # File upload + preview component
+│ ├── Closet/ # Grid view and item cards
+│ ├── Toast/ # Notification system
+│ └── ui/ # Shared UI primitives (Button, Input, etc.)
 ├── hooks/
-│   ├── useLocalCloset.ts       # Closet data management hook
-│   ├── useLocalStorage.ts      # Generic localStorage hook
-│   └── useStockPhoto.ts        # Stock image generation
+│ ├── useLocalCloset.ts # Closet data management hook
+│ ├── useLocalStorage.ts # Generic localStorage hook
+│ └── useStockPhoto.ts # Stock image generation
 ├── utils/
-│   ├── types.ts                # TypeScript interfaces & types
-│   ├── constants.ts            # App-wide constants (categories, colors)
-│   └── formatters.ts           # Date, age, and display formatters
+│ ├── types.ts # TypeScript interfaces & types
+│ ├── constants.ts # App-wide constants (categories, colors)
+│ └── formatters.ts # Date, age, and display formatters
 ├── styles/
-│   ├── theme.css               # CSS custom properties (colors, spacing)
-│   └── *.module.css            # Component-scoped CSS modules
-├── App.tsx                     # Root component
-└── main.tsx                    # Application entry point
+│ ├── theme.css # CSS custom properties (colors, spacing)
+│ └── \*.module.css # Component-scoped CSS modules
+├── App.tsx # Root component
+└── main.tsx # Application entry point
+
 ```
 
 ---
@@ -260,6 +267,7 @@ src/
 
 **Data Flow:**
 ```
+
 User Input → Form State → Validation → Hook (useLocalCloset) → localStorage → UI Update
 
 ## ⚙️ Installation & Setup
@@ -270,37 +278,66 @@ npm install
 npm run dev
 
 ## 🗺️ Roadmap
-- v1 - Currently Working on 
 
-Edit Item and adding details view
+- v1 - Currently Working on
+
+✅ Edit Item and adding details view
 Visual Cohesion
 Navigation / User Journey
 Material Percentages
 
 - v1.1 – Enhanced Filtering & Sorting
 
- Filter by category, color, brand, material, occasion
- Sort by age, price, date added
- Search functionality with fuzzy matching
+Filter by category, color, brand, material, occasion
+Sort by age, price, date added
+✅ Search functionality with fuzzy matching
+Dark mode support
+add pill for dry clean only clothes
 
-- v1.2 – Advanced Features
+-v1.2 - Auto Import
 
- Email parsing for auto-import from shopping confirmations
- "Pack a Bag" travel mode for trip planning
- Outfit builder (inspired by Clueless)
- Weather-based outfit suggestions
- Closet Analytics
+✅ Email parsing for auto-import from shopping confirmations
+Hotmail Oauth for autoimport from online shopping, parsing emails
+Most common retails parse: Amazon, Shien, Temu
+Parse email without image - can add later in edit mode
 
-- v1.3 – User Experience
+v2.1 - Mobile
 
- User authentication (optional cloud sync)
- Multi-device sync
- Export wardrobe as CSV/JSON
- Dark mode support
+Responsive to mobile phones - Apple & Andriod
 
-- v1.4 – Education & Care
+v2.2 - Mobile Camera Roll import
+image parsing
+import from camera roll folder
+parse camera roll for clothes/ outfit centric photo
 
- Fabric care guide and washing instructions
- Sustainability metrics (wear frequency, cost per wear)
- Clothing lifespan tracking
- Repair and alteration logs
+v3.1 - Database
+make fullstack with database / backend
+save data to database
+option to save closet locally/ server
+work offline option
+
+- v4.1 – Advanced Features - Travel
+
+"Pack a Bag" travel mode for trip planning
+select luggage size and trip length
+calculate how many clothes needed
+
+- v4.2 – Advanced Features - Travel - Carry On Support
+  calculate weight allowance for bag type  
+  Outfit builder (inspired by Clueless)
+  Weather-based outfit suggestions
+  Closet Analytics
+
+- v5 – User Experience - Sharing clothes
+
+User authentication (optional cloud sync)
+Multi-device sync
+Access to friends closets via invitation link
+text sent request to borrow
+
+- v6 – Education & Care
+
+✅ Fabric care guide and washing instructions
+Sustainability metrics (wear frequency, cost per wear)
+Clothing lifespan tracking
+Repair and alteration logs
