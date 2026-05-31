@@ -56,7 +56,7 @@ const JourneyC = () => {
 						const previews = STEP_PREVIEWS[phase.id] ?? [];
 
 						return (
-							<div key={phase.id} className="jc-phase-col">
+							<div key={phase.id} className={`jc-phase-col jc-phase-col-${pi}`}>
 								{/* Phase header node */}
 								<div
 									className="jc-phase-header-node"
