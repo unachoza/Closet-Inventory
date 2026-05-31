@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
+import normalizeColor from "../utils/normalizeColors";
 
 export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion";
 export type FilterState = Record<FilterDimension, string[]>;
@@ -56,9 +57,11 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 					const trimmed = val.trim();
 					if (!trimmed) continue;
 
-					// normalize for counting
-					const key = trimmed.toLowerCase();
+					// ONLY normalize colors
+					const grouped = dim === "color" ? normalizeColor(trimmed) : trimmed;
 
+					// normalize for counting
+					const key = grouped.toLowerCase();
 					const existing = counts.get(key);
 
 					if (existing) {

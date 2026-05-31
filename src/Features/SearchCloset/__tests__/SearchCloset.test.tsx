@@ -146,6 +146,7 @@ describe("FilterSidePanel", () => {
 		expect(screen.getByRole("button", { name: /^brand/i })).toBeInTheDocument();
 	});
 
+	//not expanded
 	it("accordions are expanded by default, exposing checkboxes", async () => {
 		const user = userEvent.setup();
 		renderView();
