@@ -6,13 +6,7 @@ export type FilterState = Record<FilterDimension, string[]>;
 export type FilterOption = { value: string; count: number };
 export type FilterOptions = Record<FilterDimension, FilterOption[]>;
 
-const FILTER_DIMENSIONS: FilterDimension[] = [
-	"category",
-	"color",
-	"brand",
-	"material",
-	"occasion",
-];
+const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion"];
 
 const INITIAL_FILTERS: FilterState = {
 	category: [],
@@ -31,12 +25,39 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 
 		for (const dim of FILTER_DIMENSIONS) {
 			const counts = new Map<string, number>();
+
 			for (const item of closet) {
-				const val = (item[dim] as string) ?? "";
-				if (val.trim()) {
+				const val = item[dim];
+
+				// string
+				if (typeof val === "string" && val.trim()) {
+					console.log("yes str");
 					counts.set(val, (counts.get(val) ?? 0) + 1);
 				}
+
+				// array (ex: array of material objects)
+				else if (Array.isArray(val)) {
+					console.log("yes arr");
+					for (const entry of val) {
+						const label = typeof entry === "object" ? Object.values(entry).join(" ") : String(entry);
+
+						if (label.trim()) {
+							counts.set(label, (counts.get(label) ?? 0) + 1);
+						}
+					}
+				}
+
+				// object
+				else if (val && typeof val === "object") {
+					console.log("yes obj");
+					const label = Object.values(val).join(" ");
+
+					if (label.trim()) {
+						counts.set(label, (counts.get(label) ?? 0) + 1);
+					}
+				}
 			}
+
 			result[dim] = Array.from(counts.entries())
 				.map(([value, count]) => ({ value, count }))
 				.sort((a, b) => a.value.localeCompare(b.value));
@@ -58,17 +79,12 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 		});
 	}, [closet, filters]);
 
-	const activeFilterCount = useMemo(
-		() => FILTER_DIMENSIONS.reduce((sum, dim) => sum + filters[dim].length, 0),
-		[filters]
-	);
+	const activeFilterCount = useMemo(() => FILTER_DIMENSIONS.reduce((sum, dim) => sum + filters[dim].length, 0), [filters]);
 
 	const toggleFilter = (dim: FilterDimension, value: string) => {
 		setFilters((prev) => {
 			const current = prev[dim];
-			const next = current.includes(value)
-				? current.filter((v) => v !== value)
-				: [...current, value];
+			const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
 			return { ...prev, [dim]: next };
 		});
 	};
