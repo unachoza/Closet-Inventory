@@ -272,7 +272,7 @@ npm run dev
 ## 🗺️ Roadmap
 - v1 - Currently Working on 
 
-Edit Item and adding details view
+✅ Edit Item and adding details view
 Visual Cohesion
 Navigation / User Journey
 Material Percentages
@@ -285,7 +285,7 @@ Material Percentages
 
 - v1.2 – Advanced Features
 
- Email parsing for auto-import from shopping confirmations
+ ✅ Email parsing for auto-import from shopping confirmations
  "Pack a Bag" travel mode for trip planning
  Outfit builder (inspired by Clueless)
  Weather-based outfit suggestions
@@ -300,7 +300,7 @@ Material Percentages
 
 - v1.4 – Education & Care
 
- Fabric care guide and washing instructions
+ ✅ Fabric care guide and washing instructions
  Sustainability metrics (wear frequency, cost per wear)
  Clothing lifespan tracking
  Repair and alteration logs

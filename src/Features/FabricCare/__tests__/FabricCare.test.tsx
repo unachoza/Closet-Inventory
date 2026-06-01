@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-import FabricCare from "./FabricCare";
+import FabricCare from "../FabricCare";
 
 describe("FabricCare Component", () => {
 	it("renders care instructions correctly when given a string", () => {

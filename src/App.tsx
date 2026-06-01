@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { EditProvider } from "./Features/Form/EditContext";
 import Header from "./Components/Header";
+import NavBar from "./Components/NavBar/NavBar";
 import { ToastProvider } from "./Components/Toast/Toast";
 import EditItemView from "./Features/Form/EditItemView/EditItemView";
 import MultiStepForm from "./Features/Form/Form";
@@ -8,6 +9,7 @@ import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
+import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { Menu, Search, Filter, Spool, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
 import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
 import "./App.css";
@@ -105,65 +107,76 @@ function App() {
 	return (
 		// <TextileGuildInteractive/>
 		<div className="main">
-			<EditProvider>
-				<ToastProvider>
-					<Header />
-					<div className="button-container">
-						<button onClick={handleAddItem}>
-							<Plus size={16} />
-							Add Item
-						</button>
-						<button onClick={() => setView("overview")}>
-							<LayoutGrid size={16} />
-							View Closet
-						</button>
-						<button onClick={() => setView("gmail")}>
-							<Download size={16} />
-							Import from Gmail
-						</button>
-						<button onClick={() => setView("fabric")}>
-							<Spool size={16} />
-							Fabric Guide{" "}
-						</button>
-					</div>
-					{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
-					{view === "gmail" && (
-						<GmailImport
-							onImport={handleGmailImport}
-							onImportAll={handleGmailImportAll}
-							initialSelectedEmailId={gmailSourceEmailId}
-							onSourceEmailChange={handleSourceEmailChange}
-						/>
-					)}
-					{view === "fabric" && <InteractiveGuide />}
-					{view === "carousel" && (
-						<div data-testid="carousel">
-							<Carousel setCategory={setSelectedCategory as any} />
+			{view === "overview" ? (
+				<div>
+					<NavBar /> <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
+				</div>
+			) : (
+				<EditProvider>
+					<ToastProvider>
+						<Header />
+						<div className="button-container">
+							<button onClick={handleAddItem}>
+								<Plus size={16} />
+								Add Item
+							</button>
+							<button onClick={() => setView("overview")}>
+								<LayoutGrid size={16} />
+								View Closet
+							</button>
+							<button onClick={() => setView("gmail")}>
+								<Download size={16} />
+								Import from Gmail
+							</button>
+							<button onClick={() => setView("fabric")}>
+								<Spool size={16} />
+								Fabric Guide{" "}
+							</button>
+							<button onClick={() => setView("entireCloset")}>
+								<Search size={16} />
+								Search Closet
+							</button>
 						</div>
-					)}
-					{view === "carousel" && (
-						<div data-testid="closet-container">
-							<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
-						</div>
-					)}
-					{view === "edit" && editItem && (
-						<EditItemView
-							key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
-							item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
-							mode={editMode}
-							setView={setView}
-							onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
-							onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
-							onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
-							queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
-							queueTotal={isInBatchMode ? importQueue.length : undefined}
-						/>
-					)}
-					<button className="back-button" onClick={() => setView("carousel")}>
-						Back to Carousel
-					</button>
-				</ToastProvider>
-			</EditProvider>
+						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
+						{view === "gmail" && (
+							<GmailImport
+								onImport={handleGmailImport}
+								onImportAll={handleGmailImportAll}
+								initialSelectedEmailId={gmailSourceEmailId}
+								onSourceEmailChange={handleSourceEmailChange}
+							/>
+						)}
+						{view === "fabric" && <InteractiveGuide />}
+						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
+						{view === "carousel" && (
+							<div data-testid="carousel">
+								<Carousel setCategory={setSelectedCategory as any} />
+							</div>
+						)}
+						{view === "carousel" && (
+							<div data-testid="closet-container">
+								<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
+							</div>
+						)}
+						{view === "edit" && editItem && (
+							<EditItemView
+								key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
+								item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
+								mode={editMode}
+								setView={setView}
+								onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
+								onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
+								onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+								queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
+								queueTotal={isInBatchMode ? importQueue.length : undefined}
+							/>
+						)}
+						<button className="back-button" onClick={() => setView("carousel")}>
+							Back to Carousel
+						</button>
+					</ToastProvider>
+				</EditProvider>
+			)}
 		</div>
 	);
 }
