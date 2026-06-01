@@ -30,9 +30,8 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 		if (Array.isArray(material)) {
 			return (
 				<>
-					<strong>Material:</strong> {console.log({ material }, "has more")}
+					<strong>Material:</strong> 
 					{material.map((item, index) => {
-						console.log(item, index);
 						return (
 							<span key={index}>
 								{item.material}: {item.percentage}%{index < material.length - 1 ? ", " : ""}
