@@ -41,7 +41,6 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 		() =>
 			(items: ClothingItem[]): ClothingItem[] => {
 				const copy = [...items];
-				console.log(copy.length, "copy");
 				switch (sortKey) {
 					case "priceAsc":
 						return copy.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
@@ -60,7 +59,7 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 						return copy;
 				}
 			},
-		[sortKey],
+		[sortKey]
 	);
 
 	return { sortKey, setSortKey, sortedItems };
