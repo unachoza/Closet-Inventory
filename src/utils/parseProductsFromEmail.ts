@@ -523,8 +523,13 @@ function extractFromNestedTables(doc: Document): ExtractedProduct[] {
 		if (!name && !brand) continue;
 		if (!name) name = brand;
 
-		// Deduplicate by name+brand (handles case where image is missing/same)
-		const dedupeKey = `${brand}|${name}`.toLowerCase();
+		// Deduplicate by brand+name+image+price. Resale orders (ThredUp) often
+		// contain several copies of the same style (same brand + name) that are
+		// nonetheless distinct line items — they differ by image and/or price.
+		// Keying on brand+name alone collapsed them into one; including the image
+		// URL and price keeps genuinely-separate purchases as separate items
+		// while still de-duping true repeats (identical row rendered twice).
+		const dedupeKey = `${brand}|${name}|${imageUrl}|${price}`.toLowerCase();
 		if (seenKeys.has(dedupeKey)) continue;
 		seenKeys.add(dedupeKey);
 

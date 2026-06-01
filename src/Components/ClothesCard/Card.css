@@ -136,7 +136,7 @@
 @media (max-width: 480px) {
   :root {
     /* Two cards per row on small phones */
-    --Card-width: calc(50vw - 1.5rem);
+    --Card-width: calc(40vw - 3rem);
     --Card-height: 14rem;
   }
 
@@ -144,6 +144,8 @@
     object-fit: cover;
   }
 }
+
+
 
 @media screen and (max-width: 389px) {
  /* Style adjustments for compact screens */

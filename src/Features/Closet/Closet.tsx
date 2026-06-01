@@ -77,11 +77,14 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 		<div className="items-overview">
 			{hasItems ? (
 				<motion.div
-					// Remount on category change so the stagger replays. No `mode="wait"`
-					// AnimatePresence: the grid always animates straight to its visible
-					// state and can never get stranded waiting on an exit that never
-					// completes (the cause of the blank-screen bug).
-					key={normalizedCategory || "all"}
+					// Remount on category OR page change so the stagger replays. The
+					// container's `staggerChildren` only orchestrates its children from
+					// `hidden`→`show` when the parent mounts/re-keys; without `currentPage`
+					// in the key, paging in new cards left them stuck at the `hidden`
+					// variant (opacity:0 — present in the DOM but invisible). No
+					// `mode="wait"` AnimatePresence here, so remounting is safe and can
+					// never strand the grid waiting on an exit (the blank-screen bug).
+					key={`${normalizedCategory || "all"}-${currentPage}`}
 					className="items-grid"
 					variants={containerVariants}
 					initial="hidden"
