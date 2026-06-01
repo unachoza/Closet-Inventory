@@ -333,11 +333,11 @@ Maya shops frequently (online and in-store), follows trends on TikTok and Pinter
 - ✅ Edit item with full detail view
 - Visual cohesion across all views (consistent spacing, color, typography)
 - Improved navigation and user journey between screens
-- "View more" expand/collapse to reveal hidden item details
+- "View more" expand/collapse to reveal hidden item details on Clothes Cards
 
 **Business Logic / Functionality**
 
-- Material percentage breakdown (e.g. 80% cotton, 20% polyester)
+- ✅ Material percentage breakdown (e.g. 80% cotton, 20% polyester)
 - Consistent field normalization across all saved items
 
 ---
@@ -348,12 +348,12 @@ Maya shops frequently (online and in-store), follows trends on TikTok and Pinter
 
 - ✅ Fuzzy search bar with debounce and match highlighting
 - ✅ Filter side panel (slide-in from left) with collapsible accordion sections per dimension
-- Filter functionality - not working
+- ✅ Filter functionality - not working
 - ✅ Active filter pills row with individual remove and "Clear all"
 - Sort dropdown (date added, price, age, name A–Z)
 - Dark mode toggle (CSS custom property swap, button in nav)
 - "Dry clean only" quick-filter pill
-- Item name visible on card hover (or global toggle to show all names)
+- Item Name visible on card hover (or global toggle to show all names)
 
 **Business Logic / Functionality**
 
@@ -400,8 +400,8 @@ Maya shops frequently (online and in-store), follows trends on TikTok and Pinter
 - ✅ Gmail API OAuth + email thread parsing
 - Hotmail OAuth integration (Microsoft identity platform)
 - Retailer-specific email parsers for: Amazon, Shein, Temu (note: Temu embeds product data in images — OCR required or skip image, add in edit mode)
-- Structured item extraction: name, price, brand, category from email HTML
-- Deduplication check — skip import if item UUID already exists in localStorage
+- ✅ Structured item extraction: name, price, brand, category from email HTML
+- ✅ Deduplication check — skip import if item UUID already exists in localStorage
 
 ---
 

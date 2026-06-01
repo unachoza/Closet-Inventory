@@ -40,5 +40,10 @@
 }
 
 @media (max-width: 480px) {
-
+  .pagination-controls button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+  }
 }

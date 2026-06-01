@@ -21,32 +21,36 @@
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  /* Keep the overview a fixed-height flex column. It must NOT scroll itself —
-     otherwise the pagination controls (rendered after the grid) sit at the
-     bottom of the scrolled content and stay out of view. */
+  /* Let the page (.app-content) own the scroll. The overview grows with its
+     content instead of being a fixed-height box, so it no longer matters how
+     tall the NavBar or carousel stacked above it are — which is what pushed
+     the pagination off-screen before. */
   .items-overview {
     padding: 0.5rem;
-    height: 80vh;
-    overflow: hidden;
+    height: auto;
+    overflow: visible;
   }
 
-  /* Only the grid scrolls. `min-height: 0` is required for a flex child to be
-     allowed to shrink below its content size so overflow actually kicks in. */
   .items-grid {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
     width: 100%;
     gap: 0.75rem;
     justify-content: center;
   }
 
-  /* Pagination is the last child of .items-overview. Pin it below the
-     scrollable grid so it's always visible. */
+  /* Pin the pagination to the bottom of the viewport while scrolling so the
+     buttons stay reachable no matter how much content sits above them. The
+     opaque backdrop keeps grid items from showing through, and the safe-area
+     padding clears the iOS home indicator. */
   .items-overview > :last-child {
-    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    align-self: stretch;
     width: 100%;
-    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: var(--blur, blur(12px));
+    z-index: 5;
   }
 }
 
