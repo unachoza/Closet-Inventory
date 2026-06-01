@@ -28,7 +28,9 @@ const mockItem = {
 	name: "Test Item",
 	size: "M",
 	brand: "Test Brand",
-	material: "Cotton",
+	// material is now MaterialBlend[] — the migration util also handles legacy strings,
+	// but tests should use the canonical shape.
+	material: [{ material: "cotton", percentage: 100 }],
 	occasion: "Casual",
 	age: "New",
 	care: "Machine Wash",
@@ -50,7 +52,8 @@ describe("EditItemView", () => {
 		expect(screen.getByLabelText("name")).toHaveValue(mockItem.name);
 		expect(screen.getByLabelText("size")).toHaveValue(mockItem.size);
 		expect(screen.getByLabelText("brand")).toHaveValue(mockItem.brand);
-		expect(screen.getByLabelText("material")).toHaveValue(mockItem.material);
+		// material is now a blend builder — check the first material row input
+		expect(screen.getByLabelText("Material 1 name")).toHaveValue("cotton");
 		expect(screen.getByLabelText("occasion")).toHaveValue(mockItem.occasion);
 		expect(screen.getByLabelText("age")).toHaveValue(mockItem.age);
 		expect(screen.getByLabelText("care")).toHaveValue(mockItem.care);

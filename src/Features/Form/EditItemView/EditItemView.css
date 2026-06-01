@@ -16,6 +16,10 @@
       height: 100%;
 }
 
+.edit-form  .card-title{
+      color: white
+}
+
 .form-fields{
       display: flex;
       flex-wrap: wrap;
@@ -69,10 +73,7 @@ textarea {
       padding: var(--spacing-100) var(--spacing-200);
       border: solid black 2px;
       border-radius: var(--border-radius-sm);
-      background: none;
       box-shadow: none;
-      color: black;
-      color: black;
       font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
       font-size: 1rem;
       text-transform: capitalize;
@@ -80,7 +81,7 @@ textarea {
 }
 
 .edit-form.form label >span {
-      color: black;
+      color: white;
       font-size: .8rem;
       font-weight: 600;
 }

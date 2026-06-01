@@ -86,7 +86,7 @@
 
 .card-title {
       margin: 0;
-      color: var(--Soft-Black);
+      color: black;
       font-size: 1rem;
       font-weight: 600;
       text-align: center;
@@ -119,6 +119,6 @@
 }
 
 .card-back button{
-	width: 6.25rem;
+      width: 6.25rem;
       margin: 0;
 }
