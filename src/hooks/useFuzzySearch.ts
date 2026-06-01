@@ -30,10 +30,11 @@ export const useFuzzySearch = () => {
 		() =>
 			(items: ClothingItem[]): ClothingItem[] => {
 				if (!debouncedQuery.trim()) return items;
+				console.log({ debouncedQuery });
 				const fuse = new Fuse(items, FUSE_OPTIONS);
 				return fuse.search(debouncedQuery).map((res) => res.item);
 			},
-		[debouncedQuery]
+		[debouncedQuery],
 	);
 
 	// Separate getter for match metadata (used by FilterMatchPills)
@@ -45,14 +46,12 @@ export const useFuzzySearch = () => {
 				const results = fuse.search(debouncedQuery);
 				const map = new Map<string, string[]>();
 				for (const result of results) {
-					const keys = (result.matches ?? [])
-						.map((m) => m.key ?? "")
-						.filter(Boolean);
+					const keys = (result.matches ?? []).map((m) => m.key ?? "").filter(Boolean);
 					map.set(result.item.id, keys);
 				}
 				return map;
 			},
-		[debouncedQuery]
+		[debouncedQuery],
 	);
 
 	return { searchQuery, setSearchQuery, searchResults, getMatchKeys, debouncedQuery };

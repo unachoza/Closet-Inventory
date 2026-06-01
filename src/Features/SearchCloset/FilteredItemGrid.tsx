@@ -34,6 +34,7 @@ const cardVariants: Variants = {
 };
 
 const FilteredItemGrid = ({ items, matchKeysById, totalCount, onEditItem }: FilteredItemGridProps) => {
+	console.log({ items });
 	return (
 		<>
 			<p className="entire-closet__meta">

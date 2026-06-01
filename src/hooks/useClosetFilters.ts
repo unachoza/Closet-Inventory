@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
 import normalizeColor from "../utils/normalizeColors";
+import { acceleratedValues } from "framer-motion";
 
 export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion";
 export type FilterState = Record<FilterDimension, string[]>;
@@ -89,7 +90,14 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 				const selected = filters[dim];
 				if (selected.length === 0) continue;
 				const itemVal = (item[dim] as string) ?? "";
-				if (!selected.includes(itemVal)) return false;
+				console.log(item[dim]);
+				console.log(selected[0] === item[dim]);
+				console.log({ itemVal }, "is this capital");
+
+				/////THIS FIXES case sensitivity in value and filter/////
+				if (!selected.some((term) => term.toLowerCase() === itemVal.toLowerCase())) {
+					return false;
+				}
 			}
 			return true;
 		});

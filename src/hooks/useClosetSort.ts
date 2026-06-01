@@ -1,14 +1,7 @@
 import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
 
-export type SortKey =
-	| "dateAdded"
-	| "priceAsc"
-	| "priceDesc"
-	| "ageNewest"
-	| "ageOldest"
-	| "nameAZ"
-	| "nameZA";
+export type SortKey = "dateAdded" | "priceAsc" | "priceDesc" | "ageNewest" | "ageOldest" | "nameAZ" | "nameZA";
 
 export const SORT_LABELS: Record<SortKey, string> = {
 	dateAdded: "Date Added",
@@ -48,6 +41,7 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 		() =>
 			(items: ClothingItem[]): ClothingItem[] => {
 				const copy = [...items];
+				console.log(copy.length, "copy");
 				switch (sortKey) {
 					case "priceAsc":
 						return copy.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
@@ -66,7 +60,7 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 						return copy;
 				}
 			},
-		[sortKey]
+		[sortKey],
 	);
 
 	return { sortKey, setSortKey, sortedItems };

@@ -35,6 +35,7 @@ input[type="text"] {
       /* box-shadow: 0px 2px .5rem 2px rgba(0, 0, 0, 0.875); */
       color: var(--White);
       line-height: 130%;
+      width: 100%;
       /* font: inherit; */
       font-feature-settings: 'liga' off, 'clig' off
 }

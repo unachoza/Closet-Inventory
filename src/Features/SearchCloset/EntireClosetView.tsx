@@ -16,8 +16,7 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 	const { closet } = useLocalStorageCloset();
 
 	// 1. Filter by dimension checkboxes
-	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } =
-		useClosetFilters(closet);
+	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } = useClosetFilters(closet);
 
 	// 2. Fuzzy search over filtered items
 	const { searchQuery, setSearchQuery, searchResults, getMatchKeys } = useFuzzySearch();
@@ -27,13 +26,15 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 
 	// Pipeline: closet → filter → search → sort
 	const searched = useMemo(() => searchResults(filteredItems), [searchResults, filteredItems]);
+	console.log(searched.length, { searched }, "reight here for real ");
 	const displayed = useMemo(() => sortedItems(searched), [sortedItems, searched]);
+	console.log(displayed.length, { displayed }, "after the query and after the filter");
 
 	// Match metadata for highlighting which fields were hit
-	const matchKeysById = useMemo(
-		() => getMatchKeys(filteredItems),
-		[getMatchKeys, filteredItems]
-	);
+	console.log({ filteredItems }, filteredItems.length);
+	const matchKeysById = useMemo(() => getMatchKeys(filteredItems), [getMatchKeys, filteredItems]);
+
+	console.log("this is the closet", { closet });
 
 	return (
 		<main className="entire-closet" aria-label="Entire closet view">
@@ -48,12 +49,7 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				onToggleFilter={toggleFilter}
 				onClearAll={clearAll}
 			/>
-			<FilteredItemGrid
-				items={displayed}
-				matchKeysById={matchKeysById}
-				totalCount={closet.length}
-				onEditItem={onEditItem}
-			/>
+			<FilteredItemGrid items={displayed} matchKeysById={matchKeysById} totalCount={closet.length} onEditItem={onEditItem} />
 		</main>
 	);
 };
