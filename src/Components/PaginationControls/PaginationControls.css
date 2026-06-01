@@ -26,3 +26,19 @@
 	opacity: 0.4;
 	cursor: not-allowed;
 }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* The controls are pinned in a non-scrolling footer (see Closet.css), so the
+     large bottom margin previously used to push them into view is no longer
+     needed — it only added clipped empty space. */
+  .pagination-controls {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+
+}

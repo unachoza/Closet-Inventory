@@ -7,6 +7,7 @@
       max-width: 80rem;
       margin: 0 auto;
       padding: 1rem;
+      height: 60vh;
 }
 
 /* === Grid === */
@@ -15,4 +16,43 @@
       justify-content: space-around;
       flex-wrap: wrap;
       gap: 2px
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Keep the overview a fixed-height flex column. It must NOT scroll itself —
+     otherwise the pagination controls (rendered after the grid) sit at the
+     bottom of the scrolled content and stay out of view. */
+  .items-overview {
+    padding: 0.5rem;
+    height: 80vh;
+    overflow: hidden;
+  }
+
+  /* Only the grid scrolls. `min-height: 0` is required for a flex child to be
+     allowed to shrink below its content size so overflow actually kicks in. */
+  .items-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  /* Pagination is the last child of .items-overview. Pin it below the
+     scrollable grid so it's always visible. */
+  .items-overview > :last-child {
+    flex-shrink: 0;
+    width: 100%;
+    padding-top: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .items-grid {
+    gap: 0.5rem;
+    padding: 0 0.25rem;
+  }
 }

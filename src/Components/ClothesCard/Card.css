@@ -86,7 +86,7 @@ overflow: scroll;
 
 .card-title {
       margin: 0;
-      color: var(--Soft-Black);
+      color: black;
       font-size: 1rem;
       font-weight: 600;
       text-align: center;
@@ -107,6 +107,7 @@ overflow: scroll;
       font-size: 0.95rem;
       text-align: left;
       transform: rotateY(180deg);
+      overflow: scroll;
 }
 
 .card-back p {
@@ -119,6 +120,38 @@ overflow: scroll;
 }
 
 .card-back button{
-	width: 6.25rem;
+      width: 6.25rem;
       margin: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  :root {
+    --Card-width: 15rem;
+    --Card-height: 17rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    /* Two cards per row on small phones */
+    --Card-width: calc(40vw - 3rem);
+    --Card-height: 14rem;
+  }
+
+  .card-image img {
+    object-fit: cover;
+  }
+}
+
+
+
+@media screen and (max-width: 389px) {
+ /* Style adjustments for compact screens */
+ :root {
+   /* Two cards per row on small phones */
+   --Card-width: calc(80vw - 1.5rem);
+   --Card-height: 20rem;
+ }
 }

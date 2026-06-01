@@ -128,6 +128,45 @@ describe("parseProductsFromEmail", () => {
 			expect(parseProductsFromEmail(dup)).toHaveLength(1);
 		});
 
+		it("keeps same-style items that differ by image/price as separate line items", () => {
+			// Regression: a ThredUp order with two "Reformation / Sleeveless Top"
+			// items (different images + prices) plus a dress. The brand+name dedupe
+			// key collapsed the two tops into one, dropping the third item.
+			const order = html(`
+				<table>
+					<tr>
+						<td>${productImg("https://cf.thredup.com/814111735/large.jpg")}</td>
+						<td><table><tr><td>
+							<a href="#">Reformation</a>
+							<a href="#">Size Sm <span>Sleeveless Top</span></a>
+							<a href="#">$44.99</a>
+						</td></tr></table></td>
+					</tr>
+					<tr>
+						<td>${productImg("https://cf.thredup.com/816899026/large.jpg")}</td>
+						<td><table><tr><td>
+							<a href="#">Reformation</a>
+							<a href="#">Size Sm <span>Casual Dress</span></a>
+							<a href="#">$76.99</a>
+						</td></tr></table></td>
+					</tr>
+					<tr>
+						<td>${productImg("https://cf.thredup.com/818039047/large.jpg")}</td>
+						<td><table><tr><td>
+							<a href="#">Reformation</a>
+							<a href="#">Size Sm <span>Sleeveless Top</span></a>
+							<a href="#">$45.99</a>
+						</td></tr></table></td>
+					</tr>
+				</table>
+			`);
+			const products = parseProductsFromEmail(order);
+			expect(products).toHaveLength(3);
+			// Both Sleeveless Tops survive (distinct prices), plus the dress.
+			expect(products.filter((p) => p.name === "Sleeveless Top")).toHaveLength(2);
+			expect(products.map((p) => p.price)).toEqual(["$44.99", "$76.99", "$45.99"]);
+		});
+
 		it("requires the 'Size X Name' pattern to match", () => {
 			const noSizePattern = html(`
 				<table><tr>

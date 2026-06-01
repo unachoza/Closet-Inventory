@@ -2,6 +2,9 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EntireClosetView from "../EntireClosetView";
+import NavBar from "../../../Components/NavBar/NavBar";
+import { SearchProvider } from "../../../context/SearchContext";
+import { ViewProvider } from "../../../context/ViewContext";
 import { ClothingItem } from "../../../utils/types";
 
 // ── Mock the local storage hook ───────────────────────────────────────────────
@@ -75,15 +78,38 @@ vi.mock("../../../hooks/useLocalCloset", () => ({
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const renderView = () => render(<EntireClosetView onEditItem={vi.fn()} />);
+// EntireClosetView consumes the shared SearchContext (driven by the single
+// NavBar search box), so it must be wrapped in a SearchProvider.
+const renderView = () =>
+	render(
+		<SearchProvider>
+			<EntireClosetView onEditItem={vi.fn()} />
+		</SearchProvider>
+	);
+
+// Accordions are collapsed by default — expand a dimension's section so its
+// option checkboxes become reachable.
+const expandSection = (user: ReturnType<typeof userEvent.setup>, name: RegExp) =>
+	user.click(screen.getByRole("button", { name }));
+
+// For search-integration assertions we need the actual NavBar search box
+// (the sole search input) feeding the same SearchContext as the grid.
+const renderWithNav = () =>
+	render(
+		<ViewProvider initialView="entireCloset">
+			<SearchProvider>
+				<NavBar />
+				<EntireClosetView onEditItem={vi.fn()} />
+			</SearchProvider>
+		</ViewProvider>
+	);
 
 // ── Search Sort Bar ───────────────────────────────────────────────────────────
 
 describe("SearchSortBar", () => {
-	it("renders search input with placeholder text", () => {
-		renderView();
-		expect(screen.getByPlaceholderText(/search by name, brand, color/i)).toBeInTheDocument();
-	});
+	// NOTE: search input now lives solely in the NavBar (single source of
+	// truth via SearchContext); its render/typing/clear behavior is covered
+	// by NavBar.test.tsx. This bar only owns the sort + filter controls.
 
 	it("renders a sort dropdown", () => {
 		renderView();
@@ -93,25 +119,6 @@ describe("SearchSortBar", () => {
 	it("renders a Filters button", () => {
 		renderView();
 		expect(screen.getByRole("button", { name: /filters/i })).toBeInTheDocument();
-	});
-
-	it("typing in search input updates value", async () => {
-		const user = userEvent.setup();
-		renderView();
-		const input = screen.getByPlaceholderText(/search by name, brand, color/i);
-		await user.type(input, "Denim");
-		expect(input).toHaveValue("Denim");
-	});
-
-	it("clear button appears when search has text and clears it", async () => {
-		const user = userEvent.setup();
-		renderView();
-		const input = screen.getByPlaceholderText(/search by name, brand, color/i);
-		await user.type(input, "hello");
-		const clearBtn = screen.getByRole("button", { name: /clear search/i });
-		expect(clearBtn).toBeInTheDocument();
-		await user.click(clearBtn);
-		expect(input).toHaveValue("");
 	});
 
 	it("shows item count text", () => {
@@ -146,24 +153,32 @@ describe("FilterSidePanel", () => {
 		expect(screen.getByRole("button", { name: /^brand/i })).toBeInTheDocument();
 	});
 
-	//not expanded
-	it("accordions are expanded by default, exposing checkboxes", async () => {
+	it("accordions are collapsed by default; expanding a section exposes its checkboxes", async () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
+		// Collapsed by default — no option checkboxes visible yet
+		expect(screen.queryByRole("checkbox", { name: /tops/i })).not.toBeInTheDocument();
+		// Expanding the Category section reveals its checkboxes
+		await expandSection(user, /^category/i);
 		expect(screen.getByRole("checkbox", { name: /tops/i })).toBeInTheDocument();
 		expect(screen.getByRole("checkbox", { name: /dresses/i })).toBeInTheDocument();
 	});
 
-	it("clicking an accordion header collapses its options", async () => {
+	it("clicking an accordion header toggles its options", async () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
 		const categoryHeader = screen.getByRole("button", { name: /^category/i });
+		// Collapsed by default
+		expect(categoryHeader).toHaveAttribute("aria-expanded", "false");
+		// Expand → checkbox appears
+		await user.click(categoryHeader);
 		expect(categoryHeader).toHaveAttribute("aria-expanded", "true");
+		expect(screen.getByRole("checkbox", { name: /tops/i })).toBeInTheDocument();
+		// Collapse again → checkbox removed
 		await user.click(categoryHeader);
 		expect(categoryHeader).toHaveAttribute("aria-expanded", "false");
-		// Its checkbox should no longer be present
 		expect(screen.queryByRole("checkbox", { name: /tops/i })).not.toBeInTheDocument();
 	});
 
@@ -216,6 +231,7 @@ describe("FilterPillsRow", () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
+		await expandSection(user, /^category/i);
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
 
 		const pillsRow = screen.getByLabelText(/active filters/i);
@@ -226,6 +242,7 @@ describe("FilterPillsRow", () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
+		await expandSection(user, /^category/i);
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
 
 		const removeBtn = screen.getByRole("button", { name: /remove tops filter/i });
@@ -238,7 +255,9 @@ describe("FilterPillsRow", () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
+		await expandSection(user, /^category/i);
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
+		await expandSection(user, /^color/i);
 		await user.click(screen.getByRole("checkbox", { name: /blue/i }));
 
 		// Scope to the pills row to avoid matching the panel-footer clear button
@@ -252,6 +271,7 @@ describe("FilterPillsRow", () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
+		await expandSection(user, /^category/i);
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
 
 		const badge = screen.getByLabelText(/1 active/i);
@@ -272,10 +292,13 @@ describe("FilteredItemGrid", () => {
 		const user = userEvent.setup();
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
+		await expandSection(user, /^category/i);
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
 
-		// Only 2 tops in mock closet
-		expect(screen.getAllByTestId("clothes-card")).toHaveLength(2);
+		// Only 2 tops in mock closet (waitFor lets the exit animation settle)
+		await waitFor(() => {
+			expect(screen.getAllByTestId("clothes-card")).toHaveLength(2);
+		});
 	});
 
 	it("shows empty state when no items match", async () => {
@@ -283,19 +306,23 @@ describe("FilteredItemGrid", () => {
 		renderView();
 		await user.click(screen.getByRole("button", { name: /filters/i }));
 		// tops AND red (no tops are red in mock data)
+		await expandSection(user, /^category/i);
 		await user.click(screen.getByRole("checkbox", { name: /tops/i }));
+		await expandSection(user, /^color/i);
 		await user.click(screen.getByRole("checkbox", { name: /red/i }));
 
-		expect(screen.queryByTestId("clothes-card")).not.toBeInTheDocument();
+		await waitFor(() => {
+			expect(screen.queryByTestId("clothes-card")).not.toBeInTheDocument();
+		});
 		expect(screen.getByText(/no items match/i)).toBeInTheDocument();
 	});
 
-	it("search query narrows visible items after debounce", async () => {
+	it("search query (typed in the NavBar) narrows visible items after debounce", async () => {
 		vi.useFakeTimers({ shouldAdvanceTime: true });
 		const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-		renderView();
+		renderWithNav();
 
-		const input = screen.getByPlaceholderText(/search by name, brand, color/i);
+		const input = screen.getByRole("textbox", { name: /search closet/i });
 		await user.type(input, "Denim");
 
 		// Advance past debounce

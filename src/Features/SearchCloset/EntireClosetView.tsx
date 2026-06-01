@@ -3,7 +3,7 @@ import { ClothingItem } from "../../utils/types";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { useClosetFilters } from "../../hooks/useClosetFilters";
 import { useClosetSort } from "../../hooks/useClosetSort";
-import { useFuzzySearch } from "../../hooks/useFuzzySearch";
+import { useSearch } from "../../context/SearchContext";
 import StickyTopBar from "./StickyTopBar";
 import FilteredItemGrid from "./FilteredItemGrid";
 import "./EntireCloset.css";
@@ -18,8 +18,9 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 	// 1. Filter by dimension checkboxes
 	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } = useClosetFilters(closet);
 
-	// 2. Fuzzy search over filtered items
-	const { searchQuery, setSearchQuery, searchResults, getMatchKeys } = useFuzzySearch();
+	// 2. Fuzzy search over filtered items — driven by the single NavBar search
+	// box via SearchContext (shared source of truth).
+	const { searchResults, getMatchKeys } = useSearch();
 
 	// 3. Sort the search results
 	const { sortKey, setSortKey, sortedItems } = useClosetSort();
@@ -34,8 +35,6 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 	return (
 		<main className="entire-closet" aria-label="Entire closet view">
 			<StickyTopBar
-				searchQuery={searchQuery}
-				onSearchChange={setSearchQuery}
 				sortKey={sortKey}
 				onSortChange={setSortKey}
 				filters={filters}

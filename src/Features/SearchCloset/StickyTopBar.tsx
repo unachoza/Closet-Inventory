@@ -7,8 +7,6 @@ import FilterSidePanel from "./FilterSidePanel";
 import "./EntireCloset.css";
 
 interface StickyTopBarProps {
-	searchQuery: string;
-	onSearchChange: (q: string) => void;
 	sortKey: SortKey;
 	onSortChange: (key: SortKey) => void;
 	filters: FilterState;
@@ -19,8 +17,6 @@ interface StickyTopBarProps {
 }
 
 const StickyTopBar = ({
-	searchQuery,
-	onSearchChange,
 	sortKey,
 	onSortChange,
 	filters,
@@ -34,8 +30,6 @@ const StickyTopBar = ({
 	return (
 		<div className="entire-closet__sticky">
 			<SearchSortBar
-				searchQuery={searchQuery}
-				onSearchChange={onSearchChange}
 				sortKey={sortKey}
 				onSortChange={onSortChange}
 				showFilters={showFilters}
