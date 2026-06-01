@@ -359,6 +359,7 @@
 
 .filter-accordion__option {
 	display: inline-flex;
+	flex-direction: row;
 	align-items: center;
 	gap: var(--spacing-50);
 	text-transform: uppercase;

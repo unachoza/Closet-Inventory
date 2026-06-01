@@ -1,5 +1,5 @@
 import ContentCard from "../../Components/ContentCard/ContentCard";
-import { AnimatePresence, motion } from "framer-motion";
+import AnimatedContainer from "../../Components/AnimatedContainer/AnimatedContainer";
 import { moreFeatures } from "../../utils/constants";
 import TextileGuildInteractive from "./TextileGuildInteractive";
 import { useState } from "react";
@@ -17,14 +17,8 @@ const FabricCare = ({ care }: FabricCareProps) => {
 	}
 
 	return (
-		<AnimatePresence>
-			<motion.div
-				className="content-container"
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				exit={{ opacity: 0, y: 20 }}
-				transition={{ duration: 0.3 }}
-			>
+		<AnimatedContainer className="content-container" direction="fromBottom" mode="sync">
+			<>
 				<button onClick={() => setShowGuide(true)}>Open Textile Guide</button>
 				{showGuide && <TextileGuildInteractive />}
 				{!showGuide &&
@@ -33,7 +27,6 @@ const FabricCare = ({ care }: FabricCareProps) => {
 							{feature.children}
 						</ContentCard>
 					))}
-
 				{typeof care === "string" ? (
 					<p>{care}</p>
 				) : (
@@ -43,8 +36,8 @@ const FabricCare = ({ care }: FabricCareProps) => {
 						))}
 					</ul>
 				)}
-			</motion.div>
-		</AnimatePresence>
+			</>
+		</AnimatedContainer>
 	);
 };
 

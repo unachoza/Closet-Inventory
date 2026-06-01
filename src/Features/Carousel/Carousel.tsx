@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import AnimatedContainer from "../../Components/AnimatedContainer/AnimatedContainer";
 import { carouselCategories } from "../../utils/constants";
 import { CategoryType, CarouselProps } from "../../utils/types";
 import "./Carousel.css";
@@ -24,7 +25,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 	};
 
 	return (
-		<motion.div className="carousel-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
+		<AnimatedContainer className="carousel-container" direction="fromBottom" mode="sync">
 			{/* Background / Closet Imagery */}
 
 			{/* Carousel */}
@@ -58,7 +59,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 					▶
 				</button>
 			</div>
-		</motion.div>
+		</AnimatedContainer>
 	);
 };
 

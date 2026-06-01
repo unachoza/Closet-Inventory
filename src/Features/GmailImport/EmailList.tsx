@@ -1,5 +1,9 @@
 import { memo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { GmailEmailMeta } from "../../hooks/useAdvancedSearch";
+import { containerVariants, makeCardVariants } from "../../Components/AnimatedContainer/AnimatedContainer";
+
+const emailCardVariants = makeCardVariants("fromBottom");
 
 interface EmailListProps {
 	emails: GmailEmailMeta[];
@@ -37,7 +41,7 @@ const EmailListItem = memo(function EmailListItem({
 	onToggleSelect,
 }: EmailListItemProps) {
 	return (
-		<li className="gmail-email-item">
+		<motion.li className="gmail-email-item" variants={emailCardVariants}>
 			<label
 				className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}
 			>
@@ -61,7 +65,7 @@ const EmailListItem = memo(function EmailListItem({
 					<div className="gmail-email-snippet">{email.snippet}</div>
 				</div>
 			</label>
-		</li>
+		</motion.li>
 	);
 });
 
@@ -83,15 +87,25 @@ export default function EmailList({
 	}
 
 	return (
-		<ul className="gmail-email-list" role="list">
-			{emails.map((email) => (
-				<EmailListItem
-					key={email.id}
-					email={email}
-					isSelected={email.id === selectedEmailId}
-					onToggleSelect={onToggleSelect}
-				/>
-			))}
-		</ul>
+		<AnimatePresence mode="wait">
+			<motion.ul
+				key={emails.length}
+				className="gmail-email-list"
+				role="list"
+				variants={containerVariants}
+				initial="hidden"
+				animate="show"
+				exit="exit"
+			>
+				{emails.map((email) => (
+					<EmailListItem
+						key={email.id}
+						email={email}
+						isSelected={email.id === selectedEmailId}
+						onToggleSelect={onToggleSelect}
+					/>
+				))}
+			</motion.ul>
+		</AnimatePresence>
 	);
 }

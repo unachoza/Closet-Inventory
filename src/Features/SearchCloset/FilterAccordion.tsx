@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { FilterOption } from "../../hooks/useClosetFilters";
 import "./EntireCloset.css";
+import AnimatedContainer from "../../Components/AnimatedContainer/AnimatedContainer";
 
 interface FilterAccordionProps {
 	label: string;
@@ -39,19 +40,27 @@ const FilterAccordion = ({ label, options, selected, onToggle, defaultOpen = fal
 			</button>
 
 			{expanded && (
-				<div className="filter-accordion__body" id={sectionId} role="group" aria-label={label}>
+				<AnimatedContainer
+					className="filter-accordion__body"
+					id={sectionId}
+					role="group"
+					aria-label={label}
+					direction="fromTop"
+					mode="sync"
+					cacheKey={label}
+				>
 					{options.map(({ value, count }) => {
 						const checked = selected.includes(value);
-						const id = `filter-${label}-${value}`;
+						const optionId = `filter-${label}-${value}`;
 						return (
-							<label key={value} htmlFor={id} className="filter-accordion__option">
-								<input id={id} type="checkbox" checked={checked} onChange={() => onToggle(value)} />
+							<label key={value} htmlFor={optionId} className="filter-accordion__option">
+								<input id={optionId} type="checkbox" checked={checked} onChange={() => onToggle(value)} />
 								<span className="filter-accordion__option-value">{value}</span>
 								<span className="filter-accordion__option-count">({count})</span>
 							</label>
 						);
 					})}
-				</div>
+				</AnimatedContainer>
 			)}
 		</div>
 	);
