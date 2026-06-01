@@ -78,6 +78,7 @@ textarea {
       font-size: 1rem;
       text-transform: capitalize;
       gap: .5rem;
+      background: #00000024;
 }
 
 .edit-form.form label >span {
@@ -208,4 +209,74 @@ label.animated-checkbox button.checkbox-root {
       border-radius: 50%;
       color: white;
       cursor: pointer;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .edit-form {
+    border-width: 2px;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .form-fields {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: auto;
+    overflow-y: auto;
+  }
+
+  /* Full-width text inputs on mobile — override the 13rem fixed width */
+  input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Textarea: was 41rem hardcoded — fill container on mobile */
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  label:has(.textarea) {
+    width: 100%;
+  }
+
+  .edit-form-return-btn {
+    position: static;
+    margin-bottom: 0.75rem;
+  }
+
+  .edit-form-actions {
+    flex-direction: column;
+  }
+
+  .edit-form-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-form-preview-img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+  .edit-form-return-btn{
+      width: 100px;
+      position: absolute;
+        top: 7px;
+        left: 15px;
+  }
+.edit-form label {
+      gap: .1rem;
+      font-size: .8rem;
+}
+  input[type="text"] {
+    height: 2.3rem;
+    border: solid black 1.3px;
+  }
+  .edit-form-actions{
+      margin-bottom: 5rem;
+  }
 }

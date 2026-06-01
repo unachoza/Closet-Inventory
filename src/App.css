@@ -55,3 +55,49 @@
     animation: logo-spin infinite 20s linear;
   }
 }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .button-container {
+    flex-wrap: wrap;
+    /* gap: 0.5rem; */
+    padding: 0.5rem 0.75rem;
+  }
+
+  .button-container button {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .back-button {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .button-container button {
+    margin: 2px
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --Card-width: 15rem;
+    --Card-height: 17rem;
+  }
+}
+
+@media (max-width: 480px) {
+ h1 {
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: 389px) {
+ /* Style adjustments for compact screens */
+ h1 {
+    font-size: 1.8rem;
+  }
+}

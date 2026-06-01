@@ -55,3 +55,35 @@
       background-color: var(--White);
       box-shadow: 0 0 .5rem rgba(255, 255, 255, 0.8);
 }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .step-tabs-list {
+    /* Scroll horizontally instead of wrapping or overflowing */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    justify-content: flex-start;
+    gap: 0;
+    padding-bottom: 0.25rem;
+  }
+
+  .step-tabs-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .step-tab {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.5rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .step-tab {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.4rem;
+  }
+}

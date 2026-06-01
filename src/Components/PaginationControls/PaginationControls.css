@@ -26,3 +26,15 @@
 	opacity: 0.4;
 	cursor: not-allowed;
 }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .pagination-controls {
+  margin-bottom: 5rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+}
