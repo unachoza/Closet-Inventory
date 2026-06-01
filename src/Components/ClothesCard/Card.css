@@ -107,6 +107,7 @@
       font-size: 0.95rem;
       text-align: left;
       transform: rotateY(180deg);
+      overflow: scroll;
 }
 
 .card-back p {
