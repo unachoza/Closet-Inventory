@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextPillField from "./TextInput/TextPillField";
-import { CategoryType, ItemFormData, ViewType } from "../../utils/types";
+import MaterialBlendInput from "../../Components/MaterialBlendInput/MaterialBlendInput";
+import { CategoryType, ItemFormData, MaterialBlend, ViewType } from "../../utils/types";
 import {
 	colorOptions,
 	sizeOptions,
@@ -152,17 +153,16 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 
 				{/* STEP 5: MATERIAL */}
 				{step === 5 && (
-					<TextPillField
-						label="material"
-						name="material"
-						className="string"
-						placeholder="add more options"
-						pillArray={materialoptions}
-						onPillsChange={setMaterialOptions}
-						handleFormUpdate={toggleValue}
-						formData={formData}
-						multiSelect={true}
-					/>
+					<div className="form-step">
+						<label className="step-label">Material Composition</label>
+						<p className="step-hint">Add each fiber and its percentage. Total must equal 100%.</p>
+						<MaterialBlendInput
+							value={formData.material}
+							onChange={(blend: MaterialBlend[]) =>
+								setFormData((prev) => ({ ...prev, material: blend }))
+							}
+						/>
+					</div>
 				)}
 
 				{/* STEP 6: OCCASION */}

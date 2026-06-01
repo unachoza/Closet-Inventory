@@ -6,7 +6,7 @@ export const formItem = {
 	color: "",
 	size: "",
 	brand: "",
-	material: "",
+	material: [] as import("./types").MaterialBlend[],
 	occasion: "",
 	age: "",
 	purchaseDate: "",

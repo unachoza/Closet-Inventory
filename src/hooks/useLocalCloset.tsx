@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData } from "../utils/types";
+import { normalizeMaterial } from "../utils/materialUtils";
 import { useLocalStorage } from "./uselocalStorage";
 import useStockPhoto from "./useStockPhoto";
 
@@ -7,6 +9,13 @@ const STORAGE_KEY = "my_closet_key";
 
 export function useLocalStorageCloset() {
 	const [closet, setCloset] = useLocalStorage<ClothingItem[]>(STORAGE_KEY, MY_CLOSET_DATA);
+
+	// Transparently migrate legacy string material fields to MaterialBlend[]
+	// so old localStorage data works without a manual migration step.
+	const normalizedCloset = useMemo(
+		() => closet.map((item) => ({ ...item, material: normalizeMaterial(item.material) })),
+		[closet],
+	);
 
 	const addItem = (newItem: ItemFormData) => {
 		setCloset((prev: ClothingItem[]) => {
@@ -78,5 +87,5 @@ export function useLocalStorageCloset() {
 		setCloset([]);
 	};
 
-	return { closet, addItem, addFullItem, removeItem, updateItem, getCloset, clearCloset };
+	return { closet: normalizedCloset, addItem, addFullItem, removeItem, updateItem, getCloset, clearCloset };
 }
