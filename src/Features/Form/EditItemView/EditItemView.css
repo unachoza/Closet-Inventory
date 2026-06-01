@@ -78,6 +78,7 @@ textarea {
       font-size: 1rem;
       text-transform: capitalize;
       gap: .5rem;
+      background: #00000024;
 }
 
 .edit-form.form label >span {
@@ -260,5 +261,22 @@ label.animated-checkbox button.checkbox-root {
   .edit-form-preview-img {
     max-width: 100px;
     max-height: 100px;
+  }
+  .edit-form-return-btn{
+      width: 100px;
+      position: absolute;
+        top: 7px;
+        left: 15px;
+  }
+.edit-form label {
+      gap: .1rem;
+      font-size: .8rem;
+}
+  input[type="text"] {
+    height: 2.3rem;
+    border: solid black 1.3px;
+  }
+  .edit-form-actions{
+      margin-bottom: 5rem;
   }
 }

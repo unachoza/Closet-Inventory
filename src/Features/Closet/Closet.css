@@ -7,6 +7,8 @@
       max-width: 80rem;
       margin: 0 auto;
       padding: 1rem;
+      height: 60vh;
+      border: solid red 5px;
 }
 
 /* === Grid === */
@@ -21,6 +23,7 @@
 @media (max-width: 768px) {
   .items-overview {
     padding: 0.5rem;
+    height: 80vh;
   }
 
   .items-grid {

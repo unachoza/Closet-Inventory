@@ -143,3 +143,12 @@
     object-fit: cover;
   }
 }
+
+@media screen and (max-width: 389px) {
+ /* Style adjustments for compact screens */
+ :root {
+   /* Two cards per row on small phones */
+   --Card-width: calc(80vw - 1.5rem);
+   --Card-height: 20rem;
+ }
+}
