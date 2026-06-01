@@ -1,6 +1,14 @@
 
 .main{
-  height: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scroll region beneath the persistent sticky NavBar */
+.app-content{
+  flex: 1;
+  overflow-y: auto;
 }
 /**** VARIABLES ****/
 :root {

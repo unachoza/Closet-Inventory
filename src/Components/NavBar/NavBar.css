@@ -35,10 +35,35 @@
       margin: 0;
 }
 
+.nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+}
+
 .nav-actions {
       display: flex;
       gap: 10px;
       align-items: center;
+}
+
+/* Search-only layout (entire closet / overview view) */
+.top-nav--search {
+      justify-content: flex-start;
+      gap: 16px;
+}
+
+.top-nav--search .search-container {
+      flex: 1;
+      max-width: 480px;
+}
+
+.top-nav--search .search-input {
+      width: 100%;
+}
+
+.back-to-carousel {
+      white-space: nowrap;
 }
 
 .action-btn {
@@ -98,4 +123,60 @@ div.search-container > input {
       left: 10px;
       color: var(--text-secondary);
       pointer-events: none;
+}
+
+/* Hamburger drawer */
+.nav-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 200;
+}
+
+.nav-drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 260px;
+      max-width: 80vw;
+      background-color: white;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+      z-index: 201;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: nav-drawer-in 0.2s ease;
+}
+
+@keyframes nav-drawer-in {
+      from {
+            transform: translateX(-100%);
+      }
+      to {
+            transform: translateX(0);
+      }
+}
+
+.nav-drawer__close {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+}
+
+.nav-drawer__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+}
+
+.nav-drawer__actions .action-btn {
+      width: 100%;
+      justify-content: flex-start;
 }
