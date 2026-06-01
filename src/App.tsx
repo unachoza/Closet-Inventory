@@ -1,6 +1,9 @@
 import { useState, useCallback } from "react";
 import { EditProvider } from "./Features/Form/EditContext";
-import Header from "./Components/Header";
+import { ViewProvider, useView } from "./context/ViewContext";
+import { SearchProvider } from "./context/SearchContext";
+import NavBar from "./Components/NavBar/NavBar";
+import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
 import EditItemView from "./Features/Form/EditItemView/EditItemView";
 import MultiStepForm from "./Features/Form/Form";
@@ -8,8 +11,7 @@ import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
-import { Menu, Search, Filter, Spool, Plus, LayoutGrid, Download, X, ChevronDown, ChevronUp, SlidersHorizontal, ArrowUpDown } from "lucide-react";
-import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
+import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
@@ -31,8 +33,8 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	};
 }
 
-function App() {
-	const [view, setView] = useState<ViewType>("carousel");
+function AppShell() {
+	const { view, setView } = useView();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -48,26 +50,32 @@ function App() {
 	};
 
 	// Single-item import from Gmail
-	const handleGmailImport = useCallback((prefilled: Partial<ClothingItem>) => {
-		const newItem = buildClothingItem(prefilled);
-		setEditItem(newItem);
-		setEditMode("create");
-		setImportQueue([]);
-		setImportQueueIndex(0);
-		setView("edit");
-	}, []);
+	const handleGmailImport = useCallback(
+		(prefilled: Partial<ClothingItem>) => {
+			const newItem = buildClothingItem(prefilled);
+			setEditItem(newItem);
+			setEditMode("create");
+			setImportQueue([]);
+			setImportQueueIndex(0);
+			setView("edit");
+		},
+		[setView]
+	);
 
 	// Batch import: "Import All Items" from an email
-	const handleGmailImportAll = useCallback((items: Partial<ClothingItem>[]) => {
-		if (items.length === 0) return;
+	const handleGmailImportAll = useCallback(
+		(items: Partial<ClothingItem>[]) => {
+			if (items.length === 0) return;
 
-		const clothingItems = items.map(buildClothingItem);
-		setImportQueue(clothingItems);
-		setImportQueueIndex(0);
-		setEditItem(clothingItems[0]);
-		setEditMode("create");
-		setView("edit");
-	}, []);
+			const clothingItems = items.map(buildClothingItem);
+			setImportQueue(clothingItems);
+			setImportQueueIndex(0);
+			setEditItem(clothingItems[0]);
+			setEditMode("create");
+			setView("edit");
+		},
+		[setView]
+	);
 
 	// After "Add to Closet" or "Skip" in batch mode — advance to next item
 	const handleQueueAdvance = useCallback(() => {
@@ -81,14 +89,14 @@ function App() {
 			setImportQueueIndex(0);
 			setView("gmail");
 		}
-	}, [importQueue, importQueueIndex]);
+	}, [importQueue, importQueueIndex, setView]);
 
 	// Return to email preview from EditItemView
 	const handleReturnToEmail = useCallback(() => {
 		setImportQueue([]);
 		setImportQueueIndex(0);
 		setView("gmail");
-	}, []);
+	}, [setView]);
 
 	const handleSourceEmailChange = useCallback((emailId: string | null) => {
 		setGmailSourceEmailId(emailId);
@@ -98,73 +106,68 @@ function App() {
 		setPrefilledFormData(undefined);
 		setGmailSourceEmailId(null);
 		setView("form");
-	}, []);
+	}, [setView]);
 
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
-		// <TextileGuildInteractive/>
 		<div className="main">
+			<NavBar onAddItem={handleAddItem} />
 			<EditProvider>
 				<ToastProvider>
-					<Header />
-					<div className="button-container">
-						<button onClick={handleAddItem}>
-							<Plus size={16} />
-							Add Item
-						</button>
-						<button onClick={() => setView("overview")}>
-							<LayoutGrid size={16} />
-							View Closet
-						</button>
-						<button onClick={() => setView("gmail")}>
-							<Download size={16} />
-							Import from Gmail
-						</button>
-						<button onClick={() => setView("fabric")}>
-							<Spool size={16} />
-							Fabric Guide{" "}
-						</button>
+					<div className="app-content">
+						{/* Keyed by view so a crash in one screen resets when navigating away.
+					     "Try again" sends the user back to the overview (closet) screen. */}
+						<ErrorBoundary key={view} onReset={() => setView("overview")}>
+						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />}
+						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
+						{view === "gmail" && (
+							<GmailImport
+								onImport={handleGmailImport}
+								onImportAll={handleGmailImportAll}
+								initialSelectedEmailId={gmailSourceEmailId}
+								onSourceEmailChange={handleSourceEmailChange}
+							/>
+						)}
+						{view === "fabric" && <InteractiveGuide />}
+						{view === "carousel" && (
+							<>
+								<div data-testid="carousel">
+									<Carousel setCategory={setSelectedCategory as any} />
+								</div>
+								<div data-testid="closet-container">
+									<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
+								</div>
+							</>
+						)}
+						{view === "edit" && editItem && (
+							<EditItemView
+								key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
+								item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
+								mode={editMode}
+								setView={setView}
+								onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
+								onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
+								onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+								queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
+								queueTotal={isInBatchMode ? importQueue.length : undefined}
+							/>
+						)}
+						</ErrorBoundary>
 					</div>
-					{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
-					{view === "gmail" && (
-						<GmailImport
-							onImport={handleGmailImport}
-							onImportAll={handleGmailImportAll}
-							initialSelectedEmailId={gmailSourceEmailId}
-							onSourceEmailChange={handleSourceEmailChange}
-						/>
-					)}
-					{view === "fabric" && <InteractiveGuide />}
-					{view === "carousel" && (
-						<div data-testid="carousel">
-							<Carousel setCategory={setSelectedCategory as any} />
-						</div>
-					)}
-					{view === "carousel" && (
-						<div data-testid="closet-container">
-							<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
-						</div>
-					)}
-					{view === "edit" && editItem && (
-						<EditItemView
-							key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
-							item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
-							mode={editMode}
-							setView={setView}
-							onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
-							onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
-							onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
-							queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
-							queueTotal={isInBatchMode ? importQueue.length : undefined}
-						/>
-					)}
-					<button className="back-button" onClick={() => setView("carousel")}>
-						Back to Carousel
-					</button>
 				</ToastProvider>
 			</EditProvider>
 		</div>
+	);
+}
+
+function App() {
+	return (
+		<ViewProvider initialView="carousel">
+			<SearchProvider>
+				<AppShell />
+			</SearchProvider>
+		</ViewProvider>
 	);
 }
 
