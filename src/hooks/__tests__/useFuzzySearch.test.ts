@@ -151,6 +151,47 @@ describe("useFuzzySearch", () => {
 		expect(keysForItem1).toContain("brand");
 	});
 
+	it("searching a color group surfaces items whose color normalizes to that group", async () => {
+		vi.useFakeTimers();
+		const items: ClothingItem[] = [
+			makeItem({ id: "ch", name: "Coat", color: "chocolate" }),
+			makeItem({ id: "be", name: "Scarf", color: "beige" }),
+			makeItem({ id: "bl", name: "Tee", color: "blue" }),
+		];
+		const { result } = renderHook(() => useFuzzySearch());
+
+		act(() => {
+			result.current.setSearchQuery("brown");
+		});
+		await act(async () => {
+			vi.advanceTimersByTime(300);
+		});
+
+		const ids = result.current.searchResults(items).map((i) => i.id);
+		expect(ids).toContain("ch"); // chocolate → Brown
+		expect(ids).toContain("be"); // beige → Brown
+		expect(ids).not.toContain("bl"); // blue
+	});
+
+	it("searching a singular category finds its plural items", async () => {
+		vi.useFakeTimers();
+		const items: ClothingItem[] = [
+			makeItem({ id: "d", name: "Gown", category: "dresses" }),
+			makeItem({ id: "t", name: "Shirt", category: "tops" }),
+		];
+		const { result } = renderHook(() => useFuzzySearch());
+
+		act(() => {
+			result.current.setSearchQuery("dress");
+		});
+		await act(async () => {
+			vi.advanceTimersByTime(300);
+		});
+
+		const ids = result.current.searchResults(items).map((i) => i.id);
+		expect(ids).toContain("d");
+	});
+
 	it("getMatchKeys returns empty map for blank query", () => {
 		const { result } = renderHook(() => useFuzzySearch());
 		const map = result.current.getMatchKeys(ITEMS);

@@ -86,7 +86,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				imageURL,
 				name: displayName,
 				category: formData.category ?? "",
-				color: formData.color ?? "",
+				color: formData.color?.toLowerCase() ?? "",
 				size: formData.size ?? "",
 				brand: formData.brand ?? "",
 				price: formData.price ?? "",

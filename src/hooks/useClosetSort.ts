@@ -1,14 +1,7 @@
 import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
 
-export type SortKey =
-	| "dateAdded"
-	| "priceAsc"
-	| "priceDesc"
-	| "ageNewest"
-	| "ageOldest"
-	| "nameAZ"
-	| "nameZA";
+export type SortKey = "dateAdded" | "priceAsc" | "priceDesc" | "ageNewest" | "ageOldest" | "nameAZ" | "nameZA";
 
 export const SORT_LABELS: Record<SortKey, string> = {
 	dateAdded: "Date Added",
