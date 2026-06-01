@@ -138,6 +138,87 @@ describe("useClosetFilters", () => {
 		expect(brands).toEqual([...brands].sort());
 	});
 
+	it("groups color variants under one option (brown / Brown / brown / taupe → Brown)", () => {
+		const browns: ClothingItem[] = [
+			makeItem({ id: "b1", color: "brown" }),
+			makeItem({ id: "b2", color: "Brown" }),
+			makeItem({ id: "b3", color: "brown / taupe" }),
+		];
+		const { result } = renderHook(() => useClosetFilters(browns));
+		const colorOptions = result.current.filterOptions.color;
+		const brownOption = colorOptions.find((o) => o.value === "Brown");
+		expect(brownOption).toBeDefined();
+		expect(brownOption?.count).toBe(3);
+	});
+
+	it("selecting the Brown color group matches all brown variants regardless of case/wording", () => {
+		const browns: ClothingItem[] = [
+			makeItem({ id: "b1", color: "brown" }),
+			makeItem({ id: "b2", color: "Brown" }),
+			makeItem({ id: "b3", color: "brown / taupe" }),
+			makeItem({ id: "x", color: "blue" }),
+		];
+		const { result } = renderHook(() => useClosetFilters(browns));
+		act(() => {
+			result.current.toggleFilter("color", "Brown");
+		});
+		const ids = result.current.filteredItems.map((i) => i.id);
+		expect(ids).toEqual(["b1", "b2", "b3"]);
+	});
+
+	it("matches a multi-color item by either its primary or secondary color", () => {
+		const items: ClothingItem[] = [
+			makeItem({ id: "m1", color: "blue / white" }),
+			makeItem({ id: "m2", color: "red" }),
+		];
+		const { result } = renderHook(() => useClosetFilters(items));
+
+		act(() => {
+			result.current.toggleFilter("color", "Blue");
+		});
+		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["m1"]);
+
+		act(() => {
+			result.current.clearAll();
+			result.current.toggleFilter("color", "White");
+		});
+		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["m1"]);
+	});
+
+	it("lists both colors of a multi-color item as separate options", () => {
+		const items: ClothingItem[] = [makeItem({ id: "m1", color: "blue / white" })];
+		const { result } = renderHook(() => useClosetFilters(items));
+		const colorValues = result.current.filterOptions.color.map((o) => o.value);
+		expect(colorValues).toContain("Blue");
+		expect(colorValues).toContain("White");
+	});
+
+	it("groups singular and plural category variants under one option", () => {
+		const items: ClothingItem[] = [
+			makeItem({ id: "c1", category: "dress" }),
+			makeItem({ id: "c2", category: "dresses" }),
+			makeItem({ id: "c3", category: "top" }),
+			makeItem({ id: "c4", category: "tops" }),
+		];
+		const { result } = renderHook(() => useClosetFilters(items));
+		const counts = Object.fromEntries(result.current.filterOptions.category.map((o) => [o.value, o.count]));
+		expect(counts["dresses"]).toBe(2);
+		expect(counts["tops"]).toBe(2);
+	});
+
+	it("selecting a category matches both its singular and plural items", () => {
+		const items: ClothingItem[] = [
+			makeItem({ id: "c1", category: "dress" }),
+			makeItem({ id: "c2", category: "dresses" }),
+			makeItem({ id: "c3", category: "tops" }),
+		];
+		const { result } = renderHook(() => useClosetFilters(items));
+		act(() => {
+			result.current.toggleFilter("category", "dresses");
+		});
+		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["c1", "c2"]);
+	});
+
 	it("returns no items when filters match nothing", () => {
 		const { result } = renderHook(() => useClosetFilters(CLOSET));
 		act(() => {

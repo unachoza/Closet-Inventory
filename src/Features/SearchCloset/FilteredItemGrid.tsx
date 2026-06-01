@@ -40,7 +40,7 @@ const FilteredItemGrid = ({ items, matchKeysById, totalCount, onEditItem }: Filt
 			<p className="entire-closet__meta">
 				Showing <strong>{items.length}</strong> of {totalCount} items
 			</p>
-			<div role="list">
+			<div className="filtered-items-parent"role="list">
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={`${items.length}-${totalCount}`} // <--- important: remounts when category changes

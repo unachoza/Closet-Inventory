@@ -26,15 +26,10 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 
 	// Pipeline: closet → filter → search → sort
 	const searched = useMemo(() => searchResults(filteredItems), [searchResults, filteredItems]);
-	console.log(searched.length, { searched }, "reight here for real ");
 	const displayed = useMemo(() => sortedItems(searched), [sortedItems, searched]);
-	console.log(displayed.length, { displayed }, "after the query and after the filter");
 
 	// Match metadata for highlighting which fields were hit
-	console.log({ filteredItems }, filteredItems.length);
 	const matchKeysById = useMemo(() => getMatchKeys(filteredItems), [getMatchKeys, filteredItems]);
-
-	console.log("this is the closet", { closet });
 
 	return (
 		<main className="entire-closet" aria-label="Entire closet view">

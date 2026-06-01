@@ -60,4 +60,20 @@ const normalizeColor = (color: string): string => {
 	return color.trim();
 };
 
+// Separators used when an item lists more than one color, e.g. "brown / taupe",
+// "blue, white", "red & black". Multi-word single colors ("heather dark grey")
+// have no separator and stay as one group.
+const COLOR_SPLIT = /\s*\/\s*|\s*,\s*|\s*&\s*|\s*\+\s*|\s+and\s+/i;
+
+// Expand a raw color string into its distinct normalized color groups.
+// "brown / taupe" → ["Brown"]; "blue / white" → ["Blue", "White"].
+export const normalizeColorGroups = (color: string): string[] => {
+	const parts = color
+		.split(COLOR_SPLIT)
+		.map((p) => p.trim())
+		.filter(Boolean);
+	const source = parts.length > 0 ? parts : [color];
+	return Array.from(new Set(source.map(normalizeColor)));
+};
+
 export default normalizeColor;

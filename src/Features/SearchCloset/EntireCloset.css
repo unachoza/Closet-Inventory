@@ -430,6 +430,7 @@
 
 .filter-accordion__option-value {
 	flex: 1;
+	text-transform: capitalize;
 }
 
 .filter-accordion__option-count {
@@ -449,6 +450,10 @@
     border-radius: 5px;
     border: solid black;
     color: var(--Op-Light-Grey, #999797);
+}
+
+.filtered-items-parent{
+	width: 102%;
 }
 
 /* ── Items grid ── */
