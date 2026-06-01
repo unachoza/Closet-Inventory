@@ -188,6 +188,16 @@
 	.gmail-results {
 		grid-template-columns: 1fr;
 	}
+
+	.gmail-header-bar{
+		margin-bottom: 0;
+	}
+
+	.gmail-email-list{
+		border: solid grey 1px;
+		border-radius: 5px;
+		padding: 0 10px;
+	}
 }
 
 .gmail-section-title {
@@ -473,11 +483,13 @@
 
   .gmail-header-actions {
     width: 100%;
-    flex-wrap: wrap;
+    gap: 0
   }
 
   .gmail-header-actions button {
     flex: 1 1 auto;
+    font-size: 0.8rem;
+    height: 3.5rem;
   }
 
   /* Shorter email list on mobile since preview is below */
