@@ -50,8 +50,8 @@ describe("NavBar", () => {
 			expect(screen.getByRole("button", { name: /Fabric Guide/i })).toBeInTheDocument();
 		});
 
-		it("hides the title and inline actions in the overview view, showing only search", () => {
-			renderNav({ initialView: "overview" });
+		it("hides the title and inline actions in the entire-closet view, showing only search", () => {
+			renderNav({ initialView: "entireCloset" });
 			expect(screen.queryByRole("heading", { name: /My Closet Inventory/i })).not.toBeInTheDocument();
 			expect(screen.getByRole("textbox", { name: /Search closet/i })).toBeInTheDocument();
 			// Inline actions are collapsed (only the hamburger drawer holds them now).
@@ -66,7 +66,7 @@ describe("NavBar", () => {
 
 	describe("search", () => {
 		it("writes the search input value into SearchContext", () => {
-			renderNav({ initialView: "overview" });
+			renderNav({ initialView: "entireCloset" });
 			const input = screen.getByRole("textbox", { name: /Search closet/i });
 			fireEvent.change(input, { target: { value: "brown" } });
 			expect(screen.getByTestId("current-query")).toHaveTextContent("brown");
@@ -89,10 +89,10 @@ describe("NavBar", () => {
 	});
 
 	describe("navigation actions", () => {
-		it("View All navigates to the overview view", () => {
+		it("View All navigates to the entire-closet view", () => {
 			renderNav({ initialView: "carousel" });
 			fireEvent.click(screen.getByRole("button", { name: /View All/i }));
-			expect(screen.getByTestId("current-view")).toHaveTextContent("overview");
+			expect(screen.getByTestId("current-view")).toHaveTextContent("entireCloset");
 		});
 
 		it("Import Gmail navigates to the gmail view", () => {
@@ -123,7 +123,7 @@ describe("NavBar", () => {
 
 	describe("hamburger drawer", () => {
 		it("opens the drawer with all nav actions when the hamburger is clicked", () => {
-			renderNav({ initialView: "overview" });
+			renderNav({ initialView: "entireCloset" });
 			expect(screen.queryByRole("navigation", { name: /Navigation menu/i })).not.toBeInTheDocument();
 
 			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
@@ -134,7 +134,7 @@ describe("NavBar", () => {
 		});
 
 		it("navigates and closes the drawer when a drawer action is clicked", () => {
-			renderNav({ initialView: "overview" });
+			renderNav({ initialView: "entireCloset" });
 			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /Import Gmail/i }));
 
@@ -143,7 +143,7 @@ describe("NavBar", () => {
 		});
 
 		it("closes the drawer when the overlay is clicked", () => {
-			renderNav({ initialView: "overview" });
+			renderNav({ initialView: "entireCloset" });
 			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByTestId("nav-drawer-overlay"));
 			expect(screen.queryByRole("navigation", { name: /Navigation menu/i })).not.toBeInTheDocument();

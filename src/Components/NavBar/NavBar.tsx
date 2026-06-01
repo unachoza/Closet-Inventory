@@ -19,9 +19,9 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 	const { searchQuery, setSearchQuery } = useSearch();
 	const [drawerOpen, setDrawerOpen] = useState(false);
 
-	// "overview" is the entire-closet / search experience. In that mode the
+	// "entireCloset" is the searchable all-items experience. In that mode the
 	// nav actions collapse into the hamburger drawer and only search shows.
-	const isClosetView = view === "overview";
+	const isClosetView = view === "entireCloset";
 	const showBackToCarousel = view !== "carousel";
 
 	const closeDrawer = () => setDrawerOpen(false);
@@ -45,7 +45,7 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 			<button className="action-btn" onClick={handleAddItem}>
 				<Plus size={16} /> Add Item
 			</button>
-			<button className="action-btn secondary" onClick={() => goTo("overview")}>
+			<button className="action-btn secondary" onClick={() => goTo("entireCloset")}>
 				<LayoutGrid size={16} /> View All
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("gmail")}>

@@ -1,0 +1,74 @@
+/* ── MaterialCompositionBar ──────────────────────────────────────────────────
+   Segmented horizontal bar + legend, matching FiberCard PropBar visual style.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mcb {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	width: 100%;
+}
+
+/* ── Bar ── */
+.mcb__bar {
+	display: flex;
+	height: 8px;
+	border-radius: 99px;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.mcb--compact .mcb__bar {
+	height: 5px;
+}
+
+.mcb__segment {
+	height: 100%;
+	transition: width 0.3s ease;
+	border: solid black 1px;
+}
+
+.mcb__segment:first-child {
+	border-radius: 99px 0 0 99px;
+}
+
+.mcb__segment:last-child {
+	border-radius: 0 99px 99px 0;
+}
+
+.mcb__segment:only-child {
+	border-radius: 99px;
+}
+
+/* ── Legend ── */
+.mcb__legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem 0.75rem;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.mcb__legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.mcb__legend-swatch {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.mcb__legend-label {
+	font-size: 0.75rem;
+	/* color: var(--text-muted, #9ca3af); */
+}
+
+/* Compact: hide the text legend (bar only) */
+.mcb--compact .mcb__legend {
+	display: none;
+}

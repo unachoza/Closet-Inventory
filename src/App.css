@@ -25,6 +25,10 @@
   justify-content: center;
 }
 
+.controls-container button {
+  justify-content: space-around;
+}
+
 /* Button */
 .back-button {
   padding: 0.6rem 1.5rem;

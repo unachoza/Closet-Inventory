@@ -3,6 +3,8 @@ import { ClothingItem } from "../../utils/types";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 
 import { useState } from "react";
+import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
+import { normalizeMaterial } from "../../utils/materialUtils";
 
 interface CardProps {
 	item: ClothingItem;
@@ -14,49 +16,9 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 
 	const { removeItem } = useLocalStorageCloset();
 
-	const renderMaterial = ({ material }: any) => {
-		if (!material) return null;
-
-		// if material is a string
-		if (typeof material === "string") {
-			return (
-				<>
-					<strong>Material:</strong> {material}
-				</>
-			);
-		}
-
-		// if material is an array
-		if (Array.isArray(material)) {
-			return (
-				<>
-					<strong>Material:</strong> {console.log({ material }, "has more")}
-					{material.map((item, index) => {
-						console.log(item, index);
-						return (
-							<span key={index}>
-								{item.material}: {item.percentage}%{index < material.length - 1 ? ", " : ""}
-							</span>
-						);
-					})}
-				</>
-			);
-		}
-
-		// if material is an object
-		if (typeof material === "object") {
-			return (
-				<>
-					<strong>Material:</strong>{" "}
-					{Object.entries(material)
-						.map(([key, value]) => `${key}: ${value}`)
-						.join(", ")}
-				</>
-			);
-		}
-
-		return null;
-	};
+	// Coerce defensively: closet data may still carry a legacy string
+	// (e.g. "95% Cotton, 5% Spandex") or be the new MaterialBlend[] shape.
+	const materialBlend = normalizeMaterial(item.material);
 
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
@@ -85,15 +47,11 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 						<p>
 							<strong>Brand:</strong> {item.brand}
 						</p>
-						<p>
-							{/* <strong>Material:</strong> {item.material} */}
-							{/* {item.materials.map((mat: any, idx: any) => (
-								<span key={idx}>
-									{mat.material} - {mat.percentage}%{" "}
-								</span>
-							))} */}
-							{renderMaterial(item)}
-						</p>
+						<div className="card-material">
+							<strong>Material:</strong>{" "}
+							{materialBlend.length > 0 ? <MaterialCompositionBar blend={materialBlend} /> : "—"}
+						</div>
+
 						<p>
 							<strong>Occasion:</strong> {item.occasion}
 						</p>

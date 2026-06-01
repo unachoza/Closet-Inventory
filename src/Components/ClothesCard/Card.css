@@ -68,7 +68,7 @@
 }
 
 .card-details{
-
+overflow: scroll;
 }
 
 .controls-container {

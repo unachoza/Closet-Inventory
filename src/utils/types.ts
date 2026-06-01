@@ -1,5 +1,10 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
 
+export interface MaterialBlend {
+	material: string;
+	percentage: number;
+}
+
 export type ClothingItem = {
 	//TODO: change back id to string or number?
 	id: string;
@@ -10,7 +15,7 @@ export type ClothingItem = {
 	size: string;
 	brand: string;
 	price?: string;
-	material: string;
+	material: MaterialBlend[];
 	occasion: string;
 	age: string;
 	care: string | string[];
@@ -26,7 +31,7 @@ export interface ItemFormData {
 	color: string; // single color
 	size: string; // single size
 	brand: string;
-	material: string;
+	material: MaterialBlend[];
 	occasion: string;
 	age: string;
 	purchaseDate?: string;
@@ -36,7 +41,7 @@ export interface ItemFormData {
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
-export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric"
+export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "entireCloset"
 
 export interface Option {
 	value: string;

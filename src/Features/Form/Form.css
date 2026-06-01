@@ -161,6 +161,12 @@ button.submit:hover {
 		transform: translateY(-6px);
 	}
 }
+.step-hint {
+	font-size: 0.78rem;
+	color: rgba(255, 255, 255, 0.45);
+	margin: -0.25rem 0 0.5rem;
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
