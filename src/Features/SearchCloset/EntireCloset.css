@@ -451,13 +451,12 @@
 .entire-closet__meta {
 	padding: var(--spacing-100) var(--spacing-200);
     font-size: 0.82rem;
-    color: white;
+    color: var(--White);
     background: #0000008c;
     width: fit-content;
     margin: 5px auto;
     border-radius: 5px;
-    border: solid black;
-    color: var(--Op-Light-Grey, #999797);
+    border: solid black 1px;
 }
 
 .filtered-items-parent{
@@ -510,7 +509,7 @@
 	align-items: center;
 	gap: var(--spacing-100);
 	padding: var(--spacing-400) 0;
-	color: var(--Op-Light-Grey, #aaa);
+	color: var(--Op-Light-Grey, #aaa); /* or #b9b9b9 */
 	text-align: center;
 	    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: var(--blur, blur(12px));
@@ -519,7 +518,7 @@
 
 .filtered-item-grid__empty-hint {
 	font-size: 0.82rem;
-	color: var(--Medium-Grey, #666);
+	/* color: var(--Medium-Grey, #666); */
 }
 
 /* ── Filtered card wrapper ── */

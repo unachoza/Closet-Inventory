@@ -74,33 +74,35 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	const emptyLabel = selectedCategory?.trim() ? selectedCategory : "your closet";
 
 	return (
-		<div className="items-overview">
-			{hasItems ? (
-				<motion.div
-					// Remount on category OR page change so the stagger replays. The
-					// container's `staggerChildren` only orchestrates its children from
-					// `hidden`→`show` when the parent mounts/re-keys; without `currentPage`
-					// in the key, paging in new cards left them stuck at the `hidden`
-					// variant (opacity:0 — present in the DOM but invisible). No
-					// `mode="wait"` AnimatePresence here, so remounting is safe and can
-					// never strand the grid waiting on an exit (the blank-screen bug).
-					key={`${normalizedCategory || "all"}-${currentPage}`}
-					className="items-grid"
-					variants={containerVariants}
-					initial="hidden"
-					animate="show"
-				>
-					{paginatedItems.map((item: ClothingItem) => (
-						<motion.div key={item.id} variants={cardVariants}>
-							<ClothingCard item={item} onEditItem={onEditItem} />
-						</motion.div>
-					))}
-				</motion.div>
-			) : (
-				<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
-			)}
+		<>
+			<div className="items-overview">
+				{hasItems ? (
+					<motion.div
+						// Remount on category OR page change so the stagger replays. The
+						// container's `staggerChildren` only orchestrates its children from
+						// `hidden`→`show` when the parent mounts/re-keys; without `currentPage`
+						// in the key, paging in new cards left them stuck at the `hidden`
+						// variant (opacity:0 — present in the DOM but invisible). No
+						// `mode="wait"` AnimatePresence here, so remounting is safe and can
+						// never strand the grid waiting on an exit (the blank-screen bug).
+						key={`${normalizedCategory || "all"}-${currentPage}`}
+						className="items-grid"
+						variants={containerVariants}
+						initial="hidden"
+						animate="show"
+					>
+						{paginatedItems.map((item: ClothingItem) => (
+							<motion.div key={item.id} variants={cardVariants}>
+								<ClothingCard item={item} onEditItem={onEditItem} />
+							</motion.div>
+						))}
+					</motion.div>
+				) : (
+					<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
+				)}
+			</div>
 			<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
-		</div>
+		</>
 	);
 };
 

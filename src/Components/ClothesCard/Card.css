@@ -143,6 +143,15 @@ overflow: scroll;
   .card-image img {
     object-fit: cover;
   }
+
+  .card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+        /* overflow: auto; */
+  }
+  .card-details {
+    font-size: 0.85rem;
+  }
 }
 
 

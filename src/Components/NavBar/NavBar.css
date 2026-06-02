@@ -1,16 +1,20 @@
 /* Top Sticky Navigation */
 .top-nav {
-      height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      background-color: white;
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      flex-direction: column;
+     height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: white;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100vw;
+    flex-direction: column;
+    border: var(--border-black-sm);
+    background-color: rgba(0, 0, 0, 0.53);
+    box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 .nav-left {
@@ -54,6 +58,8 @@
 .top-nav--search {
       justify-content: flex-start;
       gap: 16px;
+      display: flex;
+    flex-direction: row;
 }
 
 .top-nav--search .search-container {
@@ -70,18 +76,18 @@
 }
 
 .action-btn {
-      background-color: var(--primary-color);
-      color: var(--text-primary);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      transition: background-color 0.2s;
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    border: solid white 1px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    white-space: nowrap;
+    transition: background-color 0.2s;
+    margin: 0;
 }
 
 .action-btn:hover {
@@ -144,7 +150,6 @@ div.search-container > input {
       bottom: 0;
       width: 260px;
       max-width: 80vw;
-      background-color: white;
       box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
       z-index: 201;
       padding: 16px;
@@ -152,6 +157,9 @@ div.search-container > input {
       flex-direction: column;
       gap: 16px;
       animation: nav-drawer-in 0.2s ease;
+        border: var(--border-black-sm);
+    background-color: rgba(0, 0, 0, 0.65);
+    box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 @keyframes nav-drawer-in {
@@ -203,9 +211,16 @@ div.search-container > input {
       .nav-left {
             flex: 1;
             min-width: 0;
+            width: 100%;
       }
 
-      .hamburger-btnP{
+      .top-nav {
+            padding: 0;
+        display: flex;
+        flex-direction: row;
+      }
+
+      .hamburger-btn{
   padding: 0.6em .75rem;
       }
 
@@ -216,10 +231,15 @@ div.search-container > input {
             text-overflow: ellipsis;
             text-align: left;
       }
+      .top-nav--search .search-input {
+    width: 100%;
+    width: 70vw;
+      }
 
       /* Search (overview view) should fill the row rather than a fixed width. */
       .top-nav--search .search-container {
             max-width: none;
+            width: 70vw;
       }
 
       .search-input {

@@ -6,6 +6,7 @@
 	align-items: center;
 	gap: 1rem;
 	margin-top: 1.5rem;
+	color: var(--White);
 }
 
 .pagination-controls button {
@@ -30,12 +31,19 @@
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  /* The controls are pinned in a non-scrolling footer (see Closet.css), so the
-     large bottom margin previously used to push them into view is no longer
-     needed — it only added clipped empty space. */
+  /* Pagination sits OUTSIDE .items-overview as a full-width sibling, so its bar
+     bleeds to both screen edges instead of being inset by the overview's
+     max-width/padding. Pin it to the bottom of the viewport while scrolling so
+     the buttons stay reachable; safe-area padding clears the iOS home indicator. */
   .pagination-controls {
-    margin-top: 0.75rem;
-    margin-bottom: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    width: 100%;
+    margin: 0;
+    padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: var(--blur, blur(12px));
   }
 }
 

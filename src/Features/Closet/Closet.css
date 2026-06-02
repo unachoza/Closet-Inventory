@@ -7,7 +7,10 @@
       max-width: 80rem;
       margin: 0 auto;
       padding: 1rem;
-      height: 60vh;
+      /* min-height (not a fixed height): the box must grow to contain the whole
+         grid. With a fixed 60vh the grid overflowed and the sibling pagination
+         landed on top of the spilled-over cards. */
+      min-height: 60vh;
 }
 
 /* === Grid === */
@@ -16,6 +19,11 @@
       justify-content: space-around;
       flex-wrap: wrap;
       gap: 2px
+}
+
+p.no-results {
+  color: var(--White);
+
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
@@ -29,6 +37,7 @@
     padding: 0.5rem;
     height: auto;
     overflow: visible;
+    background: rgba(0, 0, 0, 0.75);
   }
 
   .items-grid {
@@ -37,21 +46,9 @@
     justify-content: center;
   }
 
-  /* Pin the pagination to the bottom of the viewport while scrolling so the
-     buttons stay reachable no matter how much content sits above them. The
-     opaque backdrop keeps grid items from showing through, and the safe-area
-     padding clears the iOS home indicator. */
-  .items-overview > :last-child {
-    position: sticky;
-    bottom: 0;
-    align-self: stretch;
-    width: 100%;
-    margin-top: 0.5rem;
-    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px));
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: var(--blur, blur(12px));
-    z-index: 5;
-  }
+  /* Pagination is no longer a child here — it's a full-width sibling rendered
+     after .items-overview (see Closet.tsx) and its sticky/full-bleed styling
+     lives in PaginationControls.css. */
 }
 
 @media (max-width: 480px) {
