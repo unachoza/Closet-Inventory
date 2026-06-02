@@ -57,6 +57,10 @@ form {
 	left: 1.25rem;
 }
 
+.back-button:hover {
+	filter: contrast(1.5);
+}
+
 button.submit { 
 	position: absolute;
 	right: 1.25rem;

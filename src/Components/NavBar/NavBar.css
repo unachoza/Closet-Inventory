@@ -92,6 +92,7 @@
 
 .action-btn:hover {
       background-color: var(--cream);
+      color: var(--Soft-Black);
 }
 
 .action-btn.secondary {
@@ -102,6 +103,9 @@
 
 .action-btn.secondary:hover {
       background-color: #d3d9df;
+       color: var(--Soft-Black);
+       border: solid black 1px;
+
 }
 
 .search-container {

@@ -45,7 +45,6 @@
 .back-button:hover {
 
   transform: translateY(-1px);
-  filter: brightness(.8);
 }
 
 .back-button:active {
