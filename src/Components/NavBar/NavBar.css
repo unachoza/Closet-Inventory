@@ -1,20 +1,20 @@
 /* Top Sticky Navigation */
 .top-nav {
-     height: var(--header-height);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 20px;
-    color: white;
-    border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 100;
-    width: 100vw;
+    display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+     height: var(--header-height);
+    padding: 0 20px;
     border: var(--border-black-sm);
     background-color: rgba(0, 0, 0, 0.53);
     box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    color: white;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .nav-left {
@@ -24,21 +24,21 @@
 }
 
 .hamburger-btn {
-      background: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       border: none;
+      background: none;
+      color: var(--primary-color);
       font-size: 24px;
       cursor: pointer;
-      color: var(--primary-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     
 }
 
 .page-title {
+      margin: 0;
       font-size: 20px;
       font-weight: 600;
-      margin: 0;
       white-space: nowrap;
 }
 
@@ -50,21 +50,21 @@
 
 .nav-actions {
       display: flex;
-      gap: 10px;
       align-items: center;
+      gap: 10px;
 }
 
 /* Search-only layout (entire closet / overview view) */
 .top-nav--search {
-      justify-content: flex-start;
-      gap: 16px;
       display: flex;
     flex-direction: row;
+      justify-content: flex-start;
+      gap: 16px;
 }
 
 .top-nav--search .search-container {
-      flex: 1;
       max-width: 480px;
+      flex: 1;
 }
 
 .top-nav--search .search-input {
@@ -76,18 +76,18 @@
 }
 
 .action-btn {
-    background-color: var(--primary-color);
-    color: var(--text-primary);
-    border: solid white 1px;
-    border-radius: 6px;
-    font-size: 12px;
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    white-space: nowrap;
-    transition: background-color 0.2s;
     margin: 0;
+    border: solid white 1px;
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
 }
 
 .action-btn:hover {
@@ -96,15 +96,15 @@
 }
 
 .action-btn.secondary {
+      width: 100%;
       background-color: var(--pill-bg);
       color: var(--text-primary);
-      width: 100%;
 }
 
 .action-btn.secondary:hover {
+       border: solid black 1px;
       background-color: #d3d9df;
        color: var(--Soft-Black);
-       border: solid black 1px;
 
 }
 
@@ -115,13 +115,13 @@
 }
 
 .search-input {
+      width: 250px;
       padding: 8px 12px 8px 36px;
       border: 1px solid var(--border-color);
       border-radius: 20px;
       font-size: 14px;
-      width: 250px;
-      outline: none;
       transition: border-color 0.2s;
+      outline: none;
 }
 
 .search-input:focus {
@@ -142,28 +142,28 @@ div.search-container > input {
 /* Hamburger drawer */
 .nav-drawer-overlay {
       position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.35);
       z-index: 200;
+      background: rgba(0, 0, 0, 0.35);
+      inset: 0;
 }
 
 .nav-drawer {
       position: fixed;
       top: 0;
-      left: 0;
       bottom: 0;
-      width: 260px;
-      max-width: 80vw;
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+      left: 0;
       z-index: 201;
-      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      animation: nav-drawer-in 0.2s ease;
+      width: 260px;
+      max-width: 80vw;
+      padding: 16px;
         border: var(--border-black-sm);
     background-color: rgba(0, 0, 0, 0.65);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
     box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      animation: nav-drawer-in 0.2s ease;
+      gap: 16px;
 }
 
 @keyframes nav-drawer-in {
@@ -176,14 +176,14 @@ div.search-container > input {
 }
 
 .nav-drawer__close {
-      align-self: flex-end;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--primary-color);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      border: none;
+      background: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      align-self: flex-end;
 }
 
 .nav-drawer__actions {
@@ -193,8 +193,8 @@ div.search-container > input {
 }
 
 .nav-drawer__actions .action-btn {
-      width: 100%;
       justify-content: flex-start;
+      width: 100%;
 }
 
 /* -------------------------------------------------------------------------
@@ -213,15 +213,15 @@ div.search-container > input {
 
       /* Let the title take up the available width next to the hamburger. */
       .nav-left {
-            flex: 1;
-            min-width: 0;
             width: 100%;
+            min-width: 0;
+            flex: 1;
       }
 
       .top-nav {
-            padding: 0;
         display: flex;
         flex-direction: row;
+            padding: 0;
       }
 
       .hamburger-btn{
@@ -230,10 +230,10 @@ div.search-container > input {
 
 
       .page-title {
-            flex: 1;
             overflow: hidden;
-            text-overflow: ellipsis;
             text-align: left;
+            flex: 1;
+            text-overflow: ellipsis;
       }
       .top-nav--search .search-input {
     width: 100%;
@@ -242,8 +242,8 @@ div.search-container > input {
 
       /* Search (overview view) should fill the row rather than a fixed width. */
       .top-nav--search .search-container {
-            max-width: none;
             width: 70vw;
+            max-width: none;
       }
 
       .search-input {

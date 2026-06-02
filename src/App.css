@@ -1,8 +1,8 @@
 
 .main{
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  height: 100vh;
 }
 
 /* Scroll region beneath the persistent sticky NavBar */
@@ -31,6 +31,7 @@
 
 /* Button */
 .back-button {
+  position: fixed;
   padding: 0.6rem 1.5rem;
   border-radius: var(--border-radius-sm);
   background: var(--button-background-blue-grey);
@@ -39,7 +40,6 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.25s ease, transform 0.2s ease;
-  position: fixed;
 }
 
 .back-button:hover {
@@ -69,14 +69,14 @@
   }
 
   .button-container button {
-    font-size: 0.85rem;
     padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
   }
 
   .back-button, .next-button {
-    font-size: 0.95rem;
-    padding: 0.5rem 1rem;
     height: 2.65rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
     letter-spacing: .1rem;
   }
 }

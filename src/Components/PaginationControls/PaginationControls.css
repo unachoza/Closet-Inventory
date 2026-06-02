@@ -4,9 +4,9 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	color: var(--White);
 	gap: 1rem;
 	margin-top: 1.5rem;
-	color: var(--White);
 }
 
 .pagination-controls button {

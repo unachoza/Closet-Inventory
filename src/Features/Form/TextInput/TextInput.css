@@ -31,10 +31,10 @@ input:hover{
 }
 
 input[type="text"] {
+      width: 100%;
       background: var(--white);
       color: var(--White);
       line-height: 130%;
-      width: 100%;
       font-feature-settings: 'liga' off, 'clig' off
 }
 

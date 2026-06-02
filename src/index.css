@@ -103,15 +103,19 @@ body {
 
 h1 {
 	margin: 1rem 0;
+	color: white;
 	font-size: 3em;
 	line-height: 1.1;
-	color: white;
 	paint-order: stroke;
 	-webkit-text-stroke: 2px var(--Black);
 
 }
 
 button {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: calc-size(fit-content, size * 1.05);
 	margin: var(--spacing-100);
 	padding: 0.6em 1.2em;
 	border: var(--border-black-sm);
@@ -122,10 +126,6 @@ button {
 	font-weight: 500;
 	cursor: pointer;
 	transition: border-color 0.25s;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	width: calc-size(fit-content, size * 1.05);
 }
 
 button:hover {

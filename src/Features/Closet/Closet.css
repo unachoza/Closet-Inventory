@@ -5,12 +5,12 @@
       align-items: center;
       width: 100%;
       max-width: 80rem;
-      margin: 0 auto;
-      padding: 1rem;
       /* min-height (not a fixed height): the box must grow to contain the whole
          grid. With a fixed 60vh the grid overflowed and the sibling pagination
          landed on top of the spilled-over cards. */
       min-height: 60vh;
+      margin: 0 auto;
+      padding: 1rem;
 }
 
 /* === Grid === */
@@ -34,16 +34,16 @@ p.no-results {
      tall the NavBar or carousel stacked above it are — which is what pushed
      the pagination off-screen before. */
   .items-overview {
-    padding: 0.5rem;
-    height: auto;
     overflow: visible;
+    height: auto;
+    padding: 0.5rem;
     background: rgba(0, 0, 0, 0.75);
   }
 
   .items-grid {
+    justify-content: center;
     width: 100%;
     gap: 0.75rem;
-    justify-content: center;
   }
 
   /* Pagination is no longer a child here — it's a full-width sibling rendered
@@ -53,7 +53,7 @@ p.no-results {
 
 @media (max-width: 480px) {
   .items-grid {
-    gap: 0.5rem;
     padding: 0 0.25rem;
+    gap: 0.5rem;
   }
 }

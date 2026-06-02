@@ -5,16 +5,16 @@
 .mcb {
 	display: flex;
 	flex-direction: column;
-	gap: 0.5rem;
 	width: 100%;
+	gap: 0.5rem;
 }
 
 /* ── Bar ── */
 .mcb__bar {
 	display: flex;
+	overflow: hidden;
 	height: 8px;
 	border-radius: 99px;
-	overflow: hidden;
 	background: rgba(255, 255, 255, 0.06);
 }
 
@@ -24,8 +24,8 @@
 
 .mcb__segment {
 	height: 100%;
-	transition: width 0.3s ease;
 	border: solid black 1px;
+	transition: width 0.3s ease;
 }
 
 .mcb__segment:first-child {
@@ -44,10 +44,10 @@
 .mcb__legend {
 	display: flex;
 	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
 	gap: 0.4rem 0.75rem;
 	list-style: none;
-	padding: 0;
-	margin: 0;
 }
 
 .mcb__legend-item {

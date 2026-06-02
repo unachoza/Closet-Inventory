@@ -166,9 +166,9 @@ button.submit:hover {
 	}
 }
 .step-hint {
-	font-size: 0.78rem;
-	color: rgba(255, 255, 255, 0.65);
 	margin: -0.25rem 0 0.5rem;
+	color: rgba(255, 255, 255, 0.65);
+	font-size: 0.78rem;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
@@ -191,8 +191,8 @@ button.submit:hover {
 
   .age-checkboxes,
   .age-datepicker {
-    flex: unset;
     width: 100%;
+    flex: unset;
   }
 
   .age-datepicker input {
