@@ -2,13 +2,15 @@ import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
 import normalizeColor, { normalizeColorGroups } from "../utils/normalizeColors";
 import normalizeCategory from "../utils/normalizeCategories";
+import normalizeCare from "../utils/normalizeCare";
+import { normalizeMaterial } from "../utils/materialUtils";
 
-export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion";
+export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care";
 export type FilterState = Record<FilterDimension, string[]>;
 export type FilterOption = { value: string; count: number };
 export type FilterOptions = Record<FilterDimension, FilterOption[]>;
 
-const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion"];
+const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const INITIAL_FILTERS: FilterState = {
 	category: [],
@@ -16,7 +18,10 @@ const INITIAL_FILTERS: FilterState = {
 	brand: [],
 	material: [],
 	occasion: [],
+	care: [],
 };
+
+const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 // Flatten a raw field (string | array | object) into a list of trimmed string values.
 const extractValues = (raw: unknown): string[] => {
@@ -41,10 +46,14 @@ const extractValues = (raw: unknown): string[] => {
 
 // Collapse a single value onto its canonical form for a dimension: colors group
 // via normalizeColor ("brown"/"Brown" → "Brown"), categories via normalizeCategory
-// ("dress"/"dresses" → "dresses"); other dimensions pass through unchanged.
+// ("dress"/"dresses" → "dresses"), materials surface the bare fiber name without
+// percentages ("Cotton"), care buckets to one of three wash methods; other
+// dimensions pass through unchanged.
 const normalizeForDim = (dim: FilterDimension, value: string): string => {
 	if (dim === "color") return normalizeColor(value);
 	if (dim === "category") return normalizeCategory(value);
+	if (dim === "material") return capitalize(value.trim());
+	if (dim === "care") return normalizeCare(value);
 	return value;
 };
 
@@ -53,8 +62,18 @@ const canonicalValue = (dim: FilterDimension, value: string): string => normaliz
 
 // Display value(s) a raw field contributes to its dimension. Colors expand into
 // their distinct groups (primary + secondary), e.g. "blue / white" → ["Blue", "White"].
-const displayValues = (dim: FilterDimension, raw: string): string[] =>
-	dim === "color" ? normalizeColorGroups(raw) : [normalizeForDim(dim, raw)];
+// Empty normalized values (e.g. an unbucketable care string) contribute nothing.
+const displayValues = (dim: FilterDimension, raw: string): string[] => {
+	if (dim === "color") return normalizeColorGroups(raw);
+	const normalized = normalizeForDim(dim, raw);
+	return normalized ? [normalized] : [];
+};
+
+// Raw values a single item contributes to a dimension. Materials come from
+// normalizeMaterial (strips percentages, yields lowercase fiber names); every
+// other dimension flattens its raw field into trimmed strings.
+const rawValuesForDim = (dim: FilterDimension, item: ClothingItem): string[] =>
+	dim === "material" ? normalizeMaterial(item.material).map((b) => b.material) : extractValues(item[dim]);
 
 export const useClosetFilters = (closet: ClothingItem[]) => {
 	const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
@@ -67,13 +86,20 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 			const counts = new Map<string, { value: string; count: number }>();
 
 			for (const item of closet) {
-				for (const trimmed of extractValues(item[dim])) {
+				// Dedupe per item so each item contributes at most one to a value's
+				// count, even when several raw values bucket to the same display
+				// (e.g. "machine wash cold" + "machine wash" → "Machine Wash").
+				const seen = new Set<string>();
+
+				for (const trimmed of rawValuesForDim(dim, item)) {
 					// Colors expand into their groups ("brown / taupe" → "Brown",
 					// "blue / white" → "Blue" + "White"); other dims keep their raw value.
 					for (const display of displayValues(dim, trimmed)) {
 						const key = display.toLowerCase();
-						const existing = counts.get(key);
+						if (seen.has(key)) continue;
+						seen.add(key);
 
+						const existing = counts.get(key);
 						if (existing) {
 							existing.count += 1;
 						} else {
@@ -99,7 +125,7 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 				// Canonicalize both the item's value(s) and the selected terms so that
 				// case differences and color groupings match. A multi-color item
 				// ("blue / white") contributes a key per group, so it matches either filter.
-				const itemKeys = extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+				const itemKeys = rawValuesForDim(dim, item).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
 
 				if (!matches) return false;

@@ -73,8 +73,11 @@ function parseBlendString(raw: string): MaterialBlend[] {
 		}));
 	}
 
-	// No percentages found — treat the whole string as 100% of that material
-	return [{ material: trimmed.toLowerCase(), percentage: 100 }];
+	// No percent-first matches — strip any "<number>%" tokens so fiber-first
+	// strings like "linen 100%" still yield a clean fiber name, then treat the
+	// remainder as 100% of that material.
+	const cleaned = trimmed.replace(/\d+(?:\.\d+)?\s*%/g, "").trim();
+	return cleaned ? [{ material: cleaned.toLowerCase(), percentage: 100 }] : [];
 }
 
 /** Normalize any legacy material value to MaterialBlend[].

@@ -227,4 +227,85 @@ describe("useClosetFilters", () => {
 		});
 		expect(result.current.filteredItems).toHaveLength(0);
 	});
+
+	describe("material dimension", () => {
+		it("surfaces bare fiber names without percentages", () => {
+			const items: ClothingItem[] = [
+				makeItem({ id: "m1", material: "linen 100%" }),
+				makeItem({ id: "m2", material: "68% viscose, 32% cotton" }),
+			];
+			const { result } = renderHook(() => useClosetFilters(items));
+			const values = result.current.filterOptions.material.map((o) => o.value);
+			expect(values).toContain("Linen");
+			expect(values).toContain("Viscose");
+			expect(values).toContain("Cotton");
+			// No percentage noise like "Linen 100" / "Viscose 68"
+			expect(values.some((v) => /\d/.test(v))).toBe(false);
+		});
+
+		it("groups a fiber across different blend wordings under one option", () => {
+			const items: ClothingItem[] = [
+				makeItem({ id: "m1", material: "100% cotton" }),
+				makeItem({ id: "m2", material: "80% Cotton, 20% Spandex" }),
+			];
+			const { result } = renderHook(() => useClosetFilters(items));
+			const counts = Object.fromEntries(result.current.filterOptions.material.map((o) => [o.value, o.count]));
+			expect(counts["Cotton"]).toBe(2);
+			expect(counts["Spandex"]).toBe(1);
+		});
+
+		it("filters items by a fiber regardless of its percentage in the blend", () => {
+			const items: ClothingItem[] = [
+				makeItem({ id: "m1", material: "95% Cotton, 5% Spandex" }),
+				makeItem({ id: "m2", material: "100% silk" }),
+			];
+			const { result } = renderHook(() => useClosetFilters(items));
+			act(() => {
+				result.current.toggleFilter("material", "Cotton");
+			});
+			expect(result.current.filteredItems.map((i) => i.id)).toEqual(["m1"]);
+		});
+	});
+
+	describe("care dimension", () => {
+		it("buckets messy care strings into three canonical options", () => {
+			const items: ClothingItem[] = [
+				makeItem({ id: "1", care: "machine wash cold" }),
+				makeItem({ id: "2", care: "wash like colors" }),
+				makeItem({ id: "3", care: "hand wash cold" }),
+				makeItem({ id: "4", care: "dry clean only" }),
+				makeItem({ id: "5", care: ["cold water", "hang dry"] }),
+			];
+			const { result } = renderHook(() => useClosetFilters(items));
+			const counts = Object.fromEntries(result.current.filterOptions.care.map((o) => [o.value, o.count]));
+			expect(counts["Machine Wash"]).toBe(3); // items 1, 2, 5 (cold water)
+			expect(counts["Hand Wash"]).toBe(1); // item 3
+			expect(counts["Dry Clean"]).toBe(1); // item 4
+			// "hang dry" alone contributes no stray option
+			expect(result.current.filterOptions.care.map((o) => o.value).sort()).toEqual([
+				"Dry Clean",
+				"Hand Wash",
+				"Machine Wash",
+			]);
+		});
+
+		it("filters items by a bucketed care method", () => {
+			const items: ClothingItem[] = [
+				makeItem({ id: "1", care: "hand wash cold" }),
+				makeItem({ id: "2", care: "machine wash" }),
+				makeItem({ id: "3", care: "hand wash" }),
+			];
+			const { result } = renderHook(() => useClosetFilters(items));
+			act(() => {
+				result.current.toggleFilter("care", "Hand Wash");
+			});
+			expect(result.current.filteredItems.map((i) => i.id)).toEqual(["1", "3"]);
+		});
+
+		it("ignores empty care values", () => {
+			const items: ClothingItem[] = [makeItem({ id: "1", care: "" })];
+			const { result } = renderHook(() => useClosetFilters(items));
+			expect(result.current.filterOptions.care).toHaveLength(0);
+		});
+	});
 });

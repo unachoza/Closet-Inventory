@@ -15,9 +15,10 @@ const DIM_LABELS: Record<FilterDimension, string> = {
 	brand: "brand",
 	material: "mat",
 	occasion: "occ",
+	care: "care",
 };
 
-const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion"];
+const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const FilterPillsRow = ({
 	filters,
