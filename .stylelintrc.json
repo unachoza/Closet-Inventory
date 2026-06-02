@@ -1,6 +1,15 @@
 {
   "plugins": ["stylelint-order"],
   "rules": {
+    "order/order": [
+      [
+        { "type": "at-rule", "name": "import" },
+        "declarations",
+        "rules",
+        { "type": "at-rule", "name": "media" }
+      ],
+      { "severity": "warning" }
+    ],
     "order/properties-order": [
       [
         {
@@ -32,6 +41,9 @@
         }
       ],
       { "unspecified": "bottomAlphabetical" }
-    ]
+    ],
+    "media-feature-range-notation": "prefix",
+    "media-feature-name-no-unknown": true,
+    "media-feature-name-no-vendor-prefix": true
   }
 }

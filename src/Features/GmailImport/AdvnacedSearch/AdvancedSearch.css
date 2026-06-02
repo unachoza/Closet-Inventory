@@ -1,6 +1,6 @@
 .advanced-search {
-	margin-bottom: var(--spacing-200);
 	overflow: scroll;
+	margin-bottom: var(--spacing-200);
 }
 
 .advanced-search-toggle {
@@ -8,26 +8,26 @@
 	border: 1px solid var(--Medium-Grey);
 	border-radius: var(--border-radius-sm);
 	background: transparent;
-	color: var(--Op-Light-Grey);
+	color: var(--Lightest-Grey);
 	font-size: 0.85rem;
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
 
 .advanced-search-toggle:hover {
-	border-color: var(--White);
 	color: var(--White);
+	border-color: var(--White);
 }
 
 .advanced-search-form {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-200);
-	margin-top: var(--spacing-200);
 	padding: var(--spacing-200);
+	border: 1px solid rgba(5, 5, 5, 0.5);
 	border-radius: var(--border-radius-sm);
 	background: rgba(255, 255, 255, 0.05);
-	border: 1px solid rgba(5, 5, 5, 0.5);
+	gap: var(--spacing-200);
+	margin-top: var(--spacing-200);
 }
 
 .advanced-search-fieldset {
@@ -55,14 +55,14 @@
 .advanced-search-pill {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
 	padding: 0.2rem 0.6rem;
+	border: solid 1px black;
 	border-radius: var(--border-radius-ty);
 	background: rgba(37, 99, 235, 0.25);
 	color: var(--White);
 	font-size: 0.78rem;
 	line-height: 1.4;
-	border: solid 1px black;
+	gap: 4px;
 }
 
 .advanced-search-pill--excluded {
@@ -71,8 +71,8 @@
 
 .advanced-search-pill-remove {
 	display: inline-flex;
-	align-items: center;
 	justify-content: center;
+	align-items: center;
 	width: 16px;
 	height: 16px;
 	margin: 0;
@@ -102,13 +102,13 @@
 }
 
 .advanced-search-input {
-	flex: 1;
 	padding: 0.4rem 0.6rem;
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: var(--border-radius-ty);
 	background: rgba(0, 0, 0, 0.3);
 	color: var(--White);
 	font-size: 0.85rem;
+	flex: 1;
 }
 
 .advanced-search-input::placeholder {
@@ -116,11 +116,12 @@
 }
 
 .advanced-search-input:focus {
-	outline: 1px solid var(--Focus-Blue);
 	border-color: var(--Focus-Blue);
+	outline: 1px solid var(--Focus-Blue);
 }
 
 .advanced-search-add-btn {
+	margin: 0;
 	padding: 0.4rem 0.8rem;
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: var(--border-radius-ty);
@@ -128,7 +129,6 @@
 	color: var(--White);
 	font-size: 0.82rem;
 	cursor: pointer;
-	margin: 0;
 }
 
 .advanced-search-add-btn:hover {
@@ -137,28 +137,29 @@
 
 .advanced-search-row {
 	display: flex;
-	gap: var(--spacing-200);
 	flex-wrap: wrap;
+	gap: var(--spacing-200);
 }
 
 .advanced-search-label {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
-	flex: 1;
 	min-width: 140px;
 	color: var(--Op-Light-Grey);
 	font-size: 0.85rem;
+	flex: 1;
+	gap: 4px;
 }
 
 /* Action buttons row */
 .advanced-search-actions {
 	display: flex;
-	gap: var(--spacing-100);
 	justify-content: flex-end;
+	gap: var(--spacing-100);
 }
 
 .advanced-search-submit {
+	margin: 0;
 	padding: 0.5rem 1.5rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
@@ -166,7 +167,6 @@
 	font-size: 0.9rem;
 	font-weight: 500;
 	cursor: pointer;
-	margin: 0;
 	transition: filter 0.15s ease;
 }
 
@@ -184,11 +184,12 @@
 }
 
 .advanced-search-submit--filter {
-	background: rgba(16, 185, 129, 0.3);
 	border: 1px solid rgba(16, 185, 129, 0.4);
+	background: rgba(16, 185, 129, 0.3);
 }
 
 .advanced-search-clear-btn {
+	margin: 0;
 	padding: 0.5rem 1.2rem;
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: var(--border-radius-sm);
@@ -197,15 +198,14 @@
 	font-size: 0.85rem;
 	font-weight: 500;
 	cursor: pointer;
-	margin: 0;
-	margin-left: auto;
 	transition: all 0.15s ease;
+	margin-left: auto;
 }
 
 .advanced-search-clear-btn:hover {
-	border-color: #ff6b6b;
-	color: #ff6b6b;
 	background: rgba(220, 38, 38, 0.1);
+	color: #ff6b6b;
+	border-color: #ff6b6b;
 }
 
 .advanced-search-clear-btn:disabled {
@@ -217,12 +217,12 @@
 .advanced-search-status {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
 	padding: 0.35rem 0.8rem;
 	border-radius: var(--border-radius-ty);
 	font-size: 0.82rem;
 	font-weight: 500;
 	animation: pulse-status 1.5s ease-in-out infinite;
+	gap: 6px;
 }
 
 .advanced-search-status--fetch {

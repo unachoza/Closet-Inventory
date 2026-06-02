@@ -1,44 +1,44 @@
 .modal-overlay {
 	position: fixed;
-	inset: 0;
 	z-index: 1000;
 	display: flex;
-	align-items: center;
 	justify-content: center;
+	align-items: center;
 	background: rgba(0, 0, 0, 0.6);
 	backdrop-filter: blur(4px);
+	inset: 0;
 }
 
 .modal-panel {
 	width: 90%;
 	max-height: 80vh;
-	overflow-y: auto;
-	border-radius: var(--border-radius-sm);
 	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: var(--border-radius-sm);
 	background: var(--Dark-Grey, #1a1a1a);
 	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+	overflow-y: auto;
 }
 
 /* Header */
 .modal-header {
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
+	align-items: center;
 	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .modal-title {
 	margin: 0;
+	color: var(--White, #fff);
 	font-size: 1.1rem;
 	font-weight: 600;
-	color: var(--White, #fff);
 }
 
 .modal-close-btn {
 	display: inline-flex;
-	align-items: center;
 	justify-content: center;
+	align-items: center;
 	width: 28px;
 	height: 28px;
 	margin: 0;
@@ -66,8 +66,8 @@
 /* Footer */
 .modal-footer {
 	display: flex;
-	gap: var(--spacing-100, 0.5rem);
 	justify-content: flex-end;
 	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
 	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	gap: var(--spacing-100, 0.5rem);
 }

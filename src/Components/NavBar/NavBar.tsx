@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, X } from "lucide-react";
+import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
@@ -54,6 +54,9 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
 			</button>
+			<button className="action-btn secondary " onClick={() => goTo("carousel")}>
+				<SkipBackIcon size={16} /> Back to Carousel
+			</button>
 		</>
 	);
 
@@ -87,11 +90,6 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 
 			<div className="nav-right">
 				{!isClosetView && <div className="nav-actions">{navActions}</div>}
-				{showBackToCarousel && (
-					<button className="action-btn secondary back-to-carousel" onClick={() => goTo("carousel")}>
-						Back to Carousel
-					</button>
-				)}
 			</div>
 
 			{drawerOpen && (

@@ -14,28 +14,28 @@
 .entire-closet__sticky {
 	position: sticky;
 	top: 0;
-	z-index: 100;
+	z-index: 10;
+	padding: var(--spacing-200) var(--spacing-200) 0;
 	background: rgba(0, 0, 0, 0.75);
 	backdrop-filter: var(--blur, blur(12px));
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-	padding: var(--spacing-200) var(--spacing-200) 0;
 }
 
 /* ── Search + sort row ── */
 .search-sort-bar {
 	display: flex;
 	align-items: center;
-	gap: var(--spacing-200);
 	flex-wrap: wrap;
+	gap: var(--spacing-200);
 	margin-bottom: var(--spacing-150, 0.75rem);
 }
 
 .search-sort-bar__search-wrap {
-	flex: 1;
-	min-width: 180px;
 	position: relative;
 	display: flex;
 	align-items: center;
+	min-width: 180px;
+	flex: 1;
 }
 
 .search-sort-bar__icon {
@@ -61,21 +61,21 @@
 }
 
 .search-sort-bar__input:focus {
-	outline: none;
 	border-color: var(--Focus-Blue, #3b82f6);
+	outline: none;
 }
 
 .search-sort-bar__clear-btn {
 	position: absolute;
 	right: 8px;
-	background: transparent;
-	border: none;
-	color: var(--Op-Light-Grey, #aaa);
-	cursor: pointer;
-	padding: 0;
-	margin: 0;
 	display: flex;
 	align-items: center;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--Op-Light-Grey, #aaa);
+	cursor: pointer;
 }
 
 .search-sort-bar__clear-btn:hover {
@@ -85,7 +85,6 @@
 .search-sort-bar__filter-btn {
 	display: flex;
 	align-items: center;
-	gap: 6px;
 	padding: 0.5rem 1rem;
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: var(--border-radius-sm);
@@ -94,6 +93,7 @@
 	font-size: 0.88rem;
 	cursor: pointer;
 	transition: background 0.15s;
+	gap: 6px;
 }
 
 .search-sort-bar__filter-btn:hover {
@@ -101,16 +101,16 @@
 }
 
 .search-sort-bar__filter-btn--active {
-	border-color: var(--Focus-Blue, #3b82f6);
 	background: rgba(59, 130, 246, 0.15);
+	border-color: var(--Focus-Blue, #3b82f6);
 }
 
 .search-sort-bar__badge {
 	display: inline-flex;
-	align-items: center;
 	justify-content: center;
-	min-width: 18px;
+	align-items: center;
 	height: 18px;
+	min-width: 18px;
 	padding: 0 4px;
 	border-radius: 9px;
 	background: var(--Focus-Blue, #3b82f6);
@@ -131,15 +131,15 @@
 }
 
 .search-sort-bar__sort-select:focus {
-	outline: none;
 	border-color: var(--Focus-Blue, #3b82f6);
+	outline: none;
 }
 
 /* ── Filter pills row ── */
 .filter-pills-row {
 	display: flex;
-	flex-wrap: wrap;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: var(--spacing-50);
 	padding-bottom: var(--spacing-100);
 }
@@ -147,15 +147,15 @@
 .filter-pill {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
 	padding: 0.2rem 0.65rem;
+	border: 1px solid rgba(59, 130, 246, 0.4);
 	border-radius: 999px;
 	background: rgba(59, 130, 246, 0.2);
-	border: 1px solid rgba(59, 130, 246, 0.4);
 	color: var(--White, #fff);
 	font-size: 0.78rem;
 	line-height: 1.4;
 	cursor: default;
+	gap: 4px;
 }
 
 .filter-pill__dim {
@@ -167,8 +167,8 @@
 
 .filter-pill__remove {
 	display: inline-flex;
-	align-items: center;
 	justify-content: center;
+	align-items: center;
 	width: 14px;
 	height: 14px;
 	margin: 0;
@@ -178,8 +178,8 @@
 	background: rgba(255, 255, 255, 0.15);
 	color: var(--White, #fff);
 	font-size: 0.7rem;
-	cursor: pointer;
 	line-height: 1;
+	cursor: pointer;
 }
 
 .filter-pill__remove:hover {
@@ -187,7 +187,7 @@
 }
 
 .filter-pills-row__clear-all {
-	margin-left: auto;
+	margin: 0;
 	padding: 0.2rem 0.6rem;
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: 999px;
@@ -195,7 +195,7 @@
 	color: var(--Op-Light-Grey, #aaa);
 	font-size: 0.78rem;
 	cursor: pointer;
-	margin: 0;
+	margin-left: auto;
 }
 
 .filter-pills-row__clear-all:hover {
@@ -206,12 +206,12 @@
 /* ── Filter side panel (slides in from the left) ── */
 .filter-panel-backdrop {
 	position: fixed;
-	inset: 0;
 	z-index: 200;
 	background: rgba(0, 0, 0, 0.5);
 	opacity: 0;
-	visibility: hidden;
 	transition: opacity 0.25s ease, visibility 0.25s ease;
+	inset: 0;
+	visibility: hidden;
 }
 
 .filter-panel-backdrop--open {
@@ -222,19 +222,23 @@
 .filter-side-panel {
 	position: fixed;
 	top: 0;
-	left: 0;
 	bottom: 0;
+	left: 0;
 	z-index: 201;
 	display: flex;
 	flex-direction: column;
 	width: 320px;
 	max-width: 85vw;
 	background: rgba(12, 12, 18, 0.98);
+	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+	transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+	transform: translateX(-100%);
 	backdrop-filter: var(--blur, blur(12px));
 	border-right: 1px solid rgba(255, 255, 255, 0.12);
-	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
-	transform: translateX(-100%);
-	transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+	/* Reserve space for the home indicator at the bottom */
+	padding-bottom: env(safe-area-inset-bottom);
+	/* Push content below the notch/Dynamic Island on iOS */
+	padding-top: env(safe-area-inset-top);
 }
 
 .filter-side-panel--open {
@@ -243,8 +247,8 @@
 
 .filter-side-panel__header {
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
+	align-items: center;
 	padding: var(--spacing-200);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 	flex-shrink: 0;
@@ -252,49 +256,53 @@
 
 .filter-side-panel__title {
 	margin: 0;
+	color: var(--White, #fff);
 	font-size: 1.1rem;
 	font-weight: 600;
-	color: var(--White, #fff);
 }
 
 .filter-side-panel__close {
 	display: flex;
-	align-items: center;
 	justify-content: center;
-	width: 32px;
-	height: 32px;
+	align-items: center;
+	width: 44px;
+	height: 44px;
 	margin: 0;
 	padding: 0;
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: var(--border-radius-sm);
 	background: transparent;
-	color: var(--Op-Light-Grey, #aaa);
+	color: var(--White, #fff);
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
 
 .filter-side-panel__close:hover {
-	border-color: var(--White, #fff);
-	color: var(--White, #fff);
 	background: rgba(255, 255, 255, 0.08);
+	color: var(--White, #fff);
+	border-color: var(--White, #fff);
 }
 
 .filter-side-panel__body {
+	/* Required so this flex child can shrink below its content height and
+	   actually scroll — otherwise it expands to fit every option and pushes
+	   the footer (Clear all / Done buttons) off the bottom of the screen. */
+	min-height: 0;
+	padding: var(--spacing-100) var(--spacing-200);
 	flex: 1;
 	overflow-y: auto;
-	padding: var(--spacing-100) var(--spacing-200);
 }
 
 .filter-side-panel__footer {
 	display: flex;
-	gap: var(--spacing-100);
 	padding: var(--spacing-200);
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 	flex-shrink: 0;
+	gap: var(--spacing-100);
 }
 
 .filter-side-panel__clear {
-	flex: 1;
+	margin: 0;
 	padding: 0.55rem 1rem;
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: var(--border-radius-sm);
@@ -303,14 +311,14 @@
 	font-size: 0.88rem;
 	font-weight: 500;
 	cursor: pointer;
-	margin: 0;
 	transition: all 0.15s ease;
+	flex: 1;
 }
 
 .filter-side-panel__clear:hover:not(:disabled) {
-	border-color: #ff6b6b;
-	color: #ff6b6b;
 	background: rgba(220, 38, 38, 0.1);
+	color: #ff6b6b;
+	border-color: #ff6b6b;
 }
 
 .filter-side-panel__clear:disabled {
@@ -319,7 +327,7 @@
 }
 
 .filter-side-panel__apply {
-	flex: 1;
+	margin: 0;
 	padding: 0.55rem 1rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
@@ -328,8 +336,8 @@
 	font-size: 0.88rem;
 	font-weight: 600;
 	cursor: pointer;
-	margin: 0;
 	transition: filter 0.15s ease;
+	flex: 1;
 }
 
 .filter-side-panel__apply:hover {
@@ -343,8 +351,8 @@
 
 .filter-accordion__header {
 	display: flex;
-	align-items: center;
 	justify-content: space-between;
+	align-items: center;
 	width: 100%;
 	/* padding: var(--spacing-150, 0.75rem) 0; */
 	margin: 0;
@@ -353,26 +361,26 @@
 	color: var(--White, #fff);
 	font-size: 0.9rem;
 	font-weight: 600;
-	cursor: pointer;
 	text-align: left;
+	cursor: pointer;
 }
 
 .filter-accordion__option {
 	display: inline-flex;
 	align-items: center;
-	gap: var(--spacing-50);
+	color: var(--Focus-Mustard, #f59e0b);
+	font-size: 0.82rem;
 	text-transform: uppercase;
 	letter-spacing: 0.4px;
-	font-size: 0.82rem;
-	color: var(--Focus-Mustard, #f59e0b);
+	gap: var(--spacing-50);
 }
 
 .filter-accordion__count-badge {
 	display: inline-flex;
-	align-items: center;
 	justify-content: center;
-	min-width: 18px;
+	align-items: center;
 	height: 18px;
+	min-width: 18px;
 	padding: 0 5px;
 	border-radius: 9px;
 	background: var(--Focus-Blue, #3b82f6);
@@ -405,51 +413,50 @@
 .filter-accordion__option {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	cursor: pointer;
-	user-select: none;
-	font-size: 0.85rem;
-	color: var(--Op-Light-Grey, #ccc);
 	padding: 5px 6px;
 	border-radius: var(--border-radius-ty, 4px);
+	color: var(--Op-Light-Grey, #ccc);
+	font-size: 0.85rem;
+	cursor: pointer;
 	transition: background 0.12s ease;
+	gap: 8px;
+	user-select: none;
 }
 
 .filter-accordion__option:hover {
-	color: var(--White, #fff);
 	background: rgba(255, 255, 255, 0.05);
+	color: var(--White, #fff);
 }
 
 .filter-accordion__option input[type="checkbox"] {
 	width: 15px;
 	height: 15px;
-	accent-color: var(--Focus-Blue, #3b82f6);
 	cursor: pointer;
+	accent-color: var(--Focus-Blue, #3b82f6);
 	flex-shrink: 0;
 }
 
 .filter-accordion__option-value {
-	flex: 1;
 	text-transform: capitalize;
+	flex: 1;
 }
 
 .filter-accordion__option-count {
-	margin-left: auto;
-	font-size: 0.74rem;
 	color: var(--Medium-Grey, #666);
+	font-size: 0.74rem;
+	margin-left: auto;
 }
 
 /* ── Results meta ── */
 .entire-closet__meta {
-	padding: var(--spacing-100) var(--spacing-200);
-    font-size: 0.82rem;
-    color: white;
-    background: #0000008c;
     width: fit-content;
     margin: 5px auto;
+	padding: var(--spacing-100) var(--spacing-200);
+    border: solid black 1px;
     border-radius: 5px;
-    border: solid black;
-    color: var(--Op-Light-Grey, #999797);
+    background: #0000008c;
+    color: var(--White);
+    font-size: 0.82rem;
 }
 
 .filtered-items-parent{
@@ -459,9 +466,21 @@
 /* ── Items grid ── */
 .filtered-item-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: var(--spacing-200);
 	padding: var(--spacing-200);
+	gap: var(--spacing-200);
+	grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 398px) {
+	.filter-side-panel__footer {
+		margin-bottom: 5rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.filter-side-panel__footer {
+		margin-bottom: 11rem;
+	}
 }
 
 @media (min-width: 600px) {
@@ -484,53 +503,53 @@
 
 /* ── Empty state ── */
 .filtered-item-grid__empty {
-	grid-column: 1 / -1;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: var(--spacing-100);
 	padding: var(--spacing-400) 0;
-	color: var(--Op-Light-Grey, #aaa);
-	text-align: center;
 	    background: rgba(0, 0, 0, 0.75);
+	color: var(--Op-Light-Grey, #aaa); /* or #b9b9b9 */
+	text-align: center;
     backdrop-filter: var(--blur, blur(12px));
+	gap: var(--spacing-100);
+	grid-column: 1 / -1;
 	
 }
 
 .filtered-item-grid__empty-hint {
 	font-size: 0.82rem;
-	color: var(--Medium-Grey, #666);
+	/* color: var(--Medium-Grey, #666); */
 }
 
 /* ── Filtered card wrapper ── */
 .filtered-card {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-50);
 	background-color: var(--Dark-Grey);
+	gap: var(--spacing-50);
 }
 
 /* ── Match pills on cards ── */
 .filter-match-pills {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 3px;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 3px;
-	padding: 7px 17px;
-	margin-top: -15px;
 	z-index: 10;
+	display: flex;
+	display: flex;
+	flex-wrap: wrap;
+	flex-wrap: wrap;
+	padding: 7px 17px;
+	gap: 3px;
+	gap: 3px;
+	margin-top: -15px;
 }
 
 .filter-match-pill {
 	padding: 1px 7px;
+	border: 1px solid rgb(80 50 1);
 	border-radius: 5px;
 	background: rgb(245 158 11 / 71%);
-	border: 1px solid rgb(80 50 1);
 	color: var(--Focus-Mustard, #f59e0b);
+	color: #eae3e3;
 	font-size: 0.7rem;
 	font-weight: 500;
 	text-transform: capitalize;
-	color: #eae3e3;
 }
