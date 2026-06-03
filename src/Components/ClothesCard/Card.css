@@ -152,6 +152,16 @@ overflow: scroll;
   .card-details {
     font-size: 0.85rem;
   }
+
+  .card-back {
+      padding: 1rem;
+      border: var(--Dark-Grey) .4rem solid;
+
+  }
+
+  .controls-container button {
+      padding: 0.75rem 0.75rem;
+  }
 }
 
 

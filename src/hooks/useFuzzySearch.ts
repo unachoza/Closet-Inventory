@@ -15,7 +15,7 @@ const GROUP_KEY_LABELS: Record<string, string> = {
 	_category: "category",
 };
 
-const FUSE_OPTIONS: Fuse.IFuseOptions<SearchableItem> = {
+const FUSE_OPTIONS = {
 	keys: ["name", "brand", "category", "color", "notes", "material", "occasion", "_colorGroups", "_category"],
 	threshold: 0.4,
 	ignoreLocation: true,
@@ -65,9 +65,7 @@ export const useFuzzySearch = () => {
 				const map = new Map<string, string[]>();
 				for (const result of results) {
 					// Map internal group keys back to their user-facing field names and dedupe.
-					const keys = (result.matches ?? [])
-						.map((m) => GROUP_KEY_LABELS[m.key ?? ""] ?? m.key ?? "")
-						.filter(Boolean);
+					const keys = (result.matches ?? []).map((m) => GROUP_KEY_LABELS[m.key ?? ""] ?? m.key ?? "").filter(Boolean);
 					map.set(result.item.id, Array.from(new Set(keys)));
 				}
 				return map;
