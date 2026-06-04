@@ -523,8 +523,13 @@ function extractFromNestedTables(doc: Document): ExtractedProduct[] {
 		if (!name && !brand) continue;
 		if (!name) name = brand;
 
-		// Deduplicate by name+brand (handles case where image is missing/same)
-		const dedupeKey = `${brand}|${name}`.toLowerCase();
+		// Deduplicate by brand+name+image+price. Resale orders (ThredUp) often
+		// contain several copies of the same style (same brand + name) that are
+		// nonetheless distinct line items — they differ by image and/or price.
+		// Keying on brand+name alone collapsed them into one; including the image
+		// URL and price keeps genuinely-separate purchases as separate items
+		// while still de-duping true repeats (identical row rendered twice).
+		const dedupeKey = `${brand}|${name}|${imageUrl}|${price}`.toLowerCase();
 		if (seenKeys.has(dedupeKey)) continue;
 		seenKeys.add(dedupeKey);
 
@@ -576,6 +581,101 @@ function getTextLines(el: Element): string[] {
 		.split("\n")
 		.map((line) => line.trim().replace(/\s+/g, " "))
 		.filter((line) => line.length > 0);
+}
+
+/**
+ * Read a value from a nested 2-column attribute table by its label.
+ * H&M-style detail cells embed a <table> of "Label" / "Value" rows
+ * (e.g. "Color" → "Black", "Size" → "S"). Matches case-insensitively
+ * and tolerates a trailing colon ("Color:").
+ */
+function getAttributeByLabel(cell: Element, label: string): string {
+	const cells = Array.from(cell.querySelectorAll("td"));
+	for (let i = 0; i < cells.length - 1; i++) {
+		const key = getCellText(cells[i])
+			.replace(/:$/, "")
+			.trim()
+			.toLowerCase();
+		if (key === label) return getCellText(cells[i + 1]).trim();
+	}
+	return "";
+}
+
+/**
+ * Strategy: Two-cell rows whose details cell embeds a nested attribute
+ * table (H&M). Each product is a <tr> with an image <td> and a details
+ * <td> containing the product name (first <br>-delimited line), a price
+ * (with optional struck-through original), and a nested <table> of
+ * Label/Value rows (Art. No., Color, Size, Quantity).
+ *
+ * Strict guard: both Color and Size must resolve from the nested table,
+ * so it won't false-match the paragraph/labeled/nested layouts that share
+ * the generic two-cell shape.
+ */
+function extractFromAttributeTableRows(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const row of doc.querySelectorAll("tr")) {
+		const cells = directChildren(row, "td");
+		if (cells.length !== 2) continue;
+
+		// Identify image cell and details cell.
+		let imageUrl = "";
+		let detailsCell: Element | null = null;
+		for (const cell of cells) {
+			const img = cell.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+			} else {
+				detailsCell = cell;
+			}
+		}
+		if (!detailsCell) continue;
+
+		// Strict guard: require a nested attribute table with Color AND Size.
+		const color = getAttributeByLabel(detailsCell, "color");
+		const size = getAttributeByLabel(detailsCell, "size");
+		if (!color || !size) continue;
+
+		const lines = getTextLines(detailsCell);
+
+		// Product name: first non-trivial <br>-delimited line.
+		const name = lines.find((line) => line.length > 3) ?? "";
+		if (!name) continue;
+
+		const itemNumber = getAttributeByLabel(detailsCell, "art. no.");
+
+		// Struck-through original price marks a sale; the current price is the
+		// first $ value (on the price line) that isn't the struck original.
+		const struckEl = detailsCell.querySelector("s, strike, del, [style*='line-through']");
+		const struck = struckEl ? extractPrices(struckEl.textContent ?? "")[0] ?? "" : "";
+		const onSale = Boolean(struck);
+
+		// The price line is the first <br>-delimited line containing a "$"
+		// (the nested table's "Total" line appears later and is ignored).
+		const priceLine = lines.find((line) => line.includes("$")) ?? "";
+		const prices = extractPrices(priceLine);
+		const price = prices.find((p) => p !== struck) ?? prices[0] ?? "";
+
+		const dedupeKey = `${name.toLowerCase()}|${color.toLowerCase()}|${size.toLowerCase()}`;
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color: color.toLowerCase(),
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
 }
 
 /**
@@ -1572,6 +1672,11 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 
 	const amazonProducts = extractFromAmazonLayout(doc);
 	if (amazonProducts.length > 0) return amazonProducts;
+
+	// Two-cell rows whose details cell embeds a Color/Size attribute table (H&M).
+	// Strict guard runs before the generic paragraph/table strategies.
+	const attributeTableProducts = extractFromAttributeTableRows(doc);
+	if (attributeTableProducts.length > 0) return attributeTableProducts;
 
 	const paragraphProducts = extractFromParagraphLayout(doc);
 	if (paragraphProducts.length > 0) return paragraphProducts;

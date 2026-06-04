@@ -5,6 +5,10 @@
       align-items: center;
       width: 100%;
       max-width: 80rem;
+      /* min-height (not a fixed height): the box must grow to contain the whole
+         grid. With a fixed 60vh the grid overflowed and the sibling pagination
+         landed on top of the spilled-over cards. */
+      min-height: 60vh;
       margin: 0 auto;
       padding: 1rem;
 }
@@ -14,4 +18,42 @@
       display: flex;
       justify-content: space-around;
       flex-wrap: wrap;
+      gap: 2px
+}
+
+p.no-results {
+  color: var(--White);
+
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  /* Let the page (.app-content) own the scroll. The overview grows with its
+     content instead of being a fixed-height box, so it no longer matters how
+     tall the NavBar or carousel stacked above it are — which is what pushed
+     the pagination off-screen before. */
+  .items-overview {
+    overflow: visible;
+    height: auto;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.75);
+  }
+
+  .items-grid {
+    justify-content: center;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  /* Pagination is no longer a child here — it's a full-width sibling rendered
+     after .items-overview (see Closet.tsx) and its sticky/full-bleed styling
+     lives in PaginationControls.css. */
+}
+
+@media (max-width: 480px) {
+  .items-grid {
+    padding: 0 0.25rem;
+    gap: 0.5rem;
+  }
 }

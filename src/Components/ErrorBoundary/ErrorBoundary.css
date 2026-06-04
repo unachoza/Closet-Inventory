@@ -1,0 +1,38 @@
+.error-boundary {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 48px 24px;
+	color: var(--text-primary, #1a1a1a);
+	text-align: center;
+	gap: 12px;
+}
+
+.error-boundary__title {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+}
+
+.error-boundary__message {
+	max-width: 480px;
+	margin: 0;
+	color: var(--text-secondary, #555);
+}
+
+.error-boundary__retry {
+	padding: 8px 18px;
+	border: none;
+	border-radius: 6px;
+	background-color: var(--button-background-blue-grey, #1f44a8d0);
+	color: #fff;
+	font-size: 14px;
+	cursor: pointer;
+	transition: filter 0.2s ease;
+	margin-top: 8px;
+}
+
+.error-boundary__retry:hover {
+	filter: brightness(0.9);
+}

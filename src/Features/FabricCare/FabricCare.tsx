@@ -10,6 +10,7 @@ interface FabricCareProps {
 	care: string | string[];
 }
 
+///NOT BEING USED
 const FabricCare = ({ care }: FabricCareProps) => {
 	const [showGuide, setShowGuide] = useState(false);
 	if (!care || (Array.isArray(care) && care.length === 0)) {

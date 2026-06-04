@@ -1,10 +1,13 @@
 import "./EditItemView.css";
-import type { ClothingItem, CategoryType, ViewType } from "../../../utils/types";
+import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
 import useStockPhoto from "../../../hooks/useStockPhoto";
 import TextInput from "../TextInput/TextInput";
 import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
+import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
+import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem } from "../../../utils/constants";
+import { normalizeMaterial } from "../../../utils/materialUtils";
 
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
@@ -19,7 +22,7 @@ function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 		name: item.name,
 		size: item.size,
 		brand: item.brand,
-		material: item.material,
+		material: normalizeMaterial(item.material),
 		occasion: item.occasion,
 		age: item.age,
 		care: item.care,
@@ -52,7 +55,7 @@ export interface EditItemViewProps {
 const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
-	const { id, imageURL, onSale, notes, ...remaining } = item;
+	const { id, imageURL, onSale, notes, material: _material, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
 	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
@@ -86,11 +89,11 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				imageURL,
 				name: displayName,
 				category: formData.category ?? "",
-				color: formData.color ?? "",
+				color: formData.color?.toLowerCase() ?? "",
 				size: formData.size ?? "",
 				brand: formData.brand ?? "",
 				price: formData.price ?? "",
-				material: formData.material ?? "",
+				material: normalizeMaterial(formData.material),
 				occasion: formData.occasion ?? "",
 				age: formData.age ?? "",
 				care: formData.care ?? "",
@@ -219,6 +222,22 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							handleFormUpdate={handleChange}
 						/>
 					))}
+
+					{/* Material blend — rendered separately from generic fields */}
+					<div className="edit-form-material">
+						<label className="edit-form-material__label">Material Composition</label>
+						<MaterialCompositionBar
+							blend={normalizeMaterial(formData.material)}
+							showLegend={true}
+						/>
+						<MaterialBlendInput
+							value={normalizeMaterial(formData.material)}
+							onChange={(blend: MaterialBlend[]) =>
+								setFormData((prev) => ({ ...prev, material: blend }))
+							}
+						/>
+					</div>
+
 					{separateFeilds()}
 				</div>
 

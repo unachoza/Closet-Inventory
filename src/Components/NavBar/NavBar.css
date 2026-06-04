@@ -1,0 +1,252 @@
+/* Top Sticky Navigation */
+.top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+     height: var(--header-height);
+    padding: 0 20px;
+    border: var(--border-black-sm);
+    background-color: rgba(0, 0, 0, 0.53);
+    box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    color: white;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+}
+
+.hamburger-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      background: none;
+      color: var(--primary-color);
+      font-size: 24px;
+      cursor: pointer;
+    
+}
+
+.page-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+      white-space: nowrap;
+}
+
+.nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+}
+
+.nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+}
+
+/* Search-only layout (entire closet / overview view) */
+.top-nav--search {
+      display: flex;
+    flex-direction: row;
+      justify-content: flex-start;
+      gap: 16px;
+}
+
+.top-nav--search .search-container {
+      max-width: 480px;
+      flex: 1;
+}
+
+.top-nav--search .search-input {
+      width: 100%;
+}
+
+.back-to-carousel {
+      white-space: nowrap;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    border: solid white 1px;
+    border-radius: 6px;
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+}
+
+.action-btn:hover {
+      background-color: var(--cream);
+      color: var(--Soft-Black);
+}
+
+.action-btn.secondary {
+      width: 100%;
+      background-color: var(--pill-bg);
+      color: var(--text-primary);
+}
+
+.action-btn.secondary:hover {
+       border: solid black 1px;
+      background-color: #d3d9df;
+       color: var(--Soft-Black);
+
+}
+
+.search-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+}
+
+.search-input {
+      width: 250px;
+      padding: 8px 12px 8px 36px;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+      outline: none;
+}
+
+.search-input:focus {
+      border-color: var(--secondary-color);
+}
+
+div.search-container > input {
+      color: black;
+}
+
+.search-icon {
+      position: absolute;
+      left: 10px;
+      color: var(--text-secondary);
+      pointer-events: none;
+}
+
+/* Hamburger drawer */
+.nav-drawer-overlay {
+      position: fixed;
+      z-index: 200;
+      background: rgba(0, 0, 0, 0.35);
+      inset: 0;
+}
+
+.nav-drawer {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      width: 260px;
+      max-width: 80vw;
+      padding: 16px;
+        border: var(--border-black-sm);
+    background-color: rgba(0, 0, 0, 0.65);
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      animation: nav-drawer-in 0.2s ease;
+      gap: 16px;
+}
+
+@keyframes nav-drawer-in {
+      from {
+            transform: translateX(-100%);
+      }
+      to {
+            transform: translateX(0);
+      }
+}
+
+.nav-drawer__close {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      background: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      align-self: flex-end;
+}
+
+.nav-drawer__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+}
+
+.nav-drawer__actions .action-btn {
+      justify-content: flex-start;
+      width: 100%;
+}
+
+/* -------------------------------------------------------------------------
+ * Mobile / narrow screens
+ *
+ * The four inline nav action buttons (Add Item, View All, Import Gmail,
+ * Fabric Guide) don't fit alongside the title on small screens — they were
+ * wrapping and overflowing the header. Below the breakpoint we hide the
+ * inline actions (they remain reachable via the always-present hamburger
+ * drawer) and let the title claim the freed horizontal space.
+ * ---------------------------------------------------------------------- */
+@media (max-width: 768px) {
+      .nav-actions {
+            display: none;
+      }
+
+      /* Let the title take up the available width next to the hamburger. */
+      .nav-left {
+            width: 100%;
+            min-width: 0;
+            flex: 1;
+      }
+
+      .top-nav {
+        display: flex;
+        flex-direction: row;
+            padding: 0;
+      }
+
+      .hamburger-btn{
+  padding: 0.6em .75rem;
+      }
+
+
+      .page-title {
+            overflow: hidden;
+            text-align: left;
+            flex: 1;
+            text-overflow: ellipsis;
+      }
+      .top-nav--search .search-input {
+    width: 100%;
+    width: 70vw;
+      }
+
+      /* Search (overview view) should fill the row rather than a fixed width. */
+      .top-nav--search .search-container {
+            width: 70vw;
+            max-width: none;
+      }
+
+      .search-input {
+            width: 100%;
+      }
+}

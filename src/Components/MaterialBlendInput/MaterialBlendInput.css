@@ -1,0 +1,175 @@
+/* ── MaterialBlendInput ──────────────────────────────────────────────────────
+   Blend builder: rows of [swatch | material name | % input | remove btn]
+   ────────────────────────────────────────────────────────────────────────── */
+
+.mbi {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 0.75rem;
+}
+
+/* ── Rows ── */
+.mbi__rows {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.mbi__empty {
+	padding: 0.5rem 0;
+	color: var(--text-muted, #9ca3af);
+	font-size: 0.8rem;
+	font-style: italic;
+}
+
+.mbi__row {
+	display: flex;
+	align-items: center;
+	padding: 0.4rem 0.6rem;
+	border: 1px solid rgb(21 20 20 / 60%);
+	border-radius: 0.5rem;
+	background: rgb(149 143 143);
+	gap: 0.5rem;
+}
+
+/* ── Color swatch ── */
+.mbi__swatch {
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	transition: background 0.2s;
+	flex-shrink: 0;
+}
+
+/* ── Material name input ── */
+input.mbi__material-input {
+	padding: .5rem;
+	border: 1px black solid;
+}
+.mbi__material-input {
+	min-width: 0;
+	padding: 0.2rem 0;
+	border: none;
+	background: transparent;
+	color: inherit;
+	font-size: 0.875rem;
+	flex: 1;
+	outline: none;
+}
+
+.mbi__material-input::placeholder {
+	color: var(--text-muted, #6b7280);
+}
+
+/* ── Percentage wrapper ── */
+.mbi__pct-wrapper {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	gap: 2px;
+}
+
+.mbi__pct-input {
+	width: 3.5rem;
+	padding: 0.2rem 0.4rem;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 0.375rem;
+	background: rgba(255, 255, 255, 0.06);
+	color: inherit;
+	font-size: 0.875rem;
+	text-align: right;
+	-moz-appearance: textfield;
+}
+
+.mbi__pct-input::-webkit-inner-spin-button,
+.mbi__pct-input::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+}
+
+.mbi__pct-input:focus {
+	outline: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mbi__pct-symbol {
+	color:rgb(67, 66, 66);
+	font-size: 0.8rem
+}
+
+/* ── Remove button ── */
+.mbi__remove {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0.2rem;
+	border: none;
+	border-radius: 0.25rem;
+	background: transparent;
+	color: rgb(49, 48, 48);
+	cursor: pointer;
+	transition: color 0.15s;
+	flex-shrink: 0;
+}
+
+.mbi__remove:hover {
+	color: #f87171;
+}
+
+/* ── Footer ── */
+.mbi__footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+/* ── Add button ── */
+.mbi__add {
+	display: flex;
+	align-items: center;
+	padding: 0.35rem 0.75rem;
+	border: 1px solid rgb(92 91 91 / 68%);
+	border-radius: 0.5rem;
+	background: rgb(255 255 255);
+	color: inherit;
+	font-size: 0.8rem;
+	cursor: pointer;
+	transition: background 0.15s, opacity 0.15s;
+	gap: 0.35rem;
+}
+
+.mbi__add:hover:not(:disabled) {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.mbi__add:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+/* ── Running total ── */
+.mbi__total {
+	font-size: 0.8rem;
+	transition: color 0.2s;
+	font-variant-numeric: tabular-nums;
+}
+
+.mbi__total--under {
+	color: var(--text-muted, #9ca3af);
+}
+
+.mbi__total--exact {
+	color: #86efac; /* green — matches cotton color, signals complete */
+}
+
+.mbi__total--over {
+	color: #f87171; /* red */
+}
+
+.mbi__warning {
+	font-style: italic;
+}
+
+.mbi__check {
+	font-size: 0.9rem;
+}

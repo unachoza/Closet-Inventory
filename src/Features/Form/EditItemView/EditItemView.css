@@ -20,10 +20,18 @@
       height: 100%;
 }
 
+.edit-form  .card-title{
+      color: white
+}
+
 .form-fields{
       display: flex;
       flex-wrap: wrap;
+      overflow: scroll;
       height: 100%;
+    padding: 5px;
+      border: solid #716b6b 1px;
+    border-radius: 5px;
       column-gap: 1rem;
 }
 
@@ -75,10 +83,8 @@ textarea {
       padding: var(--spacing-100) var(--spacing-200);
       border: solid black 2px;
       border-radius: var(--border-radius-sm);
-      background: none;
+      background: #00000024;
       box-shadow: none;
-      color: black;
-      color: black;
       font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
       font-size: 1rem;
       text-transform: capitalize;
@@ -86,7 +92,7 @@ textarea {
 }
 
 .edit-form.form label >span {
-      color: black;
+      color: white;
       font-size: .8rem;
       font-weight: 600;
 }
@@ -123,9 +129,9 @@ label.animated-checkbox button.checkbox-root {
 .edit-form-preview-img {
       max-width: 120px;
       max-height: 120px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
       border-radius: var(--border-radius-sm);
       object-fit: cover;
-      border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 /* Queue progress badge */
@@ -138,31 +144,34 @@ label.animated-checkbox button.checkbox-root {
 .edit-form-queue-badge {
       display: inline-block;
       padding: 0.25rem 0.75rem;
+      border: 1px solid rgba(37, 99, 235, 0.35);
       border-radius: var(--border-radius-ty, 4px);
       background: var(--color-primary-muted);
       color: var(--color-focus);
       border: 1px solid var(--color-primary-muted-hover);
+      background: rgba(37, 99, 235, 0.2);
+      color: #93bbfd;
       font-size: 0.82rem;
       font-weight: 500;
 }
 
 /* Return to email button */
 .edit-form-return-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      margin-bottom: var(--spacing-200, 1rem);
-      padding: 0.35rem 0.8rem;
-      border: 1px solid rgba(0, 0, 0, 0.25);
-      border-radius: var(--border-radius-ty, 4px);
-      background: rgba(19, 17, 146, 0.291);
-      /* border: solid 1px; */
-      color: #1a1a1a;
-      font-size: 0.82rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s ease;
-      position: absolute;
+    position: absolute;
+         display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.8rem;
+    border: solid 1px;
+    border-radius: var(--border-radius-ty, 4px);
+    background: rgb(19 17 146 / 58%);
+    /* color: #1a1a1a; */
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    gap: 0.3rem;
+    margin-bottom: var(--spacing-200, 1rem);
+
 }
 
 .edit-form-return-btn:hover {
@@ -172,9 +181,9 @@ label.animated-checkbox button.checkbox-root {
 /* Action buttons row (Add to Closet + Skip) */
 .edit-form-actions {
       display: flex;
-      gap: var(--spacing-100, 0.5rem);
       align-items: center;
-      flex-wrap: wrap;
+      gap: var(--spacing-100, 0.5rem);
+      /* flex-wrap: wrap; */
 }
 
 /* Skip / "Do NOT add" button */
@@ -208,4 +217,98 @@ label.animated-checkbox button.checkbox-root {
       border-radius: 50%;
       color: white;
       cursor: pointer;
+}
+
+/* ── Material blend section ──────────────────────────────────────────── */
+.edit-form-material {
+      display: flex;
+      flex-direction: column;
+      margin: 0.25rem 0;
+      padding: 0.75rem 0.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 0.75rem;
+}
+
+.edit-form-material__label {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .edit-form {
+    margin: 0;
+    border-radius: 0;
+    border-width: 2px;
+  }
+
+  .form-fields {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height: auto;
+    overflow-y: auto;
+  }
+
+  /* Full-width text inputs on mobile — override the 13rem fixed width */
+  input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* Textarea: was 41rem hardcoded — fill container on mobile */
+  textarea {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  label:has(.textarea) {
+    width: 100%;
+  }
+
+  .edit-form-return-btn {
+    position: static;
+    margin-bottom: 0.75rem;
+  }
+
+  .edit-form-actions {
+    /* flex-direction: column; */
+  }
+
+  .edit-form-actions button {
+    /* width: 100%; */
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-form-preview-img {
+    max-width: 100px;
+    max-height: 100px;
+  }
+  .edit-form-return-btn{
+      position: absolute;
+        top: 7px;
+        left: 15px;
+      width: 100px;
+  }
+  .edit-form-queue-badge{
+position: absolute;
+top: 1rem;
+right: 3rem;
+  }
+.edit-form label {
+      font-size: .8rem;
+      gap: .1rem;
+}
+  input[type="text"] {
+    height: 2.3rem;
+    border: solid black 1.3px;
+  }
+  .edit-form-actions{
+      /* margin-bottom: 5rem; */
+  }
 }

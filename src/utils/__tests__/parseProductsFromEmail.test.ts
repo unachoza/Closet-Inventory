@@ -128,6 +128,45 @@ describe("parseProductsFromEmail", () => {
 			expect(parseProductsFromEmail(dup)).toHaveLength(1);
 		});
 
+		it("keeps same-style items that differ by image/price as separate line items", () => {
+			// Regression: a ThredUp order with two "Reformation / Sleeveless Top"
+			// items (different images + prices) plus a dress. The brand+name dedupe
+			// key collapsed the two tops into one, dropping the third item.
+			const order = html(`
+				<table>
+					<tr>
+						<td>${productImg("https://cf.thredup.com/814111735/large.jpg")}</td>
+						<td><table><tr><td>
+							<a href="#">Reformation</a>
+							<a href="#">Size Sm <span>Sleeveless Top</span></a>
+							<a href="#">$44.99</a>
+						</td></tr></table></td>
+					</tr>
+					<tr>
+						<td>${productImg("https://cf.thredup.com/816899026/large.jpg")}</td>
+						<td><table><tr><td>
+							<a href="#">Reformation</a>
+							<a href="#">Size Sm <span>Casual Dress</span></a>
+							<a href="#">$76.99</a>
+						</td></tr></table></td>
+					</tr>
+					<tr>
+						<td>${productImg("https://cf.thredup.com/818039047/large.jpg")}</td>
+						<td><table><tr><td>
+							<a href="#">Reformation</a>
+							<a href="#">Size Sm <span>Sleeveless Top</span></a>
+							<a href="#">$45.99</a>
+						</td></tr></table></td>
+					</tr>
+				</table>
+			`);
+			const products = parseProductsFromEmail(order);
+			expect(products).toHaveLength(3);
+			// Both Sleeveless Tops survive (distinct prices), plus the dress.
+			expect(products.filter((p) => p.name === "Sleeveless Top")).toHaveLength(2);
+			expect(products.map((p) => p.price)).toEqual(["$44.99", "$76.99", "$45.99"]);
+		});
+
 		it("requires the 'Size X Name' pattern to match", () => {
 			const noSizePattern = html(`
 				<table><tr>
@@ -694,6 +733,75 @@ describe("parseProductsFromEmail", () => {
 			const dataImg = html(`<img src="data:image/png;base64,abc123" width="100" height="100" alt="Product">`);
 			const products = parseProductsFromEmail(dataImg);
 			expect(products).toHaveLength(0);
+		});
+	});
+
+	// -----------------------------------------------------------------------
+	// Strategy: two-cell rows with a nested Color/Size attribute table (H&M)
+	// -----------------------------------------------------------------------
+
+	describe("Strategy: nested attribute-table rows (H&M)", () => {
+		// H&M details cell: name <font> before the first <br>, then a price
+		// <font> with an optional struck-through original, then a nested
+		// <table> of Label/Value rows, then a "Total" paragraph.
+		const hmProduct = (name: string, current: string, original: string | null, color: string, size: string, qty: string, sku: string) =>
+			`
+				<tr>
+					<td width="140">${productImg(`https://lp2.hm.com/${sku}.jpg`, 140, 200, name)}</td>
+					<td class="fl pr10">
+						<font>${name}</font><br>
+						<font style="color:#CE2129">${current}</font>${original ? ` <s>${original}</s>` : ""}
+						<table>
+							<tr><td>Art. No.</td><td>${sku}</td></tr>
+							<tr><td>Color</td><td>${color}</td></tr>
+							<tr><td>Size</td><td>${size}</td></tr>
+							<tr><td>Quantity</td><td>${qty}</td></tr>
+						</table>
+						<p class="lom">Total $12.60</p>
+					</td>
+				</tr>
+			`;
+
+		const hm = html(`
+			<table>
+				${hmProduct("Microfiber tights 3-pack", "$6.30", "$8.99", "Black", "S", "2", "1234567001")}
+				${hmProduct("Fleece-lined tights", "$7.00", null, "Dark gray", "M", "1", "1234567002")}
+				${hmProduct("Ribbed footless tights", "$5.50", "$6.99", "Beige", "S", "1", "1234567003")}
+				${hmProduct("Sheer 20-denier tights", "$4.20", "$5.99", "Black", "L", "3", "1234567004")}
+			</table>
+		`);
+
+		it("detects all four products", () => {
+			expect(parseProductsFromEmail(hm)).toHaveLength(4);
+		});
+
+		it("extracts the product name from the first <br>-delimited line", () => {
+			const products = parseProductsFromEmail(hm);
+			expect(products.map((p) => p.name)).toEqual([
+				"Microfiber tights 3-pack",
+				"Fleece-lined tights",
+				"Ribbed footless tights",
+				"Sheer 20-denier tights",
+			]);
+		});
+
+		it("extracts color and size from the nested attribute table", () => {
+			const [p] = parseProductsFromEmail(hm);
+			expect(p.color).toBe("black");
+			expect(p.size).toBe("S");
+			expect(p.itemNumber).toBe("1234567001");
+		});
+
+		it("uses the current price, not the struck-through original", () => {
+			const products = parseProductsFromEmail(hm);
+			expect(products[0].price).toBe("$6.30");
+			expect(products[1].price).toBe("$7.00");
+		});
+
+		it("flags sale only when an original price is struck through", () => {
+			const products = parseProductsFromEmail(hm);
+			expect(products[0].onSale).toBe(true);
+			expect(products[1].onSale).toBe(false);
 		});
 	});
 

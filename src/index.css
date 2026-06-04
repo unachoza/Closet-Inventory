@@ -6,152 +6,86 @@
    ═══════════════════════════════════════════════════ */
 
 :root {
-  /* ── Background ───────────────────────────────── */
-  	/* 'https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001615/image_3_n4tvfn.webp' */
-  --bg-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001439/image_1_s0yql2.webp");
-  --bg-overlay-glass: rgba(0, 0, 0, 0.45);
-  --bg-form: #31341c59;
-  --bg-card-gradient-start: rgba(120, 172, 191, 0.7);
-  --bg-card-gradient-end: rgba(103, 131, 133, 0.76);
-  --bg-muted: rgba(255, 255, 255, 0.05);
-  --bg-muted-hover: rgba(255, 255, 255, 0.1);
+	background-color: #222c51;
+	/* background-image: url("https://sothebys-md.brightspotcdn.com/dims4/default/d74825c/2147483647/strip/true/crop/2000x1588+0+0/resize/800x635!/quality/90/?url=http%3A%2F%2Fsothebys-brightspot.s3.amazonaws.com%2Fmedia-desk%2Fwebnative%2Fimages%2Fbd%2F3a%2Fc8ce158041feac4dc32cbcbbb0d8%2Fn11753-cl3n7-t2-02-a.jpg"); */
+	/* 'https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001615/image_3_n4tvfn.webp' */
+	background-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001439/image_1_s0yql2.webp");
+	
+	
 
-  /* ── Brand / Accent ───────────────────────────── */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-muted: rgba(37, 99, 235, 0.2);
-  --color-primary-muted-hover: rgba(37, 100, 235, 0.387);
 
-  --color-success: #10b981;
-  --color-success-muted: rgba(16, 185, 129, 0.3);
-  --color-success-border: rgba(16, 185, 129, 0.4);
-  --color-success-text: #6ee7b7;
 
-  --color-danger: #dc2626;
-  --color-danger-light: #ff6b6b;
-  --color-danger-muted: rgba(220, 38, 38, 0.12);
-  --color-danger-border: rgba(220, 38, 38, 0.3);
-  --color-danger-text: #fca5a5;
+	
+	color: rgba(255, 255, 255, 0.87);
+	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	font-weight: 400;
+	line-height: 1.5;
+	/* background-image: url("https://res.cloudinary.com/dh41vh9dx/image/upload/v1761001381/elegant_closet_yst0ec.webp"); */
+	background-attachment: fixed;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
 
-  --color-warning: rgba(251, 191, 36, 0.52);
-  --color-warning-border: rgb(245, 204, 98);
+	color-scheme: light dark;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 
-  /* ── Neutrals ─────────────────────────────────── */
-  --color-black: #000000;
-  --color-soft-black: #1a1a1a;
-  --color-dark: #2a302d;
-  --color-dark-surface: #1e1c19;
-  --color-grey-900: #333;
-  --color-grey-700: #777;
-  --color-grey-600: #888;
-  --color-grey-400: rgba(255, 255, 255, 0.35);
-  --color-white: #ffffff;
-  --color-white-08: rgba(255, 255, 255, 0.08);
-  --color-white-15: rgba(255, 255, 255, 0.15);
-  --color-white-18: rgba(255, 255, 255, 0.18);
-  --color-trans-black: rgba(0, 0, 0, 0.33);
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
 
-  /* ── Focus / Interactive ──────────────────────── */
-  --color-focus: #4ab6f5;
-  --color-focus-ring: #646cff;
-  --color-link-active: #3045bc;
+	/**** VARIABLES ****/
 
-  /* ── Journey (Fiber to Garment) ───────────────── */
-  --journey-bg: #141210;
-  --journey-surface: #1e1c19;
-  --journey-surface-2: #252320;
-  --journey-border: rgba(255, 255, 255, 0.08);
-  --journey-border-hover: rgba(255, 255, 255, 0.18);
-  --journey-text: #f0ede8;
-  --journey-text-muted: #8c897f;
-  --journey-text-dim: #4a4844;
-  --journey-gold: #e8c85a;
-  --journey-phase-width: 28.125rem;
-  --journey-phase-height: 23.75rem;
+	/* COLORS */
+	--background-green: #6e707036;
+	--Black: #000000;
+	--Soft-Black: #141313a7;
+	--Op-Black:#333;
+	--Trans-Black:#00000033;
+	--White: #FFFFFF;
+	--Dark-Grey: #2a302d;
+	--Medium-Grey: #777;
+	--Op-Light-Grey: #888;
+	--Lightest-Grey: #bcbcbc;
 
-  /* Phase accent colors */
-  --journey-phase-1: #7ab882; /* sage green  — sourcing */
-  --journey-phase-2: #d4a843; /* amber       — spinning */
-  --journey-phase-3: #6b9fbf; /* steel blue  — construction */
-  --journey-phase-4: #d4724a; /* terracotta  — wet processing */
-  --journey-phase-5: #b87aaa; /* mauve       — assembly */
+	--Focus-Blue: #4ab6f5;
+	--Outline-Blue: #646cff;
+	--Focus-Mustard: #1f36b9;
+	--Background-color:  rgba(120, 172, 191, 0.396) ;
+	/* linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%); */
 
-  /* ── Typography ───────────────────────────────── */
-  --font-sans: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --font-display: "Playfair Display", serif;
-  --font-ui: "DM Sans", sans-serif;
-  --font-mono: "DM Mono", monospace;
+	
+	/* FONTS */
+	
+	/* STYLES */
+	--blur: blur(.6rem);
+	--box-shadow: .5rem .75rem 2rem .75rem rgba(0, 0, 0, 0.875);
+	
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: clamp(1.625rem, 4vw, 3.25rem);
+	--border-radius-ty: .25rem;
+	--border-radius-sm: .5rem;
+	--border-radius-md: 1rem;
+	--border-radius-lg: 2rem;
+	--border-radius-circle: 50%;
 
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --line-height-tight: 1.1;
-  --line-height-base: 1.5;
-  --line-height-relaxed: 1.65;
-  --line-height-loose: 1.75;
+	--padding-rectangle-sm: .5rem 1rem;
 
-  /* ── Spacing ──────────────────────────────────── */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-10: 2.5rem;
-  --space-12: 3rem;
-  --space-14: 3.5rem;
-  --space-16: 4rem;
-  --space-18: 4.5rem;
-  --space-20: 5rem;
+	--border-black-sm: solid 1px var(--Black);
+	--border-white-sm: solid 1px var(--White);
 
-  /* Legacy aliases — used widely, kept for compatibility */
-  --spacing-50: var(--space-1);
-  --spacing-100: var(--space-2);
-  --spacing-200: var(--space-4);
-  --spacing-300: var(--space-6);
-  --spacing-400: var(--space-8);
-  --spacing-500: var(--space-10);
-  --spacing-600: var(--space-12);
-  --spacing-700: var(--space-14);
-  --spacing-800: var(--space-16);
-  --spacing-900: var(--space-18);
-  --spacing-1000: var(--space-20);
-
-  /* ── Border Radius ────────────────────────────── */
-  --radius-xs: 0.25rem;
-  --radius-sm: 0.5rem;
-  --radius-md: 1rem;
-  --radius-lg: 1.25rem;
-  --radius-xl: 1.5rem;
-  --radius-full: 100px;
-  --radius-circle: 50%;
-
-  /* Legacy aliases */
-  --border-radius-ty: var(--radius-xs);
-  --border-radius-sm: var(--radius-sm);
-  --border-radius-md: var(--radius-md);
-  --border-radius-lg: var(--radius-xl);
-  --border-radius-circle: var(--radius-circle);
-
-  /* ── Shadows ──────────────────────────────────── */
-  --shadow-sm: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15);
-  --shadow-md: 0 0.5rem 2rem rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0.5rem 0.75rem 2rem 0.75rem rgba(0, 0, 0, 0.875);
-  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.5);
-  --shadow-journey-modal: 0 24px 80px rgba(0, 0, 0, 0.5);
-
-  /* Legacy alias */
-  --box-shadow: var(--shadow-lg);
+	/* SPACING */
+	--spacing-50: .25rem;
+	--spacing-100: .5rem;
+	--spacing-200: 1rem;
+	--spacing-300: 1.5rem;
+	--spacing-400: 2rem;
+	--spacing-500: 2.5rem;
+	--spacing-600: 3rem;
+	--spacing-700: 3.5rem;
+	--spacing-800: 4rem;
+	--spacing-900: 4.5rem;
+	--spacing-1000: 5rem;
+	--spacing-1100: 5.25rem;
+}
 
   /* ── Effects ──────────────────────────────────── */
   --blur: blur(0.6rem);
@@ -211,6 +145,13 @@
 
 * {
   box-sizing: border-box;
+} 
+
+#root {
+	width: 100%;
+	height: 100vh;
+	max-width: 1280px;
+	text-align: center
 }
 
 body {
@@ -243,6 +184,13 @@ body {
   margin: 0 auto;
   text-align: center;
 }
+h1 {
+	margin: 1rem 0;
+	color: white;
+	font-size: 3em;
+	line-height: 1.1;
+	paint-order: stroke;
+	-webkit-text-stroke: 2px var(--Black);
 
 h1 {
   margin: var(--space-4) 0;
@@ -257,20 +205,20 @@ h1 {
    ═══════════════════════════════════════════════════ */
 
 button {
-  margin: var(--space-2);
-  padding: 0.6em 1.2em;
-  border: var(--border-black-sm);
-  border-radius: var(--radius-sm);
-  background-color: var(--color-soft-black);
-  font-family: inherit;
-  font-size: var(--text-base);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: border-color var(--transition-slow);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: calc-size(fit-content, size * 1.05);
+	margin: var(--spacing-100);
+	padding: 0.6em 1.2em;
+	border: var(--border-black-sm);
+	border-radius: var(--border-radius-sm);
+	background-color: var(--Soft-Black);
+	font-family: inherit;
+	font-size: 1em;
+	font-weight: 500;
+	cursor: pointer;
+	transition: border-color 0.25s;
 }
 
 button:hover {

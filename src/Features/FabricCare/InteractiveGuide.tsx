@@ -4,8 +4,8 @@ import { FIBERS, WEAVE_TYPES, CARE_GROUPS, SOURCES, Fiber } from "../../Content/
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
 import WeaveDiagram from "../../Components/GuideComponents/WeaveDiagram";
 import FiberFlowchart from "../../Components/GuideComponents/FiberFlowchart";
-// import DetailModal from "../../Components/GuideComponents/Modal";
 import React from "react";
+import DetailModal from "../../Components/GuideComponents/Modal";
 
 const TextileGuildInteractive = () => {
 	const [selectedFiber, setSelectedFiber] = useState<Fiber | null>(null);
@@ -132,9 +132,10 @@ const TextileGuildInteractive = () => {
 					</div>
 
 					<div className="fiber-grid">
-						{animalFibers.map((f) => (
-							<FiberCard key={f.id} fiber={f} onClick={() => setSelectedFiber(f)} />
-						))}
+						{animalFibers.map((f) => {
+							console.log({ f });
+							return <FiberCard key={f.id} fiber={f} onClick={() => setSelectedFiber(f)} />;
+						})}
 					</div>
 
 					{/* Plant sub-section */}
@@ -440,7 +441,7 @@ const TextileGuildInteractive = () => {
 				</div>
 			</footer>
 			{/* ══════════ DETAIL MODAL ══════════ */}
-			{/* <DetailModal fiber={selectedFiber} onClose={() => setSelectedFiber(null)} /> */}
+			<DetailModal fiber={selectedFiber} onClose={() => setSelectedFiber(null)} />
 		</div>
 	);
 };

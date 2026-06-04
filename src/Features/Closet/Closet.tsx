@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { AnimatePresence, motion, Variants } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import ClothingCard from "../../Components/ClothesCard/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
@@ -18,11 +18,10 @@ const containerVariants: Variants = {
 	show: {
 		opacity: 1,
 		transition: {
-			staggerChildren: 0.12,
-			delayChildren: 0.12,
+			staggerChildren: 0.08,
+			delayChildren: 0.05,
 		},
 	},
-	exit: { opacity: 0, transition: { duration: 0.2 } },
 };
 
 const cardVariants: Variants = {
@@ -32,22 +31,31 @@ const cardVariants: Variants = {
 		y: 0,
 		transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
 	},
-	exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
 };
 
 const ITEMS_PER_PAGE = 6;
+
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	const { closet } = useLocalStorageCloset();
 
 	const normalizedCategory = selectedCategory?.trim().toLowerCase() || "";
 
-	// Only re-filter when closet data or category actually changes
-	const filteredItems = useMemo(() =>
-		closet.filter((item: ClothingItem) => {
-			const itemCategory = (item.category || "").toString().toLowerCase();
+	// Only re-filter when closet data or category actually changes.
+	const filteredItems = useMemo(() => {
+		// No category selected → show the whole closet.
+		if (!normalizedCategory) return closet;
+
+		return closet.filter((item: ClothingItem) => {
+			const itemCategory = (item.category || "").toString().trim().toLowerCase();
+			// An item with no category must NOT match a specific filter. (Previously
+			// `normalizedCategory.includes("")` was always true, so empty-category
+			// items leaked into every category.)
+			if (!itemCategory) return false;
+			// Substring match both directions handles singular/plural mismatches
+			// e.g. "coats" ⊇ "coat", "tops" ⊇ "top".
 			return itemCategory.includes(normalizedCategory) || normalizedCategory.includes(itemCategory);
-		}),
-	[closet, normalizedCategory]);
+		});
+	}, [closet, normalizedCategory]);
 
 	const {
 		currentPage,
@@ -62,58 +70,39 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 		goToPage(1);
 	}, [selectedCategory]);
 
-	if (selectedCategory === null) {
-		return (
+	const hasItems = paginatedItems.length > 0;
+	const emptyLabel = selectedCategory?.trim() ? selectedCategory : "your closet";
+
+	return (
+		<>
 			<div className="items-overview">
-				<AnimatePresence mode="wait">
+				{hasItems ? (
 					<motion.div
-						key={`${normalizedCategory}-${currentPage}`} // <--- important: remounts when category changes
+						// Remount on category OR page change so the stagger replays. The
+						// container's `staggerChildren` only orchestrates its children from
+						// `hidden`→`show` when the parent mounts/re-keys; without `currentPage`
+						// in the key, paging in new cards left them stuck at the `hidden`
+						// variant (opacity:0 — present in the DOM but invisible). No
+						// `mode="wait"` AnimatePresence here, so remounting is safe and can
+						// never strand the grid waiting on an exit (the blank-screen bug).
+						key={`${normalizedCategory || "all"}-${currentPage}`}
 						className="items-grid"
 						variants={containerVariants}
 						initial="hidden"
 						animate="show"
-						exit="exit"
 					>
-						{closet.length > 0 ? (
-							paginatedItems.map((item: ClothingItem) => (
-								<motion.div key={item.id} variants={cardVariants}>
-									<ClothingCard item={item} onEditItem={onEditItem} />
-								</motion.div>
-							))
-						) : (
-							<p className="no-results">No items found for “{selectedCategory}”</p>
-						)}
-					</motion.div>
-				</AnimatePresence>
-				<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
-			</div>
-		);
-	}
-
-	return (
-		<div className="items-overview">
-			<AnimatePresence mode="wait">
-				<motion.div
-					key={`${normalizedCategory}-${currentPage}`} // <--- important: remounts when category changes
-					className="items-grid"
-					variants={containerVariants}
-					initial="hidden"
-					animate="show"
-					exit="exit"
-				>
-					{paginatedItems.length > 0 ? (
-						paginatedItems.map((item: ClothingItem) => (
+						{paginatedItems.map((item: ClothingItem) => (
 							<motion.div key={item.id} variants={cardVariants}>
 								<ClothingCard item={item} onEditItem={onEditItem} />
 							</motion.div>
-						))
-					) : (
-						<p className="no-results">No items found for “{selectedCategory}”</p>
-					)}
-				</motion.div>
-			</AnimatePresence>
+						))}
+					</motion.div>
+				) : (
+					<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
+				)}
+			</div>
 			<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
-		</div>
+		</>
 	);
 };
 

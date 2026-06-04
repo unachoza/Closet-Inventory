@@ -27,11 +27,10 @@ input:hover{
 }
 
 input[type="text"] {
+      width: 100%;
       background: var(--white);
-      box-shadow: 0px 2px .5rem 2px rgba(0, 0, 0, 0.875);
       color: var(--White);
       line-height: 130%;
-      font: inherit;
       font-feature-settings: 'liga' off, 'clig' off
 }
 

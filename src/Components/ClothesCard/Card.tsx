@@ -3,6 +3,8 @@ import { ClothingItem } from "../../utils/types";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 
 import { useState } from "react";
+import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
+import { normalizeMaterial } from "../../utils/materialUtils";
 
 interface CardProps {
 	item: ClothingItem;
@@ -13,6 +15,10 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
 
 	const { removeItem } = useLocalStorageCloset();
+
+	// Coerce defensively: closet data may still carry a legacy string
+	// (e.g. "95% Cotton, 5% Spandex") or be the new MaterialBlend[] shape.
+	const materialBlend = normalizeMaterial(item.material);
 
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
@@ -41,9 +47,11 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 						<p>
 							<strong>Brand:</strong> {item.brand}
 						</p>
-						<p>
-							<strong>Material:</strong> {item.material}
-						</p>
+						<div className="card-material">
+							<strong>Material:</strong>{" "}
+							{materialBlend.length > 0 ? <MaterialCompositionBar blend={materialBlend} /> : "—"}
+						</div>
+
 						<p>
 							<strong>Occasion:</strong> {item.occasion}
 						</p>

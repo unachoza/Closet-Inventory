@@ -1,14 +1,14 @@
 .content-container{
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      background: var(--color-trans-black);
-      color: white;
-      border-radius: 10px;
-      border: solid 2px var(--color-primary);
       display: flex;
       flex-wrap: wrap;
       width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      border: solid 2px #007bff;
+      border-radius: 10px;
+      background: #33333378;
+      color: white;
 }
 
 ul{
