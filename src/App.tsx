@@ -14,6 +14,7 @@ import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
 import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
+import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -60,7 +61,7 @@ function AppShell() {
 			setImportQueueIndex(0);
 			setView("edit");
 		},
-		[setView]
+		[setView],
 	);
 
 	// Batch import: "Import All Items" from an email
@@ -75,7 +76,7 @@ function AppShell() {
 			setEditMode("create");
 			setView("edit");
 		},
-		[setView]
+		[setView],
 	);
 
 	// After "Add to Closet" or "Skip" in batch mode — advance to next item
@@ -120,41 +121,42 @@ function AppShell() {
 						{/* Keyed by view so a crash in one screen resets when navigating away.
 					     "Try again" sends the user back to the overview (closet) screen. */}
 						<ErrorBoundary key={view} onReset={() => setView("overview")}>
-						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />}
-						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
-						{view === "gmail" && (
-							<GmailImport
-								onImport={handleGmailImport}
-								onImportAll={handleGmailImportAll}
-								initialSelectedEmailId={gmailSourceEmailId}
-								onSourceEmailChange={handleSourceEmailChange}
-							/>
-						)}
-						{view === "fabric" && <InteractiveGuide />}
-						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
-						{view === "carousel" && (
-							<>
-								<div data-testid="carousel">
-									<Carousel setCategory={setSelectedCategory as any} />
-								</div>
-								<div data-testid="closet-container">
-									<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
-								</div>
-							</>
-						)}
-						{view === "edit" && editItem && (
-							<EditItemView
-								key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
-								item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
-								mode={editMode}
-								setView={setView}
-								onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
-								onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
-								onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
-								queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
-								queueTotal={isInBatchMode ? importQueue.length : undefined}
-							/>
-						)}
+							{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />}
+							{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
+							{view === "gmail" && (
+								<GmailImport
+									onImport={handleGmailImport}
+									onImportAll={handleGmailImportAll}
+									initialSelectedEmailId={gmailSourceEmailId}
+									onSourceEmailChange={handleSourceEmailChange}
+								/>
+							)}
+							{view === "fabric" && <InteractiveGuide />}
+							{view === "journey" && <JourneyC />}
+							{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
+							{view === "carousel" && (
+								<>
+									<div data-testid="carousel">
+										<Carousel setCategory={setSelectedCategory as any} />
+									</div>
+									<div data-testid="closet-container">
+										<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
+									</div>
+								</>
+							)}
+							{view === "edit" && editItem && (
+								<EditItemView
+									key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
+									item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
+									mode={editMode}
+									setView={setView}
+									onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
+									onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
+									onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+									queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
+									queueTotal={isInBatchMode ? importQueue.length : undefined}
+								/>
+							)}
 						</ErrorBoundary>
 					</div>
 				</ToastProvider>
