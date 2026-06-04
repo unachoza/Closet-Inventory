@@ -1,5 +1,21 @@
 /* ── Journey C: Dark Flowchart Swimlanes ── */
 
+/* Token definitions — ported from FiberJourneyC.html prototype */
+:root {
+  --journey-bg:           #141210;
+  --journey-surface:      #1e1c19;
+  --journey-surface-2:    #252320;
+  --journey-border:       rgba(255, 255, 255, 0.08);
+  --journey-border-hover: rgba(255, 255, 255, 0.18);
+  --journey-text:         #f0ede8;
+  --journey-text-muted:   #8c897f;
+  --journey-text-dim:     #4a4844;
+  --journey-gold:         #e8c85a;
+  --journey-gold-dim:     rgba(232, 200, 90, 0.15);
+  --journey-phase-width:  380px;
+  --journey-phase-height: 420px;
+}
+
 .journey-c {
   font-family: var(--font-ui);
   background: var(--journey-bg);
