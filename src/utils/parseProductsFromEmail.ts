@@ -114,6 +114,7 @@ interface ParsedNameCell {
 	readonly itemNumber: string;
 }
 
+//TODO -better parsing name, brand, size, material from name
 function parseNameCell(td: Element): ParsedNameCell {
 	const fullText = getCellText(td);
 
@@ -133,6 +134,7 @@ function parseNameCell(td: Element): ParsedNameCell {
 
 	let brand = "";
 	let name = linkText;
+	console.log(linkText)
 
 	if (lines.length >= 2) {
 		brand = lines[0];

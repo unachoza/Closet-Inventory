@@ -105,6 +105,7 @@ function stripHtml(html: string): string {
 	return doc.body.textContent ?? "";
 }
 
+//TODO age should be date of email
 export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
@@ -113,6 +114,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		...formItem,
 		brand: extractBrand(combinedText, from),
 		category: extractCategory(combinedText),
+		//TODO use date of email
 		age: "new",
 	};
 }
