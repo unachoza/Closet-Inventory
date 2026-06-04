@@ -55,7 +55,7 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 				<Spool size={16} /> Fabric Guide
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("journey")}>
-				<Route size={16} /> My Journey
+				<Route size={16} /> Fiber Journey
 			</button>
 			<button className="action-btn secondary " onClick={() => goTo("carousel")}>
 				<SkipBackIcon size={16} /> Back to Carousel
