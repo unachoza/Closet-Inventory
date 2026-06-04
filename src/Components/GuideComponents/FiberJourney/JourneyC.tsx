@@ -16,7 +16,7 @@ const JourneyC = () => {
 	const phaseRefs = useRef<(HTMLDivElement | null)[]>([]);
 
 	const scrollToPhase = useCallback((index: number) => {
-		phaseRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
+		phaseRefs.current[index - 1]?.scrollIntoView({ behavior: "smooth", block: "start" });
 	}, []);
 
 	const openModal = useCallback((phase: Phase, step: PhaseStep, accent: string) => {
@@ -160,7 +160,7 @@ const JourneyC = () => {
 							className="jc-key-segment"
 							role="button"
 							tabIndex={0}
-							onClick={() => scrollToPhase(pi)}
+							onClick={() => scrollToPhase(pi + 1)}
 							onKeyDown={(e) => {
 								if (e.key === "Enter" || e.key === " ") {
 									e.preventDefault();

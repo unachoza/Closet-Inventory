@@ -12,8 +12,10 @@
   --journey-text-dim:     #4a4844;
   --journey-gold:         #e8c85a;
   --journey-gold-dim:     rgba(232, 200, 90, 0.15);
-  --journey-phase-width:  380px;
-  --journey-phase-height: 420px;
+  /* Fluid column sizing: fills ~45% of viewport on wide screens,
+     never smaller than 280px, never larger than 420px */
+  --journey-phase-width:  clamp(280px, 44vw, 420px);
+  --journey-phase-height: clamp(360px, 42vw, 480px);
 }
 
 .journey-c {
@@ -111,11 +113,13 @@
   border-radius: 50%;
 }
 
-/* Main */
+/* Main — min-height on desktop ensures the absolutely-positioned zig-zag
+   columns are fully contained before the key bar renders below */
 .jc-main {
   max-width: 1160px;
   margin: 0 auto;
   padding: 56px 60px 80px;
+  min-height: calc(var(--journey-phase-height) * 3.6);
 }
 
 /* Swimlanes grid */
@@ -216,35 +220,37 @@
   left: .5rem;
 }
 
-/* Flow arrows between phase columns */
-.jc-phase-arrow-0 {
+/* Flow arrows between phase columns.
+   Horizontal: always centered between the two columns via 50% + translate.
+   Vertical: scaled by --journey-phase-height so they move with the columns. */
+.jc-phase-arrow-0,
+.jc-phase-arrow-1,
+.jc-phase-arrow-2,
+.jc-phase-arrow-3,
+.jc-phase-arrow-4 {
   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.jc-phase-arrow-0 {
   top: calc(var(--journey-phase-height) * 0.7);
-  left: calc(var(--journey-phase-width) + 100px);
 }
 
 .jc-phase-arrow-1 {
-  position: absolute;
   top: calc(var(--journey-phase-height) * 2 * 0.6);
-  left: calc(var(--journey-phase-width) + 100px);
 }
 
 .jc-phase-arrow-2 {
-  position: absolute;
   top: calc(var(--journey-phase-height) * 3 * 0.6);
-  left: calc(var(--journey-phase-width) + 100px);
 }
 
 .jc-phase-arrow-3 {
-  position: absolute;
   top: calc(var(--journey-phase-height) * 4 * 0.6);
-  left: calc(var(--journey-phase-width) + 100px);
 }
 
 .jc-phase-arrow-4 {
-  position: absolute;
   top: calc(var(--journey-phase-height) * 5 * 0.6);
-  left: calc(var(--journey-phase-width) + 100px);
 }
 
 .jc-step-node--last {
@@ -299,7 +305,6 @@
   display: flex;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
-  margin-top: calc(var(--journey-phase-height)* 3.3);
 }
 
 .jc-key-segment {
@@ -467,16 +472,45 @@
   display: none;
 }
 
-@media (max-width: 900px) {
-  .jc-swimlanes {
-    grid-template-columns: 1fr;
+/* ── Single-column layout: ≤ 768px ─────────────────────────────────────────
+   Below this width two columns of ~44vw no longer fit comfortably.
+   Switch to a simple vertical stack with down arrows between phases.       */
+@media (max-width: 768px) {
+  .jc-container {
+    flex-direction: column;
+    align-items: center;
+    min-height: unset;
   }
 
-  .jc-phase-col {
-    margin-bottom: 24px;
+  .jc-phase-col,
+  .jc-phase-col-0,
+  .jc-phase-col-1,
+  .jc-phase-col-2,
+  .jc-phase-col-3,
+  .jc-phase-col-4 {
+    position: static;
+    width: min(520px, 92vw);
+    height: auto;
   }
 
+  /* Hide diagonal arrows, show vertical down arrows */
+  .jc-phase-arrow--diagonal {
+    display: none;
+  }
+
+  .jc-phase-arrow--down {
+    display: block;
+    margin: 12px auto;
+    opacity: 0.45;
+  }
+
+  .journey-c {
+    min-height: unset;
+  }
+
+  /* Reset the desktop zig-zag min-height — natural stacked content takes over */
   .jc-main {
+    min-height: unset;
     padding: 36px 20px 60px;
   }
 
@@ -489,50 +523,23 @@
   }
 }
 
+/* ── Compact tweaks for small phones ────────────────────────────────────── */
 @media (max-width: 450px) {
-  /* Stack phases vertically — remove zig-zag absolute positioning */
-  .jc-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
   .jc-phase-col,
   .jc-phase-col-0,
   .jc-phase-col-1,
   .jc-phase-col-2,
   .jc-phase-col-3,
   .jc-phase-col-4 {
-    position: static;
-    width: 90vw;
-    height: auto;
-    margin: 1.5rem 0;
-  }
-
-  /* Hide diagonal desktop arrows, show down arrows */
-  .jc-phase-arrow--diagonal {
-    display: none;
-  }
-
-  .jc-phase-arrow--down {
-    display: block;
-    margin: 8px auto;
-    opacity: 0.5;
-  }
-
-  /* Key bar scrolls horizontally on small screens */
-  .jc-key-bar {
-    margin-top: 24px;
+    width: 92vw;
+    margin: 1.25rem 0;
   }
 
   .jc-main {
-    padding: 24px 16px 48px;
+    padding: 24px 12px 48px;
   }
 
   .jc-header {
     padding: 24px 16px 20px;
-  }
-
-  .jc-header__legend {
-    align-items: flex-start;
   }
 }
