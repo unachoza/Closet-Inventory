@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon } from "lucide-react";
+import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon, Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
@@ -22,7 +22,7 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 	// "entireCloset" is the searchable all-items experience. In that mode the
 	// nav actions collapse into the hamburger drawer and only search shows.
 	const isClosetView = view === "entireCloset";
-	const showBackToCarousel = view !== "carousel";
+	// const showBackToCarousel = view !== "carousel";
 
 	const closeDrawer = () => setDrawerOpen(false);
 
@@ -53,6 +53,9 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
+			</button>
+			<button className="action-btn secondary" onClick={() => goTo("journey")}>
+				<Route size={16} /> Fiber Journey
 			</button>
 			<button className="action-btn secondary " onClick={() => goTo("carousel")}>
 				<SkipBackIcon size={16} /> Back to Carousel
@@ -88,9 +91,7 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 				</div>
 			)}
 
-			<div className="nav-right">
-				{!isClosetView && <div className="nav-actions">{navActions}</div>}
-			</div>
+			<div className="nav-right">{!isClosetView && <div className="nav-actions">{navActions}</div>}</div>
 
 			{drawerOpen && (
 				<>
