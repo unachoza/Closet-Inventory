@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { PHASES, Phase, PhaseStep } from "../../../Content/FiberJourney";
 import { STEP_PREVIEWS, DARK_ACCENTS } from "./journeyData";
+import { MoveDown, MoveDownLeft, MoveDownRight } from "lucide-react";
 import "./JourneyC.css";
 
 interface StepModalData {
@@ -11,6 +12,12 @@ interface StepModalData {
 
 const JourneyC = () => {
 	const [modalData, setModalData] = useState<StepModalData | null>(null);
+
+	const phaseRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+	const scrollToPhase = useCallback((index: number) => {
+		phaseRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
+	}, []);
 
 	const openModal = useCallback((phase: Phase, step: PhaseStep, accent: string) => {
 		setModalData({ phase, step, accent });
@@ -41,10 +48,16 @@ const JourneyC = () => {
 				<div className="jc-header__legend">
 					<div className="jc-legend-heading">Phase color key</div>
 					{PHASES.map((phase) => (
-						<div key={phase.id} className="jc-legend-item">
+						<button
+							key={phase.id}
+							type="button"
+							className="jc-legend-item"
+							onClick={() => scrollToPhase(phase.number)}
+							aria-label={`Scroll to phase ${phase.number + 1}: ${phase.name}`}
+						>
 							<span className="jc-legend-dot" style={{ background: DARK_ACCENTS[phase.id] }} />
 							{phase.name}
-						</div>
+						</button>
 					))}
 				</div>
 			</header>
@@ -52,48 +65,85 @@ const JourneyC = () => {
 			<main className="jc-main">
 				<div className="jc-container">
 					{PHASES.map((phase, pi) => {
+						<button
+							key={phase.id}
+							type="button"
+							className="jc-legend-item"
+							onClick={() => scrollToPhase(phase.number)}
+							aria-label={`Scroll to phase ${phase.number + 1}: ${phase.name}`}
+						>
+							<span className="jc-legend-dot" style={{ background: DARK_ACCENTS[phase.id] }} />
+							{phase.name}
+						</button>;
 						const accent = DARK_ACCENTS[phase.id] ?? phase.accentColor;
 						const previews = STEP_PREVIEWS[phase.id] ?? [];
 
 						return (
-							<div key={phase.id} className={`jc-phase-col jc-phase-col-${pi}`}>
-								{/* Phase header node */}
+							<div>
 								<div
-									className="jc-phase-header-node"
-									style={{
-										borderColor: `${accent}60`,
-										background: `${accent}14`,
+									key={phase.id}
+									ref={(el) => {
+										phaseRefs.current[pi] = el;
 									}}
+									className={`jc-phase-col jc-phase-col-${pi}`}
 								>
-									<div className="jc-phase-num" style={{ color: accent }}>
-										{String(pi + 1).padStart(2, "0")} ·
-									</div>
-									<div className="jc-phase-icon">{phase.icon}</div>
-									<div className="jc-phase-name" style={{ color: accent }}>
-										{phase.name}
-									</div>
-								</div>
-
-								{/* Step nodes */}
-								{phase.steps.map((step, si) => (
+									{/* Phase header node */}
 									<div
-										key={si}
-										className={`jc-step-node ${si === phase.steps.length - 1 ? "jc-step-node--last" : ""}`}
+										className="jc-phase-header-node"
 										style={{
-											borderLeftColor: `${accent}35`,
-											borderRightColor: `${accent}35`,
-											...(si === phase.steps.length - 1 ? { borderBottomColor: `${accent}60` } : {}),
+											borderColor: `${accent}60`,
+											background: `${accent}14`,
 										}}
-										onClick={() => openModal(phase, step, accent)}
 									>
-										<div className="jc-step-node__title">
-											<span className="jc-step-dot" style={{ background: accent }} />
-											{step.title}
+										<div className="jc-phase-num" style={{ color: accent }}>
+											{String(pi + 1).padStart(2, "0")} ·
 										</div>
-										<div className="jc-step-node__preview">{previews[si] ?? ""}</div>
-										<span className="jc-step-expand-hint">tap ↗</span>
+										<div className="jc-phase-icon">{phase.icon}</div>
+										<div className="jc-phase-name" style={{ color: accent }}>
+											{phase.name}
+										</div>
 									</div>
-								))}
+									{/* Step nodes */}
+									{phase.steps.map((step, si) => (
+										<div
+											key={si}
+											className={`jc-step-node ${si === phase.steps.length - 1 ? "jc-step-node--last" : ""}`}
+											style={{
+												borderLeftColor: `${accent}35`,
+												borderRightColor: `${accent}35`,
+												...(si === phase.steps.length - 1
+													? { borderBottomColor: `${accent}60` }
+													: {}),
+											}}
+											onClick={() => openModal(phase, step, accent)}
+										>
+											<div className="jc-step-node__title">
+												<span className="jc-step-dot" style={{ background: accent }} />
+												{step.title}
+											</div>
+											<div className="jc-step-node__preview">{previews[si] ?? ""}</div>
+											<span className="jc-step-expand-hint">tap ↗</span>
+										</div>
+									))}
+								</div>
+								{/* Diagonal arrows — desktop zig-zag */}
+								{pi % 2 === 0 ? (
+									<MoveDownRight
+										size={24}
+										className={`jc-phase-arrow-${pi} jc-phase-arrow--diagonal`}
+										style={{ color: accent }}
+									/>
+								) : (
+									<MoveDownLeft
+										size={24}
+										className={`jc-phase-arrow-${pi} jc-phase-arrow--diagonal`}
+										style={{ color: accent }}
+									/>
+								)}
+								{/* Down arrow — mobile stack (hidden on desktop) */}
+								{pi < PHASES.length - 1 && (
+									<MoveDown size={24} className="jc-phase-arrow--down" style={{ color: accent }} />
+								)}
 							</div>
 						);
 					})}
@@ -105,7 +155,20 @@ const JourneyC = () => {
 				{PHASES.map((phase, pi) => {
 					const accent = DARK_ACCENTS[phase.id] ?? phase.accentColor;
 					return (
-						<div key={phase.id} className="jc-key-segment">
+						<div
+							key={phase.id}
+							className="jc-key-segment"
+							role="button"
+							tabIndex={0}
+							onClick={() => scrollToPhase(pi)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									scrollToPhase(pi);
+								}
+							}}
+							aria-label={`Scroll to phase ${pi + 1}: ${phase.name}`}
+						>
 							<div className="jc-key-seg__num" style={{ color: accent }}>
 								{String(pi + 1).padStart(2, "0")}
 							</div>
