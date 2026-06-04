@@ -391,7 +391,15 @@ const TextileGuildInteractive = () => {
 								<p style={{ color: "var(--ink-60)", fontSize: 14, marginBottom: 16 }}>{group.subtitle}</p>
 								<div className="care-grid">
 									{group.items.map((item) => (
-										<div key={item.label} className="care-card">
+										<div
+											key={item.label}
+											className="care-card"
+											style={item.backgroundImageUrl ? {
+												backgroundImage: `linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url(${item.backgroundImageUrl})`,
+												backgroundSize: "cover",
+												backgroundPosition: "center",
+											} : undefined}
+										>
 											<div className="care-icon">{item.icon}</div>
 											<div className="care-label">{item.label}</div>
 											<div className="care-value">{item.value}</div>
