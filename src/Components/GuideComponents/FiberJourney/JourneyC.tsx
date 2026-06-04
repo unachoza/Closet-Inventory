@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { PHASES, Phase, PhaseStep } from "../../../Content/FiberJourney";
 import { STEP_PREVIEWS, DARK_ACCENTS } from "./journeyData";
+import { MoveDownLeft, MoveDownRight } from "lucide-react";
 import "./JourneyC.css";
 
 interface StepModalData {
@@ -56,44 +57,58 @@ const JourneyC = () => {
 						const previews = STEP_PREVIEWS[phase.id] ?? [];
 
 						return (
-							<div key={phase.id} className={`jc-phase-col jc-phase-col-${pi}`}>
-								{/* Phase header node */}
-								<div
-									className="jc-phase-header-node"
-									style={{
-										borderColor: `${accent}60`,
-										background: `${accent}14`,
-									}}
-								>
-									<div className="jc-phase-num" style={{ color: accent }}>
-										{String(pi + 1).padStart(2, "0")} ·
-									</div>
-									<div className="jc-phase-icon">{phase.icon}</div>
-									<div className="jc-phase-name" style={{ color: accent }}>
-										{phase.name}
-									</div>
-								</div>
-
-								{/* Step nodes */}
-								{phase.steps.map((step, si) => (
+							<div>
+								<div key={phase.id} className={`jc-phase-col jc-phase-col-${pi}`}>
+									{/* Phase header node */}
 									<div
-										key={si}
-										className={`jc-step-node ${si === phase.steps.length - 1 ? "jc-step-node--last" : ""}`}
+										className="jc-phase-header-node"
 										style={{
-											borderLeftColor: `${accent}35`,
-											borderRightColor: `${accent}35`,
-											...(si === phase.steps.length - 1 ? { borderBottomColor: `${accent}60` } : {}),
+											borderColor: `${accent}60`,
+											background: `${accent}14`,
 										}}
-										onClick={() => openModal(phase, step, accent)}
 									>
-										<div className="jc-step-node__title">
-											<span className="jc-step-dot" style={{ background: accent }} />
-											{step.title}
+										yes
+										<div className="jc-phase-num" style={{ color: accent }}>
+											{String(pi + 1).padStart(2, "0")} ·
 										</div>
-										<div className="jc-step-node__preview">{previews[si] ?? ""}</div>
-										<span className="jc-step-expand-hint">tap ↗</span>
+										<div className="jc-phase-icon">{phase.icon}</div>
+										<div className="jc-phase-name" style={{ color: accent }}>
+											{phase.name}
+										</div>
 									</div>
-								))}
+									{/* Step nodes */}
+									{phase.steps.map((step, si) => (
+										<div
+											key={si}
+											className={`jc-step-node ${si === phase.steps.length - 1 ? "jc-step-node--last" : ""}`}
+											style={{
+												borderLeftColor: `${accent}35`,
+												borderRightColor: `${accent}35`,
+												...(si === phase.steps.length - 1
+													? { borderBottomColor: `${accent}60` }
+													: {}),
+											}}
+											onClick={() => openModal(phase, step, accent)}
+										>
+											<div className="jc-step-node__title">
+												<span className="jc-step-dot" style={{ background: accent }} />
+												{step.title}
+											</div>
+											<div className="jc-step-node__preview">{previews[si] ?? ""}</div>
+											<span className="jc-step-expand-hint">tap ↗</span>
+										</div>
+									))}
+								</div>
+								{pi % 2 === 0 ? (
+									<MoveDownRight key={pi} size={24} className={`jc-phase-arrow-${pi}`} style={{ color: accent }} />
+								) : (
+									<MoveDownLeft
+										key={pi}
+										size={24}
+										className={`jc-phase-arrow-${pi}`}
+										style={{ color: accent }}
+									/>
+								)}
 							</div>
 						);
 					})}

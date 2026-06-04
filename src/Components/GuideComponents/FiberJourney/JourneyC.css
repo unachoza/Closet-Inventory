@@ -58,7 +58,7 @@
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--journey-text-dim);
+  color: var(--journey-text-muted);
   margin-bottom: 4px;
 }
 
@@ -96,6 +96,10 @@
   flex-direction: column;
   width: var(--journey-phase-width);
   height: var(--journey-phase-height);
+}
+
+.jc-phase-col:hover {
+  filter: brightness(1.5);
 }
 
 /* Phase header node */
@@ -152,10 +156,22 @@
   position: absolute;
 }
 
+.jc-phase-arrow-0{
+  position: absolute;
+  top: calc(var(--journey-phase-height) * .7);
+  left: calc(var(--journey-phase-width) + 50px);
+}
+
 .jc-phase-col-1{
   position: absolute;
   top: 5rem;
   right: .5rem;
+}
+
+.jc-phase-arrow-1{
+  position: absolute;
+  top: calc((var(--journey-phase-height) * 2 ) * .6);
+  left: calc(var(--journey-phase-width) + 50px);
 }
 
 .jc-phase-col-2{
@@ -164,16 +180,34 @@
   left: .5rem;
 }
 
+.jc-phase-arrow-2{
+  position: absolute;
+top: calc((var(--journey-phase-height) * 3 ) * .6);
+  left: calc(var(--journey-phase-width) + 50px);
+}
+
 .jc-phase-col-3{
   position: absolute;
   top: calc(var(--journey-phase-height) * 1.6);
   right: .5rem;
 }
 
+.jc-phase-arrow-3{
+  position: absolute;
+top: calc((var(--journey-phase-height) * 4 ) * .6);
+  left: calc(var(--journey-phase-width) + 50px);
+}
+
 .jc-phase-col-4{
   position: absolute;
   top: calc(var(--journey-phase-height) + (var(--journey-phase-height) * 1.4));
   left: .5rem;
+}
+
+.jc-phase-arrow-4{
+  position: absolute;
+top: calc((var(--journey-phase-height) * 5 ) * .6);
+  left: calc(var(--journey-phase-width) + 50px);
 }
 
 .jc-step-node--last {
