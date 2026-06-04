@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { PHASES, Phase, PhaseStep } from "../../../Content/FiberJourney";
 import { STEP_PREVIEWS, DARK_ACCENTS } from "./journeyData";
 import { MoveDownLeft, MoveDownRight } from "lucide-react";
@@ -12,6 +12,11 @@ interface StepModalData {
 
 const JourneyC = () => {
 	const [modalData, setModalData] = useState<StepModalData | null>(null);
+	const phaseRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+	const scrollToPhase = useCallback((index: number) => {
+		phaseRefs.current[index]?.scrollIntoView({ behavior: "smooth", block: "start" });
+	}, []);
 
 	const openModal = useCallback((phase: Phase, step: PhaseStep, accent: string) => {
 		setModalData({ phase, step, accent });
@@ -42,10 +47,16 @@ const JourneyC = () => {
 				<div className="jc-header__legend">
 					<div className="jc-legend-heading">Phase color key</div>
 					{PHASES.map((phase) => (
-						<div key={phase.id} className="jc-legend-item">
-							<span className="jc-legend-dot" style={{ background: DARK_ACCENTS[phase.id] }} />
-							{phase.name}
-						</div>
+						<button
+						key={phase.id}
+						type="button"
+						className="jc-legend-item"
+						onClick={() => scrollToPhase(phase.number)}
+						aria-label={`Scroll to phase ${phase.number + 1}: ${phase.name}`}
+					>
+						<span className="jc-legend-dot" style={{ background: DARK_ACCENTS[phase.id] }} />
+						{phase.name}
+					</button>
 					))}
 				</div>
 			</header>
@@ -58,7 +69,11 @@ const JourneyC = () => {
 
 						return (
 							<div>
-								<div key={phase.id} className={`jc-phase-col jc-phase-col-${pi}`}>
+								<div
+						key={phase.id}
+						ref={(el) => { phaseRefs.current[pi] = el; }}
+						className={`jc-phase-col jc-phase-col-${pi}`}
+					>
 									{/* Phase header node */}
 									<div
 										className="jc-phase-header-node"
@@ -120,12 +135,18 @@ const JourneyC = () => {
 				{PHASES.map((phase, pi) => {
 					const accent = DARK_ACCENTS[phase.id] ?? phase.accentColor;
 					return (
-						<div key={phase.id} className="jc-key-segment">
-							<div className="jc-key-seg__num" style={{ color: accent }}>
-								{String(pi + 1).padStart(2, "0")}
-							</div>
-							<div className="jc-key-seg__name">{phase.name}</div>
+						<button
+						key={phase.id}
+						type="button"
+						className="jc-key-segment"
+						onClick={() => scrollToPhase(pi)}
+						aria-label={`Scroll to phase ${pi + 1}: ${phase.name}`}
+					>
+						<div className="jc-key-seg__num" style={{ color: accent }}>
+							{String(pi + 1).padStart(2, "0")}
 						</div>
+						<div className="jc-key-seg__name">{phase.name}</div>
+					</button>
 					);
 				})}
 			</div>
