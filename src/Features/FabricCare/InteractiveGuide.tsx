@@ -6,11 +6,16 @@ import WeaveDiagram from "../../Components/GuideComponents/WeaveDiagram";
 import FiberFlowchart from "../../Components/GuideComponents/FiberFlowchart";
 import React from "react";
 import DetailModal from "../../Components/GuideComponents/Modal";
+import { Route } from "lucide-react";
+import { useView } from "../../context/ViewContext";
+import { ViewType } from "../../utils/types";
 
 const TextileGuildInteractive = () => {
 	const [selectedFiber, setSelectedFiber] = useState<Fiber | null>(null);
 	const [activeWeave, setActiveWeave] = useState<string>("plain");
 	const [activeNavId, setActiveNavId] = useState<string>("natural");
+
+	const { view, setView } = useView();
 
 	// Section headings for IntersectionObserver nav highlight
 	const sectionIds = ["natural", "semi", "synthetic", "weaves", "compare", "flowchart", "care", "sources"];
@@ -46,6 +51,10 @@ const TextileGuildInteractive = () => {
 	const synthFibers = FIBERS.filter((f) => f.category === "synth");
 
 	const activeWeaveData = WEAVE_TYPES.find((w) => w.id === activeWeave);
+
+	function goTo(next: ViewType): void {
+		setView(next);
+	}
 
 	return (
 		<div>
@@ -133,7 +142,6 @@ const TextileGuildInteractive = () => {
 
 					<div className="fiber-grid">
 						{animalFibers.map((f) => {
-							console.log({ f });
 							return <FiberCard key={f.id} fiber={f} onClick={() => setSelectedFiber(f)} />;
 						})}
 					</div>
@@ -359,12 +367,19 @@ const TextileGuildInteractive = () => {
 			{/* ══════════ FLOWCHART ══════════ */}
 			<section id="flowchart">
 				<div className="container">
-					<div className="section-header">
-						<p className="section-eyebrow">How Fabric is Made</p>
-						<h2 className="section-title">The Fiber-to-Garment Journey</h2>
-						<p className="section-desc">
-							From raw source to finished garment — how each category of fiber travels to become textile.
-						</p>
+					<div className="section-header journey">
+						<div>
+							<p className="section-eyebrow">How Fabric is Made</p>
+							<h2 className="section-title">The Fiber-to-Garment Journey</h2>
+							<p className="section-desc">
+								From raw source to finished garment — how each category of fiber travels to become textile.
+							</p>
+						</div>
+						<div>
+							<button className="action-btn secondary" onClick={() => goTo("journey")}>
+								<Route size={16} /> Fiber Journey
+							</button>
+						</div>
 					</div>
 					<FiberFlowchart />
 				</div>
@@ -392,7 +407,19 @@ const TextileGuildInteractive = () => {
 								<p style={{ color: "var(--ink-60)", fontSize: 14, marginBottom: 16 }}>{group.subtitle}</p>
 								<div className="care-grid">
 									{group.items.map((item) => (
-										<div key={item.label} className="care-card">
+										<div
+											key={item.label}
+											className="care-card"
+											style={
+												item.backgroundImageUrl
+													? {
+															backgroundImage: `linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url(${item.backgroundImageUrl})`,
+															backgroundSize: "cover",
+															backgroundPosition: "center",
+														}
+													: undefined
+											}
+										>
 											<div className="care-icon">{item.icon}</div>
 											<div className="care-label">{item.label}</div>
 											<div className="care-value">{item.value}</div>

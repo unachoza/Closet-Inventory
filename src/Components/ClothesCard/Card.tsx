@@ -39,25 +39,25 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 					<h2 className="card-title">{item.name}</h2>
 					<div className="card-details">
 						<p>
-							<strong>Color:</strong> {item.color}
+							<strong>Size:</strong> {item.size}
 						</p>
 						<p>
-							<strong>Size:</strong> {item.size}
+							<strong>Color:</strong> {item.color}
 						</p>
 						<p>
 							<strong>Brand:</strong> {item.brand}
 						</p>
-						<div className="card-material">
-							<strong>Material:</strong>{" "}
-							{materialBlend.length > 0 ? <MaterialCompositionBar blend={materialBlend} /> : "—"}
-						</div>
-
 						<p>
 							<strong>Occasion:</strong> {item.occasion}
 						</p>
 						<p>
 							<strong>Age:</strong> {item.age}
 						</p>
+						<div className="card-material">
+							<strong>Material:</strong>{" "}
+							{materialBlend.length > 0 ? <MaterialCompositionBar blend={materialBlend} /> : "—"}
+						</div>
+
 						<p>
 							<strong>Care:</strong> {item.care}
 						</p>

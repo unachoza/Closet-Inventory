@@ -47,6 +47,7 @@ export interface CareGroup {
 		icon: string;
 		label: string;
 		value: string;
+		backgroundImageUrl: string;
 	}[];
 }
 
@@ -67,7 +68,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Sheep",
 		source: "Merino sheep · Primarily Australia & New Zealand",
-		imageUrl: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596871/Merino_sheep_gv05q2.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Grey merino wool knit texture close-up",
 		description:
 			"The gold standard of wool. Merino's ultra-fine fibers (15–24 microns) make it remarkably soft — it does not itch like coarser wools. Naturally odor-resistant and temperature-regulating.",
@@ -114,7 +115,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Cashmere Goat",
 		source: "Capra hircus laniger · Mongolia, Inner Mongolia, Kashmir Region",
-		imageUrl: "https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596871/Cashmere_Goats_sascrc.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Soft cashmere knit fabric texture",
 		description:
 			"Combed from the soft undercoat of Cashmere goats, this is one of the world's most luxurious fibers. Warmer than wool by weight, incredibly lightweight, and develops a beautiful drape.",
@@ -158,7 +159,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Angora Goat",
 		source: "Capra hircus aegagrus (Angora breed) · South Africa, Texas, Turkey",
-		imageUrl: "https://images.unsplash.com/photo-1551232864-3f0890e580d9?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596872/Angora_Goat_xviuis.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Fluffy mohair angora goat yarn texture",
 		description:
 			'Called the "Diamond Fiber," mohair has a brilliant luster unlike any other natural fiber. Highly durable and resilient — it doesn\'t felt or pill easily and takes dye in exceptionally vivid colors.',
@@ -201,7 +202,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Silkworm",
 		source: "Bombyx mori silkworm · China, India, Japan, Thailand",
-		imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596871/Silkworm_hyctwt.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Shimmery silk fabric with natural luster",
 		description:
 			"A single silkworm cocoon can yield up to 1,000 meters of continuous fiber. The result is a naturally lustrous, hypoallergenic fabric with unparalleled drape and a cool-to-the-touch feel.",
@@ -245,7 +246,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Alpaca",
 		source: "Vicugna pacos · Peruvian, Bolivian & Chilean Andes (3,500–5,000 m)",
-		imageUrl: "https://images.unsplash.com/photo-1574710813-62b2db8a2ee6?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596869/Alpaca_-_nat_geo_hq9dlr.avif?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Natural alpaca fiber texture",
 		description:
 			'Hypoallergenic because it lacks lanolin. Alpaca fiber is lighter, warmer, and stronger than sheep\'s wool with a silky feel. "Baby alpaca" refers to the finest grade, not young animals.',
@@ -288,7 +289,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Angora Rabbit",
 		source: "Oryctolagus cuniculus (Angora breed) · China, France, Germany, Americas",
-		imageUrl: "https://images.unsplash.com/photo-1548036161-6df28aced7a6?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596871/Fluffy-Angora-Rabbit-1536x1024_zjgk8c.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Fluffy soft white angora rabbit fiber",
 		description:
 			"Exceptionally fine and fluffy, angora fiber has a distinctive halo effect and is incredibly soft. Often blended with other fibers for structure, as pure angora can shed.",
@@ -321,7 +322,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Vicuña",
 		source: "Vicugna vicugna · Andes (Argentina, Bolivia, Chile, Peru) — protected",
-		imageUrl: "https://images.unsplash.com/photo-1567161322021-2c2db16bbb8c?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596870/Vicun%CC%83a_kltt03.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Luxury camel natural fine fiber",
 		description:
 			"The rarest and most expensive natural fiber in the world. At 12–14 microns, it is the finest fiber known. Once reserved for Incan royalty.",
@@ -363,7 +364,7 @@ export const FIBERS: Fiber[] = [
 		category: "animal",
 		tagLabel: "Animal · Musk Ox",
 		source: "Ovibos moschatus · Arctic Alaska & Canada",
-		imageUrl: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596870/Musk_Ox_qtiphf.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Dark textured qiviut musk ox wool",
 		description:
 			"The ultra-fine underfleece of the Arctic musk ox. Naturally shed each spring, qiviut is 8× warmer than wool and hypoallergenic. One of the rarest fibers.",
@@ -398,7 +399,7 @@ export const FIBERS: Fiber[] = [
 		category: "plant",
 		tagLabel: "Plant · Cotton Boll",
 		source: "Gossypium hirsutum · USA, India, China, Brazil, Pakistan",
-		imageUrl: "https://images.unsplash.com/photo-1503342394128-c24b3fbe23f8?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596870/cotton-plants-are-tall-and-green-with-a-branching--Xi2ktwlpS02wO48TO6CUsw-sqZ-RNRzS1GLIO91uGXvnA_4e161561-ae25-4e3c-9ffa-f94494a731b2_ygyksk.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "White cotton plant boll in field",
 		description:
 			"The world's most-used natural fiber. Cotton is soft, breathable, absorbent, and machine washable. It grows softer with each wash and is hypoallergenic.",
@@ -445,7 +446,7 @@ export const FIBERS: Fiber[] = [
 		category: "plant",
 		tagLabel: "Plant · Flax Stalk",
 		source: "Linum usitatissimum · Belgium, France, Ireland, Netherlands",
-		imageUrl: "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596870/sheaf-harvested-flax-against-white-wall-stems-seed-capsules-roots-old-wooden-surface-background-120274763_z2kmng.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Natural linen fabric texture close-up",
 		description:
 			"One of the oldest textiles — found in Egyptian tombs. Linen is crisp, cool, and strongest when wet. It softens beautifully over time and is naturally antibacterial.",
@@ -484,7 +485,7 @@ export const FIBERS: Fiber[] = [
 		category: "plant",
 		tagLabel: "Plant · Hemp Stalk",
 		source: "Cannabis sativa L. · China, France, Romania, Canada",
-		imageUrl: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596869/hem_-_stalk-650px_gobv0y.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Hemp canvas natural fiber texture",
 		description:
 			"The most sustainable textile crop — requires no pesticides, enriches soil, uses minimal water, and yields 3× more fiber per acre than cotton.",
@@ -522,7 +523,7 @@ export const FIBERS: Fiber[] = [
 		category: "plant",
 		tagLabel: "Plant · Ramie Stalk",
 		source: "Boehmeria nivea · China, Japan, Brazil, Philippines",
-		imageUrl: "https://images.unsplash.com/photo-1586495777744-4e6b8c9d1c02?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596869/Plant_Ramie_Stalk_udfke1.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Woven natural ramie bast fiber",
 		description:
 			'Known as "China grass," ramie is one of the strongest natural fibers — 8× stronger than cotton and even stronger when wet. Lustrous like silk with a natural white sheen.',
@@ -560,7 +561,7 @@ export const FIBERS: Fiber[] = [
 		category: "plant",
 		tagLabel: "Plant · Jute Stalk",
 		source: "Corchorus capsularis & C. olitorius · Bangladesh, India, China",
-		imageUrl: "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596869/PLANT_JUTE_STALK_rnafrv.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Jute burlap golden fiber texture",
 		description:
 			'Called the "Golden Fiber," jute is the second most produced natural fiber globally (after cotton). Fully biodegradable and requires very little water or pesticide to grow.',
@@ -600,7 +601,7 @@ export const FIBERS: Fiber[] = [
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Wood Pulp",
 		source: 'Regenerated cellulose — Developed 1890s as "artificial silk"',
-		imageUrl: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780601618/Properties-Manufacturing-Method-and-Uses-of-Rayon-Fiber_hs7fvs.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Draped viscose rayon fabric",
 		description:
 			"The first generation of regenerated cellulose. Silky drape, excellent absorbency, soft feel. Weakens when wet and requires careful washing.",
@@ -633,7 +634,7 @@ export const FIBERS: Fiber[] = [
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Beech Tree",
 		source: "Fagus sylvatica (beech) · Primarily Austria and Central Europe (Lenzing)",
-		imageUrl: "https://images.unsplash.com/photo-1589465885857-44538ae55f3f?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600353/Illustration-of-the-modal-fabric-production-process-from-beech-tree-pulp-c_dttffr.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Soft modal beech fabric loungewear",
 		description:
 			"A second-generation rayon with improved wet strength. Silkier, stronger, and more resistant to shrinkage than standard viscose. Stays soft wash after wash.",
@@ -672,7 +673,7 @@ export const FIBERS: Fiber[] = [
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Eucalyptus & Beech",
 		source: "Eucalyptus globulus · Lenzing AG, Austria (TENCEL™ brand name)",
-		imageUrl: "https://images.unsplash.com/photo-1617093818-d4b0c5c8d9a3?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600700/Lyocell-Yarn-from-Eucalyptus-Wood-Pulp_pleide.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "TENCEL lyocell eucalyptus fabric",
 		description:
 			"The most sustainable regenerated fiber. Made via a closed-loop process that recycles 99%+ of solvents. Stronger than viscose, moisture-wicking, and breathable.",
@@ -705,7 +706,7 @@ export const FIBERS: Fiber[] = [
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Bamboo Grass",
 		source: "Phyllostachys edulis (Moso bamboo) · Primarily China",
-		imageUrl: "https://images.unsplash.com/photo-1588675646184-14b4a2ae1f90?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600960/Screenshot_2026-06-04_at_12.22.33_PM_ufqmal.png?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Bamboo fabric soft texture",
 		description:
 			'Often marketed as eco-friendly, most "bamboo fabric" is actually bamboo viscose — chemically processed. The plant grows remarkably fast but processing method matters enormously.',
@@ -738,7 +739,7 @@ export const FIBERS: Fiber[] = [
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Cotton Linters",
 		source: "Short cotton linters (cottonseed) · Asahi Kasei (Japan) — Bemberg™",
-		imageUrl: "https://images.unsplash.com/photo-1606744824163-985d376605aa?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600715/NLHuM1n9TkyJ_QfEvzBDUEsxBEcp2fVSGIXOtlYcu_rv6QlA6OuhGr98HCNcoa8QTM4-YstpyM7DWxTm5XUUAQT86c_PjuzCdsOtXi282VzhJIl2DYOwmm7puRBXqVBoLsCUDo8p_mUTcj6i6gCAec8_pvfu28.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Cupro Bemberg silk-like fabric lining",
 		description:
 			"Made from waste cotton linters, dissolved in copper oxide solution. Has unmatched silk-like drape and is naturally antistatic. Used as luxury lining in high-end garments.",
@@ -779,7 +780,7 @@ export const FIBERS: Fiber[] = [
 		category: "synth",
 		tagLabel: "Synthetic · PET Polymer",
 		source: "Polyethylene terephthalate — First commercial production 1941 (ICI, UK)",
-		imageUrl: "https://images.unsplash.com/photo-1536494126589-caff6b0b7816?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780601815/transparent-polyethylene-granules-on-dark-hdpe-plastic-pellets-plastic-raw-material-idpe_l8pbch.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Polyester synthetic technical fabric",
 		description:
 			"The world's most produced fiber at 57–65% of global output. Wrinkle-resistant, colorfast, quick-drying, and resistant to stretching. Can now be made from recycled PET bottles.",
@@ -812,7 +813,7 @@ export const FIBERS: Fiber[] = [
 		category: "synth",
 		tagLabel: "Synthetic · Polyamide",
 		source: "Polyamide — DuPont, 1938 (world's first fully synthetic fiber)",
-		imageUrl: "https://images.unsplash.com/photo-1571009763359-e51bfc0dd3e9?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780601347/QQ_E5_9B_BE_E7_89_8720230510134930_kycqci.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Nylon performance fabric texture",
 		description:
 			"The first fully synthetic fiber. Exceptional strength, abrasion resistance, and elasticity. Lighter and more flexible than polyester.",
@@ -851,7 +852,7 @@ export const FIBERS: Fiber[] = [
 		category: "synth",
 		tagLabel: "Synthetic · Polyurethane",
 		source: "Polyurethane — DuPont, 1958 (trade name: Lycra™)",
-		imageUrl: "https://images.unsplash.com/photo-1542744094-24638eff58bb?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780602265/High-Quality-Bare-Spandex-Fibers-30d-Spandex-Yarn-Elastane-Fibers-for-Knitting-and-Weaving_uf5cow.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Spandex stretch lycra activewear fabric",
 		description:
 			"Can stretch 400–700% of its original length and return perfectly. Almost never used alone — blended at 2–25% with virtually any fiber to add stretch.",
@@ -889,7 +890,7 @@ export const FIBERS: Fiber[] = [
 		category: "synth",
 		tagLabel: "Synthetic · Acrylonitrile",
 		source: "Polyacrylonitrile — Commercial production since 1950s",
-		imageUrl: "https://images.unsplash.com/photo-1574710813-62b2db8a2ee6?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780602824/extra-05337244_g3scc7.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Colorful acrylic yarn knit texture",
 		description:
 			"Designed to mimic wool: warm, lightweight, and soft. Holds vivid colors extremely well. Resists moths, mildew, and shrinkage. Significantly cheaper than wool but prone to pilling.",
@@ -927,7 +928,7 @@ export const FIBERS: Fiber[] = [
 		category: "synth",
 		tagLabel: "Synthetic · Polypropylene Polymer",
 		source: "Thermoplastic polymer — Used in technical textiles since 1970s",
-		imageUrl: "https://images.unsplash.com/photo-1536494126589-caff6b0b7816?w=400&h=180&fit=crop&q=80",
+		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780601304/PP-Polypropylene-Staple-Fiber-Production-Line_z6cuz1.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Polypropylene technical performance fabric",
 		description:
 			"The only common textile fiber lighter than water. Does not absorb moisture at all — moisture migrates along the fiber surface. Ideal for base layers and outdoor performance gear.",
@@ -1059,31 +1060,43 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🫧",
 				label: "Washing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604530/1761432869403199-4126818_ogxz8v.png?w=200&h=180&fit=crop&q=80",
 				value: "Hand wash cold or machine delicate. Use wool-specific or pH-neutral detergent (e.g. Eucalan, Woolite).",
 			},
 			{
 				icon: "💨",
 				label: "Drying",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604552/14e6cfa72b214761038ee850a28a3c34_scplmh.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Lay flat to dry — never hang (causes stretching). Never tumble dry (causes irreversible felting).",
 			},
 			{
 				icon: "🔥",
 				label: "Ironing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604588/Garment-Hanger-Steamer-for-Clothes-Standing-Flat-Hanging-with-Ironing-Board-98_c34bbaa0-a61d-48c3-aca1-109a3b9e3e5d.bb82a78f97f227111421fa63a34bcbc5_kamxoa.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Cool iron with steam, or steam only. Press through a cloth. Never iron directly on cashmere.",
 			},
 			{
 				icon: "📦",
 				label: "Storage",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603545/Cedar-Protection-Prevents-Problems-768x431_a1wtjc.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Fold — never hang. Store in breathable cotton bag with cedar. Clean before storing to repel moths.",
 			},
 			{
 				icon: "⚡",
 				label: "Pilling",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604845/pilling-on-clothes_usjmkh.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Use a cashmere comb or fabric shaver gently. Pilling is normal — especially in friction areas.",
 			},
 			{
 				icon: "✨",
 				label: "Pro Tip",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607024/the-wardrobe-airing-routine-that-prevents-musty-smells-how-ventilation-reduces-trapped-moisture_fkdlks.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Cashmere and mohair don't need frequent washing. Air between wears — hang in a well-ventilated space overnight.",
 			},
 		],
@@ -1095,21 +1108,29 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🫧",
 				label: "Washing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604530/1761432869403199-4126818_ogxz8v.png?w=200&h=180&fit=crop&q=80",
 				value: "Hand wash in cold water with silk-specific detergent. Or dry clean. Never wring — gently squeeze out water.",
 			},
 			{
 				icon: "💨",
 				label: "Drying",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604725/Retractable-Clothesline-768x1097_t6nmzs.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Roll in a clean towel to absorb moisture, then hang in shade. Direct sunlight yellows and weakens silk.",
 			},
 			{
 				icon: "🔥",
 				label: "Ironing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603585/ironing_board_b_124x38cm_ssir_-_denim_grey_-_8710755236129_aqhifv.png?w=200&h=180&fit=crop&q=80",
 				value: "Iron slightly damp on the reverse side using a low/silk setting. Steam with care — water spots visible on some silks.",
 			},
 			{
 				icon: "🚫",
 				label: "Never",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607351/ghk-guide-to-laundry-symbols-never-bleach-1650379877_psp5hk.png?w=200&h=180&fit=crop&q=80",
 				value: "Never bleach. Never machine wash (unless label says so). Never use deodorant directly against silk — alcohol damages it.",
 			},
 		],
@@ -1121,21 +1142,29 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🫧",
 				label: "Washing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603581/how-to-use-a-front-loader-washing-machine-1708363815_iytko5.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Machine wash warm or cold. Cold preserves colors and reduces shrinkage. Linen becomes softer with each wash.",
 			},
 			{
 				icon: "💨",
 				label: "Drying",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603600/Clothes-on-Hangers-Hanging-on-Patio_egwwi2.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Tumble dry low or line dry. Remove promptly to reduce wrinkles. Linen wrinkles readily — embrace it or iron damp.",
 			},
 			{
 				icon: "🔥",
 				label: "Ironing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603585/ironing_board_b_124x38cm_ssir_-_denim_grey_-_8710755236129_aqhifv.png?w=200&h=180&fit=crop&q=80",
 				value: "Cotton and linen can take high heat. Iron damp for best results. Linen irons beautifully — press while slightly wet.",
 			},
 			{
 				icon: "⚠️",
 				label: "Shrinkage",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607076/E5_9B_BE_E7_89_878_kzfwrv.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Pre-wash before sewing. Cotton can shrink 5–10%. Buy slightly larger if garment is not pre-washed/preshrunk.",
 			},
 		],
@@ -1147,21 +1176,29 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🫧",
 				label: "Viscose / Rayon",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604530/1761432869403199-4126818_ogxz8v.png?w=200&h=180&fit=crop&q=80",
 				value: "Hand wash only in cool water, or dry clean. Never wring. Machine washing risks permanent distortion due to wet weakness.",
 			},
 			{
 				icon: "🫧",
 				label: "Modal & TENCEL™",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603581/how-to-use-a-front-loader-washing-machine-1708363815_iytko5.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Machine wash cold on gentle cycle. Much more stable wet. Lay flat or hang to dry. Avoid high heat tumble drying.",
 			},
 			{
 				icon: "🔥",
 				label: "Ironing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604588/Garment-Hanger-Steamer-for-Clothes-Standing-Flat-Hanging-with-Ironing-Board-98_c34bbaa0-a61d-48c3-aca1-109a3b9e3e5d.bb82a78f97f227111421fa63a34bcbc5_kamxoa.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Low-medium heat. Steam is effective. These fabrics wrinkle easily but respond well to gentle steaming.",
 			},
 			{
 				icon: "✨",
 				label: "Tip",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603581/how-to-use-a-front-loader-washing-machine-1708363815_iytko5.jpg?w=200&h=180&fit=crop&q=80",
 				value: "TENCEL™ and Modal are significantly more care-friendly than viscose. Worth the small price premium for ease of care.",
 			},
 		],
@@ -1173,31 +1210,43 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🫧",
 				label: "Washing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603581/how-to-use-a-front-loader-washing-machine-1708363815_iytko5.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Machine wash cold, gentle cycle. Most synthetics are very easy care — just avoid hot water, which can warp fibers.",
 			},
 			{
 				icon: "💨",
 				label: "Drying",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603600/Clothes-on-Hangers-Hanging-on-Patio_egwwi2.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Low heat or air dry. Never high heat — can permanently warp polyester. Nylon melts at high temperatures.",
 			},
 			{
 				icon: "🌊",
 				label: "Microplastics",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604518/7355b165-gp0stq2bx_medium_res_tavmf7.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Use a Guppyfriend wash bag to capture microfibers. Wash less frequently to reduce environmental impact.",
 			},
 			{
 				icon: "🚫",
 				label: "Spandex",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607351/ghk-guide-to-laundry-symbols-never-bleach-1650379877_psp5hk.png?w=200&h=180&fit=crop&q=80",
 				value: "Never bleach spandex blends — chlorine destroys elastane. Avoid fabric softener — it reduces stretch recovery.",
 			},
 			{
 				icon: "🔥",
 				label: "Ironing",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603585/ironing_board_b_124x38cm_ssir_-_denim_grey_-_8710755236129_aqhifv.png?w=200&h=180&fit=crop&q=80",
 				value: "Use low/synthetic setting. Always use a pressing cloth as synthetics can melt or develop shine.",
 			},
 			{
 				icon: "💡",
 				label: "Odor",
+				backgroundImageUrl:
+					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604594/White-vinegar-to-remove-bad-odors-on-the-couch_qu3agd.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Add white vinegar to the rinse cycle. Technical sportswear detergents (Nikwax, Sport Wash) help significantly.",
 			},
 		],

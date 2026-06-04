@@ -36,8 +36,7 @@ p.no-results {
   .items-overview {
     overflow: visible;
     height: auto;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.75);
+    padding: 0;
   }
 
   .items-grid {
