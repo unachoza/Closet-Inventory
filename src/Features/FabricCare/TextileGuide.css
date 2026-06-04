@@ -228,6 +228,11 @@ button:focus-visible .toc-link.active {
       padding: 72px 0 48px;
 }
 
+.section-header.journey {
+      display: flex;
+    align-items: center;
+}
+
 .section-eyebrow {
       display: flex;
       align-items: center;
