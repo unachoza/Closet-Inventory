@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { ClothingItem } from "../../utils/types";
-import usePagination from "../../hooks/usePagination";
-import Closet from "./Closet";
+import { ClothingItem } from "../../../utils/types";
+import usePagination from "../../../hooks/usePagination";
+import Closet from "./../Closet";
 
 const mockCloset: ClothingItem[] = [
 	{ id: "1", name: "black jeans", category: "bottoms" } as ClothingItem,
@@ -17,17 +17,17 @@ const mockGoToPage = vi.fn();
 const mockNextPage = vi.fn();
 const mockPrevPage = vi.fn();
 
-vi.mock("../../Components/ClothesCard/Card", () => ({
+vi.mock("../../../Components/ClothesCard/Card", () => ({
 	default: ({ item }: { item: ClothingItem }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 
-vi.mock("../../hooks/useLocalCloset", () => ({
+vi.mock("../../../hooks/useLocalCloset", () => ({
 	useLocalStorageCloset: () => ({
 		closet: mockCloset,
 	}),
 }));
 
-vi.mock("../../hooks/usePagination", () => ({
+vi.mock("../../../hooks/usePagination", () => ({
 	default: vi.fn(),
 }));
 

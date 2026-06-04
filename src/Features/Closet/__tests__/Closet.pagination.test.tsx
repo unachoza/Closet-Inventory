@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MY_CLOSET_DATA } from "../../utils/constants";
-import Closet from "./Closet";
+import { MY_CLOSET_DATA } from "../../../utils/constants";
+import Closet from "./../Closet";
 
 /**
  * Regression tests for the pagination "click Next/Previous → new items don't
@@ -17,11 +17,11 @@ import Closet from "./Closet";
  * hook are stubbed) and assert that the rendered card set actually CHANGES when
  * paging, which is the user-facing wiring the bug broke.
  */
-vi.mock("../../Components/ClothesCard/Card", () => ({
+vi.mock("../../../Components/ClothesCard/Card", () => ({
 	default: ({ item }: { item: any }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 
-vi.mock("../../hooks/useLocalCloset", () => ({
+vi.mock("../../../hooks/useLocalCloset", () => ({
 	useLocalStorageCloset: () => ({ closet: MY_CLOSET_DATA, removeItem: vi.fn() }),
 }));
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MY_CLOSET_DATA } from "../../utils/constants";
-import Closet from "./Closet";
+import { MY_CLOSET_DATA } from "../../../utils/constants";
+import Closet from "./../Closet";
 
 /**
  * Regression tests for the carousel "click category → blank screen" bug.
