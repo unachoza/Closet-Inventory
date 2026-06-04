@@ -1095,7 +1095,6 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "✨",
 				label: "Pro Tip",
-				//TODO FIX
 				backgroundImageUrl:
 					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607024/the-wardrobe-airing-routine-that-prevents-musty-smells-how-ventilation-reduces-trapped-moisture_fkdlks.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Cashmere and mohair don't need frequent washing. Air between wears — hang in a well-ventilated space overnight.",
@@ -1130,7 +1129,6 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🚫",
 				label: "Never",
-				//TODO FIX
 				backgroundImageUrl:
 					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607351/ghk-guide-to-laundry-symbols-never-bleach-1650379877_psp5hk.png?w=200&h=180&fit=crop&q=80",
 				value: "Never bleach. Never machine wash (unless label says so). Never use deodorant directly against silk — alcohol damages it.",
@@ -1165,7 +1163,6 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "⚠️",
 				label: "Shrinkage",
-				//TODO FIX
 				backgroundImageUrl:
 					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607076/E5_9B_BE_E7_89_878_kzfwrv.jpg?w=200&h=180&fit=crop&q=80",
 				value: "Pre-wash before sewing. Cotton can shrink 5–10%. Buy slightly larger if garment is not pre-washed/preshrunk.",
@@ -1179,7 +1176,6 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🫧",
 				label: "Viscose / Rayon",
-				//TODO FIX
 				backgroundImageUrl:
 					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780604530/1761432869403199-4126818_ogxz8v.png?w=200&h=180&fit=crop&q=80",
 				value: "Hand wash only in cool water, or dry clean. Never wring. Machine washing risks permanent distortion due to wet weakness.",
@@ -1201,7 +1197,6 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "✨",
 				label: "Tip",
-				//TODO FIX
 				backgroundImageUrl:
 					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780603581/how-to-use-a-front-loader-washing-machine-1708363815_iytko5.jpg?w=200&h=180&fit=crop&q=80",
 				value: "TENCEL™ and Modal are significantly more care-friendly than viscose. Worth the small price premium for ease of care.",
@@ -1236,7 +1231,6 @@ export const CARE_GROUPS: CareGroup[] = [
 			{
 				icon: "🚫",
 				label: "Spandex",
-				//TODO FIX
 				backgroundImageUrl:
 					"https://res.cloudinary.com/dh41vh9dx/image/upload/v1780607351/ghk-guide-to-laundry-symbols-never-bleach-1650379877_psp5hk.png?w=200&h=180&fit=crop&q=80",
 				value: "Never bleach spandex blends — chlorine destroys elastane. Avoid fabric softener — it reduces stretch recovery.",
