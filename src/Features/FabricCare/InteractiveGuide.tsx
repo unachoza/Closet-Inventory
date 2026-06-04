@@ -133,7 +133,6 @@ const TextileGuildInteractive = () => {
 
 					<div className="fiber-grid">
 						{animalFibers.map((f) => {
-							console.log({ f });
 							return <FiberCard key={f.id} fiber={f} onClick={() => setSelectedFiber(f)} />;
 						})}
 					</div>
