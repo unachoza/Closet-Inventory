@@ -138,7 +138,7 @@ body {
 
 .toc-inner {
       display: flex;
-      /* max-width: 960px; */
+      justify-content: space-evenly;
       margin: 0 auto;
       padding: 0 48px;
       gap: 0;
@@ -156,7 +156,6 @@ button.toc-link{
       background-color: transparent;
       border-bottom: solid 3px;
       border-bottom-color: var(--gold) solid 3px;
-      /* background-color: none; */
 }
 
 button.toc-link:hover{
@@ -168,7 +167,7 @@ button.toc-link:hover{
 .toc-link {
       display: flex;
       align-items: center;
-      padding: 14px 20px;
+      padding: 16px 20px;
       color: var(--ink-60);
       font-size: 13px;
       font-weight: 500;
@@ -600,6 +599,7 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
 }
 .weave-tabs {
       display: flex;
+      justify-content: space-around;
       border-bottom: 1px solid var(--border);
       gap: 4px;
       margin-bottom: 32px;
