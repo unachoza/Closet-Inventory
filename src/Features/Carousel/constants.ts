@@ -1,5 +1,5 @@
 // Carousel categories
-const categories = [
+export const categories = [
 	{ label: "Tops", icon: "👕" },
 	{ label: "Bottoms", icon: "👖" },
 	{ label: "Dresses", icon: "👗" },

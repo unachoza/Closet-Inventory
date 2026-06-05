@@ -15,7 +15,7 @@ const TextileGuildInteractive = () => {
 	const [activeWeave, setActiveWeave] = useState<string>("plain");
 	const [activeNavId, setActiveNavId] = useState<string>("natural");
 
-	const { view, setView } = useView();
+	const { setView } = useView();
 
 	// Section headings for IntersectionObserver nav highlight
 	const sectionIds = ["natural", "semi", "synthetic", "weaves", "compare", "flowchart", "care", "sources"];
