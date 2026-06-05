@@ -167,6 +167,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Smart date/age display (< 20 months → "X months", ≥ 20 → "Y years")
 - ✅ Toast notification system
 - ✅ localStorage persistence
+- 🔲 Export Closet / Download CSV Button
 - 🔲 Visual cohesion polish (spacing, color, typography consistency)
 - 🔲 "View more" expand/collapse on item cards
 
@@ -226,6 +227,31 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ---
 
+### v2.1 — Camera Roll Import
+
+- 🔲 "Import from Camera Roll" button — native `<input type="file" accept="image/*">` opens iOS/Android photo library (no native app required)
+- 🔲 "Take Photo" button — `capture="environment"` opens camera directly
+- 🔲 AI clothing detection via Vision API (GPT-4o) — send image, receive structured metadata (category, color, approximate brand)
+- 🔲 Pre-fill item form from detected metadata; user reviews before saving
+
+> **No Swift or Xcode required.** The browser's native file input triggers the same photo picker as native apps on iOS and Android. Works as a PWA installed to the home screen.
+
+---
+
+### v3.0 — Onboarding & Personalization
+
+- 🔲 First-launch onboarding (choose closet background, accent color)
+- 🔲 CSS custom property injection at runtime
+- 🔲 Onboarding completion flag in localStorage
+
+---
+
+### v3.1 — Onboarding Tour
+
+- 🔲 Step-by-step feature walkthrough with anchored tooltips
+- 🔲 Tour state machine with `tourCompleted` flag in localStorage
+
+---
 ### v4.0 — Backend & Database
 
 - ✅ Firestore NoSQL database with per-user closet collection
@@ -314,28 +340,5 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - 🔲 Feature gates in app read `isPremium` from Firestore before unlocking Gmail import / sync
 - 🔲 Free item limit enforced in `useCloudCloset` / `useLocalCloset`
 
----
 
-### v3.0 — Onboarding & Personalization
 
-- 🔲 First-launch onboarding (choose closet background, accent color)
-- 🔲 CSS custom property injection at runtime
-- 🔲 Onboarding completion flag in localStorage
-
----
-
-### v3.1 — Onboarding Tour
-
-- 🔲 Step-by-step feature walkthrough with anchored tooltips
-- 🔲 Tour state machine with `tourCompleted` flag in localStorage
-
----
-
-### v2.1 — Camera Roll Import
-
-- 🔲 "Import from Camera Roll" button — native `<input type="file" accept="image/*">` opens iOS/Android photo library (no native app required)
-- 🔲 "Take Photo" button — `capture="environment"` opens camera directly
-- 🔲 AI clothing detection via Vision API (GPT-4o) — send image, receive structured metadata (category, color, approximate brand)
-- 🔲 Pre-fill item form from detected metadata; user reviews before saving
-
-> **No Swift or Xcode required.** The browser's native file input triggers the same photo picker as native apps on iOS and Android. Works as a PWA installed to the home screen.

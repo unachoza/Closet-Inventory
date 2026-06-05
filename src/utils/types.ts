@@ -6,7 +6,6 @@ export interface MaterialBlend {
 }
 
 export type ClothingItem = {
-	//TODO: change back id to string or number?
 	id: string;
 	imageURL: string;
 	name: string;
