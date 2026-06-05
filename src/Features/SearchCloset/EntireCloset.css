@@ -222,7 +222,6 @@
 .filter-side-panel {
 	position: fixed;
 	top: 0;
-	bottom: 0;
 	left: 0;
 	z-index: 201;
 	display: flex;
@@ -235,10 +234,15 @@
 	transform: translateX(-100%);
 	backdrop-filter: var(--blur, blur(12px));
 	border-right: 1px solid rgba(255, 255, 255, 0.12);
-	/* Reserve space for the home indicator at the bottom */
-	padding-bottom: env(safe-area-inset-bottom);
-	/* Push content below the notch/Dynamic Island on iOS */
+	/* dvh tracks the actual visible viewport as Safari chrome shows/hides.
+	   Falls back to 100vh on browsers that don't support dvh yet. */
+	height: 100vh;
+	height: 100dvh;
+	/* Push content below the notch / Dynamic Island */
 	padding-top: env(safe-area-inset-top);
+	/* Keep footer above the home indicator — does NOT account for Safari
+	   browser chrome, which dvh handles instead */
+	padding-bottom: env(safe-area-inset-bottom);
 }
 
 .filter-side-panel--open {
@@ -471,15 +475,11 @@
 	grid-template-columns: repeat(2, 1fr);
 }
 
-@media (max-width: 398px) {
-	.filter-side-panel__footer {
-		margin-bottom: 5rem;
-	}
-}
-
+/* Mobile — panel takes full width, footer stays pinned via flex layout */
 @media (max-width: 480px) {
-	.filter-side-panel__footer {
-		margin-bottom: 11rem;
+	.filter-side-panel {
+		width: 100vw;
+		max-width: 100vw;
 	}
 }
 
