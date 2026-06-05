@@ -398,9 +398,11 @@ Maya shops frequently (online and in-store), follows trends on TikTok and Pinter
 **Business Logic / Functionality**
 
 - ✅ Gmail API OAuth + email thread parsing
+- ✅ Firebasse API OAuth 
 - Hotmail OAuth integration (Microsoft identity platform)
 - Retailer-specific email parsers for: Amazon, Shein, Temu (note: Temu embeds product data in images — OCR required or skip image, add in edit mode)
 - ✅ Structured item extraction: name, price, brand, category from email HTML
+- Gleans purchase date from email confirmation to calculate items age
 - ✅ Deduplication check — skip import if item UUID already exists in localStorage
 
 ---
@@ -409,7 +411,8 @@ Maya shops frequently (online and in-store), follows trends on TikTok and Pinter
 
 **UI**
 
-- Responsive layout adapted for iPhone and Android screen sizes
+-  ✅ Responsive layout adapted for iPhone and Android screen sizes 
+- Refined mobile layout, polish and fix cross browser quierks
 - Touch-friendly tap targets (min 44×44px), swipe gestures on cards
 - Bottom navigation bar on mobile (replaces sidebar nav)
 
@@ -473,12 +476,12 @@ Maya shops frequently (online and in-store), follows trends on TikTok and Pinter
 
 **UI**
 
-- Account creation / login screen (email + password, or Google OAuth)
 - "Sync" status indicator in nav (synced, syncing, offline)
 - Option to keep closet local-only (no account required)
 
 **Business Logic / Functionality**
 
+- ✅ NoSQL database with Firestore
 - REST API or tRPC backend — CRUD endpoints for closet items
 - Database: PostgreSQL (items, users, outfits, packing lists)
 - Offline-first: localStorage as cache layer, sync on reconnect
