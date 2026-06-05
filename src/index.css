@@ -112,15 +112,23 @@ h1 {
 }
 
 button {
+	/* Disable native iOS Safari button chrome so background-color/color apply.
+	   Without this, iOS renders a white pill with blue text and ignores the
+	   author background — Chrome (incl. its mobile emulator) does not. */
+	-webkit-appearance: none;
+	appearance: none;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	width: calc-size(fit-content, size * 1.05);
+	/* `calc-size()` is Chrome-only/experimental and invalid in Safari, which
+	   drops the whole declaration. `fit-content` is the cross-browser equivalent. */
+	width: fit-content;
 	margin: var(--spacing-100);
 	padding: 0.6em 1.2em;
 	border: var(--border-black-sm);
 	border-radius: var(--border-radius-sm);
 	background-color: var(--Soft-Black);
+	color: var(--White);
 	font-family: inherit;
 	font-size: 1em;
 	font-weight: 500;
@@ -163,7 +171,6 @@ button:focus-visible {
 	a:hover {
 		color: #747bff;
 	}
-	button {
-		background-color: #f9f9f9;
-	}
+	/* Buttons keep the app's dark theme in light mode too — the default
+	   global `button` rule (dark bg + white text) applies in both schemes. */
 }
