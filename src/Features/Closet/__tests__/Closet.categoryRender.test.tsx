@@ -16,8 +16,13 @@ vi.mock("../../Components/ClothesCard/Card", () => ({
 	default: ({ item }: { item: any }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 
-vi.mock("../../hooks/useLocalCloset", () => ({
+vi.mock("../../../hooks/useLocalCloset", () => ({
 	useLocalStorageCloset: () => ({ closet: MY_CLOSET_DATA, removeItem: vi.fn() }),
+}));
+
+vi.mock("../../../context/ClosetContext", () => ({
+	useLocalStorageCloset: () => ({ closet: MY_CLOSET_DATA, removeItem: vi.fn() }),
+	useCloset: () => ({ closet: MY_CLOSET_DATA, removeItem: vi.fn() }),
 }));
 
 // Labels exactly as the Carousel passes them via setCategory(item.label)
