@@ -2,7 +2,7 @@ import * as RadixToast from "@radix-ui/react-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import { ComponentRef, ReactNode, createContext, forwardRef, useContext, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
-import "./toast.css";
+import "./Toast.css";
 
 const ToastContext = createContext<{ showToast: (text: string) => void }>({
 	showToast: () => {
