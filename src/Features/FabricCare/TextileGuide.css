@@ -521,15 +521,16 @@ button:focus-visible .toc-link.active {
       align-items: flex-start;
       padding: 32px 36px 24px;
       border-bottom: 1px solid var(--border);
+      text-align: left;
 }
 
 .detail-close {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--border);
+         width: 30px;
+    height: 38px;
+    border: 1px solid rgb(28 26 23 / 24%);
       border-radius: 50%;
       background: none;
       color: var(--ink-60);
@@ -543,7 +544,7 @@ button:focus-visible .toc-link.active {
 
 .detail-body { padding: 32px 36px; }
 
-.detail-section { margin-bottom: 28px; }
+.detail-section { margin-bottom: 28px; text-align: left; }
 
 .detail-section h4 {
       color: var(--ink-60);
@@ -559,6 +560,7 @@ button:focus-visible .toc-link.active {
       color: var(--ink-60);
       font-size: 15px;
       line-height: 1.7;
+      text-align: left;
 }
 
 .detail-section ul {
@@ -566,6 +568,7 @@ button:focus-visible .toc-link.active {
       flex-direction: column;
       gap: 6px;
       list-style: none;
+      text-align: left;
 }
 
 .detail-section li {
