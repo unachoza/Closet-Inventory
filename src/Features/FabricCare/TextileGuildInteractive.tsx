@@ -3,7 +3,7 @@ import "./TextileGuide.css";
 import { FIBERS, WEAVE_TYPES, CARE_GROUPS, SOURCES, Fiber } from "../../Content/Fabric&Fiber";
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
 import WeaveDiagram from "../../Components/GuideComponents/WeaveDiagram";
-import FiberFlowchart from "../../Components/GuideComponents/FiberFlowchart";
+import FiberFlowchart from "../../Components/GuideComponents/FiberFlowChart";
 import DetailModal from "../../Components/GuideComponents/Modal";
 import React from "react";
 
