@@ -1,6 +1,5 @@
 import * as RadixToast from "@radix-ui/react-toast";
-import { AnimatePresence, motion } from "framer-motion";
-import { ComponentRef, ReactNode, createContext, forwardRef, useContext, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import "./Toast.css";
 
@@ -20,65 +19,35 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 	function showToast(text: string) {
 		setMessages((toasts) => [
 			...toasts,
-			{
-				id: window.crypto.randomUUID(),
-				text,
-			},
+			{ id: window.crypto.randomUUID(), text },
 		]);
 	}
 
+	function removeToast(id: string) {
+		setMessages((toasts) => toasts.filter((t) => t.id !== id));
+	}
+
 	return (
-		<RadixToast.Provider>
+		<RadixToast.Provider duration={4000}>
 			<ToastContext.Provider value={{ showToast }}>{children}</ToastContext.Provider>
 
-			<AnimatePresence mode="popLayout">
-				{messages.map((toast) => (
-					<Toast
-						key={toast.id}
-						text={toast.text}
-						onClose={() => setMessages((toasts) => toasts.filter((t) => t.id !== toast.id))}
-					/>
-				))}
-			</AnimatePresence>
+			{messages.map((toast) => (
+				<RadixToast.Root
+					key={toast.id}
+					open={true}
+					onOpenChange={(open) => { if (!open) removeToast(toast.id); }}
+					className="toast-root"
+				>
+					<div className="toast-item">
+						<RadixToast.Description className="toast-text">{toast.text}</RadixToast.Description>
+						<RadixToast.Close className="toast-close" aria-label="Dismiss">
+							<XMarkIcon className="x" />
+						</RadixToast.Close>
+					</div>
+				</RadixToast.Root>
+			))}
 
 			<RadixToast.Viewport className="toast-viewport" />
 		</RadixToast.Provider>
 	);
 }
-
-const Toast = forwardRef<ComponentRef<typeof RadixToast.Root>, { onClose: () => void; text: string }>(function Toast(
-	{ onClose, text },
-	forwardedRef,
-) {
-	const width = 320;
-	const margin = 16;
-
-	return (
-		<RadixToast.Root ref={forwardedRef} asChild forceMount onOpenChange={onClose} duration={9500}>
-			<motion.li
-				layout
-				initial={{ x: width + margin }}
-				animate={{ x: 50 }}
-				exit={{
-					opacity: 0,
-					zIndex: -1,
-					transition: { opacity: { duration: 0.2 } },
-				}}
-				transition={{
-					type: "spring",
-					mass: 1,
-					damping: 30,
-					stiffness: 200,
-				}}
-				style={{ width, WebkitTapHighlightColor: "transparent" }}
-			>
-				<div className="toast-item">
-					<RadixToast.Description className="toast-text">{text}</RadixToast.Description>
-					<RadixToast.Close className="toast-close">
-						<XMarkIcon className="x" />
-					</RadixToast.Close>
-				</div>
-			</motion.li>
-		</RadixToast.Root>
-	);
-});

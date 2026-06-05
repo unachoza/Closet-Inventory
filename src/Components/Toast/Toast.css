@@ -2,7 +2,7 @@
 .toast-viewport {
       position: fixed;
       right: 0;
-      bottom: 1;
+      bottom: 1rem;
       z-index: 2147483647;
       display: flex;
       flex-direction: column;
@@ -66,8 +66,12 @@
       height: 1rem;
 }
 
-.ToastRoot[data-state="open"] {
+.toast-root[data-state="open"] {
       animation: slideIn 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-root[data-state="closed"] {
+      animation: slideOut 100ms ease-in forwards;
 }
 
 @keyframes slideIn {
@@ -75,6 +79,11 @@
             transform: translateX(calc(100% + var(--viewport-padding)));
       }
       to {
-            transform: translateX(30);
+            transform: translateX(0);
       }
+}
+
+@keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to   { transform: translateX(calc(100% + var(--viewport-padding))); opacity: 0; }
 }
