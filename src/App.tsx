@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+import { AuthProvider } from "./context/AuthContext";
+import { ClosetProvider } from "./context/ClosetContext";
 import { EditProvider } from "./Features/Form/EditContext";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
@@ -169,11 +171,15 @@ function AppShell() {
 
 function App() {
 	return (
-		<ViewProvider initialView="carousel">
-			<SearchProvider>
-				<AppShell />
-			</SearchProvider>
-		</ViewProvider>
+		<AuthProvider>
+			<ClosetProvider>
+				<ViewProvider initialView="carousel">
+					<SearchProvider>
+						<AppShell />
+					</SearchProvider>
+				</ViewProvider>
+			</ClosetProvider>
+		</AuthProvider>
 	);
 }
 

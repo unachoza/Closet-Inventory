@@ -1,3 +1,10 @@
+/**
+ * useLocalStorageCloset is the localStorage-only implementation.
+ * Components import it by name — the export at the bottom re-exports
+ * useCloudCloset under that same name so cloud sync is transparent.
+ * Import useLocalStorageClosetBase if you specifically need the raw local
+ * version (e.g. useCloudCloset itself).
+ */
 import { useMemo } from "react";
 import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData } from "../utils/types";
@@ -8,7 +15,7 @@ import useStockPhoto from "./useStockPhoto";
 const STORAGE_KEY = "my_closet_key";
 // const STORAGE_KEY = "my_closet_key_v2";
 
-export function useLocalStorageCloset() {
+export function useLocalStorageClosetBase() {
 	const [closet, setCloset] = useLocalStorage<ClothingItem[]>(STORAGE_KEY, MY_CLOSET_DATA);
 
 	// Transparently migrate legacy string material fields to MaterialBlend[]
@@ -84,3 +91,7 @@ export function useLocalStorageCloset() {
 
 	return { closet: normalizedCloset, addItem, addFullItem, removeItem, updateItem, getCloset, clearCloset };
 }
+
+// Alias so existing imports keep working — resolved via ClosetContext which
+// holds a single shared instance (avoids multiple Firestore connections).
+export { useLocalStorageCloset } from "../context/ClosetContext";
