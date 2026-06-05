@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon, Route } from "lucide-react";
+import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon, Route, LogIn } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
@@ -50,6 +50,9 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("gmail")}>
 				<Download size={16} /> Import Gmail
+			</button>
+			<button className="action-btn secondary" onClick={() => goTo("login")}>
+				<LogIn size={16} /> Sign In
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide

@@ -10,6 +10,7 @@ import MultiStepForm from "./Features/Form/Form";
 import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
+import EmailAuth from "./Features/GmailImport/EmailAuth";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
 import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
@@ -131,6 +132,7 @@ function AppShell() {
 									onSourceEmailChange={handleSourceEmailChange}
 								/>
 							)}
+							{view === "login" && <EmailAuth />}
 							{view === "fabric" && <InteractiveGuide />}
 							{view === "journey" && <JourneyC />}
 							{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
