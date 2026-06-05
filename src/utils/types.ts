@@ -31,17 +31,17 @@ export interface ItemFormData {
 	color: string; // single color
 	size: string; // single size
 	brand: string;
-	material: MaterialBlend[];
+	material: MaterialBlend[] | string;
 	occasion: string;
 	age: string;
 	purchaseDate?: string;
 	care: string | string[];
-	image: string;
+	image?: string;
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
 
-export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" |  "journey"| "entireCloset"
+export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "journey" | "entireCloset";
 
 export interface Option {
 	value: string;

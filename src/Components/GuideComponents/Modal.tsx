@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Fiber } from "../../utils/Content/Fabric&Fiber";
+import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
 
 function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => void }) {

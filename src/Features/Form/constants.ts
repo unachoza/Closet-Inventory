@@ -1,12 +1,12 @@
 // For coloring checkboxes
-const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green"];
-const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
+export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green"];
+export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
 
 interface Option {
 	value: string;
 	label: string;
 }
-const options: Option[] = [
+export const options: Option[] = [
 	{ value: "tops", label: "Tops" },
 	{ value: "bottoms", label: "Bottoms" },
 	{ value: "dresses", label: "Dresses" },
@@ -18,7 +18,7 @@ const options: Option[] = [
 ];
 
 //Fibers
-const materials = {
+export const materials = {
 	natural: ["wool", "linen", "cotton", "silk", "hemp", "cashmere", "bamboo", "ramie", "leather", "suede"], 
 	semiSynthetic: ["rayon", "viscos", "modal", "lyocell","tencel"],
 	//viscos and rayon when wet weaken

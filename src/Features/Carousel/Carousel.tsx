@@ -9,7 +9,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 
 	// Move the carousel forward by removing the leftmost item and adding the next item on the right
 	const handleNext = () => {
-		setVisibleIndices(([a, b, c]) => {
+		setVisibleIndices(([, b, c]) => {
 			const nextIndex = (c + 1) % carouselCategories.length; // next item after c
 			return [b, c, nextIndex]; // shift left; add new item on the right
 		});
@@ -17,7 +17,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 
 	// Move the carousel backward by removing the rightmost item and adding a new item on the left
 	const handlePrev = () => {
-		setVisibleIndices(([a, b, c]) => {
+		setVisibleIndices(([a, b]) => {
 			const prevIndex = (a - 1 + carouselCategories.length) % carouselCategories.length; // item before a
 			return [prevIndex, a, b]; // shift right; prepend the new item
 		});

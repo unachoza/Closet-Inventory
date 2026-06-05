@@ -1,6 +1,3 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import DropDownSelect from './DropDownSelect.tsx';
-
 describe("The DropDownSelect Component", () => {
     it("should have a label and options", () => {
 

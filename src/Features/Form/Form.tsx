@@ -1,4 +1,4 @@
-import { useState, FormEvent, Dispatch, SetStateAction, ChangeEvent, MouseEvent } from "react";
+import { useState, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
 import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
@@ -11,13 +11,13 @@ import {
 	categoryOptions,
 	clothesAgesOptions,
 	formItem,
-	materialExamples,
 	brandExamples,
 	careExamples,
 	occasionExamples,
 } from "../../utils/constants";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { useLocalStorage } from "../../hooks/uselocalStorage";
+import { normalizeMaterial } from "../../utils/materialUtils";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
@@ -32,7 +32,6 @@ export interface FormProps {
 	initialData?: Partial<ItemFormData>;
 }
 
-const MATERIAL_OPTIONS_KEY = "my_material_key";
 const BRAND_OPTIONS_KEY = "my_brands_key";
 const CARE_OPTIONS_KEY = "my_care_key";
 
@@ -43,7 +42,6 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 		...initialData,
 	});
 
-	const [materialoptions, setMaterialOptions] = useLocalStorage(MATERIAL_OPTIONS_KEY, materialExamples);
 	const [brandOptions, setBrandOptions] = useLocalStorage(BRAND_OPTIONS_KEY, brandExamples);
 	const [careOptions, setCareOptions] = useLocalStorage(CARE_OPTIONS_KEY, careExamples);
 
@@ -52,10 +50,6 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 
 	const toggleValue = (value: string, label: string) => {
 		setFormData((prev) => ({ ...prev, [label]: value }));
-	};
-
-	const handleInputChange = (e: ChangeEvent<HTMLInputElement>, label: string) => {
-		setFormData((previousValues) => ({ ...previousValues, [label]: e.target.value }));
 	};
 
 	const handleDateSelect = (date: Date) => {
@@ -157,7 +151,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 						<label className="step-label">Material Composition</label>
 						<p className="step-hint">Add each fiber and its percentage. Total must equal 100%.</p>
 						<MaterialBlendInput
-							value={formData.material}
+							value={normalizeMaterial(formData.material)}
 							onChange={(blend: MaterialBlend[]) =>
 								setFormData((prev) => ({ ...prev, material: blend }))
 							}

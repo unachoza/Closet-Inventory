@@ -3,7 +3,6 @@ import {
 	parseProductsFromEmail,
 	detectImageBasedRetailer,
 	extractBrandFromSender,
-	type ExtractedProduct,
 } from "../parseProductsFromEmail";
 
 // ---------------------------------------------------------------------------

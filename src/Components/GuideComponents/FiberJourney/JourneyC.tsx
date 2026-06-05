@@ -53,7 +53,7 @@ const JourneyC = () => {
 							type="button"
 							className="jc-legend-item"
 							onClick={() => scrollToPhase(phase.number)}
-							aria-label={`Scroll to phase ${phase.number + 1}: ${phase.name}`}
+							aria-label={`Scroll to phase ${phase.number}: ${phase.name}`}
 						>
 							<span className="jc-legend-dot" style={{ background: DARK_ACCENTS[phase.id] }} />
 							{phase.name}
@@ -65,23 +65,12 @@ const JourneyC = () => {
 			<main className="jc-main">
 				<div className="jc-container">
 					{PHASES.map((phase, pi) => {
-						<button
-							key={phase.id}
-							type="button"
-							className="jc-legend-item"
-							onClick={() => scrollToPhase(phase.number)}
-							aria-label={`Scroll to phase ${phase.number + 1}: ${phase.name}`}
-						>
-							<span className="jc-legend-dot" style={{ background: DARK_ACCENTS[phase.id] }} />
-							{phase.name}
-						</button>;
 						const accent = DARK_ACCENTS[phase.id] ?? phase.accentColor;
 						const previews = STEP_PREVIEWS[phase.id] ?? [];
 
 						return (
-							<div>
+							<div key={phase.id}>
 								<div
-									key={phase.id}
 									ref={(el) => {
 										phaseRefs.current[pi] = el;
 									}}
@@ -164,7 +153,7 @@ const JourneyC = () => {
 							onKeyDown={(e) => {
 								if (e.key === "Enter" || e.key === " ") {
 									e.preventDefault();
-									scrollToPhase(pi);
+									scrollToPhase(pi + 1);
 								}
 							}}
 							aria-label={`Scroll to phase ${pi + 1}: ${phase.name}`}

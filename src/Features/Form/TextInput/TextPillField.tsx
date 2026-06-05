@@ -12,17 +12,7 @@ interface TextPillFieldProps extends Omit<InputProps, "value"> {
 	label: keyof ItemFormData;
 }
 
-const TextPillField = ({
-	label,
-	name,
-	className,
-	placeholder,
-	handleFormUpdate,
-	pillArray,
-	onPillsChange,
-	formData,
-	multiSelect = false,
-}: TextPillFieldProps) => {
+const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData }: TextPillFieldProps) => {
 	const [pills, setPills] = useState<string[]>(pillArray);
 	const [inputValue, setInputValue] = useState<string>("");
 

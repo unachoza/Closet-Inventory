@@ -1,6 +1,6 @@
 import {CategoryType} from "../utils/types"
 
-type StockPhotoMapType = Record<CategoryType, string>
+type StockPhotoMapType = Record<Exclude<CategoryType, null>, string>
 
 const stockPhotoMap : StockPhotoMapType = {
 	tops: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.45.56_AM_ef6k5l.png",
@@ -16,7 +16,8 @@ const stockPhotoMap : StockPhotoMapType = {
 };
 
 const useStockPhoto = (category: CategoryType): string => {
-	return stockPhotoMap[category] ;
+	if (!category) return "";
+	return stockPhotoMap[category];
 };
 
 export default useStockPhoto;

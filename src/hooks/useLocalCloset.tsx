@@ -48,11 +48,8 @@ export function useLocalStorageCloset() {
 		});
 	};
 
-	const getItem = (id: string): ClothingItem | undefined => {
-		return closet.find((item) => item.id === id);
-	};
 
-	const updateItem = (id: string, updatedData: Partial<ItemFormData>) => {
+	const updateItem = (id: string, updatedData: Partial<ClothingItem>) => {
 		setCloset((prev: ClothingItem[]) => {
 			const updated = prev.map((item) => {
 				if (item.id === id) {

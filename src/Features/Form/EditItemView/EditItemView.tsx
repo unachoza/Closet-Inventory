@@ -57,9 +57,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
 	const { id, imageURL, onSale, notes, material: _material, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
-	const { updateItem, addItem, addFullItem } = useLocalStorageCloset();
+	const { updateItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
-
 	// Parent renders <EditItemView key={item.id} ...> so React remounts the
 	// component for each new item, reinitializing useState with fresh data.
 	// No useEffect needed — key-based remount is the React-idiomatic approach.
@@ -226,15 +225,10 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					{/* Material blend — rendered separately from generic fields */}
 					<div className="edit-form-material">
 						<label className="edit-form-material__label">Material Composition</label>
-						<MaterialCompositionBar
-							blend={normalizeMaterial(formData.material)}
-							showLegend={true}
-						/>
+						<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
 						<MaterialBlendInput
 							value={normalizeMaterial(formData.material)}
-							onChange={(blend: MaterialBlend[]) =>
-								setFormData((prev) => ({ ...prev, material: blend }))
-							}
+							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
 						/>
 					</div>
 

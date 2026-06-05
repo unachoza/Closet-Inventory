@@ -1,6 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { describe, it, expect, beforeEach, Mock } from "vitest";
+import { render } from "@testing-library/react";
+import { describe, it, beforeEach, Mock } from "vitest";
 import TextInput from "./TextInput.tsx";
 import { InputProps } from "../../../utils/types";
 

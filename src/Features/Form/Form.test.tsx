@@ -1,6 +1,3 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import Form from "./Form.tsx";
-
 describe("Form Component", () => {
 	it("should have a multistep form with 8 steps", () => {});
   it("should have back and next buttons at bottom of form for navigation", () => {})
