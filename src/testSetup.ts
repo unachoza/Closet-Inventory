@@ -6,3 +6,18 @@ global.ResizeObserver = class ResizeObserver {
   unobserve() {}
   disconnect() {}
 }
+
+// Polyfill matchMedia for jsdom (used for responsive breakpoint detection)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  }),
+})

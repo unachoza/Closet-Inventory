@@ -2,15 +2,29 @@
 .card-details {
 	background: linear-gradient(180deg, #78acbf 0%, #678385 100%);
 	border-radius: 12px;
-	padding: 20px;
 	width: 100%;
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
 	box-sizing: border-box;
 	font-family: Inter, system-ui, sans-serif;
+	overflow: hidden;
+}
+
+/* Scrollable content area */
+.card-details__scrollable {
+	flex: 1;
 	overflow-y: auto;
+	padding: 20px 20px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+/* Footer — toggle button always pinned at bottom */
+.card-details__footer {
+	flex-shrink: 0;
+	padding: 0 20px 16px;
 }
 
 /* Header: name + category badge */
@@ -22,6 +36,34 @@
 
 .card-details__header-text {
 	flex: 1;
+}
+
+.card-details__header-right {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	flex-shrink: 0;
+}
+
+.card-details__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	background: rgba(255, 255, 255, 0.15);
+	color: white;
+	font-size: 11px;
+	cursor: pointer;
+	line-height: 1;
+	padding: 0;
+	transition: background 0.15s ease;
+}
+
+.card-details__close:hover {
+	background: rgba(255, 255, 255, 0.25);
 }
 
 .card-details__name {
@@ -233,11 +275,6 @@
 	line-height: 1.65;
 	margin: 0;
 	font-style: italic;
-}
-
-/* Spacer to push buttons down */
-.card-details__spacer {
-	flex: 1;
 }
 
 /* Buttons section */
