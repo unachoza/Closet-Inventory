@@ -1137,3 +1137,404 @@ describe("parseProductsFromEmail > Strategy: bold-paragraph layout (Banana Repub
 		expect(products[0].itemNumber).toBe("5060670120001");
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Strategy: Poshmark 3-cell row (td.item image | nested name table | td.price)
+// ---------------------------------------------------------------------------
+
+describe("parseProductsFromEmail > Poshmark: 3-cell row with td.item / td.price", () => {
+	// Two Poshmark listings in one email
+	const poshmarkHtml = html(`
+		<table>
+			<tr style="font-family:Helvetica;font-size:12px;color:#000;font-weight:normal;">
+				<td>
+					<table cellpadding="5" cellspacing="0" style="display:inline-block;">
+						<tbody>
+							<tr>
+								<td class="item" width="75">
+									<img height="75" src="https://di2ponv0v5otw.cloudfront.net/posts/2026/05/29/m_dress.jpg" width="75">
+								</td>
+								<td>
+									<table width="360">
+										<tbody>
+											<tr><td>Aritzia Teal Long-Sleeve Square Neck Bodycon Dress</td></tr>
+											<tr><td>Size: M</td></tr>
+											<tr><td><span class="price" style="overflow:hidden; float:left; display:none; line-height:0px;">Price: $24.00</span></td></tr>
+										</tbody>
+									</table>
+								</td>
+								<td class="price" style="width:90px;text-align:right;" width="90">$24.00</td>
+							</tr>
+							<tr><td colspan="3"><hr style="border:0;background:#000;height:1px;"></td></tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr style="font-family:Helvetica;font-size:12px;color:#000;font-weight:normal;">
+				<td>
+					<table cellpadding="5" cellspacing="0" style="display:inline-block;">
+						<tbody>
+							<tr>
+								<td class="item" width="75">
+									<img height="75" src="https://di2ponv0v5otw.cloudfront.net/posts/2026/05/05/m_mini.jpg" width="75">
+								</td>
+								<td>
+									<table width="360">
+										<tbody>
+											<tr><td>Aritzia Contour Squareneck Longsleeve Mini Dress in burgundy size M</td></tr>
+											<tr><td>Size: M</td></tr>
+											<tr><td><span class="price" style="overflow:hidden; float:left; display:none; line-height:0px;">Price: $23.00</span></td></tr>
+										</tbody>
+									</table>
+								</td>
+								<td class="price" style="width:90px;text-align:right;" width="90">$23.00</td>
+							</tr>
+							<tr><td colspan="3"><hr style="border:0;background:#000;height:1px;"></td></tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	`);
+
+	it("detects both Poshmark listings", () => {
+		expect(parseProductsFromEmail(poshmarkHtml)).toHaveLength(2);
+	});
+
+	it("extracts imageUrl from the td.item cell", () => {
+		const products = parseProductsFromEmail(poshmarkHtml);
+		expect(products[0].imageUrl).toContain("cloudfront.net");
+	});
+
+	it("extracts price from the td.price cell, not from the hidden span", () => {
+		const products = parseProductsFromEmail(poshmarkHtml);
+		expect(products[0].price).toBe("$24.00");
+		expect(products[1].price).toBe("$23.00");
+	});
+
+	it("extracts size from the Size: row in the nested table", () => {
+		const products = parseProductsFromEmail(poshmarkHtml);
+		expect(products[0].size).toBe("M");
+		expect(products[1].size).toBe("M");
+	});
+
+	it("preserves full product name including brand prefix", () => {
+		const products = parseProductsFromEmail(poshmarkHtml);
+		expect(products[0].name).toBe("Aritzia Teal Long-Sleeve Square Neck Bodycon Dress");
+	});
+
+	it("strips inline 'in COLOR size SIZE' suffix and sets color/size", () => {
+		const products = parseProductsFromEmail(poshmarkHtml);
+		expect(products[1].color).toBe("burgundy");
+		expect(products[1].name).toBe("Aritzia Contour Squareneck Longsleeve Mini Dress");
+	});
+
+	it("infers clothing attributes from the product name", () => {
+		const products = parseProductsFromEmail(poshmarkHtml);
+		// First product: Long-Sleeve, Square Neck, Bodycon
+		expect(products[0].sleeveLength).toBe("long sleeve");
+		expect(products[0].neckline).toBe("square neck");
+		expect(products[0].fit).toBe("bodycon");
+		// Second product: Longsleeve, Squareneck, Mini, Contour → bodycon
+		expect(products[1].sleeveLength).toBe("long sleeve");
+		expect(products[1].neckline).toBe("square neck");
+		expect(products[1].hemLength).toBe("mini");
+		expect(products[1].fit).toBe("bodycon");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Strategy: SHEIN side-by-side 30%/69% table layout (ltwebstatic.com CDN)
+// ---------------------------------------------------------------------------
+
+describe("parseProductsFromEmail > SHEIN: 30%/69% side-by-side tables with grey-span name", () => {
+	function sheinProduct(
+		orderNo: string,
+		imageSrc: string,
+		name: string,
+		sku: string,
+		sizeField: string,
+	): string {
+		return `
+			<td align="center" valign="middle" style="padding:0; margin:0">
+				<table border="0" cellpadding="0" cellspacing="0" width="100%">
+					<tbody><tr><td style="font-weight:bold">Order NO. ${orderNo}</td></tr></tbody>
+				</table>
+				<table border="0" cellpadding="0" cellspacing="0" width="30%" class="x_width30p" align="left">
+					<tbody><tr><td style="padding:10px">
+						<img alt="" border="0" width="140" class="x_productImage" style="display:block" src="${imageSrc}">
+					</td></tr></tbody>
+				</table>
+				<table border="0" cellpadding="0" cellspacing="0" width="69%" class="x_width70p" align="left">
+					<tbody><tr><td style="font-weight:bold;padding:25px 10px">
+						<span style="color:#939393; font-weight:normal; display:block">${name}</span> SKU: ${sku}<br>
+						SIZE: ${sizeField} <br>
+						QTY: 1
+					</td></tr></tbody>
+				</table>
+			</td>
+		`;
+	}
+
+	const sheinHtml = html(`
+		<table><tbody><tr>
+			${sheinProduct(
+				"GSU13538600MCPK",
+				"http://img.ltwebstatic.com/v4/j/pi/trouser_thumbnail.jpg",
+				"SHEIN PETITE Women Casual Solid Color High Waist Straight Leg Trousers Fall Cloth For Women",
+				"sz25041075170166125",
+				"Dark Grey-Petite S",
+			)}
+		</tr><tr>
+			${sheinProduct(
+				"GSU13538600MCPL",
+				"http://img.ltwebstatic.com/v4/j/pi/tshirt_thumbnail.jpg",
+				"Selianne Women's Collar Colorblock Short Sleeve Business Casual T-Shirt",
+				"sz25041075170166126",
+				"Black-S",
+			)}
+		</tr></tbody></table>
+	`);
+
+	it("detects both SHEIN products", () => {
+		expect(parseProductsFromEmail(sheinHtml)).toHaveLength(2);
+	});
+
+	it("does NOT use the Order NO. line as the product name", () => {
+		const products = parseProductsFromEmail(sheinHtml);
+		expect(products.every((p) => !p.name.startsWith("Order"))).toBe(true);
+	});
+
+	it("extracts name from the grey span, not from surrounding bold text", () => {
+		const products = parseProductsFromEmail(sheinHtml);
+		expect(products[0].name).toBe("SHEIN Casual High Waist Straight Leg Trousers");
+		expect(products[1].name).toBe("Selianne Collar Colorblock Short Sleeve Business Casual T-Shirt");
+	});
+
+	it("parses color from the SIZE: field (COLOR-SIZE format)", () => {
+		const products = parseProductsFromEmail(sheinHtml);
+		expect(products[0].color).toBe("dark grey");
+		expect(products[1].color).toBe("black");
+	});
+
+	it("parses size, stripping Petite/Plus/Tall qualifiers", () => {
+		const products = parseProductsFromEmail(sheinHtml);
+		expect(products[0].size).toBe("S");  // "Dark Grey-Petite S" → S
+		expect(products[1].size).toBe("S");  // "Black-S" → S
+	});
+
+	it("extracts imageUrl from ltwebstatic CDN", () => {
+		const products = parseProductsFromEmail(sheinHtml);
+		expect(products[0].imageUrl).toContain("ltwebstatic.com");
+		expect(products[1].imageUrl).toContain("ltwebstatic.com");
+	});
+
+	it("infers clothing attributes from product names", () => {
+		const products = parseProductsFromEmail(sheinHtml);
+		// Trousers: high waist + straight leg
+		expect(products[0].rise).toBe("high waist");
+		expect(products[0].fit).toBe("straight leg");
+		// T-Shirt: short sleeve
+		expect(products[1].sleeveLength).toBe("short sleeve");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Express Format A: text-only rows, one product per separate table
+// ---------------------------------------------------------------------------
+
+describe("parseProductsFromEmail > Express Format A: text-only separate tables", () => {
+	const expressA = html(`
+		<table>
+			<tr>
+				<td width="380">Puff Sleeve Blouse</td>
+				<td width="4"></td>
+				<td width="40" align="center">1</td>
+				<td width="4"></td>
+				<td width="60" align="right">29.90</td>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<td width="380">Plaid Blazer</td>
+				<td width="4"></td>
+				<td width="40" align="center">1</td>
+				<td width="4"></td>
+				<td width="60" align="right">79.90</td>
+			</tr>
+		</table>
+		<table>
+			<tr>
+				<td width="380">Cargo Jogger</td>
+				<td width="4"></td>
+				<td width="40" align="center">1</td>
+				<td width="4"></td>
+				<td width="60" align="right">49.90</td>
+			</tr>
+		</table>
+	`);
+
+	it("detects all 3 products across separate tables", () => {
+		expect(parseProductsFromEmail(expressA)).toHaveLength(3);
+	});
+
+	it("extracts product names from the wide name cell", () => {
+		const products = parseProductsFromEmail(expressA);
+		expect(products.map((p) => p.name)).toEqual(["Puff Sleeve Blouse", "Plaid Blazer", "Cargo Jogger"]);
+	});
+
+	it("extracts price as $-prefixed decimal", () => {
+		const products = parseProductsFromEmail(expressA);
+		expect(products[0].price).toBe("$29.90");
+		expect(products[1].price).toBe("$79.90");
+		expect(products[2].price).toBe("$49.90");
+	});
+
+	it("imageUrl is empty — no images in this format", () => {
+		const products = parseProductsFromEmail(expressA);
+		expect(products.every((p) => p.imageUrl === "")).toBe(true);
+	});
+
+	it("color and size are empty — format carries no color/size data", () => {
+		const products = parseProductsFromEmail(expressA);
+		expect(products[0].color).toBe("");
+		expect(products[0].size).toBe("");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Express Format B: image + nested tables for name / qty / price
+// ---------------------------------------------------------------------------
+
+describe("parseProductsFromEmail > Express Format B: image with nested name/qty/price tables", () => {
+	const expressB = html(`
+		<table width="520">
+			<tr>
+				<td width="36"><img src="http://example.com/spacer.gif" width="1" height="1" alt=""></td>
+				<td><img src="https://express.com/img/tank.jpg" width="120" height="150" alt="Ribbed Knit Tank Top"></td>
+				<td width="12"></td>
+				<td width="178">
+					<table><tr><td><span style="font-size:15px">Ribbed Knit Tank Top</span></td></tr></table>
+				</td>
+				<td width="62">
+					<table><tr><td>Qty:</td></tr><tr><td>1</td></tr></table>
+				</td>
+				<td width="79">
+					<table><tr><td>Unit $:</td></tr><tr><td>$19.00</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td width="36"><img src="http://example.com/spacer.gif" width="1" height="1" alt=""></td>
+				<td><img src="https://express.com/img/trouser.jpg" width="120" height="150" alt="Straight Leg Trouser"></td>
+				<td width="12"></td>
+				<td width="178">
+					<table><tr><td><span style="font-size:15px">Straight Leg Trouser</span></td></tr></table>
+				</td>
+				<td width="62">
+					<table><tr><td>Qty:</td></tr><tr><td>1</td></tr></table>
+				</td>
+				<td width="79">
+					<table><tr><td>Unit $:</td></tr><tr><td>$69.90</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td width="36"><img src="http://example.com/spacer.gif" width="1" height="1" alt=""></td>
+				<td><img src="https://express.com/img/dress.jpg" width="120" height="150" alt="Satin Wrap Dress"></td>
+				<td width="12"></td>
+				<td width="178">
+					<table><tr><td><span style="font-size:15px">Satin Wrap Dress</span></td></tr></table>
+				</td>
+				<td width="62">
+					<table><tr><td>Qty:</td></tr><tr><td>1</td></tr></table>
+				</td>
+				<td width="79">
+					<table><tr><td>Unit $:</td></tr><tr><td>$59.90</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td width="36"><img src="http://example.com/spacer.gif" width="1" height="1" alt=""></td>
+				<td><img src="https://express.com/img/hoodie.jpg" width="120" height="150" alt="Oversized Sherpa Hoodie"></td>
+				<td width="12"></td>
+				<td width="178">
+					<table><tr><td><span style="font-size:15px">Oversized Sherpa Hoodie</span></td></tr></table>
+				</td>
+				<td width="62">
+					<table><tr><td>Qty:</td></tr><tr><td>1</td></tr></table>
+				</td>
+				<td width="79">
+					<table><tr><td>Unit $:</td></tr><tr><td>$49.90</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td width="36"><img src="http://example.com/spacer.gif" width="1" height="1" alt=""></td>
+				<td><img src="https://express.com/img/skirt.jpg" width="120" height="150" alt="Flare Mini Skirt"></td>
+				<td width="12"></td>
+				<td width="178">
+					<table><tr><td><span style="font-size:15px">Flare Mini Skirt</span></td></tr></table>
+				</td>
+				<td width="62">
+					<table><tr><td>Qty:</td></tr><tr><td>1</td></tr></table>
+				</td>
+				<td width="79">
+					<table><tr><td>Unit $:</td></tr><tr><td>$39.90</td></tr></table>
+				</td>
+			</tr>
+		</table>
+	`);
+
+	it("detects all 5 products from the complex image layout", () => {
+		expect(parseProductsFromEmail(expressB)).toHaveLength(5);
+	});
+
+	it("extracts product name from the nested name table", () => {
+		const products = parseProductsFromEmail(expressB);
+		expect(products[0].name).toBe("Ribbed Knit Tank Top");
+		expect(products[1].name).toBe("Straight Leg Trouser");
+		expect(products[2].name).toBe("Satin Wrap Dress");
+		expect(products[3].name).toBe("Oversized Sherpa Hoodie");
+		expect(products[4].name).toBe("Flare Mini Skirt");
+	});
+
+	it("extracts price from the nested price table", () => {
+		const products = parseProductsFromEmail(expressB);
+		expect(products[0].price).toBe("$19.00");
+		expect(products[1].price).toBe("$69.90");
+		expect(products[4].price).toBe("$39.90");
+	});
+
+	it("extracts imageUrl from the product image column", () => {
+		const products = parseProductsFromEmail(expressB);
+		expect(products[0].imageUrl).toBe("https://express.com/img/tank.jpg");
+		expect(products[1].imageUrl).toBe("https://express.com/img/trouser.jpg");
+		expect(products[4].imageUrl).toBe("https://express.com/img/skirt.jpg");
+	});
+
+	it("color is empty — qty label cell must not pollute color field", () => {
+		const products = parseProductsFromEmail(expressB);
+		expect(products.every((p) => p.color === "")).toBe(true);
+	});
+
+	it("infers fit from product names", () => {
+		const products = parseProductsFromEmail(expressB);
+		expect(products[1].fit).toBe("straight leg");  // Straight Leg Trouser
+		expect(products[3].fit).toBe("oversized");      // Oversized Sherpa Hoodie
+		expect(products[4].fit).toBe("flare");          // Flare Mini Skirt
+	});
+
+	it("infers hemLength from product names", () => {
+		const products = parseProductsFromEmail(expressB);
+		expect(products[4].hemLength).toBe("mini");     // Flare Mini Skirt
+	});
+});
+
+
+///// confirmed working stores
+// Zara
+// Aritzia
+// Amazon
+// Shein
+// Cuup
+// Threadup
+// Poshmark
+// Express - failed
+// Banana Republic 

@@ -267,6 +267,9 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 				// Numeric-only (could be quantity) — skip single digits
 				if (/^\d$/.test(text)) continue;
 
+				// Skip quantity-label cells from nested tables (e.g. "Qty:1", "Qty: 2")
+				if (/^qty/i.test(text)) continue;
+
 				// Otherwise likely color
 				if (!color && text.length > 1 && !/^\$/.test(text)) {
 					color = text;
@@ -1794,6 +1797,193 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Strategy: Poshmark 3-cell row layout.
+ *
+ * Poshmark order emails use a 3-cell <tr>:
+ *   <td class="item"> — product image (75×75)
+ *   <td>              — nested table (width="360") with name row, Size: row, and a
+ *                       hidden <span class="price" display:none> (skipped)
+ *   <td class="price"> — visible price text (e.g. "$24.00")
+ *
+ * Guard: requires td.price class on the price cell — specific to Poshmark's template.
+ */
+function extractFromPoshmarkLayout(doc: Document): ExtractedProduct[] {
+	const priceCells = Array.from(doc.querySelectorAll("td.price")).filter((td) => {
+		const style = td.getAttribute("style") ?? "";
+		return !style.includes("display:none") && !style.includes("display: none");
+	});
+
+	if (priceCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	for (const priceCell of priceCells) {
+		const row = priceCell.closest("tr");
+		if (!row) continue;
+
+		const cells = directChildren(row, "td");
+		if (cells.length !== 3) continue;
+
+		let imageUrl = "";
+		let detailsCell: Element | null = null;
+
+		for (const cell of cells) {
+			if (cell === priceCell) continue;
+
+			const img = cell.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+				continue;
+			}
+
+			if (!detailsCell && (cell.textContent ?? "").trim().length > 3) {
+				detailsCell = cell;
+			}
+		}
+
+		if (!detailsCell) continue;
+
+		const nestedRows = Array.from(detailsCell.querySelectorAll("tr"));
+
+		let name = "";
+		let size = "";
+
+		for (const nRow of nestedRows) {
+			// Skip rows whose content is entirely hidden
+			if (nRow.querySelector("[style*='display:none']")) continue;
+
+			const text = getCellText(nRow);
+			if (!text) continue;
+
+			const sizeMatch = text.match(/^Size\s*:\s*(.+)/i);
+			if (sizeMatch && !size) {
+				size = sizeMatch[1].trim();
+				continue;
+			}
+
+			if (!name && text.length > 3) {
+				name = text;
+			}
+		}
+
+		if (!name) continue;
+
+		const priceText = getCellText(priceCell as Element);
+		const price = priceText.startsWith("$") ? priceText : (priceText ? `$${priceText}` : "");
+
+		const dedupeKey = `${name.toLowerCase()}|${price}`;
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color: "",
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: SHEIN side-by-side 30%/69% table layout.
+ *
+ * SHEIN order emails pair a 30%-width image table with a 69%-width details
+ * table inside the same container element. The details table contains:
+ *   <span style="color:#939393"> — product name (grey text)
+ *   SKU: …<br>
+ *   SIZE: COLOR-SIZE<br>   (e.g. "Dark Grey-Petite S" or "Black-S")
+ *   QTY: 1
+ *
+ * Guard: requires the image URL to come from ltwebstatic.com (SHEIN's CDN),
+ * preventing false-positive matches on other email layouts.
+ */
+function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(
+		doc.querySelectorAll("img[src*='ltwebstatic.com']"),
+	).filter((img) => isProductImage(img as HTMLImageElement));
+
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	for (const img of productImgs) {
+		const imageUrl = img.getAttribute("src") ?? "";
+
+		// Walk up to the image's containing table (the 30% one)
+		const imgTable = (img as Element).closest("table");
+		if (!imgTable) continue;
+
+		const parent = imgTable.parentElement;
+		if (!parent) continue;
+
+		// Find the sibling table that has the grey product-name span
+		let detailsTable: Element | null = null;
+		for (const sibling of Array.from(parent.children)) {
+			if (sibling === imgTable || sibling.tagName !== "TABLE") continue;
+			if (sibling.querySelector("span[style*='color:#939393'], span[style*='color: #939393']")) {
+				detailsTable = sibling;
+				break;
+			}
+		}
+
+		if (!detailsTable) continue;
+
+		const greySpan = detailsTable.querySelector(
+			"span[style*='color:#939393'], span[style*='color: #939393']",
+		);
+		if (!greySpan) continue;
+
+		const name = (greySpan.textContent ?? "").trim();
+		if (!name || name.length < 3) continue;
+
+		const detailsTd = greySpan.closest("td");
+		if (!detailsTd) continue;
+
+		const lines = getTextLines(detailsTd);
+
+		let size = "";
+		let color = "";
+
+		for (const line of lines) {
+			const sizeMatch = line.match(/^SIZE\s*:\s*(.+)/i);
+			if (sizeMatch && !size) {
+				const parsed = parseSHEINSizeField(sizeMatch[1].trim());
+				color = parsed.color;
+				size = parsed.size;
+				break;
+			}
+		}
+
+		const dedupeKey = `${name.toLowerCase()}|${size}|${color}`;
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price: "",
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 // Post-processing applied to every extracted product regardless of strategy.
 // Infer-from-raw first, then clean for storage — per advisor guidance.
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
@@ -1830,21 +2020,27 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  2. Labeled-field <th> layout (CUUP) — bold span + Color:/Size:/Price:
 	//  3. React Email sections (Cider) — data-id="react-email-section"
 	//  4. Amazon MJML columns — img.productImage + mj-column divs
-	//  5. Paragraph-based two-cell rows (Princess Polly) — <p> elements
-	//  6. Table rows with 4+ cells (Aritzia, Nordstrom)
-	//  7. Order-ID container 3-column rows (AliExpress, Wish)
-	//  8. Div-based layouts (Zara)
-	//  9. Text-only product rows (Express) — no images, ≥2 matches
-	// 10. Image fallback
+	//  5. SHEIN side-by-side tables — ltwebstatic.com CDN + grey span name
+	//  6. H&M nested attribute table — two-cell rows with Color+Size table
+	//  7. Bold-paragraph single-column (Gap/Banana Republic Factory)
+	//  8. Paragraph-based two-cell rows (Princess Polly) — <p> elements
+	//  9. Poshmark 3-cell rows — td.item image + nested name table + td.price
+	// 10. Table rows with 4+ cells (Aritzia, Nordstrom)
+	// 11. Order-ID container 3-column rows (AliExpress, Wish)
+	// 12. Div-based layouts (Zara)
+	// 13. Text-only product rows (Express) — no images, ≥2 matches
+	// 14. Image fallback
 
 	const strategies = [
 		extractFromNestedTables,
 		extractFromLabeledFieldLayout,
 		extractFromReactEmailLayout,
 		extractFromAmazonLayout,
+		extractFromSHEINLayout,            // SHEIN ltwebstatic CDN
 		extractFromAttributeTableRows,
-		extractFromBoldParagraphLayout,   // Gap / Banana Republic Factory
+		extractFromBoldParagraphLayout,    // Gap / Banana Republic Factory
 		extractFromParagraphLayout,
+		extractFromPoshmarkLayout,         // Poshmark td.price 3-cell rows
 		extractFromTableRows,
 		extractFromOrderContainerRows,
 		extractFromDivLayout,
