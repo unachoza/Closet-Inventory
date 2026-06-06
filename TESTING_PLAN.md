@@ -278,6 +278,14 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 
 ## 🐛 Known Bugs to Fix
 
+### "Fiber Journey" link from Fabric Guide lands mid-page instead of top
+- **Symptom:** Clicking the "Fiber Journey" button inside the Fabric Guide navigates to the Fiber Journey view but the page is scrolled to a mid-point rather than the top.
+- **Likely cause:** The previous scroll position from the Fabric Guide is retained when the view changes, since the app is a SPA and the scroll position isn't reset on navigation.
+- **Fix:** Call `window.scrollTo(0, 0)` (or `document.documentElement.scrollTop = 0`) when the `journey` view mounts, or add a scroll-reset to the view transition logic in `App.tsx` / `ViewContext`.
+- **Test:** Navigate to Fabric Guide → scroll down → click Fiber Journey → verify page is scrolled to top.
+
+---
+
 ### Fiber comparison table doesn't work on mobile
 - **Symptom:** The comparison table in the Fabric Guide overflows or is unreadable on small screens — columns are too wide for the viewport, no horizontal scroll, or text gets clipped.
 - **Fix:** Add `overflow-x: auto` wrapper around the table, reduce column widths on mobile, or collapse to a card-per-row layout below 600px.

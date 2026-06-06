@@ -228,3 +228,71 @@ describe("useClosetFilters", () => {
 		expect(result.current.filteredItems).toHaveLength(0);
 	});
 });
+
+describe("useClosetFilters — material (MaterialBlend[])", () => {
+	const blend = (material: string, percentage: number) => ({ material, percentage });
+
+	const items: ClothingItem[] = [
+		makeItem({ id: "m1", material: [blend("cotton", 95), blend("elastane", 5)] }),
+		makeItem({ id: "m2", material: [blend("cotton", 60), blend("modal", 35), blend("elastane", 5)] }),
+		makeItem({ id: "m3", material: [blend("silk", 100)] }),
+		makeItem({ id: "m4", material: [blend("polyester", 61), blend("nylon", 30), blend("elastane", 9)] }),
+	];
+
+	it("shows material names without percentages in filterOptions", () => {
+		const { result } = renderHook(() => useClosetFilters(items));
+		const matValues = result.current.filterOptions.material.map((o) => o.value);
+		// Should be clean names, not "Cotton 95" or "Elastane 5"
+		expect(matValues).toContain("Cotton");
+		expect(matValues).toContain("Silk");
+		expect(matValues).not.toContain("Cotton 95");
+		expect(matValues).not.toContain("Elastane 5");
+	});
+
+	it("skips fibers at or below 6% when no item has them above threshold", () => {
+		// Items where spandex appears only at 4% — below threshold, should never surface
+		const lowItems: ClothingItem[] = [
+			makeItem({ id: "low1", material: [{ material: "cotton", percentage: 96 }, { material: "spandex", percentage: 4 }] }),
+			makeItem({ id: "low2", material: [{ material: "modal", percentage: 96 }, { material: "spandex", percentage: 4 }] }),
+		];
+		const { result } = renderHook(() => useClosetFilters(lowItems));
+		const matValues = result.current.filterOptions.material.map((o) => o.value);
+		expect(matValues).not.toContain("Spandex");
+		expect(matValues).toContain("Cotton");
+		expect(matValues).toContain("Modal");
+	});
+
+	it("includes fibers above 6% and maps to canonical name (9% elastane → Spandex)", () => {
+		const { result } = renderHook(() => useClosetFilters(items));
+		const matValues = result.current.filterOptions.material.map((o) => o.value);
+		// item m4 has 9% elastane — above threshold; elastane → canonical "Spandex"
+		expect(matValues).toContain("Spandex");
+		expect(matValues).not.toContain("Elastane");
+	});
+
+	it("filtering by cotton returns items that have cotton > 6%", () => {
+		const { result } = renderHook(() => useClosetFilters(items));
+		act(() => result.current.toggleFilter("material", "Cotton"));
+		const ids = result.current.filteredItems.map((i) => i.id);
+		expect(ids).toContain("m1"); // 95% cotton
+		expect(ids).toContain("m2"); // 60% cotton
+		expect(ids).not.toContain("m3"); // silk only
+		expect(ids).not.toContain("m4"); // no cotton
+	});
+
+	it("counts reflect how many items contain that material above threshold", () => {
+		const { result } = renderHook(() => useClosetFilters(items));
+		const cottonOption = result.current.filterOptions.material.find((o) => o.value === "Cotton");
+		expect(cottonOption?.count).toBe(2); // m1 and m2
+	});
+
+	it("works with legacy string material", () => {
+		const legacyItems: ClothingItem[] = [
+			makeItem({ id: "l1", material: "silk" }),
+			makeItem({ id: "l2", material: "cotton" }),
+		];
+		const { result } = renderHook(() => useClosetFilters(legacyItems));
+		act(() => result.current.toggleFilter("material", "Silk"));
+		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["l1"]);
+	});
+});
