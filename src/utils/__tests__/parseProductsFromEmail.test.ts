@@ -1036,3 +1036,104 @@ describe("extractBrandFromSender", () => {
 		expect(extractBrandFromSender("orders <orders@nordstrom.com>")).toBe("nordstrom");
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Strategy: Bold-paragraph single-column layout (Banana Republic Factory, Gap)
+// ---------------------------------------------------------------------------
+
+describe("parseProductsFromEmail > Strategy: bold-paragraph layout (Banana Republic Factory)", () => {
+	const brfHtml = html(`
+		<table><tbody>
+		<tr>
+			<td align="left" style="padding:40px 0 0;">
+				<img width="20" alt="brand logo" src="https://example.com/logo.jpg">
+				<p style="margin:5px 0 0; font-weight:bold;">Alys Slim Flannel Shirt</p>
+				<p style="margin:5px 0 0; font-size:12px">5060670120001</p>
+				<p style="margin:5px 0 0;">
+					<span style="text-decoration:line-through;">Was $90.00</span>
+					<span style="color:#D00000">$51.97</span>
+				</p>
+				<p style="margin:5px 0 0;">S | Neutral Plaid</p>
+			</td>
+		</tr>
+		<tr>
+			<td align="left" style="padding:40px 0 0;">
+				<img width="20" alt="brand logo" src="https://example.com/logo.jpg">
+				<p style="margin:5px 0 0; font-weight:bold;">Piazza Flannel Shirt</p>
+				<p style="margin:5px 0 0; font-size:12px">5060340120001</p>
+				<p style="margin:5px 0 0;">
+					<span style="text-decoration:line-through;">Was $90.00</span>
+					<span style="color:#D00000">$29.97</span>
+				</p>
+				<p style="margin:5px 0 0;">S | Red Plaid</p>
+			</td>
+		</tr>
+		<tr>
+			<td align="left" style="padding:40px 0 0;">
+				<img width="20" alt="brand logo" src="https://example.com/logo.jpg">
+				<p style="margin:5px 0 0; font-weight:bold;">Serres Sherpa Car Coat</p>
+				<p style="margin:5px 0 0; font-size:12px">5060050020002</p>
+				<p style="margin:5px 0 0;">
+					<span style="text-decoration:line-through;">Was $400.00</span>
+					<span style="color:#D00000">$189.97</span>
+				</p>
+				<p style="margin:5px 0 0;">M | Brown</p>
+			</td>
+		</tr>
+		<tr>
+			<td align="left" style="padding:40px 0 0;">
+				<img width="20" alt="brand logo" src="https://example.com/logo.jpg">
+				<p style="margin:5px 0 0; font-weight:bold;">Plaid Mini Skirt</p>
+				<p style="margin:5px 0 0; font-size:12px">5936140020002</p>
+				<p style="margin:5px 0 0;">
+					<span style="text-decoration:line-through;">Was $80.00</span>
+					<span style="color:#D00000">$27.97</span>
+				</p>
+				<p style="margin:5px 0 0;">2 | Black &amp; White Plaid</p>
+			</td>
+		</tr>
+		</tbody></table>
+	`);
+
+	it("finds all 4 items", () => {
+		expect(parseProductsFromEmail(brfHtml)).toHaveLength(4);
+	});
+
+	it("extracts name from bold paragraph", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].name).toBe("Alys Slim Flannel Shirt");
+		expect(products[1].name).toBe("Piazza Flannel Shirt");
+		expect(products[2].name).toBe("Serres Sherpa Car Coat");
+		expect(products[3].name).toBe("Plaid Mini Skirt");
+	});
+
+	it("extracts sale price from colored span", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].price).toBe("$51.97");
+		expect(products[3].price).toBe("$27.97");
+	});
+
+	it("marks items as on sale", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products.every(p => p.onSale)).toBe(true);
+	});
+
+	it("extracts size from SIZE | COLOR field", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].size).toBe("S");
+		expect(products[2].size).toBe("M");
+		expect(products[3].size).toBe("2");
+	});
+
+	it("extracts color from SIZE | COLOR field", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].color).toBe("neutral plaid");
+		expect(products[1].color).toBe("red plaid");
+		expect(products[3].color).toBe("black & white plaid");
+	});
+
+	it("extracts item number from SKU paragraph", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].itemNumber).toBe("5060670120001");
+	});
+});

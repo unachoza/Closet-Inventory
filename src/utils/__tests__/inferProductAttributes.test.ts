@@ -82,6 +82,22 @@ describe("inferProductAttributes — rise", () => {
 	});
 });
 
+describe("inferProductAttributes — season", () => {
+	it.each([
+		["AKEFUN Womens Summer Linen Shirts", "summer"],
+		["Spring Floral Midi Dress", "spring"],
+		["Fall Flannel Shirt", "fall"],
+		["Autumn Wool Coat", "fall"],
+		["Winter Puffer Jacket", "winter"],
+	] as [string, string][])('"%s" → season="%s"', (name, expected) => {
+		expect(inferProductAttributes(name).season).toBe(expected);
+	});
+
+	it("returns undefined when no season keyword found", () => {
+		expect(inferProductAttributes("Ribbed Knit Top").season).toBeUndefined();
+	});
+});
+
 describe("inferProductAttributes — multiple attributes from one name", () => {
 	it("extracts all 5 attributes from Aritzia example", () => {
 		const result = inferProductAttributes("Aritzia Contour Squareneck Longsleeve Mini Dress in burgundy size M");

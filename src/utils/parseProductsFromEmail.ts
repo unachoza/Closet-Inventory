@@ -585,8 +585,8 @@ function parseSizeColorLine(text: string): { size: string; color: string } {
 	// Remove QTY portion if present (e.g. "US 4 / DUSTY PINKQTY: 1")
 	const cleaned = text.replace(/QTY\s*:?\s*\d+/i, "").trim();
 
-	// "US 4 / DUSTY PINK", "S / Black", "XL / Navy"
-	const match = cleaned.match(/^(?:US\s+)?(\S+)\s*\/\s*(.+)$/i);
+	// "US 4 / DUSTY PINK", "S / Black", "S | Red Plaid", "2 | Black & White Plaid"
+	const match = cleaned.match(/^(?:US\s+)?(\S+)\s*[/|]\s*(.+)$/i);
 	if (match) {
 		return {
 			size: match[1].trim(),
@@ -1689,6 +1689,111 @@ function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Strategy: Single-column bold-paragraph layout (Banana Republic Factory, Gap, Old Navy).
+ *
+ * Each product occupies a single <td> containing:
+ *   <img width="20"> (tiny brand logo — filtered by isProductImage)
+ *   <p style="font-weight:bold"> — product name
+ *   <p style="font-size:12px">  — SKU (6+ digit number)
+ *   <p> with <span style="line-through">Was $X</span> + <span style="color:...">$Y</span>
+ *   <p> — "SIZE | COLOR" (e.g. "S | Red Plaid", "2 | Black & White Plaid")
+ *
+ * Guard: requires both a bold-name <p> and a SIZE|COLOR <p> (or price) to avoid
+ * false-positives on shipping/promo rows that also contain bold text.
+ */
+function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	// Find all <p> elements whose style contains font-weight:bold
+	const boldPs = Array.from(
+		doc.querySelectorAll("p[style*='font-weight:bold'], p[style*='font-weight: bold']")
+	);
+
+	for (const boldP of boldPs) {
+		const name = (boldP.textContent ?? "").trim();
+		if (!name || name.length < 3) continue;
+
+		// Must sit inside a <td>
+		const parentTd = boldP.closest("td");
+		if (!parentTd) continue;
+
+		// Collect sibling <p> elements that follow the bold name in this <td>
+		const allPs = Array.from(parentTd.querySelectorAll("p"));
+		const boldIdx = allPs.findIndex((p) => p === boldP);
+		if (boldIdx === -1) continue;
+		const siblings = allPs.slice(boldIdx + 1);
+
+		let price = "";
+		let color = "";
+		let size = "";
+		let onSale = false;
+		let itemNumber = "";
+		let hasSizeColor = false;
+
+		for (const p of siblings) {
+			const text = (p.textContent ?? "").replace(/\s+/g, " ").trim();
+
+			// Price line: contains a strikethrough span
+			const strikeEl = p.querySelector("span[style*='line-through'], s, del");
+			if (strikeEl) {
+				onSale = true;
+				// Sale price: colored span or last price in the paragraph
+				const coloredSpan = p.querySelector("span[style*='color']");
+				if (coloredSpan) {
+					const m = (coloredSpan.textContent ?? "").match(/\$[\d.]+/);
+					if (m) price = m[0];
+				}
+				if (!price) {
+					const prices = extractPrices(text);
+					const origPrice = parseFloat((extractPrices(strikeEl.textContent ?? "")[0] ?? "0").replace("$", ""));
+					price = prices.find((p) => parseFloat(p.replace("$", "")) < origPrice) ?? prices[prices.length - 1] ?? "";
+				}
+				continue;
+			}
+
+			// SKU: exactly 6+ digits
+			if (/^\d{6,}$/.test(text)) {
+				itemNumber = text;
+				continue;
+			}
+
+			// SIZE | COLOR (or SIZE / COLOR): "S | Red Plaid", "M | Brown"
+			if (text.includes("|") || text.includes("/")) {
+				const parsed = parseSizeColorLine(text);
+				if (parsed.size) {
+					size = parsed.size;
+					color = parsed.color;
+					hasSizeColor = true;
+					continue;
+				}
+			}
+		}
+
+		// Require at minimum either a price OR a size|color to confirm product row
+		if (!hasSizeColor && !price) continue;
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
 // Post-processing applied to every extracted product regardless of strategy.
 // Infer-from-raw first, then clean for storage — per advisor guidance.
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
@@ -1738,6 +1843,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromReactEmailLayout,
 		extractFromAmazonLayout,
 		extractFromAttributeTableRows,
+		extractFromBoldParagraphLayout,   // Gap / Banana Republic Factory
 		extractFromParagraphLayout,
 		extractFromTableRows,
 		extractFromOrderContainerRows,

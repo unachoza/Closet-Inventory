@@ -4,6 +4,7 @@ export interface ProductAttributes {
 	neckline?: string;
 	fit?: string;
 	rise?: string;
+	season?: string;
 }
 
 // Each entry: [pattern, canonical value].
@@ -56,6 +57,13 @@ const RISE_MAP: [RegExp, string][] = [
 	[/\blow[- ]?(waist|rise)\b/i, "low rise"],
 ];
 
+const SEASON_MAP: [RegExp, string][] = [
+	[/\bspring\b/i, "spring"],
+	[/\bsummer\b/i, "summer"],
+	[/\b(fall|autumn)\b/i, "fall"],
+	[/\bwinter\b/i, "winter"],
+];
+
 function matchFirst(text: string, map: [RegExp, string][]): string | undefined {
 	for (const [pattern, value] of map) {
 		if (pattern.test(text)) return value;
@@ -80,6 +88,9 @@ export function inferProductAttributes(name: string): ProductAttributes {
 
 	const rise = matchFirst(name, RISE_MAP);
 	if (rise) attrs.rise = rise;
+
+	const season = matchFirst(name, SEASON_MAP);
+	if (season) attrs.season = season;
 
 	return attrs;
 }
