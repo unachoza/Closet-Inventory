@@ -59,3 +59,33 @@ describe("inferMaterialFromName — percentage extraction", () => {
 		expect(result).not.toContainEqual({ material: "silk", percentage: 100 });
 	});
 });
+
+describe("inferMaterialFromName — multi-material keyword inference (from item name)", () => {
+	const materialsOf = (name: string) => inferMaterialFromName(name).map((b) => b.material);
+
+	it.each([
+		["The Organic Cotton Crew", ["cotton"]],
+		["COTTON MODAL TANK TOP", ["cotton", "modal"]],
+		["POLYAMIDE BLEND STRAPPY DRESS", ["polyamide"]],
+		["COTTON SLEEVELESS T-SHIRT", ["cotton"]],
+		["COTTON MODAL CROP T-SHIRT", ["cotton", "modal"]],
+		["LEATHER HEELED SANDALS", ["leather"]],
+	] as [string, string[]][])('infers materials from "%s"', (name, expected) => {
+		expect(materialsOf(name)).toEqual(expected);
+	});
+
+	it("collapses overlapping keywords (organic cotton + cotton) to a single material", () => {
+		expect(inferMaterialFromName("Organic Cotton Crew")).toEqual([{ material: "cotton", percentage: 100 }]);
+	});
+
+	it("splits the percentage evenly across inferred materials so it sums to 100", () => {
+		expect(inferMaterialFromName("Cotton Modal Tank Top")).toEqual([
+			{ material: "cotton", percentage: 50 },
+			{ material: "modal", percentage: 50 },
+		]);
+	});
+
+	it("keeps a single inferred material at 100%", () => {
+		expect(inferMaterialFromName("Leather Heeled Sandals")).toEqual([{ material: "leather", percentage: 100 }]);
+	});
+});

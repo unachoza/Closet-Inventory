@@ -17,6 +17,7 @@ const MATERIAL_KEYWORDS: [RegExp, string][] = [
 	[/\bmodal\b/i, "modal"],
 	[/\bpolyester\b/i, "polyester"],
 	[/\bnylon\b/i, "nylon"],
+	[/\bpolyamide\b/i, "polyamide"],
 	[/\bacrylic\b/i, "acrylic"],
 	[/\bleather\b/i, "leather"],
 	[/\bvelvet\b/i, "velvet"],
@@ -41,12 +42,24 @@ export function inferMaterialFromName(name: string): MaterialBlend[] {
 		if (blend.length > 0) return blend;
 	}
 
-	// Single-material keyword match → 100%.
+	// Collect every distinct material keyword present in the name, preserving
+	// keyword order. A name like "Cotton Modal Tank Top" yields two materials;
+	// overlapping patterns (e.g. "organic cotton" and "cotton") collapse to one.
+	const found: string[] = [];
 	for (const [pattern, material] of MATERIAL_KEYWORDS) {
-		if (pattern.test(name)) {
-			return [{ material, percentage: 100 }];
+		if (pattern.test(name) && !found.includes(material)) {
+			found.push(material);
 		}
 	}
 
-	return [];
+	if (found.length === 0) return [];
+
+	// No explicit percentages in the name — split evenly so the inferred blend
+	// still sums to 100. Any rounding remainder goes to the first material.
+	const base = Math.floor(100 / found.length);
+	const remainder = 100 - base * found.length;
+	return found.map((material, i) => ({
+		material,
+		percentage: i === 0 ? base + remainder : base,
+	}));
 }
