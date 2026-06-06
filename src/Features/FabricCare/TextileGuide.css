@@ -697,11 +697,15 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
 }
 
 .weave-fabrics h5 {
-      color: var(--ink-60);
-      font-size: 11px;
+      color: var(--ink, #1a1a1a);
+      font-size: 13px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       margin-bottom: 10px;
+      border-bottom: 2px solid var(--gold, #c9a84c);
+      padding-bottom: 4px;
+      display: inline-block;
 }
 
 .weave-fabrics ul {
