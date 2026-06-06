@@ -97,7 +97,7 @@ overflow: scroll;
 .card-back {
       transform: rotateY(180deg);
       padding: 0;
-      border: none;
+      border: solid 5px var(--Dark-Grey);
       background: transparent;
       overflow: hidden;
 }
@@ -125,7 +125,7 @@ overflow: scroll;
 
 .card-name-label {
 	display: block;
-	color: #fff;
+	color: var(--White);
 	font-size: 0.9rem;
 	font-weight: 600;
 	text-align: center;

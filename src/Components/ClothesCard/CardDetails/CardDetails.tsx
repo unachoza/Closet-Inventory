@@ -50,11 +50,7 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 
 	const blend = normalizeMaterial(item.material);
 	const careItems = parseCare(item.care);
-	const occasions = Array.isArray(item.occasion)
-		? item.occasion
-		: item.occasion
-		? [item.occasion]
-		: [];
+	const occasions = Array.isArray(item.occasion) ? item.occasion : item.occasion ? [item.occasion] : [];
 	const notes = normalizeToString(item.notes);
 
 	const hasExpandedContent = occasions.length > 0 || !!notes || !!item.age || !!item.price;
@@ -64,20 +60,18 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 			{/* Scrollable content area */}
 			<div className="card-details__scrollable">
 				{/* Name + category badge + close button */}
+				{onClose && (
+					<button className="card-details__close" onClick={onClose} aria-label="Close">
+						✕
+					</button>
+				)}
 				<div className="card-details__header">
 					<div className="card-details__header-text">
-						<p className="card-details__name">
-							{item.name || item.brand || item.category}
-						</p>
+						<p className="card-details__name">{item.name || item.brand || item.category}</p>
 						{item.brand && <p className="card-details__brand">{item.brand}</p>}
 					</div>
 					<div className="card-details__header-right">
 						{item.category && <span className="card-details__category-tag">{item.category}</span>}
-						{onClose && (
-							<button className="card-details__close" onClick={onClose} aria-label="Close">
-								✕
-							</button>
-						)}
 					</div>
 				</div>
 
@@ -89,7 +83,7 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 						<div className="card-details__color-circle" />
 						<span className="card-details__color-name">{item.color || "—"}</span>
 					</div>
-					{item.size && <span className="card-details__size-pill">{item.size}</span>}
+					{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
 				</div>
 
 				{/* Composition bar */}
@@ -98,14 +92,22 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 						<SectionTitle label="Composition" />
 						<div className="card-details__composition-labels">
 							{blend.map((m) => (
-								<span key={m.material} className="card-details__composition-percentage" style={{ color: getMaterialColor(m.material) }}>
+								<span
+									key={m.material}
+									className="card-details__composition-percentage"
+									style={{ color: getMaterialColor(m.material) }}
+								>
 									{m.percentage}%
 								</span>
 							))}
 						</div>
 						<div className="card-details__composition-bar">
 							{blend.map((m) => (
-								<div key={m.material} className="card-details__composition-segment" style={{ background: getMaterialColor(m.material) }} />
+								<div
+									key={m.material}
+									className="card-details__composition-segment"
+									style={{ background: getMaterialColor(m.material) }}
+								/>
 							))}
 						</div>
 						<div className="card-details__composition-materials">
@@ -124,7 +126,9 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 						<SectionTitle label="Care" />
 						<div className="card-details__care-pills">
 							{careItems.map((c) => (
-								<span key={c.label} className="card-details__care-pill">{c.emoji} {c.label}</span>
+								<span key={c.label} className="card-details__care-pill  pill">
+									{c.emoji} {c.label}
+								</span>
 							))}
 						</div>
 					</div>
@@ -156,7 +160,9 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 										<SectionTitle label="Occasion" />
 										<div className="card-details__occasion-pills">
 											{occasions.map((o) => (
-												<span key={o} className="card-details__occasion-pill">{o}</span>
+												<span key={o} className="card-details__occasion-pill  pill">
+													{o}
+												</span>
 											))}
 										</div>
 									</div>
@@ -174,17 +180,29 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 									<div className="card-details__confirm-section">
 										<p className="card-details__confirm-text">Remove this item?</p>
 										<div className="card-details__buttons">
-											<button onClick={() => setConfirming(false)} className="card-details__button card-details__button--cancel">
+											<button
+												onClick={() => setConfirming(false)}
+												className="card-details__button card-details__button--cancel"
+											>
 												Cancel
 											</button>
-											<button onClick={() => { setConfirming(false); onRemove?.(); }} className="card-details__button card-details__button--confirm">
+											<button
+												onClick={() => {
+													setConfirming(false);
+													onRemove?.();
+												}}
+												className="card-details__button card-details__button--confirm"
+											>
 												Yes, remove
 											</button>
 										</div>
 									</div>
 								) : (
 									<div className="card-details__buttons">
-										<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
+										<button
+											onClick={() => setConfirming(true)}
+											className="card-details__button card-details__button--remove"
+										>
 											Remove
 										</button>
 										<button onClick={onEdit} className="card-details__button">
@@ -201,10 +219,7 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 			{/* Toggle button pinned to bottom */}
 			{hasExpandedContent && (
 				<div className="card-details__footer">
-					<button
-						onClick={() => setExpanded(!expanded)}
-						className="card-details__toggle-details"
-					>
+					<button onClick={() => setExpanded(!expanded)} className="card-details__toggle-details">
 						{expanded ? "Show less" : "See all details"}
 					</button>
 				</div>
