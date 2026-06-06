@@ -278,6 +278,14 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 
 ## 🐛 Known Bugs to Fix
 
+### Material filter not working in Search/EntireClosetView
+- **Symptom:** Selecting a material in the filter panel returns no results or incorrect results even when items with that material exist.
+- **Likely cause:** Items store `material` as `MaterialBlend[]` (e.g. `[{ material: "cotton", percentage: 100 }]`) but `useClosetFilters` likely compares the filter value against the raw field, which is an array of objects — not a plain string match.
+- **Fix:** In `useClosetFilters`, when filtering by `material`, extract the material name strings from the `MaterialBlend[]` array before comparing against the selected filter values.
+- **Test to write:** item with `material: [{ material: "cotton", percentage: 100 }]` → apply "cotton" material filter → item appears in results.
+
+---
+
 ### Remove item doesn't re-render the Closet grid
 - **Symptom:** Clicking "Remove" on a clothing card removes the item from localStorage but the Closet grid doesn't update — the card visually stays until the page reloads.
 - **Root cause:** `Card.tsx` calls `useLocalStorageCloset().removeItem`, which is a separate hook instance from the one `Closet.tsx` uses. They both read from the same localStorage key but have independent React state — so Card's `removeItem` updates localStorage but Closet's state never re-renders.
