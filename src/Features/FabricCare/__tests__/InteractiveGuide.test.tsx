@@ -46,7 +46,7 @@ describe("InteractiveGuide", { timeout: 20000 }, () => {
 		expect(screen.getAllByRole("button", { name: /natural fibers/i }).length).toBeGreaterThanOrEqual(1);
 		expect(screen.getAllByRole("button", { name: /semi-synthetic/i }).length).toBeGreaterThanOrEqual(1);
 		expect(screen.getByRole("button", { name: /care guide/i })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /sources/i })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /stain removal/i })).toBeInTheDocument();
 	});
 
 	it("clicking a TOC button calls scrollIntoView", () => {
