@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { motion, Variants } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import ClothingCard from "../../Components/ClothesCard/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
@@ -30,6 +30,11 @@ const cardVariants: Variants = {
 		opacity: 1,
 		y: 0,
 		transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
+	},
+	exit: {
+		opacity: 0,
+		scale: 0.85,
+		transition: { duration: 0.2, ease: "easeIn" },
 	},
 };
 
@@ -91,11 +96,13 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 						initial="hidden"
 						animate="show"
 					>
-						{paginatedItems.map((item: ClothingItem) => (
-							<motion.div key={item.id} variants={cardVariants}>
-								<ClothingCard item={item} onEditItem={onEditItem} onRemoveItem={removeItem} />
-							</motion.div>
-						))}
+						<AnimatePresence mode="popLayout">
+							{paginatedItems.map((item: ClothingItem) => (
+								<motion.div key={item.id} variants={cardVariants} exit="exit" layout>
+									<ClothingCard item={item} onEditItem={onEditItem} onRemoveItem={removeItem} />
+								</motion.div>
+							))}
+						</AnimatePresence>
 					</motion.div>
 				) : (
 					<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
