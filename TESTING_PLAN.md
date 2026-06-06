@@ -276,6 +276,16 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 
 ---
 
+## 🐛 Known Bugs to Fix
+
+### Remove item doesn't re-render the Closet grid
+- **Symptom:** Clicking "Remove" on a clothing card removes the item from localStorage but the Closet grid doesn't update — the card visually stays until the page reloads.
+- **Root cause:** `Card.tsx` calls `useLocalStorageCloset().removeItem`, which is a separate hook instance from the one `Closet.tsx` uses. They both read from the same localStorage key but have independent React state — so Card's `removeItem` updates localStorage but Closet's state never re-renders.
+- **Fix:** Pass `onRemoveItem` as a prop from `Closet` down to `ClothingCard` (same pattern as `onEditItem`), so removal goes through the shared `useLocalStorageCloset` instance that Closet is already subscribed to. OR switch Card to use `useCloset()` from `ClosetContext` which is the single shared instance.
+- **Test to write:** render Closet with 3 items → click Remove on card back → item disappears from grid without reload.
+
+---
+
 ## 🐛 Bug Fixes / UX Issues to Address Before Testing
 
 These flows are broken or incomplete and need fixing before or alongside tests:
