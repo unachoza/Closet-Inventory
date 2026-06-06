@@ -95,33 +95,11 @@ overflow: scroll;
 
 /* Back */
 .card-back {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: scroll;
-      padding: 1.25rem;
-      border: var(--Dark-Grey) .5rem solid;
-      background: #78acbf;
-      background: linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%);
-
-      color: #222;
-      font-size: 0.95rem;
-      text-align: left;
+      overflow-y: auto;
       transform: rotateY(180deg);
-}
-
-.card-back p {
-      margin: 0;
-      text-transform: capitalize;
-}
-
-.card-back strong {
-      color: var(--Black);;
-}
-
-.card-back button{
-      width: 6.25rem;
-      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
 }
 
 /* ── Name overlay — slides in from bottom on card hover ─────────────────────── */
@@ -195,21 +173,6 @@ overflow: scroll;
       padding: 0.5rem;
   }
 
-  .card-back {
-      padding: .65rem;
-        
-      border: var(--Dark-Grey) .4rem solid;
-
-  }
-
-    .controls-container{
-      gap: 0.5rem;
-    }
-    
-  .controls-container button {
-      padding: 0.7rem;
-      width: 5rem;
-  }
 }
 
 

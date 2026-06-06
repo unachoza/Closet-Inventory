@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import ClothingCard from "./Card";
-import type { ClothingItem } from "../../utils/types";
+import type { ClothingItem } from "../../../utils/types";
 
 const item: ClothingItem = {
 	id: "1",

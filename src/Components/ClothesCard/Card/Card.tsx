@@ -1,9 +1,10 @@
 import "./Card.css";
-import { ClothingItem } from "../../utils/types";
+import { ClothingItem } from "../../../utils/types";
+import { CardDetails } from "../CardDetails/CardDetails";
 
 import { useState } from "react";
-import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
-import { normalizeMaterial } from "../../utils/materialUtils";
+import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
+import { normalizeMaterial } from "../../../utils/materialUtils";
 
 interface CardProps {
 	item: ClothingItem;
@@ -29,13 +30,10 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 					<div className="card-name-overlay">
 						<span className="card-name-label">{item.name || item.brand || item.category}</span>
 					</div>
-					{/* <div className="card-info">
-						<p className="card-category">{item.category}</p>
-						<h2 className="card-title">{item.name}</h2>
-					</div> */}
 				</div>
 
 				{/* Back */}
+				{flipped && <CardDetails item={item} />}
 				<div className="card-back">
 					<h2 className="card-title">{item.name}</h2>
 					<div className="card-details">
