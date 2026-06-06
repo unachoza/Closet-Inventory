@@ -183,7 +183,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Sort by: date added, price (asc/desc), age (newest/oldest), name (A–Z / Z–A)
 - 🔲 Dark mode toggle
 - 🔲 "Dry clean only" quick-filter pill
-- 🔲 Item name visible on card hover (or global toggle)
+- ✅ Item name visible on card hover (or global toggle)
 
 ---
 
@@ -303,6 +303,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Interactive fabric care guide
 - ✅ Material-to-care-instructions mapping
 - ✅ Fiber Journey interactive visualization
+- ✅ Stain Removal Guide per material type
 - 🔲 Clothing lifespan tracker ("estimated wears remaining")
 - 🔲 Repair and alteration log (date, description, cost)
 

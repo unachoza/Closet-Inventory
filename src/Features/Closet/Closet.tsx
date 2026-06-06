@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import ClothingCard from "../../Components/ClothesCard/Card";
+import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import usePagination from "../../hooks/usePagination";

@@ -161,6 +161,7 @@ button.toc-link{
 button.toc-link:hover{
       transition: none;
       transform: none;
+      box-shadow: none;
 }
 
 
@@ -191,6 +192,7 @@ button.toc-link:hover{
 
 button.toc-link.active:focus  button.toc-link.active:focus-visible{
       outline: none;
+      box-shadow: none;
 }
 
 button:focus .toc-link{
@@ -624,12 +626,14 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
 .weave-tab:hover{
       transform: none;
       translate: none;
+      box-shadow: none;
 }
 
 
 .weave-tab.active {
       color: var(--ink);
       border-bottom-color: var(--gold);
+      box-shadow: none;
 }
 
 .weave-tab:hover:not(.active) { color: var(--ink); }

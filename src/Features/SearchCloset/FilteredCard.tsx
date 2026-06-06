@@ -1,5 +1,5 @@
 import { ClothingItem } from "../../utils/types";
-import ClothingCard from "../../Components/ClothesCard/Card";
+import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import FilterMatchPills from "./FilterMatchPills";
 import "./EntireCloset.css";
 
