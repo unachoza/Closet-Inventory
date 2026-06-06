@@ -132,6 +132,22 @@ describe("parseEmailToFormData — category inference", () => {
 		expect(parse("The Bra").category).toBe("lingerie");
 	});
 
+	it('infers "underwear" from "briefs"', () => {
+		expect(parse("Cotton Briefs 3-Pack").category).toBe("underwear");
+	});
+
+	it('infers "lingerie" from "teddy"', () => {
+		expect(parse("Floral Lace Zip Up Teddy").category).toBe("lingerie");
+	});
+
+	it('defaults occasion to "everyday" for underwear', () => {
+		expect(parse("Cotton Briefs 3-Pack").occasion).toBe("everyday");
+	});
+
+	it('defaults occasion to "everyday" for lingerie', () => {
+		expect(parse("Floral Lace Zip Up Teddy").occasion).toBe("everyday");
+	});
+
 	it('infers "shoes" from "sneaker"', () => {
 		expect(parse("Classic Sneaker").category).toBe("shoes");
 	});

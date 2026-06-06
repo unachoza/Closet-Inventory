@@ -2086,6 +2086,91 @@ function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Extract the current (sale) price from a cell that may carry a "Price:" /
+ * "Total:" label and a strikethrough original. Amounts may be written
+ * "$7.46" or bare "7.46". Returns the non-struck amount and a sale flag.
+ */
+function parseLabeledStruckPrice(cell: Element): { price: string; onSale: boolean } {
+	const strikeEl = cell.querySelector(".strike, s, strike, del, [style*='line-through']");
+	const struckText = strikeEl ? getCellText(strikeEl) : "";
+
+	let text = getCellText(cell).replace(/^(price|total)\s*:?\s*/i, "");
+	if (struckText) text = text.replace(struckText, " ");
+
+	const m = text.match(/(\d{1,6}(?:\.\d{2})?)/);
+	const price = m ? `$${m[1]}` : "";
+	return { price, onSale: Boolean(struckText) };
+}
+
+/**
+ * Strategy: Anthropologie / Demandware "item-detail-row" layout.
+ *
+ * Each product is a multi-column <tr> inside <td class="item-table-container">:
+ *   <td class="item-image">      — product photo (≈129px)
+ *   <td class="item-details">    — nested table of labeled rows:
+ *       td.product-name (<h4>), td.product-style, td.product-color, td.product-size
+ *   <td class="item-price-large"> ×3 — unit price / qty / line total
+ * A sibling <td class="product-specs"> repeats Price/Qty/Total in small text.
+ *
+ * Prices may be "$7.46" or bare "7.46"; the struck-through value is the
+ * original (pre-sale) price. Without a dedicated strategy the generic 4+-cell
+ * table parser dumped the whole details blob into the name and mistook the
+ * bare price for the color.
+ *
+ * Guard: requires td.product-name plus a product-color or product-size cell,
+ * so it only fires on this specific template.
+ */
+function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
+	const nameCells = Array.from(doc.querySelectorAll("td.product-name"));
+	if (nameCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	const stripLabel = (el: Element | null | undefined, label: RegExp): string =>
+		el ? getCellText(el).replace(label, "").trim() : "";
+
+	for (const nameCell of nameCells) {
+		const detailsCell = nameCell.closest("td.item-details");
+		const colorCell = detailsCell?.querySelector("td.product-color");
+		const sizeCell = detailsCell?.querySelector("td.product-size");
+		// Require a labeled attribute to confirm this is the Anthropologie layout.
+		if (!colorCell && !sizeCell) continue;
+
+		const name = getCellText(nameCell);
+		if (!name) continue;
+
+		const color = stripLabel(colorCell, /^color\s*:?\s*/i).toLowerCase();
+		const size = stripLabel(sizeCell, /^size\s*:?\s*/i);
+		const itemNumber = stripLabel(detailsCell?.querySelector("td.product-style"), /^style\s*no\.?\s*:?\s*/i);
+
+		let price = "";
+		let onSale = false;
+		let imageUrl = "";
+
+		const container = nameCell.closest("td.item-table-container");
+		if (container) {
+			const priceCell =
+				container.querySelector("td.product-price") ?? container.querySelector("td.item-price-large");
+			if (priceCell) ({ price, onSale } = parseLabeledStruckPrice(priceCell));
+
+			const img = container.querySelector("td.item-image img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+			}
+		}
+
+		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({ imageUrl, name, brand: "", price, color, size, itemNumber, material: "", onSale });
+	}
+
+	return products;
+}
+
 // Post-processing applied to every extracted product regardless of strategy.
 // Infer-from-raw first, then clean for storage — per advisor guidance.
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
@@ -2127,12 +2212,13 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  7. Bold-paragraph single-column (Gap/Banana Republic Factory)
 	//  8. Paragraph-based two-cell rows (Princess Polly) — <p> elements
 	//  9. Poshmark 3-cell rows — td.item image + nested name table + td.price
-	// 10. Table rows with 4+ cells (Aritzia, Nordstrom)
-	// 11. Shopify order template (SKIMS) — order-list__item-title class
-	// 12. Order-ID container 3-column rows (AliExpress, Wish)
-	// 13. Div-based layouts (Zara)
-	// 14. Text-only product rows (Express) — no images, ≥2 matches
-	// 15. Image fallback
+	// 10. Anthropologie item-detail-row — labeled product-name/color/size cells
+	// 11. Table rows with 4+ cells (Aritzia, Nordstrom)
+	// 12. Shopify order template (SKIMS) — order-list__item-title class
+	// 13. Order-ID container 3-column rows (AliExpress, Wish)
+	// 14. Div-based layouts (Zara)
+	// 15. Text-only product rows (Express) — no images, ≥2 matches
+	// 16. Image fallback
 
 	const strategies = [
 		extractFromNestedTables,
@@ -2144,6 +2230,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromBoldParagraphLayout,    // Gap / Banana Republic Factory
 		extractFromParagraphLayout,
 		extractFromPoshmarkLayout,         // Poshmark td.price 3-cell rows
+		extractFromAnthropologieLayout,    // Anthropologie item-detail-row labeled tables
 		extractFromTableRows,
 		extractFromShopifyLayout,          // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
