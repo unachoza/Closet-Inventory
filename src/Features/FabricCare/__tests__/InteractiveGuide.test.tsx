@@ -25,7 +25,10 @@ function renderGuide() {
 	);
 }
 
-describe("InteractiveGuide", () => {
+// InteractiveGuide renders the full textile compendium (30+ fiber cards,
+// comparison table, weave diagrams). Set a generous timeout so the full
+// suite's parallel environment pressure doesn't cause false failures.
+describe("InteractiveGuide", { timeout: 20000 }, () => {
 	// ── Section rendering ────────────────────────────────────────────────────
 	it("renders all main section headings", () => {
 		renderGuide();

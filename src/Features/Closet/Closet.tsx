@@ -36,7 +36,7 @@ const cardVariants: Variants = {
 const ITEMS_PER_PAGE = 6;
 
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
-	const { closet } = useLocalStorageCloset();
+	const { closet, removeItem } = useLocalStorageCloset();
 
 	const normalizedCategory = selectedCategory?.trim().toLowerCase() || "";
 
@@ -93,7 +93,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 					>
 						{paginatedItems.map((item: ClothingItem) => (
 							<motion.div key={item.id} variants={cardVariants}>
-								<ClothingCard item={item} onEditItem={onEditItem} />
+								<ClothingCard item={item} onEditItem={onEditItem} onRemoveItem={removeItem} />
 							</motion.div>
 						))}
 					</motion.div>
