@@ -20,6 +20,8 @@ const OCCASION_MAP: [RegExp, string][] = [
 
 const VALID_TAGS = new Set<string>(occasionExamples);
 
+const EVERYDAY_CATEGORIES = new Set(["underwear", "lingerie"]);
+
 export function inferStyleTagsFromName(name: string, category?: string): string[] {
 	const combined = `${name} ${category ?? ""}`;
 	const tags: string[] = [];
@@ -30,6 +32,10 @@ export function inferStyleTagsFromName(name: string, category?: string): string[
 		if (tags.includes(tag)) continue;
 		tags.push(tag);
 		if (tags.length >= 2) break;
+	}
+
+	if (tags.length === 0 && category && EVERYDAY_CATEGORIES.has(category)) {
+		if (VALID_TAGS.has("everyday")) tags.push("everyday");
 	}
 
 	return tags;

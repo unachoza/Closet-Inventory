@@ -53,6 +53,20 @@ describe("inferStyleTagsFromName — occasion inference", () => {
 		expect(new Set(tags).size).toBe(tags.length);
 	});
 
+	it("defaults to everyday for underwear category", () => {
+		expect(inferStyleTagsFromName("Ribbed High Waist Thong", "underwear")).toContain("everyday");
+	});
+
+	it("defaults to everyday for lingerie category", () => {
+		expect(inferStyleTagsFromName("Floral Lace Zip Up Teddy", "lingerie")).toContain("everyday");
+	});
+
+	it("does not override a more specific occasion with everyday", () => {
+		const tags = inferStyleTagsFromName("Sequin Bodycon Teddy", "lingerie");
+		expect(tags).toContain("going-out");
+		expect(tags).not.toContain("everyday");
+	});
+
 	it("only returns tags from the valid occasionExamples vocabulary", () => {
 		const validVocab = new Set(["formal", "wedding", "cocktail", "going-out", "casual", "basics", "sports", "church", "picnic", "work wear", "everyday", "vacation", "holiday"]);
 		const tags = inferStyleTagsFromName("Sports Casual Everyday Top", "active");
