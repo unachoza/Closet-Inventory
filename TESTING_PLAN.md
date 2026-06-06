@@ -278,6 +278,21 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 
 ## 🐛 Known Bugs to Fix
 
+### Fiber comparison table doesn't work on mobile
+- **Symptom:** The comparison table in the Fabric Guide overflows or is unreadable on small screens — columns are too wide for the viewport, no horizontal scroll, or text gets clipped.
+- **Fix:** Add `overflow-x: auto` wrapper around the table, reduce column widths on mobile, or collapse to a card-per-row layout below 600px.
+- **Test:** Playwright E2E at 375px viewport — verify table is scrollable and no content is clipped.
+
+---
+
+### Material filter not working in Search/EntireClosetView
+- **Symptom:** Selecting a material in the filter panel returns no results or incorrect results even when items with that material exist.
+- **Likely cause:** Items store `material` as `MaterialBlend[]` (e.g. `[{ material: "cotton", percentage: 100 }]`) but `useClosetFilters` likely compares the filter value against the raw field, which is an array of objects — not a plain string match.
+- **Fix:** In `useClosetFilters`, when filtering by `material`, extract the material name strings from the `MaterialBlend[]` array before comparing against the selected filter values.
+- **Test to write:** item with `material: [{ material: "cotton", percentage: 100 }]` → apply "cotton" material filter → item appears in results.
+
+---
+
 ### Remove item doesn't re-render the Closet grid
 - **Symptom:** Clicking "Remove" on a clothing card removes the item from localStorage but the Closet grid doesn't update — the card visually stays until the page reloads.
 - **Root cause:** `Card.tsx` calls `useLocalStorageCloset().removeItem`, which is a separate hook instance from the one `Closet.tsx` uses. They both read from the same localStorage key but have independent React state — so Card's `removeItem` updates localStorage but Closet's state never re-renders.
@@ -289,6 +304,14 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 ## 🐛 Bug Fixes / UX Issues to Address Before Testing
 
 These flows are broken or incomplete and need fixing before or alongside tests:
+
+### Stain Removal section needs polish
+- Cards feel plain compared to the rest of the Textile Compendium — needs visual refinement to match the guide's aesthetic (Playfair Display, gold accents, cream backgrounds).
+- Stain type labels could use colour coding (e.g. red for wine, brown for coffee, blue for ink).
+- Rules callout box should feel more like a warning — consider amber/gold border or icon treatment.
+- Mobile: verify the two-column stain-row layout degrades cleanly on 375px.
+
+---
 
 ### Toast Flow
 - Toast timing inconsistent — sometimes doesn't appear after email import

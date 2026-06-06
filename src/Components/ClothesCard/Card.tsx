@@ -1,6 +1,5 @@
 import "./Card.css";
 import { ClothingItem } from "../../utils/types";
-import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 
 import { useState } from "react";
 import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
@@ -9,12 +8,11 @@ import { normalizeMaterial } from "../../utils/materialUtils";
 interface CardProps {
 	item: ClothingItem;
 	onEditItem?: (item: ClothingItem) => void;
+	onRemoveItem?: (id: string) => void;
 }
 
-const ClothingCard = ({ item, onEditItem }: CardProps) => {
+const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
-
-	const { removeItem } = useLocalStorageCloset();
 
 	// Coerce defensively: closet data may still carry a legacy string
 	// (e.g. "95% Cotton, 5% Spandex") or be the new MaterialBlend[] shape.
@@ -27,6 +25,9 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 				<div className="card-front">
 					<div className="card-image">
 						<img src={item.imageURL} alt={item.name} />
+					</div>
+					<div className="card-name-overlay">
+						<span className="card-name-label">{item.name || item.brand || item.category}</span>
 					</div>
 					{/* <div className="card-info">
 						<p className="card-category">{item.category}</p>
@@ -66,7 +67,7 @@ const ClothingCard = ({ item, onEditItem }: CardProps) => {
 						<button
 							onClick={(e) => {
 								e.stopPropagation();
-								removeItem(item.id);
+								onRemoveItem?.(item.id);
 							}}
 						>
 							Remove

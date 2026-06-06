@@ -124,6 +124,40 @@ overflow: scroll;
       margin: 0;
 }
 
+/* ── Name overlay — slides in from bottom on card hover ─────────────────────── */
+.card-name-overlay {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 0.6rem 1rem;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
+	border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
+	transform: translateY(100%);
+	opacity: 0;
+	transition: transform 0.28s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.28s ease;
+	pointer-events: none;
+}
+
+.card:hover .card-name-overlay {
+	transform: translateY(-10px);
+    opacity: 1;
+    background: #2a302dde;
+}
+
+.card-name-label {
+	display: block;
+	color: #fff;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-align: center;
+	text-transform: capitalize;
+	letter-spacing: 0.2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

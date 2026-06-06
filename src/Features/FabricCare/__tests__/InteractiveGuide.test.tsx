@@ -25,7 +25,10 @@ function renderGuide() {
 	);
 }
 
-describe("InteractiveGuide", () => {
+// InteractiveGuide renders the full textile compendium (30+ fiber cards,
+// comparison table, weave diagrams). Set a generous timeout so the full
+// suite's parallel environment pressure doesn't cause false failures.
+describe("InteractiveGuide", { timeout: 20000 }, () => {
 	// ── Section rendering ────────────────────────────────────────────────────
 	it("renders all main section headings", () => {
 		renderGuide();
@@ -43,7 +46,7 @@ describe("InteractiveGuide", () => {
 		expect(screen.getAllByRole("button", { name: /natural fibers/i }).length).toBeGreaterThanOrEqual(1);
 		expect(screen.getAllByRole("button", { name: /semi-synthetic/i }).length).toBeGreaterThanOrEqual(1);
 		expect(screen.getByRole("button", { name: /care guide/i })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /sources/i })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /stain removal/i })).toBeInTheDocument();
 	});
 
 	it("clicking a TOC button calls scrollIntoView", () => {

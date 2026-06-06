@@ -697,11 +697,15 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
 }
 
 .weave-fabrics h5 {
-      color: var(--ink-60);
-      font-size: 11px;
+      color: var(--ink, #1a1a1a);
+      font-size: 13px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       margin-bottom: 10px;
+      border-bottom: 2px solid var(--gold, #c9a84c);
+      padding-bottom: 4px;
+      display: inline-block;
 }
 
 .weave-fabrics ul {
@@ -979,4 +983,88 @@ tbody td:first-child {
       .hero-stats { gap: 24px; }
 
       .weave-content { grid-template-columns: 1fr; }
+}
+/* ══════════ STAIN REMOVAL ══════════ */
+.stain-guide-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+	gap: 24px;
+	margin-top: 32px;
+}
+
+.stain-card {
+	background: var(--cream, #faf7f2);
+	border: 1px solid rgba(0,0,0,0.08);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.stain-card__header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 16px 20px 12px;
+	border-bottom: 1px solid rgba(0,0,0,0.07);
+	background: rgba(0,0,0,0.02);
+}
+
+.stain-card__icon { font-size: 1.4rem; }
+
+.stain-card__fabric {
+	margin: 0;
+	font-family: 'Playfair Display', serif;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: var(--ink, #1a1a1a);
+}
+
+.stain-card__rules {
+	list-style: none;
+	margin: 0;
+	padding: 12px 20px;
+	background: rgba(245, 158, 11, 0.06);
+	border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.stain-card__rules li {
+	font-size: 0.8rem;
+	color: var(--ink-60, #555);
+	line-height: 1.4;
+}
+
+.stain-card__table {
+	padding: 8px 0;
+}
+
+.stain-row {
+	display: grid;
+	grid-template-columns: 130px 1fr;
+	gap: 8px;
+	padding: 9px 20px;
+	border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.stain-row:last-child { border-bottom: none; }
+
+.stain-row__type {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--ink, #1a1a1a);
+	padding-top: 1px;
+	text-transform: capitalize;
+}
+
+.stain-row__method {
+	font-size: 0.8rem;
+	color: var(--ink-60, #555);
+	line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+	.stain-guide-grid { grid-template-columns: 1fr; }
+	.stain-row { grid-template-columns: 1fr; gap: 3px; }
+	.stain-row__type { color: var(--sage, #5A7A60); }
 }

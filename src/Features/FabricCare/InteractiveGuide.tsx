@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./TextileGuide.css";
-import { FIBERS, WEAVE_TYPES, CARE_GROUPS, SOURCES, Fiber } from "../../Content/Fabric&Fiber";
+import { FIBERS, WEAVE_TYPES, CARE_GROUPS, STAIN_GUIDE, Fiber } from "../../Content/Fabric&Fiber";
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
 import WeaveDiagram from "../../Components/GuideComponents/WeaveDiagram";
 import FiberFlowchart from "../../Components/GuideComponents/FiberFlowChart";
@@ -18,7 +18,7 @@ const TextileGuildInteractive = () => {
 	const { setView } = useView();
 
 	// Section headings for IntersectionObserver nav highlight
-	const sectionIds = ["natural", "semi", "synthetic", "weaves", "compare", "flowchart", "care", "sources"];
+	const sectionIds = ["natural", "semi", "synthetic", "weaves", "compare", "flowchart", "care", "stains"];
 	const observeRef = useRef<IntersectionObserver | null>(null);
 
 	useEffect(() => {
@@ -104,7 +104,7 @@ const TextileGuildInteractive = () => {
 						{ id: "compare", label: "Comparison", dot: undefined },
 						{ id: "flowchart", label: "Fiber Journey", dot: undefined },
 						{ id: "care", label: "Care Guide", dot: undefined },
-						{ id: "sources", label: "Sources", dot: undefined },
+						{ id: "stains", label: "Stain Removal", dot: undefined },
 					].map(({ id, label, dot }) => (
 						<button key={id} className={`toc-link${activeNavId === id ? " active" : ""}`} onClick={() => scrollToSection(id)}>
 							{dot && <span className="toc-dot" style={{ background: dot }} />}
@@ -432,23 +432,38 @@ const TextileGuildInteractive = () => {
 				</div>
 			</section>
 
-			{/* ══════════ SOURCES ══════════ */}
-			<section id="sources">
+			{/* ══════════ STAIN REMOVAL ══════════ */}
+			<section id="stains">
 				<div className="container">
 					<div className="section-header">
-						<p className="section-eyebrow">Research & References</p>
-						<h2 className="section-title">Sources</h2>
+						<p className="section-eyebrow">Emergency Reference</p>
+						<h2 className="section-title">Stain Removal by Fabric</h2>
 						<p className="section-desc">
-							This guide draws from textile industry sources, fiber producers, and academic references.
+							The golden rule: act immediately and blot — never rub. The right method depends entirely on the fabric.
+							Using the wrong treatment can set a stain permanently.
 						</p>
 					</div>
-					<div className="sources-grid">
-						{SOURCES.map((s) => (
-							<a key={s.num} className="source-card" href={s.url} target="_blank" rel="noopener noreferrer">
-								<div className="source-num">{s.num}</div>
-								<div className="source-title">{s.title}</div>
-								<div className="source-url">{s.domain}</div>
-							</a>
+					<div className="stain-guide-grid">
+						{STAIN_GUIDE.map((entry) => (
+							<div key={entry.fabric} className="stain-card">
+								<div className="stain-card__header">
+									<span className="stain-card__icon">{entry.icon}</span>
+									<h3 className="stain-card__fabric">{entry.fabric}</h3>
+								</div>
+								<ul className="stain-card__rules">
+									{entry.rules.map((rule) => (
+										<li key={rule}>⚠️ {rule}</li>
+									))}
+								</ul>
+								<div className="stain-card__table">
+									{entry.stains.map((s) => (
+										<div key={s.type} className="stain-row">
+											<span className="stain-row__type">{s.type}</span>
+											<span className="stain-row__method">{s.method}</span>
+										</div>
+									))}
+								</div>
+							</div>
 						))}
 					</div>
 				</div>
