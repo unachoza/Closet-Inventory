@@ -1,7 +1,54 @@
 import { useMemo, useState } from "react";
-import { ClothingItem } from "../utils/types";
+import { ClothingItem, MaterialBlend } from "../utils/types";
 import normalizeColor, { normalizeColorGroups } from "../utils/normalizeColors";
 import normalizeCategory from "../utils/normalizeCategories";
+
+const MATERIAL_MIN_PCT = 6;
+
+// Exact-key overrides — checked first.
+const MATERIAL_EXACT: Record<string, string> = {
+	"lycra": "Spandex",
+	"elastane": "Spandex",
+	"lyocell": "Tencel",
+	"cupro rayon": "Cupro",
+};
+
+// Substring rules — applied in order when no exact match found.
+// A material name that *contains* the keyword maps to the canonical value.
+const MATERIAL_CONTAINS: [substring: string, canonical: string][] = [
+	["tencel", "Tencel"],
+	["viscose", "Viscose"],
+	["polyester", "Polyester"],
+	["cupro", "Cupro"],
+	["spandex", "Spandex"],
+];
+
+function canonicalizeMaterial(name: string): string {
+	const key = name.trim().toLowerCase();
+	if (MATERIAL_EXACT[key]) return MATERIAL_EXACT[key];
+	for (const [sub, canonical] of MATERIAL_CONTAINS) {
+		if (key.includes(sub)) return canonical;
+	}
+	return capitalize(name.trim());
+}
+
+// Extract canonical material names from a raw material field.
+// Skips minor fibers (≤ 6%) so "95% Cotton, 5% Elastane" → ["Cotton"] not ["Cotton", "Elastane"].
+const extractMaterialNames = (raw: unknown): string[] => {
+	if (typeof raw === "string") {
+		return raw.trim() ? [canonicalizeMaterial(raw.trim())] : [];
+	}
+	if (Array.isArray(raw)) {
+		return (raw as MaterialBlend[])
+			.filter((b) => b && typeof b === "object" && typeof b.material === "string" && b.percentage > MATERIAL_MIN_PCT)
+			.map((b) => canonicalizeMaterial(b.material));
+	}
+	return [];
+};
+
+function capitalize(s: string): string {
+	return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
 
 export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion";
 export type FilterState = Record<FilterDimension, string[]>;
@@ -53,6 +100,8 @@ const canonicalValue = (dim: FilterDimension, value: string): string => normaliz
 
 // Display value(s) a raw field contributes to its dimension. Colors expand into
 // their distinct groups (primary + secondary), e.g. "blue / white" → ["Blue", "White"].
+// Material is handled separately via extractMaterialNames so this path is only hit
+// for non-material dimensions.
 const displayValues = (dim: FilterDimension, raw: string): string[] =>
 	dim === "color" ? normalizeColorGroups(raw) : [normalizeForDim(dim, raw)];
 
@@ -67,18 +116,18 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 			const counts = new Map<string, { value: string; count: number }>();
 
 			for (const item of closet) {
-				for (const trimmed of extractValues(item[dim])) {
-					// Colors expand into their groups ("brown / taupe" → "Brown",
-					// "blue / white" → "Blue" + "White"); other dims keep their raw value.
-					for (const display of displayValues(dim, trimmed)) {
-						const key = display.toLowerCase();
-						const existing = counts.get(key);
+				// Material uses its own extractor — pulls names only, skips minor fibers.
+				const displayList = dim === "material"
+					? extractMaterialNames(item[dim])
+					: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
 
-						if (existing) {
-							existing.count += 1;
-						} else {
-							counts.set(key, { value: display, count: 1 });
-						}
+				for (const display of displayList) {
+					const key = display.toLowerCase();
+					const existing = counts.get(key);
+					if (existing) {
+						existing.count += 1;
+					} else {
+						counts.set(key, { value: display, count: 1 });
 					}
 				}
 			}
@@ -96,10 +145,10 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 				const selected = filters[dim];
 				if (selected.length === 0) continue;
 
-				// Canonicalize both the item's value(s) and the selected terms so that
-				// case differences and color groupings match. A multi-color item
-				// ("blue / white") contributes a key per group, so it matches either filter.
-				const itemKeys = extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+				// Material uses its own extractor; all other dims use the generic path.
+				const itemKeys = dim === "material"
+					? extractMaterialNames(item[dim]).map((n) => n.toLowerCase())
+					: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
 
 				if (!matches) return false;
