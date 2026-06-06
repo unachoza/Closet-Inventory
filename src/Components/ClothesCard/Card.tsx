@@ -26,6 +26,9 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 					<div className="card-image">
 						<img src={item.imageURL} alt={item.name} />
 					</div>
+					<div className="card-name-overlay">
+						<span className="card-name-label">{item.name || item.brand || item.category}</span>
+					</div>
 					{/* <div className="card-info">
 						<p className="card-category">{item.category}</p>
 						<h2 className="card-title">{item.name}</h2>
