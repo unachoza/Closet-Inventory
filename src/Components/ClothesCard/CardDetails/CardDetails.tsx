@@ -1,156 +1,127 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { ClothingDetail } from "./cardData";
+import type { ClothingItem } from "../../../utils/types";
+import { normalizeMaterial, getMaterialColor } from "../../../utils/materialUtils";
+import { normalizeToString } from "../../../utils/normalizeToString";
+import "./CardDetails.css";
 
-const CARD_GRADIENT = "linear-gradient(180deg, #78acbf 0%, #678385 100%)";
+// ── Care emoji mapping ────────────────────────────────────────────────────────
+const CARE_MAP: [keyword: string, emoji: string, label: string][] = [
+	["dry clean", "🧺", "Dry clean"],
+	["hand wash", "👐", "Hand wash"],
+	["cold water", "🧼", "Cold wash"],
+	["cold wash", "🧼", "Cold wash"],
+	["machine wash", "🧼", "Machine wash"],
+	["no bleach", "🚫", "No bleach"],
+	["hang dry", "💨", "Hang dry"],
+	["lay flat", "📐", "Lay flat"],
+	["low heat", "🌡️", "Low heat"],
+	["tumble", "🌀", "Tumble dry"],
+	["hot water", "🔥", "Warm wash"],
+];
 
-const smallTag: React.CSSProperties = {
-	display: "inline-flex",
-	alignItems: "center",
-	padding: "3px 8px",
-	fontSize: 10,
-	fontWeight: 500,
-	color: "white",
-	background: "rgba(255,255,255,0.15)",
-	border: "1px solid rgba(255,255,255,0.42)",
-	borderRadius: 5,
-	whiteSpace: "nowrap",
-};
-
-const pill: React.CSSProperties = {
-	display: "inline-flex",
-	alignItems: "center",
-	padding: "4px 10px",
-	fontSize: 11,
-	fontWeight: 500,
-	color: "white",
-	background: "rgba(255,255,255,0.16)",
-	border: "1px solid rgba(255,255,255,0.45)",
-	borderRadius: 5,
-	whiteSpace: "nowrap",
-};
+function parseCare(care: string | string[]): { emoji: string; label: string }[] {
+	const items = Array.isArray(care) ? care : care ? [care] : [];
+	return items.filter(Boolean).map((raw) => {
+		const lower = raw.toLowerCase();
+		const match = CARE_MAP.find(([kw]) => lower.includes(kw));
+		return match ? { emoji: match[1], label: match[2] } : { emoji: "🏷️", label: raw };
+	});
+}
 
 function SectionTitle({ label }: { label: string }) {
 	return (
-		<div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
-			<span
-				style={{
-					fontSize: 10,
-					fontWeight: 700,
-					color: "rgba(255,255,255,0.55)",
-					letterSpacing: "0.12em",
-					textTransform: "uppercase",
-					flexShrink: 0,
-				}}
-			>
-				{label}
-			</span>
-			<div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.2)" }} />
+		<div className="card-details__section-title">
+			<span className="card-details__section-title-label">{label}</span>
+			<div className="card-details__section-title-divider" />
 		</div>
 	);
 }
 
-interface CardDProps {
-	item: ClothingDetail;
+// ── Props ─────────────────────────────────────────────────────────────────────
+interface CardDetailsProps {
+	item: ClothingItem;
 	onEdit?: () => void;
 	onRemove?: () => void;
 }
 
-export const CardDetails = ({ item, onEdit, onRemove }: CardDProps) => {
+export const CardDetails = ({ item, onEdit, onRemove }: CardDetailsProps) => {
 	const [expanded, setExpanded] = useState(false);
 	const [confirming, setConfirming] = useState(false);
 
+	const blend = normalizeMaterial(item.material);
+	const careItems = parseCare(item.care);
+	const occasions = Array.isArray(item.occasion)
+		? item.occasion
+		: item.occasion
+		? [item.occasion]
+		: [];
+	const notes = normalizeToString(item.notes);
+
 	return (
-		<div
-			style={{
-				background: CARD_GRADIENT,
-				borderRadius: 16,
-				padding: 24,
-				width: 300,
-				display: "flex",
-				flexDirection: "column",
-				gap: 16,
-				boxSizing: "border-box",
-				fontFamily: "Inter, sans-serif",
-				border: "2px solid #2d3035",
-			}}
-		>
-			{/* Top row: category badge */}
-			<div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-				<div style={{ flex: 1 }}>
-					<p style={{ fontSize: 22, fontWeight: 700, color: "white", lineHeight: 1.15, margin: "0 0 4px 0" }}>{item.name}</p>
-					<p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", margin: 0 }}>{item.brand}</p>
+		<div className="card-details" onClick={(e) => e.stopPropagation()}>
+			{/* Name + category badge */}
+			<div className="card-details__header">
+				<div className="card-details__header-text">
+					<p className="card-details__name">
+						{item.name || item.brand || item.category}
+					</p>
+					{item.brand && <p className="card-details__brand">{item.brand}</p>}
 				</div>
-				<span style={{ ...smallTag, marginLeft: 8, marginTop: 2 }}>{item.category}</span>
+				{item.category && <span className="card-details__category-tag">{item.category}</span>}
 			</div>
 
-			{/* Thin divider */}
-			<div style={{ height: 1, background: "rgba(255,255,255,0.2)" }} />
+			{/* Divider */}
+			<div className="card-details__divider" />
 
-			{/* Color + size row */}
-			<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-				<div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-					<div
-						style={{
-							width: 11,
-							height: 11,
-							borderRadius: "50%",
-							background: "#b2b2bc",
-							border: "1.5px solid rgba(255,255,255,0.65)",
-							flexShrink: 0,
-						}}
-					/>
-					<span style={{ fontSize: 13, color: "white", fontWeight: 500 }}>{item.color}</span>
+			{/* Color + size */}
+			<div className="card-details__color-size">
+				<div className="card-details__color-display">
+					<div className="card-details__color-circle" />
+					<span className="card-details__color-name">{item.color || "—"}</span>
 				</div>
-				<span style={pill}>
-					{item.size} · {item.sizeSystem}
-				</span>
+				{item.size && <span className="card-details__size-pill">{item.size}</span>}
 			</div>
 
-			{/* Composition — editorial style with % labels above bar */}
-			<div>
-				<SectionTitle label="Composition" />
-				<div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-					{item.material.map((m) => (
-						<span
-							key={m.name}
-							style={{
-								fontSize: 11,
-								fontWeight: 600,
-								color: m.color === "#4ab6f5" ? "#4ab6f5" : "rgba(255,255,255,0.6)",
-							}}
-						>
-							{m.pct}%
-						</span>
-					))}
+			{/* Composition bar */}
+			{blend.length > 0 && (
+				<div className="card-details__composition">
+					<SectionTitle label="Composition" />
+					<div className="card-details__composition-labels">
+						{blend.map((m) => (
+							<span key={m.material} className="card-details__composition-percentage" style={{ color: getMaterialColor(m.material) }}>
+								{m.percentage}%
+							</span>
+						))}
+					</div>
+					<div className="card-details__composition-bar">
+						{blend.map((m) => (
+							<div key={m.material} className="card-details__composition-segment" style={{ background: getMaterialColor(m.material) }} />
+						))}
+					</div>
+					<div className="card-details__composition-materials">
+						{blend.map((m) => (
+							<span key={m.material} className="card-details__composition-material">
+								{m.material}
+							</span>
+						))}
+					</div>
 				</div>
-				<div style={{ display: "flex", borderRadius: 6, overflow: "hidden", height: 10 }}>
-					{item.material.map((m) => (
-						<div key={m.name} style={{ flex: m.pct, background: m.color }} />
-					))}
-				</div>
-				<div style={{ display: "flex", justifyContent: "space-between", marginTop: 5 }}>
-					{item.material.map((m) => (
-						<span key={m.name} style={{ fontSize: 11, color: "rgba(255,255,255,0.85)" }}>
-							{m.name}
-						</span>
-					))}
-				</div>
-			</div>
+			)}
 
-			{/* Care — compact inline tags */}
-			<div>
-				<SectionTitle label="Care" />
-				<div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-					{item.care.map((c) => (
-						<span key={c.label} style={smallTag}>
-							{c.emoji} {c.label}
-						</span>
-					))}
+			{/* Care pills */}
+			{careItems.length > 0 && (
+				<div className="card-details__care">
+					<SectionTitle label="Care" />
+					<div className="card-details__care-pills">
+						{careItems.map((c) => (
+							<span key={c.label} className="card-details__care-pill">{c.emoji} {c.label}</span>
+						))}
+					</div>
 				</div>
-			</div>
+			)}
 
-			{/* Expanded — editorial prose style */}
+			{/* Expanded section */}
 			<AnimatePresence>
 				{expanded && (
 					<motion.div
@@ -158,59 +129,35 @@ export const CardDetails = ({ item, onEdit, onRemove }: CardDProps) => {
 						initial={{ opacity: 0, height: 0 }}
 						animate={{ opacity: 1, height: "auto" }}
 						exit={{ opacity: 0, height: 0 }}
-						transition={{ duration: 0.28, ease: "easeInOut" }}
+						transition={{ duration: 0.25, ease: "easeInOut" }}
 						style={{ overflow: "hidden" }}
 					>
-						<div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-							<div>
-								<SectionTitle label="Identity" />
-								<p style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 2, margin: 0 }}>
-									{item.season} · {item.year} · {item.price}
-									<br />
-									{item.retailer} · {item.condition} · {item.howAcquired}
-								</p>
-							</div>
-
-							<div>
-								<SectionTitle label="Sizing" />
-								<p style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 2, margin: 0 }}>
-									{item.size} ({item.sizeSystem}) · {item.fitType}
-								</p>
-							</div>
-
-							<div>
-								<SectionTitle label="Style" />
-								<p style={{ fontSize: 12, color: "rgba(255,255,255,0.85)", lineHeight: 2, margin: 0 }}>
-									{item.neckline} · {item.sleeve}
-									<br />
-									{item.silhouette} · {item.closure} · {item.texture}
-								</p>
-							</div>
-
-							<div>
-								<SectionTitle label="Occasion" />
-								<div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-									{item.occasion.map((o) => (
-										<span key={o} style={pill}>
-											{o}
-										</span>
-									))}
+						<div className="card-details__expanded">
+							{(item.age || item.price) && (
+								<div className="card-details__expanded-subsection">
+									<SectionTitle label="Identity" />
+									<p className="card-details__identity-text">
+										{[item.age, item.price].filter(Boolean).join(" · ")}
+									</p>
 								</div>
-							</div>
+							)}
 
-							{item.notes && (
-								<div>
+							{occasions.length > 0 && (
+								<div className="card-details__expanded-subsection">
+									<SectionTitle label="Occasion" />
+									<div className="card-details__occasion-pills">
+										{occasions.map((o) => (
+											<span key={o} className="card-details__occasion-pill">{o}</span>
+										))}
+									</div>
+								</div>
+							)}
+
+							{notes && (
+								<div className="card-details__expanded-subsection">
 									<SectionTitle label="Notes" />
-									<p
-										style={{
-											fontSize: 11,
-											color: "rgba(255,255,255,0.8)",
-											lineHeight: 1.65,
-											margin: 0,
-											fontStyle: "italic",
-										}}
-									>
-										"{item.notes}"
+									<p className="card-details__notes-text">
+										"{notes}"
 									</p>
 								</div>
 							)}
@@ -219,109 +166,43 @@ export const CardDetails = ({ item, onEdit, onRemove }: CardDProps) => {
 				)}
 			</AnimatePresence>
 
-			{!expanded && <div style={{ flex: 1 }} />}
+			<div className="card-details__spacer" />
 
+			{/* Remove / Edit buttons */}
 			{confirming ? (
-				<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-					<p style={{ margin: 0, textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 500 }}>
+				<div className="card-details__confirm-section">
+					<p className="card-details__confirm-text">
 						Remove this item?
 					</p>
-					<div style={{ display: "flex", gap: 8 }}>
-						<button
-							onClick={() => setConfirming(false)}
-							style={{
-								flex: 1,
-								padding: "9px 12px",
-								borderRadius: 8,
-								border: "1px solid rgba(255,255,255,0.4)",
-								background: "transparent",
-								color: "rgba(255,255,255,0.75)",
-								fontSize: 12,
-								fontWeight: 500,
-								cursor: "pointer",
-								fontFamily: "Inter, sans-serif",
-							}}
-						>
+					<div className="card-details__buttons">
+						<button onClick={() => setConfirming(false)} className="card-details__button card-details__button--cancel">
 							Cancel
 						</button>
-						<button
-							onClick={() => {
-								setConfirming(false);
-								onRemove?.();
-							}}
-							style={{
-								flex: 1,
-								padding: "9px 12px",
-								borderRadius: 8,
-								border: "1.5px solid rgba(255,80,80,0.7)",
-								background: "rgba(255,60,60,0.2)",
-								color: "rgba(255,160,160,1)",
-								fontSize: 12,
-								fontWeight: 700,
-								cursor: "pointer",
-								fontFamily: "Inter, sans-serif",
-							}}
-						>
+						<button onClick={() => { setConfirming(false); onRemove?.(); }} className="card-details__button card-details__button--confirm">
 							Yes, remove
 						</button>
 					</div>
 				</div>
 			) : (
-				<div style={{ display: "flex", gap: 8 }}>
-					<button
-						onClick={() => setConfirming(true)}
-						style={{
-							flex: 1,
-							padding: "9px 12px",
-							borderRadius: 8,
-							border: "1.5px solid rgba(255,110,110,0.55)",
-							background: "rgba(255,80,80,0.1)",
-							color: "rgba(255,170,170,1)",
-							fontSize: 12,
-							fontWeight: 600,
-							cursor: "pointer",
-							fontFamily: "Inter, sans-serif",
-						}}
-					>
+				<div className="card-details__buttons">
+					<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
 						Remove
 					</button>
-					<button
-						onClick={onEdit}
-						style={{
-							flex: 1,
-							padding: "9px 12px",
-							borderRadius: 8,
-							border: "1.5px solid rgba(255,255,255,0.65)",
-							background: "rgba(255,255,255,0.12)",
-							color: "white",
-							fontSize: 12,
-							fontWeight: 600,
-							cursor: "pointer",
-							fontFamily: "Inter, sans-serif",
-						}}
-					>
+					<button onClick={onEdit} className="card-details__button">
 						Edit
 					</button>
 				</div>
 			)}
 
-			<button
-				onClick={() => setExpanded(!expanded)}
-				style={{
-					width: "100%",
-					padding: "12px 16px",
-					borderRadius: 8,
-					border: "1.5px solid rgba(255,255,255,0.9)",
-					background: "transparent",
-					color: "white",
-					fontSize: 14,
-					fontWeight: 600,
-					cursor: "pointer",
-					fontFamily: "Inter, sans-serif",
-				}}
-			>
-				{expanded ? "Show less" : "See all details"}
-			</button>
+			{/* See all details toggle */}
+			{(occasions.length > 0 || notes || item.age || item.price) && (
+				<button
+					onClick={() => setExpanded(!expanded)}
+					className="card-details__toggle-details"
+				>
+					{expanded ? "Show less" : "See all details"}
+				</button>
+			)}
 		</div>
 	);
 };
