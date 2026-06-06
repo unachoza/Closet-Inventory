@@ -1693,6 +1693,108 @@ function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
 }
 
 /**
+ * Strategy: Shopify standard order email layout (SKIMS, and any Shopify-powered store).
+ *
+ * Shopify's default order confirmation template uses consistent CSS class names:
+ *   <span class="order-list__item-title">  — "PRODUCT NAME | COLOR × QTY"
+ *   <span class="order-list__item-variant"> — "COLOR / SIZE"
+ *   <p class="order-list__item-price">     — current price (after discounts)
+ *   <del class="order-list__item-original-price"> — struck-through original (sale indicator)
+ *
+ * The discount allocation span inside the description cell contains "$" amounts
+ * (e.g. "3+ FOR $12 EACH (-$40.00)"), which breaks generic column-detection strategies
+ * that identify the price column by scanning for "$". This strategy avoids that entirely
+ * by using Shopify's class names directly.
+ *
+ * SKIMS encodes color in the title as "PRODUCT NAME | COLOR × QTY". We strip both
+ * the quantity suffix ("× N") and the color suffix ("| COLOR") from the display name
+ * since color is captured separately from the variant span.
+ */
+function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
+	const titleSpans = doc.querySelectorAll("span.order-list__item-title");
+	if (titleSpans.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	for (const titleSpan of titleSpans) {
+		const row = titleSpan.closest("tr");
+		if (!row) continue;
+
+		// Image
+		const img = row.querySelector("img");
+		const imageUrl = img && isProductImage(img as HTMLImageElement)
+			? img.getAttribute("src") ?? ""
+			: "";
+
+		// Name: strip "× N" quantity suffix then "| COLOR" color suffix
+		// Raw: "FITS EVERYBODY HIGH WAISTED THONG | ONYX × 5"
+		// → strip qty: "FITS EVERYBODY HIGH WAISTED THONG | ONYX"
+		// → strip color segment: "FITS EVERYBODY HIGH WAISTED THONG"
+		const rawTitle = (titleSpan.textContent ?? "").replace(/&nbsp;/g, " ").trim().replace(/\s+/g, " ");
+		const withoutQty = rawTitle.replace(/\s*[×x]\s*\d+\s*$/, "").trim();
+		const pipeIdx = withoutQty.lastIndexOf(" | ");
+		const name = pipeIdx !== -1 ? withoutQty.slice(0, pipeIdx).trim() : withoutQty;
+
+		if (!name || name.length < 3) continue;
+
+		// Variant: "ONYX / S" → color = "onyx", size = "S"
+		const variantSpan = row.querySelector("span.order-list__item-variant");
+		const variantText = variantSpan
+			? (variantSpan.textContent ?? "").trim().replace(/\s+/g, " ")
+			: "";
+
+		let color = "";
+		let size = "";
+
+		if (variantText.includes("/")) {
+			const parts = variantText.split("/").map((p) => p.trim());
+			for (const part of parts) {
+				if (looksLikeSize(part) && !size) {
+					size = part;
+				} else if (!color) {
+					color = part.toLowerCase();
+				}
+			}
+		} else if (variantText) {
+			if (looksLikeSize(variantText)) {
+				size = variantText;
+			} else {
+				color = variantText.toLowerCase();
+			}
+		}
+
+		// Price: read directly from the dedicated price element
+		const priceEl = row.querySelector("p.order-list__item-price");
+		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : "";
+		const prices = extractPrices(priceText);
+		const price = prices[0] ?? "";
+
+		// Sale detection: struck-through original price present
+		const delEl = row.querySelector("del.order-list__item-original-price");
+		const onSale = Boolean(delEl);
+
+		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
  * Strategy: Single-column bold-paragraph layout (Banana Republic Factory, Gap, Old Navy).
  *
  * Each product occupies a single <td> containing:
@@ -2026,10 +2128,11 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  8. Paragraph-based two-cell rows (Princess Polly) — <p> elements
 	//  9. Poshmark 3-cell rows — td.item image + nested name table + td.price
 	// 10. Table rows with 4+ cells (Aritzia, Nordstrom)
-	// 11. Order-ID container 3-column rows (AliExpress, Wish)
-	// 12. Div-based layouts (Zara)
-	// 13. Text-only product rows (Express) — no images, ≥2 matches
-	// 14. Image fallback
+	// 11. Shopify order template (SKIMS) — order-list__item-title class
+	// 12. Order-ID container 3-column rows (AliExpress, Wish)
+	// 13. Div-based layouts (Zara)
+	// 14. Text-only product rows (Express) — no images, ≥2 matches
+	// 15. Image fallback
 
 	const strategies = [
 		extractFromNestedTables,
@@ -2042,6 +2145,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromParagraphLayout,
 		extractFromPoshmarkLayout,         // Poshmark td.price 3-cell rows
 		extractFromTableRows,
+		extractFromShopifyLayout,          // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
 		extractFromDivLayout,
 		extractFromTextOnlyRows,

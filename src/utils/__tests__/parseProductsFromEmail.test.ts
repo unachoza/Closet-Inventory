@@ -1528,6 +1528,98 @@ describe("parseProductsFromEmail > Express Format B: image with nested name/qty/
 });
 
 
+// ---------------------------------------------------------------------------
+// Shopify layout (SKIMS)
+// ---------------------------------------------------------------------------
+
+describe("Strategy: Shopify order template (SKIMS)", () => {
+	const skimsHtml = html(`
+		<table>
+			<tr class="order-list__item" style="width: 100%;">
+				<td class="order-list__item__cell">
+					<table>
+						<tbody>
+							<tr>
+								<td>
+									${productImg("https://cdn.shopify.com/s/files/1/0259/5448/4284/products/SKIMS-item1.jpg", 60, 60)}
+								</td>
+								<td class="order-list__product-description-cell">
+									<span class="order-list__item-title" style="font-size: 16px; font-weight: 600; color: #62554a;">FITS EVERYBODY HIGH WAISTED THONG | ONYX&nbsp;&times;&nbsp;5</span><br>
+									<span class="order-list__item-variant" style="font-size: 14px; color: #62554a;">ONYX / S</span><br>
+									<span class="order-list__item-discount-allocation" style="font-size: 14px; display: block;">
+										3+ FOR $12 EACH (-$40.00)
+									</span>
+								</td>
+								<td class="order-list__price-cell" style="white-space: nowrap;">
+									<del class="order-list__item-original-price" style="font-size: 14px; display: block; text-align: right; color: #999;">$100.00</del>
+									<p class="order-list__item-price" style="color: #62554a; font-size: 16px; font-weight: 600;" align="right">$60.00</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr class="order-list__item" style="width: 100%; border-top: 1px solid #e5e5e5;">
+				<td class="order-list__item__cell">
+					<table>
+						<tbody>
+							<tr>
+								<td>
+									${productImg("https://cdn.shopify.com/s/files/1/0259/5448/4284/products/SKIMS-item2.jpg", 60, 60)}
+								</td>
+								<td class="order-list__product-description-cell">
+									<span class="order-list__item-title" style="font-size: 16px; font-weight: 600; color: #62554a;">SUMMER MESH MID WAIST THONG | ONYX&nbsp;&times;&nbsp;5</span><br>
+									<span class="order-list__item-variant" style="font-size: 14px; color: #62554a;">ONYX / XS</span><br>
+								</td>
+								<td class="order-list__price-cell" style="white-space: nowrap;">
+									<p class="order-list__item-price" style="color: #62554a; font-size: 16px; font-weight: 600;" align="right">$40.00</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</table>
+	`);
+
+	it("extracts both SKIMS items", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products).toHaveLength(2);
+	});
+
+	it("strips the '| COLOR' suffix and '× QTY' from the product name", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].name).toBe("FITS EVERYBODY HIGH WAISTED THONG");
+		expect(products[1].name).toBe("SUMMER MESH MID WAIST THONG");
+	});
+
+	it("extracts color and size from the variant span", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].color).toBe("onyx");
+		expect(products[0].size).toBe("S");
+		expect(products[1].color).toBe("onyx");
+		expect(products[1].size).toBe("XS");
+	});
+
+	it("reads price from p.order-list__item-price (not from discount text)", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].price).toBe("$60.00");
+		expect(products[1].price).toBe("$40.00");
+	});
+
+	it("marks the discounted item as on sale", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].onSale).toBe(true);   // has <del> original price
+		expect(products[1].onSale).toBe(false);  // no original price
+	});
+
+	it("captures product image URLs", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].imageUrl).toContain("SKIMS-item1.jpg");
+		expect(products[1].imageUrl).toContain("SKIMS-item2.jpg");
+	});
+});
+
 ///// confirmed working stores
 // Zara
 // Aritzia
@@ -1537,4 +1629,5 @@ describe("parseProductsFromEmail > Express Format B: image with nested name/qty/
 // Threadup
 // Poshmark
 // Express - failed
+// SKIMS (Shopify template)
 // Banana Republic 

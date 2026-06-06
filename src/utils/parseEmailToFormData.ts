@@ -26,6 +26,7 @@ const BRAND_PATTERNS: Record<string, string> = {
 	mango: "mango",
 	asos: "asos",
 	shein: "shein",
+	skims: "skims",
 	"free people": "free people",
 	reformation: "reformation",
 	thredup: "thredup",
