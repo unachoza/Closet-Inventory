@@ -1,5 +1,10 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
+import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
+import { inferMaterialFromName } from "./inferMaterialFromName";
+import { inferProductAttributes } from "./inferProductAttributes";
+import { cleanProductName } from "./cleanProductName";
+import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
@@ -108,11 +113,30 @@ function stripHtml(html: string): string {
 export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
+	const brand = extractBrand(combinedText, from);
+	const category = extractCategory(combinedText);
+	const styleTags = inferStyleTagsFromName(combinedText, category);
+
+	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
+	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
+
+	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
+	const nameFromSubject = stripBrandFromName(subject, brand);
+	const cleanedName = cleanProductName(nameFromSubject);
+
+	// Product attributes from the raw (uncleaned) name
+	const attrs = inferProductAttributes(subject);
 
 	return {
 		...formItem,
-		brand: extractBrand(combinedText, from),
-		category: extractCategory(combinedText),
+		brand,
+		category,
+		...(cleanedName && { name: cleanedName }),
+		...(inlineColor && { color: inlineColor }),
+		...(inlineSize && { size: inlineSize }),
+		material: inferMaterialFromName(combinedText),
+		occasion: styleTags[0] ?? "",
 		age: "new",
+		...attrs,
 	};
 }

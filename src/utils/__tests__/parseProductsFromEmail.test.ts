@@ -352,7 +352,7 @@ describe("parseProductsFromEmail", () => {
 
 		it("extracts name from <a> tag", () => {
 			const [p] = parseProductsFromEmail(amazonWithClass);
-			expect(p.name).toBe("AKEFUN Womens Summer Linen Shirts");
+			expect(p.name).toBe("AKEFUN Summer Linen Shirts");
 		});
 
 		it("parses <sup>$</sup>14<sup>99</sup> into $14.99", () => {
@@ -530,7 +530,7 @@ describe("parseProductsFromEmail", () => {
 
 		it("extracts name from bold element", () => {
 			const products = parseProductsFromEmail(orderContainer);
-			expect(products[0].name).toBe("Women's Running Shoe");
+			expect(products[0].name).toBe("Running Shoe");
 		});
 
 		it("parses size/color from 'size / color' pattern", () => {

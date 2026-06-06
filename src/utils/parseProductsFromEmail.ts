@@ -1,3 +1,7 @@
+import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize } from "./parseNameHelpers";
+import { cleanProductName } from "./cleanProductName";
+import { inferProductAttributes } from "./inferProductAttributes";
+
 /**
  * Extracts product details from order confirmation email HTML.
  *
@@ -19,6 +23,12 @@ export interface ExtractedProduct {
 	readonly itemNumber: string;
 	readonly material: string;
 	readonly onSale: boolean;
+	// Inferred clothing attributes
+	readonly sleeveLength?: string;
+	readonly hemLength?: string;
+	readonly neckline?: string;
+	readonly fit?: string;
+	readonly rise?: string;
 }
 
 const PRICE_REGEX = /\$\d{1,5}(?:\.\d{2})?/g;
@@ -106,6 +116,24 @@ function getSalePrice(td: Element): string {
 
 function getCellText(td: Element): string {
 	return (td.textContent ?? "").trim().replace(/\s+/g, " ");
+}
+
+// Looks for explicit "Material:", "Fabric:", "Content:" labels,
+// then falls back to bare percentage-blend patterns.
+const MATERIAL_LABEL_RE = /(?:material|fabric|fiber\s+content|fibre\s+content|content|composition):\s*([^\n<]+)/i;
+const FIBER_PCT_RE = /\d+\s*%\s*[a-z]/i;
+
+function extractMaterialFromText(text: string): string {
+	const labelMatch = text.match(MATERIAL_LABEL_RE);
+	if (labelMatch) return labelMatch[1].trim();
+
+	// Scan line-by-line so a lone "95% Cotton, 5% Spandex" line is found
+	// without grabbing unrelated text before/after it.
+	for (const line of text.split(/[\n;]/)) {
+		if (FIBER_PCT_RE.test(line)) return line.trim();
+	}
+
+	return "";
 }
 
 interface ParsedNameCell {
@@ -882,6 +910,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 		let size = "";
 		let listPrice = 0;
 		let itemNumber = "";
+		let labeledMaterial = "";
 
 		for (const line of detailLines) {
 			const colorMatch = line.match(/^Color:\s*(.+)/i);
@@ -895,6 +924,11 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 				size = sizeVal === "N/A" ? "" : sizeVal;
 				continue;
 			}
+			const materialMatch = line.match(/^(?:Material|Fabric|Content|Fiber\s*Content|Composition):\s*(.+)/i);
+			if (materialMatch && !labeledMaterial) {
+				labeledMaterial = materialMatch[1].trim();
+				continue;
+			}
 			const itemMatch = line.match(/^Item\s*#:\s*(.+)/i);
 			if (itemMatch && !itemNumber) {
 				itemNumber = itemMatch[1].trim();
@@ -904,6 +938,11 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 			if (priceFieldMatch && listPrice === 0) {
 				listPrice = parseFloat(priceFieldMatch[1]);
 			}
+		}
+
+		// If no labeled material field, try extracting from the full details text
+		if (!labeledMaterial) {
+			labeledMaterial = extractMaterialFromText(getCellText(detailsTh));
 		}
 
 		// Get paid price from a sibling <td> (not the details td)
@@ -937,7 +976,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 			color,
 			size,
 			itemNumber,
-			material,
+			material: labeledMaterial || material,
 			onSale,
 		});
 	}
@@ -999,9 +1038,10 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 			const name = nameP ? (nameP.textContent ?? "").trim() : "";
 			if (!name || name.length < 3) continue;
 
-			// Extract Color and Size from labeled spans
+			// Extract Color, Size, and Material from labeled spans
 			let color = "";
 			let size = "";
+			let spanMaterial = "";
 			const allSpans = Array.from(detailsCol.querySelectorAll("span"));
 
 			for (let i = 0; i < allSpans.length; i++) {
@@ -1010,19 +1050,30 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 
 				if (cleanLabel === "color" && i + 1 < allSpans.length) {
 					const valText = (allSpans[i + 1].textContent ?? "").trim();
-					if (valText.length > 0 && !/^(size|color)/i.test(valText)) {
+					if (valText.length > 0 && !/^(size|color|material|fabric)/i.test(valText)) {
 						color = valText.toLowerCase();
 						i++;
 					}
 				} else if (cleanLabel === "size" && i + 1 < allSpans.length) {
 					const valText = (allSpans[i + 1].textContent ?? "").trim().replace(/\s+/g, " ");
-					if (valText.length > 0 && !/^(size|color)/i.test(valText)) {
+					if (valText.length > 0 && !/^(size|color|material|fabric)/i.test(valText)) {
 						// "XS （US 2）" or "M （US 6）" → extract size code before parens
 						const sizeMatch = valText.match(/^(\S+)/);
 						size = sizeMatch ? sizeMatch[1] : valText;
 						i++;
 					}
+				} else if (/^(material|fabric|content|composition)$/.test(cleanLabel) && i + 1 < allSpans.length) {
+					const valText = (allSpans[i + 1].textContent ?? "").trim();
+					if (valText.length > 0 && !spanMaterial) {
+						spanMaterial = valText;
+						i++;
+					}
 				}
+			}
+
+			// Fall back to scanning full column text for labeled/percentage material
+			if (!spanMaterial) {
+				spanMaterial = extractMaterialFromText(getCellText(detailsCol));
 			}
 
 			// Extract price (with sale detection via line-through)
@@ -1073,7 +1124,7 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 				color,
 				size,
 				itemNumber: "",
-				material: "",
+				material: spanMaterial,
 				onSale,
 			});
 		}
@@ -1638,6 +1689,26 @@ function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+// Post-processing applied to every extracted product regardless of strategy.
+// Infer-from-raw first, then clean for storage — per advisor guidance.
+function enrichProduct(p: ExtractedProduct): ExtractedProduct {
+	const rawName = p.name;
+
+	// Extract inline color/size suffix ("...in burgundy size M") before cleaning
+	const inline = parseInlineColorSize(rawName);
+	const color = p.color || inline.color;
+	const size = p.size || inline.size;
+
+	// Strip brand prefix from name, then clean SEO junk
+	const nameWithoutBrand = stripBrandFromName(rawName, p.brand);
+	const name = cleanProductName(nameWithoutBrand) || nameWithoutBrand;
+
+	// Infer clothing attributes from raw (un-cleaned) name
+	const attrs = inferProductAttributes(rawName);
+
+	return { ...p, name, color, size, ...attrs };
+}
+
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	if (!html.trim()) return [];
 
@@ -1661,37 +1732,24 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  9. Text-only product rows (Express) — no images, ≥2 matches
 	// 10. Image fallback
 
-	const nestedProducts = extractFromNestedTables(doc);
-	if (nestedProducts.length > 0) return nestedProducts;
+	const strategies = [
+		extractFromNestedTables,
+		extractFromLabeledFieldLayout,
+		extractFromReactEmailLayout,
+		extractFromAmazonLayout,
+		extractFromAttributeTableRows,
+		extractFromParagraphLayout,
+		extractFromTableRows,
+		extractFromOrderContainerRows,
+		extractFromDivLayout,
+		extractFromTextOnlyRows,
+		extractFromImages,
+	];
 
-	const labeledProducts = extractFromLabeledFieldLayout(doc);
-	if (labeledProducts.length > 0) return labeledProducts;
+	for (const strategy of strategies) {
+		const raw = strategy(doc);
+		if (raw.length > 0) return raw.map(enrichProduct);
+	}
 
-	const reactEmailProducts = extractFromReactEmailLayout(doc);
-	if (reactEmailProducts.length > 0) return reactEmailProducts;
-
-	const amazonProducts = extractFromAmazonLayout(doc);
-	if (amazonProducts.length > 0) return amazonProducts;
-
-	// Two-cell rows whose details cell embeds a Color/Size attribute table (H&M).
-	// Strict guard runs before the generic paragraph/table strategies.
-	const attributeTableProducts = extractFromAttributeTableRows(doc);
-	if (attributeTableProducts.length > 0) return attributeTableProducts;
-
-	const paragraphProducts = extractFromParagraphLayout(doc);
-	if (paragraphProducts.length > 0) return paragraphProducts;
-
-	const tableProducts = extractFromTableRows(doc);
-	if (tableProducts.length > 0) return tableProducts;
-
-	const orderContainerProducts = extractFromOrderContainerRows(doc);
-	if (orderContainerProducts.length > 0) return orderContainerProducts;
-
-	const divProducts = extractFromDivLayout(doc);
-	if (divProducts.length > 0) return divProducts;
-
-	const textOnlyProducts = extractFromTextOnlyRows(doc);
-	if (textOnlyProducts.length > 0) return textOnlyProducts;
-
-	return extractFromImages(doc);
+	return [];
 }
