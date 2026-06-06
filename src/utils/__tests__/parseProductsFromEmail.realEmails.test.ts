@@ -55,6 +55,25 @@ describe("real emails > Express (no photos)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Express — FULL email (header banners, hero image, summary, huge footer grid)
+// Reproduces the real-inbox failure: surrounding markup must not pre-empt the
+// text-only item rows.
+// ---------------------------------------------------------------------------
+
+describe("real emails > Express (full email body)", () => {
+	const products = parseProductsFromEmail(loadFixture("express-full-email.html"));
+
+	it("still finds exactly the 4 purchased items (ignores banners/footer)", () => {
+		expect(products.map((p) => [p.name, p.price])).toEqual([
+			["STYLIST HIGH WAISTED PLEATED SHORTS", "$34.00"],
+			["EDITOR SUPER HIGH WAISTED TAILORED MINI SKORT", "$29.00"],
+			["BODY CONTOUR VELVET MOCK NECK LONG SLEEVE BODYSUIT", "$19.00"],
+			["BODY CONTOUR HIGH COMPRESSION MOCK NECK LONG SLEEVE BODYSUIT", "$19.00"],
+		]);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Banana Republic Factory — bold-paragraph single column, no product photos
 // ---------------------------------------------------------------------------
 
@@ -158,6 +177,45 @@ describe("real emails > Anthropologie ($-prefixed prices)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Victoria's Secret — SFMC blocks: bold name + Color/Size/Qty attribute table
+// ---------------------------------------------------------------------------
+
+describe("real emails > Victoria's Secret", () => {
+	const products = parseProductsFromEmail(loadFixture("victorias-secret.html"));
+
+	it("de-duplicates repeated SKUs down to the 4 unique items", () => {
+		expect(products.map((p) => p.name)).toEqual([
+			"No-show Floral Lace Back Cheeky Panty",
+			"No-show Cheeky Panty",
+			"Lace Trim Thong Panty",
+			"Stretch Cotton High-leg Brief Panty",
+		]);
+	});
+
+	it("reads the SKU as the item number", () => {
+		expect(products.map((p) => p.itemNumber)).toEqual(["26191609", "23835482", "26114919", "24587310"]);
+	});
+
+	it("strips the color code and lowercases (54A2 Black -> black)", () => {
+		for (const p of products) expect(p.color).toBe("black");
+	});
+
+	it("reads size from the attribute table", () => {
+		for (const p of products) expect(p.size).toBe("S");
+	});
+
+	it("uses the paid line total as the price and flags the sale", () => {
+		// Stretch keeps the LAST occurrence (qty 2 / $12.00), not the qty-1 / $6.00 one.
+		expect(products.map((p) => p.price)).toEqual(["$6.00", "$24.00", "$6.00", "$12.00"]);
+		expect(products.every((p) => p.onSale)).toBe(true);
+	});
+
+	it("has no per-item image (VS shows only marketing banners)", () => {
+		for (const p of products) expect(p.imageUrl).toBe("");
+	});
+});
+
+// ---------------------------------------------------------------------------
 // SKIMS — Shopify order-notification template
 // ---------------------------------------------------------------------------
 
@@ -189,5 +247,45 @@ describe("real emails > SKIMS (Shopify notification)", () => {
 	it("flags sale only when a struck original price is present", () => {
 		expect(products[0].onSale).toBe(true);
 		expect(products[1].onSale).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Old Navy — monospace in-store register receipt (plaintext line items)
+// ---------------------------------------------------------------------------
+
+describe("real emails > Old Navy (POS receipt)", () => {
+	const products = parseProductsFromEmail(loadFixture("old-navy-receipt.html"));
+
+	it("detects the 4 purchased items and excludes the bag fee", () => {
+		expect(products).toHaveLength(4);
+		expect(products.map((p) => p.name)).toEqual([
+			"Cozy Crew Socks",
+			"Cozy Crew Socks",
+			"Low-Cut Socks 4-Pack",
+			"Crew-Socks 4-Pack",
+		]);
+	});
+
+	it("reads the net (post-discount) price, not the original", () => {
+		expect(products.map((p) => p.price)).toEqual(["$1.00", "$1.00", "$4.99", "$4.99"]);
+	});
+
+	it("captures the register SKU as the item number", () => {
+		expect(products.map((p) => p.itemNumber)).toEqual([
+			"608308-151-0000",
+			"608308-121-0000",
+			"209795-021-0000",
+			"209788-021-0000",
+		]);
+	});
+
+	it("flags every item on sale (original unit price exceeds net)", () => {
+		expect(products.every((p) => p.onSale)).toBe(true);
+	});
+
+	it("does not pick up the barcode image or summary lines as products", () => {
+		for (const p of products) expect(p.imageUrl).toBe("");
+		expect(products.map((p) => p.name)).not.toContain("Bag fee");
 	});
 });

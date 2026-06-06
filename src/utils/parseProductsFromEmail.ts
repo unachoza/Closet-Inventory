@@ -394,6 +394,14 @@ function extractFromDivLayout(doc: Document): ExtractedProduct[] {
 		const img = td.querySelector("img") as HTMLImageElement | null;
 		if (!img || !isProductImage(img)) continue;
 
+		// Only treat the image's OWN cell as the product cell. Without this, a
+		// large container <td> (e.g. an entire email body wrapping a hero banner
+		// plus unrelated text divs and an order total) is mistaken for a product
+		// cell, producing a bogus "intro text + total price" item that pre-empts
+		// the real line-item strategies. A genuine div-based product cell holds
+		// the image directly, so its closest <td> ancestor is itself.
+		if (img.closest("td") !== td) continue;
+
 		const imageUrl = img.getAttribute("src") ?? "";
 
 		// Get leaf-level divs with text content
@@ -2087,6 +2095,66 @@ function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
 }
 
 /**
+ * Strategy: monospace plaintext register receipt (Old Navy / Gap Inc. POS).
+ *
+ * In-store receipts are emailed as a single monospace block where each line is
+ * <br>-separated and space-padded. A purchased item is two consecutive lines:
+ *   "Cozy Crew Socks for Women      1.00 N"   ← name + net price + tax code
+ *   "608308-151-0000          1 @ 5.00"       ← SKU + qty @ unit (original) price
+ * followed by optional "Item Discount …" and a department-code line.
+ *
+ * Guard: an item line must be immediately followed by a SKU line in the exact
+ * NNNNNN-NNN-NNNN "1 @ price" form, and at least two items must be found. This
+ * filters non-product lines (e.g. "Bag fee … 0.05 N", whose next line is "108
+ * 1 @ 0.05") and prevents the barcode <img> from being mistaken for a product
+ * by the image fallback.
+ */
+function extractFromReceiptText(doc: Document): ExtractedProduct[] {
+	const lines = getTextLines(doc.body);
+
+	// "Name<spaces>1.00 N" — net (post-discount) price, trailing tax code letter.
+	const ITEM_RE = /^(.+?)\s+(\d+\.\d{2})\s+[A-Z]$/;
+	// "608308-151-0000   1 @ 5.00" — SKU then quantity @ unit (pre-discount) price.
+	const SKU_RE = /^(\d{6}-\d{3}-\d{4})\s+(\d+)\s*@\s*(\d+\.\d{2})$/;
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (let i = 0; i < lines.length - 1; i++) {
+		const itemMatch = lines[i].match(ITEM_RE);
+		if (!itemMatch) continue;
+
+		const skuMatch = lines[i + 1].match(SKU_RE);
+		if (!skuMatch) continue; // require the SKU line to confirm a real product
+
+		const name = itemMatch[1].trim();
+		const paid = parseFloat(itemMatch[2]);
+		const itemNumber = skuMatch[1];
+		const original = parseFloat(skuMatch[3]);
+
+		// SKU embeds the colorway, so distinct lines stay distinct; identical
+		// repeats collapse.
+		if (seen.has(itemNumber)) continue;
+		seen.add(itemNumber);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price: `$${paid.toFixed(2)}`,
+			color: "",
+			size: "",
+			itemNumber,
+			material: "",
+			onSale: original > paid,
+		});
+	}
+
+	// Require ≥2 items so a stray "label  0.00 X" line can't trigger a match.
+	return products.length >= 2 ? products : [];
+}
+
+/**
  * Extract the current (sale) price from a cell that may carry a "Price:" /
  * "Total:" label and a strikethrough original. Amounts may be written
  * "$7.46" or bare "7.46". Returns the non-struck amount and a sale flag.
@@ -2171,6 +2239,79 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/** Strip a leading VS color code ("54A2 Black" -> "black", "Black" -> "black"). */
+function cleanVSColor(raw: string): string {
+	const parts = raw.trim().split(/\s+/);
+	if (parts.length > 1 && /\d/.test(parts[0])) parts.shift();
+	return parts.join(" ").toLowerCase();
+}
+
+/**
+ * Strategy: Victoria's Secret order confirmation (Salesforce Marketing Cloud).
+ *
+ * Each item is a single-column block whose per-item <table> holds:
+ *   <b>Product Name</b>
+ *   123456            (6+ digit SKU, on its own line)
+ *   a nested Color / Size / Qty / Status attribute table
+ *   a price block: <span>$paid</span> <span>-$discount</span> $original
+ *
+ * VS repeats the same SKU across shipment sections, so items are de-duplicated
+ * by SKU with the LAST occurrence winning (the consolidated/final line). There
+ * are no per-item product images (only marketing banners), so imageUrl is empty.
+ *
+ * Guard: requires a <b> name plus Color + Size labels + a 6-digit SKU, so it
+ * won't fire on other layouts (H&M's attribute rows lack the <b> name and are
+ * already handled earlier).
+ */
+function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
+	const bolds = Array.from(doc.querySelectorAll("td b"));
+	if (bolds.length === 0) return [];
+
+	const order: string[] = [];
+	const bySku = new Map<string, ExtractedProduct>();
+
+	for (const bold of bolds) {
+		const name = getCellText(bold);
+		if (!name || name.length < 3) continue;
+
+		const block = bold.closest("table");
+		if (!block) continue;
+
+		const color = cleanVSColor(getAttributeByLabel(block, "color"));
+		const size = getAttributeByLabel(block, "size");
+		if (!color || !size) continue;
+
+		// SKU: a cell whose text is only 6+ digits.
+		const skuCell = Array.from(block.querySelectorAll("td")).find((td) => /^\d{6,}$/.test(getCellText(td)));
+		const itemNumber = skuCell ? getCellText(skuCell) : "";
+		if (!itemNumber) continue;
+
+		// Price block: first $ amount is the paid line total; a higher trailing
+		// amount is the struck original (sale).
+		const prices = extractPrices(getCellText(block));
+		const price = prices[0] ?? "";
+		const amounts = prices.map((p) => parseFloat(p.replace("$", "")));
+		const onSale = amounts.length > 1 && Math.max(...amounts) > amounts[0];
+
+		const product: ExtractedProduct = {
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		};
+
+		if (!bySku.has(itemNumber)) order.push(itemNumber);
+		bySku.set(itemNumber, product); // last occurrence wins
+	}
+
+	return order.map((sku) => bySku.get(sku) as ExtractedProduct);
+}
+
 // Post-processing applied to every extracted product regardless of strategy.
 // Infer-from-raw first, then clean for storage — per advisor guidance.
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
@@ -2218,7 +2359,8 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// 13. Order-ID container 3-column rows (AliExpress, Wish)
 	// 14. Div-based layouts (Zara)
 	// 15. Text-only product rows (Express) — no images, ≥2 matches
-	// 16. Image fallback
+	// 16. Monospace POS receipt (Old Navy / Gap Inc.) — SKU line-pattern
+	// 17. Image fallback
 
 	const strategies = [
 		extractFromNestedTables,
@@ -2231,11 +2373,13 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromParagraphLayout,
 		extractFromPoshmarkLayout,         // Poshmark td.price 3-cell rows
 		extractFromAnthropologieLayout,    // Anthropologie item-detail-row labeled tables
+		extractFromVictoriasSecretLayout,  // VS bold name + Color/Size/Qty attribute table
 		extractFromTableRows,
 		extractFromShopifyLayout,          // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
 		extractFromDivLayout,
 		extractFromTextOnlyRows,
+		extractFromReceiptText,            // Old Navy / Gap Inc. monospace POS receipt
 		extractFromImages,
 	];
 

@@ -74,6 +74,8 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	plunge: "lingerie",
 	thong: "underwear",
 	briefs: "underwear",
+	brief: "underwear",
+	panty: "underwear",
 	bikini: "lingerie",
 	teddy: "lingerie",
 	intimate: "lingerie",

@@ -1631,3 +1631,9 @@ describe("Strategy: Shopify order template (SKIMS)", () => {
 // Express - failed
 // SKIMS (Shopify template)
 // Banana Republic 
+// gap
+// victoria secret
+// old navy
+// target
+// walmart
+// levis
