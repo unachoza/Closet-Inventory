@@ -1,13 +1,14 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
 import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
-import { inferMaterialFromName } from "./inferMaterialFromName";
-import { inferCareFromMaterial } from "./inferCareFromMaterial";
-import { inferProductAttributes } from "./inferProductAttributes";
-import { cleanProductName } from "./cleanProductName";
-import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
+
+//import { inferMaterialFromName } from "./inferMaterialFromName";
+//import { inferCareFromMaterial } from "./inferCareFromMaterial";
+//import { inferProductAttributes } from "./inferProductAttributes";
+//import { cleanProductName } from "./cleanProductName";
+// import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
 import { extractBrandFromSender } from "./parseProductsFromEmail";
-import { defaultConditionForPurchaseDate } from "./condition";
+// import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
@@ -127,9 +128,10 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Brand from a known pattern in the subject/body/sender; otherwise fall back
 	// to the email sender (e.g. an Old Navy receipt has no brand text — the
 	// "Old Navy" sender becomes the brand).
-	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
+	
+	//const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
 	const category = extractCategory(combinedText);
-	const styleTags = inferStyleTagsFromName(combinedText, category);
+	//const styleTags = inferStyleTagsFromName(combinedText, category);
 
 	const parsed = new Date(date ?? "");
 	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
