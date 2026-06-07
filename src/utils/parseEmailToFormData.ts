@@ -5,11 +5,15 @@ import { inferMaterialFromName } from "./inferMaterialFromName";
 import { inferProductAttributes } from "./inferProductAttributes";
 import { cleanProductName } from "./cleanProductName";
 import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
+import { extractBrandFromSender } from "./parseProductsFromEmail";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
 	zara: "zara",
 	"banana republic": "banana republic",
+	"old navy": "old navy",
+	oldnavy: "old navy",
+	target: "target",
 	gap: "gap",
 	"forever 21": "forever 21",
 	"h&m": "h&m",
@@ -118,7 +122,10 @@ function stripHtml(html: string): string {
 export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
-	const brand = extractBrand(combinedText, from);
+	// Brand from a known pattern in the subject/body/sender; otherwise fall back
+	// to the email sender (e.g. an Old Navy receipt has no brand text — the
+	// "Old Navy" sender becomes the brand).
+	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
 	const category = extractCategory(combinedText);
 	const styleTags = inferStyleTagsFromName(combinedText, category);
 
@@ -128,11 +135,24 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
 	const nameFromSubject = stripBrandFromName(subject, brand);
 	const cleanedName = cleanProductName(nameFromSubject);
-
+	console.log({ nameFromSubject });
 	// Product attributes from the raw (uncleaned) name
 	const attrs = inferProductAttributes(subject);
-
-	return {
+	console.log({ combinedText });
+	console.log({ attrs });
+	// return {
+	// 	...formItem,
+	// 	brand,
+	// 	category,
+	// 	...(cleanedName && { name: cleanedName }),
+	// 	...(inlineColor && { color: inlineColor }),
+	// 	...(inlineSize && { size: inlineSize }),
+	// 	material: inferMaterialFromName(combinedText),
+	// 	occasion: styleTags[0] ?? "",
+	// 	age: "new",
+	// 	...attrs,
+	// };
+	const result = {
 		...formItem,
 		brand,
 		category,
@@ -144,4 +164,8 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		age: "new",
 		...attrs,
 	};
+
+	console.log("PARSE RESULT", result);
+
+	return result;
 }

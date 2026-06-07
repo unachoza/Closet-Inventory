@@ -2,8 +2,7 @@ import { describe, it, expect } from "vitest";
 import { parseEmailToFormData } from "../parseEmailToFormData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const parse = (subject: string, body = "", from = "") =>
-	parseEmailToFormData(subject, body, from);
+const parse = (subject: string, body = "", from = "") => parseEmailToFormData(subject, body, from);
 
 describe("parseEmailToFormData — brand extraction", () => {
 	it("extracts brand from sender display name", () => {
@@ -36,9 +35,11 @@ describe("parseEmailToFormData — brand extraction", () => {
 		expect(result.brand).toBe("shein");
 	});
 
-	it("returns empty string when no brand is found", () => {
+	it("falls back to the sender domain as the brand when no brand keyword is found", () => {
+		// Per product requirement: if no known brand is detected, assume the
+		// email sender is the brand (here, the domain "unknownstore").
 		const result = parse("Your order is ready", "", "hello@unknownstore.com");
-		expect(result.brand).toBe("");
+		expect(result.brand).toBe("unknownstore");
 	});
 
 	it("ignores generic sender names like 'no-reply'", () => {
@@ -186,5 +187,60 @@ describe("parseEmailToFormData — default fields", () => {
 		expect(result).toHaveProperty("occasion");
 		expect(result).toHaveProperty("age");
 		expect(result).toHaveProperty("care");
+	});
+});
+describe("parseEmailToFormData — material inference", () => {
+	it("infers a single material from the item name", () => {
+		const result = parse("Thanks for your purchase", "POLYAMIDE BLEND STRAPPY DRESS", "sales@zara.com");
+
+		expect(result.material).toEqual([
+			{
+				material: "polyamide",
+				percentage: 100,
+			},
+		]);
+	});
+
+	it("infers multiple materials from the item name", () => {
+		const result = parse("Thanks for your purchase", "COTTON MODAL TANK TOP", "sales@zara.com");
+
+		expect(result.material).toEqual([
+			{
+				material: "cotton",
+				percentage: 50,
+			},
+			{
+				material: "modal",
+				percentage: 50,
+			},
+		]);
+	});
+
+	it("infers percentage-based blends", () => {
+		const result = parse("Thanks for your purchase", "95% Cotton, 5% Spandex Leggings", "sales@zara.com");
+
+		expect(result.material).toContainEqual({
+			material: "cotton",
+			percentage: 95,
+		});
+
+		expect(result.material).toContainEqual({
+			material: "spandex",
+			percentage: 5,
+		});
+	});
+
+	it("returns an empty material array when no material is found", () => {
+		const result = parse("Thanks for your purchase", "SLEEVELESS TOP", "sales@zara.com");
+
+		expect(result.material).toEqual([]);
+	});
+	it("infers materials when the product name is passed as the email body", () => {
+		const result = parse("Thanks for your purchase", "COTTON MODAL TANK TOP", "sales@zara.com");
+
+		expect(result.material).toEqual([
+			{ material: "cotton", percentage: 50 },
+			{ material: "modal", percentage: 50 },
+		]);
 	});
 });
