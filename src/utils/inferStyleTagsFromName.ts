@@ -3,19 +3,53 @@ import { occasionExamples } from "./constants";
 // Each entry: [pattern to test against name+category, occasion tag]
 // Order matters — more specific patterns first (cocktail before going-out).
 const OCCASION_MAP: [RegExp, string][] = [
-	[/\b(formal|gala|black\s*tie|prom)\b/i, "formal"],
-	[/\b(wedding|bridal|bride)\b/i, "wedding"],
-	[/\bcocktail\b/i, "cocktail"],
-	[/\b(going[- ]out|night[- ]out|club|bodycon|sequin|sparkle)\b/i, "going-out"],
-	[/\b(work\s*wear|office|professional|business\s*casual|pencil\s*skirt)\b/i, "work wear"],
-	[/\b(gym|yoga|athletic|sport|workout|running|cycling|activewear|training)\b/i, "sports"],
-	[/\b(beach|resort|tropical|cover.?up|swim)\b/i, "vacation"],
-	[/\b(vacation)\b/i, "vacation"],
-	[/\b(christmas|festive|nye|new\s*year|thanksgiving)\b/i, "holiday"],
+	// Formal
+	[/\b(formal|gala|black\s*tie|prom|evening\s*gown|ball\s*gown)\b/i, "formal"],
+
+	// Wedding
+	[/\b(wedding|bridal|bride|bridesmaid|maid\s*of\s*honor)\b/i, "wedding"],
+
+	// Cocktail
+	[/\b(cocktail|semi[- ]?formal)\b/i, "cocktail"],
+
+	// Going Out
+	[
+		/\b(going[- ]?out|night[- ]?out|club|bodycon|animal\s*print|corset|bustier|leather|faux\s*leather|mesh|cut[- ]?out|plunge|lace[- ]?up|sequin|sequins|sparkle|sparkly)\b/i,
+		"going-out",
+	],
+
+	// Work Wear
+	[
+		/\b(work\s*wear|office|professional|business\s*casual|blazer|tailored|suiting|button[- ]?down|oxford|trouser|trousers|pencil\s*skirt)\b/i,
+		"work wear",
+	],
+
+	// Sports
+	[
+		/\b(gym|yoga|athletic|sport|workout|running|cycling|activewear|training|legging|leggings)\b/i,
+		"sports",
+	],
+
+	// Vacation
+	[
+		/\b(vacation|vacay|beach|resort|tropical|swim|bikini|one[- ]?piece|sarong|caftan|cover[- ]?up)\b/i,
+		"vacation",
+	],
+
+	// Holiday
+	[
+		/\b(christmas|festive|holiday\s*party|nye|new\s*year|thanksgiving|velvet|metallic|rhinestone)\b/i,
+		"holiday",
+	],
+
+	// Church
 	[/\b(church|sunday\s*best|sunday\s*mass)\b/i, "church"],
-	[/\b(picnic|garden\s*party)\b/i, "picnic"],
-	[/\bbasics?\b/i, "basics"],
-	[/\b(casual|everyday|lounge|weekend)\b/i, "casual"],
+
+	// Picnic
+	[/\b(picnic|garden\s*party|floral|gingham|eyelet|smocked)\b/i, "picnic"],
+
+	// Casual / Everyday
+	[/\b(casual|everyday|lounge|weekend|basic|basics)\b/i, "casual"],
 ];
 
 const VALID_TAGS = new Set<string>(occasionExamples);
