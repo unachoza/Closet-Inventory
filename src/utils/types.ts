@@ -17,6 +17,7 @@ export type ClothingItem = {
 	material: MaterialBlend[] | string;
 	occasion: string;
 	age: string;
+	purchaseDate?: string;
 	care: string | string[];
 	onSale?: boolean;
 	notes?: string | string[];
