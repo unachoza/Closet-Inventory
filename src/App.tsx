@@ -55,7 +55,6 @@ function AppShell() {
 		setView("edit");
 	};
 
-	// Single-item import from Gmail
 	const handleGmailImport = useCallback(
 		(prefilled: Partial<ClothingItem>) => {
 			const newItem = buildClothingItem(prefilled);
@@ -72,7 +71,6 @@ function AppShell() {
 	const handleGmailImportAll = useCallback(
 		(items: Partial<ClothingItem>[]) => {
 			if (items.length === 0) return;
-
 			const clothingItems = items.map(buildClothingItem);
 			setImportQueue(clothingItems);
 			setImportQueueIndex(0);

@@ -13,8 +13,7 @@
 }
 
 .gmail-container:has(.display-email-preview-panel){
-	/* background-color: red; */
-	max-width: 1050px;
+	max-width: 1175px;
 }
 
 

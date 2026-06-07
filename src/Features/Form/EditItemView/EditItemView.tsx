@@ -10,7 +10,6 @@ import { formItem, conditionOptions } from "../../../utils/constants";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import { formatItemAge } from "../../../utils/itemAge";
 import { matchedCondition } from "../../../utils/condition";
-
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";

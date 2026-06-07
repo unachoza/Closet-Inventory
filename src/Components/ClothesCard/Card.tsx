@@ -6,6 +6,7 @@ import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositio
 import { normalizeMaterial } from "../../utils/materialUtils";
 import { formatItemAge } from "../../utils/itemAge";
 import { matchedCondition } from "../../utils/condition";
+import { toTitleCase } from "../../utils/toTitleCase";
 
 interface CardProps {
 	item: ClothingItem;
@@ -23,7 +24,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	// TODO: handle items with no meaningful "purchase date" — vintage, thrifted, or
 	// inherited pieces. These need a separate provenance concept (e.g. "estimated era"
 	// or "acquired" date) rather than a purchase date, so age isn't misleading.
-	const factualAge = formatItemAge(item.purchaseDate);
+const factualAge = formatItemAge(item.purchaseDate as string);
 
 	// Subjective condition. Only a recognized condition is shown — legacy items
 	// whose `age` held a free-text duration (e.g. "one year") render no row,
@@ -39,17 +40,17 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 						<img src={item.imageURL} alt={item.name} />
 					</div>
 					<div className="card-name-overlay">
-						<span className="card-name-label">{item.name || item.brand || item.category}</span>
+						<span className="card-name-label">{toTitleCase(item.name || item.brand || item.category)}</span>
 					</div>
 					{/* <div className="card-info">
 						<p className="card-category">{item.category}</p>
-						<h2 className="card-title">{item.name}</h2>
+						<h2 className="card-title">{toTitleCase(item.name)}</h2>
 					</div> */}
 				</div>
 
 				{/* Back */}
 				<div className="card-back">
-					<h2 className="card-title">{item.name}</h2>
+					<h2 className="card-title">{toTitleCase(item.name)}</h2>
 					<div className="card-details">
 						<p>
 							<strong>Size:</strong> {item.size}
