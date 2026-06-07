@@ -1,5 +1,13 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
+import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
+import { extractBrandFromSender } from "./parseProductsFromEmail";
+import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
+import { cleanProductName } from "./cleanProductName";
+import { inferProductAttributes } from "./inferProductAttributes";
+import { inferMaterialFromName } from "./inferMaterialFromName";
+import { inferCareFromMaterial } from "./inferCareFromMaterial";
+import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
@@ -120,9 +128,9 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// to the email sender (e.g. an Old Navy receipt has no brand text — the
 	// "Old Navy" sender becomes the brand).
 	
-	//const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
-	// const category = extractCategory(combinedText);
-	//const styleTags = inferStyleTagsFromName(combinedText, category);
+	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
+	const category = extractCategory(combinedText);
+	const styleTags = inferStyleTagsFromName(combinedText, category);
 
 	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
 	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
