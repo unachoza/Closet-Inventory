@@ -104,7 +104,11 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		price: prefilled.price ?? "",
 		material: prefilled.material ?? "",
 		occasion: prefilled.occasion ?? "",
-		age: prefilled.age ?? "new",
+		age: prefilled.age ?? "",
+		condition: prefilled.condition ?? "new",
+		// Mirrors App.tsx — must carry the email's purchase date through, or
+		// imported items lose their factual age (the original "shows as new" bug).
+		purchaseDate: prefilled.purchaseDate,
 		care: prefilled.care ?? "",
 		onSale: prefilled.onSale ?? false,
 		notes: prefilled.notes ?? "",
@@ -329,6 +333,13 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		// Imported items default to "new" condition (editable during review);
 		// factual age is derived from the captured purchase date, not entered here.
 		expect(screen.getByLabelText("condition")).toHaveValue("new");
+
+		// End-to-end guard for the original "imported items show as new" bug:
+		// the email's date (2018-06-21) must survive parse → buildClothingItem →
+		// EditItemView and appear in the read-only purchase-date display.
+		const purchaseDate = screen.getByLabelText("purchase date") as HTMLInputElement;
+		expect(purchaseDate).toBeDisabled();
+		expect(purchaseDate.value).toMatch(/2018/);
 
 		// Return to Email Preview button should be visible in create mode
 		// (rendered twice due to a duplicate in EditItemView — assert at least one exists)

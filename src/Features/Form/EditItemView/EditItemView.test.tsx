@@ -37,7 +37,9 @@ const mockItem = {
 	material: [{ material: "cotton", percentage: 100 }],
 
 	occasion: "Casual",
-	age: "New",
+	age: "",
+	condition: "good",
+	purchaseDate: "2024-03-15T00:00:00.000Z",
 	care: "Machine Wash",
 	imageURL: "https://example.com/image.jpg",
 	color: "Red",
@@ -62,8 +64,37 @@ describe("EditItemView", () => {
 		expect(screen.getByLabelText("Material 1 name")).toHaveValue(mockItem.material[0].material);
 		expect(screen.getByLabelText("Material 1 percentage")).toHaveValue(mockItem.material[0].percentage);
 		expect(screen.getByLabelText("occasion")).toHaveValue(mockItem.occasion);
-		expect(screen.getByLabelText("age")).toHaveValue(mockItem.age);
+		// "age" is no longer a generic text input — condition is a fixed-option selector,
+		// and purchase date is a read-only display (factual age derived from it).
+		expect(screen.getByLabelText("condition")).toHaveValue(mockItem.condition);
 		expect(screen.getByLabelText("care")).toHaveValue(mockItem.care);
+	});
+
+	it("renders condition as an editable selector and purchase date as a read-only display", () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} />);
+		const condition = screen.getByLabelText("condition") as HTMLSelectElement;
+		expect(condition.tagName).toBe("SELECT");
+		// All five condition options are offered.
+		expect(condition.querySelectorAll("option")).toHaveLength(5);
+
+		const purchaseDate = screen.getByLabelText("purchase date") as HTMLInputElement;
+		expect(purchaseDate).toBeDisabled();
+		expect(purchaseDate.value).toMatch(/2024/);
+	});
+
+	it("offers a manual date entry when the item has no purchase date", () => {
+		render(<EditItemView item={{ ...mockItem, purchaseDate: undefined }} setView={mockSetView} mode="create" />);
+		const purchaseDate = screen.getByLabelText("purchase date") as HTMLInputElement;
+		expect(purchaseDate).not.toBeDisabled();
+		expect(purchaseDate.type).toBe("date");
+	});
+
+	it("persists condition and purchaseDate when adding an imported item to the closet", () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} mode="create" />);
+		fireEvent.click(screen.getByText("Add to Closet"));
+		expect(mockAddFullItem).toHaveBeenCalledWith(
+			expect.objectContaining({ condition: "good", purchaseDate: "2024-03-15T00:00:00.000Z" }),
+		);
 	});
 
 	it("calls updateItem with updated values on form submission", () => {

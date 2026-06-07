@@ -5,6 +5,7 @@ import { useState } from "react";
 import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import { formatItemAge } from "../../utils/itemAge";
+import { matchedCondition } from "../../utils/condition";
 
 interface CardProps {
 	item: ClothingItem;
@@ -24,8 +25,10 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	// or "acquired" date) rather than a purchase date, so age isn't misleading.
 	const factualAge = formatItemAge(item.purchaseDate);
 
-	// Subjective condition; falls back to the legacy free-text age for older items.
-	const conditionDisplay = item.condition ?? item.age;
+	// Subjective condition. Only a recognized condition is shown — legacy items
+	// whose `age` held a free-text duration (e.g. "one year") render no row,
+	// rather than a misleading "Condition: one year".
+	const conditionDisplay = matchedCondition(item.condition, item.age);
 
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>

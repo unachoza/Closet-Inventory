@@ -36,9 +36,17 @@ describe("ClothingCard — age & condition", () => {
 		expect(getByText("good")).toBeInTheDocument();
 	});
 
-	it("falls back to the legacy age field for condition when condition is absent", () => {
+	it("falls back to the legacy age field for condition when it is a valid condition", () => {
 		const { getByText } = render(<ClothingCard item={{ ...item, condition: undefined, age: "like new" }} />);
 		expect(getByText("like new")).toBeInTheDocument();
+	});
+
+	it("hides the condition row for legacy free-text ages that aren't real conditions", () => {
+		// Seed/legacy items stored durations under `age` (e.g. "one year") — these
+		// must NOT render as "Condition: one year".
+		const { queryByText } = render(<ClothingCard item={{ ...item, condition: undefined, age: "one year" }} />);
+		expect(queryByText(/Condition:/)).not.toBeInTheDocument();
+		expect(queryByText("one year")).not.toBeInTheDocument();
 	});
 });
 

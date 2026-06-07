@@ -345,7 +345,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ## 🐛 Known Bugs
 
-- **DatePicker (`MonthYearPicker`) may not select dates reliably.** The month/year dropdowns in the manual add form's "Condition & Purchase Date" step (and the form's `handleDateSelect`) don't always commit the chosen date to `purchaseDate`. Needs investigation — likely the `useEffect` firing on mount/initial option state. Until fixed, the EditItemView import flow uses a native `<input type="date">` as the manual-entry fallback, which is reliable.
+- **DatePicker (`MonthYearPicker`) needs a thorough pass.** Root issue: the picker's `useEffect` fired on mount, emitting its *default* (current month/year) before the user chose anything — so manually added items received an unintended purchase date and showed a fabricated age (e.g. "Purchased: 5 months ago"). A mount guard now prevents the picker from emitting until the user actually changes a dropdown, which stops the fabricated-age behavior. Still pending: full verification that selecting a month + year reliably commits to `purchaseDate` across edit/create flows. The EditItemView import flow sidesteps this entirely with a native `<input type="date">` (reliable) for the no-email-date manual-entry fallback.
 
 - **Email Horizontal Scroll - some email previews don't format nicely, creating difficult to view horizontal scroll. Tried fixing with .gmail-container:has(.display-email-preview-panel){max-width: 1175px;} but didnt' work accross the board
 
