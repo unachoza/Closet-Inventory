@@ -124,16 +124,38 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// const category = extractCategory(combinedText);
 	//const styleTags = inferStyleTagsFromName(combinedText, category);
 
+	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
+	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
+
+	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
+	const nameFromSubject = stripBrandFromName(subject, brand);
+	const cleanedName = cleanProductName(nameFromSubject);
+	// Product attributes from the raw (uncleaned) name
+	const attrs = inferProductAttributes(subject);
+	const inferencedMaterial = inferMaterialFromName(combinedText);
+	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
+
+	// Purchase date drives the factual age shown on the card.
 	const parsed = new Date(date ?? "");
 	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
 
-	return {
+	const result = {
 		...formItem,
-		brand: extractBrand(combinedText, from),
-		category: extractCategory(combinedText),
-		// Imported items default to "new" condition; the user can adjust this during
-		// import review (e.g. for older orders). Factual age comes from purchaseDate.
-		condition: "new",
+		brand,
+		category,
+		...(cleanedName && { name: cleanedName }),
+		...(inlineColor && { color: inlineColor }),
+		...(inlineSize && { size: inlineSize }),
+		material: inferencedMaterial,
+		...(inferencedCare.length > 0 && { care: inferencedCare }),
+		occasion: styleTags[0] ?? "",
+		// Default condition is seeded from the order's age (a years-old purchase
+		// shouldn't default to "new"). The user can adjust it during import review.
+		// Factual age comes from purchaseDate.
+		condition: defaultConditionForPurchaseDate(purchaseDate),
 		...(purchaseDate ? { purchaseDate } : {}),
+		...attrs,
 	};
+
+	return result;
 }
