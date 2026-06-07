@@ -1,10 +1,15 @@
 export interface ProductAttributes {
+	neckline?: string;
+	topLength? string;
 	sleeveLength?: string;
 	hemLength?: string;
-	neckline?: string;
 	fit?: string;
 	rise?: string;
 	season?: string;
+	hasStretch?: boolean;
+	hasPockets?: boolean;
+	pattern?: string;
+	accents?: string
 }
 
 // Each entry: [pattern, canonical value].
@@ -29,13 +34,23 @@ const NECKLINE_MAP: [RegExp, string][] = [
 	[/\b(square[- ]?neck|squareneck)\b/i, "square neck"],
 	[/\b(v[- ]?neck|vneck)\b/i, "v-neck"],
 	[/\bcrew[- ]?neck\b/i, "crew neck"],
+	[/\b(scoop[- ]?neck|scoopneck)\b/i, "scoop neck"],
+	[/\b(boat[- ]?neck|boatneck)\b/i, "boat neck"],
+	[/\b(cowl[- ]?neck|cowlneck)\b/i, "cowl neck"],
 	[/\b(turtle[- ]?neck|turtleneck)\b/i, "turtleneck"],
-	[/\bmock[- ]?neck\b/i, "mock neck"],
-	[/\boff[- ]?shoulder\b/i, "off-shoulder"],
+	[/\b(mock[- ]?neck|mockneck)\b/i, "mock neck"],
+
+	[/\bstrapless\b/i, "strapless"],
+	[/\bsweetheart\b/i, "sweetheart"],
+	[/\b(one[- ]?shoulder)\b/i, "one shoulder"],
+	[/\b(off[- ]?(the[- ]?)?shoulder)\b/i, "off-shoulder"],
+	[/\bcold[- ]?shoulder\b/i, "cold shoulder"],
 	[/\bhalter\b/i, "halter"],
-	[/\bscoop[- ]?neck\b/i, "scoop neck"],
-	[/\bboat[- ]?neck\b/i, "boat neck"],
-	[/\bcowl[- ]?neck\b/i, "cowl neck"],
+
+	[/\bplunge\b/i, "plunge"],
+	[/\bkeyhole\b/i, "keyhole"],
+	[/\btie[- ]?neck\b/i, "tie neck"],
+	[/\bhenley\b/i, "henley"],
 ];
 
 const FIT_MAP: [RegExp, string][] = [
@@ -51,6 +66,24 @@ const FIT_MAP: [RegExp, string][] = [
 	[/\bfitted\b/i, "fitted"],
 ];
 
+const STYLE_MAP: [RegExp, string][] = [
+	[/\ba[- ]?line\b/i, "a-line"],
+	[/\bsheath\b/i, "sheath"],
+	[/\bshift\b/i, "shift"],
+	[/\bmaxi\b/i, "maxi"],
+	[/\bmidi\b/i, "midi"],
+	[/\bmini\b/i, "mini"],
+	[/\bbodycon\b/i, "bodycon"],
+	[/\bfit[- ]?(and|&)[- ]?flare\b/i, "fit & flare"],
+	[/\bshirt[- ]?dress\b/i, "shirtdress"],
+	[/\bhigh[- /]?low\b/i, "high/low"],
+	[/\bwrap\b/i, "wrap"],
+	[/\bdrop[- ]?waist\b/i, "drop waist"],
+	[/\bslip[- ]?dress\b/i, "slip dress"],
+	[/\bpopover\b/i, "popover"],
+	[/\bpencil\b/i, "pencil"],
+];
+
 const RISE_MAP: [RegExp, string][] = [
 	[/\bhigh[- ]?(waist|rise)\b/i, "high waist"],
 	[/\bmid[- ]?(waist|rise)\b/i, "mid rise"],
@@ -62,6 +95,53 @@ const SEASON_MAP: [RegExp, string][] = [
 	[/\bsummer\b/i, "summer"],
 	[/\b(fall|autumn)\b/i, "fall"],
 	[/\bwinter\b/i, "winter"],
+];
+
+const ACCENTS_MAP: [RegExp, string][] = [
+	[/\bbeaded\b/i, "beaded"],
+	[/\bbows?\b/i, "bows"],
+	[/\bchains?\b/i, "chains"],
+	[/\bcut[- ]?outs?\b/i, "cut outs"],
+	[/\bembroider(ed|y)?\b/i, "embroidered"],
+	[/\bflannel\b/i, "flannel"],
+	[/\bfrayed[- ]?edges?\b/i, "frayed edges"],
+	[/\bfringe\b/i, "fringe"],
+	[/\bglitter\b/i, "glitter"],
+	[/\blace[- ]?up\b/i, "lace-up"],
+	[/\bpeplum\b/i, "peplum"],
+	[/\bripped\b/i, "ripped"],
+	[/\bruched\b/i, "ruched"],
+	[/\bruffles?\b/i, "ruffles"],
+	[/\bsequins?\b/i, "sequins"],
+	[/\brhinestones?\b/i, "rhinestones"],
+	[/\bstudded\b/i, "studded"],
+	[/\bvelvet\b/i, "velvet"],
+];
+
+const PATTERN_MAP: [RegExp, string][] = [
+	[/\banimal[- ]?print\b/i, "animal print"],
+	[/\bargyle\b/i, "argyle"],
+	[/\bcamo\b/i, "camo"],
+	[/\bcheckered\b/i, "checkered"],
+	[/\bgingham\b/i, "gingham"],
+	[/\bchevron\b/i, "chevron"],
+	[/\bherringbone\b/i, "herringbone"],
+	[/\bcolor[- ]?block(ed)?\b/i, "color block"],
+	[/\bfloral\b/i, "floral"],
+	[/\bgraphic\b/i, "graphic"],
+	[/\bhearts?\b/i, "hearts"],
+	[/\bhoundstooth\b/i, "houndstooth"],
+	[/\bmetallic\b/i, "metallic"],
+	[/\bpaisley\b/i, "paisley"],
+	[/\bplaid\b/i, "plaid"],
+	[/\bpolka[- ]?dots?\b/i, "polka dots"],
+	[/\bprint(ed)?\b/i, "print"],
+	[/\bsolid\b/i, "solid"],
+	[/\bstars?\b/i, "stars"],
+	[/\bstripes?\b/i, "stripes"],
+	[/\btie[- ]?dye\b/i, "tie-dye"],
+	[/\btropical\b/i, "tropical"],
+	[/\btweed\b/i, "tweed"],
 ];
 
 function matchFirst(text: string, map: [RegExp, string][]): string | undefined {
