@@ -39,7 +39,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 
 function AppShell() {
 	const { view, setView } = useView();
-	const { getCloset } = useLocalStorageCloset();
+	const { closet, getCloset } = useLocalStorageCloset();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -121,7 +121,7 @@ function AppShell() {
 
 	return (
 		<div className="main">
-			<NavBar onAddItem={handleAddItem} onExportCloset={handleExportCloset} />
+			<NavBar onAddItem={handleAddItem} onExportCloset={handleExportCloset} closetItemCount={closet.length} />
 			<EditProvider>
 				<ToastProvider>
 					<div className="app-content">
