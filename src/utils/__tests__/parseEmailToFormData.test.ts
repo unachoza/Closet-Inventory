@@ -173,8 +173,14 @@ describe("parseEmailToFormData — HTML stripping", () => {
 });
 
 describe("parseEmailToFormData — default fields", () => {
-	it('sets condition to "new" by default', () => {
+	it('sets condition to "new" when there is no purchase date', () => {
 		expect(parse("anything").condition).toBe("new");
+	});
+
+	it("seeds condition from the order's age — a years-old email is not 'new'", () => {
+		// An order from 2018 is well over 3 years old → defaults to "good".
+		const result = parseEmailToFormData("Order", "", "", "Thu, 21 Jun 2018 12:00:00 +0000");
+		expect(result.condition).toBe("good");
 	});
 
 	it("returns all required formItem fields", () => {

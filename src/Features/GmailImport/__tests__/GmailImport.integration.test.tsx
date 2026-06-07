@@ -330,9 +330,10 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByLabelText("brand")).toHaveValue("zara");
 		// "SHORT" matches "short" → "bottoms" before "jumpsuit" → "body" in keyword order
 		expect(screen.getByLabelText("category")).toHaveValue("bottoms");
-		// Imported items default to "new" condition (editable during review);
-		// factual age is derived from the captured purchase date, not entered here.
-		expect(screen.getByLabelText("condition")).toHaveValue("new");
+		// Default condition is seeded from the order's age (editable during review).
+		// This Zara email is dated 2018 — over 3 years old — so it defaults to "good"
+		// rather than "new". Factual age is derived from the captured purchase date.
+		expect(screen.getByLabelText("condition")).toHaveValue("good");
 
 		// End-to-end guard for the original "imported items show as new" bug:
 		// the email's date (2018-06-21) must survive parse → buildClothingItem →
