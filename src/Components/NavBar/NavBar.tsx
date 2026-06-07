@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon, Route } from "lucide-react";
+import { Menu, Search, Spool, Plus, LayoutGrid, Download, FileDown, X, SkipBackIcon, Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
@@ -12,9 +12,11 @@ interface NavBarProps {
 	 * any prefilled form / gmail source state.
 	 */
 	onAddItem?: () => void;
+	/** Trigger a CSV download of the full closet. */
+	onExportCloset?: () => void;
 }
 
-const NavBar = ({ onAddItem }: NavBarProps) => {
+const NavBar = ({ onAddItem, onExportCloset }: NavBarProps) => {
 	const { view, setView } = useView();
 	const { searchQuery, setSearchQuery } = useSearch();
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -51,6 +53,11 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 			<button className="action-btn secondary" onClick={() => goTo("gmail")}>
 				<Download size={16} /> Import Gmail
 			</button>
+			{onExportCloset && (
+				<button className="action-btn secondary" onClick={onExportCloset} title="Download closet as CSV">
+					<FileDown size={16} /> Download Closet
+				</button>
+			)}
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
 			</button>
