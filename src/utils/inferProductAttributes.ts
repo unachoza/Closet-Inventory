@@ -1,6 +1,6 @@
 export interface ProductAttributes {
 	neckline?: string;
-	topLength? string;
+	topLength?: string;
 	sleeveLength?: string;
 	hemLength?: string;
 	fit?: string;
