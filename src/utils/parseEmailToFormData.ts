@@ -1,12 +1,13 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
-import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
-import { inferMaterialFromName } from "./inferMaterialFromName";
-import { inferCareFromMaterial } from "./inferCareFromMaterial";
-import { inferProductAttributes } from "./inferProductAttributes";
-import { cleanProductName } from "./cleanProductName";
 import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
 import { extractBrandFromSender } from "./parseProductsFromEmail";
+import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
+import { cleanProductName } from "./cleanProductName";
+import { inferProductAttributes } from "./inferProductAttributes";
+import { inferMaterialFromName } from "./inferMaterialFromName";
+import { inferCareFromMaterial } from "./inferCareFromMaterial";
+import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
@@ -120,12 +121,13 @@ function stripHtml(html: string): string {
 	return doc.body.textContent ?? "";
 }
 
-export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
+export function parseEmailToFormData(subject: string, body: string, from: string, date?: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
 	// Brand from a known pattern in the subject/body/sender; otherwise fall back
 	// to the email sender (e.g. an Old Navy receipt has no brand text — the
 	// "Old Navy" sender becomes the brand).
+	
 	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
 	const category = extractCategory(combinedText);
 	const styleTags = inferStyleTagsFromName(combinedText, category);
@@ -141,6 +143,10 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
 
+	// Purchase date drives the factual age shown on the card.
+	const parsed = new Date(date ?? "");
+	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
+
 	const result = {
 		...formItem,
 		brand,
@@ -151,7 +157,11 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		material: inferencedMaterial,
 		...(inferencedCare.length > 0 && { care: inferencedCare }),
 		occasion: styleTags[0] ?? "",
-		age: "new",
+		// Default condition is seeded from the order's age (a years-old purchase
+		// shouldn't default to "new"). The user can adjust it during import review.
+		// Factual age comes from purchaseDate.
+		condition: defaultConditionForPurchaseDate(purchaseDate),
+		...(purchaseDate ? { purchaseDate } : {}),
 		...attrs,
 	};
 

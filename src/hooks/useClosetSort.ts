@@ -13,6 +13,8 @@ export const SORT_LABELS: Record<SortKey, string> = {
 	nameZA: "Name: Z → A",
 };
 
+// Condition ranking, best → worst. Includes the canonical 5 options plus a few
+// legacy free-text values from older items (stored under `age`) for graceful fallback.
 const AGE_ORDER: Record<string, number> = {
 	"brand new": 0,
 	new: 0,
@@ -20,6 +22,7 @@ const AGE_ORDER: Record<string, number> = {
 	excellent: 2,
 	good: 3,
 	fair: 4,
+	"needs repair": 5,
 	poor: 5,
 };
 
@@ -29,9 +32,11 @@ const parsePrice = (price?: string): number => {
 	return isNaN(num) ? 0 : num;
 };
 
-const parseAge = (age?: string): number => {
-	if (!age) return 999;
-	return AGE_ORDER[age.toLowerCase().trim()] ?? 999;
+// Rank by subjective condition, falling back to the legacy `age` string for older items.
+const parseCondition = (item: ClothingItem): number => {
+	const value = item.condition ?? item.age;
+	if (!value) return 999;
+	return AGE_ORDER[value.toLowerCase().trim()] ?? 999;
 };
 
 export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
@@ -47,9 +52,9 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 					case "priceDesc":
 						return copy.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
 					case "ageNewest":
-						return copy.sort((a, b) => parseAge(a.age) - parseAge(b.age));
+						return copy.sort((a, b) => parseCondition(a) - parseCondition(b));
 					case "ageOldest":
-						return copy.sort((a, b) => parseAge(b.age) - parseAge(a.age));
+						return copy.sort((a, b) => parseCondition(b) - parseCondition(a));
 					case "nameAZ":
 						return copy.sort((a, b) => a.name.localeCompare(b.name));
 					case "nameZA":

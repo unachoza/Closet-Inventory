@@ -173,8 +173,14 @@ describe("parseEmailToFormData — HTML stripping", () => {
 });
 
 describe("parseEmailToFormData — default fields", () => {
-	it('sets age to "new" by default', () => {
-		expect(parse("anything").age).toBe("new");
+	it('sets condition to "new" when there is no purchase date', () => {
+		expect(parse("anything").condition).toBe("new");
+	});
+
+	it("seeds condition from the order's age — a years-old email is not 'new'", () => {
+		// An order from 2018 is well over 3 years old → defaults to "good".
+		const result = parseEmailToFormData("Order", "", "", "Thu, 21 Jun 2018 12:00:00 +0000");
+		expect(result.condition).toBe("good");
 	});
 
 	it("returns all required formItem fields", () => {
@@ -185,10 +191,34 @@ describe("parseEmailToFormData — default fields", () => {
 		expect(result).toHaveProperty("brand");
 		expect(result).toHaveProperty("material");
 		expect(result).toHaveProperty("occasion");
-		expect(result).toHaveProperty("age");
+		expect(result).toHaveProperty("condition");
 		expect(result).toHaveProperty("care");
 	});
 });
+
+describe("parseEmailToFormData — purchase date", () => {
+	it("stores the email date as an ISO purchaseDate", () => {
+		const result = parseEmailToFormData("Order", "", "", "Fri, 15 Mar 2024 10:30:00 -0700");
+		expect(result.purchaseDate).toBeDefined();
+		expect(new Date(result.purchaseDate as string).getUTCFullYear()).toBe(2024);
+	});
+
+	it("leaves purchaseDate empty when no date is provided", () => {
+		const result = parseEmailToFormData("Order", "", "");
+		expect(result.purchaseDate).toBeFalsy();
+	});
+
+	it("leaves purchaseDate empty when the date is unparseable", () => {
+		const result = parseEmailToFormData("Order", "", "", "not-a-real-date");
+		expect(result.purchaseDate).toBeFalsy();
+	});
+});
+
+describe("parse augmented style data", () => {
+	it("gleans style data from context clues and item name", () => {})
+	//wide leg
+	//weave pattern - herringbone, houndstooth, plaid, tweed
+})
 describe("parseEmailToFormData — material inference", () => {
 	it("infers a single material from the item name", () => {
 		const result = parse("Thanks for your purchase", "POLYAMIDE BLEND STRAPPY DRESS", "sales@zara.com");

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DropDownSelect, { Option } from "../DropDownSelect/DropDownSelect";
 // import "./MonthYear.css";
 
@@ -26,7 +26,16 @@ const MonthYearPicker = ({ selectedDate, onSelectDate }: MonthYearPickerProps) =
 		yearOptions.find((y) => y.value === (selectedDate?.getFullYear() || currentYear).toString()) || yearOptions[0]
 	);
 
+	// Skip the initial mount: otherwise the picker would emit its DEFAULT
+	// (current month/year) the moment it renders, stamping every item with an
+	// unintended purchase date the user never chose. Only emit once the user
+	// actually changes a dropdown.
+	const isInitialMount = useRef(true);
 	useEffect(() => {
+		if (isInitialMount.current) {
+			isInitialMount.current = false;
+			return;
+		}
 		if (selectedMonth && selectedYear) {
 			const newDate = new Date(parseInt(selectedYear.value), parseInt(selectedMonth.value), 1);
 			onSelectDate(newDate);

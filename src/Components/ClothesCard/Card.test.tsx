@@ -17,6 +17,39 @@ const item: ClothingItem = {
 	imageURL: "https://example.com/img.jpg",
 };
 
+describe("ClothingCard — age & condition", () => {
+	it("shows a factual 'Purchased: … ago' row when a valid purchaseDate is present", () => {
+		const purchaseDate = new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString();
+		const { getByText } = render(<ClothingCard item={{ ...item, purchaseDate }} />);
+		expect(getByText(/Purchased:/)).toBeInTheDocument();
+		expect(getByText(/20 days ago/)).toBeInTheDocument();
+	});
+
+	it("hides the Purchased row when there is no purchase date", () => {
+		const { queryByText } = render(<ClothingCard item={{ ...item, purchaseDate: undefined }} />);
+		expect(queryByText(/Purchased:/)).not.toBeInTheDocument();
+	});
+
+	it("shows the condition row from the condition field", () => {
+		const { getByText } = render(<ClothingCard item={{ ...item, condition: "good" }} />);
+		expect(getByText(/Condition:/)).toBeInTheDocument();
+		expect(getByText("good")).toBeInTheDocument();
+	});
+
+	it("falls back to the legacy age field for condition when it is a valid condition", () => {
+		const { getByText } = render(<ClothingCard item={{ ...item, condition: undefined, age: "like new" }} />);
+		expect(getByText("like new")).toBeInTheDocument();
+	});
+
+	it("hides the condition row for legacy free-text ages that aren't real conditions", () => {
+		// Seed/legacy items stored durations under `age` (e.g. "one year") — these
+		// must NOT render as "Condition: one year".
+		const { queryByText } = render(<ClothingCard item={{ ...item, condition: undefined, age: "one year" }} />);
+		expect(queryByText(/Condition:/)).not.toBeInTheDocument();
+		expect(queryByText("one year")).not.toBeInTheDocument();
+	});
+});
+
 describe("ClothingCard — name overlay", () => {
 	it("renders the name overlay with the item name", () => {
 		render(<ClothingCard item={item} />);
