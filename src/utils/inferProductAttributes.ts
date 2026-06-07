@@ -9,7 +9,7 @@ export interface ProductAttributes {
 	hasStretch?: boolean;
 	hasPockets?: boolean;
 	pattern?: string;
-	accents?: string
+	accents?: string;
 }
 
 // Each entry: [pattern, canonical value].
