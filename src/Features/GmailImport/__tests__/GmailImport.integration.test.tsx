@@ -246,12 +246,12 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		const cardList = screen.getByText(/Detected 5 items/).closest(".product-card-list")!;
 		const cards = within(cardList as HTMLElement);
 
-		// Verify product names on cards (names also appear in email HTML body)
-		expect(cards.getByText("SHORT JACQUARD JUMPSUIT")).toBeInTheDocument();
-		expect(cards.getByText("KNOTTED TOP")).toBeInTheDocument();
-		expect(cards.getByText("LACE LAPEL JUMPSUIT")).toBeInTheDocument();
-		expect(cards.getByText("WIDE-LEG PANTS WITH CONTRASTING TOPSTITCHING")).toBeInTheDocument();
-		expect(cards.getByText("PLATFORM SLINGBACK SHOES")).toBeInTheDocument();
+		// Verify product names on cards (rendered title-cased; raw names are ALL CAPS in the email HTML)
+		expect(cards.getByText("Short Jacquard Jumpsuit")).toBeInTheDocument();
+		expect(cards.getByText("Knotted Top")).toBeInTheDocument();
+		expect(cards.getByText("Lace Lapel Jumpsuit")).toBeInTheDocument();
+		expect(cards.getByText("Wide-Leg Pants With Contrasting Topstitching")).toBeInTheDocument();
+		expect(cards.getByText("Platform Slingback Shoes")).toBeInTheDocument();
 
 		// Verify prices on product cards ($29.99 appears twice: jumpsuit + pants)
 		expect(cards.getAllByText("$29.99")).toHaveLength(2);

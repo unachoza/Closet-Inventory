@@ -4,6 +4,7 @@ import { ClothingItem } from "../../utils/types";
 import { useState } from "react";
 import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeMaterial } from "../../utils/materialUtils";
+import { toTitleCase } from "../../utils/toTitleCase";
 
 interface CardProps {
 	item: ClothingItem;
@@ -27,17 +28,17 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 						<img src={item.imageURL} alt={item.name} />
 					</div>
 					<div className="card-name-overlay">
-						<span className="card-name-label">{item.name || item.brand || item.category}</span>
+						<span className="card-name-label">{toTitleCase(item.name || item.brand || item.category)}</span>
 					</div>
 					{/* <div className="card-info">
 						<p className="card-category">{item.category}</p>
-						<h2 className="card-title">{item.name}</h2>
+						<h2 className="card-title">{toTitleCase(item.name)}</h2>
 					</div> */}
 				</div>
 
 				{/* Back */}
 				<div className="card-back">
-					<h2 className="card-title">{item.name}</h2>
+					<h2 className="card-title">{toTitleCase(item.name)}</h2>
 					<div className="card-details">
 						<p>
 							<strong>Size:</strong> {item.size}

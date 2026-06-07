@@ -20,7 +20,7 @@ const OCCASION_MAP: [RegExp, string][] = [
 
 const VALID_TAGS = new Set<string>(occasionExamples);
 
-const EVERYDAY_CATEGORIES = new Set(["underwear", "lingerie"]);
+const EVERYDAY_CATEGORIES = new Set(["underwear", "lingerie", "socks"]);
 
 export function inferStyleTagsFromName(name: string, category?: string): string[] {
 	const combined = `${name} ${category ?? ""}`;

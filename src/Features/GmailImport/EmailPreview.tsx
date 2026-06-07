@@ -25,7 +25,6 @@ function isHtml(text: string): boolean {
 
 export default function EmailPreview({ email, onConfirmImport }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
-
 	return (
 		<div className="gmail-preview">
 			<div className="gmail-preview-header">

@@ -8,7 +8,7 @@ import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialB
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem } from "../../../utils/constants";
 import { normalizeMaterial } from "../../../utils/materialUtils";
-
+import { toTitleCase } from "../../../utils/toTitleCase";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
@@ -55,7 +55,7 @@ export interface EditItemViewProps {
 const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
-	const { id, imageURL, onSale, notes, material: _material, ...remaining } = item;
+	const { id, imageURL, onSale, notes, material: material, ...remaining } = item;
 	const inputsToSeperate = { id, onSale, notes };
 	const { updateItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();

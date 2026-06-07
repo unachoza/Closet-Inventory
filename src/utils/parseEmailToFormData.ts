@@ -2,6 +2,7 @@ import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
 import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
 import { inferMaterialFromName } from "./inferMaterialFromName";
+import { inferCareFromMaterial } from "./inferCareFromMaterial";
 import { inferProductAttributes } from "./inferProductAttributes";
 import { cleanProductName } from "./cleanProductName";
 import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
@@ -135,23 +136,11 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
 	const nameFromSubject = stripBrandFromName(subject, brand);
 	const cleanedName = cleanProductName(nameFromSubject);
-	console.log({ nameFromSubject });
 	// Product attributes from the raw (uncleaned) name
 	const attrs = inferProductAttributes(subject);
-	console.log({ combinedText });
-	console.log({ attrs });
-	// return {
-	// 	...formItem,
-	// 	brand,
-	// 	category,
-	// 	...(cleanedName && { name: cleanedName }),
-	// 	...(inlineColor && { color: inlineColor }),
-	// 	...(inlineSize && { size: inlineSize }),
-	// 	material: inferMaterialFromName(combinedText),
-	// 	occasion: styleTags[0] ?? "",
-	// 	age: "new",
-	// 	...attrs,
-	// };
+	const inferencedMaterial = inferMaterialFromName(combinedText);
+	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
+
 	const result = {
 		...formItem,
 		brand,
@@ -159,13 +148,12 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		...(cleanedName && { name: cleanedName }),
 		...(inlineColor && { color: inlineColor }),
 		...(inlineSize && { size: inlineSize }),
-		material: inferMaterialFromName(combinedText),
+		material: inferencedMaterial,
+		...(inferencedCare.length > 0 && { care: inferencedCare }),
 		occasion: styleTags[0] ?? "",
 		age: "new",
 		...attrs,
 	};
-
-	console.log("PARSE RESULT", result);
 
 	return result;
 }

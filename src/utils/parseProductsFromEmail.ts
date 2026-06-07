@@ -176,8 +176,7 @@ function parseNameCell(td: Element): ParsedNameCell {
 		.replace(ITEM_NUMBER_REGEX, "")
 		.replace(/item\s*no\s*:\s*/i, "")
 		.trim();
-	console.log({ cleanName });
-	console.log(brand, name, itemNumber);
+
 	return { brand, name: cleanName, itemNumber };
 }
 
@@ -232,7 +231,6 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 		}
 
 		const { brand, name, itemNumber } = parseNameCell(nameCell);
-		console.log({ brand }, { name }, { itemNumber });
 
 		if (!name) continue;
 
