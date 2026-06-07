@@ -1,14 +1,7 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
 import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
-
-//import { inferMaterialFromName } from "./inferMaterialFromName";
-//import { inferCareFromMaterial } from "./inferCareFromMaterial";
-//import { inferProductAttributes } from "./inferProductAttributes";
-//import { cleanProductName } from "./cleanProductName";
-// import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
 import { extractBrandFromSender } from "./parseProductsFromEmail";
-// import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
