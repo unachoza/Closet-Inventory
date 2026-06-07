@@ -131,7 +131,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				category: emailData.category,
 				color: product.color,
 				size: product.size,
-				material: product.material,
+				material: product.material || emailData.material,
 				onSale: product.onSale,
 				age: "new",
 			});
@@ -149,6 +149,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 			const items = products.map((product) => {
 				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
+				const material = product.material && product.material.length > 0 ? product.material : emailData.material;
+
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
@@ -158,12 +160,11 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					category: emailData.category,
 					color: product.color,
 					size: product.size,
-					material: product.material,
+					material,
 					onSale: product.onSale,
 					age: "new",
 				} as Partial<ClothingItem>;
 			});
-
 			onImportAll(items);
 		},
 		[selectedEmail, selectedEmailId, onImportAll, onSourceEmailChange],

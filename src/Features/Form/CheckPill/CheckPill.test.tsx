@@ -14,7 +14,6 @@ describe("CheckPill component", () => {
 		render(<CheckPill id="001" label={"color" as keyof ItemFormData} value="Red" checked={false} onToggle={mockToggle} />);
 
 		const pill = screen.getByText("Red").closest("[role=checkbox]");
-		console.log({ pill });
 		expect(pill).toBeTruthy();
 
 		expect(pill).toHaveAttribute("data-state", "unchecked");

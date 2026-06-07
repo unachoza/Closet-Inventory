@@ -31,7 +31,7 @@ describe("ClothingCard — name overlay", () => {
 
 	it("falls back to category when name and brand are both empty", () => {
 		render(<ClothingCard item={{ ...item, name: "", brand: "" }} />);
-		expect(document.querySelector(".card-name-label")).toHaveTextContent("tops");
+		expect(document.querySelector(".card-name-label")).toHaveTextContent("Tops");
 	});
 
 	it("overlay starts hidden (translateY 100% via CSS class)", () => {

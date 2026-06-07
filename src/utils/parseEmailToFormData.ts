@@ -1,10 +1,20 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
+import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
+import { inferMaterialFromName } from "./inferMaterialFromName";
+import { inferCareFromMaterial } from "./inferCareFromMaterial";
+import { inferProductAttributes } from "./inferProductAttributes";
+import { cleanProductName } from "./cleanProductName";
+import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
+import { extractBrandFromSender } from "./parseProductsFromEmail";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
 	zara: "zara",
 	"banana republic": "banana republic",
+	"old navy": "old navy",
+	oldnavy: "old navy",
+	target: "target",
 	gap: "gap",
 	"forever 21": "forever 21",
 	"h&m": "h&m",
@@ -21,6 +31,7 @@ const BRAND_PATTERNS: Record<string, string> = {
 	mango: "mango",
 	asos: "asos",
 	shein: "shein",
+	skims: "skims",
 	"free people": "free people",
 	reformation: "reformation",
 	thredup: "thredup",
@@ -67,7 +78,11 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	balconette: "lingerie",
 	plunge: "lingerie",
 	thong: "underwear",
+	briefs: "underwear",
+	brief: "underwear",
+	panty: "underwear",
 	bikini: "lingerie",
+	teddy: "lingerie",
 	intimate: "lingerie",
 	boots: "shoes",
 	loafers: "shoes",
@@ -108,11 +123,37 @@ function stripHtml(html: string): string {
 export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
+	// Brand from a known pattern in the subject/body/sender; otherwise fall back
+	// to the email sender (e.g. an Old Navy receipt has no brand text — the
+	// "Old Navy" sender becomes the brand).
+	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
+	const category = extractCategory(combinedText);
+	const styleTags = inferStyleTagsFromName(combinedText, category);
 
-	return {
+	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
+	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
+
+	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
+	const nameFromSubject = stripBrandFromName(subject, brand);
+	const cleanedName = cleanProductName(nameFromSubject);
+	// Product attributes from the raw (uncleaned) name
+	const attrs = inferProductAttributes(subject);
+	const inferencedMaterial = inferMaterialFromName(combinedText);
+	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
+
+	const result = {
 		...formItem,
-		brand: extractBrand(combinedText, from),
-		category: extractCategory(combinedText),
+		brand,
+		category,
+		...(cleanedName && { name: cleanedName }),
+		...(inlineColor && { color: inlineColor }),
+		...(inlineSize && { size: inlineSize }),
+		material: inferencedMaterial,
+		...(inferencedCare.length > 0 && { care: inferencedCare }),
+		occasion: styleTags[0] ?? "",
 		age: "new",
+		...attrs,
 	};
+
+	return result;
 }

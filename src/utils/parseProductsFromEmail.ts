@@ -1,3 +1,7 @@
+import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize } from "./parseNameHelpers";
+import { cleanProductName } from "./cleanProductName";
+import { inferProductAttributes } from "./inferProductAttributes";
+
 /**
  * Extracts product details from order confirmation email HTML.
  *
@@ -19,6 +23,12 @@ export interface ExtractedProduct {
 	readonly itemNumber: string;
 	readonly material: string;
 	readonly onSale: boolean;
+	// Inferred clothing attributes
+	readonly sleeveLength?: string;
+	readonly hemLength?: string;
+	readonly neckline?: string;
+	readonly fit?: string;
+	readonly rise?: string;
 }
 
 const PRICE_REGEX = /\$\d{1,5}(?:\.\d{2})?/g;
@@ -108,6 +118,24 @@ function getCellText(td: Element): string {
 	return (td.textContent ?? "").trim().replace(/\s+/g, " ");
 }
 
+// Looks for explicit "Material:", "Fabric:", "Content:" labels,
+// then falls back to bare percentage-blend patterns.
+const MATERIAL_LABEL_RE = /(?:material|fabric|fiber\s+content|fibre\s+content|content|composition):\s*([^\n<]+)/i;
+const FIBER_PCT_RE = /\d+\s*%\s*[a-z]/i;
+
+function extractMaterialFromText(text: string): string {
+	const labelMatch = text.match(MATERIAL_LABEL_RE);
+	if (labelMatch) return labelMatch[1].trim();
+
+	// Scan line-by-line so a lone "95% Cotton, 5% Spandex" line is found
+	// without grabbing unrelated text before/after it.
+	for (const line of text.split(/[\n;]/)) {
+		if (FIBER_PCT_RE.test(line)) return line.trim();
+	}
+
+	return "";
+}
+
 interface ParsedNameCell {
 	readonly brand: string;
 	readonly name: string;
@@ -148,6 +176,7 @@ function parseNameCell(td: Element): ParsedNameCell {
 		.replace(ITEM_NUMBER_REGEX, "")
 		.replace(/item\s*no\s*:\s*/i, "")
 		.trim();
+
 	return { brand, name: cleanName, itemNumber };
 }
 
@@ -238,6 +267,9 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 
 				// Numeric-only (could be quantity) — skip single digits
 				if (/^\d$/.test(text)) continue;
+
+				// Skip quantity-label cells from nested tables (e.g. "Qty:1", "Qty: 2")
+				if (/^qty/i.test(text)) continue;
 
 				// Otherwise likely color
 				if (!color && text.length > 1 && !/^\$/.test(text)) {
@@ -362,6 +394,14 @@ function extractFromDivLayout(doc: Document): ExtractedProduct[] {
 	for (const td of allTds) {
 		const img = td.querySelector("img") as HTMLImageElement | null;
 		if (!img || !isProductImage(img)) continue;
+
+		// Only treat the image's OWN cell as the product cell. Without this, a
+		// large container <td> (e.g. an entire email body wrapping a hero banner
+		// plus unrelated text divs and an order total) is mistaken for a product
+		// cell, producing a bogus "intro text + total price" item that pre-empts
+		// the real line-item strategies. A genuine div-based product cell holds
+		// the image directly, so its closest <td> ancestor is itself.
+		if (img.closest("td") !== td) continue;
 
 		const imageUrl = img.getAttribute("src") ?? "";
 
@@ -557,8 +597,8 @@ function parseSizeColorLine(text: string): { size: string; color: string } {
 	// Remove QTY portion if present (e.g. "US 4 / DUSTY PINKQTY: 1")
 	const cleaned = text.replace(/QTY\s*:?\s*\d+/i, "").trim();
 
-	// "US 4 / DUSTY PINK", "S / Black", "XL / Navy"
-	const match = cleaned.match(/^(?:US\s+)?(\S+)\s*\/\s*(.+)$/i);
+	// "US 4 / DUSTY PINK", "S / Black", "S | Red Plaid", "2 | Black & White Plaid"
+	const match = cleaned.match(/^(?:US\s+)?(\S+)\s*[/|]\s*(.+)$/i);
 	if (match) {
 		return {
 			size: match[1].trim(),
@@ -592,10 +632,7 @@ function getTextLines(el: Element): string[] {
 function getAttributeByLabel(cell: Element, label: string): string {
 	const cells = Array.from(cell.querySelectorAll("td"));
 	for (let i = 0; i < cells.length - 1; i++) {
-		const key = getCellText(cells[i])
-			.replace(/:$/, "")
-			.trim()
-			.toLowerCase();
+		const key = getCellText(cells[i]).replace(/:$/, "").trim().toLowerCase();
 		if (key === label) return getCellText(cells[i + 1]).trim();
 	}
 	return "";
@@ -649,7 +686,7 @@ function extractFromAttributeTableRows(doc: Document): ExtractedProduct[] {
 		// Struck-through original price marks a sale; the current price is the
 		// first $ value (on the price line) that isn't the struck original.
 		const struckEl = detailsCell.querySelector("s, strike, del, [style*='line-through']");
-		const struck = struckEl ? extractPrices(struckEl.textContent ?? "")[0] ?? "" : "";
+		const struck = struckEl ? (extractPrices(struckEl.textContent ?? "")[0] ?? "") : "";
 		const onSale = Boolean(struck);
 
 		// The price line is the first <br>-delimited line containing a "$"
@@ -882,6 +919,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 		let size = "";
 		let listPrice = 0;
 		let itemNumber = "";
+		let labeledMaterial = "";
 
 		for (const line of detailLines) {
 			const colorMatch = line.match(/^Color:\s*(.+)/i);
@@ -895,6 +933,11 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 				size = sizeVal === "N/A" ? "" : sizeVal;
 				continue;
 			}
+			const materialMatch = line.match(/^(?:Material|Fabric|Content|Fiber\s*Content|Composition):\s*(.+)/i);
+			if (materialMatch && !labeledMaterial) {
+				labeledMaterial = materialMatch[1].trim();
+				continue;
+			}
 			const itemMatch = line.match(/^Item\s*#:\s*(.+)/i);
 			if (itemMatch && !itemNumber) {
 				itemNumber = itemMatch[1].trim();
@@ -904,6 +947,11 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 			if (priceFieldMatch && listPrice === 0) {
 				listPrice = parseFloat(priceFieldMatch[1]);
 			}
+		}
+
+		// If no labeled material field, try extracting from the full details text
+		if (!labeledMaterial) {
+			labeledMaterial = extractMaterialFromText(getCellText(detailsTh));
 		}
 
 		// Get paid price from a sibling <td> (not the details td)
@@ -937,7 +985,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 			color,
 			size,
 			itemNumber,
-			material,
+			material: labeledMaterial || material,
 			onSale,
 		});
 	}
@@ -999,9 +1047,10 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 			const name = nameP ? (nameP.textContent ?? "").trim() : "";
 			if (!name || name.length < 3) continue;
 
-			// Extract Color and Size from labeled spans
+			// Extract Color, Size, and Material from labeled spans
 			let color = "";
 			let size = "";
+			let spanMaterial = "";
 			const allSpans = Array.from(detailsCol.querySelectorAll("span"));
 
 			for (let i = 0; i < allSpans.length; i++) {
@@ -1010,19 +1059,30 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 
 				if (cleanLabel === "color" && i + 1 < allSpans.length) {
 					const valText = (allSpans[i + 1].textContent ?? "").trim();
-					if (valText.length > 0 && !/^(size|color)/i.test(valText)) {
+					if (valText.length > 0 && !/^(size|color|material|fabric)/i.test(valText)) {
 						color = valText.toLowerCase();
 						i++;
 					}
 				} else if (cleanLabel === "size" && i + 1 < allSpans.length) {
 					const valText = (allSpans[i + 1].textContent ?? "").trim().replace(/\s+/g, " ");
-					if (valText.length > 0 && !/^(size|color)/i.test(valText)) {
+					if (valText.length > 0 && !/^(size|color|material|fabric)/i.test(valText)) {
 						// "XS （US 2）" or "M （US 6）" → extract size code before parens
 						const sizeMatch = valText.match(/^(\S+)/);
 						size = sizeMatch ? sizeMatch[1] : valText;
 						i++;
 					}
+				} else if (/^(material|fabric|content|composition)$/.test(cleanLabel) && i + 1 < allSpans.length) {
+					const valText = (allSpans[i + 1].textContent ?? "").trim();
+					if (valText.length > 0 && !spanMaterial) {
+						spanMaterial = valText;
+						i++;
+					}
 				}
+			}
+
+			// Fall back to scanning full column text for labeled/percentage material
+			if (!spanMaterial) {
+				spanMaterial = extractMaterialFromText(getCellText(detailsCol));
 			}
 
 			// Extract price (with sale detection via line-through)
@@ -1073,7 +1133,7 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 				color,
 				size,
 				itemNumber: "",
-				material: "",
+				material: spanMaterial,
 				onSale,
 			});
 		}
@@ -1638,6 +1698,683 @@ function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Strategy: Shopify standard order email layout (SKIMS, and any Shopify-powered store).
+ *
+ * Shopify's default order confirmation template uses consistent CSS class names:
+ *   <span class="order-list__item-title">  — "PRODUCT NAME | COLOR × QTY"
+ *   <span class="order-list__item-variant"> — "COLOR / SIZE"
+ *   <p class="order-list__item-price">     — current price (after discounts)
+ *   <del class="order-list__item-original-price"> — struck-through original (sale indicator)
+ *
+ * The discount allocation span inside the description cell contains "$" amounts
+ * (e.g. "3+ FOR $12 EACH (-$40.00)"), which breaks generic column-detection strategies
+ * that identify the price column by scanning for "$". This strategy avoids that entirely
+ * by using Shopify's class names directly.
+ *
+ * SKIMS encodes color in the title as "PRODUCT NAME | COLOR × QTY". We strip both
+ * the quantity suffix ("× N") and the color suffix ("| COLOR") from the display name
+ * since color is captured separately from the variant span.
+ */
+function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
+	const titleSpans = doc.querySelectorAll("span.order-list__item-title");
+	if (titleSpans.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	for (const titleSpan of titleSpans) {
+		const row = titleSpan.closest("tr");
+		if (!row) continue;
+
+		// Image
+		const img = row.querySelector("img");
+		const imageUrl = img && isProductImage(img as HTMLImageElement) ? (img.getAttribute("src") ?? "") : "";
+
+		// Name: strip "× N" quantity suffix then "| COLOR" color suffix
+		// Raw: "FITS EVERYBODY HIGH WAISTED THONG | ONYX × 5"
+		// → strip qty: "FITS EVERYBODY HIGH WAISTED THONG | ONYX"
+		// → strip color segment: "FITS EVERYBODY HIGH WAISTED THONG"
+		const rawTitle = (titleSpan.textContent ?? "")
+			.replace(/&nbsp;/g, " ")
+			.trim()
+			.replace(/\s+/g, " ");
+		const withoutQty = rawTitle.replace(/\s*[×x]\s*\d+\s*$/, "").trim();
+		const pipeIdx = withoutQty.lastIndexOf(" | ");
+		const name = pipeIdx !== -1 ? withoutQty.slice(0, pipeIdx).trim() : withoutQty;
+
+		if (!name || name.length < 3) continue;
+
+		// Variant: "ONYX / S" → color = "onyx", size = "S"
+		const variantSpan = row.querySelector("span.order-list__item-variant");
+		const variantText = variantSpan ? (variantSpan.textContent ?? "").trim().replace(/\s+/g, " ") : "";
+
+		let color = "";
+		let size = "";
+
+		if (variantText.includes("/")) {
+			const parts = variantText.split("/").map((p) => p.trim());
+			for (const part of parts) {
+				if (looksLikeSize(part) && !size) {
+					size = part;
+				} else if (!color) {
+					color = part.toLowerCase();
+				}
+			}
+		} else if (variantText) {
+			if (looksLikeSize(variantText)) {
+				size = variantText;
+			} else {
+				color = variantText.toLowerCase();
+			}
+		}
+
+		// Price: read directly from the dedicated price element
+		const priceEl = row.querySelector("p.order-list__item-price");
+		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : "";
+		const prices = extractPrices(priceText);
+		const price = prices[0] ?? "";
+
+		// Sale detection: struck-through original price present
+		const delEl = row.querySelector("del.order-list__item-original-price");
+		const onSale = Boolean(delEl);
+
+		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Single-column bold-paragraph layout (Banana Republic Factory, Gap, Old Navy).
+ *
+ * Each product occupies a single <td> containing:
+ *   <img width="20"> (tiny brand logo — filtered by isProductImage)
+ *   <p style="font-weight:bold"> — product name
+ *   <p style="font-size:12px">  — SKU (6+ digit number)
+ *   <p> with <span style="line-through">Was $X</span> + <span style="color:...">$Y</span>
+ *   <p> — "SIZE | COLOR" (e.g. "S | Red Plaid", "2 | Black & White Plaid")
+ *
+ * Guard: requires both a bold-name <p> and a SIZE|COLOR <p> (or price) to avoid
+ * false-positives on shipping/promo rows that also contain bold text.
+ */
+function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	// Find all <p> elements whose style contains font-weight:bold
+	const boldPs = Array.from(doc.querySelectorAll("p[style*='font-weight:bold'], p[style*='font-weight: bold']"));
+
+	for (const boldP of boldPs) {
+		const name = (boldP.textContent ?? "").trim();
+		if (!name || name.length < 3) continue;
+
+		// Must sit inside a <td>
+		const parentTd = boldP.closest("td");
+		if (!parentTd) continue;
+
+		// Collect sibling <p> elements that follow the bold name in this <td>
+		const allPs = Array.from(parentTd.querySelectorAll("p"));
+		const boldIdx = allPs.findIndex((p) => p === boldP);
+		if (boldIdx === -1) continue;
+		const siblings = allPs.slice(boldIdx + 1);
+
+		let price = "";
+		let color = "";
+		let size = "";
+		let onSale = false;
+		let itemNumber = "";
+		let hasSizeColor = false;
+
+		for (const p of siblings) {
+			const text = (p.textContent ?? "").replace(/\s+/g, " ").trim();
+
+			// Price line: contains a strikethrough span
+			const strikeEl = p.querySelector("span[style*='line-through'], s, del");
+			if (strikeEl) {
+				onSale = true;
+				// Sale price: colored span or last price in the paragraph
+				const coloredSpan = p.querySelector("span[style*='color']");
+				if (coloredSpan) {
+					const m = (coloredSpan.textContent ?? "").match(/\$[\d.]+/);
+					if (m) price = m[0];
+				}
+				if (!price) {
+					const prices = extractPrices(text);
+					const origPrice = parseFloat((extractPrices(strikeEl.textContent ?? "")[0] ?? "0").replace("$", ""));
+					price = prices.find((p) => parseFloat(p.replace("$", "")) < origPrice) ?? prices[prices.length - 1] ?? "";
+				}
+				continue;
+			}
+
+			// SKU: exactly 6+ digits
+			if (/^\d{6,}$/.test(text)) {
+				itemNumber = text;
+				continue;
+			}
+
+			// SIZE | COLOR (or SIZE / COLOR): "S | Red Plaid", "M | Brown"
+			if (text.includes("|") || text.includes("/")) {
+				const parsed = parseSizeColorLine(text);
+				if (parsed.size) {
+					size = parsed.size;
+					color = parsed.color;
+					hasSizeColor = true;
+					continue;
+				}
+			}
+		}
+
+		// Require at minimum either a price OR a size|color to confirm product row
+		if (!hasSizeColor && !price) continue;
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Poshmark 3-cell row layout.
+ *
+ * Poshmark order emails use a 3-cell <tr>:
+ *   <td class="item"> — product image (75×75)
+ *   <td>              — nested table (width="360") with name row, Size: row, and a
+ *                       hidden <span class="price" display:none> (skipped)
+ *   <td class="price"> — visible price text (e.g. "$24.00")
+ *
+ * Guard: requires td.price class on the price cell — specific to Poshmark's template.
+ */
+function extractFromPoshmarkLayout(doc: Document): ExtractedProduct[] {
+	const priceCells = Array.from(doc.querySelectorAll("td.price")).filter((td) => {
+		const style = td.getAttribute("style") ?? "";
+		return !style.includes("display:none") && !style.includes("display: none");
+	});
+
+	if (priceCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	for (const priceCell of priceCells) {
+		const row = priceCell.closest("tr");
+		if (!row) continue;
+
+		const cells = directChildren(row, "td");
+		if (cells.length !== 3) continue;
+
+		let imageUrl = "";
+		let detailsCell: Element | null = null;
+
+		for (const cell of cells) {
+			if (cell === priceCell) continue;
+
+			const img = cell.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+				continue;
+			}
+
+			if (!detailsCell && (cell.textContent ?? "").trim().length > 3) {
+				detailsCell = cell;
+			}
+		}
+
+		if (!detailsCell) continue;
+
+		const nestedRows = Array.from(detailsCell.querySelectorAll("tr"));
+
+		let name = "";
+		let size = "";
+
+		for (const nRow of nestedRows) {
+			// Skip rows whose content is entirely hidden
+			if (nRow.querySelector("[style*='display:none']")) continue;
+
+			const text = getCellText(nRow);
+			if (!text) continue;
+
+			const sizeMatch = text.match(/^Size\s*:\s*(.+)/i);
+			if (sizeMatch && !size) {
+				size = sizeMatch[1].trim();
+				continue;
+			}
+
+			if (!name && text.length > 3) {
+				name = text;
+			}
+		}
+
+		if (!name) continue;
+
+		const priceText = getCellText(priceCell as Element);
+		const price = priceText.startsWith("$") ? priceText : priceText ? `$${priceText}` : "";
+
+		const dedupeKey = `${name.toLowerCase()}|${price}`;
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color: "",
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: SHEIN side-by-side 30%/69% table layout.
+ *
+ * SHEIN order emails pair a 30%-width image table with a 69%-width details
+ * table inside the same container element. The details table contains:
+ *   <span style="color:#939393"> — product name (grey text)
+ *   SKU: …<br>
+ *   SIZE: COLOR-SIZE<br>   (e.g. "Dark Grey-Petite S" or "Black-S")
+ *   QTY: 1
+ *
+ * Guard: requires the image URL to come from ltwebstatic.com (SHEIN's CDN),
+ * preventing false-positive matches on other email layouts.
+ */
+function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img[src*='ltwebstatic.com']")).filter((img) => isProductImage(img as HTMLImageElement));
+
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seenKeys = new Set<string>();
+
+	for (const img of productImgs) {
+		const imageUrl = img.getAttribute("src") ?? "";
+
+		// Walk up to the image's containing table (the 30% one)
+		const imgTable = (img as Element).closest("table");
+		if (!imgTable) continue;
+
+		const parent = imgTable.parentElement;
+		if (!parent) continue;
+
+		// Find the sibling table that has the grey product-name span
+		let detailsTable: Element | null = null;
+		for (const sibling of Array.from(parent.children)) {
+			if (sibling === imgTable || sibling.tagName !== "TABLE") continue;
+			if (sibling.querySelector("span[style*='color:#939393'], span[style*='color: #939393']")) {
+				detailsTable = sibling;
+				break;
+			}
+		}
+
+		if (!detailsTable) continue;
+
+		const greySpan = detailsTable.querySelector("span[style*='color:#939393'], span[style*='color: #939393']");
+		if (!greySpan) continue;
+
+		const name = (greySpan.textContent ?? "").trim();
+		if (!name || name.length < 3) continue;
+
+		const detailsTd = greySpan.closest("td");
+		if (!detailsTd) continue;
+
+		const lines = getTextLines(detailsTd);
+
+		let size = "";
+		let color = "";
+
+		for (const line of lines) {
+			const sizeMatch = line.match(/^SIZE\s*:\s*(.+)/i);
+			if (sizeMatch && !size) {
+				const parsed = parseSHEINSizeField(sizeMatch[1].trim());
+				color = parsed.color;
+				size = parsed.size;
+				break;
+			}
+		}
+
+		const dedupeKey = `${name.toLowerCase()}|${size}|${color}`;
+		if (seenKeys.has(dedupeKey)) continue;
+		seenKeys.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price: "",
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Target order email two-column product blocks.
+ *
+ * Each item is a `<!-- PRODUCT BLOCK -->` with a 2-column layout: a left
+ * `td.product-image` holding the photo (target.scene7.com) and a right
+ * `td.product-details` holding `<h2><a>` (the product name) and a `Qty: N`
+ * paragraph. No price is included in these emails.
+ *
+ * Name comes from the <h2> link (the image `alt` is sometimes mangled, e.g.
+ * the shower-liner alt is broken across HTML attributes). Guard: requires a
+ * `td.product-details` containing an <h2>, so it won't fire on generic emails.
+ */
+function extractFromTargetLayout(doc: Document): ExtractedProduct[] {
+	const detailCells = Array.from(doc.querySelectorAll("td.product-details"));
+	if (detailCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const cell of detailCells) {
+		const heading = cell.querySelector("h2 a") ?? cell.querySelector("h2");
+		const name = heading ? getCellText(heading) : "";
+		if (!name || name.length < 3) continue;
+
+		// The image lives in the sibling product-col-left table inside the same
+		// wrapping <td>. Walk up to that wrapper, then find the product image.
+		let imageUrl = "";
+		const wrapper = cell.closest("table")?.parentElement ?? null;
+		if (wrapper) {
+			const img = wrapper.querySelector("td.product-image img") ?? wrapper.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+			}
+		}
+
+		if (seen.has(name.toLowerCase())) continue;
+		seen.add(name.toLowerCase());
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price: "",
+			color: "",
+			size: "",
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: monospace plaintext register receipt (Old Navy / Gap Inc. POS).
+ *
+ * In-store receipts are emailed as a single monospace block where each line is
+ * <br>-separated and space-padded. A purchased item is two consecutive lines:
+ *   "Cozy Crew Socks for Women      1.00 N"   ← name + net price + tax code
+ *   "608308-151-0000          1 @ 5.00"       ← SKU + qty @ unit (original) price
+ * followed by optional "Item Discount …" and a department-code line.
+ *
+ * Guard: an item line must be immediately followed by a SKU line in the exact
+ * NNNNNN-NNN-NNNN "1 @ price" form, and at least two items must be found. This
+ * filters non-product lines (e.g. "Bag fee … 0.05 N", whose next line is "108
+ * 1 @ 0.05") and prevents the barcode <img> from being mistaken for a product
+ * by the image fallback.
+ */
+function extractFromReceiptText(doc: Document): ExtractedProduct[] {
+	const lines = getTextLines(doc.body);
+
+	// "Name<spaces>1.00 N" — net (post-discount) price, trailing tax code letter.
+	const ITEM_RE = /^(.+?)\s+(\d+\.\d{2})\s+[A-Z]$/;
+	// "608308-151-0000   1 @ 5.00" — SKU then quantity @ unit (pre-discount) price.
+	const SKU_RE = /^(\d{6}-\d{3}-\d{4})\s+(\d+)\s*@\s*(\d+\.\d{2})$/;
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (let i = 0; i < lines.length - 1; i++) {
+		const itemMatch = lines[i].match(ITEM_RE);
+		if (!itemMatch) continue;
+
+		const skuMatch = lines[i + 1].match(SKU_RE);
+		if (!skuMatch) continue; // require the SKU line to confirm a real product
+
+		const name = itemMatch[1].trim();
+		const paid = parseFloat(itemMatch[2]);
+		const itemNumber = skuMatch[1];
+		const original = parseFloat(skuMatch[3]);
+
+		// SKU embeds the colorway, so distinct lines stay distinct; identical
+		// repeats collapse.
+		if (seen.has(itemNumber)) continue;
+		seen.add(itemNumber);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price: `$${paid.toFixed(2)}`,
+			color: "",
+			size: "",
+			itemNumber,
+			material: "",
+			onSale: original > paid,
+		});
+	}
+
+	// Require ≥2 items so a stray "label  0.00 X" line can't trigger a match.
+	return products.length >= 2 ? products : [];
+}
+
+/**
+ * Extract the current (sale) price from a cell that may carry a "Price:" /
+ * "Total:" label and a strikethrough original. Amounts may be written
+ * "$7.46" or bare "7.46". Returns the non-struck amount and a sale flag.
+ */
+function parseLabeledStruckPrice(cell: Element): { price: string; onSale: boolean } {
+	const strikeEl = cell.querySelector(".strike, s, strike, del, [style*='line-through']");
+	const struckText = strikeEl ? getCellText(strikeEl) : "";
+
+	let text = getCellText(cell).replace(/^(price|total)\s*:?\s*/i, "");
+	if (struckText) text = text.replace(struckText, " ");
+
+	const m = text.match(/(\d{1,6}(?:\.\d{2})?)/);
+	const price = m ? `$${m[1]}` : "";
+	return { price, onSale: Boolean(struckText) };
+}
+
+/**
+ * Strategy: Anthropologie / Demandware "item-detail-row" layout.
+ *
+ * Each product is a multi-column <tr> inside <td class="item-table-container">:
+ *   <td class="item-image">      — product photo (≈129px)
+ *   <td class="item-details">    — nested table of labeled rows:
+ *       td.product-name (<h4>), td.product-style, td.product-color, td.product-size
+ *   <td class="item-price-large"> ×3 — unit price / qty / line total
+ * A sibling <td class="product-specs"> repeats Price/Qty/Total in small text.
+ *
+ * Prices may be "$7.46" or bare "7.46"; the struck-through value is the
+ * original (pre-sale) price. Without a dedicated strategy the generic 4+-cell
+ * table parser dumped the whole details blob into the name and mistook the
+ * bare price for the color.
+ *
+ * Guard: requires td.product-name plus a product-color or product-size cell,
+ * so it only fires on this specific template.
+ */
+function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
+	const nameCells = Array.from(doc.querySelectorAll("td.product-name"));
+	if (nameCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	const stripLabel = (el: Element | null | undefined, label: RegExp): string => (el ? getCellText(el).replace(label, "").trim() : "");
+
+	for (const nameCell of nameCells) {
+		const detailsCell = nameCell.closest("td.item-details");
+		const colorCell = detailsCell?.querySelector("td.product-color");
+		const sizeCell = detailsCell?.querySelector("td.product-size");
+		// Require a labeled attribute to confirm this is the Anthropologie layout.
+		if (!colorCell && !sizeCell) continue;
+
+		const name = getCellText(nameCell);
+		if (!name) continue;
+
+		const color = stripLabel(colorCell, /^color\s*:?\s*/i).toLowerCase();
+		const size = stripLabel(sizeCell, /^size\s*:?\s*/i);
+		const itemNumber = stripLabel(detailsCell?.querySelector("td.product-style"), /^style\s*no\.?\s*:?\s*/i);
+
+		let price = "";
+		let onSale = false;
+		let imageUrl = "";
+
+		const container = nameCell.closest("td.item-table-container");
+		if (container) {
+			const priceCell = container.querySelector("td.product-price") ?? container.querySelector("td.item-price-large");
+			if (priceCell) ({ price, onSale } = parseLabeledStruckPrice(priceCell));
+
+			const img = container.querySelector("td.item-image img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+			}
+		}
+
+		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({ imageUrl, name, brand: "", price, color, size, itemNumber, material: "", onSale });
+	}
+
+	return products;
+}
+
+/** Strip a leading VS color code ("54A2 Black" -> "black", "Black" -> "black"). */
+function cleanVSColor(raw: string): string {
+	const parts = raw.trim().split(/\s+/);
+	if (parts.length > 1 && /\d/.test(parts[0])) parts.shift();
+	return parts.join(" ").toLowerCase();
+}
+
+/**
+ * Strategy: Victoria's Secret order confirmation (Salesforce Marketing Cloud).
+ *
+ * Each item is a single-column block whose per-item <table> holds:
+ *   <b>Product Name</b>
+ *   123456            (6+ digit SKU, on its own line)
+ *   a nested Color / Size / Qty / Status attribute table
+ *   a price block: <span>$paid</span> <span>-$discount</span> $original
+ *
+ * VS repeats the same SKU across shipment sections, so items are de-duplicated
+ * by SKU with the LAST occurrence winning (the consolidated/final line). There
+ * are no per-item product images (only marketing banners), so imageUrl is empty.
+ *
+ * Guard: requires a <b> name plus Color + Size labels + a 6-digit SKU, so it
+ * won't fire on other layouts (H&M's attribute rows lack the <b> name and are
+ * already handled earlier).
+ */
+function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
+	const bolds = Array.from(doc.querySelectorAll("td b"));
+	if (bolds.length === 0) return [];
+
+	const order: string[] = [];
+	const bySku = new Map<string, ExtractedProduct>();
+
+	for (const bold of bolds) {
+		const name = getCellText(bold);
+		if (!name || name.length < 3) continue;
+
+		const block = bold.closest("table");
+		if (!block) continue;
+
+		const color = cleanVSColor(getAttributeByLabel(block, "color"));
+		const size = getAttributeByLabel(block, "size");
+		if (!color || !size) continue;
+
+		// SKU: a cell whose text is only 6+ digits.
+		const skuCell = Array.from(block.querySelectorAll("td")).find((td) => /^\d{6,}$/.test(getCellText(td)));
+		const itemNumber = skuCell ? getCellText(skuCell) : "";
+		if (!itemNumber) continue;
+
+		// Price block: first $ amount is the paid line total; a higher trailing
+		// amount is the struck original (sale).
+		const prices = extractPrices(getCellText(block));
+		const price = prices[0] ?? "";
+		const amounts = prices.map((p) => parseFloat(p.replace("$", "")));
+		const onSale = amounts.length > 1 && Math.max(...amounts) > amounts[0];
+
+		const product: ExtractedProduct = {
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		};
+
+		if (!bySku.has(itemNumber)) order.push(itemNumber);
+		bySku.set(itemNumber, product); // last occurrence wins
+	}
+
+	return order.map((sku) => bySku.get(sku) as ExtractedProduct);
+}
+
+// Post-processing applied to every extracted product regardless of strategy.
+// Infer-from-raw first, then clean for storage — per advisor guidance.
+function enrichProduct(p: ExtractedProduct): ExtractedProduct {
+	const rawName = p.name;
+
+	// Extract inline color/size suffix ("...in burgundy size M") before cleaning
+	const inline = parseInlineColorSize(rawName);
+	const color = p.color || inline.color;
+	const size = p.size || inline.size;
+
+	// Strip brand prefix from name, then clean SEO junk
+	const nameWithoutBrand = stripBrandFromName(rawName, p.brand);
+	const name = cleanProductName(nameWithoutBrand) || nameWithoutBrand;
+
+	// Infer clothing attributes from raw (un-cleaned) name
+	const attrs = inferProductAttributes(rawName);
+
+	return { ...p, name, color, size, ...attrs };
+}
+
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	if (!html.trim()) return [];
 
@@ -1654,44 +2391,46 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  2. Labeled-field <th> layout (CUUP) — bold span + Color:/Size:/Price:
 	//  3. React Email sections (Cider) — data-id="react-email-section"
 	//  4. Amazon MJML columns — img.productImage + mj-column divs
-	//  5. Paragraph-based two-cell rows (Princess Polly) — <p> elements
-	//  6. Table rows with 4+ cells (Aritzia, Nordstrom)
-	//  7. Order-ID container 3-column rows (AliExpress, Wish)
-	//  8. Div-based layouts (Zara)
-	//  9. Text-only product rows (Express) — no images, ≥2 matches
-	// 10. Image fallback
+	//  5. SHEIN side-by-side tables — ltwebstatic.com CDN + grey span name
+	//  6. H&M nested attribute table — two-cell rows with Color+Size table
+	//  7. Bold-paragraph single-column (Gap/Banana Republic Factory)
+	//  8. Paragraph-based two-cell rows (Princess Polly) — <p> elements
+	//  9. Poshmark 3-cell rows — td.item image + nested name table + td.price
+	// 10. Anthropologie item-detail-row — labeled product-name/color/size cells
+	// 11. Table rows with 4+ cells (Aritzia, Nordstrom)
+	// 12. Shopify order template (SKIMS) — order-list__item-title class
+	// 13. Order-ID container 3-column rows (AliExpress, Wish)
+	// 14. Div-based layouts (Zara)
+	// 15. Text-only product rows (Express) — no images, ≥2 matches
+	// 16. Monospace POS receipt (Old Navy / Gap Inc.) — SKU line-pattern
+	// 17. Image fallback
 
-	const nestedProducts = extractFromNestedTables(doc);
-	if (nestedProducts.length > 0) return nestedProducts;
+	const strategies = [
+		extractFromNestedTables,
+		extractFromLabeledFieldLayout,
+		extractFromReactEmailLayout,
+		extractFromAmazonLayout,
+		extractFromSHEINLayout, // SHEIN ltwebstatic CDN
+		extractFromAttributeTableRows,
+		extractFromBoldParagraphLayout, // Gap / Banana Republic Factory
+		extractFromParagraphLayout,
+		extractFromPoshmarkLayout, // Poshmark td.price 3-cell rows
+		extractFromAnthropologieLayout, // Anthropologie item-detail-row labeled tables
+		extractFromVictoriasSecretLayout, // VS bold name + Color/Size/Qty attribute table
+		extractFromTargetLayout, // Target product-block 2-column layout
+		extractFromTableRows,
+		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
+		extractFromOrderContainerRows,
+		extractFromDivLayout,
+		extractFromTextOnlyRows,
+		extractFromReceiptText, // Old Navy / Gap Inc. monospace POS receipt
+		extractFromImages,
+	];
 
-	const labeledProducts = extractFromLabeledFieldLayout(doc);
-	if (labeledProducts.length > 0) return labeledProducts;
+	for (const strategy of strategies) {
+		const raw = strategy(doc);
+		if (raw.length > 0) return raw.map(enrichProduct);
+	}
 
-	const reactEmailProducts = extractFromReactEmailLayout(doc);
-	if (reactEmailProducts.length > 0) return reactEmailProducts;
-
-	const amazonProducts = extractFromAmazonLayout(doc);
-	if (amazonProducts.length > 0) return amazonProducts;
-
-	// Two-cell rows whose details cell embeds a Color/Size attribute table (H&M).
-	// Strict guard runs before the generic paragraph/table strategies.
-	const attributeTableProducts = extractFromAttributeTableRows(doc);
-	if (attributeTableProducts.length > 0) return attributeTableProducts;
-
-	const paragraphProducts = extractFromParagraphLayout(doc);
-	if (paragraphProducts.length > 0) return paragraphProducts;
-
-	const tableProducts = extractFromTableRows(doc);
-	if (tableProducts.length > 0) return tableProducts;
-
-	const orderContainerProducts = extractFromOrderContainerRows(doc);
-	if (orderContainerProducts.length > 0) return orderContainerProducts;
-
-	const divProducts = extractFromDivLayout(doc);
-	if (divProducts.length > 0) return divProducts;
-
-	const textOnlyProducts = extractFromTextOnlyRows(doc);
-	if (textOnlyProducts.length > 0) return textOnlyProducts;
-
-	return extractFromImages(doc);
+	return [];
 }
