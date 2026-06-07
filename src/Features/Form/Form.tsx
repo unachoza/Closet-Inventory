@@ -9,7 +9,7 @@ import {
 	colorOptions,
 	sizeOptions,
 	categoryOptions,
-	clothesAgesOptions,
+	conditionOptions,
 	formItem,
 	brandExamples,
 	careExamples,
@@ -52,30 +52,10 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 		setFormData((prev) => ({ ...prev, [label]: value }));
 	};
 
+	// Capture only the purchase date — factual age is derived from it at display time
+	// (see formatItemAge / the Card), so we no longer write a frozen age string here.
 	const handleDateSelect = (date: Date) => {
-		const today = new Date();
-		let months = (today.getFullYear() - date.getFullYear()) * 12;
-		months += today.getMonth() - date.getMonth();
-
-		if (today.getDate() < date.getDate()) {
-			months -= 1;
-		}
-
-		// If less than 20 months, show in months
-		if (months < 20) {
-			setFormData((prev) => ({
-				...prev,
-				age: `${months} month${months > 1 ? "s" : ""}`,
-				purchaseDate: date.toISOString(),
-			}));
-		} else {
-			const years = Math.floor(months / 12);
-			setFormData((prev) => ({
-				...prev,
-				age: `${years} year${years > 1 ? "s" : ""}`,
-				purchaseDate: date.toISOString(),
-			}));
-		}
+		setFormData((prev) => ({ ...prev, purchaseDate: date.toISOString() }));
 	};
 
 	const handleNext = () => {
@@ -173,21 +153,21 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 
 				{step === 7 && (
 					<div className="form-step two-option-step">
-						<label className="step-label">Item Age</label>
+						<label className="step-label">Condition & Purchase Date</label>
 						<div className="double-options">
-							{/* Left: checkboxes */}
+							{/* Left: condition */}
 							<div className="age-checkboxes">
-								<span className="option-label">Select Age</span>
+								<span className="option-label">Condition</span>
 								<CheckboxCollection
-									label="age"
-									detailOptions={clothesAgesOptions}
+									label="condition"
+									detailOptions={conditionOptions}
 									onToggleDetail={toggleValue}
 									formData={formData}
 								/>
 							</div>
-							{/* Right: date picker */}
+							{/* Right: purchase date (drives the factual age shown on the card) */}
 							<div className="age-datepicker">
-								<span className="option-label">Or select purchase date</span>
+								<span className="option-label">Purchase date</span>
 								<MonthYearPicker
 									selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
 									onSelectDate={handleDateSelect}

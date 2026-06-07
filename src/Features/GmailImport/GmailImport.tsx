@@ -110,7 +110,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		if (!selectedEmail) return;
 
 		onSourceEmailChange?.(selectedEmailId);
-		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from);
+		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from, selectedEmail.date);
 		onImport(prefilled);
 	}, [selectedEmail, selectedEmailId, onImport, onSourceEmailChange]);
 
@@ -118,9 +118,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		(product: ExtractedProduct) => {
 			const emailFrom = selectedEmail?.from ?? "";
 			const emailSubject = selectedEmail?.subject ?? "";
+			const emailDate = selectedEmail?.date;
 
-			// Use parseEmailToFormData for brand/category detection from email context
-			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
+			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
@@ -133,7 +133,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				size: product.size,
 				material: product.material,
 				onSale: product.onSale,
-				age: "new",
+				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
+				condition: emailData.condition,
 			});
 		},
 		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
@@ -144,11 +145,12 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			if (!onImportAll) return;
 			const emailFrom = selectedEmail?.from ?? "";
 			const emailSubject = selectedEmail?.subject ?? "";
+			const emailDate = selectedEmail?.date;
 
 			onSourceEmailChange?.(selectedEmailId);
 
 			const items = products.map((product) => {
-				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom);
+				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
@@ -160,7 +162,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					size: product.size,
 					material: product.material,
 					onSale: product.onSale,
-					age: "new",
+					condition: emailData.condition,
 				} as Partial<ClothingItem>;
 			});
 

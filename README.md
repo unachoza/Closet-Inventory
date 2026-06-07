@@ -164,10 +164,11 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Edit item with full detail view
 - ✅ Material percentage breakdown (e.g. 80% cotton, 20% polyester)
 - ✅ Image upload with base64 persistence and live preview
-- ✅ Smart date/age display (< 20 months → "X months", ≥ 20 → "Y years")
+- ✅ Factual age display computed from purchase date ("20 days", "1.5 years", "3 years")
+- ✅ Separate condition field (new / like new / good / fair / needs repair)
 - ✅ Toast notification system
 - ✅ localStorage persistence
-- 🔲 Export Closet / Download CSV Button
+- ✅ Export Closet / Download CSV Button
 - 🔲 Visual cohesion polish (spacing, color, typography consistency)
 - 🔲 "View more" expand/collapse on item cards
 
@@ -208,7 +209,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Structured item extraction (name, price, brand, category) from email HTML
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
-- 🔲 Purchase date gleaned from confirmation email for age calculation
+- ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
 - 🔲 Hotmail / Outlook OAuth integration
 - 🔲 Retailer-specific parsers (Amazon, Shein, Temu — note: Temu embeds data in images, OCR required)
 - 🔲 "Find image" flow for items imported without photos
@@ -339,6 +340,20 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - 🔲 Stripe webhook → Firestore `users/{uid}` document `{ isPremium: true }`
 - 🔲 Feature gates in app read `isPremium` from Firestore before unlocking Gmail import / sync
 - 🔲 Free item limit enforced in `useCloudCloset` / `useLocalCloset`
+
+---
+
+## 🐛 Known Bugs
+
+- **DatePicker (`MonthYearPicker`) may not select dates reliably.** The month/year dropdowns in the manual add form's "Condition & Purchase Date" step (and the form's `handleDateSelect`) don't always commit the chosen date to `purchaseDate`. Needs investigation — likely the `useEffect` firing on mount/initial option state. Until fixed, the EditItemView import flow uses a native `<input type="date">` as the manual-entry fallback, which is reliable.
+
+- **Email Horizontal Scroll - some email previews don't format nicely, creating difficult to view horizontal scroll. Tried fixing with .gmail-container:has(.display-email-preview-panel){max-width: 1175px;} but didnt' work accross the board
+
+- **ZaraAndAritziaNormalizedNameCAPSLOCK - title to string removing caps lock has improved but for Zara and Aritizia titles still no, and shein has be defaulting to CAPS but just store name, not rest of name in item title
+
+- **ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
+
+
 
 
 

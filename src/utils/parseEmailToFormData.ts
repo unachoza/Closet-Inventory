@@ -105,14 +105,20 @@ function stripHtml(html: string): string {
 	return doc.body.textContent ?? "";
 }
 
-export function parseEmailToFormData(subject: string, body: string, from: string): Partial<ItemFormData> {
+export function parseEmailToFormData(subject: string, body: string, from: string, date?: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
+
+	const parsed = new Date(date ?? "");
+	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
 
 	return {
 		...formItem,
 		brand: extractBrand(combinedText, from),
 		category: extractCategory(combinedText),
-		age: "new",
+		// Imported items default to "new" condition; the user can adjust this during
+		// import review (e.g. for older orders). Factual age comes from purchaseDate.
+		condition: "new",
+		...(purchaseDate ? { purchaseDate } : {}),
 	};
 }

@@ -326,7 +326,9 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByLabelText("brand")).toHaveValue("zara");
 		// "SHORT" matches "short" → "bottoms" before "jumpsuit" → "body" in keyword order
 		expect(screen.getByLabelText("category")).toHaveValue("bottoms");
-		expect(screen.getByLabelText("age")).toHaveValue("new");
+		// Imported items default to "new" condition (editable during review);
+		// factual age is derived from the captured purchase date, not entered here.
+		expect(screen.getByLabelText("condition")).toHaveValue("new");
 
 		// Return to Email Preview button should be visible in create mode
 		// (rendered twice due to a duplicate in EditItemView — assert at least one exists)

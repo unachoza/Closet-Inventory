@@ -28,7 +28,11 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		price: prefilled.price ?? "",
 		material: prefilled.material ?? "",
 		occasion: prefilled.occasion ?? "",
-		age: prefilled.age ?? "new",
+		age: prefilled.age ?? "",
+		condition: prefilled.condition ?? "new",
+		// Carry the email's purchase date through — earlier this was dropped by the
+		// explicit literal, so imported items lost their factual age and showed "new".
+		purchaseDate: prefilled.purchaseDate,
 		care: prefilled.care ?? "",
 		onSale: prefilled.onSale ?? false,
 		notes: prefilled.notes ?? "",

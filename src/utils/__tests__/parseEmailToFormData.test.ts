@@ -156,8 +156,8 @@ describe("parseEmailToFormData — HTML stripping", () => {
 });
 
 describe("parseEmailToFormData — default fields", () => {
-	it('sets age to "new" by default', () => {
-		expect(parse("anything").age).toBe("new");
+	it('sets condition to "new" by default', () => {
+		expect(parse("anything").condition).toBe("new");
 	});
 
 	it("returns all required formItem fields", () => {
@@ -168,7 +168,31 @@ describe("parseEmailToFormData — default fields", () => {
 		expect(result).toHaveProperty("brand");
 		expect(result).toHaveProperty("material");
 		expect(result).toHaveProperty("occasion");
-		expect(result).toHaveProperty("age");
+		expect(result).toHaveProperty("condition");
 		expect(result).toHaveProperty("care");
 	});
 });
+
+describe("parseEmailToFormData — purchase date", () => {
+	it("stores the email date as an ISO purchaseDate", () => {
+		const result = parseEmailToFormData("Order", "", "", "Fri, 15 Mar 2024 10:30:00 -0700");
+		expect(result.purchaseDate).toBeDefined();
+		expect(new Date(result.purchaseDate as string).getUTCFullYear()).toBe(2024);
+	});
+
+	it("leaves purchaseDate empty when no date is provided", () => {
+		const result = parseEmailToFormData("Order", "", "");
+		expect(result.purchaseDate).toBeFalsy();
+	});
+
+	it("leaves purchaseDate empty when the date is unparseable", () => {
+		const result = parseEmailToFormData("Order", "", "", "not-a-real-date");
+		expect(result.purchaseDate).toBeFalsy();
+	});
+});
+
+describe("parse augmented style data", () => {
+	it("gleans style data from context clues and item name", () => {})
+	//wide leg
+	//weave pattern - herringbone, houndstooth, plaid, tweed
+})
