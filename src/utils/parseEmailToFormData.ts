@@ -1,7 +1,5 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
-import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
-import { extractBrandFromSender } from "./parseProductsFromEmail";
 
 const BRAND_PATTERNS: Record<string, string> = {
 	aritzia: "aritzia",
@@ -123,7 +121,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// "Old Navy" sender becomes the brand).
 	
 	//const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
-	const category = extractCategory(combinedText);
+	// const category = extractCategory(combinedText);
 	//const styleTags = inferStyleTagsFromName(combinedText, category);
 
 	const parsed = new Date(date ?? "");
