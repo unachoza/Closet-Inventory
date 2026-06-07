@@ -4,6 +4,7 @@ import { ClothingItem } from "../../utils/types";
 import { useState } from "react";
 import MaterialCompositionBar from "../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeMaterial } from "../../utils/materialUtils";
+import { formatItemAge } from "../../utils/itemAge";
 
 interface CardProps {
 	item: ClothingItem;
@@ -14,9 +15,17 @@ interface CardProps {
 const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	const [flipped, setFlipped] = useState<boolean>(false);
 
-	// Coerce defensively: closet data may still carry a legacy string
-	// (e.g. "95% Cotton, 5% Spandex") or be the new MaterialBlend[] shape.
 	const materialBlend = normalizeMaterial(item.material);
+
+	// Factual age, computed from the purchase date (e.g. "1.5 years", "20 days").
+	// Empty when there is no valid purchase date — the row is hidden in that case.
+	// TODO: handle items with no meaningful "purchase date" — vintage, thrifted, or
+	// inherited pieces. These need a separate provenance concept (e.g. "estimated era"
+	// or "acquired" date) rather than a purchase date, so age isn't misleading.
+	const factualAge = formatItemAge(item.purchaseDate);
+
+	// Subjective condition; falls back to the legacy free-text age for older items.
+	const conditionDisplay = item.condition ?? item.age;
 
 	return (
 		<div data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={() => setFlipped(!flipped)}>
@@ -51,9 +60,16 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 						<p>
 							<strong>Occasion:</strong> {item.occasion}
 						</p>
-						<p>
-							<strong>Age:</strong> {item.age}
-						</p>
+						{factualAge && (
+							<p>
+								<strong>Purchased:</strong> {factualAge} ago
+							</p>
+						)}
+						{conditionDisplay && (
+							<p>
+								<strong>Condition:</strong> {conditionDisplay}
+							</p>
+						)}
 						<div className="card-material">
 							<strong>Material:</strong>{" "}
 							{materialBlend.length > 0 ? <MaterialCompositionBar blend={materialBlend} /> : "—"}
