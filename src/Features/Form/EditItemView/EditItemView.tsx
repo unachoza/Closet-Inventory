@@ -8,7 +8,6 @@ import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialB
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem } from "../../../utils/constants";
 import { normalizeMaterial } from "../../../utils/materialUtils";
-import { toTitleCase } from "../../../utils/toTitleCase";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
