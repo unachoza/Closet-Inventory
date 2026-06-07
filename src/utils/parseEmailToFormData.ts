@@ -140,7 +140,8 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		// Imported items default to "new" condition; the user can adjust this during
 		// import review (e.g. for older orders). Factual age comes from purchaseDate.
 		condition: "new",
-		...(purchaseDate ? { purchaseDate } : {}),
+		...(purchaseDate ? { purchaseDate } : {})
+	}
 	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
 	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
 
