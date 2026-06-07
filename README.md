@@ -183,7 +183,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Sort by: date added, price (asc/desc), age (newest/oldest), name (A–Z / Z–A)
 - 🔲 Dark mode toggle
 - 🔲 "Dry clean only" quick-filter pill
-- 🔲 Item name visible on card hover (or global toggle)
+- ✅ Item name visible on card hover (or global toggle)
 
 ---
 
@@ -208,9 +208,14 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Structured item extraction (name, price, brand, category) from email HTML
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
+- ✅ Multi-retailer email parsing (Express, Banana Republic Factory, Anthropologie, SKIMS, Poshmark, SHEIN)
+- ✅ Multi-material inference with blend percentages and polyamide keyword support
+- ✅ Title-case display transform for product names (display-only, non-mutating)
+- ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
 - 🔲 Purchase date gleaned from confirmation email for age calculation
+- 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
 - 🔲 Hotmail / Outlook OAuth integration
-- 🔲 Retailer-specific parsers (Amazon, Shein, Temu — note: Temu embeds data in images, OCR required)
+- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 - 🔲 "Find image" flow for items imported without photos
 
 ---

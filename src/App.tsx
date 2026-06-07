@@ -3,6 +3,8 @@ import { EditProvider } from "./Features/Form/EditContext";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import NavBar from "./Components/NavBar/NavBar";
+import { useLocalStorageCloset } from "./hooks/useLocalCloset";
+import { exportClosetToCSV } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
 import EditItemView from "./Features/Form/EditItemView/EditItemView";
@@ -37,6 +39,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 
 function AppShell() {
 	const { view, setView } = useView();
+	const { getCloset } = useLocalStorageCloset();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -110,11 +113,15 @@ function AppShell() {
 		setView("form");
 	}, [setView]);
 
+	const handleExportCloset = useCallback(() => {
+		exportClosetToCSV(getCloset());
+	}, [getCloset]);
+
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
 		<div className="main">
-			<NavBar onAddItem={handleAddItem} />
+			<NavBar onAddItem={handleAddItem} onExportCloset={handleExportCloset} />
 			<EditProvider>
 				<ToastProvider>
 					<div className="app-content">
