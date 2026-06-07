@@ -14,7 +14,7 @@ export interface ProductAttributes {
 
 // Each entry: [pattern, canonical value].
 // More-specific alternatives come before shorter ones they overlap with.
-const SLEEVE_MAP: [RegExp, string][] = [
+export const SLEEVE_MAP: [RegExp, string][] = [
 	[/\b(long[- ]?sleeve|longsleeve)\b/i, "long sleeve"],
 	[/\b3\/4[- ]?sleeve\b/i, "3/4 sleeve"],
 	[/\bshort[- ]?sleeve\b/i, "short sleeve"],
@@ -23,14 +23,14 @@ const SLEEVE_MAP: [RegExp, string][] = [
 	[/\bflutter[- ]?sleeve\b/i, "flutter sleeve"],
 ];
 
-const HEM_MAP: [RegExp, string][] = [
+export const HEM_MAP: [RegExp, string][] = [
 	[/\bmini\b/i, "mini"],
 	[/\bmidi\b/i, "midi"],
 	[/\bmaxi\b/i, "maxi"],
 	[/\bcrop(ped)?\b/i, "crop"],
 ];
 
-const NECKLINE_MAP: [RegExp, string][] = [
+export const NECKLINE_MAP: [RegExp, string][] = [
 	[/\b(square[- ]?neck|squareneck)\b/i, "square neck"],
 	[/\b(v[- ]?neck|vneck)\b/i, "v-neck"],
 	[/\bcrew[- ]?neck\b/i, "crew neck"],
@@ -66,7 +66,7 @@ const FIT_MAP: [RegExp, string][] = [
 	[/\bfitted\b/i, "fitted"],
 ];
 
-const STYLE_MAP: [RegExp, string][] = [
+export const STYLE_MAP: [RegExp, string][] = [
 	[/\ba[- ]?line\b/i, "a-line"],
 	[/\bsheath\b/i, "sheath"],
 	[/\bshift\b/i, "shift"],
@@ -97,7 +97,7 @@ const SEASON_MAP: [RegExp, string][] = [
 	[/\bwinter\b/i, "winter"],
 ];
 
-const ACCENTS_MAP: [RegExp, string][] = [
+export const ACCENTS_MAP: [RegExp, string][] = [
 	[/\bbeaded\b/i, "beaded"],
 	[/\bbows?\b/i, "bows"],
 	[/\bchains?\b/i, "chains"],
@@ -118,7 +118,7 @@ const ACCENTS_MAP: [RegExp, string][] = [
 	[/\bvelvet\b/i, "velvet"],
 ];
 
-const PATTERN_MAP: [RegExp, string][] = [
+export const PATTERN_MAP: [RegExp, string][] = [
 	[/\banimal[- ]?print\b/i, "animal print"],
 	[/\bargyle\b/i, "argyle"],
 	[/\bcamo\b/i, "camo"],
