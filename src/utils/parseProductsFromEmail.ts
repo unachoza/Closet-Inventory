@@ -176,6 +176,8 @@ function parseNameCell(td: Element): ParsedNameCell {
 		.replace(ITEM_NUMBER_REGEX, "")
 		.replace(/item\s*no\s*:\s*/i, "")
 		.trim();
+	console.log({ cleanName });
+	console.log(brand, name, itemNumber);
 	return { brand, name: cleanName, itemNumber };
 }
 
@@ -230,6 +232,7 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 		}
 
 		const { brand, name, itemNumber } = parseNameCell(nameCell);
+		console.log({ brand }, { name }, { itemNumber });
 
 		if (!name) continue;
 
@@ -631,10 +634,7 @@ function getTextLines(el: Element): string[] {
 function getAttributeByLabel(cell: Element, label: string): string {
 	const cells = Array.from(cell.querySelectorAll("td"));
 	for (let i = 0; i < cells.length - 1; i++) {
-		const key = getCellText(cells[i])
-			.replace(/:$/, "")
-			.trim()
-			.toLowerCase();
+		const key = getCellText(cells[i]).replace(/:$/, "").trim().toLowerCase();
 		if (key === label) return getCellText(cells[i + 1]).trim();
 	}
 	return "";
@@ -688,7 +688,7 @@ function extractFromAttributeTableRows(doc: Document): ExtractedProduct[] {
 		// Struck-through original price marks a sale; the current price is the
 		// first $ value (on the price line) that isn't the struck original.
 		const struckEl = detailsCell.querySelector("s, strike, del, [style*='line-through']");
-		const struck = struckEl ? extractPrices(struckEl.textContent ?? "")[0] ?? "" : "";
+		const struck = struckEl ? (extractPrices(struckEl.textContent ?? "")[0] ?? "") : "";
 		const onSale = Boolean(struck);
 
 		// The price line is the first <br>-delimited line containing a "$"
@@ -1731,15 +1731,16 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 
 		// Image
 		const img = row.querySelector("img");
-		const imageUrl = img && isProductImage(img as HTMLImageElement)
-			? img.getAttribute("src") ?? ""
-			: "";
+		const imageUrl = img && isProductImage(img as HTMLImageElement) ? (img.getAttribute("src") ?? "") : "";
 
 		// Name: strip "× N" quantity suffix then "| COLOR" color suffix
 		// Raw: "FITS EVERYBODY HIGH WAISTED THONG | ONYX × 5"
 		// → strip qty: "FITS EVERYBODY HIGH WAISTED THONG | ONYX"
 		// → strip color segment: "FITS EVERYBODY HIGH WAISTED THONG"
-		const rawTitle = (titleSpan.textContent ?? "").replace(/&nbsp;/g, " ").trim().replace(/\s+/g, " ");
+		const rawTitle = (titleSpan.textContent ?? "")
+			.replace(/&nbsp;/g, " ")
+			.trim()
+			.replace(/\s+/g, " ");
 		const withoutQty = rawTitle.replace(/\s*[×x]\s*\d+\s*$/, "").trim();
 		const pipeIdx = withoutQty.lastIndexOf(" | ");
 		const name = pipeIdx !== -1 ? withoutQty.slice(0, pipeIdx).trim() : withoutQty;
@@ -1748,9 +1749,7 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 
 		// Variant: "ONYX / S" → color = "onyx", size = "S"
 		const variantSpan = row.querySelector("span.order-list__item-variant");
-		const variantText = variantSpan
-			? (variantSpan.textContent ?? "").trim().replace(/\s+/g, " ")
-			: "";
+		const variantText = variantSpan ? (variantSpan.textContent ?? "").trim().replace(/\s+/g, " ") : "";
 
 		let color = "";
 		let size = "";
@@ -1820,9 +1819,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 	const seenKeys = new Set<string>();
 
 	// Find all <p> elements whose style contains font-weight:bold
-	const boldPs = Array.from(
-		doc.querySelectorAll("p[style*='font-weight:bold'], p[style*='font-weight: bold']")
-	);
+	const boldPs = Array.from(doc.querySelectorAll("p[style*='font-weight:bold'], p[style*='font-weight: bold']"));
 
 	for (const boldP of boldPs) {
 		const name = (boldP.textContent ?? "").trim();
@@ -1981,7 +1978,7 @@ function extractFromPoshmarkLayout(doc: Document): ExtractedProduct[] {
 		if (!name) continue;
 
 		const priceText = getCellText(priceCell as Element);
-		const price = priceText.startsWith("$") ? priceText : (priceText ? `$${priceText}` : "");
+		const price = priceText.startsWith("$") ? priceText : priceText ? `$${priceText}` : "";
 
 		const dedupeKey = `${name.toLowerCase()}|${price}`;
 		if (seenKeys.has(dedupeKey)) continue;
@@ -2017,9 +2014,7 @@ function extractFromPoshmarkLayout(doc: Document): ExtractedProduct[] {
  * preventing false-positive matches on other email layouts.
  */
 function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
-	const productImgs = Array.from(
-		doc.querySelectorAll("img[src*='ltwebstatic.com']"),
-	).filter((img) => isProductImage(img as HTMLImageElement));
+	const productImgs = Array.from(doc.querySelectorAll("img[src*='ltwebstatic.com']")).filter((img) => isProductImage(img as HTMLImageElement));
 
 	if (productImgs.length === 0) return [];
 
@@ -2048,9 +2043,7 @@ function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
 
 		if (!detailsTable) continue;
 
-		const greySpan = detailsTable.querySelector(
-			"span[style*='color:#939393'], span[style*='color: #939393']",
-		);
+		const greySpan = detailsTable.querySelector("span[style*='color:#939393'], span[style*='color: #939393']");
 		if (!greySpan) continue;
 
 		const name = (greySpan.textContent ?? "").trim();
@@ -2085,6 +2078,60 @@ function extractFromSHEINLayout(doc: Document): ExtractedProduct[] {
 			price: "",
 			color,
 			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Target order email two-column product blocks.
+ *
+ * Each item is a `<!-- PRODUCT BLOCK -->` with a 2-column layout: a left
+ * `td.product-image` holding the photo (target.scene7.com) and a right
+ * `td.product-details` holding `<h2><a>` (the product name) and a `Qty: N`
+ * paragraph. No price is included in these emails.
+ *
+ * Name comes from the <h2> link (the image `alt` is sometimes mangled, e.g.
+ * the shower-liner alt is broken across HTML attributes). Guard: requires a
+ * `td.product-details` containing an <h2>, so it won't fire on generic emails.
+ */
+function extractFromTargetLayout(doc: Document): ExtractedProduct[] {
+	const detailCells = Array.from(doc.querySelectorAll("td.product-details"));
+	if (detailCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const cell of detailCells) {
+		const heading = cell.querySelector("h2 a") ?? cell.querySelector("h2");
+		const name = heading ? getCellText(heading) : "";
+		if (!name || name.length < 3) continue;
+
+		// The image lives in the sibling product-col-left table inside the same
+		// wrapping <td>. Walk up to that wrapper, then find the product image.
+		let imageUrl = "";
+		const wrapper = cell.closest("table")?.parentElement ?? null;
+		if (wrapper) {
+			const img = wrapper.querySelector("td.product-image img") ?? wrapper.querySelector("img");
+			if (img && isProductImage(img as HTMLImageElement)) {
+				imageUrl = img.getAttribute("src") ?? "";
+			}
+		}
+
+		if (seen.has(name.toLowerCase())) continue;
+		seen.add(name.toLowerCase());
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price: "",
+			color: "",
+			size: "",
 			itemNumber: "",
 			material: "",
 			onSale: false,
@@ -2196,8 +2243,7 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 	const products: ExtractedProduct[] = [];
 	const seen = new Set<string>();
 
-	const stripLabel = (el: Element | null | undefined, label: RegExp): string =>
-		el ? getCellText(el).replace(label, "").trim() : "";
+	const stripLabel = (el: Element | null | undefined, label: RegExp): string => (el ? getCellText(el).replace(label, "").trim() : "");
 
 	for (const nameCell of nameCells) {
 		const detailsCell = nameCell.closest("td.item-details");
@@ -2219,8 +2265,7 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 
 		const container = nameCell.closest("td.item-table-container");
 		if (container) {
-			const priceCell =
-				container.querySelector("td.product-price") ?? container.querySelector("td.item-price-large");
+			const priceCell = container.querySelector("td.product-price") ?? container.querySelector("td.item-price-large");
 			if (priceCell) ({ price, onSale } = parseLabeledStruckPrice(priceCell));
 
 			const img = container.querySelector("td.item-image img");
@@ -2367,19 +2412,20 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromLabeledFieldLayout,
 		extractFromReactEmailLayout,
 		extractFromAmazonLayout,
-		extractFromSHEINLayout,            // SHEIN ltwebstatic CDN
+		extractFromSHEINLayout, // SHEIN ltwebstatic CDN
 		extractFromAttributeTableRows,
-		extractFromBoldParagraphLayout,    // Gap / Banana Republic Factory
+		extractFromBoldParagraphLayout, // Gap / Banana Republic Factory
 		extractFromParagraphLayout,
-		extractFromPoshmarkLayout,         // Poshmark td.price 3-cell rows
-		extractFromAnthropologieLayout,    // Anthropologie item-detail-row labeled tables
-		extractFromVictoriasSecretLayout,  // VS bold name + Color/Size/Qty attribute table
+		extractFromPoshmarkLayout, // Poshmark td.price 3-cell rows
+		extractFromAnthropologieLayout, // Anthropologie item-detail-row labeled tables
+		extractFromVictoriasSecretLayout, // VS bold name + Color/Size/Qty attribute table
+		extractFromTargetLayout, // Target product-block 2-column layout
 		extractFromTableRows,
-		extractFromShopifyLayout,          // Shopify order template (SKIMS, etc.)
+		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
 		extractFromDivLayout,
 		extractFromTextOnlyRows,
-		extractFromReceiptText,            // Old Navy / Gap Inc. monospace POS receipt
+		extractFromReceiptText, // Old Navy / Gap Inc. monospace POS receipt
 		extractFromImages,
 	];
 

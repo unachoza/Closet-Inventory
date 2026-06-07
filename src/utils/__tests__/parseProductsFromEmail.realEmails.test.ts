@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseProductsFromEmail, type ExtractedProduct } from "../parseProductsFromEmail";
+import { parseEmailToFormData } from "../parseEmailToFormData";
 
 /**
  * Regression tests built from real order-confirmation email HTML captured from
@@ -287,5 +288,63 @@ describe("real emails > Old Navy (POS receipt)", () => {
 	it("does not pick up the barcode image or summary lines as products", () => {
 		for (const p of products) expect(p.imageUrl).toBe("");
 		expect(products.map((p) => p.name)).not.toContain("Bag fee");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Target — 2-column product blocks (image + <h2> name, no price)
+// ---------------------------------------------------------------------------
+
+describe("real emails > Target (product blocks)", () => {
+	const products = parseProductsFromEmail(loadFixture("target.html"));
+
+	it("detects all 4 product blocks", () => {
+		expect(products).toHaveLength(4);
+	});
+
+	it("reads the name from the <h2> link, not the (sometimes mangled) image alt", () => {
+		expect(products.map((p) => p.name)).toEqual([
+			"EcoTools Exfoliating Shower Gloves - Pink",
+			"Native Body Wash - Eucalyptus & Mint - Sulfate Free - 18 fl oz",
+			'70"x71" Lightweight Color Shower Liner Clay - Room Essentials™: PEVA, Buttonhole Top, Easy to Clean',
+			"Native Body Wash - Lavender & Rose - Sulfate Free - 18 fl oz",
+		]);
+	});
+
+	it("captures the scene7 product image for each item", () => {
+		for (const p of products) expect(p.imageUrl).toContain("target.scene7.com");
+		expect(products[0].imageUrl).toContain("GUEST_fed2a379");
+	});
+
+	it("has no price (Target order emails omit it)", () => {
+		for (const p of products) expect(p.price).toBe("");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Cross-cutting enrichment: brand-from-sender fallback + everyday occasion
+// ---------------------------------------------------------------------------
+
+describe("enrichment > brand falls back to the email sender", () => {
+	it("uses the sender display name when no brand text is present", () => {
+		const data = parseEmailToFormData("Cozy Crew Socks", "<p>Cozy Crew Socks</p>", "Old Navy <orders@oldnavy.com>");
+		expect(data.brand).toBe("old navy");
+	});
+
+	it("uses the sender domain when the display name is generic", () => {
+		const data = parseEmailToFormData("Some Item", "<p>Some Item</p>", "no-reply <no-reply@target.com>");
+		expect(data.brand).toBe("target");
+	});
+});
+
+describe("enrichment > socks/underwear/lingerie default to everyday occasion", () => {
+	it("defaults socks to everyday", () => {
+		const data = parseEmailToFormData("Cozy Crew Socks", "<p>Cozy Crew Socks</p>", "Old Navy <orders@oldnavy.com>");
+		expect(data.occasion).toBe("everyday");
+	});
+
+	it("defaults underwear to everyday", () => {
+		const data = parseEmailToFormData("Waverly High-Waisted Briefs", "<p>briefs</p>", "Anthropologie <o@anthropologie.com>");
+		expect(data.occasion).toBe("everyday");
 	});
 });
