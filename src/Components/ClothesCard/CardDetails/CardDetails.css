@@ -1,0 +1,419 @@
+/* Main container */
+.card-details {
+	background: linear-gradient(180deg, #78acbf 0%, #678385 100%);
+	border-radius: 12px;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	font-family: Inter, system-ui, sans-serif;
+	overflow: hidden;
+}
+
+/* Scrollable content area */
+.card-details__scrollable {
+	flex: 1;
+	overflow-y: auto;
+	padding: 20px 20px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	    position: relative;
+}
+
+/* Footer — toggle button always pinned at bottom */
+.card-details__footer {
+	flex-shrink: 0;
+	padding: 0 20px 16px;
+}
+
+/* Header: name + category badge */
+.card-details__header {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	width: 90%;
+}
+
+.card-details__header-text {
+	flex: 1;
+}
+
+.card-details__header-right {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	flex-shrink: 0;
+}
+
+.card-details__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	background: rgba(255, 255, 255, 0.15);
+	color: white;
+	font-size: 11px;
+	cursor: pointer;
+	line-height: 1;
+	padding: 0;
+	transition: background 0.15s ease;
+}
+
+.pill {
+	    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    color: rgb(15, 26, 32);
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    white-space: nowrap;
+    margin-left: 8px;
+    margin-top: 2px;
+}
+
+.card-details__close:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.card-details__name {
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--Dark-Grey);
+	line-height: 1.2;
+	margin: 0 0 3px 0;
+	text-align: left;
+}
+
+.card-details__brand {
+	font-size: 12px;
+    color: rgb(61, 79, 92);
+    margin: 0px;
+    text-align: left;
+}
+
+.card-details__category-tag {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 8px;
+	font-size: 10px;
+	font-weight: 500;
+	color: white;
+	background: rgba(255, 255, 255, 0.15);
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	border-radius: 5px;
+	white-space: nowrap;
+	margin-left: 8px;
+	margin-top: 2px;
+}
+
+/* Divider */
+.card-details__divider {
+	height: 1px;
+	background: rgba(255, 255, 255, 0.2);
+}
+
+/* Color + Size row */
+.card-details__color-size {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.card-details__color-display {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.card-details__color-circle {
+	width: 11px;
+	height: 11px;
+	border-radius: 50%;
+	background: #b2b2bc;
+	border: 1.5px solid rgba(255, 255, 255, 0.65);
+	flex-shrink: 0;
+}
+
+.card-details__color-name {
+	font-size: 13px;
+	color: var(--Dark-Grey);
+	font-weight: 500;
+	text-transform: capitalize;
+}
+
+.card-details__size-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	font-size: 11px;
+	font-weight: 500;
+	color: white;
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	border-radius: 5px;
+	white-space: nowrap;
+}
+
+/* Composition section */
+.card-details__composition {
+	display: flex;
+	flex-direction: column;
+}
+
+.card-details__composition-labels {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 4px;
+}
+
+.card-details__composition-percentage {
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.card-details__composition-bar {
+	display: flex;
+	border-radius: 6px;
+	overflow: hidden;
+	height: 10px;
+}
+
+.card-details__composition-segment {
+	flex: 1;
+}
+
+.card-details__composition-materials {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 5px;
+}
+
+.card-details__composition-material {
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.85);
+	text-transform: capitalize;
+}
+
+/* Care section */
+.card-details__care {
+	display: flex;
+	flex-direction: column;
+}
+
+.card-details__care-pills {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.card-details__care-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 8px;
+	font-size: 10px;
+	font-weight: 500;
+	color: white;
+	background: rgba(255, 255, 255, 0.15);
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	border-radius: 5px;
+	white-space: nowrap;
+}
+
+/* Section title (with divider) */
+.card-details__section-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 9px;
+}
+
+.card-details__section-title-label {
+	font-size: 10px;
+	font-weight: 700;
+	color: var(--Dark-Grey);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	flex-shrink: 0;
+}
+
+.card-details__section-title-divider {
+	flex: 1;
+	height: 1px;
+	background: rgba(255, 255, 255, 0.2);
+}
+
+/* Expanded section */
+.card-details__expanded {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.card-details__expanded-subsection {
+	display: flex;
+	flex-direction: column;
+}
+
+.card-details__identity-text {
+	font-size: 12px;
+	color: rgba(255, 255, 255, 0.85);
+	line-height: 2;
+	margin: 0;
+}
+
+.card-details__occasion-pills {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.card-details__occasion-pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	font-size: 11px;
+	font-weight: 500;
+	color: white;
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	border-radius: 5px;
+	white-space: nowrap;
+}
+
+.card-details__notes-text {
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.8);
+	line-height: 1.65;
+	margin: 0;
+	font-style: italic;
+}
+
+/* Buttons section */
+.card-details__buttons {
+	display: flex;
+	gap: 8px;
+}
+
+.card-details__button {
+	flex: 1;
+	padding: 9px 12px;
+	border-radius: 8px;
+	border: 1.5px solid rgba(255, 255, 255, 0.65);
+	background: rgba(255, 255, 255, 0.12);
+	color: white;
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.2s ease;
+}
+
+.card-details__button:hover {
+	background: rgba(255, 255, 255, 0.18);
+}
+
+.card-details__button--remove {
+	border-color: rgba(255, 110, 110, 0.55);
+	background: rgba(255, 80, 80, 0.1);
+	color: rgba(255, 170, 170, 1);
+	font-weight: 600;
+}
+
+.card-details__button--remove:hover {
+	background: rgba(255, 80, 80, 0.15);
+}
+
+.card-details__button--cancel {
+	border-color: rgba(255, 255, 255, 0.4);
+	background: transparent;
+	color: rgba(255, 255, 255, 0.75);
+	font-weight: 500;
+}
+
+.card-details__button--cancel:hover {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.card-details__button--confirm {
+	border-color: rgba(255, 80, 80, 0.7);
+	background: rgba(255, 60, 60, 0.2);
+	color: rgba(255, 160, 160, 1);
+	font-weight: 700;
+}
+
+.card-details__button--confirm:hover {
+	background: rgba(255, 60, 60, 0.28);
+}
+
+/* Confirm section */
+.card-details__confirm-section {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+/* Confirm text */
+.card-details__confirm-text {
+	margin: 0;
+	text-align: center;
+	font-size: 12px;
+	color: rgba(255, 255, 255, 0.75);
+	font-weight: 500;
+}
+
+/* Toggle details button */
+.card-details__toggle-details {
+	width: 100%;
+	padding: 11px 16px;
+	border-radius: 8px;
+	border: 1.5px solid rgba(255, 255, 255, 0.85);
+	background: transparent;
+	color: white;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.2s ease;
+}
+
+.card-details__toggle-details:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* Shared pill styles for backward compatibility */
+.tag {
+	display: inline-flex;
+	align-items: center;
+	padding: 3px 8px;
+	font-size: 10px;
+	font-weight: 500;
+	color: white;
+	background: rgba(255, 255, 255, 0.15);
+	border: 1px solid rgba(255, 255, 255, 0.42);
+	border-radius: 5px;
+	white-space: nowrap;
+}
+
+.pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	font-size: 11px;
+	font-weight: 500;
+	color: white;
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.45);
+	border-radius: 5px;
+	white-space: nowrap;
+}

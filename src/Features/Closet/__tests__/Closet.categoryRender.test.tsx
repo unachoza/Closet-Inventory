@@ -12,7 +12,7 @@ import Closet from "./../Closet";
  * blank screen. Uses the REAL filter + REAL pagination (only the card and
  * storage hook are stubbed) so the actual matching + render path is exercised.
  */
-vi.mock("../../Components/ClothesCard/Card", () => ({
+vi.mock("../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: any }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 

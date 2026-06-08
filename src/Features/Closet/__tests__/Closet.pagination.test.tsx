@@ -17,7 +17,7 @@ import Closet from "./../Closet";
  * hook are stubbed) and assert that the rendered card set actually CHANGES when
  * paging, which is the user-facing wiring the bug broke.
  */
-vi.mock("../../../Components/ClothesCard/Card", () => ({
+vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: any }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
-vi.mock("../../../Components/ClothesCard/Card", () => ({
+vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: { name: string } }) => <div data-testid="card">{item.name}</div>,
 }));
 

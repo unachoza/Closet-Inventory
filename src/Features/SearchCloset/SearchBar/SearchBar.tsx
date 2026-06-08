@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
-import Card from "../../../Components/ClothesCard/Card";
+import Card from "../../../Components/ClothesCard/Card/Card";
 import Fuse from "fuse.js";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
 
