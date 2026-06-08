@@ -55,7 +55,7 @@ const OCCASION_MAP: [RegExp, string][] = [
 	[/\b(basic|basics)\b/i, "basics"],
 
 	// Casual / Everyday
-	[/\b(casual|everyday|lounge|weekend)\b/i, "casual"],
+	[/\b(casual|everyday|lounge|weekend|basic|basics)\b/i, "casual"],
 ];
 
 const VALID_TAGS = new Set<string>(occasionExamples);
