@@ -45,11 +45,17 @@ const OCCASION_MAP: [RegExp, string][] = [
 	// Church
 	[/\b(church|sunday\s*best|sunday\s*mass)\b/i, "church"],
 
-	// Picnic
-	[/\b(picnic|garden\s*party|floral|gingham|eyelet|smocked)\b/i, "picnic"],
+	// Picnic — occasion words only. Prints/fabrications (floral, gingham, eyelet,
+	// smocked) are NOT occasions — they're captured as pattern attributes in
+	// inferProductAttributes — and previously dragged everyday items (e.g. a
+	// "Floral Lace Teddy") into "picnic" before the EVERYDAY_CATEGORIES fallback.
+	[/\b(picnic|garden\s*party)\b/i, "picnic"],
+
+	// Basics
+	[/\b(basic|basics)\b/i, "basics"],
 
 	// Casual / Everyday
-	[/\b(casual|everyday|lounge|weekend|basic|basics)\b/i, "casual"],
+	[/\b(casual|everyday|lounge|weekend)\b/i, "casual"],
 ];
 
 const VALID_TAGS = new Set<string>(occasionExamples);

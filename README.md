@@ -93,8 +93,8 @@ src/
 
 | Category          | Technology                     | Purpose                              |
 |-------------------|--------------------------------|--------------------------------------|
-| **Framework**     | React 18+ (TypeScript)         | Component-based UI                   |
-| **Build Tool**    | Vite 5+                        | Fast dev server and bundling         |
+| **Framework**     | React 19 (TypeScript)          | Component-based UI                   |
+| **Build Tool**    | Vite 6                         | Fast dev server and bundling         |
 | **Styling**       | CSS Modules + Custom Properties| Scoped styles with theme system      |
 | **Animations**    | Framer Motion                  | Declarative animations               |
 | **UI Primitives** | Radix UI                       | Accessible, unstyled components      |
@@ -103,7 +103,7 @@ src/
 | **Auth**          | Firebase Auth + Google OAuth   | User sign-in and Gmail access        |
 | **Search**        | Fuse.js                        | Fuzzy client-side search             |
 | **Testing**       | Vitest + React Testing Library | Unit and integration tests           |
-| **E2E**           | Playwright                     | End-to-end critical flows            |
+| **E2E**           | Playwright _(planned — not yet installed)_ | End-to-end critical flows            |
 | **Type Safety**   | TypeScript 5+                  | Static type checking                 |
 
 ---
@@ -154,7 +154,26 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ## 🗺️ Roadmap
 
-> ✅ = Shipped &nbsp;|&nbsp; 🔲 = Planned
+> ✅ = Shipped (on `main`) &nbsp;|&nbsp; 🚧 = In open PR / review &nbsp;|&nbsp; 🔲 = Planned
+
+> **Version numbers are scope groupings, not build order.** The actual near-term sequence is mobile-first (below). Some items already exist as code but live in open PRs, not yet on `main` — those note the PR number.
+
+---
+
+### 🎯 Near-Term Priority Order (mobile-first)
+
+The closet is responsive today, but the mobile experience the product and
+business model depend on is unbuilt. Actual build order:
+
+1. **Merge in-flight PRs** — [#42](https://github.com/unachoza/Closet-Inventory/pull/42) (iOS Safari button fix), [#41](https://github.com/unachoza/Closet-Inventory/pull/41) (Export), [#43](https://github.com/unachoza/Closet-Inventory/pull/43) (Card overhaul), [#44](https://github.com/unachoza/Closet-Inventory/pull/44) (Firebase). ⚠️ #41 and #43 rewrite the same email-parsing utils — sequence them deliberately to avoid conflicts.
+2. **Mobile UI polish** (from v2.0) — touch-target audit (44×44px) and a bottom nav / "Add Item" FAB so the primary action isn't buried in the hamburger drawer.
+3. **PWA scaffolding** (pulled forward from v2.0) — `manifest.json`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen.
+4. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
+
+**Cross-version dependencies:**
+- `wornCount` (in v1.2) is required by **v7.0** lifespan tracker and **v8.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
+- **v4.0 backend** (Firestore) gates **v6.1** social and **v9.0** monetization (`isPremium` read). It's effectively done in [#44](https://github.com/unachoza/Closet-Inventory/pull/44), so v9.0 is closer than its number implies.
+- **v9.0 monetization** also depends on the **PWA** install path (priority 3).
 
 ---
 
@@ -168,7 +187,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Separate condition field (new / like new / good / fair / needs repair)
 - ✅ Toast notification system
 - ✅ localStorage persistence
-- ✅ Export Closet / Download CSV Button
+- 🚧 Export Closet / Download CSV Button _(in PR [#41](https://github.com/unachoza/Closet-Inventory/pull/41) — not yet on `main`)_
 - 🔲 Visual cohesion polish (spacing, color, typography consistency)
 - 🔲 "View more" expand/collapse on item cards
 
@@ -190,6 +209,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ### v1.2 — Closet Analytics Dashboard
 
+> Deprioritized behind mobile (see Near-Term Priority Order). **Pull the `wornCount` field + "Log a Wear" button out of this milestone and ship it early** — v7.0 and v8.0 both depend on it.
+
 - 🔲 Summary stats cards (total items, total spend, avg cost-per-wear)
 - 🔲 Category breakdown chart (`recharts`)
 - 🔲 Brand frequency chart
@@ -204,22 +225,28 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 ### v1.3 — Auto Import (Email)
 
 - ✅ Gmail OAuth import screen
-- ✅ Firebase Auth integration
+- 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 - ✅ Gmail API email thread parsing
 - ✅ Structured item extraction (name, price, brand, category) from email HTML
+- ✅ Multi-retailer HTML parsers — Anthropologie, Aritzia, Banana Republic, Express, Old Navy, Shein, Skims, Target, Victoria's Secret, Zara (+ partial Amazon); tested against real-email fixtures
+- ✅ Attribute inference from product name — material blend, fabric care, condition (from order age), and style/occasion tags
+- ✅ Advanced Gmail search — subject/body keyword + date-range query builder with confirmation modal and 24h email cache
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
-- 🔲 Hotmail / Outlook OAuth integration
-- 🔲 Retailer-specific parsers (Amazon, Shein, Temu — note: Temu embeds data in images, OCR required)
+- 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
+- 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
+- 🔲 Don't import items that can't be mapped to a category (big for Amazon emails)
 - 🔲 "Find image" flow for items imported without photos
 
 ---
 
 ### v2.0 — Mobile & PWA
 
-- ✅ Responsive layout for iPhone and Android screen sizes
-- 🔲 PWA setup (`vite-plugin-pwa`) — `manifest.json` + service worker for "Add to Home Screen" support
+> **Active priority** (see Near-Term Priority Order). Responsive layout is done; PWA, touch-target audit, and bottom nav / "Add Item" FAB are the next mobile work.
+
+- ✅ Responsive layout for iPhone and Android screen sizes (29 `@media` blocks; hamburger drawer nav < 768px)
+- 🔲 PWA setup (`vite-plugin-pwa`) — `manifest.json` + service worker for "Add to Home Screen" support **(unblocks v9.0 monetization + v4.0 offline)**
 - 🔲 Full-screen launch on iOS (no Safari browser chrome)
 - 🔲 Offline support via service worker cache
 - 🔲 Touch-friendly tap targets (min 44×44px) and swipe gestures
@@ -229,6 +256,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 ---
 
 ### v2.1 — Camera Roll Import
+
+> Pulled **ahead of v1.2 analytics** — for the mobile persona, photographing an item is the fastest way to log one, and it's the only import path for in-store / second-hand purchases (email import covers online only).
 
 - 🔲 "Import from Camera Roll" button — native `<input type="file" accept="image/*">` opens iOS/Android photo library (no native app required)
 - 🔲 "Take Photo" button — `capture="environment"` opens camera directly
@@ -255,9 +284,11 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 ---
 ### v4.0 — Backend & Database
 
-- ✅ Firestore NoSQL database with per-user closet collection
-- ✅ Offline-first: localStorage as cache, Firestore sync on sign-in
-- ✅ First-sign-in seed: uploads local closet to Firestore on first login
+> ⚠️ The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these ✅ as "built, pending merge."
+
+- 🚧 Firestore NoSQL database with per-user closet collection
+- 🚧 Offline-first: localStorage as cache, Firestore sync on sign-in
+- 🚧 First-sign-in seed: uploads local closet to Firestore on first login
 - 🔲 Conflict resolution (last-write-wins with `updatedAt` timestamps)
 - 🔲 Multi-device real-time sync (WebSocket or polling)
 - 🔲 "Sync" status indicator in nav
