@@ -17,7 +17,7 @@ const mockGoToPage = vi.fn();
 const mockNextPage = vi.fn();
 const mockPrevPage = vi.fn();
 
-vi.mock("../../../Components/ClothesCard/Card", () => ({
+vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: ClothingItem }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 

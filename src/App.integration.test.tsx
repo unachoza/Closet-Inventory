@@ -43,7 +43,7 @@ vi.mock("./Features/Carousel/Carousel", () => ({
 vi.mock("./Features/Form/ImageUploader/ImageUploader", () => ({
 	default: () => <div data-testid="image-uploader" />,
 }));
-vi.mock("./Components/ClothesCard/Card", () => ({
+vi.mock("./Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: ClothingItem }) => (
 		<div data-testid="clothes-card">{item.name || item.category}</div>
 	),

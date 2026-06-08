@@ -28,7 +28,7 @@ vi.mock("../../../hooks/useLocalCloset", () => ({
 	}),
 }));
 
-vi.mock("../../../Components/ClothesCard/Card", () => ({
+vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item, onRemoveItem }: { item: ClothingItem; onRemoveItem?: (id: string) => void }) => (
 		<div data-testid="card">
 			<span>{item.name}</span>
