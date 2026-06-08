@@ -9,6 +9,7 @@
 	box-sizing: border-box;
 	font-family: Inter, system-ui, sans-serif;
 	overflow: hidden;
+	text-align: left;
 }
 
 /* Scrollable content area */
@@ -19,7 +20,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
-	    position: relative;
+	position: relative;
 }
 
 /* Footer — toggle button always pinned at bottom */
@@ -57,9 +58,9 @@
 	width: 24px;
 	height: 24px;
 	border-radius: 50%;
-	border: 1px solid rgba(255, 255, 255, 0.45);
-	background: rgba(255, 255, 255, 0.15);
-	color: white;
+	border: 1px solid rgba(42, 48, 45, 0.9);
+	background: rgba(42, 48, 45, 0.5);
+	color: var(--White);
 	font-size: 11px;
 	cursor: pointer;
 	line-height: 1;
@@ -67,23 +68,8 @@
 	transition: background 0.15s ease;
 }
 
-.pill {
-	    display: inline-flex;
-    align-items: center;
-    padding: 3px 8px;
-    font-size: 10px;
-    font-weight: 500;
-    color: rgb(15, 26, 32);
-    background: rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    white-space: nowrap;
-    margin-left: 8px;
-    margin-top: 2px;
-}
-
 .card-details__close:hover {
-	background: rgba(255, 255, 255, 0.25);
+	background: rgba(42, 48, 45, 0.7);
 }
 
 .card-details__name {
@@ -97,22 +83,38 @@
 
 .card-details__brand {
 	font-size: 12px;
-    color: rgb(61, 79, 92);
-    margin: 0px;
-    text-align: left;
+	color: var(--Op-Black);
+	margin: 0px;
+	text-align: left;
+}
+
+/* Translucent grey pills with a defining border — category / size / care / occasion / .pill / .tag */
+.card-details__category-tag,
+.card-details__size-pill,
+.card-details__care-pill,
+.card-details__occasion-pill,
+.tag,
+.pill {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 10px;
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--White);
+	background: rgba(42, 48, 45, 0.45);
+	border: 1px solid rgba(42, 48, 45, 0.9);
+	border-radius: 5px;
+	white-space: nowrap;
+}
+
+/* Smaller pills (category / care) keep the tighter padding + size */
+.card-details__category-tag,
+.card-details__care-pill {
+	padding: 3px 8px;
+	font-size: 10px;
 }
 
 .card-details__category-tag {
-	display: inline-flex;
-	align-items: center;
-	padding: 3px 8px;
-	font-size: 10px;
-	font-weight: 500;
-	color: white;
-	background: rgba(255, 255, 255, 0.15);
-	border: 1px solid rgba(255, 255, 255, 0.42);
-	border-radius: 5px;
-	white-space: nowrap;
 	margin-left: 8px;
 	margin-top: 2px;
 }
@@ -120,7 +122,7 @@
 /* Divider */
 .card-details__divider {
 	height: 1px;
-	background: rgba(255, 255, 255, 0.2);
+	background: rgba(0, 0, 0, 0.18);
 }
 
 /* Color + Size row */
@@ -141,7 +143,7 @@
 	height: 11px;
 	border-radius: 50%;
 	background: #b2b2bc;
-	border: 1.5px solid rgba(255, 255, 255, 0.65);
+	border: 1.5px solid var(--Dark-Grey);
 	flex-shrink: 0;
 }
 
@@ -150,19 +152,6 @@
 	color: var(--Dark-Grey);
 	font-weight: 500;
 	text-transform: capitalize;
-}
-
-.card-details__size-pill {
-	display: inline-flex;
-	align-items: center;
-	padding: 4px 10px;
-	font-size: 11px;
-	font-weight: 500;
-	color: white;
-	background: rgba(255, 255, 255, 0.16);
-	border: 1px solid rgba(255, 255, 255, 0.45);
-	border-radius: 5px;
-	white-space: nowrap;
 }
 
 /* Composition section */
@@ -187,10 +176,16 @@
 	border-radius: 6px;
 	overflow: hidden;
 	height: 10px;
+	border: 1px solid var(--Dark-Grey);
 }
 
 .card-details__composition-segment {
 	flex: 1;
+	border-right: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.card-details__composition-segment:last-child {
+	border-right: none;
 }
 
 .card-details__composition-materials {
@@ -201,7 +196,7 @@
 
 .card-details__composition-material {
 	font-size: 11px;
-	color: rgba(255, 255, 255, 0.85);
+	color: var(--Dark-Grey);
 	text-transform: capitalize;
 }
 
@@ -215,19 +210,6 @@
 	display: flex;
 	gap: 6px;
 	flex-wrap: wrap;
-}
-
-.card-details__care-pill {
-	display: inline-flex;
-	align-items: center;
-	padding: 3px 8px;
-	font-size: 10px;
-	font-weight: 500;
-	color: white;
-	background: rgba(255, 255, 255, 0.15);
-	border: 1px solid rgba(255, 255, 255, 0.42);
-	border-radius: 5px;
-	white-space: nowrap;
 }
 
 /* Section title (with divider) */
@@ -250,7 +232,7 @@
 .card-details__section-title-divider {
 	flex: 1;
 	height: 1px;
-	background: rgba(255, 255, 255, 0.2);
+	background: rgba(0, 0, 0, 0.18);
 }
 
 /* Expanded section */
@@ -267,9 +249,10 @@
 
 .card-details__identity-text {
 	font-size: 12px;
-	color: rgba(255, 255, 255, 0.85);
+	color: var(--Op-Black);
 	line-height: 2;
 	margin: 0;
+	text-align: left;
 }
 
 .card-details__occasion-pills {
@@ -278,25 +261,13 @@
 	flex-wrap: wrap;
 }
 
-.card-details__occasion-pill {
-	display: inline-flex;
-	align-items: center;
-	padding: 4px 10px;
-	font-size: 11px;
-	font-weight: 500;
-	color: white;
-	background: rgba(255, 255, 255, 0.16);
-	border: 1px solid rgba(255, 255, 255, 0.45);
-	border-radius: 5px;
-	white-space: nowrap;
-}
-
 .card-details__notes-text {
 	font-size: 11px;
-	color: rgba(255, 255, 255, 0.8);
+	color: var(--Op-Black);
 	line-height: 1.65;
 	margin: 0;
 	font-style: italic;
+	text-align: left;
 }
 
 /* Buttons section */
@@ -309,9 +280,9 @@
 	flex: 1;
 	padding: 9px 12px;
 	border-radius: 8px;
-	border: 1.5px solid rgba(255, 255, 255, 0.65);
-	background: rgba(255, 255, 255, 0.12);
-	color: white;
+	border: 1.5px solid var(--Dark-Grey);
+	background: rgba(42, 48, 45, 0.5);
+	color: var(--White);
 	font-size: 12px;
 	font-weight: 600;
 	cursor: pointer;
@@ -320,40 +291,40 @@
 }
 
 .card-details__button:hover {
-	background: rgba(255, 255, 255, 0.18);
+	background: rgba(42, 48, 45, 0.68);
 }
 
 .card-details__button--remove {
-	border-color: rgba(255, 110, 110, 0.55);
-	background: rgba(255, 80, 80, 0.1);
-	color: rgba(255, 170, 170, 1);
+	border-color: rgba(150, 40, 40, 0.9);
+	background: rgba(150, 40, 40, 0.5);
+	color: var(--White);
 	font-weight: 600;
 }
 
 .card-details__button--remove:hover {
-	background: rgba(255, 80, 80, 0.15);
+	background: rgba(150, 40, 40, 0.66);
 }
 
 .card-details__button--cancel {
-	border-color: rgba(255, 255, 255, 0.4);
+	border-color: var(--Dark-Grey);
 	background: transparent;
-	color: rgba(255, 255, 255, 0.75);
+	color: var(--Dark-Grey);
 	font-weight: 500;
 }
 
 .card-details__button--cancel:hover {
-	background: rgba(255, 255, 255, 0.08);
+	background: rgba(0, 0, 0, 0.08);
 }
 
 .card-details__button--confirm {
-	border-color: rgba(255, 80, 80, 0.7);
-	background: rgba(255, 60, 60, 0.2);
-	color: rgba(255, 160, 160, 1);
+	border-color: rgba(150, 40, 40, 0.95);
+	background: rgba(150, 40, 40, 0.6);
+	color: var(--White);
 	font-weight: 700;
 }
 
 .card-details__button--confirm:hover {
-	background: rgba(255, 60, 60, 0.28);
+	background: rgba(150, 40, 40, 0.75);
 }
 
 /* Confirm section */
@@ -368,7 +339,7 @@
 	margin: 0;
 	text-align: center;
 	font-size: 12px;
-	color: rgba(255, 255, 255, 0.75);
+	color: var(--Dark-Grey);
 	font-weight: 500;
 }
 
@@ -377,9 +348,9 @@
 	width: 100%;
 	padding: 11px 16px;
 	border-radius: 8px;
-	border: 1.5px solid rgba(255, 255, 255, 0.85);
-	background: transparent;
-	color: white;
+	border: 1.5px solid var(--Dark-Grey);
+	background: rgba(42, 48, 45, 0.5);
+	color: var(--White);
 	font-size: 13px;
 	font-weight: 600;
 	cursor: pointer;
@@ -388,32 +359,5 @@
 }
 
 .card-details__toggle-details:hover {
-	background: rgba(255, 255, 255, 0.1);
-}
-
-/* Shared pill styles for backward compatibility */
-.tag {
-	display: inline-flex;
-	align-items: center;
-	padding: 3px 8px;
-	font-size: 10px;
-	font-weight: 500;
-	color: white;
-	background: rgba(255, 255, 255, 0.15);
-	border: 1px solid rgba(255, 255, 255, 0.42);
-	border-radius: 5px;
-	white-space: nowrap;
-}
-
-.pill {
-	display: inline-flex;
-	align-items: center;
-	padding: 4px 10px;
-	font-size: 11px;
-	font-weight: 500;
-	color: white;
-	background: rgba(255, 255, 255, 0.16);
-	border: 1px solid rgba(255, 255, 255, 0.45);
-	border-radius: 5px;
-	white-space: nowrap;
+	background: rgba(42, 48, 45, 0.68);
 }
