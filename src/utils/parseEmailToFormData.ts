@@ -7,6 +7,7 @@ import { cleanProductName } from "./cleanProductName";
 import { inferProductAttributes } from "./inferProductAttributes";
 import { inferMaterialFromName } from "./inferMaterialFromName";
 import { inferCareFromMaterial } from "./inferCareFromMaterial";
+// import { inferSemanticAttributes } from "./inferSemanticAttributes";
 import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
@@ -127,7 +128,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Brand from a known pattern in the subject/body/sender; otherwise fall back
 	// to the email sender (e.g. an Old Navy receipt has no brand text — the
 	// "Old Navy" sender becomes the brand).
-	
+
 	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
 	const category = extractCategory(combinedText);
 	const styleTags = inferStyleTagsFromName(combinedText, category);
@@ -140,6 +141,14 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	const cleanedName = cleanProductName(nameFromSubject);
 	// Product attributes from the raw (uncleaned) name
 	const attrs = inferProductAttributes(subject);
+
+	// 👇 ADD THIS LAYER
+	// const semantic = inferSemanticAttributes(combinedText, {
+	// 	name: cleanedName,
+	// 	category,
+	// 	styleTags,
+	// });
+
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
 
@@ -163,6 +172,8 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		condition: defaultConditionForPurchaseDate(purchaseDate),
 		...(purchaseDate ? { purchaseDate } : {}),
 		...attrs,
+		// 👇 override rules live here
+		// ...semantic,
 	};
 
 	return result;
