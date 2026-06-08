@@ -187,9 +187,9 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Separate condition field (new / like new / good / fair / needs repair)
 - ✅ Toast notification system
 - ✅ localStorage persistence
-- 🚧 Export Closet / Download CSV Button _(in PR [#41](https://github.com/unachoza/Closet-Inventory/pull/41) — not yet on `main`)_
+- ✅ Export Closet / Download CSV Button
 - 🔲 Visual cohesion polish (spacing, color, typography consistency)
-- 🔲 "View more" expand/collapse on item cards
+- 🚧 "View more" expand/collapse on item cards - PR #43
 
 ---
 
@@ -203,7 +203,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Sort by: date added, price (asc/desc), age (newest/oldest), name (A–Z / Z–A)
 - 🔲 Dark mode toggle
 - 🔲 "Dry clean only" quick-filter pill
-- 🔲 Item name visible on card hover (or global toggle)
+- ✅ Item name visible on card hover (or global toggle)
 
 ---
 
@@ -233,10 +233,17 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Advanced Gmail search — subject/body keyword + date-range query builder with confirmation modal and 24h email cache
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
+- ✅ Multi-retailer email parsing (Express, Banana Republic Factory, Anthropologie, SKIMS, Poshmark, SHEIN)
+- ✅ Multi-material inference with blend percentages and polyamide keyword support
+- ✅ Title-case display transform for product names (display-only, non-mutating)
+- ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
+- 🔲 Purchase date gleaned from confirmation email for age calculation
+- 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
 - 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
 - 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
 - 🔲 Don't import items that can't be mapped to a category (big for Amazon emails)
+- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 - 🔲 "Find image" flow for items imported without photos
 
 ---

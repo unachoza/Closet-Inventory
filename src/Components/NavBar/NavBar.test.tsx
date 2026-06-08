@@ -19,14 +19,16 @@ function SearchProbe() {
 interface RenderOptions {
 	initialView?: ViewType;
 	onAddItem?: () => void;
+	onExportCloset?: () => void;
+	closetItemCount?: number;
 	children?: ReactNode;
 }
 
-function renderNav({ initialView = "carousel", onAddItem, children }: RenderOptions = {}) {
+function renderNav({ initialView = "carousel", onAddItem, onExportCloset, closetItemCount, children }: RenderOptions = {}) {
 	return render(
 		<ViewProvider initialView={initialView}>
 			<SearchProvider>
-				<NavBar onAddItem={onAddItem} />
+				<NavBar onAddItem={onAddItem} onExportCloset={onExportCloset} closetItemCount={closetItemCount} />
 				<ViewProbe />
 				<SearchProbe />
 				{children}
@@ -118,6 +120,65 @@ describe("NavBar", () => {
 			renderNav({ initialView: "carousel" });
 			fireEvent.click(screen.getByRole("button", { name: /Add Item/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("form");
+		});
+	});
+
+	describe("Download Closet", () => {
+		it("does not render the Download Closet button when onExportCloset is not provided", () => {
+			renderNav({ initialView: "carousel" });
+			expect(screen.queryByRole("button", { name: /download closet/i })).not.toBeInTheDocument();
+		});
+
+		it("renders the Download Closet button when onExportCloset is provided", () => {
+			renderNav({ initialView: "carousel", onExportCloset: vi.fn() });
+			expect(screen.getByRole("button", { name: /download closet/i })).toBeInTheDocument();
+		});
+
+		it("opens the export confirmation modal when Download Closet is clicked", () => {
+			renderNav({ initialView: "carousel", onExportCloset: vi.fn(), closetItemCount: 8 });
+			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
+			expect(screen.getByRole("dialog")).toBeInTheDocument();
+			expect(screen.getByText(/download your closet/i)).toBeInTheDocument();
+		});
+
+		it("shows the correct item count in the modal", () => {
+			renderNav({ initialView: "carousel", onExportCloset: vi.fn(), closetItemCount: 5 });
+			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
+			expect(screen.getByText("5 items will be exported")).toBeInTheDocument();
+		});
+
+		it("calls onExportCloset and closes the modal when Download Spreadsheet is confirmed", () => {
+			const onExportCloset = vi.fn();
+			renderNav({ initialView: "carousel", onExportCloset, closetItemCount: 3 });
+
+			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
+			expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+			fireEvent.click(screen.getByRole("button", { name: /download spreadsheet/i }));
+			expect(onExportCloset).toHaveBeenCalledTimes(1);
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+		});
+
+		it("closes the modal without calling onExportCloset when Cancel is clicked", () => {
+			const onExportCloset = vi.fn();
+			renderNav({ initialView: "carousel", onExportCloset });
+
+			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
+			fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
+
+			expect(onExportCloset).not.toHaveBeenCalled();
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+		});
+
+		it("closes the drawer before opening the modal when triggered from the hamburger drawer", () => {
+			renderNav({ initialView: "entireCloset", onExportCloset: vi.fn() });
+
+			fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
+			expect(screen.getByRole("navigation", { name: /navigation menu/i })).toBeInTheDocument();
+
+			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
+			expect(screen.queryByRole("navigation", { name: /navigation menu/i })).not.toBeInTheDocument();
+			expect(screen.getByRole("dialog")).toBeInTheDocument();
 		});
 	});
 
