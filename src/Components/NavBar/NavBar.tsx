@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, X, SkipBackIcon, Route } from "lucide-react";
+import { Menu, Search, Spool, Plus, LayoutGrid, Download, FileDown, X, SkipBackIcon, Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
+import ExportClosetModal from "./ExportClosetModal";
 import "./NavBar.css";
 
 interface NavBarProps {
@@ -12,12 +13,17 @@ interface NavBarProps {
 	 * any prefilled form / gmail source state.
 	 */
 	onAddItem?: () => void;
+	/** Trigger a CSV download of the full closet. Passing this prop enables the Download Closet button. */
+	onExportCloset?: () => void;
+	/** Number of closet items — shown in the export confirmation modal. */
+	closetItemCount?: number;
 }
 
-const NavBar = ({ onAddItem }: NavBarProps) => {
+const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps) => {
 	const { view, setView } = useView();
 	const { searchQuery, setSearchQuery } = useSearch();
 	const [drawerOpen, setDrawerOpen] = useState(false);
+	const [exportModalOpen, setExportModalOpen] = useState(false);
 
 	// "entireCloset" is the searchable all-items experience. In that mode the
 	// nav actions collapse into the hamburger drawer and only search shows.
@@ -40,6 +46,20 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 		closeDrawer();
 	};
 
+	const handleDownloadClosetClick = () => {
+		closeDrawer();
+		setExportModalOpen(true);
+	};
+
+	const handleExportConfirm = () => {
+		setExportModalOpen(false);
+		onExportCloset?.();
+	};
+
+	const handleExportCancel = () => {
+		setExportModalOpen(false);
+	};
+
 	const navActions = (
 		<>
 			<button className="action-btn" onClick={handleAddItem}>
@@ -51,6 +71,11 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 			<button className="action-btn secondary" onClick={() => goTo("gmail")}>
 				<Download size={16} /> Import Gmail
 			</button>
+			{onExportCloset && (
+				<button className="action-btn secondary" onClick={handleDownloadClosetClick} title="Download your closet as a spreadsheet">
+					<FileDown size={16} /> Download Closet
+				</button>
+			)}
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
 			</button>
@@ -105,6 +130,15 @@ const NavBar = ({ onAddItem }: NavBarProps) => {
 						<div className="nav-drawer__actions">{navActions}</div>
 					</nav>
 				</>
+			)}
+
+			{onExportCloset && (
+				<ExportClosetModal
+					isOpen={exportModalOpen}
+					itemCount={closetItemCount}
+					onConfirm={handleExportConfirm}
+					onCancel={handleExportCancel}
+				/>
 			)}
 		</header>
 	);
