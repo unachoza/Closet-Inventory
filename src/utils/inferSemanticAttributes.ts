@@ -1,6 +1,6 @@
 export function inferSemanticAttributes(text: string, item: any) {
 	const lower = text.toLowerCase();
-
+	console.log({item})
 	const result: any = {};
 
 	// blazer → care override
