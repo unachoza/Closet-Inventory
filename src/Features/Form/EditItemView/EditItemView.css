@@ -308,3 +308,40 @@ right: 3rem;
       /* margin-bottom: 5rem; */
   }
 }
+
+/* Condition selector + purchase-date display (item age feature) */
+.edit-form-condition,
+.edit-form-purchase-date {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin-top: 0.5rem;
+}
+
+.edit-form-condition__select {
+	height: 2.3rem;
+	padding: 0 0.5rem;
+	border: solid black 1.3px;
+	border-radius: var(--border-radius-ty, 4px);
+	background: var(--White, #fff);
+	text-transform: capitalize;
+}
+
+.edit-form-purchase-date__display:disabled {
+	color: var(--Soft-Black, #333);
+	background: rgba(255, 255, 255, 0.55);
+	cursor: not-allowed;
+	opacity: 1; /* keep the captured date legible rather than greyed out */
+}
+
+.edit-form-purchase-date__input {
+	height: 2.3rem;
+	border: solid black 1.3px;
+	border-radius: var(--border-radius-ty, 4px);
+}
+
+.edit-form-purchase-date__hint {
+	color: var(--Soft-Black, #333);
+	font-size: 0.7rem;
+	font-style: italic;
+}

@@ -1,5 +1,6 @@
 import { memo, useState, useCallback } from "react";
 import type { ExtractedProduct } from "../../../utils/parseProductsFromEmail";
+import { toTitleCase } from "../../../utils/toTitleCase";
 import "./ProductCard.css";
 
 interface ProductCardProps {
@@ -51,7 +52,7 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 			)}
 			<div className="product-card-details">
 				{product.brand && <span className="product-card-brand">{product.brand}</span>}
-				<h4 className="product-card-name">{product.name}</h4>
+				<h4 className="product-card-name">{toTitleCase(product.name)}</h4>
 				<div className="product-card-meta">
 					{product.price && <span className="product-card-price">{product.price}</span>}
 					{product.onSale && <span className="product-card-tag product-card-sale">Sale</span>}

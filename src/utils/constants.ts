@@ -9,6 +9,7 @@ export const formItem = {
 	material: [] as import("./types").MaterialBlend[],
 	occasion: "",
 	age: "",
+	condition: "new",
 	purchaseDate: "",
 	care: "",
 	imageURL: "",
@@ -32,6 +33,9 @@ export const colorOptions = ["red", "brown", "black", "grey", "white", "floral",
 export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
 
 export const clothesAgesOptions = ["new", "3 months", "6 months", "1 year", "18 months", "3 years", "vintage", "unknown"];
+
+// Subjective condition states (replaces the old free-text "age" picker).
+export const conditionOptions = ["new", "like new", "good", "fair", "needs repair"];
 
 export const brandExamples = [
 	"aritzia",

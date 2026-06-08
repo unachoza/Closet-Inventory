@@ -30,7 +30,11 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		price: prefilled.price ?? "",
 		material: prefilled.material ?? "",
 		occasion: prefilled.occasion ?? "",
-		age: prefilled.age ?? "new",
+		age: prefilled.age ?? "",
+		condition: prefilled.condition ?? "new",
+		// Carry the email's purchase date through — earlier this was dropped by the
+		// explicit literal, so imported items lost their factual age and showed "new".
+		purchaseDate: prefilled.purchaseDate,
 		care: prefilled.care ?? "",
 		onSale: prefilled.onSale ?? false,
 		notes: prefilled.notes ?? "",
@@ -54,7 +58,6 @@ function AppShell() {
 		setView("edit");
 	};
 
-	// Single-item import from Gmail
 	const handleGmailImport = useCallback(
 		(prefilled: Partial<ClothingItem>) => {
 			const newItem = buildClothingItem(prefilled);
@@ -71,7 +74,6 @@ function AppShell() {
 	const handleGmailImportAll = useCallback(
 		(items: Partial<ClothingItem>[]) => {
 			if (items.length === 0) return;
-
 			const clothingItems = items.map(buildClothingItem);
 			setImportQueue(clothingItems);
 			setImportQueueIndex(0);

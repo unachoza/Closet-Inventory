@@ -2,8 +2,7 @@ import { describe, it, expect } from "vitest";
 import { parseEmailToFormData } from "../parseEmailToFormData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const parse = (subject: string, body = "", from = "") =>
-	parseEmailToFormData(subject, body, from);
+const parse = (subject: string, body = "", from = "") => parseEmailToFormData(subject, body, from);
 
 describe("parseEmailToFormData — brand extraction", () => {
 	it("extracts brand from sender display name", () => {
@@ -36,9 +35,11 @@ describe("parseEmailToFormData — brand extraction", () => {
 		expect(result.brand).toBe("shein");
 	});
 
-	it("returns empty string when no brand is found", () => {
+	it("falls back to the sender domain as the brand when no brand keyword is found", () => {
+		// Per product requirement: if no known brand is detected, assume the
+		// email sender is the brand (here, the domain "unknownstore").
 		const result = parse("Your order is ready", "", "hello@unknownstore.com");
-		expect(result.brand).toBe("");
+		expect(result.brand).toBe("unknownstore");
 	});
 
 	it("ignores generic sender names like 'no-reply'", () => {
@@ -132,6 +133,22 @@ describe("parseEmailToFormData — category inference", () => {
 		expect(parse("The Bra").category).toBe("lingerie");
 	});
 
+	it('infers "underwear" from "briefs"', () => {
+		expect(parse("Cotton Briefs 3-Pack").category).toBe("underwear");
+	});
+
+	it('infers "lingerie" from "teddy"', () => {
+		expect(parse("Floral Lace Zip Up Teddy").category).toBe("lingerie");
+	});
+
+	it('defaults occasion to "everyday" for underwear', () => {
+		expect(parse("Cotton Briefs 3-Pack").occasion).toBe("everyday");
+	});
+
+	it('defaults occasion to "everyday" for lingerie', () => {
+		expect(parse("Floral Lace Zip Up Teddy").occasion).toBe("everyday");
+	});
+
 	it('infers "shoes" from "sneaker"', () => {
 		expect(parse("Classic Sneaker").category).toBe("shoes");
 	});
@@ -156,8 +173,14 @@ describe("parseEmailToFormData — HTML stripping", () => {
 });
 
 describe("parseEmailToFormData — default fields", () => {
-	it('sets age to "new" by default', () => {
-		expect(parse("anything").age).toBe("new");
+	it('sets condition to "new" when there is no purchase date', () => {
+		expect(parse("anything").condition).toBe("new");
+	});
+
+	it("seeds condition from the order's age — a years-old email is not 'new'", () => {
+		// An order from 2018 is well over 3 years old → defaults to "good".
+		const result = parseEmailToFormData("Order", "", "", "Thu, 21 Jun 2018 12:00:00 +0000");
+		expect(result.condition).toBe("good");
 	});
 
 	it("returns all required formItem fields", () => {
@@ -168,7 +191,86 @@ describe("parseEmailToFormData — default fields", () => {
 		expect(result).toHaveProperty("brand");
 		expect(result).toHaveProperty("material");
 		expect(result).toHaveProperty("occasion");
-		expect(result).toHaveProperty("age");
+		expect(result).toHaveProperty("condition");
 		expect(result).toHaveProperty("care");
+	});
+});
+
+describe("parseEmailToFormData — purchase date", () => {
+	it("stores the email date as an ISO purchaseDate", () => {
+		const result = parseEmailToFormData("Order", "", "", "Fri, 15 Mar 2024 10:30:00 -0700");
+		expect(result.purchaseDate).toBeDefined();
+		expect(new Date(result.purchaseDate as string).getUTCFullYear()).toBe(2024);
+	});
+
+	it("leaves purchaseDate empty when no date is provided", () => {
+		const result = parseEmailToFormData("Order", "", "");
+		expect(result.purchaseDate).toBeFalsy();
+	});
+
+	it("leaves purchaseDate empty when the date is unparseable", () => {
+		const result = parseEmailToFormData("Order", "", "", "not-a-real-date");
+		expect(result.purchaseDate).toBeFalsy();
+	});
+});
+
+describe("parse augmented style data", () => {
+	it("gleans style data from context clues and item name", () => {})
+	//wide leg
+	//weave pattern - herringbone, houndstooth, plaid, tweed
+})
+describe("parseEmailToFormData — material inference", () => {
+	it("infers a single material from the item name", () => {
+		const result = parse("Thanks for your purchase", "POLYAMIDE BLEND STRAPPY DRESS", "sales@zara.com");
+
+		expect(result.material).toEqual([
+			{
+				material: "polyamide",
+				percentage: 100,
+			},
+		]);
+	});
+
+	it("infers multiple materials from the item name", () => {
+		const result = parse("Thanks for your purchase", "COTTON MODAL TANK TOP", "sales@zara.com");
+
+		expect(result.material).toEqual([
+			{
+				material: "cotton",
+				percentage: 50,
+			},
+			{
+				material: "modal",
+				percentage: 50,
+			},
+		]);
+	});
+
+	it("infers percentage-based blends", () => {
+		const result = parse("Thanks for your purchase", "95% Cotton, 5% Spandex Leggings", "sales@zara.com");
+
+		expect(result.material).toContainEqual({
+			material: "cotton",
+			percentage: 95,
+		});
+
+		expect(result.material).toContainEqual({
+			material: "spandex",
+			percentage: 5,
+		});
+	});
+
+	it("returns an empty material array when no material is found", () => {
+		const result = parse("Thanks for your purchase", "SLEEVELESS TOP", "sales@zara.com");
+
+		expect(result.material).toEqual([]);
+	});
+	it("infers materials when the product name is passed as the email body", () => {
+		const result = parse("Thanks for your purchase", "COTTON MODAL TANK TOP", "sales@zara.com");
+
+		expect(result.material).toEqual([
+			{ material: "cotton", percentage: 50 },
+			{ material: "modal", percentage: 50 },
+		]);
 	});
 });
