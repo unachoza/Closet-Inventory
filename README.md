@@ -26,13 +26,13 @@ npm install
 npm run dev
 ```
 
-| Command           | Description               |
-|-------------------|---------------------------|
-| `npm run dev`     | Start development server  |
-| `npm run build`   | Build for production      |
-| `npm run preview` | Preview production build  |
-| `npm run test`    | Run test suite            |
-| `npm run lint`    | Lint codebase             |
+| Command           | Description              |
+| ----------------- | ------------------------ |
+| `npm run dev`     | Start development server |
+| `npm run build`   | Build for production     |
+| `npm run preview` | Preview production build |
+| `npm run test`    | Run test suite           |
+| `npm run lint`    | Lint codebase            |
 
 ---
 
@@ -91,31 +91,33 @@ src/
 
 ## 🛠️ Tech Stack
 
-| Category          | Technology                     | Purpose                              |
-|-------------------|--------------------------------|--------------------------------------|
-| **Framework**     | React 19 (TypeScript)          | Component-based UI                   |
-| **Build Tool**    | Vite 6                         | Fast dev server and bundling         |
-| **Styling**       | CSS Modules + Custom Properties| Scoped styles with theme system      |
-| **Animations**    | Framer Motion                  | Declarative animations               |
-| **UI Primitives** | Radix UI                       | Accessible, unstyled components      |
-| **State**         | React Hooks + Context          | Local and global state               |
-| **Database**      | Firebase Firestore             | Cloud persistence per user           |
-| **Auth**          | Firebase Auth + Google OAuth   | User sign-in and Gmail access        |
-| **Search**        | Fuse.js                        | Fuzzy client-side search             |
-| **Testing**       | Vitest + React Testing Library | Unit and integration tests           |
-| **E2E**           | Playwright _(planned — not yet installed)_ | End-to-end critical flows            |
-| **Type Safety**   | TypeScript 5+                  | Static type checking                 |
+| Category          | Technology                                 | Purpose                         |
+| ----------------- | ------------------------------------------ | ------------------------------- |
+| **Framework**     | React 19 (TypeScript)                      | Component-based UI              |
+| **Build Tool**    | Vite 6                                     | Fast dev server and bundling    |
+| **Styling**       | CSS Modules + Custom Properties            | Scoped styles with theme system |
+| **Animations**    | Framer Motion                              | Declarative animations          |
+| **UI Primitives** | Radix UI                                   | Accessible, unstyled components |
+| **State**         | React Hooks + Context                      | Local and global state          |
+| **Database**      | Firebase Firestore                         | Cloud persistence per user      |
+| **Auth**          | Firebase Auth + Google OAuth               | User sign-in and Gmail access   |
+| **Search**        | Fuse.js                                    | Fuzzy client-side search        |
+| **Testing**       | Vitest + React Testing Library             | Unit and integration tests      |
+| **E2E**           | Playwright _(planned — not yet installed)_ | End-to-end critical flows       |
+| **Type Safety**   | TypeScript 5+                              | Static type checking            |
 
 ---
 
 ## 🏛️ Architecture
 
 **Data flow:**
+
 ```
 User Input → Form State → Validation → useCloudCloset → Firestore + localStorage → UI
 ```
 
 **Key patterns:**
+
 - `useCloudCloset` — writes to Firestore when signed in, falls back to localStorage when offline/signed out. On first sign-in with no cloud data, seeds Firestore from localStorage.
 - `ClosetContext` — single shared instance of `useCloudCloset` across the app; prevents duplicate Firestore connections.
 - `ToastProvider` — global, decoupled notification system.
@@ -129,15 +131,16 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 > _"I keep buying things I already own, and I still feel like I have nothing to wear."_
 
-| | |
-|--|--|
-| **Age** | 26 |
-| **Occupation** | Marketing Coordinator |
-| **Location** | Urban — NYC, LA, Chicago |
-| **Devices** | iPhone, MacBook |
+|                  |                            |
+| ---------------- | -------------------------- |
+| **Age**          | 26                         |
+| **Occupation**   | Marketing Coordinator      |
+| **Location**     | Urban — NYC, LA, Chicago   |
+| **Devices**      | iPhone, MacBook            |
 | **Tech Comfort** | High — uses 10+ apps daily |
 
 **Pain Points**
+
 - Opens her closet and feels overwhelmed — takes 20+ minutes to decide
 - Has bought the same white sneaker three times
 - Can't remember what she paid for things
@@ -145,6 +148,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - Has "guilt items" she bought and never wore
 
 **Goals**
+
 - Know exactly what she owns without digging through physical piles
 - Get dressed faster with less decision fatigue
 - Shop smarter — fill gaps, not duplicates
@@ -171,6 +175,7 @@ business model depend on is unbuilt. Actual build order:
 4. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
 
 **Cross-version dependencies:**
+
 - `wornCount` (in v1.2) is required by **v7.0** lifespan tracker and **v8.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
 - **v4.0 backend** (Firestore) gates **v6.1** social and **v9.0** monetization (`isPremium` read). It's effectively done in [#44](https://github.com/unachoza/Closet-Inventory/pull/44), so v9.0 is closer than its number implies.
 - **v9.0 monetization** also depends on the **PWA** install path (priority 3).
@@ -207,48 +212,49 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v1.2 — Closet Analytics Dashboard
-
-> Deprioritized behind mobile (see Near-Term Priority Order). **Pull the `wornCount` field + "Log a Wear" button out of this milestone and ship it early** — v7.0 and v8.0 both depend on it.
-
-- 🔲 Summary stats cards (total items, total spend, avg cost-per-wear)
-- 🔲 Category breakdown chart (`recharts`)
-- 🔲 Brand frequency chart
-- 🔲 Price range distribution histogram
-- 🔲 Occasion coverage gap indicator
-- 🔲 Wear count tracking (`wornCount` field + "Log a Wear" button)
-- 🔲 Sustainability score badge (🌱 at 20+ wears)
-- 🔲 `useClosetStats` hook
-
----
-
-### v1.3 — Auto Import (Email)
+### v2 — Auto Email Import
 
 - ✅ Gmail OAuth import screen
-- 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 - ✅ Gmail API email thread parsing
 - ✅ Structured item extraction (name, price, brand, category) from email HTML
 - ✅ Multi-retailer HTML parsers — Anthropologie, Aritzia, Banana Republic, Express, Old Navy, Shein, Skims, Target, Victoria's Secret, Zara (+ partial Amazon); tested against real-email fixtures
-- ✅ Attribute inference from product name — material blend, fabric care, condition (from order age), and style/occasion tags
 - ✅ Advanced Gmail search — subject/body keyword + date-range query builder with confirmation modal and 24h email cache
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
 - ✅ Multi-retailer email parsing (Express, Banana Republic Factory, Anthropologie, SKIMS, Poshmark, SHEIN)
-- ✅ Multi-material inference with blend percentages and polyamide keyword support
-- ✅ Title-case display transform for product names (display-only, non-mutating)
-- ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
-- 🔲 Purchase date gleaned from confirmation email for age calculation
-- 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
-- ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
-- 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
-- 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
-- 🔲 Don't import items that can't be mapped to a category (big for Amazon emails)
-- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
-- 🔲 "Find image" flow for items imported without photos
 
 ---
 
-### v2.0 — Mobile & PWA
+### v2.1 — Intense Email Parsing
+
+- ✅ Attribute inference from product name — material blend, fabric care, condition (from order age), and style/occasion tags
+- ✅ Multi-material inference with blend percentages and polyamide keyword support
+- ✅ Title-case display transform for product names (display-only, non-mutating)
+- ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
+- ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
+- 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
+- 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
+- 🔲 Don't import items that can't be mapped to a category (big for Amazon emails)
+- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
+- 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
+
+---
+
+### v2.2 — Engaging the Web for missing details
+
+- 🔲 "Find image" flow for items imported without photos
+- 🔲 search for item material breakdown and item descriptions from retailer websites
+- 🔲 Engaging Internet Archive for older details
+
+---
+
+### v2.3 - Expanding Email Provider Scope
+
+- 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
+
+---
+
+### v3.0 — Mobile & PWA
 
 > **Active priority** (see Near-Term Priority Order). Responsive layout is done; PWA, touch-target audit, and bottom nav / "Add Item" FAB are the next mobile work.
 
@@ -262,7 +268,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v2.1 — Camera Roll Import
+### v3.1 — Camera Roll Import
 
 > Pulled **ahead of v1.2 analytics** — for the mobile persona, photographing an item is the fastest way to log one, and it's the only import path for in-store / second-hand purchases (email import covers online only).
 
@@ -275,7 +281,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v3.0 — Onboarding & Personalization
+### v4.0 — Onboarding & Personalization
 
 - 🔲 First-launch onboarding (choose closet background, accent color)
 - 🔲 CSS custom property injection at runtime
@@ -283,13 +289,27 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v3.1 — Onboarding Tour
+### v4.1 — Onboarding Tour
 
 - 🔲 Step-by-step feature walkthrough with anchored tooltips
 - 🔲 Tour state machine with `tourCompleted` flag in localStorage
 
 ---
-### v4.0 — Backend & Database
+
+### v5 — Closet Analytics Dashboard
+
+> Deprioritized behind mobile (see Near-Term Priority Order). **Pull the `wornCount` field + "Log a Wear" button out of this milestone and ship it early** — v7.0 and v8.0 both depend on it.
+
+- 🔲 Summary stats cards (total items, total spend, avg cost-per-wear)
+- 🔲 Category breakdown chart (`recharts`)
+- 🔲 Brand frequency chart
+- 🔲 Price range distribution histogram
+- 🔲 Occasion coverage gap indicator
+- 🔲 Wear count tracking (`wornCount` field + "Log a Wear" button)
+- 🔲 Sustainability score badge (🌱 at 20+ wears)
+- 🔲 `useClosetStats` hoo
+
+### v5.1 — Backend & Database
 
 > ⚠️ The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these ✅ as "built, pending merge."
 
@@ -302,7 +322,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v5.0 — Travel: Pack a Bag
+### v6.0 — Travel: Pack a Bag
 
 - 🔲 Trip setup form (destination type, duration, luggage size)
 - 🔲 Suggested packing checklist pulled from closet by occasion tag
@@ -311,7 +331,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v5.1 — Travel: Carry-On Weight Calculator
+### v6.1 — Travel: Carry-On Weight Calculator
 
 - 🔲 Weight progress bar (e.g. "4.2kg / 7kg")
 - 🔲 Per-item weight chip (editable inline)
@@ -319,7 +339,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v6.0 — Outfit Builder
+### v7.0 — Outfit Builder
 
 - 🔲 Split-pane: closet grid (left) + outfit canvas (right)
 - 🔲 Drag-and-drop via `@dnd-kit/core`
@@ -328,7 +348,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v6.1 — Social & Sharing
+### v8.1 — Social & Sharing
 
 - 🔲 "Share closet" read-only invite link
 - 🔲 "Request to borrow" button
@@ -337,7 +357,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v7.0 — Education & Care
+### v9.0 — Education & Care
 
 - ✅ Interactive fabric care guide
 - ✅ Material-to-care-instructions mapping
@@ -347,7 +367,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v8.0 — Sustainability
+### v10.0 — Sustainability
 
 - 🔲 Sustainability score on item cards (🌱 at 20+ wears)
 - 🔲 "Cost per wear" on card hover / detail view
@@ -356,16 +376,18 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v9.0 — Monetization (Stripe)
+### v1.0 — Monetization (Stripe)
 
 > Distributed as a PWA — no App Store, no 30% Apple cut. Stripe takes ~2.9% + 30¢ per transaction. You keep ~97%.
 
 **Free tier**
+
 - Up to 30 closet items
 - Manual item entry
 - Local storage only
 
 **Premium tier (Stripe subscription)**
+
 - Unlimited items
 - Gmail import
 - Firestore cloud sync + multi-device access
@@ -373,6 +395,7 @@ business model depend on is unbuilt. Actual build order:
 - Future: outfit builder, packing lists, analytics
 
 **Implementation**
+
 - 🔲 Stripe Checkout — hosted payment page, no custom payment UI needed
 - 🔲 Stripe Customer Portal — handles upgrades, cancellations, billing history automatically
 - 🔲 Stripe webhook → Firestore `users/{uid}` document `{ isPremium: true }`
@@ -383,15 +406,10 @@ business model depend on is unbuilt. Actual build order:
 
 ## 🐛 Known Bugs
 
-- **DatePicker (`MonthYearPicker`) needs a thorough pass.** Root issue: the picker's `useEffect` fired on mount, emitting its *default* (current month/year) before the user chose anything — so manually added items received an unintended purchase date and showed a fabricated age (e.g. "Purchased: 5 months ago"). A mount guard now prevents the picker from emitting until the user actually changes a dropdown, which stops the fabricated-age behavior. Still pending: full verification that selecting a month + year reliably commits to `purchaseDate` across edit/create flows. The EditItemView import flow sidesteps this entirely with a native `<input type="date">` (reliable) for the no-email-date manual-entry fallback.
+- **DatePicker (`MonthYearPicker`) needs a thorough pass.** Root issue: the picker's `useEffect` fired on mount, emitting its _default_ (current month/year) before the user chose anything — so manually added items received an unintended purchase date and showed a fabricated age (e.g. "Purchased: 5 months ago"). A mount guard now prevents the picker from emitting until the user actually changes a dropdown, which stops the fabricated-age behavior. Still pending: full verification that selecting a month + year reliably commits to `purchaseDate` across edit/create flows. The EditItemView import flow sidesteps this entirely with a native `<input type="date">` (reliable) for the no-email-date manual-entry fallback.
 
-- **Email Horizontal Scroll - some email previews don't format nicely, creating difficult to view horizontal scroll. Tried fixing with .gmail-container:has(.display-email-preview-panel){max-width: 1175px;} but didnt' work accross the board
+- \*\*Email Horizontal Scroll - some email previews don't format nicely, creating difficult to view horizontal scroll. Tried fixing with .gmail-container:has(.display-email-preview-panel){max-width: 1175px;} but didnt' work accross the board
 
-- **ZaraAndAritziaNormalizedNameCAPSLOCK - title to string removing caps lock has improved but for Zara and Aritizia titles still no, and shein has be defaulting to CAPS but just store name, not rest of name in item title
+- \*\*ZaraAndAritziaNormalizedNameCAPSLOCK - title to string removing caps lock has improved but for Zara and Aritizia titles still no, and shein has be defaulting to CAPS but just store name, not rest of name in item title
 
-- **ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
-
-
-
-
-
+- \*\*ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
