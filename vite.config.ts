@@ -12,6 +12,7 @@ export default defineConfig(() => ({
 		environment: "jsdom",
 		css: true,
 		setupFiles: "./src/testSetup.ts",
-		exclude: ["**/node_modules/**", "**/.claude/**"],
+		// e2e/ holds Playwright specs (own runner) — keep them out of Vitest.
+		exclude: ["**/node_modules/**", "**/.claude/**", "**/e2e/**"],
 	},
 }));
