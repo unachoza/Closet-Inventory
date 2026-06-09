@@ -40,7 +40,6 @@ const JourneyC = () => {
 		<div className="journey-c">
 			<header className="jc-header">
 				<div>
-					<div className="jc-option-label">Option C</div>
 					<h1 className="jc-header__title">
 						Fiber to <em>Garment</em>
 					</h1>

@@ -76,7 +76,7 @@ input.mbi__material-input {
 	border: 2px solid black;
 	border-radius: 0.375rem;
 	background: #00000000;
-	color: inherit;
+	color: white;
 	font-size: 0.875rem;
 	text-align: right;
 	-moz-appearance: textfield;
@@ -92,7 +92,7 @@ input.mbi__material-input {
 }
 
 .mbi__pct-symbol {
-	color:rgb(67, 66, 66);
+	color:white;
 	font-size: 0.8rem
 }
 
@@ -109,6 +109,7 @@ input.mbi__material-input {
 	cursor: pointer;
 	transition: color 0.15s;
 	flex-shrink: 0;
+	color: white;
 }
 
 .mbi__remove:hover {

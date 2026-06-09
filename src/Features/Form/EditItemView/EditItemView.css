@@ -85,6 +85,10 @@ textarea {
       gap: .5rem;
 }
 
+textarea::placeholder{
+      color: rgb(226, 223, 223);
+}
+
 .edit-form.form label >span {
       color: white;
       font-size: .8rem;
@@ -324,6 +328,7 @@ right: 3rem;
 	border: solid black 1.3px;
 	border-radius: var(--border-radius-ty, 4px);
 	text-transform: capitalize;
+      background-color: #00000024;
 }
 
 .edit-form-purchase-date__display:disabled {
@@ -337,6 +342,8 @@ right: 3rem;
 	height: 2.3rem;
 	border: solid black 1.3px;
 	border-radius: var(--border-radius-ty, 4px);
+      background-color: #00000024;
+      color: white;
 }
 
 .edit-form-purchase-date__hint {

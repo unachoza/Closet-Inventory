@@ -169,10 +169,10 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 The closet is responsive today, but the mobile experience the product and
 business model depend on is unbuilt. Actual build order:
 
-1. **Merge in-flight PRs** — [#42](https://github.com/unachoza/Closet-Inventory/pull/42) (iOS Safari button fix), [#41](https://github.com/unachoza/Closet-Inventory/pull/41) (Export), [#43](https://github.com/unachoza/Closet-Inventory/pull/43) (Card overhaul), [#44](https://github.com/unachoza/Closet-Inventory/pull/44) (Firebase). ⚠️ #41 and #43 rewrite the same email-parsing utils — sequence them deliberately to avoid conflicts.
-2. **Mobile UI polish** (from v2.0) — touch-target audit (44×44px) and a bottom nav / "Add Item" FAB so the primary action isn't buried in the hamburger drawer.
-3. **PWA scaffolding** (pulled forward from v2.0) — `manifest.json`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen.
-4. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
+
+1. **Mobile UI polish** (from v2.0) — touch-target audit (44×44px) and a bottom nav / "Add Item" FAB so the primary action isn't buried in the hamburger drawer.
+2. **PWA scaffolding** (pulled forward from v2.0) — `manifest.json`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen.
+3. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
 
 **Cross-version dependencies:**
 
@@ -194,7 +194,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ localStorage persistence
 - ✅ Export Closet / Download CSV Button
 - 🔲 Visual cohesion polish (spacing, color, typography consistency)
-- 🚧 "View more" expand/collapse on item cards - PR #43
+- ✅  "View more" expand/collapse on item cards - PR #43
 
 ---
 
@@ -206,7 +206,6 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Active filter pills with individual remove and "Clear all"
 - ✅ Dynamic option counts update as filters apply
 - ✅ Sort by: date added, price (asc/desc), age (newest/oldest), name (A–Z / Z–A)
-- 🔲 Dark mode toggle
 - 🔲 "Dry clean only" quick-filter pill
 - ✅ Item name visible on card hover (or global toggle)
 
