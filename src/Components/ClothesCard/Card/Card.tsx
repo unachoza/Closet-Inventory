@@ -79,9 +79,10 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 		});
 	}, []);
 
-	// Close: shrink the modal back to the card rect, then flip to front.
+	// Close: if only flipped (no modal), just flip back to front. If the modal is
+	// open, shrink it back to the card rect first, then flip to front.
 	const handleClose = useCallback(() => {
-		if (prefersReducedMotion()) {
+		if (!expanded || prefersReducedMotion()) {
 			setExpanded(false);
 			setGeometry(null);
 			setFlipped(false);
@@ -90,7 +91,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 		const rect = cardRef.current?.getBoundingClientRect();
 		setClosing(true);
 		setGeometry(rect ? rectToGeometry(rect) : null);
-	}, []);
+	}, [expanded]);
 
 	// When the shrink-back transition finishes, tear down the modal and flip front.
 	const handleModalTransitionEnd = useCallback(
@@ -105,7 +106,12 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	);
 
 	const handleCardClick = () => {
-		if (flipped) return;
+		// Flipped (but not yet expanded): clicking the card flips it back to front.
+		// CardDetails stops propagation, so clicks on its content/buttons are safe.
+		if (flipped) {
+			if (!expanded) handleClose();
+			return;
+		}
 		setFlipped(true);
 	};
 
