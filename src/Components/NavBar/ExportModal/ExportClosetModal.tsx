@@ -1,10 +1,13 @@
+import { useState } from "react";
 import Modal from "../../Modal/Modal";
+import type { ExportFormat } from "../../../utils/exportCloset";
 import "./ExportClosetModal.css";
+import "../ImportModal/ImportClosetModal.css";
 
 interface ExportClosetModalProps {
 	readonly isOpen: boolean;
 	readonly itemCount: number;
-	readonly onConfirm: () => void;
+	readonly onConfirm: (format: ExportFormat) => void;
 	readonly onCancel: () => void;
 }
 
@@ -19,6 +22,10 @@ const INCLUDED_FIELDS = [
 ];
 
 export default function ExportClosetModal({ isOpen, itemCount, onConfirm, onCancel }: ExportClosetModalProps) {
+	const [format, setFormat] = useState<ExportFormat>("csv");
+
+	const confirmLabel = format === "json" ? "Download JSON" : "Download Spreadsheet";
+
 	return (
 		<Modal
 			isOpen={isOpen}
@@ -27,8 +34,8 @@ export default function ExportClosetModal({ isOpen, itemCount, onConfirm, onCanc
 			maxWidth={420}
 			footer={
 				<>
-					<button className="ecm-btn ecm-btn--confirm" onClick={onConfirm} type="button">
-						Download Spreadsheet
+					<button className="ecm-btn ecm-btn--confirm" onClick={() => onConfirm(format)} type="button">
+						{confirmLabel}
 					</button>
 					<button className="ecm-btn ecm-btn--cancel" onClick={onCancel} type="button">
 						Cancel
@@ -42,6 +49,26 @@ export default function ExportClosetModal({ isOpen, itemCount, onConfirm, onCanc
 
 			<div className="ecm-count-badge">
 				{itemCount} item{itemCount !== 1 ? "s" : ""} will be exported
+			</div>
+
+			<p className="ecm-section-label">Choose a format</p>
+			<div className="ecm-description">
+				<label className="import-option">
+					<input type="radio" name="exportFormat" value="csv" checked={format === "csv"} onChange={() => setFormat("csv")} />
+					<span className="import-option__radio" />
+					<div className="import-option__label">
+						<strong>Spreadsheet (CSV)</strong>
+						<div className="import-option__details">Open in Excel, Google Sheets, or Numbers</div>
+					</div>
+				</label>
+				<label className="import-option">
+					<input type="radio" name="exportFormat" value="json" checked={format === "json"} onChange={() => setFormat("json")} />
+					<span className="import-option__radio" />
+					<div className="import-option__label">
+						<strong>Backup (JSON)</strong>
+						<div className="import-option__details">Best for re-importing — keeps all data exact</div>
+					</div>
+				</label>
 			</div>
 
 			<p className="ecm-section-label">What's included</p>

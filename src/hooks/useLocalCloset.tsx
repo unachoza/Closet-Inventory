@@ -40,6 +40,18 @@ export function useLocalStorageCloset() {
 		});
 	};
 
+	/**
+	 * Bulk-import items from a file. "replace" swaps the whole closet;
+	 * "merge" appends to the existing one. Single atomic update either way.
+	 */
+	const importItems = (items: ClothingItem[], mode: "replace" | "merge") => {
+		setCloset((prev: ClothingItem[]) => {
+			const updated = mode === "replace" ? [...items] : [...prev, ...items];
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			return updated;
+		});
+	};
+
 	const removeItem = (id: string) => {
 		setCloset((prev: ClothingItem[]) => {
 			const updated = prev.filter((item) => item.id !== id);
@@ -82,5 +94,5 @@ export function useLocalStorageCloset() {
 		setCloset([]);
 	};
 
-	return { closet: normalizedCloset, addItem, addFullItem, removeItem, updateItem, getCloset, clearCloset };
+	return { closet: normalizedCloset, addItem, addFullItem, importItems, removeItem, updateItem, getCloset, clearCloset };
 }

@@ -250,3 +250,32 @@ div.search-container > input {
             width: 100%;
       }
 }
+
+.import-error-banner {
+	position: fixed;
+	top: 72px;
+	right: 16px;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	max-width: 360px;
+	padding: 12px 14px;
+	background: #fde8e8;
+	color: #8a1f1f;
+	border: 1px solid #f5c2c2;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	font-size: 0.9rem;
+}
+
+.import-error-banner__close {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px;
+	background: transparent;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+}

@@ -4,8 +4,9 @@ import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ClothingItem, ViewType } from "../../utils/types";
 import ExportClosetModal from "./ExportModal/ExportClosetModal";
+import type { ExportFormat } from "../../utils/exportCloset";
 import "./NavBar.css";
-import { importClosetFromCSV } from "../../utils/importCloset";
+import { importClosetFromFile } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 
 interface NavBarProps {
@@ -15,13 +16,15 @@ interface NavBarProps {
 	 * any prefilled form / gmail source state.
 	 */
 	onAddItem?: () => void;
-	/** Trigger a CSV download of the full closet. Passing this prop enables the Download Closet button. */
-	onExportCloset?: () => void;
-	/** Number of closet items — shown in the export confirmation modal. */
+	/** Trigger a download of the full closet in the chosen format. Passing this prop enables the Download Closet button. */
+	onExportCloset?: (format: ExportFormat) => void;
+	/** Persist imported items into the closet (replace or merge). Passing this prop enables the Upload Closet button. */
+	onImportCloset?: (items: ClothingItem[], mode: "replace" | "merge") => void;
+	/** Number of closet items — shown in the export/import confirmation modals. */
 	closetItemCount?: number;
 }
 
-const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps) => {
+const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0 }: NavBarProps) => {
 	const { view, setView } = useView();
 	const { searchQuery, setSearchQuery } = useSearch();
 	const [drawerOpen, setDrawerOpen] = useState(false);
@@ -30,6 +33,7 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 	const [importModalOpen, setImportModalOpen] = useState(false);
 	const [pendingImportItems, setPendingImportItems] = useState<ClothingItem[]>([]);
 	const [importMode, setImportMode] = useState<"replace" | "merge">("merge");
+	const [importError, setImportError] = useState<string | null>(null);
 
 	// "entireCloset" is the searchable all-items experience. In that mode the
 	// nav actions collapse into the hamburger drawer and only search shows.
@@ -58,9 +62,9 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 		setExportModalOpen(true);
 	};
 
-	const handleExportConfirm = () => {
+	const handleExportConfirm = (format: ExportFormat) => {
 		setExportModalOpen(false);
-		onExportCloset?.();
+		onExportCloset?.(format);
 	};
 
 	const handleExportCancel = () => {
@@ -73,10 +77,14 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 
 	const handleUploadCloset = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
+		// allow re-uploading the same file
+		e.target.value = "";
 		if (!file) return;
 
+		setImportError(null);
+
 		try {
-			const items = await importClosetFromCSV(file);
+			const items = await importClosetFromFile(file);
 
 			setPendingImportItems(items);
 			setImportMode("merge");
@@ -84,11 +92,8 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 
 			closeDrawer();
 		} catch (error) {
-			console.error(error);
+			setImportError(error instanceof Error ? error.message : "Could not read that file. Please try a .csv or .json export.");
 		}
-
-		// allow re-uploading the same file
-		e.target.value = "";
 	};
 
 	const handleImportCancel = () => {
@@ -97,9 +102,7 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 	};
 
 	const handleImportConfirm = () => {
-		console.log(`Importing ${pendingImportItems.length} items using ${importMode}`);
-
-		// importCloset(pendingImportItems, importMode);
+		onImportCloset?.(pendingImportItems, importMode);
 
 		setPendingImportItems([]);
 		setImportModalOpen(false);
@@ -121,31 +124,12 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 					<FileDown size={16} /> Download Closet
 				</button>
 			)}
-			<button className="action-btn secondary" onClick={handleUploadClick} title="Upload a closet backup">
-				<FileUp size={16} /> Upload Closet
-				<input ref={fileInputRef} type="file" accept=".csv" onChange={handleUploadCloset} style={{ display: "none" }} />
-			</button>
-			{/* <button
-				type="file"
-				accept=".csv"
-				className="action-btn secondary"
-				onChange={async (e) => {
-					const file = e.target.files?.[0];
-					if (!file) return;
-
-					try {
-						const items = await importClosetFromCSV(file);
-
-						localStorage.setItem("closet", JSON.stringify(items));
-
-						console.log(`Imported ${items.length} items`);
-					} catch (error) {
-						console.error(error);
-					}
-				}}
-			>
-				<FileUp size={16} /> Upload
-			</button> */}
+			{onImportCloset && (
+				<button className="action-btn secondary" onClick={handleUploadClick} title="Upload a closet backup (.csv or .json)">
+					<FileUp size={16} /> Upload Closet
+					<input ref={fileInputRef} type="file" accept=".csv,.json" onChange={handleUploadCloset} style={{ display: "none" }} />
+				</button>
+			)}
 
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
@@ -210,6 +194,14 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 					onConfirm={handleExportConfirm}
 					onCancel={handleExportCancel}
 				/>
+			)}
+			{importError && (
+				<div className="import-error-banner" role="alert">
+					<span>{importError}</span>
+					<button className="import-error-banner__close" aria-label="Dismiss error" onClick={() => setImportError(null)}>
+						<X size={16} />
+					</button>
+				</div>
 			)}
 			{importModalOpen && (
 				<ImportClosetModal
