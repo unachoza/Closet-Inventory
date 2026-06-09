@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, FileDown, X, SkipBackIcon, Route } from "lucide-react";
+import { useRef, useState } from "react";
+import { Menu, Search, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
 import ExportClosetModal from "./ExportClosetModal";
 import "./NavBar.css";
+import { importClosetFromCSV } from "../../utils/importCloset";
 
 interface NavBarProps {
 	/**
@@ -29,6 +30,7 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 	// nav actions collapse into the hamburger drawer and only search shows.
 	const isClosetView = view === "entireCloset";
 	const showBackToCarousel = view !== "carousel";
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const closeDrawer = () => setDrawerOpen(false);
 
@@ -60,6 +62,30 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 		setExportModalOpen(false);
 	};
 
+	const handleUploadClick = () => {
+		fileInputRef.current?.click();
+	};
+
+	const handleUploadCloset = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		try {
+			const items = await importClosetFromCSV(file);
+
+			console.log(`Imported ${items.length} items`);
+			// TODO:
+			// importCloset(items)
+			// or whatever hook method you create
+			closeDrawer();
+		} catch (error) {
+			console.error(error);
+		}
+
+		// allow re-uploading the same file
+		e.target.value = "";
+	};
+
 	const navActions = (
 		<>
 			<button className="action-btn" onClick={handleAddItem}>
@@ -76,6 +102,32 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 					<FileDown size={16} /> Download Closet
 				</button>
 			)}
+			<button className="action-btn secondary" onClick={handleUploadClick} title="Upload a closet backup">
+				<FileUp size={16} /> Upload Closet
+				<input ref={fileInputRef} type="file" accept=".csv" onChange={handleUploadCloset} style={{ display: "none" }} />
+			</button>
+			{/* <button
+				type="file"
+				accept=".csv"
+				className="action-btn secondary"
+				onChange={async (e) => {
+					const file = e.target.files?.[0];
+					if (!file) return;
+
+					try {
+						const items = await importClosetFromCSV(file);
+
+						localStorage.setItem("closet", JSON.stringify(items));
+
+						console.log(`Imported ${items.length} items`);
+					} catch (error) {
+						console.error(error);
+					}
+				}}
+			>
+				<FileUp size={16} /> Upload
+			</button> */}
+
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
 			</button>

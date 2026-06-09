@@ -296,7 +296,7 @@
 
 .card-details__button--remove {
 	border-color: rgba(150, 40, 40, 0.9);
-	background: rgba(150, 40, 40, 0.5);
+	background: rgba(150, 40, 40, 0.7);
 	color: var(--White);
 	font-weight: 600;
 }
@@ -356,6 +356,7 @@
 	cursor: pointer;
 	font-family: inherit;
 	transition: all 0.2s ease;
+	margin: 0;
 }
 
 .card-details__toggle-details:hover {
