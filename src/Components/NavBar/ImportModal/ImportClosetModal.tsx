@@ -1,5 +1,6 @@
 import Modal from "../../Modal/Modal";
 import "../ExportModal/ExportClosetModal.css";
+import "./ImportClosetModal.css";
 
 interface ImportClosetModalProps {
 	readonly isOpen: boolean;
@@ -10,16 +11,6 @@ interface ImportClosetModalProps {
 	readonly onConfirm: () => void;
 	readonly onCancel: () => void;
 }
-
-const INCLUDED_FIELDS = [
-	"Item name & brand",
-	"Category, color & size",
-	"Price & purchase date",
-	"Material composition",
-	"Occasion & care instructions",
-	"Condition & sale flag",
-	"Notes",
-];
 
 export default function ImportClosetModal({
 	isOpen,
@@ -39,10 +30,7 @@ export default function ImportClosetModal({
 			footer={
 				<>
 					<button className="ecm-btn ecm-btn--confirm" onClick={onConfirm} type="button">
-						Replace Closet
-					</button>
-					<button className="ecm-btn ecm-btn--confirm" onClick={onConfirm} type="button">
-						Merge Closet
+						Import Closet
 					</button>
 					<button className="ecm-btn ecm-btn--cancel" onClick={onCancel} type="button">
 						Cancel
@@ -50,38 +38,48 @@ export default function ImportClosetModal({
 				</>
 			}
 		>
-			{/* <p className="ecm-description">
-				Save your wardrobe as a spreadsheet you can open in Excel, Google Sheets, or Numbers — no tech knowledge needed.
-			</p> */}
-
+			<p className="ecm-description">Choose how you'd like to import this closet file.</p>
 			<div className="ecm-count-badge">
 				Found {importItemCount} item{importItemCount !== 1 ? "s" : ""} in this file
 			</div>
-			<div>
+			<div className="ecm-count-badge">
 				Current closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
 			</div>
-			<div>
-				○ Replace my current closet
-				<span>
-					Final closet: {importItemCount} item{importItemCount !== 1 ? "s" : ""}
-				</span>
-			</div>
+			<div className="ecm-description">
+				<label className="import-option">
+					<input
+						type="radio"
+						name="importMode"
+						value="replace"
+						checked={importMode === "replace"}
+						onChange={() => onModeChange("replace")}
+					/>
+					<span className="import-option__radio" />
+					<div className="import-option__label">
+						<strong>Replace my current closet</strong>
 
-			<div>
-				○ Add to my current closet{" "}
-				<span>
-					Final closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
-				</span>
-			</div>
+						<div className="import-option__details">Final closet: {importItemCount} items</div>
+					</div>
+				</label>
+				<label className="import-option">
+					<input
+						type="radio"
+						name="importMode"
+						value="merge"
+						checked={importMode === "merge"}
+						onChange={() => onModeChange("merge")}
+					/>
+					<span className="import-option__radio" />
+					<div className="import-option__label">
+						<strong>Add to my current closet</strong>
 
-			<p className="ecm-section-label">What's included</p>
-			<ul className="ecm-field-list">
-				{INCLUDED_FIELDS.map((field) => (
-					<li key={field} className="ecm-field-item">
-						{field}
-					</li>
-				))}
-			</ul>
+						<div className="import-option__details">
+							Final closet: {currentItemCount + importItemCount} item
+							{currentItemCount + importItemCount !== 1 ? "s" : ""}
+						</div>
+					</div>
+				</label>
+			</div>
 		</Modal>
 	);
 }
