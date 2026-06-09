@@ -34,6 +34,9 @@ test.describe("Card detail modal — mobile", () => {
 		// 1) Tap the card → it flips to the compact summary.
 		await card.tap();
 		await expect(card).toHaveClass(/flipped/);
+		// Wait for the 0.8s flip transition to finish so the back face is settled
+		// before we tap into it (force-tapping mid-flip can miss the button).
+		await page.waitForTimeout(900);
 
 		// 2) Tap "See all details" → the card grows into the centered modal.
 		//    force:true because the back face lives in a rotateY(180deg) 3D context,
