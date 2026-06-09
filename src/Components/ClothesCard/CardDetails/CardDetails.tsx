@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ClothingItem } from "../../../utils/types";
-import { normalizeMaterial, getMaterialColor } from "../../../utils/materialUtils";
+import { normalizeMaterial } from "../../../utils/materialUtils";
+import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { parseCareItems } from "../../../utils/careUtils";
 import "./CardDetails.css";
@@ -72,37 +73,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
 				</div>
 
-				{/* Composition bar */}
+				{/* Composition bar — proportional segments + dot legend */}
 				{blend.length > 0 && (
 					<div className="card-details__composition">
 						<SectionTitle label="Composition" />
-						<div className="card-details__composition-labels">
-							{blend.map((m) => (
-								<span
-									key={m.material}
-									className="card-details__composition-percentage"
-									style={{ color: getMaterialColor(m.material) }}
-								>
-									{m.percentage}%
-								</span>
-							))}
-						</div>
-						<div className="card-details__composition-bar">
-							{blend.map((m) => (
-								<div
-									key={m.material}
-									className="card-details__composition-segment"
-									style={{ background: getMaterialColor(m.material) }}
-								/>
-							))}
-						</div>
-						<div className="card-details__composition-materials">
-							{blend.map((m) => (
-								<span key={m.material} className="card-details__composition-material">
-									{m.material}
-								</span>
-							))}
-						</div>
+						<MaterialCompositionBar blend={blend} />
 					</div>
 				)}
 

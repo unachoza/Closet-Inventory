@@ -65,7 +65,7 @@
 
 .mcb__legend-label {
 	font-size: 0.75rem;
-	color: var(--text-muted, #9ca3af);
+	/* color: var(--text-muted, #9ca3af); */
 }
 
 /* Compact: hide the text legend (bar only) */
