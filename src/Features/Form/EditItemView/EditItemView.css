@@ -160,7 +160,7 @@ label.animated-checkbox button.checkbox-root {
     padding: 0.35rem 0.8rem;
     border: solid 1px;
     border-radius: var(--border-radius-ty, 4px);
-    background: rgb(19 17 146 / 58%);
+    background: var(--color-primary-muted);
     /* color: #1a1a1a; */
     font-size: 0.82rem;
     font-weight: 500;

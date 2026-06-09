@@ -49,17 +49,17 @@
 	/* BUTTONS — single source of truth for button colors.
 	   (Previously split into App.css with a "backround" typo; the typo'd
 	   names below are kept as aliases so existing references keep working.) */
-	--color-primary: #2563eb;
-	--color-primary-hover: #1d4ed8;
+	--color-primary: rgb(19, 17, 146);
+	--color-primary-hover: rgb(14, 13, 110);
+	--color-primary-muted: rgb(19, 17, 146, 0.58);
 	--color-accent: #808000;
 	--color-accent-hover: #676702;
-	--color-primary-muted: #1f44a8d0;
 	/* Aliases for legacy (misspelled) names still referenced across the app. */
 	--button-backround-blue: var(--color-primary);
 	--button-backround-blue-hover: var(--color-primary-hover);
 	--button-backround-green: var(--color-accent);
 	--button-backround-green-hover: var(--color-accent-hover);
-	--button-background-blue-grey: var(--color-primary-muted);
+	--button-background-blue-grey: var(--color-primary-muted); /* back-button uses this */
 
 	/* FONTS */
 	/* --font-ui is the app-wide default; --font-display / --font-mono are the

@@ -200,6 +200,7 @@
 .card-details__expanded {
 	display: flex;
 	flex-direction: column;
+	flex: 1;
 	gap: 14px;
 }
 
@@ -235,6 +236,8 @@
 .card-details__buttons {
 	display: flex;
 	gap: 8px;
+	margin-top: auto;
+	/* padding-top: 14px; */
 }
 
 .card-details__button {
