@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial, getMaterialColor } from "../../../utils/materialUtils";
 import { normalizeToString } from "../../../utils/normalizeToString";
@@ -39,14 +38,23 @@ function SectionTitle({ label }: { label: string }) {
 
 interface CardDetailsProps {
 	item: ClothingItem;
+	/**
+	 * "compact" (default): summary shown on the flipped card, with a
+	 * "See all details" button that calls onExpand to open the modal.
+	 * "full": the modal view — every section + Edit/Remove are shown inline.
+	 */
+	variant?: "compact" | "full";
+	/** Invoked by the compact "See all details" button to grow into the modal. */
+	onExpand?: () => void;
 	onEdit?: () => void;
 	onRemove?: () => void;
 	onClose?: () => void;
 }
 
-export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProps) => {
-	const [expanded, setExpanded] = useState(false);
+export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
+
+	const isFull = variant === "full";
 
 	const blend = normalizeMaterial(item.material);
 	const careItems = parseCare(item.care);
@@ -56,7 +64,7 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 	const hasExpandedContent = occasions.length > 0 || !!notes || !!item.age || !!item.price;
 
 	return (
-		<div className="card-details" onClick={(e) => e.stopPropagation()}>
+		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
 			{/* Scrollable content area */}
 			<div className="card-details__scrollable">
 				{/* Name + category badge + close button */}
@@ -134,93 +142,74 @@ export const CardDetails = ({ item, onEdit, onRemove, onClose }: CardDetailsProp
 					</div>
 				)}
 
-				{/* Expanded: extra details + action buttons */}
-				<AnimatePresence>
-					{expanded && (
-						<motion.div
-							key="expanded"
-							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
-							exit={{ opacity: 0, height: 0 }}
-							transition={{ duration: 0.25, ease: "easeInOut" }}
-							style={{ overflow: "hidden" }}
-						>
-							<div className="card-details__expanded">
-								{(item.age || item.price) && (
-									<div className="card-details__expanded-subsection">
-										<SectionTitle label="Identity" />
-										<p className="card-details__identity-text">
-											{[item.age, item.price].filter(Boolean).join(" · ")}
-										</p>
-									</div>
-								)}
-
-								{occasions.length > 0 && (
-									<div className="card-details__expanded-subsection">
-										<SectionTitle label="Occasion" />
-										<div className="card-details__occasion-pills">
-											{occasions.map((o) => (
-												<span key={o} className="card-details__occasion-pill  pill">
-													{o}
-												</span>
-											))}
-										</div>
-									</div>
-								)}
-
-								{notes && (
-									<div className="card-details__expanded-subsection">
-										<SectionTitle label="Notes" />
-										<p className="card-details__notes-text">"{notes}"</p>
-									</div>
-								)}
-
-								{/* Action buttons only in expanded state */}
-								{confirming ? (
-									<div className="card-details__confirm-section">
-										<p className="card-details__confirm-text">Remove this item?</p>
-										<div className="card-details__buttons">
-											<button
-												onClick={() => setConfirming(false)}
-												className="card-details__button card-details__button--cancel"
-											>
-												Cancel
-											</button>
-											<button
-												onClick={() => {
-													setConfirming(false);
-													onRemove?.();
-												}}
-												className="card-details__button card-details__button--confirm"
-											>
-												Yes, remove
-											</button>
-										</div>
-									</div>
-								) : (
-									<div className="card-details__buttons">
-										<button
-											onClick={() => setConfirming(true)}
-											className="card-details__button card-details__button--remove"
-										>
-											Remove
-										</button>
-										<button onClick={onEdit} className="card-details__button">
-											Edit
-										</button>
-									</div>
-								)}
+				{/* Full view only: extra details + action buttons */}
+				{isFull && (
+					<div className="card-details__expanded">
+						{(item.age || item.price) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Identity" />
+								<p className="card-details__identity-text">{[item.age, item.price].filter(Boolean).join(" · ")}</p>
 							</div>
-						</motion.div>
-					)}
-				</AnimatePresence>
+						)}
+
+						{occasions.length > 0 && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Occasion" />
+								<div className="card-details__occasion-pills">
+									{occasions.map((o) => (
+										<span key={o} className="card-details__occasion-pill  pill">
+											{o}
+										</span>
+									))}
+								</div>
+							</div>
+						)}
+
+						{notes && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Notes" />
+								<p className="card-details__notes-text">"{notes}"</p>
+							</div>
+						)}
+
+						{/* Action buttons */}
+						{confirming ? (
+							<div className="card-details__confirm-section">
+								<p className="card-details__confirm-text">Remove this item?</p>
+								<div className="card-details__buttons">
+									<button onClick={() => setConfirming(false)} className="card-details__button card-details__button--cancel">
+										Cancel
+									</button>
+									<button
+										onClick={() => {
+											setConfirming(false);
+											onRemove?.();
+										}}
+										className="card-details__button card-details__button--confirm"
+									>
+										Yes, remove
+									</button>
+								</div>
+							</div>
+						) : (
+							<div className="card-details__buttons">
+								<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
+									Remove
+								</button>
+								<button onClick={onEdit} className="card-details__button">
+									Edit
+								</button>
+							</div>
+						)}
+					</div>
+				)}
 			</div>
 
-			{/* Toggle button pinned to bottom */}
-			{hasExpandedContent && (
+			{/* Compact view only: button to grow into the full modal */}
+			{!isFull && hasExpandedContent && (
 				<div className="card-details__footer">
-					<button onClick={() => setExpanded(!expanded)} className="card-details__toggle-details">
-						{expanded ? "Show less" : "See all details"}
+					<button onClick={onExpand} className="card-details__toggle-details">
+						See all details
 					</button>
 				</div>
 			)}
