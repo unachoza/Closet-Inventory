@@ -33,7 +33,9 @@
 
 .edit-form.form label{
       margin:0;
-      gap: .25rem
+      gap: .25rem;
+      color: white;
+      font-size: .8rem;
       
 }
 
