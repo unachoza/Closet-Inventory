@@ -9,6 +9,7 @@ const emptyFilters: FilterState = {
 	brand: [],
 	material: [],
 	occasion: [],
+	care: []
 };
 
 const filterOptions: FilterOptions = {
@@ -17,6 +18,7 @@ const filterOptions: FilterOptions = {
 	brand: [],
 	material: [],
 	occasion: [],
+	care: []
 };
 
 const baseProps = {
