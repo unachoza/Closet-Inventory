@@ -323,3 +323,13 @@
 .card-details__toggle-details:hover {
 	background: rgba(42, 48, 45, 0.68);
 }
+
+@media (max-width: 480px) {
+  .card-details__close {
+   top: 0;
+   right: 0;
+  }
+  .card-details__name {
+font-size: 1.1rem;
+  }
+}
