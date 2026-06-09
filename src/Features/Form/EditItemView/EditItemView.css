@@ -46,7 +46,7 @@ input[type="text"] {
       text-transform: capitalize;
 }
 
-//TODO:Doesnt work with the current structure of the form, but it is meant to target the label text when the input is focused. It should be adjusted to fit the actual structure of the form.
+/*TODO:Doesnt work with the current structure of the form, but it is meant to target the label text when the input is focused. It should be adjusted to fit the actual structure of the form.*/
 span.label-text:has(input:focus),
 span.label-text:has(+ input:focus) {
       color: white;
