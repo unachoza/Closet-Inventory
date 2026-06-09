@@ -61,10 +61,17 @@
       text-align: left;
 }
 
-.import-option__radio:has(input[type=radio]:checked) {
-      background-color: #eb25cda5;
+/* Fill the radio dot when its (sibling) input is checked. The input is a
+   previous sibling of .import-option__radio, so use the adjacent-sibling
+   combinator — :has(input) inside the span can't match a sibling. */
+.import-option input[type="radio"]:checked + .import-option__radio {
+	border-color: #93c5fd;
+	background: #2564eba5;
+	box-shadow: inset 0 0 0 4px #1e293b;
 }
-.import-option:has(input[type=radio]:checked) {
-background-color: #2564eba5;
-border: solid 1px;
+
+/* Highlight the whole option row when selected. */
+.import-option:has(input[type="radio"]:checked) {
+      border-color: #2264f3 solid 1.5px;
+	background: #2564eba5;
 }
