@@ -16,6 +16,8 @@ const SORT_OPTIONS: SortKey[] = [
 	"priceDesc",
 	"ageNewest",
 	"ageOldest",
+	"purchasedNewest",
+	"purchasedOldest",
 	"nameAZ",
 	"nameZA",
 ];

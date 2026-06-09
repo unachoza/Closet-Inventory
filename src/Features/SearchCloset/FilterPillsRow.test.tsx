@@ -9,6 +9,7 @@ const emptyFilters: FilterState = {
 	brand: [],
 	material: [],
 	occasion: [],
+	care: []
 };
 
 const activeFilters: FilterState = {

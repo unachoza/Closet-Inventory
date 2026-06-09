@@ -27,6 +27,34 @@ const CLOSET: ClothingItem[] = [
 ];
 
 describe("useClosetFilters", () => {
+	// Care is free-text; the filter indexes canonical labels and must match
+	// compound entries that list multiple instructions.
+	const CARE_CLOSET: ClothingItem[] = [
+		makeItem({ id: "dc", care: "Dry clean only" }),
+		makeItem({ id: "mw", care: "machine wash cold" }),
+		makeItem({ id: "both", care: "machine wash, dry clean acceptable" }),
+		makeItem({ id: "hw", care: "hand wash" }),
+	];
+
+	describe("care dimension", () => {
+		it("offers canonical care labels as filter options", () => {
+			const { result } = renderHook(() => useClosetFilters(CARE_CLOSET));
+			const labels = result.current.filterOptions.care.map((o) => o.value);
+			expect(labels).toContain("Dry clean");
+			expect(labels).toContain("Machine wash");
+			expect(labels).toContain("Hand wash");
+		});
+
+		it("filtering by 'Dry clean' keeps dry-clean items, including compound-care entries", () => {
+			const { result } = renderHook(() => useClosetFilters(CARE_CLOSET));
+			act(() => {
+				result.current.toggleFilter("care", "Dry clean");
+			});
+			const ids = result.current.filteredItems.map((i) => i.id).sort();
+			expect(ids).toEqual(["both", "dc"]); // pure dry-clean + the compound one
+		});
+	});
+
 	it("returns all items when no filters are active", () => {
 		const { result } = renderHook(() => useClosetFilters(CLOSET));
 		expect(result.current.filteredItems).toHaveLength(5);

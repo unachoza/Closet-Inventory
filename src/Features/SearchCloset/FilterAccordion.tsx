@@ -14,7 +14,7 @@ interface FilterAccordionProps {
 const FilterAccordion = ({ label, options, selected, onToggle, defaultOpen = false }: FilterAccordionProps) => {
 	const [expanded, setExpanded] = useState(defaultOpen);
 
-	if (options.length === 0) return null;
+	if (!options || options.length === 0) return null;
 
 	const sectionId = `accordion-panel-${label.toLowerCase()}`;
 

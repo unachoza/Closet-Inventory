@@ -1,31 +1,10 @@
 import { useState } from "react";
 import type { ClothingItem } from "../../../utils/types";
-import { normalizeMaterial, getMaterialColor } from "../../../utils/materialUtils";
+import { normalizeMaterial } from "../../../utils/materialUtils";
+import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeToString } from "../../../utils/normalizeToString";
+import { parseCareItems } from "../../../utils/careUtils";
 import "./CardDetails.css";
-
-const CARE_MAP: [keyword: string, emoji: string, label: string][] = [
-	["dry clean", "🧺", "Dry clean"],
-	["hand wash", "👐", "Hand wash"],
-	["cold water", "🧼", "Cold wash"],
-	["cold wash", "🧼", "Cold wash"],
-	["machine wash", "🧼", "Machine wash"],
-	["no bleach", "🚫", "No bleach"],
-	["hang dry", "💨", "Hang dry"],
-	["lay flat", "📐", "Lay flat"],
-	["low heat", "🌡️", "Low heat"],
-	["tumble", "🌀", "Tumble dry"],
-	["hot water", "🔥", "Warm wash"],
-];
-
-function parseCare(care: string | string[]): { emoji: string; label: string }[] {
-	const items = Array.isArray(care) ? care : care ? [care] : [];
-	return items.filter(Boolean).map((raw) => {
-		const lower = raw.toLowerCase();
-		const match = CARE_MAP.find(([kw]) => lower.includes(kw));
-		return match ? { emoji: match[1], label: match[2] } : { emoji: "🏷️", label: raw };
-	});
-}
 
 function SectionTitle({ label }: { label: string }) {
 	return (
@@ -57,7 +36,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const isFull = variant === "full";
 
 	const blend = normalizeMaterial(item.material);
-	const careItems = parseCare(item.care);
+	const careItems = parseCareItems(item.care);
 	const occasions = Array.isArray(item.occasion) ? item.occasion : item.occasion ? [item.occasion] : [];
 	const notes = normalizeToString(item.notes);
 
@@ -94,37 +73,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
 				</div>
 
-				{/* Composition bar */}
+				{/* Composition bar — proportional segments + dot legend */}
 				{blend.length > 0 && (
 					<div className="card-details__composition">
 						<SectionTitle label="Composition" />
-						<div className="card-details__composition-labels">
-							{blend.map((m) => (
-								<span
-									key={m.material}
-									className="card-details__composition-percentage"
-									style={{ color: getMaterialColor(m.material) }}
-								>
-									{m.percentage}%
-								</span>
-							))}
-						</div>
-						<div className="card-details__composition-bar">
-							{blend.map((m) => (
-								<div
-									key={m.material}
-									className="card-details__composition-segment"
-									style={{ background: getMaterialColor(m.material) }}
-								/>
-							))}
-						</div>
-						<div className="card-details__composition-materials">
-							{blend.map((m) => (
-								<span key={m.material} className="card-details__composition-material">
-									{m.material}
-								</span>
-							))}
-						</div>
+						<MaterialCompositionBar blend={blend} />
 					</div>
 				)}
 

@@ -1,7 +1,16 @@
 import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
 
-export type SortKey = "dateAdded" | "priceAsc" | "priceDesc" | "ageNewest" | "ageOldest" | "nameAZ" | "nameZA";
+export type SortKey =
+	| "dateAdded"
+	| "priceAsc"
+	| "priceDesc"
+	| "ageNewest"
+	| "ageOldest"
+	| "purchasedNewest"
+	| "purchasedOldest"
+	| "nameAZ"
+	| "nameZA";
 
 export const SORT_LABELS: Record<SortKey, string> = {
 	dateAdded: "Date Added",
@@ -9,6 +18,8 @@ export const SORT_LABELS: Record<SortKey, string> = {
 	priceDesc: "Price: High → Low",
 	ageNewest: "Condition: Best First",
 	ageOldest: "Condition: Worst First",
+	purchasedNewest: "Purchased: Newest First",
+	purchasedOldest: "Purchased: Oldest First",
 	nameAZ: "Name: A → Z",
 	nameZA: "Name: Z → A",
 };
@@ -39,6 +50,26 @@ const parseCondition = (item: ClothingItem): number => {
 	return AGE_ORDER[value.toLowerCase().trim()] ?? 999;
 };
 
+// Parse the ISO purchaseDate to a timestamp; null when missing or unparseable.
+const parsePurchaseDate = (item: ClothingItem): number | null => {
+	if (!item.purchaseDate) return null;
+	const t = Date.parse(item.purchaseDate);
+	return isNaN(t) ? null : t;
+};
+
+// Sort by purchaseDate; items with no/invalid date always sink to the bottom,
+// regardless of direction, so they don't masquerade as the newest or oldest.
+const byPurchaseDate =
+	(direction: "newest" | "oldest") =>
+	(a: ClothingItem, b: ClothingItem): number => {
+		const ta = parsePurchaseDate(a);
+		const tb = parsePurchaseDate(b);
+		if (ta === null && tb === null) return 0;
+		if (ta === null) return 1;
+		if (tb === null) return -1;
+		return direction === "newest" ? tb - ta : ta - tb;
+	};
+
 export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 	const [sortKey, setSortKey] = useState<SortKey>(defaultSort);
 
@@ -55,6 +86,10 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 						return copy.sort((a, b) => parseCondition(a) - parseCondition(b));
 					case "ageOldest":
 						return copy.sort((a, b) => parseCondition(b) - parseCondition(a));
+					case "purchasedNewest":
+						return copy.sort(byPurchaseDate("newest"));
+					case "purchasedOldest":
+						return copy.sort(byPurchaseDate("oldest"));
 					case "nameAZ":
 						return copy.sort((a, b) => a.name.localeCompare(b.name));
 					case "nameZA":

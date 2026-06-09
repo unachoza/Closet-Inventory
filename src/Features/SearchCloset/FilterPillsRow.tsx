@@ -15,9 +15,10 @@ const DIM_LABELS: Record<FilterDimension, string> = {
 	brand: "brand",
 	material: "mat",
 	occasion: "occ",
+	care: ""
 };
 
-const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion"];
+const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const FilterPillsRow = ({
 	filters,
@@ -30,7 +31,7 @@ const FilterPillsRow = ({
 	return (
 		<div className="filter-pills-row" aria-label="Active filters">
 			{DIMENSIONS.flatMap((dim) =>
-				filters[dim].map((value) => (
+				(filters[dim] ?? []).map((value) => (
 					<span key={`${dim}:${value}`} className="filter-pill">
 						<span className="filter-pill__dim">{DIM_LABELS[dim]}:</span>
 						{value}

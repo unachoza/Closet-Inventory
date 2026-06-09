@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ClothingItem, MaterialBlend } from "../utils/types";
 import normalizeColor, { normalizeColorGroups } from "../utils/normalizeColors";
 import normalizeCategory from "../utils/normalizeCategories";
+import { parseCareLabels } from "../utils/careUtils";
 
 const MATERIAL_MIN_PCT = 6;
 
@@ -50,12 +51,12 @@ function capitalize(s: string): string {
 	return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }
 
-export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion";
+export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care";
 export type FilterState = Record<FilterDimension, string[]>;
 export type FilterOption = { value: string; count: number };
 export type FilterOptions = Record<FilterDimension, FilterOption[]>;
 
-const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion"];
+const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const INITIAL_FILTERS: FilterState = {
 	category: [],
@@ -63,6 +64,7 @@ const INITIAL_FILTERS: FilterState = {
 	brand: [],
 	material: [],
 	occasion: [],
+	care: [],
 };
 
 // Flatten a raw field (string | array | object) into a list of trimmed string values.
@@ -116,10 +118,12 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 			const counts = new Map<string, { value: string; count: number }>();
 
 			for (const item of closet) {
-				// Material uses its own extractor — pulls names only, skips minor fibers.
+				// Material and care use their own extractors; all other dims use the generic path.
 				const displayList = dim === "material"
 					? extractMaterialNames(item[dim])
-					: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
+					: dim === "care"
+						? parseCareLabels(item.care)
+						: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
 
 				for (const display of displayList) {
 					const key = display.toLowerCase();
@@ -145,10 +149,12 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 				const selected = filters[dim];
 				if (selected.length === 0) continue;
 
-				// Material uses its own extractor; all other dims use the generic path.
+				// Material and care use their own extractors; all other dims use the generic path.
 				const itemKeys = dim === "material"
 					? extractMaterialNames(item[dim]).map((n) => n.toLowerCase())
-					: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+					: dim === "care"
+						? parseCareLabels(item.care).map((l) => l.toLowerCase())
+						: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
 
 				if (!matches) return false;
