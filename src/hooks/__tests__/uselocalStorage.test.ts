@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useLocalStorage } from "../uselocalStorage";
 
 beforeEach(() => localStorage.clear());
@@ -33,5 +33,23 @@ describe("useLocalStorage", () => {
 		localStorage.setItem("bad-key", "not valid json {{");
 		const { result } = renderHook(() => useLocalStorage("bad-key", "fallback"));
 		expect(result.current[0]).toBe("fallback");
+	});
+
+	// Safari caps localStorage at ~5MB and throws QuotaExceededError on write;
+	// private mode throws SecurityError. Persistence is best-effort and must not
+	// crash the app (this is the Gmail-import-on-Safari crash).
+	it("does not throw when setItem fails (quota exceeded / storage blocked)", () => {
+		const spy = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+			throw new DOMException("The quota has been exceeded.", "QuotaExceededError");
+		});
+
+		const { result } = renderHook(() => useLocalStorage("quota-key", "init"));
+
+		// Updating must not throw even though the write to storage fails...
+		expect(() => act(() => result.current[1]("updated"))).not.toThrow();
+		// ...and the in-memory value still updates so the UI keeps working.
+		expect(result.current[0]).toBe("updated");
+
+		spy.mockRestore();
 	});
 });

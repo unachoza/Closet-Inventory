@@ -11,7 +11,14 @@ export const useLocalStorage = <T,>(keyName: string, initialValue: T) => {
 	});
 
 	useEffect(() => {
-		window.localStorage.setItem(keyName, JSON.stringify(value));
+		try {
+			window.localStorage.setItem(keyName, JSON.stringify(value));
+		} catch (error) {
+			// Persistence is best-effort. Safari caps localStorage at ~5MB and throws
+			// QuotaExceededError once full; private mode throws SecurityError. Keep the
+			// in-memory value working rather than crashing the whole app on write.
+			console.warn(`useLocalStorage: could not persist "${keyName}"`, error);
+		}
 	}, [keyName, value]);
 
 	return [value, setValue] as const;

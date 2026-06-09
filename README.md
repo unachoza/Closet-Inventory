@@ -206,7 +206,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Active filter pills with individual remove and "Clear all"
 - ✅ Dynamic option counts update as filters apply
 - ✅ Sort by: date added, price (asc/desc), age (newest/oldest), name (A–Z / Z–A)
-- 🔲 "Dry clean only" quick-filter pill
+- ✅ "Dry clean only" quick-filter pill
 - ✅ Item name visible on card hover (or global toggle)
 
 ---
@@ -412,3 +412,5 @@ business model depend on is unbuilt. Actual build order:
 - \*\*ZaraAndAritziaNormalizedNameCAPSLOCK - title to string removing caps lock has improved but for Zara and Aritizia titles still no, and shein has be defaulting to CAPS but just store name, not rest of name in item title
 
 - \*\*ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
+
+- \*\*Safari Gmail Auth - get's stuck 
