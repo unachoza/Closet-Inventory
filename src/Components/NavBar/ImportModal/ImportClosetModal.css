@@ -1,18 +1,13 @@
 .import-option {
 	display: flex;
       flex-direction: row;
-
 	align-items: center;
 	gap: 12px;
-
-	padding: 12px;
+	padding: 10px 7px;
 	margin-bottom: 12px;
-
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	border-radius: var(--border-radius-ty, 4px);
-
 	background: rgba(255, 255, 255, 0.04);
-
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
@@ -35,7 +30,7 @@
 
 .import-option__details {
 	margin-top: 4px;
-	font-size: 0.82rem;
+	font-size: 0.75rem;
 	color: var(--Lightest-Grey, #bcbcbc);
 }
 
@@ -72,6 +67,7 @@
 
 /* Highlight the whole option row when selected. */
 .import-option:has(input[type="radio"]:checked) {
-      border-color: #2264f3 solid 1.5px;
+      border: solid 1.5px;
+      border-color: #2264f3;
 	background: #2564eba5;
 }
