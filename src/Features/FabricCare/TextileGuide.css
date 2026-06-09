@@ -645,26 +645,22 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
       display: grid;
       align-items: start;
       margin: 1rem;
-      /* border-radius: var(--border-radius); */
-      padding: 2rem;
       background: color-mix(in srgb, var(--warm-white) 70%, transparent);
       gap: 32px;
       grid-template-columns: 1fr 1fr;
 }
 
 .weave-diagram {
-      /* border-radius: var(--border-radius); */
       overflow: hidden;
       background: var(--cream);
 }
-/* #weaves > div > div.weave-content > div.weave-diagram > svg */
+
 .weave-diagram > svg {
       padding: 1.5rem;
       border-radius: none;
 }
 
 .weave-info {
-      /* border-radius: var(--border-radius); */
       padding: 1.5rem;
       background: var(--cream);
       background-color: rgb(250, 247, 242);

@@ -33,6 +33,9 @@ dist-ssr
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+# Throwaway review screenshots (regenerated each run). Visual-regression
+# baselines, if added later, live elsewhere under e2e/__screenshots__ and ARE tracked.
+/e2e/__screenshots__/review/
 
 
 .env
