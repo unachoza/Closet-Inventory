@@ -106,6 +106,12 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		setSelectedEmailId((prev) => (prev === emailId ? null : emailId));
 	}, []);
 
+	// Dismiss the preview (used by the mobile overlay's Back button).
+	const handleClosePreview = useCallback(() => {
+		setSelectedEmailId(null);
+		setSelectedEmail(undefined);
+	}, []);
+
 	const handleConfirmImport = useCallback(() => {
 		if (!selectedEmail) return;
 
@@ -260,6 +266,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
+							<button className="gmail-preview-close" onClick={handleClosePreview} type="button" aria-label="Back to email list">
+								← Back to list
+							</button>
 							<EmailPreview
 								email={selectedEmail}
 								onConfirmImport={handleConfirmImport}

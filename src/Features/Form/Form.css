@@ -12,7 +12,7 @@ form {
 .form {
 	position: relative;
 	overflow: hidden; /* important for max-height animations */
-	height: 85%;
+	height: 95%;
 	max-width: var(--Form-width);
 	margin: .5rem auto;
 	padding: var(--Form-padding);

@@ -183,16 +183,21 @@
 }
 
 
+/* Mobile-only "Back to list" control for the preview overlay (hidden on desktop). */
+.gmail-preview-close {
+	display: none;
+}
+
 @media (max-width: 768px) {
 	.gmail-results {
 		grid-template-columns: 1fr;
 	}
 
-	.gmail-header-bar{
+	.gmail-header-bar {
 		margin-bottom: 0;
 	}
 
-	.gmail-email-list{
+	.gmail-email-list {
 		padding: 0 10px;
 		border: solid grey 1px;
 		border-radius: 5px;
@@ -457,20 +462,50 @@
     margin: 0.5rem;
     padding: var(--spacing-100);
     border-radius: var(--border-radius-sm);
+    /* Drop the blur on mobile: backdrop-filter makes this a containing block for
+       position:fixed, which would trap the preview overlay inside the container
+       instead of letting it cover the viewport. */
+    backdrop-filter: none;
   }
 
-  /* Collapse the side-by-side email list + preview panel to stacked */
+  /* The email list takes the full width... */
   .display-email-preview-panel {
-    flex-direction: column;
+    display: block;
   }
 
   .display-email-preview-panel > .gmail-list-panel {
     width: 100%;
   }
 
+  /* ...and the preview opens as a focused full-screen overlay on top of it,
+     rather than stacking below where it's easy to miss. */
   .display-email-preview-panel > .gmail-preview-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
     width: 100%;
-    max-height: 400px;
+    max-height: none;
+    border-radius: 0;
+    background: var(--Dark-Grey, #2a302d);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--spacing-200);
+    box-sizing: border-box;
+  }
+
+  /* Show the Back control inside the overlay so the list is reachable again. */
+  .gmail-preview-close {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: var(--spacing-100);
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--Medium-Grey);
+    border-radius: var(--border-radius-sm);
+    background: transparent;
+    color: var(--White);
+    font-size: 0.9rem;
+    cursor: pointer;
   }
 
   /* Tighten up the header actions so they don't overflow */
@@ -482,18 +517,21 @@
 
   .gmail-header-actions {
     width: 100%;
-    gap: 0
+    flex-wrap: wrap;
+    gap: var(--spacing-50);
   }
 
+  /* Wrap to multiple rows instead of cramming 3 buttons into one. */
   .gmail-header-actions button {
-    height: 3.5rem;
+    height: 3rem;
+    min-width: 8rem;
     font-size: 0.8rem;
-    flex: 1 1 auto;
+    flex: 1 1 8rem;
   }
 
   /* Shorter email list on mobile since preview is below */
   .gmail-email-list {
-    max-height: 280px;
+    /* max-height: 280px; */
   }
 
   .gmail-preview-panel {
