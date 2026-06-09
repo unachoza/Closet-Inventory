@@ -2,10 +2,11 @@ import { useRef, useState } from "react";
 import { Menu, Search, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { useSearch } from "../../context/SearchContext";
-import { ViewType } from "../../utils/types";
-import ExportClosetModal from "./ExportClosetModal";
+import { ClothingItem, ViewType } from "../../utils/types";
+import ExportClosetModal from "./ExportModal/ExportClosetModal";
 import "./NavBar.css";
 import { importClosetFromCSV } from "../../utils/importCloset";
+import ImportClosetModal from "./ImportModal/ImportClosetModal";
 
 interface NavBarProps {
 	/**
@@ -25,6 +26,10 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 	const { searchQuery, setSearchQuery } = useSearch();
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [exportModalOpen, setExportModalOpen] = useState(false);
+
+	const [importModalOpen, setImportModalOpen] = useState(false);
+	const [pendingImportItems, setPendingImportItems] = useState<ClothingItem[]>([]);
+	const [importMode, setImportMode] = useState<"replace" | "merge">("merge");
 
 	// "entireCloset" is the searchable all-items experience. In that mode the
 	// nav actions collapse into the hamburger drawer and only search shows.
@@ -73,10 +78,10 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 		try {
 			const items = await importClosetFromCSV(file);
 
-			console.log(`Imported ${items.length} items`);
-			// TODO:
-			// importCloset(items)
-			// or whatever hook method you create
+			setPendingImportItems(items);
+			setImportMode("merge");
+			setImportModalOpen(true);
+
 			closeDrawer();
 		} catch (error) {
 			console.error(error);
@@ -84,6 +89,20 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 
 		// allow re-uploading the same file
 		e.target.value = "";
+	};
+
+	const handleImportCancel = () => {
+		setPendingImportItems([]);
+		setImportModalOpen(false);
+	};
+
+	const handleImportConfirm = () => {
+		console.log(`Importing ${pendingImportItems.length} items using ${importMode}`);
+
+		// importCloset(pendingImportItems, importMode);
+
+		setPendingImportItems([]);
+		setImportModalOpen(false);
 	};
 
 	const navActions = (
@@ -190,6 +209,17 @@ const NavBar = ({ onAddItem, onExportCloset, closetItemCount = 0 }: NavBarProps)
 					itemCount={closetItemCount}
 					onConfirm={handleExportConfirm}
 					onCancel={handleExportCancel}
+				/>
+			)}
+			{importModalOpen && (
+				<ImportClosetModal
+					isOpen={importModalOpen}
+					currentItemCount={closetItemCount}
+					importItemCount={pendingImportItems.length}
+					importMode={importMode}
+					onModeChange={setImportMode}
+					onConfirm={handleImportConfirm}
+					onCancel={handleImportCancel}
 				/>
 			)}
 		</header>
