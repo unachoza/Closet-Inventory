@@ -46,9 +46,39 @@
 	--Background-color:  rgba(120, 172, 191, 0.396) ;
 	/* linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%); */
 
-	
+	/* BUTTONS — single source of truth for button colors.
+	   (Previously split into App.css with a "backround" typo; the typo'd
+	   names below are kept as aliases so existing references keep working.) */
+	--color-primary: #2563eb;
+	--color-primary-hover: #1d4ed8;
+	--color-accent: #808000;
+	--color-accent-hover: #676702;
+	--color-primary-muted: #1f44a8d0;
+	/* Aliases for legacy (misspelled) names still referenced across the app. */
+	--button-backround-blue: var(--color-primary);
+	--button-backround-blue-hover: var(--color-primary-hover);
+	--button-backround-green: var(--color-accent);
+	--button-backround-green-hover: var(--color-accent-hover);
+	--button-background-blue-grey: var(--color-primary-muted);
+
 	/* FONTS */
-	
+	/* --font-ui is the app-wide default; --font-display / --font-mono are the
+	   editorial fonts used by the Fabric/Guide section (loaded via @import in
+	   TextileGuide.css). Referenced as var(--font-ui) in JourneyC.css. */
+	--font-ui: system-ui, Avenir, Helvetica, Arial, sans-serif;
+	--font-display: 'Playfair Display', serif;
+	--font-mono: 'DM Mono', monospace;
+
+	/* TYPE SCALE — collapse ~54 ad-hoc font-sizes onto a shared ramp.
+	   Migrate declarations onto these incrementally. */
+	--text-xs: 0.75rem;
+	--text-sm: 0.85rem;
+	--text-base: 1rem;
+	--text-lg: 1.15rem;
+	--text-xl: 1.5rem;
+	--text-2xl: 2rem;
+	--text-3xl: 3rem;
+
 	/* STYLES */
 	--blur: blur(.6rem);
 	--box-shadow: .5rem .75rem 2rem .75rem rgba(0, 0, 0, 0.875);
@@ -58,9 +88,13 @@
 	--border-radius-sm: .5rem;
 	--border-radius-md: 1rem;
 	--border-radius-lg: 2rem;
+	/* Was 999px (fully rounded); squared to 5px per design preference. */
+	--border-radius-pill: 5px;
 	--border-radius-circle: 50%;
 
 	--padding-rectangle-sm: .5rem 1rem;
+	/* Standard button padding — use instead of ad-hoc per-button values. */
+	--button-padding: var(--spacing-100) var(--spacing-200);
 
 	--border-black-sm: solid 1px var(--Black);
 	--border-white-sm: solid 1px var(--White);

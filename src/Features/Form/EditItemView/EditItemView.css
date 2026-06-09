@@ -81,7 +81,7 @@ textarea {
       border-radius: var(--border-radius-sm);
       background: #00000024;
       box-shadow: none;
-      font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+      font-family: var(--font-ui);
       font-size: 1rem;
       text-transform: capitalize;
       gap: .5rem;
