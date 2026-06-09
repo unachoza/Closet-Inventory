@@ -25,23 +25,33 @@ describe("CardDetails", () => {
 		expect(screen.getByText("Nike")).toBeInTheDocument();
 	});
 
-	it("keeps Edit/Remove hidden until expanded, then fires onEdit", () => {
-		const onEdit = vi.fn();
-		render(<CardDetails item={item} onEdit={onEdit} />);
+	it("compact variant shows 'See all details' and calls onExpand instead of Edit/Remove", () => {
+		const onExpand = vi.fn();
+		render(<CardDetails item={item} variant="compact" onExpand={onExpand} />);
 
+		// Compact: no inline action buttons, just the expand affordance.
 		expect(screen.queryByRole("button", { name: "Edit" })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: "Remove" })).not.toBeInTheDocument();
 
 		fireEvent.click(screen.getByRole("button", { name: /see all details/i }));
+		expect(onExpand).toHaveBeenCalledTimes(1);
+	});
+
+	it("full variant shows Edit/Remove directly and fires onEdit", () => {
+		const onEdit = vi.fn();
+		render(<CardDetails item={item} variant="full" onEdit={onEdit} />);
+
+		// Full view replaces the "See all details" affordance with the actions.
+		expect(screen.queryByRole("button", { name: /see all details/i })).not.toBeInTheDocument();
 		fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
 		expect(onEdit).toHaveBeenCalledTimes(1);
 	});
 
-	it("requires confirmation before calling onRemove", () => {
+	it("full variant requires confirmation before calling onRemove", () => {
 		const onRemove = vi.fn();
-		render(<CardDetails item={item} onRemove={onRemove} />);
+		render(<CardDetails item={item} variant="full" onRemove={onRemove} />);
 
-		fireEvent.click(screen.getByRole("button", { name: /see all details/i }));
 		fireEvent.click(screen.getByRole("button", { name: "Remove" }));
 		// A confirm step appears — onRemove only fires after explicit confirmation.
 		expect(onRemove).not.toHaveBeenCalled();

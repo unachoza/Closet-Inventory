@@ -319,8 +319,7 @@
 }
 
 .jc-key-segment:hover {
-  /* background: rgba(255, 255, 255, 0.03); */
-  borde:none;
+  border :none;
   filter: brightness(1.5);
 }
 

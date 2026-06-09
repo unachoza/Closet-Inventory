@@ -167,6 +167,44 @@ overflow: scroll;
 	to   { transform: translateY(0); }
 }
 
+.card-modal-overlay--closing {
+	animation: overlay-fade-out 0.3s ease forwards;
+}
+
+@keyframes overlay-fade-out {
+	from { opacity: 1; }
+	to   { opacity: 0; }
+}
+
+/* ── Desktop grow-into-modal ─────────────────────────────────────────────────
+   The flipped card "grows" out of the grid: a fixed-position element starts at
+   the card's rect and transitions (top/left/width/height) to a centered modal.
+   Geometry is supplied inline from JS; this rule owns the easing + chrome. */
+.card-grow-modal {
+	position: fixed;
+	z-index: 1001;
+	box-sizing: border-box;
+	border: solid 0.5rem var(--Dark-Grey);
+	border-radius: var(--border-radius-md);
+	overflow: hidden;
+	box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
+	transition:
+		top 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+		left 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+		width 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+		height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.card-grow-modal {
+		transition: none;
+	}
+	.card-modal-overlay,
+	.card-modal-overlay--closing {
+		animation: none;
+	}
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
