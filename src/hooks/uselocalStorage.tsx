@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeSetItem } from "../utils/safeStorage";
 
 export const useLocalStorage = <T,>(keyName: string, initialValue: T) => {
 	const [value, setValue] = useState(() => {
@@ -11,14 +12,7 @@ export const useLocalStorage = <T,>(keyName: string, initialValue: T) => {
 	});
 
 	useEffect(() => {
-		try {
-			window.localStorage.setItem(keyName, JSON.stringify(value));
-		} catch (error) {
-			// Persistence is best-effort. Safari caps localStorage at ~5MB and throws
-			// QuotaExceededError once full; private mode throws SecurityError. Keep the
-			// in-memory value working rather than crashing the whole app on write.
-			console.warn(`useLocalStorage: could not persist "${keyName}"`, error);
-		}
+		safeSetItem(keyName, JSON.stringify(value));
 	}, [keyName, value]);
 
 	return [value, setValue] as const;
