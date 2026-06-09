@@ -4,7 +4,7 @@ import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import NavBar from "./Components/NavBar/NavBar";
 import { useLocalStorageCloset } from "./hooks/useLocalCloset";
-import { exportClosetToCSV } from "./utils/exportCloset";
+import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
 import EditItemView from "./Features/Form/EditItemView/EditItemView";
@@ -43,7 +43,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 
 function AppShell() {
 	const { view, setView } = useView();
-	const { closet, getCloset } = useLocalStorageCloset();
+	const { closet, getCloset, importItems } = useLocalStorageCloset();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -115,15 +115,18 @@ function AppShell() {
 		setView("form");
 	}, [setView]);
 
-	const handleExportCloset = useCallback(() => {
-		exportClosetToCSV(getCloset());
-	}, [getCloset]);
+	const handleExportCloset = useCallback(
+		(format: ExportFormat) => {
+			exportCloset(getCloset(), format);
+		},
+		[getCloset]
+	);
 
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
 		<div className="main">
-			<NavBar onAddItem={handleAddItem} onExportCloset={handleExportCloset} closetItemCount={closet.length} />
+			<NavBar onAddItem={handleAddItem} onExportCloset={handleExportCloset} onImportCloset={importItems} closetItemCount={closet.length} />
 			<EditProvider>
 				<ToastProvider>
 					<div className="app-content">

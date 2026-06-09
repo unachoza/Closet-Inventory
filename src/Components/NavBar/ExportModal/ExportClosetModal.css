@@ -3,6 +3,7 @@
 	color: var(--Lightest-Grey, #bcbcbc);
 	font-size: 0.9rem;
 	line-height: 1.5;
+	text-align: left;
 }
 
 .ecm-count-badge {

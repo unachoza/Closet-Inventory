@@ -323,7 +323,6 @@ right: 3rem;
 	padding: 0 0.5rem;
 	border: solid black 1.3px;
 	border-radius: var(--border-radius-ty, 4px);
-	background: var(--White, #fff);
 	text-transform: capitalize;
 }
 

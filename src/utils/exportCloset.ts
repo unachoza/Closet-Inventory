@@ -56,16 +56,12 @@ function buildCSV(items: ClothingItem[]): string {
 	return [header, ...rows].join("\n");
 }
 
-/** Trigger a browser download of the closet as a .csv file. */
-export function exportClosetToCSV(items: ClothingItem[]): void {
-	if (items.length === 0) return;
+export type ExportFormat = "csv" | "json";
 
-	const csv = buildCSV(items);
-	const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+/** Trigger a browser download of arbitrary text content as a named file. */
+function downloadFile(content: string, filename: string, mimeType: string): void {
+	const blob = new Blob([content], { type: mimeType });
 	const url = URL.createObjectURL(blob);
-
-	const timestamp = new Date().toISOString().slice(0, 10);
-	const filename = `my-closet-${timestamp}.csv`;
 
 	const link = document.createElement("a");
 	link.href = url;
@@ -75,4 +71,30 @@ export function exportClosetToCSV(items: ClothingItem[]): void {
 	link.click();
 	document.body.removeChild(link);
 	URL.revokeObjectURL(url);
+}
+
+function timestampedName(extension: ExportFormat): string {
+	const timestamp = new Date().toISOString().slice(0, 10);
+	return `my-closet-${timestamp}.${extension}`;
+}
+
+/** Trigger a browser download of the closet as a .csv file. */
+export function exportClosetToCSV(items: ClothingItem[]): void {
+	if (items.length === 0) return;
+	downloadFile(buildCSV(items), timestampedName("csv"), "text/csv;charset=utf-8;");
+}
+
+/** Trigger a browser download of the closet as a .json file (preserves types for round-trip). */
+export function exportClosetToJSON(items: ClothingItem[]): void {
+	if (items.length === 0) return;
+	downloadFile(JSON.stringify(items, null, 2), timestampedName("json"), "application/json;charset=utf-8;");
+}
+
+/** Download the closet in the chosen format. */
+export function exportCloset(items: ClothingItem[], format: ExportFormat): void {
+	if (format === "json") {
+		exportClosetToJSON(items);
+	} else {
+		exportClosetToCSV(items);
+	}
 }

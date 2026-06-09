@@ -1,0 +1,73 @@
+.import-option {
+	display: flex;
+      flex-direction: row;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 7px;
+	margin-bottom: 12px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: var(--border-radius-ty, 4px);
+	background: rgba(255, 255, 255, 0.04);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.import-option:hover {
+	border-color: rgba(99, 179, 237, 0.35);
+}
+
+.import-option--selected {
+	border-color: rgba(99, 179, 237, 0.5);
+	background: rgba(99, 179, 237, 0.08);
+}
+.import-option strong {
+	display: block;
+	font-size: 0.95rem;
+	font-weight: 600;
+	color: var(--White, #fff);
+      text-transform: capitalize;
+}
+
+.import-option__details {
+	margin-top: 4px;
+	font-size: 0.75rem;
+	color: var(--Lightest-Grey, #bcbcbc);
+}
+
+.import-option input[type="radio"] {
+	display: none;
+}
+
+.import-option__radio {
+      width: 18px;
+    height: 18px;
+    border: 1px solid rgb(255 255 255 / 54%);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.import-option--selected .import-option__radio {
+	border-color: #93c5fd;
+	background: #93c5fd;
+	box-shadow: inset 0 0 0 4px #1e293b;
+}
+
+.import-option__label {
+      text-align: left;
+}
+
+/* Fill the radio dot when its (sibling) input is checked. The input is a
+   previous sibling of .import-option__radio, so use the adjacent-sibling
+   combinator — :has(input) inside the span can't match a sibling. */
+.import-option input[type="radio"]:checked + .import-option__radio {
+	border-color: #93c5fd;
+	background: #2564eba5;
+	box-shadow: inset 0 0 0 4px #1e293b;
+}
+
+/* Highlight the whole option row when selected. */
+.import-option:has(input[type="radio"]:checked) {
+      border: solid 1.5px;
+      border-color: #2264f3;
+	background: #2564eba5;
+}
