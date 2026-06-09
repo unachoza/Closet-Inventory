@@ -103,6 +103,25 @@ describe("useClosetSort", () => {
 		expect(fairIdx).toBeLessThan(brandNewIdx);
 	});
 
+	const DATED_ITEMS: ClothingItem[] = [
+		makeItem({ id: "a", purchaseDate: "2024-01-15" }),
+		makeItem({ id: "b", purchaseDate: "2026-03-01" }),
+		makeItem({ id: "c", purchaseDate: "2025-06-10" }),
+		makeItem({ id: "d", purchaseDate: undefined }), // no date → always last
+	];
+
+	it("purchasedNewest: most recent purchaseDate first, missing dates last", () => {
+		const { result } = renderHook(() => useClosetSort("purchasedNewest"));
+		const sorted = result.current.sortedItems(DATED_ITEMS);
+		expect(sorted.map((i) => i.id)).toEqual(["b", "c", "a", "d"]);
+	});
+
+	it("purchasedOldest: earliest purchaseDate first, missing dates still last", () => {
+		const { result } = renderHook(() => useClosetSort("purchasedOldest"));
+		const sorted = result.current.sortedItems(DATED_ITEMS);
+		expect(sorted.map((i) => i.id)).toEqual(["a", "c", "b", "d"]);
+	});
+
 	it("setSortKey changes the active sort key", () => {
 		const { result } = renderHook(() => useClosetSort());
 		expect(result.current.sortKey).toBe("dateAdded");

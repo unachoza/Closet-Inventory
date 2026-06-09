@@ -21,9 +21,10 @@ const DIM_LABELS: Record<FilterDimension, string> = {
 	brand: "Brand",
 	material: "Material",
 	occasion: "Occasion",
+	care: "Care",
 };
 
-const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion"];
+const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const FilterSidePanel = ({
 	open,
