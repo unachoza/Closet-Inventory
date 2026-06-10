@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronRight, Mail, Search } from "lucide-react";
 
-import "./OnboardingOption3.css";
+import "./InteractiveOnboardingV2.css";
 
 export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 	const [currentStep, setCurrentStep] = useState(0);

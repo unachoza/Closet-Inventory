@@ -13,6 +13,10 @@
 	display: flex;
 	flex-direction: column;
 	gap: 2rem;
+      background: #a9a7a7ba;
+      border-radius: 5px;
+      border: solid 2px #212020;
+      box-shadow: 9px 8px 5px rgb(0 0 0 / 28%);
 }
 
 .onboarding__content {
