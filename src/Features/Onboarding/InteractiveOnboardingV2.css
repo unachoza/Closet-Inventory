@@ -3,10 +3,10 @@
 ======================================== */
 
 :root {
-	--color-background: #ffffff;
+	--color-background: #ffffff36;
 	--color-foreground: #111827;
 
-	--color-primary: #7c3aed;
+	--color-primary: #3a61ed;
 	--color-primary-light: #ede9fe;
 	--color-primary-foreground: #ffffff;
 
@@ -212,9 +212,12 @@ body,
 
 	height: 16rem;
 	padding: 1.5rem;
+          border-radius: 5px;
+    border: solid #373535a1;
 
 	overflow: hidden;
-	border-radius: var(--radius-xl);
+	border-radius: var(--radius-sm);
+      box-shadow: .5rem .5rem 2rem .5rem rgb(0 0 0 / 49%);
 }
 
 .onboarding-demo--welcome {
@@ -225,8 +228,8 @@ body,
 	background:
 		linear-gradient(
 			135deg,
-			rgb(124 58 237 / 0.05),
-			rgb(168 85 247 / 0.15)
+			rgba(58, 64, 237, 0.25),
+			rgba(85, 171, 247, 0.45)
 		);
 }
 

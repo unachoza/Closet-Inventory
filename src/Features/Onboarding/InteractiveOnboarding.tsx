@@ -139,8 +139,6 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 	return (
 		<div className="onboarding">
 			<div className="onboarding__container">
-				<div>{currentStepData.demo}</div>
-
 				<div className="onboarding__content">
 					<div className="onboarding__badge">{currentStepData.badge}</div>
 
@@ -148,6 +146,7 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 
 					<p className="onboarding__description">{currentStepData.description}</p>
 				</div>
+				<div>{currentStepData.demo}</div>
 
 				<div className="onboarding__footer">
 					<div className="onboarding-progress">
