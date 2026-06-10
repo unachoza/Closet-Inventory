@@ -6,6 +6,8 @@ import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import type { AdvancedSearchParams, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
+import { extractColorFromName } from "../../utils/parseNameHelpers";
+import normalizeColor from "../../utils/normalizeColors";
 import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
@@ -135,7 +137,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				brand: product.brand || emailData.brand,
 				price: product.price,
 				category: emailData.category,
-				color: product.color,
+				// Color: prefer the structured value from the email HTML; otherwise
+				// scan the item name (e.g. "Babaton Deep Taupe ... Dress" → Brown).
+				color: product.color || normalizeColor(extractColorFromName(product.name)),
 				size: product.size,
 				material: product.material || emailData.material,
 				onSale: product.onSale,
@@ -166,7 +170,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					brand: product.brand || emailData.brand,
 					price: product.price,
 					category: emailData.category,
-					color: product.color,
+					color: product.color || normalizeColor(extractColorFromName(product.name)),
 					size: product.size,
 					material,
 					onSale: product.onSale,
