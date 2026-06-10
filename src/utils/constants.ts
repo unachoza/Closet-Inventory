@@ -130,7 +130,7 @@ export const MY_CLOSET_DATA = [
 		size: "M",
 		brand: "aritzia",
 		price: "$43.99",
-		material: "knitt",
+		material: "knit",
 		occasion: "sporty",
 		age: "one year",
 		care: "hand wash",
