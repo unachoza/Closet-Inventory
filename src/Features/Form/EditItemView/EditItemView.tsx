@@ -3,7 +3,7 @@ import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
 import useStockPhoto from "../../../hooks/useStockPhoto";
 import TextInput from "../TextInput/TextInput";
-import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
+// import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem, conditionOptions } from "../../../utils/constants";
@@ -95,9 +95,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
-	const onToggleDetail = useCallback((key: string, value: any) => {
-		setFormData((prev) => ({ ...prev, [key]: !value }));
-	}, []);
+	// const onToggleDetail = useCallback((key: string, value: any) => {
+	// 	setFormData((prev) => ({ ...prev, [key]: !value }));
+	// }, []);
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData((prev) => ({ ...prev, condition: e.target.value }));

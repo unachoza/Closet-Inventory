@@ -1,4 +1,4 @@
-export function inferSemanticAttributes(text: string, item: any) {
+export function inferSemanticAttributes(text: string) {
 	const lower = text.toLowerCase();
 	const result: any = {};
 

@@ -145,11 +145,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Product attributes from the raw (uncleaned) name
 	const attrs = inferProductAttributes(subject);
 
-	const semantic = inferSemanticAttributes(combinedText, {
-		name: cleanedName,
-		category,
-		styleTags,
-	});
+	const semantic = inferSemanticAttributes(combinedText);
 
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
