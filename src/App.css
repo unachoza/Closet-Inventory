@@ -10,9 +10,6 @@
   flex: 1;
   overflow-y: auto;
   width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 /* Button color tokens now live centrally in index.css (:root).
    The legacy --button-backround-* names are aliased there for compatibility. */
