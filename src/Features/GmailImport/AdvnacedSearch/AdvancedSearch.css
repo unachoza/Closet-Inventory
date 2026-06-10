@@ -5,10 +5,10 @@
 
 .advanced-search-toggle {
 	padding: 0.4rem 1rem;
-	border: 1px solid var(--Medium-Grey);
+	border: 1px solid #fffbfb;
 	border-radius: var(--border-radius-sm);
-	background: transparent;
-	color: var(--Lightest-Grey);
+	background: #b4aeae4a;
+	color: #fffbfb;
 	font-size: 0.85rem;
 	cursor: pointer;
 	transition: all 0.15s ease;
@@ -39,8 +39,8 @@
 
 .advanced-search-fieldset legend {
 	padding: 0 var(--spacing-50);
-	color: var(--Op-Light-Grey);
-	font-size: 0.85rem;
+	color: var(--White);
+	font-size: 1rem;
 	font-weight: 500;
 }
 
@@ -91,7 +91,7 @@
 }
 
 .advanced-search-hint {
-	color: var(--Medium-Grey);
+	color: var(--White);
 	font-size: 0.8rem;
 	font-style: italic;
 }
@@ -112,7 +112,7 @@
 }
 
 .advanced-search-input::placeholder {
-	color: var(--Medium-Grey);
+	color: var(--White);
 }
 
 .advanced-search-input:focus {
@@ -145,7 +145,7 @@
 	display: flex;
 	flex-direction: column;
 	min-width: 140px;
-	color: var(--Op-Light-Grey);
+	color: var(--White);
 	font-size: 0.85rem;
 	flex: 1;
 	gap: 4px;
