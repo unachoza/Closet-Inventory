@@ -1,13 +1,14 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
-import { parseInlineColorSize, stripBrandFromName } from "./parseNameHelpers";
+import { parseInlineColorSize, stripBrandFromName, extractColorFromName } from "./parseNameHelpers";
+import normalizeColor from "./normalizeColors";
 import { extractBrandFromSender } from "./parseProductsFromEmail";
 import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
 import { cleanProductName } from "./cleanProductName";
 import { inferProductAttributes } from "./inferProductAttributes";
 import { inferMaterialFromName } from "./inferMaterialFromName";
 import { inferCareFromMaterial } from "./inferCareFromMaterial";
-// import { inferSemanticAttributes } from "./inferSemanticAttributes";
+import { inferSemanticAttributes } from "./inferSemanticAttributes";
 import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
@@ -135,6 +136,8 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 
 	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
 	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
+	// Fallback: scan product name for a known color word (e.g. "Deep Taupe" in Aritzia subjects)
+	const color = normalizeColor(inlineColor || extractColorFromName(subject));
 
 	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
 	const nameFromSubject = stripBrandFromName(subject, brand);
@@ -142,12 +145,11 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Product attributes from the raw (uncleaned) name
 	const attrs = inferProductAttributes(subject);
 
-	// 👇 ADD THIS LAYER
-	// const semantic = inferSemanticAttributes(combinedText, {
-	// 	name: cleanedName,
-	// 	category,
-	// 	styleTags,
-	// });
+	const semantic = inferSemanticAttributes(combinedText, {
+		name: cleanedName,
+		category,
+		styleTags,
+	});
 
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
@@ -161,7 +163,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		brand,
 		category,
 		...(cleanedName && { name: cleanedName }),
-		...(inlineColor && { color: inlineColor }),
+		...(color && { color }),
 		...(inlineSize && { size: inlineSize }),
 		material: inferencedMaterial,
 		...(inferencedCare.length > 0 && { care: inferencedCare }),
@@ -172,8 +174,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		condition: defaultConditionForPurchaseDate(purchaseDate),
 		...(purchaseDate ? { purchaseDate } : {}),
 		...attrs,
-		// 👇 override rules live here
-		// ...semantic,
+		...semantic,
 	};
 
 	return result;

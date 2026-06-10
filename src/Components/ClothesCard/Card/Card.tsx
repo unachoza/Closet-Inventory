@@ -9,31 +9,32 @@ interface CardProps {
 	onRemoveItem?: (id: string) => void;
 }
 
-/** Geometry the growing modal animates through (start = card rect, end = centered). */
+/** Geometry the growing modal animates through (start = card rect, end = centered).
+ *  Height is intentionally omitted from the centered state — the modal grows to
+ *  fit its content (bounded by CSS max-height / min-height). */
 interface Geometry {
 	top: number;
 	left: number;
 	width: number;
-	height: number;
+	height?: number;
 }
 
-const DESKTOP_MODAL_MAX_WIDTH = 560;
-const DESKTOP_MODAL_MAX_HEIGHT = 740;
+const DESKTOP_MODAL_MAX_WIDTH = 500;
 const MOBILE_BREAKPOINT = 768;
 
 function prefersReducedMotion(): boolean {
 	return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** Centered resting geometry for the details modal — near-fullscreen on phones. */
+/** Centered resting geometry for the details modal — near-fullscreen on phones.
+ *  Height is omitted so the modal sizes to its content (CSS handles max/min). */
 function centeredGeometry(): Geometry {
 	const isSmall = window.innerWidth <= MOBILE_BREAKPOINT;
 	const width = isSmall ? window.innerWidth * 0.94 : Math.min(DESKTOP_MODAL_MAX_WIDTH, window.innerWidth * 0.92);
-	const height = isSmall ? window.innerHeight * 0.88 : Math.min(DESKTOP_MODAL_MAX_HEIGHT, window.innerHeight * 0.86);
 	return {
 		width,
-		height,
-		top: (window.innerHeight - height) / 2,
+		// top: 50vh — CSS translateY(-50%) on the --centered class handles true vertical centering.
+		top: window.innerHeight * 0.5,
 		left: (window.innerWidth - width) / 2,
 	};
 }
@@ -152,8 +153,8 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 			{expanded && geometry && (
 				<div className={`card-modal-overlay ${closing ? "card-modal-overlay--closing" : ""}`} onClick={handleClose}>
 					<div
-						className="card-grow-modal"
-						style={{ top: geometry.top, left: geometry.left, width: geometry.width, height: geometry.height }}
+						className={`card-grow-modal${!closing ? " card-grow-modal--centered" : ""}`}
+						style={{ top: geometry.top, left: geometry.left, width: geometry.width, ...(geometry.height !== undefined && { height: geometry.height }) }}
 						onClick={(e) => e.stopPropagation()}
 						onTransitionEnd={handleModalTransitionEnd}
 					>
