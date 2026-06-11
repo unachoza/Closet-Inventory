@@ -153,8 +153,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 											<br />
 										</>
 									)}
-									{identityParts.join(" · ")}
-									{!purchasedLabel && item.age ? (identityParts.length ? ` · ${item.age}` : item.age) : ""}
+									<p className="card-details__identity-text">Condition: {item.condition}
+										</p>
+									<p className="card-details__identity-text">
+										Price: {item.price}</p>
+							
 								</p>
 							</div>
 						)}
