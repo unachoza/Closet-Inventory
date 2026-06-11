@@ -6,6 +6,7 @@ import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import type { AdvancedSearchParams, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
+import { normalizeMaterial } from "../../utils/materialUtils";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
 import normalizeColor from "../../utils/normalizeColors";
 import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
@@ -119,7 +120,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 		onSourceEmailChange?.(selectedEmailId);
 		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from, selectedEmail.date);
-		onImport(prefilled);
+		onImport({ ...prefilled, material: normalizeMaterial(prefilled.material) });
 	}, [selectedEmail, selectedEmailId, onImport, onSourceEmailChange]);
 
 	const handleImportProduct = useCallback(
@@ -141,7 +142,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				// scan the item name (e.g. "Babaton Deep Taupe ... Dress" → Brown).
 				color: product.color || normalizeColor(extractColorFromName(product.name)),
 				size: product.size,
-				material: product.material || emailData.material,
+				material: normalizeMaterial(product.material || emailData.material),
 				onSale: product.onSale,
 				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
 				condition: emailData.condition,
