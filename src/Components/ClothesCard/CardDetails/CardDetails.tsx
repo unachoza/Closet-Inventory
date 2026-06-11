@@ -4,7 +4,7 @@ import { normalizeMaterial } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { parseCareItems } from "../../../utils/careUtils";
-import { toAbsoluteDate } from "../../../Features/Form/EditItemView/EditItemView";
+import { toAbsoluteDate } from "../../../utils/dateUtils";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
 

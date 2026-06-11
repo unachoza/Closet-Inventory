@@ -238,9 +238,11 @@
 /* Buttons section */
 .card-details__buttons {
 	display: flex;
-	gap: 8px;
-	margin-top: auto;
-	/* padding-top: 14px; */
+   	gap: 15px;
+}
+
+.card-details__buttons > button{
+	margin: 0;
 }
 
 .card-details__button {
