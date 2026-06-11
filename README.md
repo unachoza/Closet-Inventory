@@ -171,7 +171,7 @@ business model depend on is unbuilt. Actual build order:
 
 
 1. **Mobile UI polish** (from v2.0) — touch-target audit (44×44px) and a bottom nav / "Add Item" FAB so the primary action isn't buried in the hamburger drawer.
-2. **PWA scaffolding** (pulled forward from v2.0) — `manifest.json`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen.
+2. ✅ **PWA scaffolding** (pulled forward from v2.0) — `manifest.webmanifest`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen. _Done — `vite-plugin-pwa` configured; verified against a production build._
 3. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
 
 **Cross-version dependencies:**
@@ -255,12 +255,12 @@ business model depend on is unbuilt. Actual build order:
 
 ### v3.0 — Mobile & PWA
 
-> **Active priority** (see Near-Term Priority Order). Responsive layout is done; PWA, touch-target audit, and bottom nav / "Add Item" FAB are the next mobile work.
+> **Active priority** (see Near-Term Priority Order). Responsive layout and PWA scaffolding are done; touch-target audit and bottom nav / "Add Item" FAB are the next mobile work.
 
 - ✅ Responsive layout for iPhone and Android screen sizes (29 `@media` blocks; hamburger drawer nav < 768px)
-- 🔲 PWA setup (`vite-plugin-pwa`) — `manifest.json` + service worker for "Add to Home Screen" support **(unblocks v9.0 monetization + v4.0 offline)**
-- 🔲 Full-screen launch on iOS (no Safari browser chrome)
-- 🔲 Offline support via service worker cache
+- ✅ PWA setup (`vite-plugin-pwa`) — `manifest.webmanifest` + service worker for "Add to Home Screen" support **(unblocks v9.0 monetization + v4.0 offline)**
+- ✅ Full-screen launch on iOS (`apple-mobile-web-app-capable` + `display: standalone`, no Safari browser chrome)
+- ✅ Offline support via service worker cache (Workbox app-shell precache, `autoUpdate`)
 - 🔲 Touch-friendly tap targets (min 44×44px) and swipe gestures
 - 🔲 Bottom navigation bar on mobile
 - 🔲 Camera input (`capture="environment"`) for direct photo capture on mobile
