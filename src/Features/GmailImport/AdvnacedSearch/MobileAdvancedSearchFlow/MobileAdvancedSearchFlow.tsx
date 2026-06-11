@@ -1,29 +1,29 @@
-import { useState, useRef, KeyboardEvent, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, useRef, KeyboardEvent, useEffect } from "react";
 import { X, Plus, Search, ArrowRight, ArrowLeft, Check, User, Tag, SlidersHorizontal, EyeOff } from "lucide-react";
 import "./MobileAdvancedSearchFlow.css";
 
 /* ─── Default data ─── */
-const DEFAULT_SUBJECTS = [
-	"Thank you for your purchase",
-	"Thanks for your purchase",
-	"Order Confirmation",
-	"Your order has shipped",
-	"Receipt for your purchase",
-];
+// const DEFAULT_SUBJECTS = [
+// 	"Thank you for your purchase",
+// 	"Thanks for your purchase",
+// 	"Order Confirmation",
+// 	"Your order has shipped",
+// 	"Receipt for your purchase",
+// ];
 
-const DEFAULT_KEYWORDS = [
-	"order",
-	"receipt",
-	"purchase",
-	"shipping confirmation",
-	"invoice",
-	"Your Order Summary",
-	"package has been shipped",
-	"order is being processed",
-	"See your order details",
-	"Check order Status",
-	"Order Subtotal",
-];
+// const DEFAULT_KEYWORDS = [
+// 	"order",
+// 	"receipt",
+// 	"purchase",
+// 	"shipping confirmation",
+// 	"invoice",
+// 	"Your Order Summary",
+// 	"package has been shipped",
+// 	"order is being processed",
+// 	"See your order details",
+// 	"Check order Status",
+// 	"Order Subtotal",
+// ];
 
 /* ─── Steps config ─── */
 const STEPS = [
@@ -375,11 +375,7 @@ export function MobileSearchWizard({
 							>
 								<ArrowLeft size={16} />
 							</button>
-							<button
-								className="sw-btn sw-btn--success"
-								onClick={() => onSearch("fetch")}
-								disabled={loading}
-							>
+							<button className="sw-btn sw-btn--success" onClick={() => onSearch("fetch")} disabled={loading}>
 								<Search size={14} />
 								{loading ? "Searching..." : "New Search"}
 							</button>

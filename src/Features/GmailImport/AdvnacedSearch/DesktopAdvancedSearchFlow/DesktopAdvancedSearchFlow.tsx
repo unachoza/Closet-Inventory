@@ -1,27 +1,27 @@
-import { useState, useRef, KeyboardEvent, useEffect } from "react";
+import { useState, KeyboardEvent, useEffect } from "react";
 import { X, Plus, Search, Check, User, Tag, SlidersHorizontal, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
 import "./DesktopAdvancedSearchFlow.css";
 
-const DEFAULT_SUBJECTS = [
-	"Thank you for your purchase",
-	"Thanks for your purchase",
-	"Order Confirmation",
-	"Your order has shipped",
-	"Receipt for your purchase",
-];
-const DEFAULT_KEYWORDS = [
-	"order",
-	"receipt",
-	"purchase",
-	"shipping confirmation",
-	"invoice",
-	"Your Order Summary",
-	"package has been shipped",
-	"order is being processed",
-	"See your order details",
-	"Check order Status",
-	"Order Subtotal",
-];
+// const DEFAULT_SUBJECTS = [
+// 	"Thank you for your purchase",
+// 	"Thanks for your purchase",
+// 	"Order Confirmation",
+// 	"Your order has shipped",
+// 	"Receipt for your purchase",
+// ];
+// const DEFAULT_KEYWORDS = [
+// 	"order",
+// 	"receipt",
+// 	"purchase",
+// 	"shipping confirmation",
+// 	"invoice",
+// 	"Your Order Summary",
+// 	"package has been shipped",
+// 	"order is being processed",
+// 	"See your order details",
+// 	"Check order Status",
+// 	"Order Subtotal",
+// ];
 
 const STEPS = [
 	{ id: 0, label: "Sender & Dates", desc: "Who sent it and when", Icon: User },
