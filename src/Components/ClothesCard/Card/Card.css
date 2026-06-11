@@ -186,13 +186,21 @@ overflow: scroll;
 	box-sizing: border-box;
 	border: solid 0.5rem var(--Dark-Grey);
 	border-radius: var(--border-radius-md);
-	overflow: hidden;
+	overflow-y: auto;
 	box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
+	/* Height is content-driven; CSS owns the bounds. */
+	min-height: 300px;
+	max-height: 92dvh;
 	transition:
-		top 0.35s cubic-bezier(0.32, 0.72, 0, 1),
-		left 0.35s cubic-bezier(0.32, 0.72, 0, 1),
-		width 0.35s cubic-bezier(0.32, 0.72, 0, 1),
-		height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+		top 0.55s cubic-bezier(0.32, 0.7, 0, 1),
+		left 0.55s cubic-bezier(0.32, 0.7, 0, 1),
+		width 0.55s cubic-bezier(0.32, 0.7, 0, 1),
+		transform 0.55s cubic-bezier(0.32, 0.7, 0, 1);
+}
+
+/* When resting at center, offset upward by half own height for true vertical center. */
+.card-grow-modal--centered {
+	transform: translateY(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {

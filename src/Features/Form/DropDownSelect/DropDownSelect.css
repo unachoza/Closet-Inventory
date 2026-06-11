@@ -10,7 +10,7 @@ label {
 
 .dropdown {
 	position: relative;
-	font-family: Arial, sans-serif;
+	font-family: var(--font-ui);
 	user-select: none;
 }
 

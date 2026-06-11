@@ -76,7 +76,7 @@ body {
 
 .hero-eyebrow {
       color: var(--gold-light);
-      font-family: 'DM Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.15em;
@@ -85,7 +85,7 @@ body {
 
 .hero h1 {
       color: var(--warm-white);
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: clamp(40px, 6vw, 72px);
       font-weight: 700;
       line-height: 1.08;
@@ -114,7 +114,7 @@ body {
 .hero-stat-num {
       display: block;
       color: var(--gold-light);
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: 36px;
       font-weight: 600;
 }
@@ -238,7 +238,7 @@ button:focus-visible .toc-link.active {
       display: flex;
       align-items: center;
       color: var(--ink-60);
-      font-family: 'DM Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.18em;
@@ -255,7 +255,7 @@ button:focus-visible .toc-link.active {
 }
 
 .section-title {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: clamp(28px, 4vw, 44px);
       font-weight: 700;
       line-height: 1.15;
@@ -320,8 +320,8 @@ button:focus-visible .toc-link.active {
 .fiber-tag {
       display: inline-block;
       padding: 3px 10px;
-      border-radius: 100px;
-      font-family: 'DM Mono', monospace;
+      border-radius: var(--border-radius-pill);
+      font-family: var(--font-mono);
       font-size: 10px;
       font-weight: 400;
       text-transform: uppercase;
@@ -335,7 +335,7 @@ button:focus-visible .toc-link.active {
 .tag-synth  { background: var(--mauve-pale); color: var(--mauve); }
 
 .fiber-card h3 {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: 22px;
       font-weight: 600;
       margin-bottom: 4px;
@@ -667,7 +667,7 @@ div.weave-tabs.toc-nav > button.weave-tab:hover{
 }
 
 .weave-info h3 {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: 26px;
       font-weight: 600;
       margin-bottom: 8px;
@@ -827,7 +827,7 @@ tbody td:first-child {
 
 .source-num {
       color: var(--ink-30);
-      font-family: 'DM Mono', monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       margin-bottom: 6px;
 }
@@ -885,7 +885,7 @@ tbody td:first-child {
 }
 
 .cat-banner h2 {
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: 32px;
       font-weight: 700;
       margin-bottom: 8px;
@@ -927,7 +927,7 @@ tbody td:first-child {
 
 .footer-title {
       color: var(--warm-white);
-      font-family: 'Playfair Display', serif;
+      font-family: var(--font-display);
       font-size: 24px;
       font-weight: 600;
       margin-bottom: 12px;
@@ -1012,7 +1012,7 @@ tbody td:first-child {
 
 .stain-card__fabric {
 	margin: 0;
-	font-family: 'Playfair Display', serif;
+	font-family: var(--font-display);
 	font-size: 1.1rem;
 	font-weight: 600;
 	color: var(--ink, #1a1a1a);

@@ -342,9 +342,8 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(purchaseDate).toBeDisabled();
 		expect(purchaseDate.value).toMatch(/2018/);
 
-		// Return to Email Preview button should be visible in create mode
-		// (rendered twice due to a duplicate in EditItemView — assert at least one exists)
-		expect(screen.getAllByText(/Return to Email Preview/).length).toBeGreaterThanOrEqual(1);
+		// "Back to Email" button should be visible in create mode
+		expect(screen.getAllByText(/Back to Email/).length).toBeGreaterThanOrEqual(1);
 	});
 
 	it("clicking Import on the second product pre-populates correct data", async () => {
@@ -483,8 +482,8 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 			expect(screen.getByText("Import Item")).toBeInTheDocument();
 		});
 
-		// Click return to email preview (button is rendered twice in EditItemView — click first one)
-		fireEvent.click(screen.getAllByText(/Return to Email Preview/)[0]);
+		// Click "Back to Email" to return to the gmail preview
+		fireEvent.click(screen.getAllByText(/Back to Email/)[0]);
 
 		// Should be back on the gmail view with email list
 		await waitFor(() => {

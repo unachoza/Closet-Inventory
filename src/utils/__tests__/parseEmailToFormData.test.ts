@@ -214,6 +214,33 @@ describe("parseEmailToFormData — purchase date", () => {
 	});
 });
 
+describe("parseEmailToFormData — color extraction from subject", () => {
+	it("extracts teal from subject and normalizes to Blue", () => {
+		const result = parse("Aritzia Teal Long-Sleeve Square Neck Bodycon Dress", "", "aritzia@aritzia.com");
+		expect(result.color).toBe("Blue");
+	});
+
+	it("extracts deep taupe from subject and normalizes to Brown", () => {
+		const result = parse("Babaton Deep Taupe Contour Scoop Stretch Cami Mini Dress Medium NWT", "", "aritzia@aritzia.com");
+		expect(result.color).toBe("Brown");
+	});
+
+	it("extracts single-word color (navy) from subject", () => {
+		const result = parse("Zara Navy Blazer Size M", "", "sales@zara.com");
+		expect(result.color).toBe("Blue");
+	});
+
+	it("prefers inline 'in <color>' pattern over name scan", () => {
+		const result = parse("Silk blouse in ivory size S", "", "store@store.com");
+		expect(result.color).toBe("White");
+	});
+
+	it("leaves color empty when no color word is found", () => {
+		const result = parse("Order Confirmation #12345", "", "store@store.com");
+		expect(result.color).toBeFalsy();
+	});
+});
+
 describe("parse augmented style data", () => {
 	it("gleans style data from context clues and item name", () => {})
 	//wide leg
