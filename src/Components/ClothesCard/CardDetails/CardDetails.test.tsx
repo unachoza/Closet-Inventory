@@ -84,7 +84,6 @@ describe("CardDetails", () => {
 
 	it("full variant renders inferred Style attributes", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
-
 		expect(screen.getByText("Style")).toBeInTheDocument();
 		// neckline · sleeve on one line, construction descriptors on another
 		expect(screen.getByText(/crew neck · long sleeve/i)).toBeInTheDocument();
@@ -99,10 +98,11 @@ describe("CardDetails", () => {
 		expect(screen.getByText("Pockets")).toBeInTheDocument();
 	});
 
-	it("full variant renders Identity with condition + season, no leaked template text", () => {
+	it("full variant renders Identity with condition + price, no leaked template text", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
 
-		expect(screen.getByText(/fall · like new · \$40/i)).toBeInTheDocument();
+		expect(screen.getByText(/condition: like new/i)).toBeInTheDocument();
+		expect(screen.getByText(/price: \$40/i)).toBeInTheDocument();
 		// Regression guard: the old buggy block leaked a raw backtick + "$".
 		expect(screen.queryByText(/purchaseDate/)).not.toBeInTheDocument();
 		expect(screen.queryByText(/formatItemAge/)).not.toBeInTheDocument();

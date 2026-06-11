@@ -46,7 +46,7 @@ function toDateInputValue(iso?: string): string {
 	return d.toISOString().slice(0, 10);
 }
 
-export { toAbsoluteDate } from "../../../utils/dateUtils";
+import { toAbsoluteDate } from "../../../utils/dateUtils";
 
 export interface EditItemViewProps {
 	item: ClothingItem;
