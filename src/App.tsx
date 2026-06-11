@@ -17,7 +17,7 @@ import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
-import { OnboardingOption3 } from "./Features/Onboarding/InteractiveOnboarding";
+import { OnboardingExpanded } from "./Features/Onboarding/SevenStepOnboarding";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -147,7 +147,7 @@ function AppShell() {
 	}
 
 	if (showOnboarding) {
-		return <OnboardingOption3 onComplete={handleComplete} />;
+		return <OnboardingExpanded onComplete={handleComplete} />;
 	}
 	return (
 		<div className="main">

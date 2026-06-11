@@ -1,0 +1,973 @@
+/* ─── Design tokens ───────────────────────────────────────────────────────────
+   Mapped to the closet's dark, navy, glassy vibe. All scoped to .ob-root so
+   nothing leaks into the rest of the app. */
+.ob-root {
+  color: #ffffff;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* Theme tokens the markup relies on (previously undefined → silently dead). */
+  --background: rgba(0, 0, 0, 0.45);     /* scrim over the fixed closet photo */
+  --foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.18);
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --primary: rgb(19, 17, 146);           /* navy — matches the closet */
+  --primary-hover: rgb(14, 13, 110);
+  --primary-foreground: #ffffff;
+
+  --app-bg: #0c0c10;
+
+  /* Accent (was bright #2563eb) → navy to match the closet primary.
+     --blue is the FILL/border navy; --blue-text is a legible light variant
+     for text/icons (navy-on-near-black would be unreadable). */
+  --blue: rgb(19, 17, 146);
+  --blue-text: rgb(165, 180, 252);
+  --blue-faint: rgba(19, 17, 146, 0.16);
+  --blue-border: rgba(19, 17, 146, 0.5);
+  --blue-dim: rgba(19, 17, 146, 0.35);
+  --white-90: rgba(255, 255, 255, 0.9);
+  --white-80: rgba(255, 255, 255, 0.8);
+  --white-70: rgba(255, 255, 255, 0.7);
+  --white-60: rgba(255, 255, 255, 0.6);
+  --white-50: rgba(255, 255, 255, 0.5);
+  --white-40: rgba(255, 255, 255, 0.4);
+  --white-30: rgba(255, 255, 255, 0.3);
+  --white-20: rgba(255, 255, 255, 0.2);
+  --white-10: rgba(255, 255, 255, 0.1);
+  --white-08: rgba(255, 255, 255, 0.08);
+  --white-05: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --green: #16a34a;
+  --green-faint: rgba(22, 163, 74, 0.8);
+}
+
+/* ─── Page layout ────────────────────────────────────────────────────────────── */
+.ob-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--background);
+}
+
+.ob-container {
+  width: 100%;
+  max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  /* Frosted-glass card matching the closet's panels. */
+  padding: 1.75rem 1.5rem;
+  background: var(--Soft-Black, #141313a7);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--box-shadow, .5rem .75rem 2rem .75rem rgba(0, 0, 0, 0.875));
+  backdrop-filter: var(--blur, blur(.6rem));
+}
+
+/* ─── Progress bar ───────────────────────────────────────────────────────────── */
+.ob-progress {
+  display: flex;
+  gap: 4px;
+}
+
+.ob-progress-seg {
+  height: 4px;
+  flex: 1;
+  border-radius: 9999px;
+  transition: background-color 0.5s;
+  background: var(--muted);
+}
+
+.ob-progress-seg--done {
+  background: var(--foreground);
+}
+
+.ob-progress-seg--active {
+  background: color-mix(in srgb, var(--foreground) 50%, transparent);
+}
+
+/* ─── Demo shell ─────────────────────────────────────────────────────────────── */
+.ob-demo-shell {
+  height: 16rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--app-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Content block ──────────────────────────────────────────────────────────── */
+.ob-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ob-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ob-group-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.ob-step-label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.ob-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ob-description {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* ─── Navigation row ─────────────────────────────────────────────────────────── */
+.ob-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ob-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.ob-back-btn:hover {
+  color: var(--foreground);
+}
+
+.ob-back-btn--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ob-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ob-skip-btn {
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.ob-skip-btn:hover {
+  color: var(--foreground);
+}
+
+.ob-next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.ob-next-btn:hover {
+  opacity: 0.9;
+}
+
+/* ─── Shared within demos ────────────────────────────────────────────────────── */
+.ob-caps {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-40);
+}
+
+.ob-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+}
+
+/* ─── Step 1: Main menu ──────────────────────────────────────────────────────── */
+.ob-menu {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ob-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  transition: all 0.5s;
+  color: var(--white-70);
+  flex-shrink: 0;
+}
+
+.ob-menu-item--highlight {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--white-05);
+  animation: pulse-opacity 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.ob-menu-item--tapped {
+  border-color: var(--blue-text);
+  background: var(--blue-faint);
+  transform: scale(1.02);
+  animation: none;
+}
+
+.ob-menu-icon {
+  width: 16px;
+  height: 16px;
+  margin-bottom: 2px;
+}
+
+.ob-menu-label {
+  font-size: 0.75rem;
+}
+
+/* ─── Step 2: Email list ─────────────────────────────────────────────────────── */
+.ob-email-wrap {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.ob-email-header {
+  color: var(--blue-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.ob-email-list {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-email-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.4s, transform 0.4s, border-color 0.2s, background 0.2s;
+}
+
+.ob-email-row--checked {
+  border-color: var(--blue-border);
+  background: var(--blue-faint);
+}
+
+.ob-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid var(--white-30);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.ob-checkbox--checked {
+  background: var(--blue);
+  border-color: var(--blue-text);
+}
+
+.ob-email-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ob-email-sender {
+  color: var(--white-90);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ob-email-subject {
+  color: var(--white-60);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ob-email-preview {
+  color: var(--white-30);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Step 3: Parsed items ───────────────────────────────────────────────────── */
+.ob-items-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ob-items-scroll {
+  flex: 1;
+  overflow: hidden;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-items-header {
+  color: var(--blue-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.ob-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  transition: opacity 0.3s, border-color 0.2s;
+}
+
+.ob-item-row--imported {
+  border-color: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  opacity: 0.5;
+}
+
+.ob-item-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ob-item-thumb-inner {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--white-10);
+}
+
+.ob-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ob-item-name {
+  color: var(--white-90);
+  font-size: 0.75rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ob-item-price {
+  color: var(--blue-text);
+  font-size: 0.75rem;
+}
+
+.ob-item-size {
+  color: var(--white-30);
+}
+
+.ob-item-color {
+  color: var(--white-30);
+  font-size: 0.75rem;
+}
+
+.ob-import-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: var(--blue);
+  color: #fff;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ob-import-btn--done {
+  background: var(--white-10);
+  color: var(--white-30);
+}
+
+.ob-import-all-bar {
+  flex-shrink: 0;
+  padding: 12px;
+  border-top: 1px solid var(--white-10);
+}
+
+.ob-import-all-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: var(--blue);
+  color: #fff;
+  transition: background 0.3s;
+}
+
+.ob-import-all-btn--done {
+  background: var(--green-faint);
+}
+
+/* ─── Step 4: Review form ────────────────────────────────────────────────────── */
+.ob-form-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ob-form-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 6px;
+  flex-shrink: 0;
+}
+
+.ob-form-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--blue-text);
+  font-size: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ob-form-counter {
+  color: var(--white-40);
+  font-size: 0.75rem;
+}
+
+.ob-form-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--white-40);
+  display: flex;
+  align-items: center;
+}
+
+.ob-form-thumb-row {
+  padding: 0 12px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ob-form-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #78716c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ob-form-thumb-inner {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--white-10);
+}
+
+.ob-form-hint {
+  color: var(--white-50);
+  font-size: 0.75rem;
+}
+
+.ob-fields-grid {
+  flex: 1;
+  overflow: hidden;
+  padding: 0 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-content: start;
+}
+
+.ob-field-btn {
+  text-align: left;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ob-field-btn--editing {
+  border-color: var(--blue-border);
+  background: var(--blue-faint);
+}
+
+.ob-field-value {
+  font-size: 0.75rem;
+  margin-top: 2px;
+  color: var(--white-80);
+}
+
+.ob-field-value--editing {
+  color: var(--blue-text);
+}
+
+.ob-form-actions {
+  padding: 8px 12px 12px;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ob-add-btn {
+  flex: 1;
+  padding: 8px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ob-skip-item-btn {
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  color: var(--white-60);
+  border: 1px solid var(--white-20);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ─── Step 5: Manual form ────────────────────────────────────────────────────── */
+.ob-manual-wrap {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.ob-pills {
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ob-pill {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  transition: all 0.3s;
+  background: var(--white-08);
+  color: var(--white-40);
+}
+
+.ob-pill--active {
+  background: var(--blue);
+  color: #fff;
+}
+
+.ob-pill--done {
+  background: var(--blue-dim);
+  color: var(--blue-text);
+}
+
+.ob-manual-body {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ob-photo-drop {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ob-photo-drop-inner {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  border: 2px dashed var(--white-20);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--white-20);
+}
+
+.ob-photo-label {
+  font-size: 0.75rem;
+  color: var(--white-30);
+}
+
+.ob-field-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.ob-fake-input {
+  height: 32px;
+  background: var(--white-08);
+  border: 1px solid var(--white-10);
+  border-radius: 8px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--white-80);
+}
+
+.ob-fake-textarea {
+  height: 48px;
+  background: var(--white-08);
+  border: 1px solid var(--white-10);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  color: var(--white-30);
+}
+
+.ob-cat-options {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.ob-cat-option {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  color: var(--white-60);
+}
+
+.ob-cat-option--active {
+  background: var(--blue);
+  border-color: var(--blue-text);
+  color: #fff;
+}
+
+/* ─── Step 6: Search & filter ────────────────────────────────────────────────── */
+.ob-search-wrap {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.ob-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.ob-search-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--white-40);
+  flex-shrink: 0;
+}
+
+.ob-search-text {
+  font-size: 0.875rem;
+  color: var(--white-40);
+  flex: 1;
+}
+
+.ob-search-count {
+  font-size: 0.75rem;
+  color: var(--blue-text);
+  font-weight: 500;
+}
+
+.ob-filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.ob-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
+.ob-chip-x {
+  width: 10px;
+  height: 10px;
+}
+
+.ob-closet-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+
+.ob-closet-card {
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ob-closet-card-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.ob-closet-card-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--white-10);
+}
+
+.ob-closet-card-label {
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--white-60);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Step 7: Fabric guide ───────────────────────────────────────────────────── */
+.ob-fabric-wrap {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.ob-fabric-tabs {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ob-fabric-tab {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--white-10);
+  background: var(--white-08);
+  color: var(--white-50);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.ob-fabric-tab--active {
+  background: var(--blue);
+  border-color: var(--blue-text);
+  color: #fff;
+}
+
+.ob-fabric-card {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.ob-fabric-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ob-bar-track {
+  height: 12px;
+  background: var(--white-10);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.ob-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s;
+}
+
+.ob-bar-legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.ob-bar-legend span {
+  font-size: 0.75rem;
+  color: var(--white-40);
+}
+
+.ob-care-text {
+  font-size: 0.75rem;
+  color: var(--white-70);
+}
+
+.ob-mini-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-mini-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ob-mini-bar-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ob-mini-bar-header span {
+  font-size: 0.75rem;
+  color: var(--white-40);
+}
+
+.ob-mini-track {
+  height: 6px;
+  background: var(--white-10);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.ob-mini-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s;
+}

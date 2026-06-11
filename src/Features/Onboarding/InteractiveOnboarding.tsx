@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronRight, Mail, Search } from "lucide-react";
+import {
+	ChevronRight, ChevronLeft, Mail, Search, Check, Edit3, Plus, Sparkles, Download, LayoutGrid, Scissors, Activity, ArrowLeft, SkipBack, Upload, FileDown, FileUp, X } from "lucide-react";
 
 import "./InteractiveOnboardingV2.css";
 
