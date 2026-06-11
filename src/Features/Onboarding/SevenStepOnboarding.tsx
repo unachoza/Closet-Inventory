@@ -17,7 +17,7 @@ import {
 	X,
 } from "lucide-react";
 import "./SevenStepsOnboarding.css";
-import WardrobeLogo from "../../assets/WardrobeLogo.png";
+import WardrobeLogo from "../../assets/Logo.png";
 
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
