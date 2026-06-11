@@ -55,6 +55,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	skirt: "bottoms",
 	pant: "bottoms",
 	jean: "bottoms",
+	culottes: "bottoms",
 	trouser: "bottoms",
 	short: "bottoms",
 	top: "tops",
@@ -71,15 +72,23 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	blazer: "coats",
 	bra: "lingerie",
 	lingerie: "lingerie",
+	plunge: "lingerie",
+	balconette: "lingerie",
+	demi: "lingerie",
+	scoop: "lingerie",
+	racerback: "lingerie",
+	underwire: "lingerie",
+	padded: "lingerie",
+	unpadded: "lingerie",
 	sock: "socks",
+	tights: "socks",
 	underwear: "underwear",
 	legging: "active",
 	sports: "active",
 	bodysuit: "body",
 	jumpsuit: "body",
 	skort: "bottoms",
-	balconette: "lingerie",
-	plunge: "lingerie",
+	cheeky: "underwear",
 	thong: "underwear",
 	briefs: "underwear",
 	brief: "underwear",
@@ -87,14 +96,20 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	bikini: "lingerie",
 	teddy: "lingerie",
 	intimate: "lingerie",
-	boots: "shoes",
-	loafers: "shoes",
+	shoe: "shoes",
+	boot: "shoes",
+	loafer: "shoes",
 	slipper: "shoes",
 	sandal: "shoes",
 	sneaker: "shoes",
 	heel: "shoes",
 	flat: "shoes",
 	mule: "shoes",
+	slingback: "shoes",
+	pump: "shoes",
+	wedge: "shoes",
+	clog: "shoes",
+	platform: "shoes",
 };
 
 function extractBrand(text: string, from: string): string {
@@ -115,6 +130,11 @@ function extractCategory(text: string): string {
 		}
 	}
 	return "";
+}
+
+/** Returns the clothing category for a product name, or "" if none matches. */
+export function categoryFromName(name: string): string {
+	return extractCategory(name);
 }
 
 function stripHtml(html: string): string {

@@ -29,6 +29,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 	const {
 		emails,
 		isSearching,
+		isFetchingMore,
 		error: searchError,
 		searchEmails,
 		fetchNextPage,
@@ -255,15 +256,22 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 							)}
 						</h3>
 						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} />
+						{isFetchingMore && (
+							<>
+								<div className="gmail-skeleton-row" aria-hidden="true" />
+								<div className="gmail-skeleton-row" aria-hidden="true" />
+								<div className="gmail-skeleton-row" aria-hidden="true" />
+							</>
+						)}
 						{hasNextPage && (
 							<button
 								className="gmail-search-btn"
 								onClick={handleNextPage}
-								disabled={isSearching}
+								disabled={isFetchingMore}
 								type="button"
 								style={{ marginTop: "var(--spacing-100)", width: "100%" }}
 							>
-								Load More
+								{isFetchingMore ? "Loading..." : "Load More"}
 							</button>
 						)}
 					</div>
