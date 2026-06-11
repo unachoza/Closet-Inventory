@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
+import { ProductAttributes } from "../utils/inferProductAttributes";
 
 export interface MaterialBlend {
 	material: string;
@@ -25,6 +26,7 @@ export type ClothingItem = {
 	care: string | string[];
 	onSale?: boolean;
 	notes?: string | string[];
+	style?: ProductAttributes;
 	[key: string]: any;
 };
 

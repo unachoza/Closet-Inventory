@@ -11,6 +11,15 @@ const mockAddFullItem = vi.fn();
 const mockShowToast = vi.fn();
 const mockSetView = vi.fn();
 
+vi.mock("../TextInput/TextInput", () => ({
+	default: ({ name, label, value, handleFormUpdate }: any) => (
+		<label>
+			{label}
+			<input aria-label={label} name={name} value={value ?? ""} onChange={handleFormUpdate} />
+		</label>
+	),
+}));
+
 vi.mock("../../../hooks/useLocalCloset", () => ({
 	useLocalStorageCloset: () => ({
 		updateItem: mockUpdateItem,
@@ -38,7 +47,7 @@ const mockItem = {
 
 	material: [{ material: "cotton", percentage: 100 }],
 
-	occasion: "Casual",
+	occasion: "casual",
 	age: "",
 	condition: "good",
 	purchaseDate: "2024-03-15T00:00:00.000Z",
@@ -94,9 +103,7 @@ describe("EditItemView", () => {
 	it("persists condition and purchaseDate when adding an imported item to the closet", () => {
 		render(<EditItemView item={mockItem} setView={mockSetView} mode="create" />);
 		fireEvent.click(screen.getByText("Add to Closet"));
-		expect(mockAddFullItem).toHaveBeenCalledWith(
-			expect.objectContaining({ condition: "good", purchaseDate: "2024-03-15T00:00:00.000Z" }),
-		);
+		expect(mockAddFullItem).toHaveBeenCalledWith(expect.objectContaining({ condition: "good", purchaseDate: "2024-03-15T00:00:00.000Z" }));
 	});
 
 	it("calls updateItem with updated values on form submission", () => {

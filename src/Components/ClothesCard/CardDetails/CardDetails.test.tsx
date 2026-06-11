@@ -68,4 +68,50 @@ describe("CardDetails", () => {
 
 		expect(onClose).toHaveBeenCalledTimes(1);
 	});
+
+	// ── Inferred style attributes (populated during email import) ──
+	const styledItem: ClothingItem = {
+		...item,
+		neckline: "crew neck",
+		sleeveLength: "long sleeve",
+		fit: "relaxed",
+		pattern: "ribbed",
+		hasStretch: true,
+		hasPockets: true,
+		condition: "like new",
+		season: "fall",
+	};
+
+	it("full variant renders inferred Style attributes", () => {
+		render(<CardDetails item={styledItem} variant="full" />);
+		expect(screen.getByText("Style")).toBeInTheDocument();
+		// neckline · sleeve on one line, construction descriptors on another
+		expect(screen.getByText(/crew neck · long sleeve/i)).toBeInTheDocument();
+		expect(screen.getByText(/relaxed · ribbed/i)).toBeInTheDocument();
+	});
+
+	it("full variant renders Features pills for boolean attributes", () => {
+		render(<CardDetails item={styledItem} variant="full" />);
+
+		expect(screen.getByText("Features")).toBeInTheDocument();
+		expect(screen.getByText("Stretch")).toBeInTheDocument();
+		expect(screen.getByText("Pockets")).toBeInTheDocument();
+	});
+
+	it("full variant renders Identity with condition + price, no leaked template text", () => {
+		render(<CardDetails item={styledItem} variant="full" />);
+
+		expect(screen.getByText(/condition: like new/i)).toBeInTheDocument();
+		expect(screen.getByText(/price: \$40/i)).toBeInTheDocument();
+		// Regression guard: the old buggy block leaked a raw backtick + "$".
+		expect(screen.queryByText(/purchaseDate/)).not.toBeInTheDocument();
+		expect(screen.queryByText(/formatItemAge/)).not.toBeInTheDocument();
+	});
+
+	it("hides Style and Features sections when no attributes were inferred", () => {
+		render(<CardDetails item={item} variant="full" />);
+
+		expect(screen.queryByText("Style")).not.toBeInTheDocument();
+		expect(screen.queryByText("Features")).not.toBeInTheDocument();
+	});
 });

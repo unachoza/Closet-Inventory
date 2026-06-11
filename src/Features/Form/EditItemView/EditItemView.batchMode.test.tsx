@@ -10,6 +10,21 @@ import EditItemView from "./EditItemView";
 vi.mock("framer-motion");
 import type { ClothingItem } from "../../../utils/types";
 
+vi.mock("framer-motion", async () => {
+	const React = await import("react");
+	const makeEl = (tag: string) =>
+		React.forwardRef(({ children, animate, initial, exit, transition, variants, whileHover, whileTap, whileFocus, whileInView, layout, layoutId, ...rest }: any, ref: any) =>
+			React.createElement(tag, { ...rest, ref }, children),
+		);
+	return {
+		motion: new Proxy({}, { get: (_t: any, tag: string) => makeEl(tag) }),
+		AnimatePresence: ({ children }: any) => children,
+		useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
+		useMotionValue: (v: unknown) => ({ get: () => v, set: vi.fn() }),
+		useTransform: (v: unknown) => v,
+	};
+});
+
 const mockAddFullItem = vi.fn();
 const mockShowToast = vi.fn();
 const mockSetView = vi.fn();
