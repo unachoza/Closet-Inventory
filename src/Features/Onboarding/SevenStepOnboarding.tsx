@@ -511,10 +511,92 @@ function Step7Demo() {
 	);
 }
 
+// ─── Step 2b: Advanced search demo ─────────────────────────────────────────────
+
+const ADV_NAV = ["Sender", "Dates", "Keywords", "Exclude"];
+const ADV_SENDER = "zara.com";
+const ADV_TAGS = ["Order Confirmation", "Thanks for purchase"];
+
+function StepAdvancedSearchDemo() {
+	const [senderText, setSenderText] = useState("");
+	const [tags, setTags] = useState<string[]>([]);
+	const [highlightSearch, setHighlightSearch] = useState(false);
+	const [activeNav, setActiveNav] = useState(0);
+
+	useEffect(() => {
+		const senderTimers = [...ADV_SENDER].map((_, i) =>
+			setTimeout(() => setSenderText(ADV_SENDER.slice(0, i + 1)), 500 + i * 90),
+		);
+		const t1 = setTimeout(() => { setActiveNav(1); }, 1400);
+		const t2 = setTimeout(() => { setActiveNav(2); setTags([ADV_TAGS[0]]); }, 2000);
+		const t3 = setTimeout(() => setTags([...ADV_TAGS]), 2600);
+		const t4 = setTimeout(() => setHighlightSearch(true), 3000);
+		return () => { senderTimers.forEach(clearTimeout); [t1, t2, t3, t4].forEach(clearTimeout); };
+	}, []);
+
+	return (
+		<div className="ob-demo-shell ob-adv-root">
+			<div className="ob-adv-header">
+				<Search size={13} className="ob-adv-header-icon" />
+				<span className="ob-adv-header-title">Advanced Email Search</span>
+			</div>
+
+			<div className="ob-adv-body">
+				<nav className="ob-adv-sidebar">
+					{ADV_NAV.map((label, i) => {
+						const isDone = i < activeNav;
+						const isActive = i === activeNav;
+						return (
+							<div
+								key={label}
+								className={`ob-adv-nav-item${isActive ? " ob-adv-nav-item--active" : ""}${isDone ? " ob-adv-nav-item--done" : ""}`}
+							>
+								<div className={`ob-adv-nav-dot${isActive ? " ob-adv-nav-dot--active" : ""}${isDone ? " ob-adv-nav-dot--done" : ""}`}>
+									{isDone && <Check size={8} />}
+								</div>
+								<span className="ob-adv-nav-label">{label}</span>
+								{i === 0 && senderText && <span className="ob-adv-nav-badge">1</span>}
+								{i === 2 && tags.length > 0 && <span className="ob-adv-nav-badge">{tags.length}</span>}
+							</div>
+						);
+					})}
+				</nav>
+
+				<div className="ob-adv-content">
+					<div className="ob-caps">From sender</div>
+					<div className="ob-adv-input">
+						<span>{senderText}</span>
+						<span className={`ob-adv-cursor${senderText === ADV_SENDER ? " ob-adv-cursor--hidden" : ""}`} />
+					</div>
+
+					{tags.length > 0 && (
+						<>
+							<div className="ob-caps ob-adv-tags-label">Subjects</div>
+							<div className="ob-adv-tags">
+								{tags.map((t) => (
+									<span key={t} className="ob-adv-tag">
+										{t}
+									</span>
+								))}
+							</div>
+						</>
+					)}
+				</div>
+			</div>
+
+			<div className="ob-adv-footer">
+				<button className="ob-adv-btn ob-adv-btn--ghost">Filter (12)</button>
+				<button className={`ob-adv-btn ob-adv-btn--primary${highlightSearch ? " ob-adv-btn--pulse" : ""}`}>
+					<Search size={11} /> New Search
+				</button>
+			</div>
+		</div>
+	);
+}
+
 // ─── Step definitions ───────────────────────────────────────────────────────────
 
 type StepDef = {
-	badge: string;
 	group: string;
 	groupStyle: React.CSSProperties;
 	title: string;
@@ -522,44 +604,53 @@ type StepDef = {
 	demo: React.ReactNode;
 };
 
+const EMAIL_IMPORT_STYLE: React.CSSProperties = {
+	background: "rgba(19,17,146,0.30)",
+	color: "rgb(199,210,254)",
+	border: "1px solid rgba(199,210,254,0.25)",
+};
+
 const STEPS: StepDef[] = [
 	{
-		badge: "Step 1 of 7",
 		group: "Email Import",
-		groupStyle: { background: "rgba(19,17,146,0.30)", color: "rgb(199,210,254)", border: "1px solid rgba(199,210,254,0.25)" },
+		groupStyle: EMAIL_IMPORT_STYLE,
 		title: "Connect your Gmail",
 		description: "Tap 'Import Gmail' from the main menu. Closet Inventory reads only order confirmation emails — nothing personal, never.",
 		demo: <Step1Demo />,
 	},
 	{
-		badge: "Step 2 of 7",
 		group: "Email Import",
-		groupStyle: { background: "rgba(19,17,146,0.30)", color: "rgb(199,210,254)", border: "1px solid rgba(199,210,254,0.25)" },
+		groupStyle: EMAIL_IMPORT_STYLE,
+		title: "Narrow your search",
+		description:
+			"Use Advanced Search to filter by sender, date range, subject patterns, or body keywords — then choose 'New Search' to fetch fresh results or 'Filter Existing' to slice what's already cached.",
+		demo: <StepAdvancedSearchDemo />,
+	},
+	{
+		group: "Email Import",
+		groupStyle: EMAIL_IMPORT_STYLE,
 		title: "We find your purchases",
 		description:
 			"The app scans your inbox and surfaces order confirmations. Found 100 emails? You'll see them all listed here ready to select.",
 		demo: <Step2Demo />,
 	},
 	{
-		badge: "Step 3 of 7",
 		group: "Email Import",
-		groupStyle: { background: "rgba(19,17,146,0.30)", color: "rgb(199,210,254)", border: "1px solid rgba(199,210,254,0.25)" },
+		groupStyle: EMAIL_IMPORT_STYLE,
 		title: "Pick items to import",
 		description:
 			"Import one item at a time or hit 'Import All' to bring everything in at once. Each order is parsed into individual garments.",
 		demo: <Step3Demo />,
 	},
 	{
-		badge: "Step 4 of 7",
 		group: "Email Import",
-		groupStyle: { background: "rgba(19,17,146,0.30)", color: "rgb(199,210,254)", border: "1px solid rgba(199,210,254,0.25)" },
+		groupStyle: EMAIL_IMPORT_STYLE,
 		title: "Review the parsed details",
 		description:
 			"Name, category, color, size, brand, and price is extracted from each order. Tap any field to correct it before adding to your closet.",
 		demo: <Step4Demo />,
 	},
 	{
-		badge: "Step 5 of 7",
 		group: "Manual Entry",
 		groupStyle: { background: "rgba(245,158,11,0.15)", color: "rgb(251,191,36)", border: "1px solid rgba(245,158,11,0.2)" },
 		title: "Add items manually too",
@@ -568,7 +659,6 @@ const STEPS: StepDef[] = [
 		demo: <Step5Demo />,
 	},
 	{
-		badge: "Step 6 of 7",
 		group: "Search & Filter",
 		groupStyle: { background: "rgba(168,85,247,0.15)", color: "rgb(192,132,252)", border: "1px solid rgba(168,85,247,0.2)" },
 		title: "Find anything instantly",
@@ -577,7 +667,6 @@ const STEPS: StepDef[] = [
 		demo: <Step6Demo />,
 	},
 	{
-		badge: "Step 7 of 7",
 		group: "Fabric Guide",
 		groupStyle: { background: "rgba(34,197,94,0.15)", color: "rgb(74,222,128)", border: "1px solid rgba(34,197,94,0.2)" },
 		title: "Know how to care for it",
@@ -616,7 +705,7 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 						<span className="ob-group-badge" style={step.groupStyle}>
 							{step.group}
 						</span>
-						<span className="ob-step-label">{step.badge}</span>
+						<span className="ob-step-label">Step {currentStep + 1} of {STEPS.length}</span>
 					</div>
 					<h2 className="ob-title">{step.title}</h2>
 					<p className="ob-description">{step.description}</p>

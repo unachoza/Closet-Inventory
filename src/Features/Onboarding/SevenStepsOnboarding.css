@@ -274,7 +274,216 @@
   font-size: 0.75rem;
 }
 
-/* ─── Step 2: Email list ─────────────────────────────────────────────────────── */
+/* ─── Step 2: Advanced search demo ──────────────────────────────────────────── */
+.ob-adv-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ob-adv-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--white-08);
+  flex-shrink: 0;
+}
+
+.ob-adv-header-icon {
+  color: var(--blue-text);
+  flex-shrink: 0;
+}
+
+.ob-adv-header-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--white-80);
+}
+
+.ob-adv-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.ob-adv-sidebar {
+  width: 88px;
+  flex-shrink: 0;
+  background: rgba(19, 17, 146, 0.06);
+  border-right: 1px solid var(--white-08);
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ob-adv-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.ob-adv-nav-item--active { background: rgba(19, 17, 146, 0.22); }
+.ob-adv-nav-item--done   { opacity: 0.6; }
+
+.ob-adv-nav-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--white-08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white-30);
+  transition: background 0.25s;
+}
+
+.ob-adv-nav-dot--active {
+  background: var(--blue);
+  color: #fff;
+  animation: pulse-opacity 1.6s ease-in-out infinite;
+}
+
+.ob-adv-nav-dot--done {
+  background: var(--blue-dim);
+  color: var(--blue-text);
+}
+
+.ob-adv-nav-label {
+  font-size: 10px;
+  color: var(--white-40);
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ob-adv-nav-item--active .ob-adv-nav-label { color: var(--white-80); }
+
+.ob-adv-nav-badge {
+  font-size: 9px;
+  background: rgba(19, 17, 146, 0.4);
+  color: var(--blue-text);
+  border-radius: 999px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+/* Main content */
+.ob-adv-content {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ob-adv-input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  background: var(--white-05);
+  border: 1px solid var(--white-10);
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  color: var(--white-80);
+  margin-top: 5px;
+}
+
+.ob-adv-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: var(--blue-text);
+  animation: ob-blink 0.9s step-end infinite;
+}
+
+.ob-adv-cursor--hidden { opacity: 0; animation: none; }
+
+@keyframes ob-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.ob-adv-tags-label { margin-top: 8px; margin-bottom: 5px; }
+
+.ob-adv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ob-adv-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(19, 17, 146, 0.22);
+  border: 1px solid rgba(19, 17, 146, 0.45);
+  color: var(--blue-text);
+  font-size: 10px;
+  animation: ob-tag-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes ob-tag-in {
+  from { opacity: 0; transform: scale(0.75) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Footer */
+.ob-adv-footer {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--white-08);
+  flex-shrink: 0;
+}
+
+.ob-adv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: default;
+}
+
+.ob-adv-btn--ghost {
+  background: var(--white-05);
+  color: var(--white-40);
+  border: 1px solid var(--white-08);
+}
+
+.ob-adv-btn--primary {
+  background: var(--blue);
+  color: #fff;
+  flex: 1;
+  justify-content: center;
+}
+
+.ob-adv-btn--pulse {
+  animation: ob-btn-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ob-btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(19, 17, 146, 0.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(19, 17, 146, 0); }
+}
+
+/* ─── Step 3: Email list (was Step 2) ────────────────────────────────────────── */
 .ob-email-wrap {
   padding: 12px;
   display: flex;
