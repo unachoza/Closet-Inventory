@@ -27,7 +27,7 @@ const carouselLabels = [
 	"Dresses",
 	"Coats",
 	"Sweaters",
-	"Active",
+	"Athleisure",
 	"Lingerie",
 	"Socks",
 	"Underwear",

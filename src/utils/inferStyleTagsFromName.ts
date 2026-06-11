@@ -27,7 +27,7 @@ const OCCASION_MAP: [RegExp, string][] = [
 	// Sports
 	[
 		/\b(gym|yoga|athletic|sport|workout|running|cycling|activewear|training|legging|leggings)\b/i,
-		"sports",
+		"athleisure",
 	],
 
 	// Vacation
