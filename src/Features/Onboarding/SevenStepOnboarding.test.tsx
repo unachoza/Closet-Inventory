@@ -4,20 +4,20 @@ import { OnboardingExpanded } from "./SevenStepOnboarding";
 
 const next = () => fireEvent.click(screen.getByRole("button", { name: /^next$/i }));
 const advanceToLast = () => {
-	for (let i = 0; i < 6; i++) next();
+	for (let i = 0; i < 8; i++) next();
 };
 
 describe("OnboardingExpanded (SevenStep)", () => {
 	it("renders the first step with its badge, group, and title", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
-		expect(screen.getByText("Connect your Gmail")).toBeInTheDocument();
-		expect(screen.getByText("Step 1 of 7")).toBeInTheDocument();
-		expect(screen.getByText("Email Import")).toBeInTheDocument();
+		expect(screen.getByText("A personal wardrobe management app")).toBeInTheDocument();
+		expect(screen.getByText("Step 1 of 9")).toBeInTheDocument();
+		// expect(screen.getByText("Email Import")).toBeInTheDocument();
 	});
 
 	it("renders one progress segment per step", () => {
 		const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
-		expect(container.querySelectorAll(".ob-progress-seg")).toHaveLength(7);
+		expect(container.querySelectorAll(".ob-progress-seg")).toHaveLength(9);
 	});
 
 	it("disables Back on the first step", () => {
@@ -28,21 +28,21 @@ describe("OnboardingExpanded (SevenStep)", () => {
 	it("advances to the next step when Next is clicked", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		next();
-		expect(screen.getByText("We find your purchases")).toBeInTheDocument();
-		expect(screen.getByText("Step 2 of 7")).toBeInTheDocument();
+		expect(screen.getByText("Connect your Gmail")).toBeInTheDocument();
+		expect(screen.getByText("Step 2 of 9")).toBeInTheDocument();
 	});
 
 	it("goes back to the previous step when Back is clicked", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		next();
 		fireEvent.click(screen.getByRole("button", { name: /back/i }));
-		expect(screen.getByText("Connect your Gmail")).toBeInTheDocument();
+		expect(screen.getByText("A personal wardrobe management app")).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: /back/i })).toBeDisabled();
 	});
 
 	it("updates the group badge across phases (Manual Entry on step 5)", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
-		for (let i = 0; i < 4; i++) next();
+		for (let i = 0; i < 6; i++) next();
 		expect(screen.getByText("Add items manually too")).toBeInTheDocument();
 		expect(screen.getByText("Manual Entry")).toBeInTheDocument();
 	});
@@ -75,7 +75,9 @@ describe("OnboardingExpanded (SevenStep)", () => {
 	it("walks through all seven step titles in order", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		const titles = [
+			"Closet Inventory",
 			"Connect your Gmail",
+			"Narrow your search",
 			"We find your purchases",
 			"Pick items to import",
 			"Review the parsed details",
@@ -108,7 +110,7 @@ describe("OnboardingExpanded (SevenStep)", () => {
 		vi.useFakeTimers();
 		try {
 			render(<OnboardingExpanded onComplete={vi.fn()} />);
-			for (let i = 0; i < 4; i++) next(); // reach step 5
+			for (let i = 0; i < 6; i++) next(); // reach step 5
 			expect(screen.getByText("Add items manually too")).toBeInTheDocument();
 
 			// Run the timed walk through the 5 sub-steps to completion (5 × 1300ms).

@@ -22,32 +22,31 @@ import logoImg from "../../assets/WardrobeLogo.png";
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
 const welcomeFeatures = [
-  { dot: "#e8453c", text: "Import from Gmail automatically" },
-  { dot: "#2bbfb3", text: "Learn fabric care for every item" },
-  { dot: "#2563eb", text: "Search & filter your whole closet" },
+	{ dot: "#e8453c", text: "Import from Gmail automatically" },
+	{ dot: "#2bbfb3", text: "Learn fabric care for every item" },
+	{ dot: "#2563eb", text: "Search & filter your whole closet" },
 ];
 
 function WelcomeStepDemo() {
-  return (
-    <div className="ob-demo-shell ob-welcome-full">
-      <div className="ob-welcome-glow" />
-      <div className="ob-welcome-logo-wrap">
-        <img src={logoImg} alt="Closet Inventory logo" className="ob-welcome-logo" />
-      </div>
-      <div className="ob-welcome-appname">My Closet Inventory</div>
-      <div className="ob-welcome-tagline">A personal wardrobe management app</div>
-      <div className="ob-welcome-feats">
-        {welcomeFeatures.map((f) => (
-          <div key={f.text} className="ob-welcome-feat">
-            <div className="ob-welcome-feat-dot" style={{ background: f.dot }} />
-            {f.text}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+	return (
+		<div className="ob-demo-shell ob-welcome-full">
+			<div className="ob-welcome-glow" />
+			<div className="ob-welcome-logo-wrap">
+				<img src={logoImg} alt="Closet Inventory logo" className="ob-welcome-logo" />
+			</div>
+			<div className="ob-welcome-appname">My Closet Inventory</div>
+			<div className="ob-welcome-tagline">A personal wardrobe management app</div>
+			<div className="ob-welcome-feats">
+				{welcomeFeatures.map((f) => (
+					<div key={f.text} className="ob-welcome-feat">
+						<div className="ob-welcome-feat-dot" style={{ background: f.dot }} />
+						{f.text}
+					</div>
+				))}
+			</div>
+		</div>
+	);
 }
-
 
 // ─── Step 1: App menu — Import Gmail highlighted ────────────────────────────────
 
@@ -555,14 +554,20 @@ function StepAdvancedSearchDemo() {
 	const [activeNav, setActiveNav] = useState(0);
 
 	useEffect(() => {
-		const senderTimers = [...ADV_SENDER].map((_, i) =>
-			setTimeout(() => setSenderText(ADV_SENDER.slice(0, i + 1)), 500 + i * 90),
-		);
-		const t1 = setTimeout(() => { setActiveNav(1); }, 1400);
-		const t2 = setTimeout(() => { setActiveNav(2); setTags([ADV_TAGS[0]]); }, 2000);
+		const senderTimers = [...ADV_SENDER].map((_, i) => setTimeout(() => setSenderText(ADV_SENDER.slice(0, i + 1)), 500 + i * 90));
+		const t1 = setTimeout(() => {
+			setActiveNav(1);
+		}, 1400);
+		const t2 = setTimeout(() => {
+			setActiveNav(2);
+			setTags([ADV_TAGS[0]]);
+		}, 2000);
 		const t3 = setTimeout(() => setTags([...ADV_TAGS]), 2600);
 		const t4 = setTimeout(() => setHighlightSearch(true), 3000);
-		return () => { senderTimers.forEach(clearTimeout); [t1, t2, t3, t4].forEach(clearTimeout); };
+		return () => {
+			senderTimers.forEach(clearTimeout);
+			[t1, t2, t3, t4].forEach(clearTimeout);
+		};
 	}, []);
 
 	return (
@@ -582,7 +587,9 @@ function StepAdvancedSearchDemo() {
 								key={label}
 								className={`ob-adv-nav-item${isActive ? " ob-adv-nav-item--active" : ""}${isDone ? " ob-adv-nav-item--done" : ""}`}
 							>
-								<div className={`ob-adv-nav-dot${isActive ? " ob-adv-nav-dot--active" : ""}${isDone ? " ob-adv-nav-dot--done" : ""}`}>
+								<div
+									className={`ob-adv-nav-dot${isActive ? " ob-adv-nav-dot--active" : ""}${isDone ? " ob-adv-nav-dot--done" : ""}`}
+								>
 									{isDone && <Check size={8} />}
 								</div>
 								<span className="ob-adv-nav-label">{label}</span>
@@ -642,13 +649,13 @@ const EMAIL_IMPORT_STYLE: React.CSSProperties = {
 };
 
 const STEPS: StepDef[] = [
-	  {
-    group: "Welcome",
-    groupStyle: { background: "rgba(232,69,60,0.12)", color: "#e8453c", border: "1px solid rgba(232,69,60,0.25)" },
-    title: "My Closet Inventory",
-    description: "A personal wardrobe management app. Upload your closet, learn fabric care, and more!",
-    demo: <WelcomeStepDemo />,
-  },
+	{
+		group: "Welcome",
+		groupStyle: { background: "rgba(232,69,60,0.12)", color: "#e8453c", border: "1px solid rgba(232,69,60,0.25)" },
+		title: "Closet Inventory",
+		description: "A personal wardrobe management app. Upload your closet, learn fabric care, and more!",
+		demo: <WelcomeStepDemo />,
+	},
 	{
 		group: "Email Import",
 		groupStyle: EMAIL_IMPORT_STYLE,
@@ -743,7 +750,9 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 						<span className="ob-group-badge" style={step.groupStyle}>
 							{step.group}
 						</span>
-						<span className="ob-step-label">Step {currentStep + 1} of {STEPS.length}</span>
+						<span className="ob-step-label">
+							Step {currentStep + 1} of {STEPS.length}
+						</span>
 					</div>
 					<h2 className="ob-title">{step.title}</h2>
 					<p className="ob-description">{step.description}</p>
