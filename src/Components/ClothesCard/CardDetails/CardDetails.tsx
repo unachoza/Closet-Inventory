@@ -4,7 +4,9 @@ import { normalizeMaterial } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { parseCareItems } from "../../../utils/careUtils";
+import { toAbsoluteDate } from "../../../Features/Form/EditItemView/EditItemView";
 import "./CardDetails.css";
+import { formatItemAge } from "../../../utils/itemAge";
 
 function SectionTitle({ label }: { label: string }) {
 	return (
@@ -32,7 +34,7 @@ interface CardDetailsProps {
 
 export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
-
+	console.log({ item });
 	const isFull = variant === "full";
 
 	const blend = normalizeMaterial(item.material);
@@ -57,20 +59,21 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						<p className="card-details__name">{item.name || item.brand || item.category}</p>
 						{item.brand && <p className="card-details__brand">{item.brand}</p>}
 					</div>
-					<div className="card-details__header-right">
+					{/* <div className="card-details__header-right">
 						{item.category && <span className="card-details__category-tag">{item.category}</span>}
-					</div>
+					</div> */}
 				</div>
 
-				<div className="card-details__divider" />
-
 				{/* Color + size */}
+				<SectionTitle label="Size & Color - Category" />
 				<div className="card-details__color-size">
 					<div className="card-details__color-display">
-						<div className="card-details__color-circle" />
-						<span className="card-details__color-name">{item.color || "—"}</span>
+						{/* <div className="card-details__color-circle" />
+						<span className="card-details__color-name">{item.color || "—"}</span> */}
+						{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
+						<span className="pill">{item.color || "—"}</span>
+						<span className="card-details__category-tag">{item.category}</span>
 					</div>
-					{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
 				</div>
 
 				{/* Composition bar — proportional segments + dot legend */}
@@ -100,11 +103,14 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<div className="card-details__expanded">
 						{(item.age || item.price) && (
 							<div className="card-details__expanded-subsection">
+								{/* //AGE and Condition */}
 								<SectionTitle label="Identity" />
+							{toAbsoluteDate(item.purchaseDate)}$
+							{formatItemAge(item.purchaseDate) ? ` · ${formatItemAge(item.purchaseDate)} ago` : ""}`
 								<p className="card-details__identity-text">{[item.age, item.price].filter(Boolean).join(" · ")}</p>
+								{item.condition}
 							</div>
 						)}
-
 						{occasions.length > 0 && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Occasion" />
@@ -117,20 +123,21 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 								</div>
 							</div>
 						)}
-
 						{notes && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Notes" />
 								<p className="card-details__notes-text">"{notes}"</p>
 							</div>
 						)}
-
 						{/* Action buttons */}
 						{confirming ? (
 							<div className="card-details__confirm-section">
 								<p className="card-details__confirm-text">Remove this item?</p>
 								<div className="card-details__buttons">
-									<button onClick={() => setConfirming(false)} className="card-details__button card-details__button--cancel">
+									<button
+										onClick={() => setConfirming(false)}
+										className="card-details__button card-details__button--cancel"
+									>
 										Cancel
 									</button>
 									<button
@@ -146,7 +153,10 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 							</div>
 						) : (
 							<div className="card-details__buttons">
-								<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
+								<button
+									onClick={() => setConfirming(true)}
+									className="card-details__button card-details__button--remove"
+								>
 									Remove
 								</button>
 								<button onClick={onEdit} className="card-details__button">
