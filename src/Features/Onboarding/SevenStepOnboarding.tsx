@@ -60,8 +60,8 @@ function Step1Demo() {
 const emails = [
 	{ from: "POSHMARK", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO ARIANNA! THANK YOU FOR SHOPPING ON P…" },
 	{ from: "ZARA", subject: "THANKS FOR YOUR PURCHASE", preview: "THANK YOU FOR YOUR PURCHASE ORDER NO. 5431…" },
-	{ from: "ZARA", subject: "THANKS FOR YOUR PURCHASE", preview: "THANK YOU FOR YOUR PURCHASE ORDER NO. 546…" },
-	{ from: "POSHMARK", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO ARIANNA! THANK YOU FOR SHOPPING ON P…" },
+	{ from: "GAP", subject: "THANKS FOR YOUR PURCHASE", preview: "THANK YOU FOR YOUR PURCHASE ORDER NO. 546…" },
+	{ from: "MACY'S", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO ARIANNA! THANK YOU FOR SHOPPING ON P…" },
 ];
 
 function Step2Demo() {
@@ -112,11 +112,46 @@ function Step2Demo() {
 // ─── Step 3: Parsed items ───────────────────────────────────────────────────────
 
 const parsedItems = [
-	{ name: "Sleeveless Top", price: "$14.90", size: "S", color: "Brown", bg: "#78716c" },
-	{ name: "Rib Sleeveless Top", price: "$12.90", size: "S", color: "Blue / White", bg: "#475569" },
-	{ name: "Cotton Modal Tan…", price: "$12.90", size: "S", color: "Tan", bg: "#92400e" },
-	{ name: "Polyamide Blend S…", price: "$29.90", size: "S", color: "Raspberry", bg: "#9f1239" },
-	{ name: "Cotton Sleeveless…", price: "$12.90", size: "M", color: "White", bg: "#d6d3d1" },
+	{
+		name: "Sleeveless Top",
+		price: "$14.90",
+		size: "S",
+		color: "Brown",
+		bg: "#78716c",
+		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150747/Screenshot_2026-06-10_at_9.02.32_PM_ddjuk6.png",
+	},
+	{
+		name: "Rib Sleeveless Top",
+		price: "$12.90",
+		size: "S",
+		color: "Blue / White",
+		bg: "#475569",
+		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151246/Screenshot_2026-06-10_at_9.13.58_PM_gim9sb.png",
+	},
+	{
+		name: "Cotton Modal Tan…",
+		price: "$12.90",
+		size: "S",
+		color: "Tan",
+		bg: "#92400e",
+		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151252/Screenshot_2026-06-10_at_9.13.32_PM_elrnha.png",
+	},
+	{
+		name: "Polyamide Blend S…",
+		price: "$29.90",
+		size: "S",
+		color: "Raspberry",
+		bg: "#9f1239",
+		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150851/Screenshot_2026-06-10_at_9.06.54_PM_h3kjkd.png",
+	},
+	{
+		name: "Cotton Sleeveless…",
+		price: "$12.90",
+		size: "M",
+		color: "White",
+		bg: "#d6d3d1",
+		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151106/Screenshot_2026-06-10_at_9.11.29_PM_nl3nxc.png",
+	},
 ];
 
 function Step3Demo() {
@@ -137,7 +172,8 @@ function Step3Demo() {
 				{parsedItems.map((item, i) => (
 					<div key={item.name} className={`ob-item-row${imported.has(i) ? " ob-item-row--imported" : ""}`}>
 						<div className="ob-item-thumb" style={{ background: item.bg }}>
-							<div className="ob-item-thumb-inner" />
+							{/* <div className="ob-item-thumb-inner" /> */}
+							<img className="ob-item-thumb-inner" src={item.imgURL} alt="clothing image" />
 						</div>
 						<div className="ob-item-info">
 							<div className="ob-item-name">{item.name}</div>
@@ -196,7 +232,12 @@ function Step4Demo() {
 
 			<div className="ob-form-thumb-row">
 				<div className="ob-form-thumb">
-					<div className="ob-form-thumb-inner" />
+					{/* <div className="ob-form-thumb-inner" /> */}
+					<img
+						className="ob-item-thumb-inner"
+						src="https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150851/Screenshot_2026-06-10_at_9.07.20_PM_vvmgkb.png"
+						alt="clothing image"
+					/>
 				</div>
 				<span className="ob-form-hint">Tap a field to edit</span>
 			</div>
@@ -225,18 +266,27 @@ function Step4Demo() {
 	);
 }
 
-// ─── Step 5: 9-step manual form ─────────────────────────────────────────────────
+// ─── Step 5: guided manual form ─────────────────────────────────────────────────
 
-const formStepLabels = ["Photo", "Details", "Category", "Brand", "Size", "Color", "Material", "Price", "Care"];
+const formStepLabels = ["Category", "Color", "Size", "Details", "Photo"];
+
+// Option chips shown for the choice-style steps. Keyed by pill label.
+const formStepOptions: Record<string, string[]> = {
+	Category: ["Tops", "Bottoms", "Outerwear", "Accessories"],
+	Color: ["Black", "White", "Brown", "Blue"],
+	Size: ["XS", "S", "M", "L"],
+};
 
 function Step5Demo() {
 	const [step, setStep] = useState(0);
 	useEffect(() => {
-		const t = setInterval(() => setStep((s) => (s + 1) % formStepLabels.length), 800);
+		// Slower cadence + the panel fade below keep the swap from feeling abrupt.
+		const t = setInterval(() => setStep((s) => (s + 1) % formStepLabels.length), 1400);
 		return () => clearInterval(t);
 	}, []);
 
-	const bodySlot = step % 3;
+	const label = formStepLabels[step];
+	const options = formStepOptions[label];
 
 	return (
 		<div className="ob-demo-shell ob-manual-wrap">
@@ -254,42 +304,45 @@ function Step5Demo() {
 			</div>
 
 			<div className="ob-manual-body">
-				{bodySlot === 0 && (
-					<div className="ob-photo-drop">
-						<div className="ob-photo-drop-inner">
-							<Plus style={{ width: 32, height: 32 }} />
-							<span className="ob-photo-label">Add photo</span>
-						</div>
-					</div>
-				)}
-				{bodySlot === 1 && (
-					<div className="ob-field-group">
-						<div>
-							<div className="ob-caps">ITEM NAME</div>
-							<div className="ob-fake-input" style={{ marginTop: 4 }}>
-								White Oxford Shirt
+				{/* keyed by step → remounts so the fade animation replays on each change */}
+				<div key={step} className="ob-manual-panel">
+					{label === "Photo" && (
+						<div className="ob-photo-drop">
+							<div className="ob-photo-drop-inner">
+								<Plus style={{ width: 32, height: 32 }} />
+								<span className="ob-photo-label">Add photo</span>
 							</div>
 						</div>
-						<div>
-							<div className="ob-caps">NOTES</div>
-							<div className="ob-fake-textarea" style={{ marginTop: 4 }}>
-								Bought for work…
-							</div>
-						</div>
-					</div>
-				)}
-				{bodySlot === 2 && (
-					<div className="ob-field-group">
-						<div className="ob-caps">CATEGORY</div>
-						<div className="ob-cat-options">
-							{["Tops", "Bottoms", "Outerwear", "Accessories"].map((c, ci) => (
-								<div key={c} className={`ob-cat-option${ci === 0 ? " ob-cat-option--active" : ""}`}>
-									{c}
+					)}
+					{label === "Details" && (
+						<div className="ob-field-group">
+							<div>
+								<div className="ob-caps">ITEM NAME</div>
+								<div className="ob-fake-input" style={{ marginTop: 4 }}>
+									White Oxford Shirt
 								</div>
-							))}
+							</div>
+							<div>
+								<div className="ob-caps">NOTES</div>
+								<div className="ob-fake-textarea" style={{ marginTop: 4 }}>
+									Bought for work…
+								</div>
+							</div>
 						</div>
-					</div>
-				)}
+					)}
+					{options && (
+						<div className="ob-field-group">
+							<div className="ob-caps">{label}</div>
+							<div className="ob-cat-options">
+								{options.map((c, ci) => (
+									<div key={c} className={`ob-cat-option${ci === 0 ? " ob-cat-option--active" : ""}`}>
+										{c}
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
 			</div>
 		</div>
 	);
@@ -307,7 +360,7 @@ const closetItems = [
 ];
 
 function Step6Demo() {
-	const filters = ["Cotton", "Under $100", "Tops"];
+	const filters = ["Cotton", "Brown", "Tops"];
 	return (
 		<div className="ob-demo-shell ob-search-wrap">
 			<div className="ob-search-bar">
@@ -338,36 +391,56 @@ function Step6Demo() {
 }
 
 // ─── Step 7: Fabric guide ───────────────────────────────────────────────────────
+// Mirrors the real Textile Compendium: fiber tabs with category dots,
+// High/Medium/Low property pills, and icon care cards.
 
-const fabrics = [
+type Level = "High" | "Medium" | "Low";
+
+const fabrics: {
+	name: string;
+	dot: string; // fiber-category dot color, matching the real guide's TOC
+	properties: { label: string; level: Level }[];
+	care: { icon: string; label: string; value: string }[];
+}[] = [
 	{
 		name: "Cotton",
-		care: "Machine wash cold · Tumble dry low",
-		bars: [
-			{ label: "Washability", pct: 90 },
-			{ label: "Durability", pct: 80 },
+		dot: "#5a7a60", // natural (plant) → sage
+		properties: [
+			{ label: "Breathability", level: "High" },
+			{ label: "Durability", level: "High" },
 		],
-		fill: "#fbbf24",
+		care: [
+			{ icon: "🫧", label: "Washing", value: "Machine wash cold" },
+			{ icon: "🌀", label: "Drying", value: "Tumble dry low" },
+		],
 	},
 	{
 		name: "Polyester",
-		care: "Machine wash warm · Avoid high heat",
-		bars: [
-			{ label: "Washability", pct: 95 },
-			{ label: "Durability", pct: 95 },
+		dot: "#8b5a7a", // synthetic → mauve
+		properties: [
+			{ label: "Breathability", level: "Low" },
+			{ label: "Durability", level: "High" },
 		],
-		fill: "#60a5fa",
+		care: [
+			{ icon: "🫧", label: "Washing", value: "Machine wash warm" },
+			{ icon: "🌀", label: "Drying", value: "Low heat only" },
+		],
 	},
 	{
 		name: "Silk",
-		care: "Hand wash only · Do not tumble dry",
-		bars: [
-			{ label: "Washability", pct: 30 },
-			{ label: "Durability", pct: 40 },
+		dot: "#5a7a60", // natural (animal) → sage
+		properties: [
+			{ label: "Breathability", level: "High" },
+			{ label: "Durability", level: "Medium" },
 		],
-		fill: "#c084fc",
+		care: [
+			{ icon: "🤲", label: "Washing", value: "Hand wash only" },
+			{ icon: "🚫", label: "Drying", value: "Do not tumble dry" },
+		],
 	},
 ];
+
+const pillClass = (level: Level) => (level === "High" ? "ob-pill-high" : level === "Medium" ? "ob-pill-med" : "ob-pill-low");
 
 function Step7Demo() {
 	const [active, setActive] = useState(0);
@@ -382,38 +455,31 @@ function Step7Demo() {
 						onClick={() => setActive(i)}
 						className={`ob-fabric-tab${i === active ? " ob-fabric-tab--active" : ""}`}
 					>
+						<span className="ob-fabric-dot" style={{ background: f.dot }} />
 						{f.name}
 					</button>
 				))}
 			</div>
 
 			<div className="ob-fabric-card">
-				<div className="ob-fabric-section">
-					<div className="ob-caps">FABRIC</div>
-					<div className="ob-bar-track">
-						<div className="ob-bar-fill" style={{ width: "80%", background: fabric.fill }} />
-					</div>
-					<div className="ob-bar-legend">
-						<span>80% {fabric.name}</span>
-						<span>20% Blend</span>
-					</div>
+				<div className="ob-fabric-eyebrow">Fabric Care</div>
+				<h3 className="ob-fabric-title">{fabric.name}</h3>
+
+				<div className="ob-fabric-props">
+					{fabric.properties.map((p) => (
+						<div key={p.label} className="ob-fabric-prop">
+							<span className="ob-fabric-prop-label">{p.label}</span>
+							<span className={`ob-prop-pill ${pillClass(p.level)}`}>{p.level}</span>
+						</div>
+					))}
 				</div>
 
-				<div className="ob-fabric-section">
-					<div className="ob-caps">CARE</div>
-					<div className="ob-care-text">{fabric.care}</div>
-				</div>
-
-				<div className="ob-mini-bars">
-					{fabric.bars.map((b) => (
-						<div key={b.label} className="ob-mini-bar-row">
-							<div className="ob-mini-bar-header">
-								<span>{b.label}</span>
-								<span>{b.pct}%</span>
-							</div>
-							<div className="ob-mini-track">
-								<div className="ob-mini-fill" style={{ width: `${b.pct}%`, background: fabric.fill }} />
-							</div>
+				<div className="ob-care-grid">
+					{fabric.care.map((c) => (
+						<div key={c.label} className="ob-care-card">
+							<div className="ob-care-icon">{c.icon}</div>
+							<div className="ob-care-label">{c.label}</div>
+							<div className="ob-care-value">{c.value}</div>
 						</div>
 					))}
 				</div>
@@ -474,7 +540,8 @@ const STEPS: StepDef[] = [
 		group: "Manual Entry",
 		groupStyle: { background: "rgba(245,158,11,0.15)", color: "rgb(251,191,36)", border: "1px solid rgba(245,158,11,0.2)" },
 		title: "Add items manually too",
-		description: "Use the 9-step guided form for items you own but didn't buy online — snap a photo, fill what you know, and you're done.",
+		description:
+			"Use the guided step-by-step form for items you own but didn't buy online — snap a photo, fill what you know, and you're done.",
 		demo: <Step5Demo />,
 	},
 	{
@@ -491,7 +558,7 @@ const STEPS: StepDef[] = [
 		group: "Fabric Guide",
 		groupStyle: { background: "rgba(34,197,94,0.15)", color: "rgb(74,222,128)", border: "1px solid rgba(34,197,94,0.2)" },
 		title: "Know how to care for it",
-		description: "The Fabric Guide shows washability, durability, and exact care instructions for every material in your closet.",
+		description: "The Fabric Guide shows breathability, durability, and exact care instructions for every material in your closet.",
 		demo: <Step7Demo />,
 	},
 ];
