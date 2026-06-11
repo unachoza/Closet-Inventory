@@ -3,7 +3,7 @@ import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
 import useStockPhoto from "../../../hooks/useStockPhoto";
 import TextInput from "../TextInput/TextInput";
-import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
+// import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem, conditionOptions } from "../../../utils/constants";
@@ -46,13 +46,7 @@ function toDateInputValue(iso?: string): string {
 	return d.toISOString().slice(0, 10);
 }
 
-/** Human-readable absolute date, e.g. "Mar 15, 2024". */
-function toAbsoluteDate(iso?: string): string {
-	if (!iso) return "";
-	const d = new Date(iso);
-	if (isNaN(d.getTime())) return "";
-	return d.toLocaleDateString("default", { year: "numeric", month: "short", day: "numeric" });
-}
+import { toAbsoluteDate } from "../../../utils/dateUtils";
 
 export interface EditItemViewProps {
 	item: ClothingItem;
@@ -95,9 +89,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
-	const onToggleDetail = useCallback((key: string, value: any) => {
-		setFormData((prev) => ({ ...prev, [key]: !value }));
-	}, []);
+	// const onToggleDetail = useCallback((key: string, value: any) => {
+	// 	setFormData((prev) => ({ ...prev, [key]: !value }));
+	// }, []);
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData((prev) => ({ ...prev, condition: e.target.value }));
@@ -174,9 +168,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					/>
 				);
 			} else if (key === "onSale") {
-				return (
-					<AnimatedCheckbox key={key} label={key} checked={!!formData[key]} onCheckedChange={() => onToggleDetail(key, value)} />
-				);
+				// TODO: re-enable onSale checkbox when needed
+				return null;
 			} else if (key === "notes") {
 				return (
 					<label key={key}>
@@ -235,7 +228,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				{/* Return to email button for create mode */}
 				{isCreateMode && onReturnToEmail && (
 					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
-						&larr; Return to Email Preview
+						&larr; Back to Email
 					</button>
 				)}
 				{/* Image preview for create mode */}
@@ -257,7 +250,36 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							handleFormUpdate={handleChange}
 						/>
 					))}
-
+					{formData.purchaseDate ? (
+						<label className="edit-form-purchase-date">
+							purchase date
+							<input
+								type="text"
+								className="edit-form-purchase-date__display"
+								value={`${toAbsoluteDate(formData.purchaseDate)}${
+									formatItemAge(formData.purchaseDate) ? ` · ${formatItemAge(formData.purchaseDate)} ago` : ""
+								}`}
+								disabled
+								readOnly
+								aria-label="purchase date"
+							/>
+						</label>
+					) : (
+						<label className="edit-form-purchase-date">
+							purchase date
+							<input
+								type="date"
+								className="edit-form-purchase-date__input"
+								value={toDateInputValue(formData.purchaseDate)}
+								onChange={handlePurchaseDateChange}
+								max={toDateInputValue(new Date().toISOString())}
+								aria-label="purchase date"
+							/>
+							<span className="edit-form-purchase-date__hint">
+								No date found in the email — add one to track this item's age.
+							</span>
+						</label>
+					)}
 					{/* Material blend — rendered separately from generic fields */}
 					<div className="edit-form-material">
 						<label className="edit-form-material__label">Material Composition</label>
@@ -289,34 +311,6 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					{/* Purchase date — drives factual age. When captured from an email it is
 					    shown read-only (disabled); the rare no-date import falls back to a
 					    manual date entry. */}
-					{formData.purchaseDate ? (
-						<label className="edit-form-purchase-date">
-							purchase date
-							<input
-								type="text"
-								className="edit-form-purchase-date__display"
-								value={`${toAbsoluteDate(formData.purchaseDate)}${
-									formatItemAge(formData.purchaseDate) ? ` · ${formatItemAge(formData.purchaseDate)} ago` : ""
-								}`}
-								disabled
-								readOnly
-								aria-label="purchase date"
-							/>
-						</label>
-					) : (
-						<label className="edit-form-purchase-date">
-							purchase date
-							<input
-								type="date"
-								className="edit-form-purchase-date__input"
-								value={toDateInputValue(formData.purchaseDate)}
-								onChange={handlePurchaseDateChange}
-								max={toDateInputValue(new Date().toISOString())}
-								aria-label="purchase date"
-							/>
-							<span className="edit-form-purchase-date__hint">No date found in the email — add one to track this item's age.</span>
-						</label>
-					)}
 
 					{separateFeilds()}
 				</div>

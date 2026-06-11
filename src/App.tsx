@@ -29,7 +29,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		size: prefilled.size ?? "",
 		brand: prefilled.brand ?? "",
 		price: prefilled.price ?? "",
-		material: prefilled.material ?? "",
+		material: prefilled.material ?? [],
 		occasion: prefilled.occasion ?? "",
 		age: prefilled.age ?? "",
 		condition: prefilled.condition ?? "new",
@@ -91,6 +91,7 @@ function AppShell() {
 	// Batch import: "Import All Items" from an email
 	const handleGmailImportAll = useCallback(
 		(items: Partial<ClothingItem>[]) => {
+			console.log({ items });
 			if (items.length === 0) return;
 			const clothingItems = items.map(buildClothingItem);
 			setImportQueue(clothingItems);

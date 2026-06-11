@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
+import { ProductAttributes } from "../utils/inferProductAttributes";
 
 export interface MaterialBlend {
 	material: string;
@@ -14,10 +15,10 @@ export type ClothingItem = {
 	size: string;
 	brand: string;
 	price?: string;
-	material: MaterialBlend[] | string;
+	material: MaterialBlend[];
 	occasion: string;
 	/** Legacy free-text age (e.g. "1 year"). Superseded by purchaseDate (factual age) + condition (subjective state). Kept for back-compat display fallback. */
-	age: string;
+	age?: string;
 	/** Subjective wear state: "new" | "like new" | "good" | "fair" | "needs repair". */
 	condition?: string;
 	/** ISO date the item was purchased — the source of the card's factual age. */
@@ -25,6 +26,7 @@ export type ClothingItem = {
 	care: string | string[];
 	onSale?: boolean;
 	notes?: string | string[];
+	style?: ProductAttributes;
 	[key: string]: any;
 };
 
@@ -44,7 +46,7 @@ export interface ItemFormData {
 	image?: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "athleisure" | "socks" | "underwear" | null;
 
 export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "journey" | "entireCloset";
 
