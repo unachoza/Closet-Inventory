@@ -1,0 +1,1315 @@
+/* ─── Design tokens ───────────────────────────────────────────────────────────
+   Mapped to the closet's dark, navy, glassy vibe. All scoped to .ob-root so
+   nothing leaks into the rest of the app. */
+.ob-root {
+  color: #ffffff;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+  /* Theme tokens the markup relies on (previously undefined → silently dead). */
+  --background: rgba(0, 0, 0, 0.45);     /* scrim over the fixed closet photo */
+  --foreground: #ffffff;
+  --muted: rgba(255, 255, 255, 0.18);
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --primary: rgb(19, 17, 146);           /* navy — matches the closet */
+  --primary-hover: rgb(14, 13, 110);
+  --primary-foreground: #ffffff;
+
+  --app-bg: #0c0c10;
+
+  /* Accent (was bright #2563eb) → navy to match the closet primary.
+     --blue is the FILL/border navy; --blue-text is a legible light variant
+     for text/icons (navy-on-near-black would be unreadable). */
+  --blue: rgb(19, 17, 146);
+  --blue-text: rgb(165, 180, 252);
+  --blue-faint: rgba(19, 17, 146, 0.16);
+  --blue-border: rgba(19, 17, 146, 0.5);
+  --blue-dim: rgba(19, 17, 146, 0.35);
+  --white-90: rgba(255, 255, 255, 0.9);
+  --white-80: rgba(255, 255, 255, 0.8);
+  --white-70: rgba(255, 255, 255, 0.7);
+  --white-60: rgba(255, 255, 255, 0.6);
+  --white-50: rgba(255, 255, 255, 0.5);
+  --white-40: rgba(255, 255, 255, 0.4);
+  --white-30: rgba(255, 255, 255, 0.3);
+  --white-20: rgba(255, 255, 255, 0.2);
+  --white-10: rgba(255, 255, 255, 0.1);
+  --white-08: rgba(255, 255, 255, 0.08);
+  --white-05: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --green: #16a34a;
+  --green-faint: rgba(22, 163, 74, 0.8);
+}
+
+/* ─── Page layout ────────────────────────────────────────────────────────────── */
+.ob-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--background);
+}
+
+.ob-container {
+  width: 100%;
+  max-width: 24rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  /* Frosted-glass card matching the closet's panels. */
+  padding: 1.75rem 1.5rem;
+  background: var(--Soft-Black, #141313a7);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.25rem;
+  box-shadow: var(--box-shadow, .5rem .75rem 2rem .75rem rgba(0, 0, 0, 0.875));
+  backdrop-filter: var(--blur, blur(.6rem));
+}
+
+/* ─── Progress bar ───────────────────────────────────────────────────────────── */
+.ob-progress {
+  display: flex;
+  gap: 4px;
+}
+
+.ob-progress-seg {
+  height: 4px;
+  flex: 1;
+  border-radius: 9999px;
+  transition: background-color 0.5s;
+  background: var(--muted);
+}
+
+.ob-progress-seg--done {
+  background: var(--foreground);
+}
+
+.ob-progress-seg--active {
+  background: color-mix(in srgb, var(--foreground) 50%, transparent);
+}
+
+/* ─── Demo shell ─────────────────────────────────────────────────────────────── */
+.ob-demo-shell {
+  height: 16rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--app-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Content block ──────────────────────────────────────────────────────────── */
+.ob-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ob-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  
+}
+
+.ob-group-badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+.ob-step-label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.ob-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ob-description {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+/* ─── Navigation row ─────────────────────────────────────────────────────────── */
+.ob-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ob-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.ob-back-btn:hover {
+  color: var(--foreground);
+}
+
+.ob-back-btn--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ob-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ob-skip-btn {
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.ob-skip-btn:hover {
+  color: var(--foreground);
+}
+
+.ob-next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.ob-next-btn:hover {
+  opacity: 0.9;
+}
+
+/* ─── Shared within demos ────────────────────────────────────────────────────── */
+.ob-caps {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-40);
+}
+
+.ob-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+}
+
+/* ─── Step 1: Main menu ──────────────────────────────────────────────────────── */
+.ob-menu {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ob-menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  transition: all 0.5s;
+  color: var(--white-70);
+  flex-shrink: 0;
+}
+
+.ob-menu-item--highlight {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--white-05);
+  animation: pulse-opacity 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse-opacity {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.ob-menu-item--tapped {
+  border-color: var(--blue-text);
+  background: var(--blue-faint);
+  transform: scale(1.02);
+  animation: none;
+}
+
+.ob-menu-icon {
+  width: 16px;
+  height: 16px;
+  margin-bottom: 2px;
+}
+
+.ob-menu-label {
+  font-size: 0.75rem;
+}
+
+/* ─── Step 2: Advanced search demo ──────────────────────────────────────────── */
+.ob-adv-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ob-adv-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--white-08);
+  flex-shrink: 0;
+}
+
+.ob-adv-header-icon {
+  color: var(--blue-text);
+  flex-shrink: 0;
+}
+
+.ob-adv-header-title {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--white-80);
+}
+
+.ob-adv-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.ob-adv-sidebar {
+  width: 88px;
+  flex-shrink: 0;
+  background: rgba(19, 17, 146, 0.06);
+  border-right: 1px solid var(--white-08);
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ob-adv-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.ob-adv-nav-item--active { background: rgba(19, 17, 146, 0.22); }
+.ob-adv-nav-item--done   { opacity: 0.6; }
+
+.ob-adv-nav-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--white-08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white-30);
+  transition: background 0.25s;
+}
+
+.ob-adv-nav-dot--active {
+  background: var(--blue);
+  color: #fff;
+  animation: pulse-opacity 1.6s ease-in-out infinite;
+}
+
+.ob-adv-nav-dot--done {
+  background: var(--blue-dim);
+  color: var(--blue-text);
+}
+
+.ob-adv-nav-label {
+  font-size: 10px;
+  color: var(--white-40);
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ob-adv-nav-item--active .ob-adv-nav-label { color: var(--white-80); }
+
+.ob-adv-nav-badge {
+  font-size: 9px;
+  background: rgba(19, 17, 146, 0.4);
+  color: var(--blue-text);
+  border-radius: 999px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+/* Main content */
+.ob-adv-content {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ob-adv-input {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  background: var(--white-05);
+  border: 1px solid var(--white-10);
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  color: var(--white-80);
+  margin-top: 5px;
+}
+
+.ob-adv-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background: var(--blue-text);
+  animation: ob-blink 0.9s step-end infinite;
+}
+
+.ob-adv-cursor--hidden { opacity: 0; animation: none; }
+
+@keyframes ob-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.ob-adv-tags-label { margin-top: 8px; margin-bottom: 5px; }
+
+.ob-adv-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ob-adv-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(19, 17, 146, 0.22);
+  border: 1px solid rgba(19, 17, 146, 0.45);
+  color: var(--blue-text);
+  font-size: 10px;
+  animation: ob-tag-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes ob-tag-in {
+  from { opacity: 0; transform: scale(0.75) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Footer */
+.ob-adv-footer {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--white-08);
+  flex-shrink: 0;
+}
+
+.ob-adv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: default;
+}
+
+.ob-adv-btn--ghost {
+  background: var(--white-05);
+  color: var(--white-40);
+  border: 1px solid var(--white-08);
+}
+
+.ob-adv-btn--primary {
+  background: var(--blue);
+  color: #fff;
+  flex: 1;
+  justify-content: center;
+}
+
+.ob-adv-btn--pulse {
+  animation: ob-btn-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ob-btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(19, 17, 146, 0.6); }
+  50%       { box-shadow: 0 0 0 5px rgba(19, 17, 146, 0); }
+}
+
+/* ─── Step 3: Email list (was Step 2) ────────────────────────────────────────── */
+.ob-email-wrap {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.ob-email-header {
+  color: var(--blue-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+.ob-email-list {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-email-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  text-align: left;
+  cursor: pointer;
+  width: 96%;
+  transition: opacity 0.4s, transform 0.4s, border-color 0.2s, background 0.2s;
+}
+
+.ob-email-row--checked {
+  border-color: var(--blue-border);
+  background: var(--blue-faint);
+}
+
+.ob-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid var(--white-30);
+  flex-shrink: 0;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.ob-checkbox--checked {
+  background: var(--blue);
+  border-color: var(--blue-text);
+}
+
+.ob-email-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ob-email-sender {
+  color: var(--white-90);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ob-email-subject {
+  color: var(--white-60);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ob-email-preview {
+  color: var(--white-30);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Step 3: Parsed items ───────────────────────────────────────────────────── */
+.ob-items-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ob-items-scroll {
+  flex: 1;
+  overflow: hidden;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-items-header {
+  color: var(--blue-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.ob-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  transition: opacity 0.3s, border-color 0.2s;
+}
+
+.ob-item-row--imported {
+  border-color: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  opacity: 0.5;
+}
+
+.ob-item-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ob-item-thumb-inner {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--white-10);
+}
+
+.ob-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ob-item-name {
+  color: var(--white-90);
+  font-size: 0.75rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ob-item-price {
+  color: var(--blue-text);
+  font-size: 0.75rem;
+}
+
+.ob-item-size {
+  color: var(--white-30);
+}
+
+.ob-item-color {
+  color: var(--white-30);
+  font-size: 0.75rem;
+}
+
+.ob-import-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: var(--blue);
+  color: #fff;
+  transition: background 0.2s, color 0.2s;
+}
+
+.ob-import-btn--done {
+  background: var(--white-10);
+  color: var(--white-30);
+}
+
+.ob-import-all-bar {
+  flex-shrink: 0;
+  padding: 12px;
+  border-top: 1px solid var(--white-10);
+}
+
+.ob-import-all-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: var(--blue);
+  color: #fff;
+  transition: background 0.3s;
+}
+
+.ob-import-all-btn--done {
+  background: var(--green-faint);
+}
+
+/* ─── Step 4: Review form ────────────────────────────────────────────────────── */
+.ob-form-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ob-form-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 6px;
+  flex-shrink: 0;
+}
+
+.ob-form-back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--blue-text);
+  font-size: 0.75rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ob-form-counter {
+  color: var(--white-40);
+  font-size: 0.75rem;
+}
+
+.ob-form-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--white-40);
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.ob-form-thumb-row {
+  padding: 0 21px 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ob-form-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #78716c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ob-form-thumb-inner {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--white-10);
+}
+
+.ob-form-hint {
+  color: var(--white-50);
+  font-size: 0.75rem;
+}
+
+.ob-fields-grid {
+  flex: 1;
+  overflow: hidden;
+padding: 0px 12px 10px 9px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  align-content: start;
+}
+
+.ob-field-btn {
+  display: flex;
+text-align: left;
+flex-direction: column;
+justify-content: space-around;
+align-items: flex-start;
+width: 95%;
+height: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ob-field-btn--editing {
+  border-color: var(--blue-border);
+  background: var(--blue-faint);
+}
+
+.ob-field-value {
+  font-size: 0.75rem;
+  margin-top: 2px;
+  color: var(--white-80);
+}
+
+.ob-field-value--editing {
+  color: var(--blue-text);
+}
+
+.ob-form-actions {
+  padding: 8px 12px 12px;
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ob-add-btn {
+  flex: 1;
+  padding: 8px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ob-skip-item-btn {
+  flex: 1;
+  padding: 8px;
+  background: transparent;
+  color: var(--white-60);
+  border: 1px solid var(--white-20);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ─── Step 5: Manual form ────────────────────────────────────────────────────── */
+.ob-manual-wrap {
+  position: relative;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+/* End state: success check + label, shown after the last step (no looping). */
+.ob-manual-success {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: ob-manual-fade 0.4s ease;
+}
+
+.ob-success-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 9999px;
+  color: #fff;
+  background: var(--green, #16a34a);
+  animation: ob-success-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ob-success-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--white-90);
+}
+
+@keyframes ob-success-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Toast pill — mirrors the app's slide-in "added to your closet" toast. */
+.ob-toast {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--Soft-Black, #141313e0);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 0.75rem;
+  backdrop-filter: blur(8px);
+  animation: ob-toast-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ob-toast-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: var(--green, #16a34a);
+  color: #fff;
+}
+
+@keyframes ob-toast-in {
+  from { opacity: 0; transform: translateY(120%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ob-pills {
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ob-pill {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  transition: all 0.3s;
+  background: var(--white-08);
+  color: var(--white-40);
+}
+
+.ob-pill--active {
+  background: var(--blue);
+  color: #fff;
+}
+
+.ob-pill--done {
+  background: var(--blue-dim);
+  color: var(--blue-text);
+}
+
+.ob-manual-body {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Remounted on each step change (keyed) so this fade replays — softens the swap. */
+.ob-manual-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: ob-manual-fade 0.5s ease;
+}
+
+@keyframes ob-manual-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.ob-photo-drop {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ob-photo-drop-inner {
+  width: 96px;
+  height: 96px;
+  border-radius: 16px;
+  border: 2px dashed var(--white-20);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--white-20);
+}
+
+.ob-photo-label {
+  font-size: 0.75rem;
+  color: var(--white-30);
+}
+
+.ob-field-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.ob-fake-input {
+  height: 32px;
+  background: var(--white-08);
+  border: 1px solid var(--white-10);
+  border-radius: 8px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--white-80);
+}
+
+.ob-fake-textarea {
+  height: 48px;
+  background: var(--white-08);
+  border: 1px solid var(--white-10);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  color: var(--white-30);
+}
+
+.ob-cat-options {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.ob-cat-option {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  border: 1px solid var(--white-10);
+  background: var(--white-05);
+  color: var(--white-60);
+}
+
+.ob-cat-option--active {
+  background: var(--blue);
+  border-color: var(--blue-text);
+  color: #fff;
+}
+
+/* ─── Step 6: Search & filter ────────────────────────────────────────────────── */
+.ob-search-wrap {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.ob-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+
+.ob-search-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--white-40);
+  flex-shrink: 0;
+}
+
+.ob-search-text {
+  font-size: 0.875rem;
+  color: var(--white-40);
+  flex: 1;
+}
+
+.ob-search-count {
+  font-size: 0.75rem;
+  color: var(--blue-text);
+  font-weight: 500;
+}
+
+.ob-filter-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.ob-filter-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #fff;
+}
+
+.ob-chip-x {
+  width: 10px;
+  height: 10px;
+}
+
+.ob-closet-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+
+.ob-closet-card {
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ob-closet-card-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.ob-closet-card-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--white-10);
+}
+
+.ob-closet-card-label {
+  padding: 4px 6px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--white-60);
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Step 7: Fabric guide — mirrors the real "Textile Compendium" ──────────────
+   The actual Fabric/Fiber guide is a light, editorial reference (cream paper,
+   serif titles, sage/gold/terracotta High/Med/Low pills, icon care cards).
+   This demo renders that look on a light screen inside the dark phone shell.
+   Palette is scoped here so it doesn't touch the rest of the onboarding. */
+.ob-fabric-wrap {
+  --fg-sage: #5a7a60;
+  --fg-sage-pale: #eef4ef;
+  --fg-gold: #b8860b;
+  --fg-gold-pale: #fdf4dc;
+  --fg-terra: #c1622a;
+  --fg-terra-pale: #fbf0e8;
+  --fg-ink: #1c1a17;
+  --fg-ink-60: #6b6659;
+  --fg-cream: #faf7f2;
+  --fg-paper: #ffffff;
+  --fg-line: #e7e1d6;
+
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  background: var(--fg-cream);
+}
+
+.ob-fabric-tabs {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.ob-fabric-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--fg-line);
+  background: var(--fg-paper);
+  color: var(--fg-ink-60);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.ob-fabric-tab--active {
+  background: var(--fg-ink);
+  border-color: var(--fg-ink);
+  color: var(--fg-cream);
+}
+
+.ob-fabric-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.ob-fabric-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--fg-line);
+  border-radius: 12px;
+  background: var(--fg-paper);
+  overflow: hidden;
+}
+
+.ob-fabric-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--fg-sage);
+}
+
+.ob-fabric-title {
+  margin: -2px 0 2px;
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--fg-ink);
+}
+
+.ob-fabric-props {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 5px;
+}
+
+.ob-fabric-prop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ob-fabric-prop-label {
+  font-size: 0.75rem;
+  color: var(--fg-ink-60);
+}
+
+.ob-prop-pill {
+  padding: 2px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.ob-prop-pill.ob-pill-high { background: var(--fg-sage-pale); color: var(--fg-sage); }
+.ob-prop-pill.ob-pill-med  { background: var(--fg-gold-pale); color: var(--fg-gold); }
+.ob-prop-pill.ob-pill-low  { background: var(--fg-terra-pale); color: var(--fg-terra); }
+
+.ob-care-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.ob-care-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid var(--fg-line);
+  border-radius: 10px;
+  background: var(--fg-cream);
+}
+
+.ob-care-icon {
+  font-size: 18px;
+}
+
+.ob-care-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--fg-ink-60);
+}
+
+.ob-care-value {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--fg-ink);
+}

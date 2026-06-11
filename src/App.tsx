@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { EditProvider } from "./Features/Form/EditContext";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
@@ -17,6 +17,7 @@ import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
+import { OnboardingExpanded } from "./Features/Onboarding/SevenStepOnboarding";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -41,6 +42,8 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	};
 }
 
+const ONBOARDING_KEY = "closetly-onboarding-complete";
+
 function AppShell() {
 	const { view, setView } = useView();
 	const { closet, getCloset, importItems } = useLocalStorageCloset();
@@ -51,6 +54,21 @@ function AppShell() {
 	const [gmailSourceEmailId, setGmailSourceEmailId] = useState<string | null>(null);
 	const [importQueue, setImportQueue] = useState<ClothingItem[]>([]);
 	const [importQueueIndex, setImportQueueIndex] = useState(0);
+
+	const [showOnboarding, setShowOnboarding] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		const hasCompletedOnboarding = localStorage.getItem(ONBOARDING_KEY);
+
+		setShowOnboarding(!hasCompletedOnboarding);
+		setIsLoading(false);
+	}, []);
+
+	const handleComplete = () => {
+		localStorage.setItem(ONBOARDING_KEY, "true");
+		setShowOnboarding(false);
+	};
 
 	const handleEditItem = (item: ClothingItem) => {
 		setEditItem(item);
@@ -125,6 +143,13 @@ function AppShell() {
 
 	const isInBatchMode = importQueue.length > 1;
 
+	if (isLoading) {
+		return null;
+	}
+
+	if (showOnboarding) {
+		return <OnboardingExpanded onComplete={handleComplete} />;
+	}
 	return (
 		<div className="main">
 			<NavBar
