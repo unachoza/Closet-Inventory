@@ -1,80 +1,39 @@
 /* ========================================
    THEME VARIABLES
+
+   Scoped to .onboarding (NOT :root) so they never leak into the rest of
+   the app. Colors map onto the global design tokens in index.css to match
+   the closet's dark, navy, glassy vibe. --color-primary (navy) is inherited
+   straight from index.css :root.
 ======================================== */
 
-:root {
-	--color-background: #ffffff36;
-	--color-foreground: #111827;
+.onboarding {
+	--color-foreground: var(--White);
 
-	--color-primary: #3a61ed;
-	--color-primary-light: #ede9fe;
-	--color-primary-foreground: #ffffff;
+	/* Navy primary — defined locally (scoped) so this works regardless of
+	   whether the shared index.css token foundation is present on this branch. */
+	--color-primary: rgb(19, 17, 146);
+	--color-primary-hover: rgb(14, 13, 110);
+	--color-primary-muted: rgba(19, 17, 146, 0.58);
+	--color-primary-light: rgba(19, 17, 146, 0.30);
+	--color-primary-foreground: var(--White);
 
-	--color-muted: #e5e7eb;
-	--color-muted-foreground: #6b7280;
+	--font-ui: system-ui, Avenir, Helvetica, Arial, sans-serif;
 
-	--color-accent: #f3e8ff;
+	--color-muted: rgba(255, 255, 255, 0.14);
+	--color-muted-foreground: var(--Lightest-Grey);
 
-	--color-border: #d1d5db;
+	/* Glassy surfaces layered over the closet background photo. */
+	--color-surface: rgba(255, 255, 255, 0.08);
+	--color-border: rgba(255, 255, 255, 0.16);
 
-	--shadow-card:
-		0 10px 15px -3px rgb(0 0 0 / 0.1),
-		0 4px 6px -4px rgb(0 0 0 / 0.1);
+	--shadow-card: var(--box-shadow);
 
-	--radius-sm: 0.5rem;
-	--radius-md: 0.75rem;
-	--radius-lg: 1rem;
-	--radius-xl: 1.5rem;
+	--radius-sm: var(--border-radius-sm);
+	--radius-md: var(--border-radius-md);
+	--radius-lg: var(--border-radius-lg);
 
 	--transition-fast: 0.2s ease;
-}
-
-/* ========================================
-   DARK MODE
-======================================== */
-
-.dark {
-	--color-background: #111827;
-	--color-foreground: #f9fafb;
-
-	--color-primary: #8b5cf6;
-	--color-primary-light: rgb(139 92 246 / 0.15);
-	--color-primary-foreground: #ffffff;
-
-	--color-muted: #1f2937;
-	--color-muted-foreground: #9ca3af;
-
-	--color-accent: #1e1b4b;
-
-	--color-border: #374151;
-
-	--shadow-card:
-		0 10px 15px -3px rgb(0 0 0 / 0.4),
-		0 4px 6px -4px rgb(0 0 0 / 0.4);
-}
-
-/* ========================================
-   BASE
-======================================== */
-
-* {
-	box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-	margin: 0;
-	min-height: 100%;
-	background: var(--color-background);
-	color: var(--color-foreground);
-	font-family:
-		Inter,
-		system-ui,
-		-apple-system,
-		BlinkMacSystemFont,
-		"Segoe UI",
-		sans-serif;
 }
 
 /* ========================================
@@ -131,7 +90,11 @@ body,
 	align-items: center;
 	justify-content: center;
 
-	background: var(--color-background);
+	color: var(--color-foreground);
+	font-family: var(--font-ui);
+
+	/* Sit over index.css's fixed closet photo with a subtle dark scrim. */
+	background: rgba(0, 0, 0, 0.45);
 }
 
 .onboarding__container {
@@ -140,7 +103,16 @@ body,
 
 	display: flex;
 	flex-direction: column;
-	gap: 2rem;
+	gap: 1.75rem;
+
+	padding: 2rem 1.75rem;
+
+	/* Frosted-glass card, matching the closet's glassmorphism. */
+	background: var(--Soft-Black);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-card);
+	backdrop-filter: var(--blur);
 
 	animation: fadeInUp 0.5s ease;
 }
@@ -162,10 +134,13 @@ body,
 	border-radius: 999px;
 
 	background: var(--color-primary-light);
-	color: var(--color-primary);
+	border: 1px solid rgba(199, 210, 254, 0.35);
+	color: #c7d2fe;
 
 	font-size: 0.75rem;
 	font-weight: 600;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
 }
 
 .onboarding__title {
@@ -203,6 +178,49 @@ body,
 	gap: 0.5rem;
 }
 
+/* Self-contained footer buttons (no dependency on a shared .btn system). */
+.onboarding__btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.35rem;
+
+	padding: 0.6rem 1.25rem;
+
+	border: 1px solid transparent;
+	border-radius: var(--radius-sm);
+
+	font-family: var(--font-ui);
+	font-size: 0.95rem;
+	font-weight: 600;
+
+	cursor: pointer;
+	transition: background var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.onboarding__btn:active {
+	transform: translateY(1px);
+}
+
+.onboarding__btn--ghost {
+	background: transparent;
+	border-color: var(--color-border);
+	color: var(--color-foreground);
+}
+
+.onboarding__btn--ghost:hover {
+	background: rgba(255, 255, 255, 0.08);
+}
+
+.onboarding__btn--primary {
+	background: var(--color-primary);
+	color: var(--color-primary-foreground);
+}
+
+.onboarding__btn--primary:hover {
+	background: var(--color-primary-hover);
+}
+
 /* ========================================
    DEMO CONTAINERS
 ======================================== */
@@ -212,12 +230,11 @@ body,
 
 	height: 16rem;
 	padding: 1.5rem;
-          border-radius: 5px;
-    border: solid #373535a1;
 
 	overflow: hidden;
-	border-radius: var(--radius-sm);
-      box-shadow: .5rem .5rem 2rem .5rem rgb(0 0 0 / 49%);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0.5rem 1.5rem rgba(0, 0, 0, 0.4);
 }
 
 .onboarding-demo--welcome {
@@ -228,8 +245,8 @@ body,
 	background:
 		linear-gradient(
 			135deg,
-			rgba(58, 64, 237, 0.25),
-			rgba(85, 171, 247, 0.45)
+			rgba(19, 17, 146, 0.55),
+			rgba(120, 172, 191, 0.40)
 		);
 }
 
@@ -241,8 +258,8 @@ body,
 	background:
 		linear-gradient(
 			135deg,
-			#eff6ff,
-			#dbeafe
+			rgba(19, 17, 146, 0.40),
+			rgba(13, 13, 110, 0.20)
 		);
 }
 
@@ -259,8 +276,8 @@ body,
 	background:
 		linear-gradient(
 			135deg,
-			#faf5ff,
-			#f3e8ff
+			rgba(49, 46, 129, 0.45),
+			rgba(19, 17, 146, 0.22)
 		);
 }
 
@@ -281,8 +298,8 @@ body,
 	background:
 		linear-gradient(
 			135deg,
-			#ecfdf5,
-			#d1fae5
+			rgba(103, 131, 133, 0.45),
+			rgba(19, 17, 146, 0.22)
 		);
 }
 
@@ -351,14 +368,11 @@ body,
 
 	border-radius: var(--radius-md);
 
-	background: rgb(255 255 255 / 0.7);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	backdrop-filter: blur(12px);
 
 	animation: pulse 2s infinite;
-}
-
-.dark .onboarding-email-card {
-	background: rgb(17 24 39 / 0.6);
 }
 
 .onboarding-email-card--delay-1 {
@@ -402,14 +416,14 @@ body,
 	width: 75%;
 	height: 0.75rem;
 
-	background: rgb(124 58 237 / 0.2);
+	background: rgba(199, 210, 254, 0.40);
 }
 
 .onboarding-email-card__line--secondary {
 	width: 50%;
 	height: 0.5rem;
 
-	background: rgb(156 163 175 / 0.35);
+	background: rgba(255, 255, 255, 0.22);
 }
 
 .onboarding-ping,
@@ -425,7 +439,7 @@ body,
 }
 
 .onboarding-ping {
-	background: rgb(124 58 237 / 0.2);
+	background: var(--color-primary-light);
 
 	animation: ping 1.5s infinite;
 }
@@ -457,12 +471,14 @@ body,
 
 	border-radius: var(--radius-md);
 
-	background: rgb(255 255 255 / 0.7);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
 	backdrop-filter: blur(12px);
 }
 
-.dark .onboarding-search__input {
-	background: rgb(17 24 39 / 0.6);
+.onboarding-search__query {
+	font-size: 0.875rem;
+	color: var(--color-muted-foreground);
 }
 
 .onboarding-search__filters {
@@ -494,12 +510,9 @@ body,
 
 	border-radius: var(--radius-md);
 
-	background: rgb(255 255 255 / 0.5);
+	background: rgba(255, 255, 255, 0.07);
+	border: 1px solid var(--color-border);
 	backdrop-filter: blur(12px);
-}
-
-.dark .onboarding-search__item {
-	background: rgb(17 24 39 / 0.5);
 }
 
 /* ========================================
@@ -518,14 +531,11 @@ body,
 
 	border-radius: var(--radius-lg);
 
-	background: rgb(255 255 255 / 0.85);
+	background: var(--Soft-Black);
+	border: 1px solid var(--color-border);
 	backdrop-filter: blur(12px);
 
 	box-shadow: var(--shadow-card);
-}
-
-.dark .onboarding-care-card {
-	background: rgb(17 24 39 / 0.7);
 }
 
 .onboarding-care-card__header {
@@ -556,14 +566,14 @@ body,
 	height: 0.75rem;
 	margin-bottom: 0.5rem;
 
-	background: rgb(124 58 237 / 0.2);
+	background: rgba(199, 210, 254, 0.40);
 }
 
 .onboarding-care-card__line--secondary {
 	width: 50%;
 	height: 0.5rem;
 
-	background: rgb(156 163 175 / 0.35);
+	background: rgba(255, 255, 255, 0.22);
 }
 
 .onboarding-care-card__materials {
@@ -578,6 +588,15 @@ body,
 	justify-content: space-between;
 
 	font-size: 0.75rem;
+}
+
+.onboarding-care-card__material-name {
+	font-weight: 600;
+	color: var(--color-foreground);
+}
+
+.onboarding-care-card__material-muted {
+	color: var(--color-muted-foreground);
 }
 
 .onboarding-care-card__progress {
@@ -637,5 +656,5 @@ body,
 }
 
 .onboarding-progress__dot--completed {
-	background: rgb(124 58 237 / 0.5);
+	background: var(--color-primary-muted);
 }

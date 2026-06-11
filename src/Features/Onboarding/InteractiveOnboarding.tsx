@@ -30,7 +30,7 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 				<div className="onboarding-demo onboarding-demo--email">
 					<div className="onboarding-email">
 						<div className="onboarding-email__header">
-							<Mail className="size-4" />
+							<Mail size={16} />
 							<span>Connect Gmail</span>
 						</div>
 
@@ -38,7 +38,7 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 							{[1, 2, 3].map((i) => (
 								<div key={i} className={`onboarding-email-card onboarding-email-card--delay-${i}`}>
 									<div className="onboarding-email-card__icon">
-										<Mail className="size-5 text-primary" />
+										<Mail size={20} />
 									</div>
 
 									<div className="onboarding-email-card__content">
@@ -52,7 +52,7 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 
 					<div className="onboarding-ping" />
 					<div className="onboarding-action">
-						<ChevronRight className="size-6 text-primary-foreground" />
+						<ChevronRight size={22} />
 					</div>
 				</div>
 			),
@@ -66,12 +66,12 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 				<div className="onboarding-demo onboarding-demo--search">
 					<div className="onboarding-search">
 						<div className="onboarding-search__input">
-							<Search className="size-4 text-muted-foreground" />
-							<div className="text-sm text-muted-foreground">summer dress</div>
+							<Search size={16} />
+							<div className="onboarding-search__query">summer dress</div>
 						</div>
 
 						<div className="onboarding-search__filters">
-							{["Dresses", "Cotton", "Under $50"].map((filter) => (
+							{["Dresses", "Cotton", "Black"].map((filter) => (
 								<div key={filter} className="onboarding-search__filter">
 									{filter}
 								</div>
@@ -106,8 +106,8 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 
 						<div className="onboarding-care-card__materials">
 							<div className="onboarding-care-card__material-row">
-								<span className="font-medium">Cotton 80%</span>
-								<span className="text-muted-foreground">Polyester 20%</span>
+								<span className="onboarding-care-card__material-name">Cotton 80%</span>
+								<span className="onboarding-care-card__material-muted">Polyester 20%</span>
 							</div>
 
 							<div className="onboarding-care-card__progress">
@@ -165,11 +165,15 @@ export function OnboardingOption3({ onComplete }: { onComplete: () => void }) {
 					</div>
 
 					<div className="onboarding__actions">
-						{!isLastStep && <button onClick={onComplete}>Skip</button>}
+						{!isLastStep && (
+							<button className="onboarding__btn onboarding__btn--ghost" onClick={onComplete} type="button">
+								Skip
+							</button>
+						)}
 
-						<button onClick={handleNext}>
+						<button className="onboarding__btn onboarding__btn--primary" onClick={handleNext} type="button">
 							{isLastStep ? "Get Started" : "Next"}
-							<ChevronRight className="size-4 ml-1" />
+							<ChevronRight size={16} />
 						</button>
 					</div>
 				</div>
