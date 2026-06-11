@@ -279,10 +279,15 @@ const formStepOptions: Record<string, string[]> = {
 
 function Step5Demo() {
 	const [step, setStep] = useState(0);
+	const [done, setDone] = useState(false);
+
 	useEffect(() => {
-		// Slower cadence + the panel fade below keep the swap from feeling abrupt.
-		const t = setInterval(() => setStep((s) => (s + 1) % formStepLabels.length), 1400);
-		return () => clearInterval(t);
+		// Advance through each step once, then finish — no infinite loop.
+		const STEP_MS = 1300;
+		const timers = formStepLabels.slice(1).map((_, i) => setTimeout(() => setStep(i + 1), (i + 1) * STEP_MS));
+		// After the final (Photo) step: "added to closet" toast + success animation, then stop.
+		timers.push(setTimeout(() => setDone(true), formStepLabels.length * STEP_MS));
+		return () => timers.forEach(clearTimeout);
 	}, []);
 
 	const label = formStepLabels[step];
@@ -293,8 +298,8 @@ function Step5Demo() {
 			<div className="ob-pills">
 				{formStepLabels.map((s, i) => {
 					let cls = "ob-pill";
-					if (i === step) cls += " ob-pill--active";
-					else if (i < step) cls += " ob-pill--done";
+					if (done || i < step) cls += " ob-pill--done";
+					else if (i === step) cls += " ob-pill--active";
 					return (
 						<div key={s} className={cls}>
 							{s}
@@ -304,46 +309,64 @@ function Step5Demo() {
 			</div>
 
 			<div className="ob-manual-body">
-				{/* keyed by step → remounts so the fade animation replays on each change */}
-				<div key={step} className="ob-manual-panel">
-					{label === "Photo" && (
-						<div className="ob-photo-drop">
-							<div className="ob-photo-drop-inner">
-								<Plus style={{ width: 32, height: 32 }} />
-								<span className="ob-photo-label">Add photo</span>
-							</div>
+				{done ? (
+					<div className="ob-manual-success">
+						<div className="ob-success-check">
+							<Check style={{ width: 30, height: 30 }} />
 						</div>
-					)}
-					{label === "Details" && (
-						<div className="ob-field-group">
-							<div>
-								<div className="ob-caps">ITEM NAME</div>
-								<div className="ob-fake-input" style={{ marginTop: 4 }}>
-									White Oxford Shirt
+						<div className="ob-success-text">All set!</div>
+					</div>
+				) : (
+					/* keyed by step → remounts so the fade animation replays on each change */
+					<div key={step} className="ob-manual-panel">
+						{label === "Photo" && (
+							<div className="ob-photo-drop">
+								<div className="ob-photo-drop-inner">
+									<Plus style={{ width: 32, height: 32 }} />
+									<span className="ob-photo-label">Add photo</span>
 								</div>
 							</div>
-							<div>
-								<div className="ob-caps">NOTES</div>
-								<div className="ob-fake-textarea" style={{ marginTop: 4 }}>
-									Bought for work…
-								</div>
-							</div>
-						</div>
-					)}
-					{options && (
-						<div className="ob-field-group">
-							<div className="ob-caps">{label}</div>
-							<div className="ob-cat-options">
-								{options.map((c, ci) => (
-									<div key={c} className={`ob-cat-option${ci === 0 ? " ob-cat-option--active" : ""}`}>
-										{c}
+						)}
+						{label === "Details" && (
+							<div className="ob-field-group">
+								<div>
+									<div className="ob-caps">ITEM NAME</div>
+									<div className="ob-fake-input" style={{ marginTop: 4 }}>
+										White Oxford Shirt
 									</div>
-								))}
+								</div>
+								<div>
+									<div className="ob-caps">NOTES</div>
+									<div className="ob-fake-textarea" style={{ marginTop: 4 }}>
+										Bought for work…
+									</div>
+								</div>
 							</div>
-						</div>
-					)}
-				</div>
+						)}
+						{options && (
+							<div className="ob-field-group">
+								<div className="ob-caps">{label}</div>
+								<div className="ob-cat-options">
+									{options.map((c, ci) => (
+										<div key={c} className={`ob-cat-option${ci === 0 ? " ob-cat-option--active" : ""}`}>
+											{c}
+										</div>
+									))}
+								</div>
+							</div>
+						)}
+					</div>
+				)}
 			</div>
+
+			{done && (
+				<div className="ob-toast" role="status">
+					<span className="ob-toast-check">
+						<Check style={{ width: 12, height: 12 }} />
+					</span>
+					White Oxford Shirt added to your closet!
+				</div>
+			)}
 		</div>
 	);
 }
