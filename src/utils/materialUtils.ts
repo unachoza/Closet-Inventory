@@ -5,33 +5,33 @@ import type { MaterialBlend } from "./types";
 // fall back to a deterministic hue derived from the material name.
 
 export const MATERIAL_COLORS: Record<string, string> = {
-	cotton: "#86efac",      // green-300
-	silk: "#f9a8d4",        // pink-300
-	wool: "#fcd34d",        // amber-300
-	cashmere: "#fbbf24",    // amber-400
-	linen: "#d4b896",       // warm tan
-	modal: "#93c5fd",       // blue-300
-	lace: "#e9d5ff",        // purple-200
-	chiffon: "#fde68a",     // yellow-200
-	polyester: "#5eead4",   // teal-300
-	rayon: "#a5b4fc",       // indigo-300
-	nylon: "#94a3b8",       // slate-400
-	spandex: "#f87171",     // red-400
-	elastane: "#fb923c",    // orange-400
-	lycra: "#fb923c",       // orange-400 (same as elastane — synonym)
-	viscose: "#c4b5fd",     // violet-300
-	acrylic: "#67e8f9",     // cyan-300
-	fleece: "#a3e635",      // lime-400
-	denim: "#60a5fa",       // blue-400
-	leather: "#92400e",     // brown-700
-	suede: "#b45309",       // amber-700
-	velvet: "#7c3aed",      // violet-600
-	satin: "#db2777",       // pink-600
-	corduroy: "#78350f",    // amber-900
-	tweed: "#6b7280",       // gray-500
-	jersey: "#34d399",      // emerald-400
-	cupro: "#e879f9",       // fuchsia-400
-	bamboo: "#bef264",      // lime-300
+	cotton: "#86efac", // green-300
+	silk: "#f9a8d4", // pink-300
+	wool: "#fcd34d", // amber-300
+	cashmere: "#fbbf24", // amber-400
+	linen: "#d4b896", // warm tan
+	modal: "#93c5fd", // blue-300
+	lace: "#e9d5ff", // purple-200
+	chiffon: "#fde68a", // yellow-200
+	polyester: "#5eead4", // teal-300
+	rayon: "#a5b4fc", // indigo-300
+	nylon: "#94a3b8", // slate-400
+	spandex: "#f87171", // red-400
+	elastane: "#fb923c", // orange-400
+	lycra: "#fb923c", // orange-400 (same as elastane — synonym)
+	viscose: "#c4b5fd", // violet-300
+	acrylic: "#67e8f9", // cyan-300
+	fleece: "#a3e635", // lime-400
+	denim: "#60a5fa", // blue-400
+	leather: "#92400e", // brown-700
+	suede: "#b45309", // amber-700
+	velvet: "#7c3aed", // violet-600
+	satin: "#db2777", // pink-600
+	corduroy: "#78350f", // amber-900
+	tweed: "#6b7280", // gray-500
+	jersey: "#34d399", // emerald-400
+	cupro: "#e879f9", // fuchsia-400
+	bamboo: "#bef264", // lime-300
 };
 
 /** Returns a CSS color string for any material, falling back to a
@@ -79,34 +79,46 @@ function parseBlendString(raw: string): MaterialBlend[] {
 
 /** Normalize any legacy material value to MaterialBlend[].
  *  Safe to call on values already in the new shape. */
-export function normalizeMaterial(raw: unknown): MaterialBlend[] {
-	if (Array.isArray(raw)) {
-		// Already new format — validate each entry has the right shape
-		const valid = (raw as unknown[]).filter(
-			(entry): entry is MaterialBlend =>
-				typeof entry === "object" &&
-				entry !== null &&
-				typeof (entry as MaterialBlend).material === "string" &&
-				typeof (entry as MaterialBlend).percentage === "number",
-		);
-		return valid.length > 0 ? valid : [];
+// export function normalizeMaterial(raw: unknown): MaterialBlend[] {
+// 	if (Array.isArray(raw)) {
+// 		// Already new format — validate each entry has the right shape
+// 		const valid = (raw as unknown[]).filter(
+// 			(entry): entry is MaterialBlend =>
+// 				typeof entry === "object" &&
+// 				entry !== null &&
+// 				typeof (entry as MaterialBlend).material === "string" &&
+// 				typeof (entry as MaterialBlend).percentage === "number",
+// 		);
+// 		return valid.length > 0 ? valid : [];
+// 	}
+
+// 	if (typeof raw === "string") {
+// 		return parseBlendString(raw);
+// 	}
+
+// 	return [];
+// }
+
+export function normalizeMaterial(material: unknown): MaterialBlend[] {
+	if (!material) return [];
+
+	if (Array.isArray(material)) {
+		return material;
 	}
 
-	if (typeof raw === "string") {
-		return parseBlendString(raw);
+	// legacy string migration
+	if (typeof material === "string") {
+		return [{ material, percentage: 100 }];
 	}
 
 	return [];
 }
-
 // ── Display helpers ───────────────────────────────────────────────────────────
 
 /** Human-readable summary: "80% Cotton, 20% Polyester" */
 export function blendToDisplayString(blend: MaterialBlend[]): string {
 	if (blend.length === 0) return "—";
-	return blend
-		.map((b) => `${b.percentage}% ${capitalize(b.material)}`)
-		.join(", ");
+	return blend.map((b) => `${b.percentage}% ${capitalize(b.material)}`).join(", ");
 }
 
 /** Primary material name (highest percentage), capitalized. */
