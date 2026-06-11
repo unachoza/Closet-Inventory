@@ -1,4 +1,4 @@
-import { useState, useRef, KeyboardEvent, useEffect } from "react";
+import { useState, useRef, KeyboardEvent, useEffect, Dispatch, SetStateAction } from "react";
 import { X, Plus, Search, ArrowRight, ArrowLeft, Check, User, Tag, SlidersHorizontal, EyeOff } from "lucide-react";
 import "./MobileAdvancedSearchFlow.css";
 
@@ -105,18 +105,51 @@ function TagInput({
 	);
 }
 
+interface MobileSearchWizardProps {
+	fromSender: string;
+	onFromSenderChange: (value: string) => void;
+	dateAfter: string;
+	onDateAfterChange: (value: string) => void;
+	dateBefore: string;
+	onDateBeforeChange: (value: string) => void;
+	subjects: string[];
+	onAddSubject: (subject: string) => void;
+	onRemoveSubject: (subject: string) => void;
+	keywords: string[];
+	onAddKeyword: (keyword: string) => void;
+	onRemoveKeyword: (keyword: string) => void;
+	excluded: string[];
+	onAddExcluded: (sender: string) => void;
+	onRemoveExcluded: (sender: string) => void;
+	onSearch: (mode: "fetch" | "filter") => void;
+	loading: boolean;
+	cachedCount: number;
+}
+
 /* ─── Main wizard ─── */
-export function SearchWizard() {
+export function MobileSearchWizard({
+	fromSender,
+	onFromSenderChange,
+	dateAfter,
+	onDateAfterChange,
+	dateBefore,
+	onDateBeforeChange,
+	subjects,
+	onAddSubject,
+	onRemoveSubject,
+	keywords,
+	onAddKeyword,
+	onRemoveKeyword,
+	excluded,
+	onAddExcluded,
+	onRemoveExcluded,
+	onSearch,
+	loading,
+	cachedCount,
+}: MobileSearchWizardProps) {
 	const [step, setStep] = useState(0);
 	const [dir, setDir] = useState<"right" | "left">("right");
 	const [showSummary, setShowSummary] = useState(false);
-
-	const [fromSender, setFromSender] = useState("");
-	const [dateAfter, setDateAfter] = useState("");
-	const [dateBefore, setDateBefore] = useState("");
-	const [subjects, setSubjects] = useState(DEFAULT_SUBJECTS);
-	const [keywords, setKeywords] = useState(DEFAULT_KEYWORDS);
-	const [excluded, setExcluded] = useState<string[]>([]);
 
 	// Re-trigger animation when step changes
 	const [panelKey, setPanelKey] = useState(0);
@@ -130,13 +163,14 @@ export function SearchWizard() {
 		setShowSummary(false);
 	};
 
-	const clearAll = () => {
-		setFromSender("");
-		setDateAfter("");
-		setDateBefore("");
-		setSubjects([]);
-		setKeywords([]);
-		setExcluded([]);
+	const handleClearAll = () => {
+		onFromSenderChange("");
+		onDateAfterChange("");
+		onDateBeforeChange("");
+		// Clear subjects, keywords, excluded by removing all
+		subjects.forEach(onRemoveSubject);
+		keywords.forEach(onRemoveKeyword);
+		excluded.forEach(onRemoveExcluded);
 		setShowSummary(false);
 		setDir("right");
 		setStep(0);
@@ -155,7 +189,7 @@ export function SearchWizard() {
 			<div className="sw-header">
 				<div className="sw-header-row">
 					<h2 className="sw-title">Email Search</h2>
-					<button className="sw-reset-btn" onClick={clearAll}>
+					<button className="sw-reset-btn" onClick={handleClearAll}>
 						Reset
 					</button>
 				</div>
@@ -254,7 +288,7 @@ export function SearchWizard() {
 								className="sw-input"
 								type="text"
 								value={fromSender}
-								onChange={(e) => setFromSender(e.target.value)}
+								onChange={(e) => onFromSenderChange(e.target.value)}
 								placeholder="E.g. orders@zara.com"
 								autoComplete="off"
 							/>
@@ -267,7 +301,7 @@ export function SearchWizard() {
 									className="sw-input"
 									type="date"
 									value={dateAfter}
-									onChange={(e) => setDateAfter(e.target.value)}
+									onChange={(e) => onDateAfterChange(e.target.value)}
 								/>
 							</div>
 							<div className="sw-input-group">
@@ -276,7 +310,7 @@ export function SearchWizard() {
 									className="sw-input"
 									type="date"
 									value={dateBefore}
-									onChange={(e) => setDateBefore(e.target.value)}
+									onChange={(e) => onDateBeforeChange(e.target.value)}
 								/>
 							</div>
 						</div>
@@ -289,8 +323,8 @@ export function SearchWizard() {
 						<p className="sw-panel-hint">What should the subject line contain?</p>
 						<TagInput
 							tags={subjects}
-							onAdd={(t) => setSubjects((p) => [...p, t])}
-							onRemove={(t) => setSubjects((p) => p.filter((x) => x !== t))}
+							onAdd={onAddSubject}
+							onRemove={onRemoveSubject}
 							placeholder="Add subject pattern…"
 							variant="sky"
 						/>
@@ -303,8 +337,8 @@ export function SearchWizard() {
 						<p className="sw-panel-hint">What should the email body contain?</p>
 						<TagInput
 							tags={keywords}
-							onAdd={(t) => setKeywords((p) => [...p, t])}
-							onRemove={(t) => setKeywords((p) => p.filter((x) => x !== t))}
+							onAdd={onAddKeyword}
+							onRemove={onRemoveKeyword}
 							placeholder="Add body keyword…"
 							variant="violet"
 						/>
@@ -317,8 +351,8 @@ export function SearchWizard() {
 						<p className="sw-panel-hint">Skip emails from these senders</p>
 						<TagInput
 							tags={excluded}
-							onAdd={(t) => setExcluded((p) => [...p, t])}
-							onRemove={(t) => setExcluded((p) => p.filter((x) => x !== t))}
+							onAdd={onAddExcluded}
+							onRemove={onRemoveExcluded}
 							placeholder="E.g. noreply@uber.com"
 							variant="rose"
 						/>
@@ -337,30 +371,41 @@ export function SearchWizard() {
 									setShowSummary(false);
 									setDir("left");
 								}}
+								disabled={loading}
 							>
 								<ArrowLeft size={16} />
 							</button>
-							<button className="sw-btn sw-btn--success">
+							<button
+								className="sw-btn sw-btn--success"
+								onClick={() => onSearch("fetch")}
+								disabled={loading}
+							>
 								<Search size={14} />
-								New Search
+								{loading ? "Searching..." : "New Search"}
 							</button>
 						</div>
-						<button className="sw-btn sw-btn--ghost sw-btn--full">Filter Existing (100)</button>
+						<button
+							className="sw-btn sw-btn--ghost sw-btn--full"
+							onClick={() => onSearch("filter")}
+							disabled={loading || cachedCount === 0}
+						>
+							{loading ? "Filtering..." : `Filter Existing (${cachedCount})`}
+						</button>
 					</>
 				) : (
 					<div className="sw-footer-row">
 						{step > 0 && (
-							<button className="sw-btn sw-btn--icon" onClick={() => go(step - 1)}>
+							<button className="sw-btn sw-btn--icon" onClick={() => go(step - 1)} disabled={loading}>
 								<ArrowLeft size={16} />
 							</button>
 						)}
 						{step < STEPS.length - 1 ? (
-							<button className="sw-btn sw-btn--primary" onClick={() => go(step + 1)}>
+							<button className="sw-btn sw-btn--primary" onClick={() => go(step + 1)} disabled={loading}>
 								Next
 								<ArrowRight size={14} />
 							</button>
 						) : (
-							<button className="sw-btn sw-btn--success" onClick={() => setShowSummary(true)}>
+							<button className="sw-btn sw-btn--success" onClick={() => setShowSummary(true)} disabled={loading}>
 								<Check size={14} />
 								Review
 							</button>
