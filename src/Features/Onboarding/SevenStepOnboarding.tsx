@@ -17,6 +17,37 @@ import {
 	X,
 } from "lucide-react";
 import "./SevenStepsOnboarding.css";
+import logoImg from "../../assets/WardrobeLogo.png";
+
+// ─── Step 0: Welcome ────────────────────────────────────────────────────────────
+
+const welcomeFeatures = [
+  { dot: "#e8453c", text: "Import from Gmail automatically" },
+  { dot: "#2bbfb3", text: "Learn fabric care for every item" },
+  { dot: "#2563eb", text: "Search & filter your whole closet" },
+];
+
+function WelcomeStepDemo() {
+  return (
+    <div className="ob-demo-shell ob-welcome-full">
+      <div className="ob-welcome-glow" />
+      <div className="ob-welcome-logo-wrap">
+        <img src={logoImg} alt="Closet Inventory logo" className="ob-welcome-logo" />
+      </div>
+      <div className="ob-welcome-appname">My Closet Inventory</div>
+      <div className="ob-welcome-tagline">A personal wardrobe management app</div>
+      <div className="ob-welcome-feats">
+        {welcomeFeatures.map((f) => (
+          <div key={f.text} className="ob-welcome-feat">
+            <div className="ob-welcome-feat-dot" style={{ background: f.dot }} />
+            {f.text}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 // ─── Step 1: App menu — Import Gmail highlighted ────────────────────────────────
 
@@ -611,6 +642,13 @@ const EMAIL_IMPORT_STYLE: React.CSSProperties = {
 };
 
 const STEPS: StepDef[] = [
+	  {
+    group: "Welcome",
+    groupStyle: { background: "rgba(232,69,60,0.12)", color: "#e8453c", border: "1px solid rgba(232,69,60,0.25)" },
+    title: "My Closet Inventory",
+    description: "A personal wardrobe management app. Upload your closet, learn fabric care, and more!",
+    demo: <WelcomeStepDemo />,
+  },
 	{
 		group: "Email Import",
 		groupStyle: EMAIL_IMPORT_STYLE,
