@@ -17,7 +17,7 @@ export type ClothingItem = {
 	material: MaterialBlend[] | string;
 	occasion: string;
 	/** Legacy free-text age (e.g. "1 year"). Superseded by purchaseDate (factual age) + condition (subjective state). Kept for back-compat display fallback. */
-	age: string;
+	age?: string;
 	/** Subjective wear state: "new" | "like new" | "good" | "fair" | "needs repair". */
 	condition?: string;
 	/** ISO date the item was purchased — the source of the card's factual age. */
