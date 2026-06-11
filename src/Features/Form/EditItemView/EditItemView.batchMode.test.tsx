@@ -10,8 +10,8 @@ import EditItemView from "./EditItemView";
 vi.mock("framer-motion");
 import type { ClothingItem } from "../../../utils/types";
 
-vi.mock("framer-motion", () => {
-	const React = require("react");
+vi.mock("framer-motion", async () => {
+	const React = await import("react");
 	const makeEl = (tag: string) =>
 		React.forwardRef(({ children, animate, initial, exit, transition, variants, whileHover, whileTap, whileFocus, whileInView, layout, layoutId, ...rest }: any, ref: any) =>
 			React.createElement(tag, { ...rest, ref }, children),

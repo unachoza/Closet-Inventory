@@ -16,8 +16,8 @@ import { useState, useCallback } from "react";
 import GmailImport from "../GmailImport";
 import EditItemView from "../../Form/EditItemView/EditItemView";
 
-vi.mock("framer-motion", () => {
-	const React = require("react");
+vi.mock("framer-motion", async () => {
+	const React = await import("react");
 	const makeEl = (tag: string) =>
 		React.forwardRef(({ children, animate, initial, exit, transition, variants, whileHover, whileTap, whileFocus, whileInView, layout, layoutId, ...rest }: any, ref: any) =>
 			React.createElement(tag, { ...rest, ref }, children),
