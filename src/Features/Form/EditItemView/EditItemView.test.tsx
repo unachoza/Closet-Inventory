@@ -2,6 +2,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import EditItemView from "./EditItemView";
 
+vi.mock("framer-motion");
+
 // Accessible mock functions for assertions
 const mockUpdateItem = vi.fn();
 const mockAddItem = vi.fn();

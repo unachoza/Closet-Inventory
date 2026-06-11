@@ -79,36 +79,20 @@ function parseBlendString(raw: string): MaterialBlend[] {
 
 /** Normalize any legacy material value to MaterialBlend[].
  *  Safe to call on values already in the new shape. */
-// export function normalizeMaterial(raw: unknown): MaterialBlend[] {
-// 	if (Array.isArray(raw)) {
-// 		// Already new format — validate each entry has the right shape
-// 		const valid = (raw as unknown[]).filter(
-// 			(entry): entry is MaterialBlend =>
-// 				typeof entry === "object" &&
-// 				entry !== null &&
-// 				typeof (entry as MaterialBlend).material === "string" &&
-// 				typeof (entry as MaterialBlend).percentage === "number",
-// 		);
-// 		return valid.length > 0 ? valid : [];
-// 	}
-
-// 	if (typeof raw === "string") {
-// 		return parseBlendString(raw);
-// 	}
-
-// 	return [];
-// }
-
-export function normalizeMaterial(material: unknown): MaterialBlend[] {
-	if (!material) return [];
-
-	if (Array.isArray(material)) {
-		return material;
+export function normalizeMaterial(raw: unknown): MaterialBlend[] {
+	if (Array.isArray(raw)) {
+		const valid = (raw as unknown[]).filter(
+			(entry): entry is MaterialBlend =>
+				typeof entry === "object" &&
+				entry !== null &&
+				typeof (entry as MaterialBlend).material === "string" &&
+				typeof (entry as MaterialBlend).percentage === "number",
+		);
+		return valid.length > 0 ? valid : [];
 	}
 
-	// legacy string migration
-	if (typeof material === "string") {
-		return [{ material, percentage: 100 }];
+	if (typeof raw === "string") {
+		return parseBlendString(raw);
 	}
 
 	return [];
