@@ -52,6 +52,10 @@
 	--color-primary: rgb(19, 17, 146);
 	--color-primary-hover: rgb(14, 13, 110);
 	--color-primary-muted: rgb(19, 17, 146, 0.58);
+	--color-green-muted: rgb(17 146 113 / 58%);
+	--color-green-hover: rgb(10, 172, 131);
+	--color-green: rgb(17 146 113);
+	
 	--color-accent: #808000;
 	--color-accent-hover: #676702;
 	/* Aliases for legacy (misspelled) names still referenced across the app. */
