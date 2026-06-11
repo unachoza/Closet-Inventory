@@ -10,6 +10,8 @@
  */
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("framer-motion");
 import { useState, useCallback } from "react";
 import GmailImport from "../GmailImport";
 import EditItemView from "../../Form/EditItemView/EditItemView";
@@ -102,7 +104,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		size: prefilled.size ?? "",
 		brand: prefilled.brand ?? "",
 		price: prefilled.price ?? "",
-		material: prefilled.material ?? "",
+		material: prefilled.material ?? [],
 		occasion: prefilled.occasion ?? "",
 		age: prefilled.age ?? "",
 		condition: prefilled.condition ?? "new",

@@ -11,7 +11,7 @@ const makeItem = (overrides: Partial<ClothingItem>): ClothingItem => ({
 	color: "black",
 	size: "M",
 	brand: "Nike",
-	material: "cotton",
+	material: [{ material: "cotton", percentage: 100 }],
 	occasion: "casual",
 	age: "new",
 	care: "machine wash",

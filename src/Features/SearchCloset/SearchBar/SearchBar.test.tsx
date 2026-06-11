@@ -8,9 +8,9 @@ vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 vi.mock("../../../hooks/useLocalCloset", () => ({
 	useLocalStorageCloset: () => ({
 		closet: [
-			{ id: "1", name: "Nike Top", brand: "Nike", category: "tops", color: "black", material: "cotton", notes: "" },
-			{ id: "2", name: "Zara Dress", brand: "Zara", category: "dresses", color: "red", material: "silk", notes: "" },
-			{ id: "3", name: "Levi Jeans", brand: "Levi's", category: "bottoms", color: "blue", material: "denim", notes: "" },
+			{ id: "1", name: "Nike Top", brand: "Nike", category: "tops", color: "black", material: [{ material: "cotton", percentage: 100 }], notes: "" },
+			{ id: "2", name: "Zara Dress", brand: "Zara", category: "dresses", color: "red", material: [{ material: "silk", percentage: 100 }], notes: "" },
+			{ id: "3", name: "Levi Jeans", brand: "Levi's", category: "bottoms", color: "blue", material: [{ material: "denim", percentage: 100 }], notes: "" },
 		],
 	}),
 }));

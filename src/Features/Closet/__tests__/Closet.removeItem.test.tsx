@@ -11,9 +11,9 @@ import Closet from "../Closet";
 import type { ClothingItem } from "../../../utils/types";
 
 const ITEMS: ClothingItem[] = [
-	{ id: "1", name: "Nike Top", category: "tops", color: "black", size: "M", brand: "Nike", material: "cotton", occasion: "casual", age: "new", care: "machine wash", imageURL: "" },
-	{ id: "2", name: "Zara Dress", category: "dresses", color: "red", size: "S", brand: "Zara", material: "silk", occasion: "formal", age: "1 year", care: "dry clean", imageURL: "" },
-	{ id: "3", name: "Levi Jeans", category: "bottoms", color: "blue", size: "28", brand: "Levi's", material: "denim", occasion: "casual", age: "2 years", care: "machine wash", imageURL: "" },
+	{ id: "1", name: "Nike Top", category: "tops", color: "black", size: "M", brand: "Nike", material: [{ material: "cotton", percentage: 100 }], occasion: "casual", age: "new", care: "machine wash", imageURL: "" },
+	{ id: "2", name: "Zara Dress", category: "dresses", color: "red", size: "S", brand: "Zara", material: [{ material: "silk", percentage: 100 }], occasion: "formal", age: "1 year", care: "dry clean", imageURL: "" },
+	{ id: "3", name: "Levi Jeans", category: "bottoms", color: "blue", size: "28", brand: "Levi's", material: [{ material: "denim", percentage: 100 }], occasion: "casual", age: "2 years", care: "machine wash", imageURL: "" },
 ];
 
 vi.mock("../../../hooks/useLocalCloset", () => ({

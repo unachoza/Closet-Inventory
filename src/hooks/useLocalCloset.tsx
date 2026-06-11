@@ -25,6 +25,7 @@ export function useLocalStorageCloset() {
 					id: crypto.randomUUID(),
 					imageURL: photo ? photo : useStockPhoto(newItem.category as CategoryType),
 					name: newItem.brand ? `${newItem.brand} ${newItem.category}` : newItem.category,
+					material: normalizeMaterial(newItem.material),
 				},
 			];
 			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));

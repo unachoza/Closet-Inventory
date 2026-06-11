@@ -28,7 +28,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		size: prefilled.size ?? "",
 		brand: prefilled.brand ?? "",
 		price: prefilled.price ?? "",
-		material: prefilled.material ?? "",
+		material: prefilled.material ?? [],
 		occasion: prefilled.occasion ?? "",
 		age: prefilled.age ?? "",
 		condition: prefilled.condition ?? "new",
@@ -73,6 +73,7 @@ function AppShell() {
 	// Batch import: "Import All Items" from an email
 	const handleGmailImportAll = useCallback(
 		(items: Partial<ClothingItem>[]) => {
+			console.log({ items });
 			if (items.length === 0) return;
 			const clothingItems = items.map(buildClothingItem);
 			setImportQueue(clothingItems);
@@ -119,14 +120,19 @@ function AppShell() {
 		(format: ExportFormat) => {
 			exportCloset(getCloset(), format);
 		},
-		[getCloset]
+		[getCloset],
 	);
 
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
 		<div className="main">
-			<NavBar onAddItem={handleAddItem} onExportCloset={handleExportCloset} onImportCloset={importItems} closetItemCount={closet.length} />
+			<NavBar
+				onAddItem={handleAddItem}
+				onExportCloset={handleExportCloset}
+				onImportCloset={importItems}
+				closetItemCount={closet.length}
+			/>
 			<EditProvider>
 				<ToastProvider>
 					<div className="app-content">

@@ -6,6 +6,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import EditItemView from "./EditItemView";
+
+vi.mock("framer-motion");
 import type { ClothingItem } from "../../../utils/types";
 
 const mockAddFullItem = vi.fn();
