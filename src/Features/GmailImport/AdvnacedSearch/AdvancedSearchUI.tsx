@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { GMAIL_SEARCH_SUBJECTS, GMAIL_SEARCH_BODY_KEYWORDS } from "../constants";
-import SearchConfirmationModal from "./SearchConfirmationModal";
-import "./AdvancedSearch.css";
+import SearchConfirmationModal from "../AdvnacedSearch/SearchConfirmationModal/SearchConfirmationModal";
+import {SearchWizard} from "../AdvnacedSearch/MobileAdvancedSearchFlow/MobileAdvancedSearchFlow"
 
 export type SearchMode = "fetch" | "filter";
 
@@ -29,7 +29,7 @@ interface AdvancedSearchUIProps {
 	readonly cachedCount: number;
 }
 
-export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: AdvancedSearchUIProps) {
+export const AdvancedSearchUI = ({ onSearch, loading, cachedCount }: AdvancedSearchUIProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [from, setFrom] = useState("");
 	const [after, setAfter] = useState("");
@@ -44,14 +44,17 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 	// Confirmation modal state
 	const [pendingMode, setPendingMode] = useState<SearchMode | null>(null);
 
-	const buildParams = useCallback((): AdvancedSearchParams => ({
-		subjects,
-		excludedSenders,
-		bodyKeywords,
-		from,
-		after,
-		before,
-	}), [subjects, excludedSenders, bodyKeywords, from, after, before]);
+	const buildParams = useCallback(
+		(): AdvancedSearchParams => ({
+			subjects,
+			excludedSenders,
+			bodyKeywords,
+			from,
+			after,
+			before,
+		}),
+		[subjects, excludedSenders, bodyKeywords, from, after, before],
+	);
 
 	// ── Pill add/remove handlers ───────────────────────────
 
@@ -134,11 +137,7 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 
 	return (
 		<div className="advanced-search">
-			<button
-				className="advanced-search-toggle"
-				onClick={() => setIsExpanded((prev) => !prev)}
-				type="button"
-			>
+			<button className="advanced-search-toggle" onClick={() => setIsExpanded((prev) => !prev)} type="button">
 				{isExpanded ? "Hide" : "Show"} Advanced Search
 			</button>
 
@@ -197,9 +196,7 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 									</button>
 								</span>
 							))}
-							{excludedSenders.length === 0 && (
-								<span className="advanced-search-hint">No senders excluded</span>
-							)}
+							{excludedSenders.length === 0 && <span className="advanced-search-hint">No senders excluded</span>}
 						</div>
 						<div className="advanced-search-input-row">
 							<input
@@ -233,9 +230,7 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 									</button>
 								</span>
 							))}
-							{bodyKeywords.length === 0 && (
-								<span className="advanced-search-hint">No body keyword filters</span>
-							)}
+							{bodyKeywords.length === 0 && <span className="advanced-search-hint">No body keyword filters</span>}
 						</div>
 						<div className="advanced-search-input-row">
 							<input
@@ -300,16 +295,9 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 							disabled={loading || cachedCount === 0}
 							onClick={() => handleRequestSearch("filter")}
 						>
-							{loading
-								? "Filtering..."
-								: `Filter Existing (${cachedCount})`}
+							{loading ? "Filtering..." : `Filter Existing (${cachedCount})`}
 						</button>
-						<button
-							type="button"
-							className="advanced-search-clear-btn"
-							onClick={handleClearAll}
-							disabled={loading}
-						>
+						<button type="button" className="advanced-search-clear-btn" onClick={handleClearAll} disabled={loading}>
 							Clear All Filters
 						</button>
 					</div>
@@ -329,4 +317,4 @@ export default function AdvancedSearchUI({ onSearch, loading, cachedCount }: Adv
 			)}
 		</div>
 	);
-}
+};
