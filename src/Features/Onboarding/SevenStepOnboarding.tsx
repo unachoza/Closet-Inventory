@@ -17,7 +17,7 @@ import {
 	X,
 } from "lucide-react";
 import "./SevenStepsOnboarding.css";
-import logoImg from "../../assets/WardrobeLogo.png";
+import WardrobeLogo from "../../assets/WardrobeLogo.png";
 
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
@@ -32,7 +32,7 @@ function WelcomeStepDemo() {
 		<div className="ob-demo-shell ob-welcome-full">
 			<div className="ob-welcome-glow" />
 			<div className="ob-welcome-logo-wrap">
-				<img src={logoImg} alt="Closet Inventory logo" className="ob-welcome-logo" />
+				<img src={WardrobeLogo} alt="Closet Inventory logo" className="ob-welcome-logo" />
 			</div>
 			<div className="ob-welcome-appname">My Closet Inventory</div>
 			<div className="ob-welcome-tagline">A personal wardrobe management app</div>
