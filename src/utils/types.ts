@@ -18,7 +18,7 @@ export type ClothingItem = {
 	material: MaterialBlend[];
 	occasion: string;
 	/** Legacy free-text age (e.g. "1 year"). Superseded by purchaseDate (factual age) + condition (subjective state). Kept for back-compat display fallback. */
-	age: string;
+	age?: string;
 	/** Subjective wear state: "new" | "like new" | "good" | "fair" | "needs repair". */
 	condition?: string;
 	/** ISO date the item was purchased — the source of the card's factual age. */
@@ -46,7 +46,7 @@ export interface ItemFormData {
 	image?: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "active" | "socks" | "underwear" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "athleisure" | "socks" | "underwear" | null;
 
 export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "journey" | "entireCloset";
 

@@ -17,8 +17,8 @@ describe("inferStyleTagsFromName — occasion inference", () => {
 		["Work Wear Blazer", "coats", ["work wear"]],
 		["Office Pencil Skirt", "bottoms", ["work wear"]],
 		// Sports
-		["Gym Yoga Leggings", "active", ["sports"]],
-		["Running Workout Top", "active", ["sports"]],
+		["Gym Yoga Leggings", "active", ["athleisure"]],
+		["Running Workout Top", "active", ["athleisure"]],
 		// Vacation / beach
 		["Beach Cover-Up Resort Dress", "dresses", ["vacation"]],
 		["Tropical Print Swimsuit", undefined, ["vacation"]],
@@ -68,7 +68,7 @@ describe("inferStyleTagsFromName — occasion inference", () => {
 	});
 
 	it("only returns tags from the valid occasionExamples vocabulary", () => {
-		const validVocab = new Set(["formal", "wedding", "cocktail", "going-out", "casual", "basics", "sports", "church", "picnic", "work wear", "everyday", "vacation", "holiday"]);
+		const validVocab = new Set(["formal", "wedding", "cocktail", "going-out", "casual", "basics", "athleisure", "church", "picnic", "work wear", "everyday", "vacation", "holiday"]);
 		const tags = inferStyleTagsFromName("Sports Casual Everyday Top", "active");
 		for (const tag of tags) {
 			expect(validVocab.has(tag)).toBe(true);
