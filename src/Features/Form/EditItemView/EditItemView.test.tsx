@@ -11,18 +11,6 @@ const mockAddFullItem = vi.fn();
 const mockShowToast = vi.fn();
 const mockSetView = vi.fn();
 
-vi.mock("../../../Components/MaterialBlendInput/MaterialBlendInput", () => ({
-	default: ({ value, onChange }: any) => (
-		<div data-testid="material-blend-input">
-			<button onClick={() => onChange?.([{ material: "cotton", percentage: 100 }])}>mock-material</button>
-		</div>
-	),
-}));
-
-vi.mock("../../../Components/MaterialCompositionBar/MaterialCompositionBar", () => ({
-	default: ({ blend }: any) => <div data-testid="material-bar">{Array.isArray(blend) ? blend.length : "no-blend"}</div>,
-}));
-
 vi.mock("../TextInput/TextInput", () => ({
 	default: ({ name, label, value, handleFormUpdate }: any) => (
 		<label>
