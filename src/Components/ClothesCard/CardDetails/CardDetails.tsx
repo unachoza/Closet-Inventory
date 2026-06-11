@@ -43,8 +43,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 
 	// Inferred style attributes (from inferProductAttributes — populated during
 	// email import). Deduped + joined so empty fields collapse gracefully.
-	const dedupeJoin = (parts: (string | undefined)[]) =>
-		[...new Set(parts.filter((p): p is string => !!p))].join(" · ");
+	const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
 	const styleNeckSleeve = dedupeJoin([item.neckline, item.sleeveLength]);
 	const styleConstruction = dedupeJoin([item.fit, item.style, item.rise, item.hemLength || item.topLength, item.pattern, item.accents]);
 	const hasStyle = !!styleNeckSleeve || !!styleConstruction;
@@ -53,15 +52,10 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
-	const identityParts = [
-		item.season,
-		item.condition,
-		item.price,
-	].filter((p): p is string => !!p);
+	const identityParts = [item.season, item.condition, item.price].filter((p): p is string => !!p);
 	const hasIdentity = !!purchasedLabel || identityParts.length > 0 || !!item.age;
 
-	const hasExpandedContent =
-		hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!notes;
+	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!notes;
 
 	return (
 		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
@@ -78,20 +72,15 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						<p className="card-details__name">{item.name || item.brand || item.category}</p>
 						{item.brand && <p className="card-details__brand">{item.brand}</p>}
 					</div>
-					{/* <div className="card-details__header-right">
-						{item.category && <span className="card-details__category-tag">{item.category}</span>}
-					</div> */}
 				</div>
 
 				{/* Color + size */}
-				<SectionTitle label="Size & Color - Category" />
 				<div className="card-details__color-size">
+					<SectionTitle label="Size & Color - Category" />
 					<div className="card-details__color-display">
-						{/* <div className="card-details__color-circle" />
-						<span className="card-details__color-name">{item.color || "—"}</span> */}
 						{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
 						<span className="pill">{item.color || "—"}</span>
-						<span className="card-details__category-tag">{item.category}</span>
+						<span className="card-details__size-pill  pill">{item.category}</span>
 					</div>
 				</div>
 
@@ -149,15 +138,12 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 									{purchasedLabel && (
 										<>
 											Purchased {purchasedLabel}
-											{ageLabel ? ` · ${ageLabel} ago` : ""}
+											{ageLabel ? ` - ${ageLabel} ago` : ""}
 											<br />
 										</>
 									)}
-									<p className="card-details__identity-text">Condition: {item.condition}
-										</p>
-									<p className="card-details__identity-text">
-										Price: {item.price}</p>
-							
+									<p className="card-details__identity-text">Condition: {item.condition}</p>
+									<p className="card-details__identity-text">Price: {item.price}</p>
 								</p>
 							</div>
 						)}
