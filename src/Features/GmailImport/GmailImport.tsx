@@ -14,6 +14,7 @@ import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
 import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "./constants";
+import { inferProductAttributes } from "../../utils/inferProductAttributes";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -128,8 +129,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			const emailFrom = selectedEmail?.from ?? "";
 			const emailSubject = selectedEmail?.subject ?? "";
 			const emailDate = selectedEmail?.date;
-
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
+			const style = inferProductAttributes(product.name);
 			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
@@ -146,6 +147,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				onSale: product.onSale,
 				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
 				condition: emailData.condition,
+				style,
 			});
 		},
 		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
@@ -163,7 +165,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			const items = products.map((product) => {
 				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 				const material = product.material && product.material.length > 0 ? product.material : emailData.material;
-
+				const style = inferProductAttributes(product.name);
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
@@ -176,6 +178,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					material,
 					onSale: product.onSale,
 					condition: emailData.condition,
+					style,
 				} as Partial<ClothingItem>;
 			});
 			onImportAll(items);
@@ -271,7 +274,12 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
-							<button className="gmail-preview-close" onClick={handleClosePreview} type="button" aria-label="Back to email list">
+							<button
+								className="gmail-preview-close"
+								onClick={handleClosePreview}
+								type="button"
+								aria-label="Back to email list"
+							>
 								← Back to list
 							</button>
 							<EmailPreview
