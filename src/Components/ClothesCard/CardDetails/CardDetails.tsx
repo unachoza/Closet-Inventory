@@ -34,7 +34,6 @@ interface CardDetailsProps {
 
 export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
-	console.log({ item });
 	const isFull = variant === "full";
 
 	const blend = normalizeMaterial(item.material);
@@ -42,7 +41,27 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const occasions = Array.isArray(item.occasion) ? item.occasion : item.occasion ? [item.occasion] : [];
 	const notes = normalizeToString(item.notes);
 
-	const hasExpandedContent = occasions.length > 0 || !!notes || !!item.age || !!item.price;
+	// Inferred style attributes (from inferProductAttributes — populated during
+	// email import). Deduped + joined so empty fields collapse gracefully.
+	const dedupeJoin = (parts: (string | undefined)[]) =>
+		[...new Set(parts.filter((p): p is string => !!p))].join(" · ");
+	const styleNeckSleeve = dedupeJoin([item.neckline, item.sleeveLength]);
+	const styleConstruction = dedupeJoin([item.fit, item.style, item.rise, item.hemLength || item.topLength, item.pattern, item.accents]);
+	const hasStyle = !!styleNeckSleeve || !!styleConstruction;
+	const featureTags = [item.hasStretch && "Stretch", item.hasPockets && "Pockets"].filter((t): t is string => !!t);
+
+	// Identity: factual age (from purchaseDate), price, condition, season.
+	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
+	const ageLabel = formatItemAge(item.purchaseDate);
+	const identityParts = [
+		item.season,
+		item.condition,
+		item.price,
+	].filter((p): p is string => !!p);
+	const hasIdentity = !!purchasedLabel || identityParts.length > 0 || !!item.age;
+
+	const hasExpandedContent =
+		hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!notes;
 
 	return (
 		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
@@ -101,14 +120,42 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 				{/* Full view only: extra details + action buttons */}
 				{isFull && (
 					<div className="card-details__expanded">
-						{(item.age || item.price) && (
+						{hasStyle && (
 							<div className="card-details__expanded-subsection">
-								{/* //AGE and Condition */}
+								<SectionTitle label="Style" />
+								<p className="card-details__identity-text">
+									{styleNeckSleeve}
+									{styleNeckSleeve && styleConstruction && <br />}
+									{styleConstruction}
+								</p>
+							</div>
+						)}
+						{featureTags.length > 0 && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Features" />
+								<div className="card-details__occasion-pills">
+									{featureTags.map((t) => (
+										<span key={t} className="card-details__occasion-pill  pill">
+											{t}
+										</span>
+									))}
+								</div>
+							</div>
+						)}
+						{hasIdentity && (
+							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Identity" />
-							{toAbsoluteDate(item.purchaseDate)}$
-							{formatItemAge(item.purchaseDate) ? ` · ${formatItemAge(item.purchaseDate)} ago` : ""}`
-								<p className="card-details__identity-text">{[item.age, item.price].filter(Boolean).join(" · ")}</p>
-								{item.condition}
+								<p className="card-details__identity-text">
+									{purchasedLabel && (
+										<>
+											Purchased {purchasedLabel}
+											{ageLabel ? ` · ${ageLabel} ago` : ""}
+											<br />
+										</>
+									)}
+									{identityParts.join(" · ")}
+									{!purchasedLabel && item.age ? (identityParts.length ? ` · ${item.age}` : item.age) : ""}
+								</p>
 							</div>
 						)}
 						{occasions.length > 0 && (

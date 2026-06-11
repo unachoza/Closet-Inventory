@@ -142,8 +142,11 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
 	const nameFromSubject = stripBrandFromName(subject, brand);
 	const cleanedName = cleanProductName(nameFromSubject);
-	// Product attributes from the raw (uncleaned) name
-	const attrs = inferProductAttributes(subject);
+	// Product attributes from the raw (uncleaned) text. Must scan combinedText,
+	// not just the subject: on the per-product import path the style-bearing
+	// product name arrives as `body` (subject is the retailer's generic
+	// "Your order has been received"), so subject-only inference drops it.
+	const attrs = inferProductAttributes(combinedText);
 
 	const semantic = inferSemanticAttributes(combinedText);
 
