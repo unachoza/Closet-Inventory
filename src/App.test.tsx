@@ -75,6 +75,8 @@ import App from "./App";
 beforeEach(() => {
 	vi.clearAllMocks();
 	localStorage.clear();
+	// Skip the first-launch onboarding so these tests exercise the app views.
+	localStorage.setItem("closetly-onboarding-complete", "true");
 });
 
 describe("App — view transitions", () => {
