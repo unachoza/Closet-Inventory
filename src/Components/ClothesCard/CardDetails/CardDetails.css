@@ -19,7 +19,7 @@
 	padding: 20px 20px 14px;
 	display: flex;
 	flex-direction: column;
-	gap: 14px;
+	gap: 10px;
 	position: relative;
 }
 
@@ -86,6 +86,7 @@
 	color: var(--Op-Black);
 	margin: 0px;
 	text-align: left;
+	text-transform: capitalize;
 }
 
 /* Translucent grey pills with a defining border — category / size / care / occasion / .pill / .tag */
@@ -93,6 +94,7 @@
 .card-details__size-pill,
 .card-details__care-pill,
 .card-details__occasion-pill,
+.card-details__category-tag,
 .tag,
 .pill {
 	display: inline-flex;
@@ -105,6 +107,7 @@
 	border: 1px solid rgba(42, 48, 45, 0.9);
 	border-radius: 5px;
 	white-space: nowrap;
+	text-transform: capitalize;
 }
 
 /* Smaller pills (category / care) keep the tighter padding + size */
@@ -128,8 +131,7 @@
 /* Color + Size row */
 .card-details__color-size {
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
+	flex-direction: column;
 }
 
 .card-details__color-display {
@@ -215,6 +217,7 @@
 	line-height: 2;
 	margin: 0;
 	text-align: left;
+	text-transform: capitalize;
 }
 
 .card-details__occasion-pills {
@@ -235,9 +238,11 @@
 /* Buttons section */
 .card-details__buttons {
 	display: flex;
-	gap: 8px;
-	margin-top: auto;
-	/* padding-top: 14px; */
+   	gap: 15px;
+}
+
+.card-details__buttons > button{
+	margin: 0;
 }
 
 .card-details__button {

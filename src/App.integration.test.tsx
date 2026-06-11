@@ -130,17 +130,17 @@ describe("Filter pills lifecycle", () => {
 	const TEST_CLOSET: ClothingItem[] = [
 		{
 			id: "1", name: "Nike Top", brand: "Nike", category: "tops",
-			color: "black", size: "M", material: "cotton", occasion: "casual",
+			color: "black", size: "M", material: [{ material: "cotton", percentage: 100 }], occasion: "casual",
 			age: "new", care: "machine wash", imageURL: "",
 		},
 		{
 			id: "2", name: "Zara Dress", brand: "Zara", category: "dresses",
-			color: "red", size: "S", material: "silk", occasion: "formal",
+			color: "red", size: "S", material: [{ material: "silk", percentage: 100 }], occasion: "formal",
 			age: "1 year", care: "dry clean", imageURL: "",
 		},
 		{
 			id: "3", name: "Levi Jeans", brand: "Levi's", category: "bottoms",
-			color: "blue", size: "28", material: "denim", occasion: "casual",
+			color: "blue", size: "28", material: [{ material: "denim", percentage: 100 }], occasion: "casual",
 			age: "2 years", care: "machine wash", imageURL: "",
 		},
 	];

@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
+import { ProductAttributes } from "../utils/inferProductAttributes";
 
 export interface MaterialBlend {
 	material: string;
@@ -14,7 +15,7 @@ export type ClothingItem = {
 	size: string;
 	brand: string;
 	price?: string;
-	material: MaterialBlend[] | string;
+	material: MaterialBlend[];
 	occasion: string;
 	/** Legacy free-text age (e.g. "1 year"). Superseded by purchaseDate (factual age) + condition (subjective state). Kept for back-compat display fallback. */
 	age?: string;
@@ -25,6 +26,7 @@ export type ClothingItem = {
 	care: string | string[];
 	onSale?: boolean;
 	notes?: string | string[];
+	style?: ProductAttributes;
 	[key: string]: any;
 };
 

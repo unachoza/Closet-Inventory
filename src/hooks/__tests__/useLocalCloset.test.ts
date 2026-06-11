@@ -47,7 +47,7 @@ describe("useLocalStorageClosetBase", () => {
 				color: "red",
 				size: "S",
 				brand: "Zara",
-				material: "silk",
+				material: [{ material: "silk", percentage: 100 }],
 				occasion: "formal",
 				age: "new",
 				care: "dry clean",
@@ -119,7 +119,7 @@ describe("useLocalStorageClosetBase", () => {
 	});
 
 	it("normalises legacy string material fields to MaterialBlend[] on read", () => {
-		const legacyItem = { ...makeItem({ id: "legacy" }), material: "cotton" };
+		const legacyItem = { ...makeItem({ id: "legacy" }), material: "cotton" } as any;
 		localStorage.setItem(STORAGE_KEY, JSON.stringify([legacyItem]));
 
 		const { result } = renderHook(() => useLocalStorageClosetBase());

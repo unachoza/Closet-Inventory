@@ -1,4 +1,6 @@
-import { Option, Step } from "./types.ts";
+import { Option, Step, MaterialBlend } from "./types.ts";
+
+const b = (material: string, percentage: number): MaterialBlend => ({ material, percentage });
 
 export const formItem = {
 	id: "",
@@ -340,7 +342,7 @@ export const MY_CLOSET_DATA = [
 		size: "6",
 		brand: "aritzia",
 		price: "$166",
-		material: "Content: 61% recycled polyester, 26% LENZING™ ECOVERO™ Viscose, 7% cotton, 6% elastane; Lining: 100% cupro",
+		material: [b("recycled polyester", 61), b("viscose", 26), b("cotton", 7), b("elastane", 6)],
 		occasion: "work",
 		purchaseDate: "2023-08-23T01:59:09.000Z",
 		condition: "good",
@@ -361,7 +363,7 @@ export const MY_CLOSET_DATA = [
 		brand: "Banana Republic",
 		price: "$128.54",
 		// was 400
-		material: "Shell: 100% polyester; Lining: 100% cupro rayon",
+		material: [b("polyester", 100)],
 		occasion: "winter",
 		condition: "good",
 		purchaseDate: "2023-01-19T21:19:18.000Z",
@@ -384,7 +386,7 @@ export const MY_CLOSET_DATA = [
 		brand: "Aritzia",
 		price: "$118",
 		// was 400
-		material: "Content: 61% polyester, 26% viscose, 7% cotton, 6% elastane; Lining: 100% cupro",
+		material: [b("polyester", 61), b("viscose", 26), b("cotton", 7), b("elastane", 6)],
 		occasion: "wear to work",
 		condition: "good",
 		purchaseDate: "2023-01-19T21:19:18.000Z",
@@ -406,7 +408,7 @@ export const MY_CLOSET_DATA = [
 		brand: "Lulus",
 		price: "$35",
 		// was 44
-		material: "95% Cotton, 5% Spandex",
+		material: [b("cotton", 95), b("spandex", 5)],
 		purchaseDate: "2021-11-10T01:02:37.000Z",
 		condition: "needs repair",
 		occasion: "casual",
@@ -425,7 +427,7 @@ export const CLOSET_DATA = [
 		color: "red",
 		size: "M",
 		brand: "Zara",
-		material: "cotton",
+		material: [b("cotton", 100)],
 		occasion: "casual",
 		age: 18,
 		care: "wash like colors",

@@ -10,9 +10,26 @@
  */
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("framer-motion");
 import { useState, useCallback } from "react";
 import GmailImport from "../GmailImport";
 import EditItemView from "../../Form/EditItemView/EditItemView";
+
+vi.mock("framer-motion", async () => {
+	const React = await import("react");
+	const makeEl = (tag: string) =>
+		React.forwardRef(({ children, animate, initial, exit, transition, variants, whileHover, whileTap, whileFocus, whileInView, layout, layoutId, ...rest }: any, ref: any) =>
+			React.createElement(tag, { ...rest, ref }, children),
+		);
+	return {
+		motion: new Proxy({}, { get: (_t: any, tag: string) => makeEl(tag) }),
+		AnimatePresence: ({ children }: any) => children,
+		useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
+		useMotionValue: (v: unknown) => ({ get: () => v, set: vi.fn() }),
+		useTransform: (v: unknown) => v,
+	};
+});
 import { EditProvider } from "../../Form/EditContext";
 import { ToastProvider } from "../../../Components/Toast/Toast";
 import type { ClothingItem, ViewType } from "../../../utils/types";
@@ -102,7 +119,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		size: prefilled.size ?? "",
 		brand: prefilled.brand ?? "",
 		price: prefilled.price ?? "",
-		material: prefilled.material ?? "",
+		material: prefilled.material ?? [],
 		occasion: prefilled.occasion ?? "",
 		age: prefilled.age ?? "",
 		condition: prefilled.condition ?? "new",

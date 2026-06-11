@@ -46,13 +46,7 @@ function toDateInputValue(iso?: string): string {
 	return d.toISOString().slice(0, 10);
 }
 
-/** Human-readable absolute date, e.g. "Mar 15, 2024". */
-function toAbsoluteDate(iso?: string): string {
-	if (!iso) return "";
-	const d = new Date(iso);
-	if (isNaN(d.getTime())) return "";
-	return d.toLocaleDateString("default", { year: "numeric", month: "short", day: "numeric" });
-}
+import { toAbsoluteDate } from "../../../utils/dateUtils";
 
 export interface EditItemViewProps {
 	item: ClothingItem;
