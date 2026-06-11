@@ -466,7 +466,7 @@ const STEPS: StepDef[] = [
 		groupStyle: { background: "rgba(19,17,146,0.30)", color: "rgb(199,210,254)", border: "1px solid rgba(199,210,254,0.25)" },
 		title: "Review the parsed details",
 		description:
-			"AI extracts name, category, color, size, brand, and price from each order. Tap any field to correct it before adding to your closet.",
+			"Name, category, color, size, brand, and price is extracted from each order. Tap any field to correct it before adding to your closet.",
 		demo: <Step4Demo />,
 	},
 	{
@@ -520,9 +520,6 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 					})}
 				</div>
 
-				{/* Demo — keyed so animations restart on step change */}
-				<div key={currentStep}>{step.demo}</div>
-
 				{/* Content */}
 				<div className="ob-content">
 					<div className="ob-badges">
@@ -534,6 +531,8 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 					<h2 className="ob-title">{step.title}</h2>
 					<p className="ob-description">{step.description}</p>
 				</div>
+				{/* Demo — keyed so animations restart on step change */}
+				<div key={currentStep}>{step.demo}</div>
 
 				{/* Navigation */}
 				<div className="ob-nav">
