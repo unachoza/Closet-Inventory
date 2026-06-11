@@ -142,8 +142,8 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 											<br />
 										</>
 									)}
-									<p className="card-details__identity-text">Condition: {item.condition}</p>
-									<p className="card-details__identity-text">Price: {item.price}</p>
+									{item.condition && <p className="card-details__identity-text">Condition: {item.condition}</p>}
+									{item.price && <p className="card-details__identity-text">Price: {item.price}</p>}
 								</p>
 							</div>
 						)}
