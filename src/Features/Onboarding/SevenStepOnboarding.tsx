@@ -62,7 +62,7 @@ function Step1Demo() {
 		{ icon: LayoutGrid, label: "View All" },
 		{ icon: Download, label: "Import Gmail", highlight: true },
 		{ icon: FileDown, label: "Download Closet" },
-		{ icon: FileUp, label: "Upload Closet" },
+		/* { icon: FileUp, label: "Upload Closet" }, */
 		{ icon: Scissors, label: "Fabric Guide" },
 		{ icon: Activity, label: "Fiber Journey" },
 		{ icon: SkipBack, label: "Back to Carousel" },
@@ -150,14 +150,14 @@ const parsedItems = [
 		bg: "#78716c",
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150747/Screenshot_2026-06-10_at_9.02.32_PM_ddjuk6.png",
 	},
-	{
-		name: "Rib Sleeveless Top",
-		price: "$12.90",
-		size: "S",
-		color: "Blue / White",
-		bg: "#475569",
-		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151246/Screenshot_2026-06-10_at_9.13.58_PM_gim9sb.png",
-	},
+	// {
+	// 	name: "Rib Sleeveless Top",
+	// 	price: "$12.90",
+	// 	size: "S",
+	// 	color: "Blue / White",
+	// 	bg: "#475569",
+	// 	imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151246/Screenshot_2026-06-10_at_9.13.58_PM_gim9sb.png",
+	// },
 	{
 		name: "Cotton Modal Tan…",
 		price: "$12.90",
@@ -198,7 +198,7 @@ function Step3Demo() {
 	return (
 		<div className="ob-demo-shell ob-items-wrap">
 			<div className="ob-items-scroll">
-				<div className="ob-items-header">Detected 5 Items</div>
+				<div className="ob-items-header">Detected 4 Items</div>
 				{parsedItems.map((item, i) => (
 					<div key={item.name} className={`ob-item-row${imported.has(i) ? " ob-item-row--imported" : ""}`}>
 						<div className="ob-item-thumb" style={{ background: item.bg }}>
@@ -735,17 +735,15 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 		<div className="ob-root ob-page">
 			<div className="ob-container">
 				{/* Progress */}
-				<div className="ob-progress">
-					{STEPS.map((_, i) => {
-						let cls = "ob-progress-seg";
-						if (i < currentStep) cls += " ob-progress-seg--done";
-						else if (i === currentStep) cls += " ob-progress-seg--active";
-						return <div key={i} className={cls} />;
-					})}
-				</div>
-
-				{/* Content */}
-				<div className="ob-content">
+				<div className="ob-progress-container">
+					<div className="ob-progress">
+						{STEPS.map((_, i) => {
+							let cls = "ob-progress-seg";
+							if (i < currentStep) cls += " ob-progress-seg--done";
+							else if (i === currentStep) cls += " ob-progress-seg--active";
+							return <div key={i} className={cls} />;
+						})}
+					</div>
 					<div className="ob-badges">
 						<span className="ob-group-badge" style={step.groupStyle}>
 							{step.group}
@@ -754,11 +752,15 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 							Step {currentStep + 1} of {STEPS.length}
 						</span>
 					</div>
+				</div>
+
+				{/* Content */}
+				<div className="ob-content">
 					<h2 className="ob-title">{step.title}</h2>
 					<p className="ob-description">{step.description}</p>
+					{/* Demo — keyed so animations restart on step change */}
+					<div key={currentStep}>{step.demo}</div>
 				</div>
-				{/* Demo — keyed so animations restart on step change */}
-				<div key={currentStep}>{step.demo}</div>
 
 				{/* Navigation */}
 				<div className="ob-nav">

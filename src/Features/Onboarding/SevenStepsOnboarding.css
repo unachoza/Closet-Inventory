@@ -56,7 +56,10 @@
   max-width: 24rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 95vh;
+
 
   /* Frosted-glass card matching the closet's panels. */
   padding: 1.75rem 1.5rem;
@@ -68,6 +71,12 @@
 }
 
 /* ─── Progress bar ───────────────────────────────────────────────────────────── */
+.ob-progress-container{
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
 .ob-progress {
   display: flex;
   gap: 4px;
@@ -102,13 +111,17 @@
 .ob-demo-shell.ob-welcome-full{
    align-items: center;
    justify-content: center;
+    height: 22rem;
+    gap: .8rem;
 }
 
 /* ─── Content block ──────────────────────────────────────────────────────────── */
 .ob-content {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+      gap: 1.5rem;
+    height: 80%;
+    justify-content: center;
 }
 
 .ob-badges {
@@ -150,6 +163,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: -1.25rem;
 }
 
 .ob-back-btn {
@@ -163,6 +177,14 @@
   color: var(--muted-foreground);
   padding: 0;
   transition: color 0.2s;
+}
+
+.ob-nav > button {
+  margin-bottom: -.25rem;
+}
+
+.ob-nav-right > button {
+  margin-bottom: -.25rem;
 }
 
 .ob-back-btn:hover {
@@ -281,7 +303,7 @@
 .ob-welcome-feats {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 10px;
   width: 100%;
   position: relative;
   z-index: 1;
