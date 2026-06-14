@@ -56,8 +56,9 @@
   > presentational — treat as low-priority unless its source-links/tab logic grows.
 
 **So "how much testing is needed?" is not "a lot more unit tests."** The unit floor
-is solid. The real gaps are two: **no E2E at all**, and **the known bugs have no
-regression tests.** Everything below is sized to those.
+is solid. The real gaps are two: **E2E exists but is mobile-only and thin** (no desktop
+projects, core flows uncovered), and **the known bugs have no regression tests.**
+Everything below is sized to those.
 
 ---
 
@@ -75,19 +76,25 @@ A roadmap that assumes green is incomplete; this is step zero.
 
 ---
 
-## Gap 1 — E2E is entirely absent (the whole missing layer)
+## Gap 1 — E2E exists but is mobile-only (broaden it)
 
-Playwright is documented in the README + TESTING_PLAN but **still not installed**.
-This is the single biggest hole and the highest-value next investment, because the
-mobile experience the business model depends on has **zero** real-browser coverage.
+> **Correction:** Playwright **is** installed and running (the README/TESTING_PLAN
+> "planned — not installed" claims were stale). As of 2026-06-14: `playwright.config.ts`
+> with **2 projects** (Mobile Safari iPhone 13, Mobile Chrome Pixel 7), **3 specs / 14
+> tests** (`card-detail-modal.mobile`, `gmail-import.mobile`, `image-compression`),
+> run via `npm run test:e2e`. **12 pass, 2 fail** — both the same `card-detail-modal`
+> visual-snapshot baseline, stale after the CardDetails rework (re-bless with
+> `--update-snapshots` once the modal layout is final; not a functional failure).
 
-- [ ] Install + configure Playwright (5 projects: Chrome/Safari desktop, iPhone Safari,
-      Pixel Chrome, Firefox).
-- [ ] **Add Item** full 9-step flow → item in grid (Chrome + Safari desktop).
-- [ ] **Add Item on iPhone Safari** — incl. image upload from the photo picker.
+The layer is no longer absent — but it's **mobile-only and thin**. The real work is
+breadth: desktop browsers and the core flows aren't covered yet.
+
+- [x] Playwright installed + configured (2 mobile projects).
+- [x] Mobile: card-detail modal flow, Gmail-import flow, image compression.
+- [ ] **Re-bless the 2 stale `card-detail-modal` snapshots** (or fix if the drift is unintended).
+- [ ] **Add desktop projects** (Chromium + WebKit desktop) — currently zero desktop coverage.
+- [ ] **Add Item** full 9-step flow → item in grid (desktop + iPhone, incl. image upload).
 - [ ] **Search + filter + sort** combined — desktop + mobile filter panel open/close.
-- [ ] **Mobile modal behaviour** (known-weak): filter panel doesn't overflow at 375px,
-      backdrop tap dismisses, body scroll-lock holds, keyboard doesn't shove modal off-screen.
 - [ ] **Gmail OAuth** happy path (Chrome only).
 - [ ] **PWA install** (Safari iOS) — once PWA scaffolding lands (currently nothing to test).
 
@@ -143,12 +150,13 @@ The genuinely worthwhile remainder is **~12–15 files**, most modest:
 | Hooks | Mature | — (OAuth hooks are E2E-only by design) |
 | Components | Good | ~10 render/interaction tests, mostly modest value |
 | Integration | Good | Add the bug-regression flows (Gap 2) |
-| **E2E** | **Zero** | **The whole layer — biggest gap, do first after green** |
+| **E2E** | **Mobile-only (14 tests, 2 mobile projects)** | **Add desktop projects + core flows; biggest breadth gap** |
 
-**Priority:** (0) green + de-noise → (1) regression tests for the known bugs, landed
-with their fixes → (2) Playwright + the critical-flow E2E set → (3) backfill the
-~12–15 unit/component gaps opportunistically. Chasing the long tail of "every file
-has a test" is **not** where the risk is; mobile + real-browser behaviour is.
+**Priority:** (0) green + de-noise (incl. re-blessing the 2 stale e2e snapshots) →
+(1) regression tests for the known bugs, landed with their fixes → (2) broaden E2E:
+desktop projects + the critical-flow set → (3) backfill the ~12–15 unit/component
+gaps opportunistically. Chasing the long tail of "every file has a test" is **not**
+where the risk is; desktop + real-browser breadth is.
 
 ---
 
@@ -156,6 +164,8 @@ has a test" is **not** where the risk is; mobile + real-browser behaviour is.
 
 - [ ] Suite green; no `console.log` in source.
 - [ ] Every README "Known Bug" has a regression test.
-- [ ] Playwright installed; critical flows pass on Chrome + Safari desktop + iPhone Safari.
+- [x] Playwright installed; mobile flows pass on iPhone 13 + Pixel 7 (2 snapshots need re-blessing).
+- [ ] Desktop projects added; critical flows pass on Chromium + WebKit desktop too.
+- [ ] Critical flows pass on Chrome + Safari desktop + iPhone Safari
 - [x] `@vitest/coverage-v8` installed; baseline measured (73% lines, 2026-06-14).
 - [ ] Lines coverage ≥ 80% (README target) and a coverage gate wired into CI.

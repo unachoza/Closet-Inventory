@@ -241,6 +241,12 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 ## Week 4 — E2E (Playwright)
 > Real browser. Real interactions. Cross-device.
 
+> ✅ **Update (2026-06-14): Playwright is installed and running** — `playwright.config.ts`
+> with 2 mobile projects (iPhone 13, Pixel 7), 3 specs / 14 tests (`card-detail-modal.mobile`,
+> `gmail-import.mobile`, `image-compression`), run via `npm run test:e2e`. The matrix below
+> is still aspirational for **desktop** browsers (not yet configured). See
+> [TESTING_ROADMAP.md → Gap 1](./TESTING_ROADMAP.md).
+
 ### Browser Matrix
 
 | Browser | Device | Priority |
@@ -251,6 +257,7 @@ Steps 1–9 of the form → submit → item appears in Closet grid
 | Chrome | Pixel 5 (Android) | P1 |
 | Firefox | Desktop | P1 |
 | Edge | Desktop | P2 |
+| Opera| Desktop | P2 |
 
 ### Critical E2E Flows
 
@@ -400,7 +407,7 @@ Week 3 — Integration Flows
   [ ] Firestore sync
 
 Week 4 — E2E (Playwright)
-  [ ] Playwright config (5 browser/device projects)
+  [x] Playwright config (2 mobile projects done; desktop projects still TODO)
   [ ] Add item — Chrome + Safari desktop
   [ ] Add item — iPhone Safari
   [ ] Filter + search — all browsers

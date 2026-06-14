@@ -103,7 +103,7 @@ src/
 | **Auth**          | Firebase Auth + Google OAuth               | User sign-in and Gmail access   |
 | **Search**        | Fuse.js                                    | Fuzzy client-side search        |
 | **Testing**       | Vitest + React Testing Library             | Unit and integration tests      |
-| **E2E**           | Playwright _(planned — not yet installed)_ | End-to-end critical flows       |
+| **E2E**           | Playwright (installed — 2 mobile projects: iPhone 13 + Pixel 7) | End-to-end critical flows (`npm run test:e2e`) |
 | **Type Safety**   | TypeScript 5+                              | Static type checking            |
 
 ---
