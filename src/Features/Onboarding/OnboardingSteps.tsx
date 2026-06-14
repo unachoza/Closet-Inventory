@@ -282,8 +282,44 @@ const reviewFields = [
 	{ key: "price", label: "PRICE", value: "$14.90" },
 ];
 
+const NAME_TARGET = "Strappy Top";
+
 function Step4Demo() {
 	const [editing, setEditing] = useState<string | null>(null);
+	// Auto-demo: tap the NAME field, retype its value, then cue "Add to Closet".
+	const [autoEditName, setAutoEditName] = useState(false);
+	const [typing, setTyping] = useState(false);
+	const [nameValue, setNameValue] = useState(reviewFields[0].value);
+	const [addPulse, setAddPulse] = useState(false);
+
+	useEffect(() => {
+		const timers: ReturnType<typeof setTimeout>[] = [];
+		// 1. Tap the NAME field → highlight + clear, ready to retype.
+		timers.push(
+			setTimeout(() => {
+				setAutoEditName(true);
+				setTyping(true);
+				setNameValue("");
+			}, 800),
+		);
+		// 2. Type the corrected name one character at a time.
+		const TYPE_START = 1100;
+		const TYPE_MS = 90;
+		[...NAME_TARGET].forEach((_, i) => {
+			timers.push(setTimeout(() => setNameValue(NAME_TARGET.slice(0, i + 1)), TYPE_START + i * TYPE_MS));
+		});
+		const typedAt = TYPE_START + NAME_TARGET.length * TYPE_MS;
+		// 3. Commit the edit (drop the highlight + cursor).
+		timers.push(
+			setTimeout(() => {
+				setTyping(false);
+				setAutoEditName(false);
+			}, typedAt + 400),
+		);
+		// 4. Pulse "Add to Closet" to point at the next action.
+		timers.push(setTimeout(() => setAddPulse(true), typedAt + 800));
+		return () => timers.forEach(clearTimeout);
+	}, []);
 
 	return (
 		<div className="ob-demo-shell ob-form-wrap">
@@ -312,23 +348,29 @@ function Step4Demo() {
 
 			<div className="ob-fields-grid">
 				{reviewFields.map((f) => {
-					const isEditing = editing === f.key;
+					// The NAME field is driven by the auto-demo (or a manual tap); the rest stay tap-to-edit.
+					const isEditing = f.key === "name" ? autoEditName || editing === "name" : editing === f.key;
+					const value = f.key === "name" ? nameValue : f.value;
+					const showCursor = f.key === "name" && typing;
 					return (
 						<button
 							key={f.key}
-							onClick={() => setEditing(isEditing ? null : f.key)}
+							onClick={() => setEditing(editing === f.key ? null : f.key)}
 							className={`ob-field-btn${isEditing ? " ob-field-btn--editing" : ""}`}
 						>
 							<div className="ob-caps">{f.label}</div>
-							<div className={`ob-field-value${isEditing ? " ob-field-value--editing" : ""}`}>{f.value}</div>
+							<div className={`ob-field-value${isEditing ? " ob-field-value--editing" : ""}`}>
+								{value}
+								{showCursor && <span className="ob-field-cursor" />}
+							</div>
 						</button>
 					);
 				})}
 			</div>
 
 			<div className="ob-form-actions">
-				<button className="ob-add-btn">Add to Closet</button>
-				<button className="ob-skip-item-btn">Do NOT Add This Item</button>
+				<button className="ob-skip-item-btn">Skip This Item</button>
+				<button className={`ob-add-btn${addPulse ? " ob-add-btn--pulse" : ""}`}>Add to Closet</button>
 			</div>
 		</div>
 	);

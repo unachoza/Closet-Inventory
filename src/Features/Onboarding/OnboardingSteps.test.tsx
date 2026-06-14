@@ -7,7 +7,7 @@ const advanceToLast = () => {
 	for (let i = 0; i < 8; i++) next();
 };
 
-describe("OnboardingExpanded (SevenStep)", () => {
+describe("OnboardingExpanded", () => {
 	it("renders the first step with its badge, group, and title", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		expect(screen.getByText("A personal wardrobe management app")).toBeInTheDocument();
@@ -72,7 +72,7 @@ describe("OnboardingExpanded (SevenStep)", () => {
 		expect(onComplete).toHaveBeenCalledTimes(1);
 	});
 
-	it("walks through all seven step titles in order", () => {
+	it("walks through all step titles in order", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		const titles = [
 			"Closet Inventory",
@@ -126,6 +126,115 @@ describe("OnboardingExpanded (SevenStep)", () => {
 			});
 			expect(screen.getByText("All set!")).toBeInTheDocument();
 			expect(screen.getByText(/added to your closet/i)).toBeInTheDocument();
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+});
+
+describe("Step 2 — Connect your Gmail (nav drawer demo)", () => {
+	it("lists the app menu items inside the drawer", () => {
+		render(<OnboardingExpanded onComplete={vi.fn()} />);
+		next(); // reach step 2
+		expect(screen.getByText("Connect your Gmail")).toBeInTheDocument();
+		["View All", "Add Item", "Import Gmail", "Download Closet", "Fabric Guide", "Fiber Journey", "Back to Carousel"].forEach((label) => {
+			expect(screen.getByText(label)).toBeInTheDocument();
+		});
+	});
+
+	it("plays the hamburger → drawer → Import Gmail highlight sequence", () => {
+		vi.useFakeTimers();
+		try {
+			const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
+			next(); // reach step 2
+
+			// Starts on an idle home screen: drawer closed, hamburger at rest.
+			expect(container.querySelector(".ob-nav-drawer--open")).toBeNull();
+			expect(container.querySelector(".ob-nav-hamburger--press")).toBeNull();
+			expect(container.querySelector(".ob-menu-item--tapped")).toBeNull();
+
+			// Hamburger presses (700ms) then the drawer slides open (1000ms).
+			act(() => {
+				vi.advanceTimersByTime(1100);
+			});
+			expect(container.querySelector(".ob-nav-drawer--open")).not.toBeNull();
+
+			// Import Gmail highlights once the drawer has settled (2400ms).
+			act(() => {
+				vi.advanceTimersByTime(1500);
+			});
+			expect(container.querySelector(".ob-menu-item--tapped")).not.toBeNull();
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+});
+
+describe("Step 3 — Narrow your search (advanced search demo)", () => {
+	it("renders the advanced-search filter nav", () => {
+		render(<OnboardingExpanded onComplete={vi.fn()} />);
+		next();
+		next(); // reach step 3
+		expect(screen.getByText("Advanced Email Search")).toBeInTheDocument();
+		["Sender", "Dates", "Keywords", "Exclude"].forEach((label) => {
+			expect(screen.getByText(label)).toBeInTheDocument();
+		});
+	});
+
+	it("completes (dims) the Exclude step before the search button pulses", () => {
+		vi.useFakeTimers();
+		try {
+			const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
+			next();
+			next(); // reach step 3
+
+			// Exclude is the 4th (last) nav dot; the primary button is the search CTA.
+			const excludeDot = () => container.querySelectorAll(".ob-adv-nav-dot")[3];
+			const searchBtn = () => container.querySelector(".ob-adv-btn--primary");
+
+			// After Exclude completes (3800ms) it is marked done with a checkmark...
+			act(() => {
+				vi.advanceTimersByTime(3900);
+			});
+			expect(excludeDot().classList.contains("ob-adv-nav-dot--done")).toBe(true);
+			// ...and the search button has NOT begun pulsing yet.
+			expect(searchBtn()?.classList.contains("ob-adv-btn--pulse")).toBe(false);
+
+			// The search button pulses only after Exclude has dimmed (4200ms).
+			act(() => {
+				vi.advanceTimersByTime(400);
+			});
+			expect(searchBtn()?.classList.contains("ob-adv-btn--pulse")).toBe(true);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+});
+
+describe("Step 6 — Review the parsed details (edit field demo)", () => {
+	it("retypes the NAME field then pulses Add to Closet", () => {
+		vi.useFakeTimers();
+		try {
+			const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
+			for (let i = 0; i < 5; i++) next(); // reach the review step
+			expect(screen.getByText("Review the parsed details")).toBeInTheDocument();
+
+			// Starts with the parsed value and no pulse on the add button.
+			expect(screen.getByText("SLEEVELESS TOP")).toBeInTheDocument();
+			expect(container.querySelector(".ob-add-btn--pulse")).toBeNull();
+
+			// The name field is tapped, cleared, and retyped to the corrected value.
+			act(() => {
+				vi.advanceTimersByTime(2600);
+			});
+			expect(screen.getByText("Strappy Top")).toBeInTheDocument();
+			expect(screen.queryByText("SLEEVELESS TOP")).not.toBeInTheDocument();
+
+			// Once committed, "Add to Closet" pulses to point at the next action.
+			act(() => {
+				vi.advanceTimersByTime(500);
+			});
+			expect(container.querySelector(".ob-add-btn--pulse")).not.toBeNull();
 		} finally {
 			vi.useRealTimers();
 		}

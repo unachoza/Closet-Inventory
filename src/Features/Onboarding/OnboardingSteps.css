@@ -242,7 +242,7 @@ gap: 10px;
 
 /* ─── Shared within demos ────────────────────────────────────────────────────── */
 .ob-caps {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--white-40);
@@ -1044,13 +1044,24 @@ height: 100%;
 }
 
 .ob-field-value {
-  font-size: 0.75rem;
+  font-size: 0.95rem;
   margin-top: 2px;
   color: var(--white-80);
 }
 
 .ob-field-value--editing {
   color: var(--blue-text);
+}
+
+/* Blinking caret shown while the NAME field is auto-typed. */
+.ob-field-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 11px;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--blue-text);
+  animation: ob-blink 0.9s step-end infinite;
 }
 
 .ob-form-actions {
@@ -1070,6 +1081,12 @@ height: 100%;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
+  justify-content: center;
+}
+
+/* Cue the primary action once the field edit is committed. */
+.ob-add-btn--pulse {
+  animation: ob-btn-pulse 1.4s ease-in-out infinite;
 }
 
 .ob-skip-item-btn {
@@ -1082,6 +1099,7 @@ height: 100%;
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
+  justify-content: center;
 }
 
 /* ─── Step 5: Manual form ────────────────────────────────────────────────────── */

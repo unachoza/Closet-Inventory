@@ -316,12 +316,12 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				</div>
 
 				<div className="edit-form-actions">
-					<button type="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
 					{isInBatchMode && onSkipItem && (
 						<button className="edit-form-skip-btn" onClick={handleSkip} type="button">
-							Do NOT Add This Item
+							Skip This Item
 						</button>
 					)}
+					<button type="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
 				</div>
 			</motion.form>
 		</div>
