@@ -15,9 +15,11 @@ import {
 	FileDown,
 	// FileUp,
 	X,
+	Menu,
 } from "lucide-react";
 import "./SevenStepsOnboarding.css";
-import logo from "../../assets/Logo.png";
+import logo from "../../assets/hangerLogo.png";
+import { carouselCategories } from "../../utils/constants";
 
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
@@ -52,14 +54,21 @@ function WelcomeStepDemo() {
 
 function Step1Demo() {
 	const [tapped, setTapped] = useState(false);
+	const [pressing, setPressing] = useState(false);
+	const [drawerOpen, setDrawerOpen] = useState(false);
+
+	//mock user pressing hamburger for menu slide out and tap on Gmail Import
 	useEffect(() => {
-		const t = setTimeout(() => setTapped(true), 1000);
-		return () => clearTimeout(t);
+		const press = setTimeout(() => setPressing(true), 700);
+		const release = setTimeout(() => setPressing(false), 1050);
+		const open = setTimeout(() => setDrawerOpen(true), 1000);
+		const tap = setTimeout(() => setTapped(true), 2400);
+		return () => [press, release, open, tap].forEach(clearTimeout);
 	}, []);
 
 	const menuItems = [
-		{ icon: Plus, label: "Add Item" },
 		{ icon: LayoutGrid, label: "View All" },
+		{ icon: Plus, label: "Add Item" },
 		{ icon: Download, label: "Import Gmail", highlight: true },
 		{ icon: FileDown, label: "Download Closet" },
 		/* { icon: FileUp, label: "Upload Closet" }, */
@@ -69,18 +78,47 @@ function Step1Demo() {
 	];
 
 	return (
-		<div className="ob-demo-shell ob-menu">
-			{menuItems.map(({ icon: Icon, label, highlight }) => {
-				let itemClass = "ob-menu-item";
-				if (highlight && tapped) itemClass += " ob-menu-item--tapped";
-				else if (highlight) itemClass += " ob-menu-item--highlight";
-				return (
-					<div key={label} className={itemClass}>
-						<Icon className="ob-menu-icon" />
-						<span className="ob-menu-label">{label}</span>
-					</div>
-				);
-			})}
+		<div className="ob-demo-shell ob-nav-demo">
+			{/* Home screen behind the drawer */}
+			<div className="ob-nav-topbar">
+				<div className={`ob-nav-hamburger${pressing ? " ob-nav-hamburger--press" : ""}`}>
+					<Menu size={18} />
+					{pressing && <span className="ob-nav-tap" aria-hidden="true" />}
+				</div>
+				<span className="ob-nav-title">My Closet Inventory</span>
+			</div>
+			<div className="ob-nav-home">
+				<div className="ob-nav-ghost-row">
+					{carouselCategories.slice(1, 4).map(({ label, icon }) => {
+						return (
+							<div key={label} className=" ob-nav-ghost-tile clothes-card emoji">
+								{icon}
+							</div>
+						);
+					})}
+				</div>
+			</div>
+
+			{/* Slide-out drawer (mirrors the real NavBar drawer) */}
+			<div className={`ob-nav-overlay${drawerOpen ? " ob-nav-overlay--show" : ""}`} aria-hidden="true" />
+			<nav className={`ob-nav-drawer${drawerOpen ? " ob-nav-drawer--open" : ""}`} aria-label="Navigation menu">
+				<div className="ob-nav-drawer-close">
+					<X size={14} />
+				</div>
+				<div className="ob-nav-drawer-list">
+					{menuItems.map(({ icon: Icon, label, highlight }) => {
+						let itemClass = "ob-menu-item";
+						if (highlight && tapped) itemClass += " ob-menu-item--tapped";
+						else if (highlight) itemClass += " ob-menu-item--highlight";
+						return (
+							<div key={label} className={itemClass}>
+								<Icon className="ob-menu-icon" />
+								<span className="ob-menu-label">{label}</span>
+							</div>
+						);
+					})}
+				</div>
+			</nav>
 		</div>
 	);
 }
