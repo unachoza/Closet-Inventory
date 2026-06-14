@@ -40,3 +40,6 @@ dist-ssr
 
 .env
 .claude/
+
+# test coverage reports
+coverage/

@@ -1,5 +1,11 @@
 # Testing Plan
 
+> ⚠️ **The "Current State" below is stale.** As of 2026-06-14 the suite is
+> **70 test files / ~915 cases** — most of Week 1–3 here is already done. See
+> [TESTING_ROADMAP.md](./TESTING_ROADMAP.md) for the current state and priorities
+> (E2E + known-bug regressions). The per-file checklists and **Skip list** below
+> are still useful as a backlog.
+
 ## Current State
 - **72 source files → 22 test files**
 - Estimated coverage: ~30%
