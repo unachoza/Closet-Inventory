@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeSetItem } from "../utils/safeStorage";
 
 export const useLocalStorage = <T,>(keyName: string, initialValue: T) => {
 	const [value, setValue] = useState(() => {
@@ -11,7 +12,7 @@ export const useLocalStorage = <T,>(keyName: string, initialValue: T) => {
 	});
 
 	useEffect(() => {
-		window.localStorage.setItem(keyName, JSON.stringify(value));
+		safeSetItem(keyName, JSON.stringify(value));
 	}, [keyName, value]);
 
 	return [value, setValue] as const;
