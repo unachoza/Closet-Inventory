@@ -13,44 +13,110 @@ import {
 	ArrowLeft,
 	SkipBack,
 	FileDown,
-	FileUp,
 	X,
+	Menu,
 } from "lucide-react";
-import "./SevenStepsOnboarding.css";
+import "./OnboardingSteps.css";
+import logo from "../../assets/hangerLogo.png";
+import { carouselCategories } from "../../utils/constants";
+
+// ─── Step 0: Welcome ────────────────────────────────────────────────────────────
+
+const welcomeFeatures = [
+	{ dot: "#e8453c", text: "Import from Gmail automatically" },
+	{ dot: "#2bbfb3", text: "Learn fabric care for every item" },
+	{ dot: "#2563eb", text: "Search & filter your whole closet" },
+];
+
+function WelcomeStepDemo() {
+	return (
+		<div className="ob-demo-shell ob-welcome-full">
+			<div className="ob-welcome-glow" />
+			<div className="ob-welcome-logo-wrap">
+				<img src={logo} alt="Closet Inventory logo" className="ob-welcome-logo" />
+			</div>
+			<div className="ob-welcome-appname">My Closet Inventory</div>
+			<div className="ob-welcome-tagline">A personal wardrobe management app</div>
+			<div className="ob-welcome-feats">
+				{welcomeFeatures.map((f) => (
+					<div key={f.text} className="ob-welcome-feat">
+						<div className="ob-welcome-feat-dot" style={{ background: f.dot }} />
+						{f.text}
+					</div>
+				))}
+			</div>
+		</div>
+	);
+}
 
 // ─── Step 1: App menu — Import Gmail highlighted ────────────────────────────────
 
 function Step1Demo() {
 	const [tapped, setTapped] = useState(false);
+	const [pressing, setPressing] = useState(false);
+	const [drawerOpen, setDrawerOpen] = useState(false);
+
+	//mock user pressing hamburger for menu slide out and tap on Gmail Import
 	useEffect(() => {
-		const t = setTimeout(() => setTapped(true), 1000);
-		return () => clearTimeout(t);
+		const press = setTimeout(() => setPressing(true), 700);
+		const release = setTimeout(() => setPressing(false), 1050);
+		const open = setTimeout(() => setDrawerOpen(true), 1000);
+		const tap = setTimeout(() => setTapped(true), 2400);
+		return () => [press, release, open, tap].forEach(clearTimeout);
 	}, []);
 
 	const menuItems = [
-		{ icon: Plus, label: "Add Item" },
 		{ icon: LayoutGrid, label: "View All" },
+		{ icon: Plus, label: "Add Item" },
 		{ icon: Download, label: "Import Gmail", highlight: true },
 		{ icon: FileDown, label: "Download Closet" },
-		{ icon: FileUp, label: "Upload Closet" },
 		{ icon: Scissors, label: "Fabric Guide" },
 		{ icon: Activity, label: "Fiber Journey" },
 		{ icon: SkipBack, label: "Back to Carousel" },
 	];
 
 	return (
-		<div className="ob-demo-shell ob-menu">
-			{menuItems.map(({ icon: Icon, label, highlight }) => {
-				let itemClass = "ob-menu-item";
-				if (highlight && tapped) itemClass += " ob-menu-item--tapped";
-				else if (highlight) itemClass += " ob-menu-item--highlight";
-				return (
-					<div key={label} className={itemClass}>
-						<Icon className="ob-menu-icon" />
-						<span className="ob-menu-label">{label}</span>
-					</div>
-				);
-			})}
+		<div className="ob-demo-shell ob-nav-demo">
+			{/* Home screen behind the drawer */}
+			<div className="ob-nav-topbar">
+				<div className={`ob-nav-hamburger${pressing ? " ob-nav-hamburger--press" : ""}`}>
+					<Menu size={18} />
+					{pressing && <span className="ob-nav-tap" aria-hidden="true" />}
+				</div>
+				<span className="ob-nav-title">My Closet Inventory</span>
+			</div>
+			<div className="ob-nav-home">
+				<div className="ob-nav-ghost-row">
+					{carouselCategories.slice(1, 4).map(({ label, icon }) => {
+						return (
+							<div key={label} className=" ob-nav-ghost-tile clothes-card emoji">
+								{icon}
+							</div>
+						);
+					})}
+				</div>
+			</div>
+
+			{/* Slide-out drawer (mirrors the real NavBar drawer) */}
+			<div className={`ob-nav-overlay${drawerOpen ? " ob-nav-overlay--show" : ""}`} aria-hidden="true" />
+			<nav className={`ob-nav-drawer${drawerOpen ? " ob-nav-drawer--open" : ""}`} aria-label="Navigation menu">
+				<div className="ob-nav-drawer-close">
+					<X size={14} />
+				</div>
+				<div className="ob-nav-drawer-list">
+					{menuItems.map(({ icon: Icon, label, highlight }) => {
+						let itemClass = "ob-menu-item";
+						if (highlight && tapped) itemClass += " ob-menu-item--tapped";
+						else if (highlight) itemClass += " ob-menu-item--highlight";
+						return (
+							<div key={label} className={itemClass}>
+								<Icon className="ob-menu-icon" />
+								<span className="ob-menu-label">{label}</span>
+							</div>
+						);
+					})}
+				</div>
+			</nav>
 		</div>
 	);
 }
@@ -121,14 +187,6 @@ const parsedItems = [
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150747/Screenshot_2026-06-10_at_9.02.32_PM_ddjuk6.png",
 	},
 	{
-		name: "Rib Sleeveless Top",
-		price: "$12.90",
-		size: "S",
-		color: "Blue / White",
-		bg: "#475569",
-		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151246/Screenshot_2026-06-10_at_9.13.58_PM_gim9sb.png",
-	},
-	{
 		name: "Cotton Modal Tan…",
 		price: "$12.90",
 		size: "S",
@@ -168,11 +226,10 @@ function Step3Demo() {
 	return (
 		<div className="ob-demo-shell ob-items-wrap">
 			<div className="ob-items-scroll">
-				<div className="ob-items-header">Detected 5 Items</div>
+				<div className="ob-items-header">Detected 4 Items</div>
 				{parsedItems.map((item, i) => (
 					<div key={item.name} className={`ob-item-row${imported.has(i) ? " ob-item-row--imported" : ""}`}>
 						<div className="ob-item-thumb" style={{ background: item.bg }}>
-							{/* <div className="ob-item-thumb-inner" /> */}
 							<img className="ob-item-thumb-inner" src={item.imgURL} alt="clothing image" />
 						</div>
 						<div className="ob-item-info">
@@ -214,8 +271,43 @@ const reviewFields = [
 	{ key: "price", label: "PRICE", value: "$14.90" },
 ];
 
+const NAME_TARGET = "Strappy Top";
+
 function Step4Demo() {
 	const [editing, setEditing] = useState<string | null>(null);
+	const [autoEditName, setAutoEditName] = useState(false);
+	const [typing, setTyping] = useState(false);
+	const [nameValue, setNameValue] = useState(reviewFields[0].value);
+	const [addPulse, setAddPulse] = useState(false);
+
+	useEffect(() => {
+		const timers: ReturnType<typeof setTimeout>[] = [];
+		// 1. Tap the NAME field → highlight + clear, ready to retype.
+		timers.push(
+			setTimeout(() => {
+				setAutoEditName(true);
+				setTyping(true);
+				setNameValue("");
+			}, 800),
+		);
+		// 2. Type the corrected name one character at a time.
+		const TYPE_START = 1100;
+		const TYPE_MS = 90;
+		[...NAME_TARGET].forEach((_, i) => {
+			timers.push(setTimeout(() => setNameValue(NAME_TARGET.slice(0, i + 1)), TYPE_START + i * TYPE_MS));
+		});
+		const typedAt = TYPE_START + NAME_TARGET.length * TYPE_MS;
+		// 3. Commit the edit (drop the highlight + cursor).
+		timers.push(
+			setTimeout(() => {
+				setTyping(false);
+				setAutoEditName(false);
+			}, typedAt + 400),
+		);
+		// 4. Pulse "Add to Closet" to point at the next action.
+		timers.push(setTimeout(() => setAddPulse(true), typedAt + 800));
+		return () => timers.forEach(clearTimeout);
+	}, []);
 
 	return (
 		<div className="ob-demo-shell ob-form-wrap">
@@ -224,7 +316,7 @@ function Step4Demo() {
 					<ArrowLeft style={{ width: 12, height: 12 }} />
 					Return to Email Preview
 				</button>
-				<span className="ob-form-counter">Item 1 of 5</span>
+				<span className="ob-form-counter">Item 1 of 4</span>
 				<button className="ob-form-close">
 					<X style={{ width: 14, height: 14 }} />
 				</button>
@@ -232,7 +324,6 @@ function Step4Demo() {
 
 			<div className="ob-form-thumb-row">
 				<div className="ob-form-thumb">
-					{/* <div className="ob-form-thumb-inner" /> */}
 					<img
 						className="ob-item-thumb-inner"
 						src="https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150851/Screenshot_2026-06-10_at_9.07.20_PM_vvmgkb.png"
@@ -244,23 +335,29 @@ function Step4Demo() {
 
 			<div className="ob-fields-grid">
 				{reviewFields.map((f) => {
-					const isEditing = editing === f.key;
+					// The NAME field is driven by the auto-demo (or a manual tap); the rest stay tap-to-edit.
+					const isEditing = f.key === "name" ? autoEditName || editing === "name" : editing === f.key;
+					const value = f.key === "name" ? nameValue : f.value;
+					const showCursor = f.key === "name" && typing;
 					return (
 						<button
 							key={f.key}
-							onClick={() => setEditing(isEditing ? null : f.key)}
+							onClick={() => setEditing(editing === f.key ? null : f.key)}
 							className={`ob-field-btn${isEditing ? " ob-field-btn--editing" : ""}`}
 						>
 							<div className="ob-caps">{f.label}</div>
-							<div className={`ob-field-value${isEditing ? " ob-field-value--editing" : ""}`}>{f.value}</div>
+							<div className={`ob-field-value${isEditing ? " ob-field-value--editing" : ""}`}>
+								{value}
+								{showCursor && <span className="ob-field-cursor" />}
+							</div>
 						</button>
 					);
 				})}
 			</div>
 
 			<div className="ob-form-actions">
-				<button className="ob-add-btn">Add to Closet</button>
-				<button className="ob-skip-item-btn">Do NOT Add This Item</button>
+				<button className="ob-skip-item-btn">Skip This Item</button>
+				<button className={`ob-add-btn${addPulse ? " ob-add-btn--pulse" : ""}`}>Add to Closet</button>
 			</div>
 		</div>
 	);
@@ -272,21 +369,69 @@ const formStepLabels = ["Category", "Color", "Size", "Details", "Photo"];
 
 // Option chips shown for the choice-style steps. Keyed by pill label.
 const formStepOptions: Record<string, string[]> = {
-	Category: ["Tops", "Bottoms", "Outerwear", "Accessories"],
-	Color: ["Black", "White", "Brown", "Blue"],
-	Size: ["XS", "S", "M", "L"],
+	Category: ["Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Sleep", "Accessories"],
+	Color: ["Black", "White", "Brown", "Blue", "Red", "Purple"],
+	Size: ["XS", "S", "M", "L", "XL"],
 };
+
+// The choice the demo "user" makes on each step — building a White Oxford Shirt.
+const formStepSelection: Record<string, string> = {
+	Category: "Tops",
+	Color: "White",
+	Size: "M",
+};
+
+const NOTES_TARGET = "Bought for work";
+// Mock photo for the "upload" step
+const UPLOADED_PHOTO = "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378933/Screenshot_2025-10-13_at_11.07.40_AM_ywvcnu.png";
 
 function Step5Demo() {
 	const [step, setStep] = useState(0);
 	const [done, setDone] = useState(false);
+	// Which choice steps have been "clicked" (chip grey → blue a beat after the step appears).
+	const [picked, setPicked] = useState<Set<string>>(new Set());
+	// Typed-out note on the Details step.
+	const [notes, setNotes] = useState("");
+	// Mock photo upload on the Photo step (drop zone → image lands).
+	const [uploaded, setUploaded] = useState(false);
 
 	useEffect(() => {
-		// Advance through each step once, then finish — no infinite loop.
+		// Choice steps keep the steady cadence; the Details + Photo steps get extra
+		// room so the typed note and the photo upload have time to breathe.
 		const STEP_MS = 1300;
-		const timers = formStepLabels.slice(1).map((_, i) => setTimeout(() => setStep(i + 1), (i + 1) * STEP_MS));
-		// After the final (Photo) step: "added to closet" toast + success animation, then stop.
-		timers.push(setTimeout(() => setDone(true), formStepLabels.length * STEP_MS));
+		const PICK_DELAY = 600;
+		const timers: ReturnType<typeof setTimeout>[] = [];
+
+		const detailsIdx = formStepLabels.indexOf("Details");
+		const photoIdx = formStepLabels.indexOf("Photo");
+
+		// Category → Color → Size → Details advance on the steady 1300ms cadence.
+		for (let i = 1; i <= detailsIdx; i++) {
+			timers.push(setTimeout(() => setStep(i), i * STEP_MS));
+		}
+		// Choice steps: chips appear grey, then the picked one highlights blue.
+		formStepLabels.forEach((lbl, i) => {
+			if (formStepSelection[lbl]) {
+				timers.push(setTimeout(() => setPicked((p) => new Set([...p, lbl])), i * STEP_MS + PICK_DELAY));
+			}
+		});
+
+		// Details: pause, then type the note slowly, then let it settle.
+		const NOTE_START = detailsIdx * STEP_MS + 500;
+		const NOTE_MS = 90;
+		[...NOTES_TARGET].forEach((_, i) => {
+			timers.push(setTimeout(() => setNotes(NOTES_TARGET.slice(0, i + 1)), NOTE_START + i * NOTE_MS));
+		});
+		const noteEnd = NOTE_START + NOTES_TARGET.length * NOTE_MS;
+
+		// Photo: linger on the finished note, reveal the drop zone, then mock an upload.
+		const photoAt = noteEnd + 900;
+		timers.push(setTimeout(() => setStep(photoIdx), photoAt));
+		const uploadAt = photoAt + 900;
+		timers.push(setTimeout(() => setUploaded(true), uploadAt));
+
+		// Success once the photo has "uploaded".
+		timers.push(setTimeout(() => setDone(true), uploadAt + 1000));
 		return () => timers.forEach(clearTimeout);
 	}, []);
 
@@ -319,14 +464,25 @@ function Step5Demo() {
 				) : (
 					/* keyed by step → remounts so the fade animation replays on each change */
 					<div key={step} className="ob-manual-panel">
-						{label === "Photo" && (
-							<div className="ob-photo-drop">
-								<div className="ob-photo-drop-inner">
-									<Plus style={{ width: 32, height: 32 }} />
-									<span className="ob-photo-label">Add photo</span>
+						{label === "Photo" &&
+							(uploaded ? (
+								<div className="ob-photo-drop">
+									<div className="ob-photo-uploaded">
+										<img className="ob-photo-uploaded-img" src={UPLOADED_PHOTO} alt="White Oxford Shirt" />
+										<div className="ob-photo-uploaded-badge">
+											<Check style={{ width: 12, height: 12 }} />
+											Photo added
+										</div>
+									</div>
 								</div>
-							</div>
-						)}
+							) : (
+								<div className="ob-photo-drop">
+									<div className="ob-photo-drop-inner">
+										<Plus style={{ width: 32, height: 32 }} />
+										<span className="ob-photo-label">Add photo</span>
+									</div>
+								</div>
+							))}
 						{label === "Details" && (
 							<div className="ob-field-group">
 								<div>
@@ -337,8 +493,12 @@ function Step5Demo() {
 								</div>
 								<div>
 									<div className="ob-caps">NOTES</div>
-									<div className="ob-fake-textarea" style={{ marginTop: 4 }}>
-										Bought for work…
+									<div
+										className={`ob-fake-textarea${notes ? " ob-fake-textarea--filled" : ""}`}
+										style={{ marginTop: 4 }}
+									>
+										{notes}
+										<span className="ob-field-cursor" />
 									</div>
 								</div>
 							</div>
@@ -347,11 +507,14 @@ function Step5Demo() {
 							<div className="ob-field-group">
 								<div className="ob-caps">{label}</div>
 								<div className="ob-cat-options">
-									{options.map((c, ci) => (
-										<div key={c} className={`ob-cat-option${ci === 0 ? " ob-cat-option--active" : ""}`}>
-											{c}
-										</div>
-									))}
+									{options.map((c) => {
+										const isPicked = picked.has(label) && formStepSelection[label] === c;
+										return (
+											<div key={c} className={`ob-cat-option${isPicked ? " ob-cat-option--active" : ""}`}>
+												{c}
+											</div>
+										);
+									})}
 								</div>
 							</div>
 						)}
@@ -364,7 +527,7 @@ function Step5Demo() {
 					<span className="ob-toast-check">
 						<Check style={{ width: 12, height: 12 }} />
 					</span>
-					White Oxford Shirt added to your closet!
+					White Oxford Shirt <br /> added to your closet!
 				</div>
 			)}
 		</div>
@@ -374,7 +537,7 @@ function Step5Demo() {
 // ─── Step 6: Search & filter ────────────────────────────────────────────────────
 
 const closetItems = [
-	{ label: "Sleeveless Top", bg: "#78716c" },
+	{ label: "Strappy Top", bg: "#78716c" },
 	{ label: "Wide Leg Jeans", bg: "#334155" },
 	{ label: "Linen Blazer", bg: "#451a03" },
 	{ label: "Slip Dress", bg: "#881337" },
@@ -382,32 +545,94 @@ const closetItems = [
 	{ label: "Trousers", bg: "#3f3f46" },
 ];
 
+const SEARCH_QUERY = "going out";
+const SEARCH_FILTER_CHIP = "Sleeveless";
+// "going out" narrows to these three going-out pieces…
+const QUERY_DROPS = ["Wide Leg Jeans", "Cardigan", "Trousers"];
+// …then the Sleeveless chip drops the blazer, leaving Strappy Top + Slip Dress.
+const CHIP_DROPS = ["Linen Blazer"];
+
 function Step6Demo() {
-	const filters = ["Cotton", "Brown", "Tops"];
+	const [query, setQuery] = useState("");
+	const [chipShown, setChipShown] = useState(false);
+	// Two-stage removal: fade out first, then collapse out of the grid so it reflows.
+	const [out, setOut] = useState<Set<string>>(new Set());
+	const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+	const [resultCount, setResultCount] = useState(closetItems.length);
+
+	useEffect(() => {
+		const timers: ReturnType<typeof setTimeout>[] = [];
+
+		// 1. Type the query.
+		const TYPE_START = 400;
+		const TYPE_MS = 95;
+		[...SEARCH_QUERY].forEach((_, i) => {
+			timers.push(setTimeout(() => setQuery(SEARCH_QUERY.slice(0, i + 1)), TYPE_START + i * TYPE_MS));
+		});
+		const queryEnd = TYPE_START + SEARCH_QUERY.length * TYPE_MS;
+
+		// 2. Query narrows the grid to the going-out three (fade, then collapse).
+		timers.push(
+			setTimeout(() => {
+				setOut(new Set(QUERY_DROPS));
+				setResultCount(closetItems.length - QUERY_DROPS.length);
+			}, queryEnd + 350),
+		);
+		timers.push(setTimeout(() => setCollapsed(new Set(QUERY_DROPS)), queryEnd + 700));
+
+		// 3. A filter chip lands and drops the blazer, settling on the final two.
+		const chipAt = queryEnd + 1450;
+		timers.push(setTimeout(() => setChipShown(true), chipAt));
+		timers.push(
+			setTimeout(() => {
+				setOut(new Set([...QUERY_DROPS, ...CHIP_DROPS]));
+				setResultCount(closetItems.length - QUERY_DROPS.length - CHIP_DROPS.length);
+			}, chipAt + 350),
+		);
+		timers.push(setTimeout(() => setCollapsed(new Set([...QUERY_DROPS, ...CHIP_DROPS])), chipAt + 700));
+
+		return () => timers.forEach(clearTimeout);
+	}, []);
+
 	return (
 		<div className="ob-demo-shell ob-search-wrap">
 			<div className="ob-search-bar">
 				<Search className="ob-search-icon" />
-				<span className="ob-search-text">summer top</span>
-				<span className="ob-search-count">4 results</span>
+				{query ? (
+					<span className="ob-search-text ob-search-text--typed">
+						{query}
+						<span className="ob-field-cursor" />
+					</span>
+				) : (
+					<span className="ob-search-text">
+						Search your closet
+						<span className="ob-field-cursor" />
+					</span>
+				)}
+				<span className="ob-search-count">{resultCount} results</span>
 			</div>
 			<div className="ob-filter-chips">
-				{filters.map((f) => (
-					<div key={f} className="ob-filter-chip">
-						{f}
+				{chipShown && (
+					<div className="ob-filter-chip ob-filter-chip--in">
+						{SEARCH_FILTER_CHIP}
 						<X className="ob-chip-x" />
 					</div>
-				))}
+				)}
 			</div>
 			<div className="ob-closet-grid">
-				{closetItems.map((item) => (
-					<div key={item.label} className="ob-closet-card" style={{ background: item.bg }}>
-						<div className="ob-closet-card-body">
-							<div className="ob-closet-card-icon" />
+				{closetItems.map((item) => {
+					let cls = "ob-closet-card";
+					if (out.has(item.label)) cls += " ob-closet-card--out";
+					if (collapsed.has(item.label)) cls += " ob-closet-card--collapsed";
+					return (
+						<div key={item.label} className={cls} style={{ background: item.bg }}>
+							<div className="ob-closet-card-body">
+								<div className="ob-closet-card-icon" />
+							</div>
+							<div className="ob-closet-card-label">{item.label}</div>
 						</div>
-						<div className="ob-closet-card-label">{item.label}</div>
-					</div>
-				))}
+					);
+				})}
 			</div>
 		</div>
 	);
@@ -422,15 +647,22 @@ type Level = "High" | "Medium" | "Low";
 const fabrics: {
 	name: string;
 	dot: string; // fiber-category dot color, matching the real guide's TOC
+	type: string;
 	properties: { label: string; level: Level }[];
+	keyFacts: string[];
 	care: { icon: string; label: string; value: string }[];
 }[] = [
 	{
 		name: "Cotton",
 		dot: "#5a7a60", // natural (plant) → sage
+		type: "Natural Fiber - Plant",
 		properties: [
 			{ label: "Breathability", level: "High" },
 			{ label: "Durability", level: "High" },
+		],
+		keyFacts: [
+			"Wicks moisture but holds it (stays wet longer than synthetics)",
+			"Wrinkles easily — blending with polyester reduces wrinkling",
 		],
 		care: [
 			{ icon: "🫧", label: "Washing", value: "Machine wash cold" },
@@ -440,10 +672,12 @@ const fabrics: {
 	{
 		name: "Polyester",
 		dot: "#8b5a7a", // synthetic → mauve
+		type: "Synthetic",
 		properties: [
 			{ label: "Breathability", level: "Low" },
 			{ label: "Durability", level: "High" },
 		],
+		keyFacts: ["Releases microplastic fibers when washed", "Polyester is not biodegradable and can persist for hundreds of years"],
 		care: [
 			{ icon: "🫧", label: "Washing", value: "Machine wash warm" },
 			{ icon: "🌀", label: "Drying", value: "Low heat only" },
@@ -452,10 +686,13 @@ const fabrics: {
 	{
 		name: "Silk",
 		dot: "#5a7a60", // natural (animal) → sage
+		type: "Natural Fiber - Animal",
 		properties: [
 			{ label: "Breathability", level: "High" },
 			{ label: "Durability", level: "Medium" },
 		],
+		keyFacts: ["Weakens by ~20% when wet — handle very gently", "UV rays degrade silk — avoid prolonged sunlight storage"],
+
 		care: [
 			{ icon: "🤲", label: "Washing", value: "Hand wash only" },
 			{ icon: "🚫", label: "Drying", value: "Do not tumble dry" },
@@ -468,6 +705,13 @@ const pillClass = (level: Level) => (level === "High" ? "ob-pill-high" : level =
 function Step7Demo() {
 	const [active, setActive] = useState(0);
 	const fabric = fabrics[active];
+
+	useEffect(() => {
+		const pressCotton = setTimeout(() => setActive(0), 800);
+		const pressPolyester = setTimeout(() => setActive(1), 1600);
+		const pressSilk = setTimeout(() => setActive(2), 2900);
+		return () => [pressCotton, pressPolyester, pressSilk].forEach(clearTimeout);
+	}, []);
 
 	return (
 		<div className="ob-demo-shell ob-fabric-wrap">
@@ -493,6 +737,13 @@ function Step7Demo() {
 						<div key={p.label} className="ob-fabric-prop">
 							<span className="ob-fabric-prop-label">{p.label}</span>
 							<span className={`ob-prop-pill ${pillClass(p.level)}`}>{p.level}</span>
+						</div>
+					))}
+				</div>
+				<div className="ob-fabric-props">
+					{fabric.keyFacts.map((p, i) => (
+						<div key={i} className="ob-fabric-prop">
+							<span className="ob-fabric-fact">{p}</span>
 						</div>
 					))}
 				</div>
@@ -524,14 +775,22 @@ function StepAdvancedSearchDemo() {
 	const [activeNav, setActiveNav] = useState(0);
 
 	useEffect(() => {
-		const senderTimers = [...ADV_SENDER].map((_, i) =>
-			setTimeout(() => setSenderText(ADV_SENDER.slice(0, i + 1)), 500 + i * 90),
-		);
-		const t1 = setTimeout(() => { setActiveNav(1); }, 1400);
-		const t2 = setTimeout(() => { setActiveNav(2); setTags([ADV_TAGS[0]]); }, 2000);
+		const senderTimers = [...ADV_SENDER].map((_, i) => setTimeout(() => setSenderText(ADV_SENDER.slice(0, i + 1)), 500 + i * 90));
+		const t1 = setTimeout(() => {
+			setActiveNav(1);
+		}, 1400);
+		const t2 = setTimeout(() => {
+			setActiveNav(2);
+			setTags([ADV_TAGS[0]]);
+		}, 2000);
 		const t3 = setTimeout(() => setTags([...ADV_TAGS]), 2600);
-		const t4 = setTimeout(() => setHighlightSearch(true), 3000);
-		return () => { senderTimers.forEach(clearTimeout); [t1, t2, t3, t4].forEach(clearTimeout); };
+		const t4 = setTimeout(() => setActiveNav(3), 3200);
+		const t5 = setTimeout(() => setActiveNav(4), 3800);
+		const t6 = setTimeout(() => setHighlightSearch(true), 4200);
+		return () => {
+			senderTimers.forEach(clearTimeout);
+			[t1, t2, t3, t4, t5, t6].forEach(clearTimeout);
+		};
 	}, []);
 
 	return (
@@ -551,7 +810,9 @@ function StepAdvancedSearchDemo() {
 								key={label}
 								className={`ob-adv-nav-item${isActive ? " ob-adv-nav-item--active" : ""}${isDone ? " ob-adv-nav-item--done" : ""}`}
 							>
-								<div className={`ob-adv-nav-dot${isActive ? " ob-adv-nav-dot--active" : ""}${isDone ? " ob-adv-nav-dot--done" : ""}`}>
+								<div
+									className={`ob-adv-nav-dot${isActive ? " ob-adv-nav-dot--active" : ""}${isDone ? " ob-adv-nav-dot--done" : ""}`}
+								>
 									{isDone && <Check size={8} />}
 								</div>
 								<span className="ob-adv-nav-label">{label}</span>
@@ -611,6 +872,13 @@ const EMAIL_IMPORT_STYLE: React.CSSProperties = {
 };
 
 const STEPS: StepDef[] = [
+	{
+		group: "Welcome",
+		groupStyle: { background: "rgba(232,69,60,0.12)", color: "#e8453c", border: "1px solid rgba(232,69,60,0.25)" },
+		title: "Closet Inventory",
+		description: "A personal wardrobe management app. Upload your closet, learn fabric care, and more!",
+		demo: <WelcomeStepDemo />,
+	},
 	{
 		group: "Email Import",
 		groupStyle: EMAIL_IMPORT_STYLE,
@@ -690,28 +958,32 @@ export function OnboardingExpanded({ onComplete }: { onComplete: () => void }) {
 		<div className="ob-root ob-page">
 			<div className="ob-container">
 				{/* Progress */}
-				<div className="ob-progress">
-					{STEPS.map((_, i) => {
-						let cls = "ob-progress-seg";
-						if (i < currentStep) cls += " ob-progress-seg--done";
-						else if (i === currentStep) cls += " ob-progress-seg--active";
-						return <div key={i} className={cls} />;
-					})}
-				</div>
-
-				{/* Content */}
-				<div className="ob-content">
+				<div className="ob-progress-container">
+					<div className="ob-progress">
+						{STEPS.map((_, i) => {
+							let cls = "ob-progress-seg";
+							if (i < currentStep) cls += " ob-progress-seg--done";
+							else if (i === currentStep) cls += " ob-progress-seg--active";
+							return <div key={i} className={cls} />;
+						})}
+					</div>
 					<div className="ob-badges">
 						<span className="ob-group-badge" style={step.groupStyle}>
 							{step.group}
 						</span>
-						<span className="ob-step-label">Step {currentStep + 1} of {STEPS.length}</span>
+						<span className="ob-step-label">
+							Step {currentStep + 1} of {STEPS.length}
+						</span>
 					</div>
+				</div>
+
+				{/* Content */}
+				<div className="ob-content">
 					<h2 className="ob-title">{step.title}</h2>
 					<p className="ob-description">{step.description}</p>
+					{/* Demo — keyed so animations restart on step change */}
+					<div key={currentStep}>{step.demo}</div>
 				</div>
-				{/* Demo — keyed so animations restart on step change */}
-				<div key={currentStep}>{step.demo}</div>
 
 				{/* Navigation */}
 				<div className="ob-nav">

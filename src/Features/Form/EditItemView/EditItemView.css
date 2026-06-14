@@ -185,6 +185,7 @@ label.animated-checkbox button.checkbox-root {
       display: flex;
       align-items: center;
       gap: var(--spacing-100, 0.5rem);
+      justify-content: flex-end;
       /* flex-wrap: wrap; */
 }
 

@@ -193,8 +193,8 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Toast notification system
 - ✅ localStorage persistence
 - ✅ Export Closet / Download CSV Button
-- 🔲 Visual cohesion polish (spacing, color, typography consistency)
 - ✅  "View more" expand/collapse on item cards - PR #43
+- 🔲 Visual cohesion polish (spacing, color, typography consistency)
 
 ---
 
@@ -206,7 +206,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Active filter pills with individual remove and "Clear all"
 - ✅ Dynamic option counts update as filters apply
 - ✅ Sort by: date added, price (asc/desc), age (newest/oldest), name (A–Z / Z–A)
-- 🔲 "Dry clean only" quick-filter pill
+- ✅ "Dry clean only" quick-filter pill
 - ✅ Item name visible on card hover (or global toggle)
 
 ---
@@ -233,7 +233,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
 - 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
 - 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
-- 🔲 Don't import items that can't be mapped to a category (big for Amazon emails)
+- 🚧  Don't import items that can't be mapped to a category (big for Amazon emails)
 - 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 - 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 
@@ -290,12 +290,12 @@ business model depend on is unbuilt. Actual build order:
 
 ### v4.1 — Onboarding Tour
 
-- 🔲 Step-by-step feature walkthrough with anchored tooltips
-- 🔲 Tour state machine with `tourCompleted` flag in localStorage
+- ✅ Step-by-step feature walkthrough with anchored tooltips
+- ✅ Tour state machine with `tourCompleted` flag in localStorage
 
 ---
 
-### v5 — Closet Analytics Dashboard
+### v5 — Closet Insighs Analytics Dashboard
 
 > Deprioritized behind mobile (see Near-Term Priority Order). **Pull the `wornCount` field + "Log a Wear" button out of this milestone and ship it early** — v7.0 and v8.0 both depend on it.
 

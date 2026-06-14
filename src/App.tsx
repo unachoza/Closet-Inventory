@@ -17,7 +17,7 @@ import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
-import { OnboardingExpanded } from "./Features/Onboarding/SevenStepOnboarding";
+import { OnboardingExpanded } from "./Features/Onboarding/OnboardingSteps";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
