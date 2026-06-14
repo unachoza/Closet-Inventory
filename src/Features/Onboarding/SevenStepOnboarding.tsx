@@ -17,7 +17,7 @@ import {
 	X,
 } from "lucide-react";
 import "./SevenStepsOnboarding.css";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/Logo.png";
 
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
