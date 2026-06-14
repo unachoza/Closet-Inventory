@@ -25,6 +25,16 @@ export default defineConfig({
 		screenshot: "only-on-failure",
 	},
 
+	// Visual baselines run over screens with a photographic background + async
+	// card images, so allow a small per-pixel + ratio tolerance to absorb
+	// anti-aliasing/image-load noise without masking real layout regressions.
+	expect: {
+		toHaveScreenshot: {
+			animations: "disabled",
+			maxDiffPixelRatio: 0.02,
+		},
+	},
+
 	projects: [
 		{
 			name: "Mobile Safari (iPhone 13)",

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useLocalStorage } from "./uselocalStorage";
 
@@ -22,18 +22,23 @@ function isTokenValid(auth: StoredAuth): boolean {
 }
 
 export function useGmailAuth() {
-	const [storedAuth, setStoredAuth] = useLocalStorage<StoredAuth>(
-		AUTH_STORAGE_KEY,
-		EMPTY_AUTH
-	);
-	const [error, setError] = useLocalStorage<string | null>(
-		"gmail_auth_error",
-		null
-	);
-	const [isLoading, setIsLoading] = useLocalStorage<boolean>(
-		"gmail_auth_loading",
-		false
-	);
+	// Only the token is persisted. error/isLoading are transient UI state — if they
+	// were persisted, an interrupted login (e.g. a blocked popup on Safari) would
+	// leave isLoading=true stored forever, permanently disabling the Connect button.
+	const [storedAuth, setStoredAuth] = useLocalStorage<StoredAuth>(AUTH_STORAGE_KEY, EMPTY_AUTH);
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	// One-time cleanup: drop stale loading/error flags persisted by older builds so
+	// users currently trapped on "Connecting..." recover on next load.
+	useEffect(() => {
+		try {
+			window.localStorage.removeItem("gmail_auth_loading");
+			window.localStorage.removeItem("gmail_auth_error");
+		} catch {
+			// Storage unavailable (e.g. private mode) — nothing to clean up.
+		}
+	}, []);
 
 	const authenticated = isTokenValid(storedAuth);
 
@@ -65,7 +70,14 @@ export function useGmailAuth() {
 	const handleLogin = useCallback(() => {
 		setIsLoading(true);
 		setError(null);
-		login();
+		try {
+			login();
+		} catch (err) {
+			// Safari can block the OAuth popup outright; don't leave the button hung.
+			setIsLoading(false);
+			setError("Couldn't open Google sign-in. Please allow pop-ups for this site and try again.");
+			console.warn("Gmail login failed to open", err);
+		}
 	}, [login, setIsLoading, setError]);
 
 	const logout = useCallback(() => {

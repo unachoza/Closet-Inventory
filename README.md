@@ -103,7 +103,7 @@ src/
 | **Auth**          | Firebase Auth + Google OAuth               | User sign-in and Gmail access   |
 | **Search**        | Fuse.js                                    | Fuzzy client-side search        |
 | **Testing**       | Vitest + React Testing Library             | Unit and integration tests      |
-| **E2E**           | Playwright _(planned — not yet installed)_ | End-to-end critical flows       |
+| **E2E**           | Playwright (installed — 2 mobile projects: iPhone 13 + Pixel 7) | End-to-end critical flows (`npm run test:e2e`) |
 | **Type Safety**   | TypeScript 5+                              | Static type checking            |
 
 ---
@@ -412,3 +412,5 @@ business model depend on is unbuilt. Actual build order:
 - \*\*ZaraAndAritziaNormalizedNameCAPSLOCK - title to string removing caps lock has improved but for Zara and Aritizia titles still no, and shein has be defaulting to CAPS but just store name, not rest of name in item title
 
 - \*\*ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
+
+- \*\*Safari Gmail Auth - get's stuck 

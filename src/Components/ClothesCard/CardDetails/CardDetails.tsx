@@ -4,7 +4,7 @@ import { normalizeMaterial } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { parseCareItems } from "../../../utils/careUtils";
-import { toAbsoluteDate } from "../../../utils/dateUtils";
+import { toAbsoluteDate } from "../../../utils/dateUtils"
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
 
@@ -41,18 +41,22 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const occasions = Array.isArray(item.occasion) ? item.occasion : item.occasion ? [item.occasion] : [];
 	const notes = normalizeToString(item.notes);
 
-	// Inferred style attributes (from inferProductAttributes — populated during
-	// email import). Deduped + joined so empty fields collapse gracefully.
+	// Inferred style attributes live on the nested `style` object (from
+	// inferProductAttributes — populated during email import), NOT as flat
+	// fields on the item. Deduped + joined so empty fields collapse gracefully.
+	const style = item.style;
 	const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
-	const styleNeckSleeve = dedupeJoin([item.neckline, item.sleeveLength]);
-	const styleConstruction = dedupeJoin([item.fit, item.style, item.rise, item.hemLength || item.topLength, item.pattern, item.accents]);
-	const hasStyle = !!styleNeckSleeve || !!styleConstruction;
-	const featureTags = [item.hasStretch && "Stretch", item.hasPockets && "Pockets"].filter((t): t is string => !!t);
+	const styleConstruction = dedupeJoin([style?.fit, style?.rise, style?.hemLength || style?.topLength, style?.pattern]);
+	console.log({ styleConstruction });
+	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
+	const hasStyle = Object.keys(otherStyles).length > 0;
 
+	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", style?.accents].filter((t): t is string => !!t);
+	console.log({ featureTags });
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
-	const identityParts = [item.season, item.condition, item.price].filter((p): p is string => !!p);
+	const identityParts = [style?.season, item.condition, item.price].filter((p): p is string => !!p);
 	const hasIdentity = !!purchasedLabel || identityParts.length > 0 || !!item.age;
 
 	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!notes;
@@ -112,11 +116,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						{hasStyle && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Style" />
-								<p className="card-details__identity-text">
-									{styleNeckSleeve}
-									{styleNeckSleeve && styleConstruction && <br />}
-									{styleConstruction}
-								</p>
+								{style?.fit && <p className="card-details__identity-text">Fit: {style.fit}</p>}
+								{style?.neckline && <p className="card-details__identity-text">Neckline: {style?.neckline}</p>}
+								{style?.sleeveLength && <p className="card-details__identity-text">Sleeve: {style?.sleeveLength}</p>}
+								{style?.hemLength && <p className="card-details__identity-text">Hem Length: {style?.hemLength}</p>}
+								{style?.rise && <p className="card-details__identity-text">Rise: {style?.rise}</p>}
 							</div>
 						)}
 						{featureTags.length > 0 && (

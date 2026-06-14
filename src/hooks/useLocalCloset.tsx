@@ -3,6 +3,7 @@ import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData } from "../utils/types";
 import { normalizeMaterial } from "../utils/materialUtils";
 import { useLocalStorage } from "./uselocalStorage";
+import { safeSetItem } from "../utils/safeStorage";
 import useStockPhoto from "./useStockPhoto";
 
 const STORAGE_KEY = "my_closet_key";
@@ -28,7 +29,7 @@ export function useLocalStorageCloset() {
 					material: normalizeMaterial(newItem.material),
 				},
 			];
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			safeSetItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
 	};
@@ -36,7 +37,7 @@ export function useLocalStorageCloset() {
 	const addFullItem = (newItem: ClothingItem) => {
 		setCloset((prev: ClothingItem[]) => {
 			const updated = [...prev, newItem];
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			safeSetItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
 	};
@@ -48,7 +49,7 @@ export function useLocalStorageCloset() {
 	const importItems = (items: ClothingItem[], mode: "replace" | "merge") => {
 		setCloset((prev: ClothingItem[]) => {
 			const updated = mode === "replace" ? [...items] : [...prev, ...items];
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			safeSetItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
 	};
@@ -56,7 +57,7 @@ export function useLocalStorageCloset() {
 	const removeItem = (id: string) => {
 		setCloset((prev: ClothingItem[]) => {
 			const updated = prev.filter((item) => item.id !== id);
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			safeSetItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
 	};
@@ -76,7 +77,7 @@ export function useLocalStorageCloset() {
 				}
 				return item;
 			});
-			localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+			safeSetItem(STORAGE_KEY, JSON.stringify(updated));
 			return updated;
 		});
 	};
