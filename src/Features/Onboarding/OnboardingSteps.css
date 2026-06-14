@@ -1514,7 +1514,7 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 100%;
+  /* height: 100%; */
   background: var(--fg-cream);
 }
 
@@ -1605,6 +1605,20 @@ height: 100%;
   border-radius: 5px;
   font-size: 11px;
   font-weight: 600;
+}
+
+.ob-fabric-fact {
+    font-size: 0.75rem;
+  color: var(--fg-ink-60);
+  margin-left: 25px;
+  text-align: left;
+}
+
+.ob-fabric-fact:before {
+    position: absolute;
+    left: 56px;
+    color: var(--gold);
+    content: "→";
 }
 
 .ob-prop-pill.ob-pill-high { background: var(--fg-sage-pale); color: var(--fg-sage); }

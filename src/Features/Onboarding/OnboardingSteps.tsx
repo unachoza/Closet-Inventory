@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
 	ChevronRight,
 	ChevronLeft,
@@ -407,6 +407,7 @@ function Step5Demo() {
 	const [notes, setNotes] = useState("");
 	// Mock photo upload on the Photo step (drop zone → image lands).
 	const [uploaded, setUploaded] = useState(false);
+	// Prevent the effect from running multiple times if the component remounts.
 
 	useEffect(() => {
 		// Choice steps keep the steady cadence; the Details + Photo steps get extra
@@ -660,15 +661,22 @@ type Level = "High" | "Medium" | "Low";
 const fabrics: {
 	name: string;
 	dot: string; // fiber-category dot color, matching the real guide's TOC
+	type: string;
 	properties: { label: string; level: Level }[];
+	keyFacts: string[];
 	care: { icon: string; label: string; value: string }[];
 }[] = [
 	{
 		name: "Cotton",
 		dot: "#5a7a60", // natural (plant) → sage
+		type: "Natural Fiber - Plant",
 		properties: [
 			{ label: "Breathability", level: "High" },
 			{ label: "Durability", level: "High" },
+		],
+		keyFacts: [
+			"Wicks moisture but holds it (stays wet longer than synthetics)",
+			"Wrinkles easily — blending with polyester reduces wrinkling",
 		],
 		care: [
 			{ icon: "🫧", label: "Washing", value: "Machine wash cold" },
@@ -678,10 +686,12 @@ const fabrics: {
 	{
 		name: "Polyester",
 		dot: "#8b5a7a", // synthetic → mauve
+		type: "Synthetic",
 		properties: [
 			{ label: "Breathability", level: "Low" },
 			{ label: "Durability", level: "High" },
 		],
+		keyFacts: ["Releases microplastic fibers when washed", "Polyester is not biodegradable and can persist for hundreds of years"],
 		care: [
 			{ icon: "🫧", label: "Washing", value: "Machine wash warm" },
 			{ icon: "🌀", label: "Drying", value: "Low heat only" },
@@ -690,10 +700,13 @@ const fabrics: {
 	{
 		name: "Silk",
 		dot: "#5a7a60", // natural (animal) → sage
+		type: "Natural Fiber - Animal",
 		properties: [
 			{ label: "Breathability", level: "High" },
 			{ label: "Durability", level: "Medium" },
 		],
+		keyFacts: ["Weakens by ~20% when wet — handle very gently", "UV rays degrade silk — avoid prolonged sunlight storage"],
+
 		care: [
 			{ icon: "🤲", label: "Washing", value: "Hand wash only" },
 			{ icon: "🚫", label: "Drying", value: "Do not tumble dry" },
@@ -706,6 +719,13 @@ const pillClass = (level: Level) => (level === "High" ? "ob-pill-high" : level =
 function Step7Demo() {
 	const [active, setActive] = useState(0);
 	const fabric = fabrics[active];
+
+	useEffect(() => {
+		const pressCotton = setTimeout(() => setActive(0), 800);
+		const pressPolyester = setTimeout(() => setActive(1), 1600);
+		const pressSilk = setTimeout(() => setActive(2), 2500);
+		return () => [pressCotton, pressPolyester, pressSilk].forEach(clearTimeout);
+	}, []);
 
 	return (
 		<div className="ob-demo-shell ob-fabric-wrap">
@@ -731,6 +751,13 @@ function Step7Demo() {
 						<div key={p.label} className="ob-fabric-prop">
 							<span className="ob-fabric-prop-label">{p.label}</span>
 							<span className={`ob-prop-pill ${pillClass(p.level)}`}>{p.level}</span>
+						</div>
+					))}
+				</div>
+				<div className="ob-fabric-props">
+					{fabric.keyFacts.map((p, i) => (
+						<div key={i} className="ob-fabric-prop">
+							<span className="ob-fabric-fact">{p}</span>
 						</div>
 					))}
 				</div>
