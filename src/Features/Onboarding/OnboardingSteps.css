@@ -514,7 +514,6 @@ gap: 10px;
 .ob-adv-root {
   display: flex;
   flex-direction: column;
-  /* height: 100%; */
 }
 
 .ob-adv-header {
@@ -727,7 +726,6 @@ gap: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  /* height: 100%; */
 }
 
 .ob-email-header {
@@ -814,7 +812,6 @@ gap: 10px;
 .ob-items-wrap {
   display: flex;
   flex-direction: column;
-  /* height: 100%; */
 }
 
 .ob-items-scroll {
@@ -943,7 +940,6 @@ gap: 10px;
 .ob-form-wrap {
   display: flex;
   flex-direction: column;
-  /* height: 100%; */
 }
 
 .ob-form-nav {
@@ -1111,7 +1107,6 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* height: 100%; */
 }
 
 /* End state: success check + label, shown after the last step (no looping). */
@@ -1189,7 +1184,7 @@ height: 100%;
 
 .ob-pills {
   display: flex;
-  gap: 7px;
+  gap: 12px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -1370,7 +1365,6 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* height: 100%; */
 }
 
 .ob-search-bar {
@@ -1514,7 +1508,6 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  /* height: 100%; */
   background: var(--fg-cream);
 }
 

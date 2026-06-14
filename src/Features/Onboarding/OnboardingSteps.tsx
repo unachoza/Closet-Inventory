@@ -13,7 +13,6 @@ import {
 	ArrowLeft,
 	SkipBack,
 	FileDown,
-	// FileUp,
 	X,
 	Menu,
 } from "lucide-react";
@@ -71,7 +70,6 @@ function Step1Demo() {
 		{ icon: Plus, label: "Add Item" },
 		{ icon: Download, label: "Import Gmail", highlight: true },
 		{ icon: FileDown, label: "Download Closet" },
-		/* { icon: FileUp, label: "Upload Closet" }, */
 		{ icon: Scissors, label: "Fabric Guide" },
 		{ icon: Activity, label: "Fiber Journey" },
 		{ icon: SkipBack, label: "Back to Carousel" },
@@ -188,14 +186,6 @@ const parsedItems = [
 		bg: "#78716c",
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150747/Screenshot_2026-06-10_at_9.02.32_PM_ddjuk6.png",
 	},
-	// {
-	// 	name: "Rib Sleeveless Top",
-	// 	price: "$12.90",
-	// 	size: "S",
-	// 	color: "Blue / White",
-	// 	bg: "#475569",
-	// 	imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151246/Screenshot_2026-06-10_at_9.13.58_PM_gim9sb.png",
-	// },
 	{
 		name: "Cotton Modal Tan…",
 		price: "$12.90",
@@ -240,7 +230,6 @@ function Step3Demo() {
 				{parsedItems.map((item, i) => (
 					<div key={item.name} className={`ob-item-row${imported.has(i) ? " ob-item-row--imported" : ""}`}>
 						<div className="ob-item-thumb" style={{ background: item.bg }}>
-							{/* <div className="ob-item-thumb-inner" /> */}
 							<img className="ob-item-thumb-inner" src={item.imgURL} alt="clothing image" />
 						</div>
 						<div className="ob-item-info">
@@ -286,7 +275,6 @@ const NAME_TARGET = "Strappy Top";
 
 function Step4Demo() {
 	const [editing, setEditing] = useState<string | null>(null);
-	// Auto-demo: tap the NAME field, retype its value, then cue "Add to Closet".
 	const [autoEditName, setAutoEditName] = useState(false);
 	const [typing, setTyping] = useState(false);
 	const [nameValue, setNameValue] = useState(reviewFields[0].value);
@@ -336,7 +324,6 @@ function Step4Demo() {
 
 			<div className="ob-form-thumb-row">
 				<div className="ob-form-thumb">
-					{/* <div className="ob-form-thumb-inner" /> */}
 					<img
 						className="ob-item-thumb-inner"
 						src="https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150851/Screenshot_2026-06-10_at_9.07.20_PM_vvmgkb.png"
@@ -395,7 +382,7 @@ const formStepSelection: Record<string, string> = {
 };
 
 const NOTES_TARGET = "Bought for work";
-// Mock photo for the "upload" step — the trusted white-garment asset used elsewhere.
+// Mock photo for the "upload" step
 const UPLOADED_PHOTO = "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378933/Screenshot_2025-10-13_at_11.07.40_AM_ywvcnu.png";
 
 function Step5Demo() {
@@ -407,7 +394,6 @@ function Step5Demo() {
 	const [notes, setNotes] = useState("");
 	// Mock photo upload on the Photo step (drop zone → image lands).
 	const [uploaded, setUploaded] = useState(false);
-	// Prevent the effect from running multiple times if the component remounts.
 
 	useEffect(() => {
 		// Choice steps keep the steady cadence; the Details + Photo steps get extra
@@ -723,7 +709,7 @@ function Step7Demo() {
 	useEffect(() => {
 		const pressCotton = setTimeout(() => setActive(0), 800);
 		const pressPolyester = setTimeout(() => setActive(1), 1600);
-		const pressSilk = setTimeout(() => setActive(2), 2500);
+		const pressSilk = setTimeout(() => setActive(2), 2900);
 		return () => [pressCotton, pressPolyester, pressSilk].forEach(clearTimeout);
 	}, []);
 
