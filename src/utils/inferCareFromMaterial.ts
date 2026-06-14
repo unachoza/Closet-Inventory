@@ -38,35 +38,45 @@ const MATERIAL_TO_CARE_GROUP: Record<string, string> = {
 	polypropylene: "Polyester, Nylon & Synthetics",
 };
 
+// Care guidance that depends on color rather than material.
+const WHITE_CARE_TAG = "Wash with like colors only";
+
+/** A color counts as "white" once normalized/trimmed (e.g. "White", "white "). */
+function isWhite(color?: string): boolean {
+	return color?.trim().toLowerCase() === "white";
+}
+
 /**
- * Maps a material name to its care group and extracts wash + dry instructions.
- * Returns an array of care strings (both washing and drying guidance).
+ * Maps a material name to its care group and extracts wash + dry instructions,
+ * then layers on any color-driven guidance.
  *
- * Care instructions are extracted from CARE_GROUPS in Fabric&Fiber.ts.
- * Only "Washing" and "Drying" labels are included (skips "Ironing").
+ * Material care is extracted from CARE_GROUPS in Fabric&Fiber.ts — only
+ * "Washing" and "Drying" labels are included (skips "Ironing"). A white item
+ * additionally gets a "Wash with like colors only" tag, regardless of material
+ * (so a white piece with unknown fabric still carries the warning).
  */
-export function inferCareFromMaterial(materials: MaterialBlend[]): string[] {
-	if (materials.length === 0) return [];
-
-	// Use the primary (highest percentage) material's care group
-	const primary = materials.sort((a, b) => b.percentage - a.percentage)[0];
-	const normalizedMaterial = primary.material.toLowerCase().trim();
-
-	// Look up the care group for this material
-	const careGroupTitle = MATERIAL_TO_CARE_GROUP[normalizedMaterial];
-	if (!careGroupTitle) return [];
-
-	// Find the care group by title
-	const careGroup = CARE_GROUPS.find((g) => g.title === careGroupTitle);
-	if (!careGroup) return [];
-
-	// Extract "Washing" and "Drying" instructions (if present)
+export function inferCareFromMaterial(materials: MaterialBlend[], color?: string): string[] {
 	const instructions: string[] = [];
-	for (const item of careGroup.items) {
-		if ((item.label === "Washing" || item.label === "Drying") && item.value) {
-			instructions.push(item.value);
+
+	if (materials.length > 0) {
+		// Use the primary (highest percentage) material's care group. Sort a copy
+		// to avoid mutating the caller's array.
+		const primary = [...materials].sort((a, b) => b.percentage - a.percentage)[0];
+		const normalizedMaterial = primary.material.toLowerCase().trim();
+
+		const careGroupTitle = MATERIAL_TO_CARE_GROUP[normalizedMaterial];
+		const careGroup = careGroupTitle ? CARE_GROUPS.find((g) => g.title === careGroupTitle) : undefined;
+
+		if (careGroup) {
+			for (const item of careGroup.items) {
+				if ((item.label === "Washing" || item.label === "Drying") && item.value) {
+					instructions.push(item.value);
+				}
+			}
 		}
 	}
+	console.log(isWhite(color));
+	if (isWhite(color)) instructions.push(WHITE_CARE_TAG);
 
 	return instructions;
 }

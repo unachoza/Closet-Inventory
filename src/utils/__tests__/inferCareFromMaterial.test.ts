@@ -57,4 +57,31 @@ describe("inferCareFromMaterial", () => {
 		// Should have at least one "Washing" and one "Drying" instruction
 		expect(care.length).toBeGreaterThanOrEqual(2);
 	});
+
+	it("appends a like-colors tag for white items", () => {
+		const care = inferCareFromMaterial([{ material: "cotton", percentage: 100 }], "White");
+		expect(care).toContain("Wash with like colors only");
+		// Material care is still present alongside the color tag.
+		expect(care.some((c) => c.toLowerCase().includes("wash"))).toBe(true);
+	});
+
+	it("matches white case-insensitively and ignores surrounding whitespace", () => {
+		expect(inferCareFromMaterial([], " white ")).toContain("Wash with like colors only");
+	});
+
+	it("adds the like-colors tag even when the material is unknown", () => {
+		// A white item with no recognized fabric should still carry the warning.
+		const care = inferCareFromMaterial([], "White");
+		expect(care).toEqual(["Wash with like colors only"]);
+	});
+
+	it("does not add the like-colors tag for non-white colors", () => {
+		const care = inferCareFromMaterial([{ material: "cotton", percentage: 100 }], "Black");
+		expect(care).not.toContain("Wash with like colors only");
+	});
+
+	it("omits the like-colors tag when no color is provided", () => {
+		const care = inferCareFromMaterial([{ material: "cotton", percentage: 100 }]);
+		expect(care).not.toContain("Wash with like colors only");
+	});
 });
