@@ -24,6 +24,11 @@
   --blue-faint: rgba(19, 17, 146, 0.16);
   --blue-border: rgba(19, 17, 146, 0.5);
   --blue-dim: rgba(19, 17, 146, 0.35);
+  --green: rgb(17, 146, 90);
+  --green-text: rgb(165, 245, 177);
+  --green-faint: rgba(17, 146, 90, 0.16);
+  --green-border: rgba(17, 146, 90, 0.5);
+  --green-dim: rgba(17, 146, 90, 0.35);
   --white-90: rgba(255, 255, 255, 0.9);
   --white-80: rgba(255, 255, 255, 0.8);
   --white-70: rgba(255, 255, 255, 0.7);
@@ -542,7 +547,7 @@ gap: 10px;
 
 /* Sidebar */
 .ob-adv-sidebar {
-  width: 88px;
+  width: 115px;
   flex-shrink: 0;
   background: rgba(19, 17, 146, 0.06);
   border-right: 1px solid var(--white-08);
@@ -578,14 +583,14 @@ gap: 10px;
 }
 
 .ob-adv-nav-dot--active {
-  background: var(--blue);
+  background: var(--green);
   color: #fff;
   animation: pulse-opacity 1.6s ease-in-out infinite;
 }
 
 .ob-adv-nav-dot--done {
-  background: var(--blue-dim);
-  color: var(--blue-text);
+  background: var(--green-dim);
+  color: var(--green-text);
 }
 
 .ob-adv-nav-label {
@@ -595,6 +600,7 @@ gap: 10px;
   flex: 1;
   min-width: 0;
   overflow: hidden;
+  text-align: left;
 }
 
 .ob-adv-nav-item--active .ob-adv-nav-label { color: var(--white-80); }
@@ -708,11 +714,12 @@ gap: 10px;
 
 .ob-adv-btn--pulse {
   animation: ob-btn-pulse 1.4s ease-in-out infinite;
+  background: var(--green);
 }
 
 @keyframes ob-btn-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(19, 17, 146, 0.6); }
-  50%       { box-shadow: 0 0 0 5px rgba(19, 17, 146, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(11, 168, 68, 0.6); }
+  50%       { box-shadow: 0 0 0 8px rgba(19, 17, 146, 0); }
 }
 
 /* ─── Step 3: Email list (was Step 2) ────────────────────────────────────────── */
@@ -928,6 +935,8 @@ gap: 10px;
 
 .ob-import-all-btn--done {
   background: var(--green-faint);
+ animation: ob-btn-pulse 1.4s ease-in-out infinite;
+
 }
 
 /* ─── Step 4: Review form ────────────────────────────────────────────────────── */
