@@ -470,6 +470,6 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 - \*\*RemoveButtonWhileOverview - if user is on overview and views an item, clicks remove, the card just flips back, closet does not get updated
 
-- \*\*NoFeaturesGetsEmptyPill - if an item doesn't have any style features, that section of card detais still renders with a ghoast pill
+-- \*\*NoFeaturesGetsEmptyPill - if an item doesn't have any style features, that section of card detais still renders with a ghoast pill
 
-- \*\*ErrorBoundaries, error messages, user feedback, try again messages don't have adequate contrast
+-- \*\*ErrorBoundaries, error messages, user feedback, try again messages don't have adequate contrast

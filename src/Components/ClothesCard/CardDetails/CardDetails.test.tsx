@@ -73,16 +73,6 @@ describe("CardDetails", () => {
 	const styledItem: ClothingItem = {
 		...item,
 		condition: "like new",
-		style: {
-			season: "fall",
-			hasPockets: true,
-			hasStretch: true,
-			pattern: "ribbed",
-			fit: "relaxed",
-			sleeveLength: "long sleeve",
-			neckline: "crew neck",
-			hemLength: "crop",
-		},
 	};
 
 	it("full variant renders inferred Style attributes", () => {
