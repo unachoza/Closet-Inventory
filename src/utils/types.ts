@@ -27,7 +27,6 @@ export type ClothingItem = {
 	onSale?: boolean;
 	notes?: string | string[];
 	style?: ProductAttributes;
-	[key: string]: any;
 };
 
 export interface ItemFormData {

@@ -20,21 +20,9 @@ import close from "../../../assets/close.svg";
  *  initial state and when the item prop changes (batch import queue). */
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	return {
-		name: item.name,
-		size: item.size,
-		brand: item.brand,
+		...item,
 		material: normalizeMaterial(item.material),
-		occasion: item.occasion,
-		age: item.age,
 		condition: matchedCondition(item.condition, item.age) ?? "new",
-		purchaseDate: item.purchaseDate,
-		care: item.care,
-		price: item.price,
-		onSale: item.onSale,
-		notes: item.notes,
-		imageURL: item.imageURL,
-		category: item.category,
-		color: item.color,
 	};
 }
 
@@ -111,24 +99,15 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			const displayName = formData.name || (formData.brand ? `${formData.brand} ${formData.category}` : formData.category) || "New Item";
 
 			addFullItem({
+				...item,
+				...formData,
 				id: item.id || crypto.randomUUID(),
 				imageURL,
 				name: displayName,
-				category: formData.category ?? "",
-				color: formData.color?.toLowerCase() ?? "",
-				size: formData.size ?? "",
-				brand: formData.brand ?? "",
-				price: formData.price ?? "",
+				color: (formData.color ?? "").toLowerCase(),
 				material: normalizeMaterial(formData.material),
-				occasion: formData.occasion ?? "",
-				age: formData.age ?? "",
 				condition: formData.condition ?? "new",
-				// Preserve the captured purchase date so the card can compute factual age.
-				purchaseDate: formData.purchaseDate,
-				care: formData.care ?? "",
-				onSale: formData.onSale ?? false,
-				notes: formData.notes ?? "",
-			});
+			} as ClothingItem);
 			showToast(`${displayName} added to your closet!`);
 
 			// In batch mode, advance to next item instead of going to carousel
