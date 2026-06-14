@@ -30,6 +30,10 @@ export const HEM_MAP: [RegExp, string][] = [
 	[/\bcrop(ped)?\b/i, "crop"],
 ];
 
+export const STRETCH_MAP: [RegExp, string][] = [[/\bstretch\b/i, "stretch"]];
+
+export const POCKET_MAP: [RegExp, string][] = [[/\bpockets\b/i, "pockets"]];
+
 export const NECKLINE_MAP: [RegExp, string][] = [
 	[/\b(square[- ]?neck|squareneck)\b/i, "square neck"],
 	[/\b(v[- ]?neck|vneck)\b/i, "v-neck"],
@@ -171,6 +175,15 @@ export function inferProductAttributes(name: string): ProductAttributes {
 
 	const season = matchFirst(name, SEASON_MAP);
 	if (season) attrs.season = season;
+
+	const hasStretch = matchFirst(name, STRETCH_MAP);
+	if (hasStretch) attrs.hasStretch = true;
+
+	const hasPockets = matchFirst(name, POCKET_MAP);
+	if (hasPockets) attrs.hasPockets = true;
+
+	const accents = matchFirst(name, ACCENTS_MAP);
+	if (accents) attrs.accents = accents;
 
 	return attrs;
 }

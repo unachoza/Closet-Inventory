@@ -72,14 +72,18 @@ describe("CardDetails", () => {
 	// ── Inferred style attributes (populated during email import) ──
 	const styledItem: ClothingItem = {
 		...item,
-		neckline: "crew neck",
-		sleeveLength: "long sleeve",
-		fit: "relaxed",
-		pattern: "ribbed",
-		hasStretch: true,
-		hasPockets: true,
+		// Inferred attributes live on the nested `style` object (matches the
+		// import path: inferProductAttributes(...) → item.style).
+		style: {
+			neckline: "crew neck",
+			sleeveLength: "long sleeve",
+			fit: "relaxed",
+			pattern: "ribbed",
+			hasStretch: true,
+			hasPockets: true,
+			season: "fall",
+		},
 		condition: "like new",
-		season: "fall",
 	};
 
 	it("full variant renders inferred Style attributes", () => {

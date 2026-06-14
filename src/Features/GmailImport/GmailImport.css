@@ -314,6 +314,7 @@
 .gmail-empty {
 	padding: var(--spacing-400);
 	text-align: center;
+	color: var(--White);
 }
 
 .gmail-empty-hint {
