@@ -116,7 +116,6 @@ gap: 10px;
 .ob-demo-shell.ob-welcome-full{
    align-items: center;
    justify-content: center;
-    height: 22rem;
     gap: .8rem;
 }
 
@@ -515,7 +514,7 @@ gap: 10px;
 .ob-adv-root {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .ob-adv-header {
@@ -728,7 +727,7 @@ gap: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .ob-email-header {
@@ -815,7 +814,7 @@ gap: 10px;
 .ob-items-wrap {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .ob-items-scroll {
@@ -838,7 +837,7 @@ gap: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px;
+  padding: 6px 8px;
   border-radius: 12px;
   border: 1px solid var(--white-10);
   background: var(--white-05);
@@ -898,6 +897,7 @@ gap: 10px;
 
 .ob-import-btn {
   flex-shrink: 0;
+  height: 33px;
   padding: 4px 10px;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -916,12 +916,12 @@ gap: 10px;
 
 .ob-import-all-bar {
   flex-shrink: 0;
-  padding: 12px;
+  padding: 3px 12px;
   border-top: 1px solid var(--white-10);
 }
 
 .ob-import-all-btn {
-  width: 100%;
+  width: 97%;
   padding: 10px;
   border-radius: 12px;
   font-size: 0.875rem;
@@ -943,7 +943,7 @@ gap: 10px;
 .ob-form-wrap {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .ob-form-nav {
@@ -1018,7 +1018,7 @@ gap: 10px;
 padding: 0px 12px 10px 9px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 10px;
   align-content: start;
 }
 
@@ -1073,6 +1073,7 @@ height: 100%;
 
 .ob-add-btn {
   flex: 1;
+  height: 40px;
   padding: 8px;
   background: var(--blue);
   color: #fff;
@@ -1092,6 +1093,7 @@ height: 100%;
 .ob-skip-item-btn {
   flex: 1;
   padding: 8px;
+  height: 40px;
   background: transparent;
   color: var(--white-60);
   border: 1px solid var(--white-20);
@@ -1109,7 +1111,7 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  height: 100%;
+  /* height: 100%; */
 }
 
 /* End state: success check + label, shown after the last step (no looping). */
@@ -1136,7 +1138,7 @@ height: 100%;
 }
 
 .ob-success-text {
-  font-size: 0.875rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--white-90);
 }
@@ -1154,16 +1156,17 @@ height: 100%;
   bottom: 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 20px;
   padding: 10px 12px;
   border-radius: 10px;
   background: var(--Soft-Black, #141313e0);
   border: 1px solid var(--glass-border);
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.45);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: 1.1rem;
   backdrop-filter: blur(8px);
   animation: ob-toast-in 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
 }
 
 .ob-toast-check {
@@ -1176,6 +1179,7 @@ height: 100%;
   border-radius: 9999px;
   background: var(--green, #16a34a);
   color: #fff;
+  transform: scale(1.4);
 }
 
 @keyframes ob-toast-in {
@@ -1185,7 +1189,7 @@ height: 100%;
 
 .ob-pills {
   display: flex;
-  gap: 4px;
+  gap: 7px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -1261,6 +1265,45 @@ height: 100%;
   color: var(--white-30);
 }
 
+/* Mock upload result — image lands in place of the drop zone. */
+.ob-photo-uploaded {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--white-10);
+  animation: ob-photo-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.ob-photo-uploaded-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ob-photo-uploaded-badge {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--green, #16a34a);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes ob-photo-pop {
+  from { opacity: 0; transform: scale(0.82); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .ob-field-group {
   flex: 1;
   display: flex;
@@ -1282,13 +1325,19 @@ height: 100%;
 }
 
 .ob-fake-textarea {
-  height: 48px;
+  height: 300px;
   background: var(--white-08);
   border: 1px solid var(--white-10);
   border-radius: 8px;
   padding: 8px 12px;
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   color: var(--white-30);
+  text-align: left;
+}
+
+/* Brighten once the user has typed real text into the note. */
+.ob-fake-textarea--filled {
+  color: var(--white-80);
 }
 
 .ob-cat-options {
@@ -1306,6 +1355,7 @@ height: 100%;
   border: 1px solid var(--white-10);
   background: var(--white-05);
   color: var(--white-60);
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .ob-cat-option--active {
@@ -1320,7 +1370,7 @@ height: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .ob-search-bar {
@@ -1382,7 +1432,7 @@ height: 100%;
   flex: 1;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 18px;
   overflow: hidden;
 }
 
@@ -1402,8 +1452,8 @@ height: 100%;
 }
 
 .ob-closet-card-icon {
-  width: 24px;
-  height: 24px;
+  width: 50px;
+  height: 60px;
   border-radius: 4px;
   background: var(--white-10);
 }

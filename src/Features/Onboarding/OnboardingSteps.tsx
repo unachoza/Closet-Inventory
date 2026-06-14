@@ -328,7 +328,7 @@ function Step4Demo() {
 					<ArrowLeft style={{ width: 12, height: 12 }} />
 					Return to Email Preview
 				</button>
-				<span className="ob-form-counter">Item 1 of 5</span>
+				<span className="ob-form-counter">Item 1 of 4</span>
 				<button className="ob-form-close">
 					<X style={{ width: 14, height: 14 }} />
 				</button>
@@ -382,21 +382,69 @@ const formStepLabels = ["Category", "Color", "Size", "Details", "Photo"];
 
 // Option chips shown for the choice-style steps. Keyed by pill label.
 const formStepOptions: Record<string, string[]> = {
-	Category: ["Tops", "Bottoms", "Outerwear", "Accessories"],
-	Color: ["Black", "White", "Brown", "Blue"],
-	Size: ["XS", "S", "M", "L"],
+	Category: ["Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Sleep", "Accessories"],
+	Color: ["Black", "White", "Brown", "Blue", "Red", "Purple"],
+	Size: ["XS", "S", "M", "L", "XL"],
 };
+
+// The choice the demo "user" makes on each step — building a White Oxford Shirt.
+const formStepSelection: Record<string, string> = {
+	Category: "Tops",
+	Color: "White",
+	Size: "M",
+};
+
+const NOTES_TARGET = "Bought for work";
+// Mock photo for the "upload" step — the trusted white-garment asset used elsewhere.
+const UPLOADED_PHOTO = "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378933/Screenshot_2025-10-13_at_11.07.40_AM_ywvcnu.png";
 
 function Step5Demo() {
 	const [step, setStep] = useState(0);
 	const [done, setDone] = useState(false);
+	// Which choice steps have been "clicked" (chip grey → blue a beat after the step appears).
+	const [picked, setPicked] = useState<Set<string>>(new Set());
+	// Typed-out note on the Details step.
+	const [notes, setNotes] = useState("");
+	// Mock photo upload on the Photo step (drop zone → image lands).
+	const [uploaded, setUploaded] = useState(false);
 
 	useEffect(() => {
-		// Advance through each step once, then finish — no infinite loop.
+		// Choice steps keep the steady cadence; the Details + Photo steps get extra
+		// room so the typed note and the photo upload have time to breathe.
 		const STEP_MS = 1300;
-		const timers = formStepLabels.slice(1).map((_, i) => setTimeout(() => setStep(i + 1), (i + 1) * STEP_MS));
-		// After the final (Photo) step: "added to closet" toast + success animation, then stop.
-		timers.push(setTimeout(() => setDone(true), formStepLabels.length * STEP_MS));
+		const PICK_DELAY = 600;
+		const timers: ReturnType<typeof setTimeout>[] = [];
+
+		const detailsIdx = formStepLabels.indexOf("Details");
+		const photoIdx = formStepLabels.indexOf("Photo");
+
+		// Category → Color → Size → Details advance on the steady 1300ms cadence.
+		for (let i = 1; i <= detailsIdx; i++) {
+			timers.push(setTimeout(() => setStep(i), i * STEP_MS));
+		}
+		// Choice steps: chips appear grey, then the picked one highlights blue.
+		formStepLabels.forEach((lbl, i) => {
+			if (formStepSelection[lbl]) {
+				timers.push(setTimeout(() => setPicked((p) => new Set([...p, lbl])), i * STEP_MS + PICK_DELAY));
+			}
+		});
+
+		// Details: pause, then type the note slowly, then let it settle.
+		const NOTE_START = detailsIdx * STEP_MS + 500;
+		const NOTE_MS = 90;
+		[...NOTES_TARGET].forEach((_, i) => {
+			timers.push(setTimeout(() => setNotes(NOTES_TARGET.slice(0, i + 1)), NOTE_START + i * NOTE_MS));
+		});
+		const noteEnd = NOTE_START + NOTES_TARGET.length * NOTE_MS;
+
+		// Photo: linger on the finished note, reveal the drop zone, then mock an upload.
+		const photoAt = noteEnd + 900;
+		timers.push(setTimeout(() => setStep(photoIdx), photoAt));
+		const uploadAt = photoAt + 900;
+		timers.push(setTimeout(() => setUploaded(true), uploadAt));
+
+		// Success once the photo has "uploaded".
+		timers.push(setTimeout(() => setDone(true), uploadAt + 1000));
 		return () => timers.forEach(clearTimeout);
 	}, []);
 
@@ -429,14 +477,25 @@ function Step5Demo() {
 				) : (
 					/* keyed by step → remounts so the fade animation replays on each change */
 					<div key={step} className="ob-manual-panel">
-						{label === "Photo" && (
-							<div className="ob-photo-drop">
-								<div className="ob-photo-drop-inner">
-									<Plus style={{ width: 32, height: 32 }} />
-									<span className="ob-photo-label">Add photo</span>
+						{label === "Photo" &&
+							(uploaded ? (
+								<div className="ob-photo-drop">
+									<div className="ob-photo-uploaded">
+										<img className="ob-photo-uploaded-img" src={UPLOADED_PHOTO} alt="White Oxford Shirt" />
+										<div className="ob-photo-uploaded-badge">
+											<Check style={{ width: 12, height: 12 }} />
+											Photo added
+										</div>
+									</div>
 								</div>
-							</div>
-						)}
+							) : (
+								<div className="ob-photo-drop">
+									<div className="ob-photo-drop-inner">
+										<Plus style={{ width: 32, height: 32 }} />
+										<span className="ob-photo-label">Add photo</span>
+									</div>
+								</div>
+							))}
 						{label === "Details" && (
 							<div className="ob-field-group">
 								<div>
@@ -447,8 +506,12 @@ function Step5Demo() {
 								</div>
 								<div>
 									<div className="ob-caps">NOTES</div>
-									<div className="ob-fake-textarea" style={{ marginTop: 4 }}>
-										Bought for work…
+									<div
+										className={`ob-fake-textarea${notes ? " ob-fake-textarea--filled" : ""}`}
+										style={{ marginTop: 4 }}
+									>
+										{notes}
+										<span className="ob-field-cursor" />
 									</div>
 								</div>
 							</div>
@@ -457,11 +520,14 @@ function Step5Demo() {
 							<div className="ob-field-group">
 								<div className="ob-caps">{label}</div>
 								<div className="ob-cat-options">
-									{options.map((c, ci) => (
-										<div key={c} className={`ob-cat-option${ci === 0 ? " ob-cat-option--active" : ""}`}>
-											{c}
-										</div>
-									))}
+									{options.map((c) => {
+										const isPicked = picked.has(label) && formStepSelection[label] === c;
+										return (
+											<div key={c} className={`ob-cat-option${isPicked ? " ob-cat-option--active" : ""}`}>
+												{c}
+											</div>
+										);
+									})}
 								</div>
 							</div>
 						)}
@@ -474,7 +540,7 @@ function Step5Demo() {
 					<span className="ob-toast-check">
 						<Check style={{ width: 12, height: 12 }} />
 					</span>
-					White Oxford Shirt added to your closet!
+					White Oxford Shirt <br /> added to your closet!
 				</div>
 			)}
 		</div>

@@ -113,9 +113,9 @@ describe("OnboardingExpanded", () => {
 			for (let i = 0; i < 6; i++) next(); // reach step 5
 			expect(screen.getByText("Add items manually too")).toBeInTheDocument();
 
-			// Run the timed walk through the 5 sub-steps to completion (5 × 1300ms).
+			// Run the timed walk through the sub-steps (incl. note typing + photo upload) to completion.
 			act(() => {
-				vi.advanceTimersByTime(7000);
+				vi.advanceTimersByTime(9000);
 			});
 			expect(screen.getByText(/added to your closet/i)).toBeInTheDocument();
 			expect(screen.getByText("All set!")).toBeInTheDocument();
@@ -133,7 +133,7 @@ describe("OnboardingExpanded", () => {
 });
 
 describe("Step 7 — Add items manually (guided form demo)", () => {
-	it("picks Tops → White → M and types the note for a White Oxford Shirt", () => {
+	it("picks Tops → White → M, types the note, then mocks a photo upload", () => {
 		vi.useFakeTimers();
 		try {
 			const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
@@ -160,12 +160,19 @@ describe("Step 7 — Add items manually (guided form demo)", () => {
 			});
 			expect(activeChip()).toBe("M");
 
-			// Details → the note types out, item name shown.
+			// Details → the note types out fully (~5750ms), item name shown.
 			act(() => {
-				vi.advanceTimersByTime(1800);
+				vi.advanceTimersByTime(2700);
 			});
 			expect(screen.getByText("Bought for work")).toBeInTheDocument();
 			expect(screen.getByText("White Oxford Shirt")).toBeInTheDocument();
+
+			// Photo → drop zone gives way to the mocked uploaded image (~7550ms).
+			act(() => {
+				vi.advanceTimersByTime(1800);
+			});
+			expect(screen.getByAltText("White Oxford Shirt")).toBeInTheDocument();
+			expect(screen.getByText("Photo added")).toBeInTheDocument();
 		} finally {
 			vi.useRealTimers();
 		}
