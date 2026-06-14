@@ -132,6 +132,46 @@ describe("OnboardingExpanded", () => {
 	});
 });
 
+describe("Step 7 — Add items manually (guided form demo)", () => {
+	it("picks Tops → White → M and types the note for a White Oxford Shirt", () => {
+		vi.useFakeTimers();
+		try {
+			const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
+			for (let i = 0; i < 6; i++) next(); // reach the manual-entry step
+			expect(screen.getByText("Add items manually too")).toBeInTheDocument();
+
+			const activeChip = () => container.querySelector(".ob-cat-option--active")?.textContent;
+
+			// Category → Tops highlights a beat after the step appears (600ms).
+			act(() => {
+				vi.advanceTimersByTime(700);
+			});
+			expect(activeChip()).toBe("Tops");
+
+			// Color → White (~1900ms).
+			act(() => {
+				vi.advanceTimersByTime(1200);
+			});
+			expect(activeChip()).toBe("White");
+
+			// Size → M (~3200ms).
+			act(() => {
+				vi.advanceTimersByTime(1300);
+			});
+			expect(activeChip()).toBe("M");
+
+			// Details → the note types out, item name shown.
+			act(() => {
+				vi.advanceTimersByTime(1800);
+			});
+			expect(screen.getByText("Bought for work")).toBeInTheDocument();
+			expect(screen.getByText("White Oxford Shirt")).toBeInTheDocument();
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+});
+
 describe("Step 2 — Connect your Gmail (nav drawer demo)", () => {
 	it("lists the app menu items inside the drawer", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);

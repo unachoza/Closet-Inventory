@@ -467,7 +467,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		});
 
 		// Skip button should be present in batch mode
-		const skipBtn = screen.getByText("Do NOT Add This Item");
+		const skipBtn = screen.getByText("Skip This Item");
 		expect(skipBtn).toBeInTheDocument();
 
 		// Skip first item

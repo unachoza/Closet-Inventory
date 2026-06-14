@@ -91,7 +91,7 @@ describe("EditItemView — batch import mode", () => {
 				onSkipItem={vi.fn()}
 			/>,
 		);
-		expect(screen.getByRole("button", { name: /do not add this item/i })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /skip this item/i })).toBeInTheDocument();
 	});
 
 	it("clicking Skip calls onSkipItem", () => {
@@ -106,13 +106,13 @@ describe("EditItemView — batch import mode", () => {
 				onSkipItem={onSkipItem}
 			/>,
 		);
-		fireEvent.click(screen.getByRole("button", { name: /do not add this item/i }));
+		fireEvent.click(screen.getByRole("button", { name: /skip this item/i }));
 		expect(onSkipItem).toHaveBeenCalled();
 	});
 
 	it("does not show Skip button outside batch mode", () => {
 		render(<EditItemView item={makeItem()} mode="create" setView={mockSetView} />);
-		expect(screen.queryByRole("button", { name: /do not add this item/i })).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /skip this item/i })).not.toBeInTheDocument();
 	});
 
 	it("Add to Closet calls addFullItem and then onItemAdded in batch mode", () => {
