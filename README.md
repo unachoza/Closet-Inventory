@@ -414,3 +414,12 @@ business model depend on is unbuilt. Actual build order:
 - \*\*ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
 
 - \*\*Safari Gmail Auth - get's stuck 
+
+- **CardDetailsFeaturesPill - if item as mutliple accents, they are rendered/ displayed in one pill. ie 'buttonszipper' shoud be two pills
+
+- **RemoveButtonWhileOverview - if user is on overview and views an item, clicks remove, the card just flips back, closet does not get updated
+
+-- **NoFeaturesGetsEmptyPill - if an item doesn't have any style features, that section of card detais still renders with a ghoast pill
+
+-- **ErrorBoundaries, error messages, user feedback, try again messages don't have adequate contrast
+

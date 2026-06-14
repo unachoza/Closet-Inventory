@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * E2E config focused on mobile viewports. Tests live in ./e2e and are run with
- * `npm run test:e2e` (separate from the Vitest unit suite).
+ * E2E config covering mobile and desktop viewports. Tests live in ./e2e and
+ * are run with `npm run test:e2e` (separate from the Vitest unit suite).
  *
  * The webServer block boots Vite automatically; locally it reuses an already
  * running dev server if you have one on :5173.
@@ -43,6 +43,14 @@ export default defineConfig({
 		{
 			name: "Mobile Chrome (Pixel 7)",
 			use: { ...devices["Pixel 7"] },
+		},
+		{
+			name: "Desktop Chrome",
+			use: { ...devices["Desktop Chrome"] },
+		},
+		{
+			name: "Desktop Safari (WebKit)",
+			use: { ...devices["Desktop Safari"] },
 		},
 	],
 

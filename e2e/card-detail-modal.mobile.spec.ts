@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { skipOnboarding } from "./helpers/navHelpers";
 
 /**
  * Mobile UX flow for the card → flip → "See all details" → grow-into-modal path.
@@ -24,8 +25,9 @@ async function expectWithinViewport(page: Page, selector: string) {
 
 test.describe("Card detail modal — mobile", () => {
 	test.beforeEach(async ({ page }) => {
+		await skipOnboarding(page);
 		await page.goto("/");
-		await expect(page.getByTestId("clothes-card").first()).toBeVisible();
+		await expect(page.getByTestId("clothes-card").first()).toBeVisible({ timeout: 8000 });
 	});
 
 	test("flip → See all details → grow modal → close", async ({ page }) => {

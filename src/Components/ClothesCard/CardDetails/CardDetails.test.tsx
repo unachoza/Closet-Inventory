@@ -80,6 +80,13 @@ describe("CardDetails", () => {
 		hasPockets: true,
 		condition: "like new",
 		season: "fall",
+		style: {
+			hasPockets: true,
+			hasStretch: true,
+			hemLength: "crop",
+			fit: "fitted",
+			sleeveLength: "long sleeve",
+		},
 	};
 
 	it("full variant renders inferred Style attributes", () => {
