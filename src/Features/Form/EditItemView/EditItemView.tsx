@@ -60,8 +60,19 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// auto-rendered as generic editable text inputs. They get bespoke controls:
 	// condition → a fixed-option selector, purchaseDate → a disabled display
 	// (or a manual-entry prompt when an import has no date), factual age → read-only.
-	const { id, imageURL, onSale, notes, material: _material, age: _age, condition: _condition, purchaseDate: _purchaseDate, style, ...remaining } = item;
-	const inputsToSeperate = { id, onSale, notes , style};
+	const {
+		id,
+		imageURL,
+		onSale,
+		notes,
+		material: _material,
+		age: _age,
+		condition: _condition,
+		purchaseDate: _purchaseDate,
+		style,
+		...remaining
+	} = item;
+	const inputsToSeperate = { id, onSale, notes, style };
 	const { updateItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 	// Parent renders <EditItemView key={item.id} ...> so React remounts the
@@ -300,7 +311,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							Skip This Item
 						</button>
 					)}
-					<button type="submit" className="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
+					<button type="submit" className="submit">
+						{isCreateMode ? "Add to Closet" : "Save Changes"}
+					</button>
 				</div>
 			</motion.form>
 		</div>
