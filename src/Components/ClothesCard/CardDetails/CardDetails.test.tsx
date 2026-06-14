@@ -73,6 +73,16 @@ describe("CardDetails", () => {
 	const styledItem: ClothingItem = {
 		...item,
 		condition: "like new",
+		style: {
+			season: "fall",
+			hasPockets: true,
+			hasStretch: true,
+			pattern: "ribbed",
+			fit: "relaxed",
+			sleeveLength: "long sleeve",
+			neckline: "crew neck",
+			hemLength: "crop",
+		},
 	};
 
 	it("full variant renders inferred Style attributes", () => {
@@ -80,6 +90,7 @@ describe("CardDetails", () => {
 		expect(screen.getByText("Style & Construction")).toBeInTheDocument();
 		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
 		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
+		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 
 	it("full variant renders Features pills for boolean attributes", () => {
