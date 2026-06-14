@@ -15,12 +15,14 @@ form {
 	height: 95%;
 	max-width: var(--Form-width);
 	margin: .5rem auto;
-	padding: var(--Form-padding);
+	/* padding: var(--Form-padding); */
+	padding: 1rem 1.5rem .8rem 1.5rem;
 	border: var(--border-black-sm);
 	border-radius: var(--border-radius-md);
 	background: var(--background-form);
 	box-shadow: var(--box-shadow);
 	backdrop-filter: var(--blur)
+
 }
 
 .form-step{

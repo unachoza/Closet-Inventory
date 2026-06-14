@@ -1,5 +1,5 @@
-import Modal from "../../../Components/Modal/Modal";
-import type { AdvancedSearchParams, SearchMode } from "./AdvancedSearchUI";
+import Modal from "../../../../Components/Modal/Modal";
+import type { AdvancedSearchParams, SearchMode } from "../AdvancedSearchUI";
 import "./SearchConfirmationModal.css";
 
 interface SearchConfirmationModalProps {

@@ -10,9 +10,26 @@
  */
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
+vi.mock("framer-motion");
 import { useState, useCallback } from "react";
 import GmailImport from "../GmailImport";
 import EditItemView from "../../Form/EditItemView/EditItemView";
+
+vi.mock("framer-motion", async () => {
+	const React = await import("react");
+	const makeEl = (tag: string) =>
+		React.forwardRef(({ children, animate, initial, exit, transition, variants, whileHover, whileTap, whileFocus, whileInView, layout, layoutId, ...rest }: any, ref: any) =>
+			React.createElement(tag, { ...rest, ref }, children),
+		);
+	return {
+		motion: new Proxy({}, { get: (_t: any, tag: string) => makeEl(tag) }),
+		AnimatePresence: ({ children }: any) => children,
+		useAnimation: () => ({ start: vi.fn(), stop: vi.fn() }),
+		useMotionValue: (v: unknown) => ({ get: () => v, set: vi.fn() }),
+		useTransform: (v: unknown) => v,
+	};
+});
 import { EditProvider } from "../../Form/EditContext";
 import { ToastProvider } from "../../../Components/Toast/Toast";
 import type { ClothingItem, ViewType } from "../../../utils/types";
@@ -102,7 +119,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		size: prefilled.size ?? "",
 		brand: prefilled.brand ?? "",
 		price: prefilled.price ?? "",
-		material: prefilled.material ?? "",
+		material: prefilled.material ?? [],
 		occasion: prefilled.occasion ?? "",
 		age: prefilled.age ?? "",
 		condition: prefilled.condition ?? "new",
@@ -342,9 +359,8 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(purchaseDate).toBeDisabled();
 		expect(purchaseDate.value).toMatch(/2018/);
 
-		// Return to Email Preview button should be visible in create mode
-		// (rendered twice due to a duplicate in EditItemView — assert at least one exists)
-		expect(screen.getAllByText(/Return to Email Preview/).length).toBeGreaterThanOrEqual(1);
+		// "Back to Email" button should be visible in create mode
+		expect(screen.getAllByText(/Back to Email/).length).toBeGreaterThanOrEqual(1);
 	});
 
 	it("clicking Import on the second product pre-populates correct data", async () => {
@@ -451,7 +467,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		});
 
 		// Skip button should be present in batch mode
-		const skipBtn = screen.getByText("Do NOT Add This Item");
+		const skipBtn = screen.getByText("Skip This Item");
 		expect(skipBtn).toBeInTheDocument();
 
 		// Skip first item
@@ -483,8 +499,8 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 			expect(screen.getByText("Import Item")).toBeInTheDocument();
 		});
 
-		// Click return to email preview (button is rendered twice in EditItemView — click first one)
-		fireEvent.click(screen.getAllByText(/Return to Email Preview/)[0]);
+		// Click "Back to Email" to return to the gmail preview
+		fireEvent.click(screen.getAllByText(/Back to Email/)[0]);
 
 		// Should be back on the gmail view with email list
 		await waitFor(() => {

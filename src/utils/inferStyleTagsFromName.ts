@@ -14,20 +14,20 @@ const OCCASION_MAP: [RegExp, string][] = [
 
 	// Going Out
 	[
-		/\b(going[- ]?out|night[- ]?out|club|bodycon|animal\s*print|corset|bustier|leather|faux\s*leather|mesh|cut[- ]?out|plunge|lace[- ]?up|sequin|sequins|sparkle|sparkly)\b/i,
+		/\b(going[- ]?out|night[- ]?out|club|bodycon|animal\s*print|corset|bustier|leather|faux\s*leather|mesh|cut[- ]?out|plunge|lace[- ]?up|sequin|sequins|sparkle|sparkly|mini\s*dress|mini\s*skirt)\b/i,
 		"going-out",
 	],
 
 	// Work Wear
 	[
-		/\b(work\s*wear|office|professional|business\s*casual|blazer|tailored|suiting|button[- ]?down|oxford|trouser|trousers|pencil\s*skirt)\b/i,
+		/\b(work\s*wear|office|professional|business\s*casual|blazer|tailored|suiting|button[- ]?down|pleated|pleat|oxford|trouser|trousers|pencil\s*skirt)\b/i,
 		"work wear",
 	],
 
 	// Sports
 	[
 		/\b(gym|yoga|athletic|sport|workout|running|cycling|activewear|training|legging|leggings)\b/i,
-		"sports",
+		"athleisure",
 	],
 
 	// Vacation
@@ -55,7 +55,7 @@ const OCCASION_MAP: [RegExp, string][] = [
 	[/\b(basic|basics)\b/i, "basics"],
 
 	// Casual / Everyday
-	[/\b(casual|everyday|lounge|weekend|basic|basics)\b/i, "casual"],
+	[/\b(casual|everyday|lounge|weekend|basic|basics|tank|t[- ]?shirt|midi\s*dress|midi\s*skirt|maxi\s*dress|maxi\s*skirt)\b/i, "casual"],
 ];
 
 const VALID_TAGS = new Set<string>(occasionExamples);

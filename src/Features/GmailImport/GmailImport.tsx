@@ -4,13 +4,16 @@ import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
-import type { AdvancedSearchParams, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
+import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
-import AdvancedSearchUI from "./AdvnacedSearch/AdvancedSearchUI";
+import { normalizeMaterial } from "../../utils/materialUtils";
+import { extractColorFromName } from "../../utils/parseNameHelpers";
+import normalizeColor from "../../utils/normalizeColors";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
 import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "./constants";
+import { inferProductAttributes } from "../../utils/inferProductAttributes";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -117,7 +120,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 		onSourceEmailChange?.(selectedEmailId);
 		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from, selectedEmail.date);
-		onImport(prefilled);
+		onImport({ ...prefilled, material: normalizeMaterial(prefilled.material) });
 	}, [selectedEmail, selectedEmailId, onImport, onSourceEmailChange]);
 
 	const handleImportProduct = useCallback(
@@ -125,8 +128,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			const emailFrom = selectedEmail?.from ?? "";
 			const emailSubject = selectedEmail?.subject ?? "";
 			const emailDate = selectedEmail?.date;
-
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
+			const style = inferProductAttributes(product.name);
 			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
@@ -135,12 +138,15 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				brand: product.brand || emailData.brand,
 				price: product.price,
 				category: emailData.category,
-				color: product.color,
+				// Color: prefer the structured value from the email HTML; otherwise
+				// scan the item name (e.g. "Babaton Deep Taupe ... Dress" → Brown).
+				color: product.color || normalizeColor(extractColorFromName(product.name)),
 				size: product.size,
-				material: product.material || emailData.material,
+				material: normalizeMaterial(product.material || emailData.material),
 				onSale: product.onSale,
 				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
 				condition: emailData.condition,
+				style,
 			});
 		},
 		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
@@ -158,7 +164,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			const items = products.map((product) => {
 				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 				const material = product.material && product.material.length > 0 ? product.material : emailData.material;
-
+				const style = inferProductAttributes(product.name);
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
@@ -166,11 +172,12 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					brand: product.brand || emailData.brand,
 					price: product.price,
 					category: emailData.category,
-					color: product.color,
+					color: product.color || normalizeColor(extractColorFromName(product.name)),
 					size: product.size,
 					material,
 					onSale: product.onSale,
 					condition: emailData.condition,
+					style,
 				} as Partial<ClothingItem>;
 			});
 			onImportAll(items);
@@ -266,7 +273,12 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 					{selectedEmail && (
 						<div className="gmail-preview-panel">
-							<button className="gmail-preview-close" onClick={handleClosePreview} type="button" aria-label="Back to email list">
+							<button
+								className="gmail-preview-close"
+								onClick={handleClosePreview}
+								type="button"
+								aria-label="Back to email list"
+							>
 								← Back to list
 							</button>
 							<EmailPreview

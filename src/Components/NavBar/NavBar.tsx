@@ -110,11 +110,11 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 
 	const navActions = (
 		<>
-			<button className="action-btn" onClick={handleAddItem}>
-				<Plus size={16} /> Add Item
-			</button>
 			<button className="action-btn secondary" onClick={() => goTo("entireCloset")}>
 				<LayoutGrid size={16} /> View All
+			</button>
+			<button className="action-btn" onClick={handleAddItem}>
+				<Plus size={16} /> Add Item
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("gmail")}>
 				<Download size={16} /> Import Gmail

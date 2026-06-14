@@ -7,7 +7,7 @@ const normalizeColor = (color: string): string => {
 	}
 
 	// WHITE
-	if (c.includes("white")) {
+	if (c.includes("white") || c.includes("ivory") || c.includes("ecru") || c.includes("cream") || c.includes("pearl")) {
 		return "White";
 	}
 
@@ -36,8 +36,8 @@ const normalizeColor = (color: string): string => {
 		return "Green";
 	}
 
-	// BLUE
-	if (c.includes("blue") || c.includes("ocean") || c.includes("midnight")) {
+	// BLUE / TEAL
+	if (c.includes("blue") || c.includes("navy") || c.includes("ocean") || c.includes("midnight") || c.includes("teal") || c.includes("cyan") || c.includes("cobalt")) {
 		return "Blue";
 	}
 

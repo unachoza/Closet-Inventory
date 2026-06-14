@@ -10,14 +10,11 @@ interface MaterialCompositionBarProps {
 	compact?: boolean;
 }
 
-const MaterialCompositionBar = ({
-	blend,
-	showLegend = true,
-	compact = false,
-}: MaterialCompositionBarProps) => {
-	if (blend.length === 0) return null;
+const MaterialCompositionBar = ({ blend, showLegend = true, compact = false }: MaterialCompositionBarProps) => {
+	const safeBlend = Array.isArray(blend) ? blend : [];
+	// if (blend.length === 0) return null;
 
-	const total = blendTotal(blend);
+	const total = blendTotal(safeBlend);
 	// Normalize widths so they always fill 100% of the bar,
 	// even if percentages don't add up perfectly.
 	const scale = total > 0 ? 100 / total : 1;
@@ -26,12 +23,13 @@ const MaterialCompositionBar = ({
 		<div className={`mcb${compact ? " mcb--compact" : ""}`}>
 			{/* Segmented bar */}
 			<div className="mcb__bar" role="img" aria-label="Material composition">
-				{blend.map((b, i) => {
+				{safeBlend.map((b, i) => {
 					const color = getMaterialColor(b.material);
 					const width = b.percentage * scale;
 					return (
 						<div
 							key={i}
+							data-testid="material-segment"
 							className="mcb__segment"
 							style={{ width: `${width}%`, background: color }}
 							title={`${b.material}: ${b.percentage}%`}
@@ -43,15 +41,11 @@ const MaterialCompositionBar = ({
 			{/* Legend */}
 			{showLegend && (
 				<ul className="mcb__legend">
-					{blend.map((b, i) => {
+					{safeBlend.map((b, i) => {
 						const color = getMaterialColor(b.material);
 						return (
 							<li key={i} className="mcb__legend-item">
-								<span
-									className="mcb__legend-swatch"
-									style={{ background: color }}
-									aria-hidden="true"
-								/>
+								<span className="mcb__legend-swatch" style={{ background: color }} aria-hidden="true" />
 								<span className="mcb__legend-label">
 									{b.percentage}%&nbsp;{capitalize(b.material)}
 								</span>

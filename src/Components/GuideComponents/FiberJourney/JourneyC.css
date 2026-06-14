@@ -42,17 +42,17 @@
   display: inline-block;
   background: var(--journey-gold);
   color: var(--journey-bg);
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   padding: 4px 14px;
-  border-radius: 100px;
+  border-radius: var(--border-radius-pill);
   margin-bottom: 14px;
 }
 
 .jc-header__title {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: clamp(26px, 4vw, 52px);
   color: var(--journey-text);
   font-weight: 700;
@@ -72,7 +72,7 @@
 }
 
 .jc-legend-heading {
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -154,7 +154,7 @@
 }
 
 .jc-phase-num {
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -166,7 +166,7 @@
 }
 
 .jc-phase-name {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: 17px;
   font-weight: 600;
   line-height: 1.2;
@@ -333,7 +333,7 @@
 }
 
 .jc-key-seg__num {
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -397,14 +397,14 @@
 }
 
 .jc-modal__phase-label {
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .jc-modal__step-title {
-  font-family: "Playfair Display", serif;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 600;
   color: var(--journey-text);
@@ -448,10 +448,10 @@
 }
 
 .jc-modal__source-link {
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   padding: 3px 10px;
-  border-radius: 100px;
+  border-radius: var(--border-radius-pill);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: var(--journey-text-muted);
   text-decoration: none;

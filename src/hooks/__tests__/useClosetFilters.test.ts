@@ -11,7 +11,7 @@ const makeItem = (overrides: Partial<ClothingItem>): ClothingItem => ({
 	color: "black",
 	size: "M",
 	brand: "Nike",
-	material: "cotton",
+	material: [{ material: "cotton", percentage: 100 }],
 	occasion: "casual",
 	age: "new",
 	care: "machine wash",
@@ -19,11 +19,11 @@ const makeItem = (overrides: Partial<ClothingItem>): ClothingItem => ({
 });
 
 const CLOSET: ClothingItem[] = [
-	makeItem({ id: "1", category: "tops", color: "black", brand: "Nike", material: "cotton", occasion: "casual" }),
-	makeItem({ id: "2", category: "bottoms", color: "blue", brand: "Levi's", material: "denim", occasion: "casual" }),
-	makeItem({ id: "3", category: "tops", color: "white", brand: "Zara", material: "cotton", occasion: "formal" }),
-	makeItem({ id: "4", category: "dresses", color: "red", brand: "Zara", material: "silk", occasion: "formal" }),
-	makeItem({ id: "5", category: "bottoms", color: "black", brand: "Nike", material: "polyester", occasion: "active" }),
+	makeItem({ id: "1", category: "tops", color: "black", brand: "Nike", material: [{ material: "cotton", percentage: 100 }], occasion: "casual" }),
+	makeItem({ id: "2", category: "bottoms", color: "blue", brand: "Levi's", material: [{ material: "denim", percentage: 100 }], occasion: "casual" }),
+	makeItem({ id: "3", category: "tops", color: "white", brand: "Zara", material: [{ material: "cotton", percentage: 100 }], occasion: "formal" }),
+	makeItem({ id: "4", category: "dresses", color: "red", brand: "Zara", material: [{ material: "silk", percentage: 100 }], occasion: "formal" }),
+	makeItem({ id: "5", category: "bottoms", color: "black", brand: "Nike", material: [{ material: "polyester", percentage: 100 }], occasion: "active" }),
 ];
 
 describe("useClosetFilters", () => {
@@ -314,12 +314,12 @@ describe("useClosetFilters — material (MaterialBlend[])", () => {
 		expect(cottonOption?.count).toBe(2); // m1 and m2
 	});
 
-	it("works with legacy string material", () => {
-		const legacyItems: ClothingItem[] = [
-			makeItem({ id: "l1", material: "silk" }),
-			makeItem({ id: "l2", material: "cotton" }),
+	it("filters correctly when items have MaterialBlend[]", () => {
+		const items: ClothingItem[] = [
+			makeItem({ id: "l1", material: [{ material: "silk", percentage: 100 }] }),
+			makeItem({ id: "l2", material: [{ material: "cotton", percentage: 100 }] }),
 		];
-		const { result } = renderHook(() => useClosetFilters(legacyItems));
+		const { result } = renderHook(() => useClosetFilters(items));
 		act(() => result.current.toggleFilter("material", "Silk"));
 		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["l1"]);
 	});
