@@ -91,7 +91,6 @@ function AppShell() {
 	// Batch import: "Import All Items" from an email
 	const handleGmailImportAll = useCallback(
 		(items: Partial<ClothingItem>[]) => {
-			console.log({ items });
 			if (items.length === 0) return;
 			const clothingItems = items.map(buildClothingItem);
 			setImportQueue(clothingItems);
