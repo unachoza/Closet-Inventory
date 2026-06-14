@@ -235,7 +235,6 @@ business model depend on is unbuilt. Actual build order:
 - 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
 - 🚧  Don't import items that can't be mapped to a category (big for Amazon emails)
 - 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
-- 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 
 ---
 
@@ -249,6 +248,7 @@ business model depend on is unbuilt. Actual build order:
 
 ### v2.3 - Expanding Email Provider Scope
 
+- 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 - 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
 
 ---
@@ -361,6 +361,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Interactive fabric care guide
 - ✅ Material-to-care-instructions mapping
 - ✅ Fiber Journey interactive visualization
+- ✅ Stain removal guide by fabric and common weaves
 - 🔲 Clothing lifespan tracker ("estimated wears remaining")
 - 🔲 Repair and alteration log (date, description, cost)
 
