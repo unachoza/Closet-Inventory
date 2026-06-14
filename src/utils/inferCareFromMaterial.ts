@@ -38,35 +38,46 @@ const MATERIAL_TO_CARE_GROUP: Record<string, string> = {
 	polypropylene: "Polyester, Nylon & Synthetics",
 };
 
+// Fiber-trait rules that apply to any material present in the blend (not just
+// the primary), layered on top of the care-group wash/dry guidance.
+const MATERIAL_TRAIT_RULES: [string[], string[]][] = [
+	[["linen", "rayon"], ["Line dry"]],
+	[["nylon", "polyester"], ["Do not use fabric softeners"]],
+];
+
 /**
- * Maps a material name to its care group and extracts wash + dry instructions.
- * Returns an array of care strings (both washing and drying guidance).
+ * Maps a material blend to care instructions.
+ * - The primary (highest %) material contributes wash/dry guidance from
+ *   CARE_GROUPS in Fabric&Fiber.ts (only "Washing"/"Drying", skips "Ironing").
+ * - Fiber-trait rules add extra guidance for any material in the blend
+ *   (e.g. linen/rayon → line dry, nylon/polyester → no fabric softener).
  *
- * Care instructions are extracted from CARE_GROUPS in Fabric&Fiber.ts.
- * Only "Washing" and "Drying" labels are included (skips "Ironing").
+ * Pure: returns a deduped (possibly empty) list, never mutates the input.
  */
 export function inferCareFromMaterial(materials: MaterialBlend[]): string[] {
 	if (materials.length === 0) return [];
 
-	// Use the primary (highest percentage) material's care group
-	const primary = materials.sort((a, b) => b.percentage - a.percentage)[0];
-	const normalizedMaterial = primary.material.toLowerCase().trim();
-
-	// Look up the care group for this material
-	const careGroupTitle = MATERIAL_TO_CARE_GROUP[normalizedMaterial];
-	if (!careGroupTitle) return [];
-
-	// Find the care group by title
-	const careGroup = CARE_GROUPS.find((g) => g.title === careGroupTitle);
-	if (!careGroup) return [];
-
-	// Extract "Washing" and "Drying" instructions (if present)
 	const instructions: string[] = [];
-	for (const item of careGroup.items) {
-		if ((item.label === "Washing" || item.label === "Drying") && item.value) {
-			instructions.push(item.value);
+
+	// Primary (highest percentage) material's care group → wash/dry guidance.
+	const primary = [...materials].sort((a, b) => b.percentage - a.percentage)[0];
+	const careGroupTitle = MATERIAL_TO_CARE_GROUP[primary.material.toLowerCase().trim()];
+	const careGroup = careGroupTitle ? CARE_GROUPS.find((g) => g.title === careGroupTitle) : undefined;
+	if (careGroup) {
+		for (const item of careGroup.items) {
+			if ((item.label === "Washing" || item.label === "Drying") && item.value) {
+				instructions.push(item.value);
+			}
 		}
 	}
 
-	return instructions;
+	// Fiber-trait rules across the whole blend.
+	const names = materials.map((m) => m.material.toLowerCase().trim());
+	for (const [keywords, careTags] of MATERIAL_TRAIT_RULES) {
+		if (keywords.some((k) => names.some((n) => n.includes(k)))) {
+			instructions.push(...careTags);
+		}
+	}
+
+	return [...new Set(instructions)];
 }

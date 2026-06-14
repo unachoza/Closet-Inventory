@@ -7,7 +7,7 @@ import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
 import { cleanProductName } from "./cleanProductName";
 import { inferProductAttributes } from "./inferProductAttributes";
 import { inferMaterialFromName } from "./inferMaterialFromName";
-import { inferCareFromMaterial } from "./inferCareFromMaterial";
+import { inferCare } from "./inferCare";
 import { inferSemanticAttributes } from "./inferSemanticAttributes";
 import { defaultConditionForPurchaseDate } from "./condition";
 
@@ -151,7 +151,11 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	const semantic = inferSemanticAttributes(combinedText);
 
 	const inferencedMaterial = inferMaterialFromName(combinedText);
-	const inferencedCare = inferCareFromMaterial(inferencedMaterial);
+	// Care from material (fiber wash/dry) + name/color attributes (jeans → wash
+	// inside out, white → wash with like colors, etc.), deduped. NOTE: on the
+	// per-product import path the resolved color/material are recomputed there
+	// (see GmailImport) since the card's color isn't visible to this function.
+	const inferencedCare = inferCare(combinedText, color, inferencedMaterial);
 
 	// Purchase date drives the factual age shown on the card.
 	const parsed = new Date(date ?? "");

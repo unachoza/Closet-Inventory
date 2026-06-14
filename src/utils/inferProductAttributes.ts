@@ -9,7 +9,7 @@ export interface ProductAttributes {
 	hasStretch?: boolean;
 	hasPockets?: boolean;
 	pattern?: string;
-	accents?: string;
+	accents?: string | string[];
 }
 
 // Each entry: [pattern, canonical value].
@@ -29,6 +29,10 @@ export const HEM_MAP: [RegExp, string][] = [
 	[/\bmaxi\b/i, "maxi"],
 	[/\bcrop(ped)?\b/i, "crop"],
 ];
+
+export const STRETCH_MAP: [RegExp, string][] = [[/\bstretch\b/i, "stretch"]];
+
+export const POCKET_MAP: [RegExp, string][] = [[/\bpockets?\b/i, "pockets"]];
 
 export const NECKLINE_MAP: [RegExp, string][] = [
 	[/\b(square[- ]?neck|squareneck)\b/i, "square neck"],
@@ -100,6 +104,7 @@ const SEASON_MAP: [RegExp, string][] = [
 export const ACCENTS_MAP: [RegExp, string][] = [
 	[/\bbeaded\b/i, "beaded"],
 	[/\bbows?\b/i, "bows"],
+	[/\bbuttons?\b/i, "buttons"],
 	[/\bchains?\b/i, "chains"],
 	[/\bcut[- ]?outs?\b/i, "cut outs"],
 	[/\bembroider(ed|y)?\b/i, "embroidered"],
@@ -116,6 +121,7 @@ export const ACCENTS_MAP: [RegExp, string][] = [
 	[/\brhinestones?\b/i, "rhinestones"],
 	[/\bstudded\b/i, "studded"],
 	[/\bvelvet\b/i, "velvet"],
+	[/\bzipper\b/i, "zipper"],
 ];
 
 export const PATTERN_MAP: [RegExp, string][] = [
@@ -151,6 +157,10 @@ function matchFirst(text: string, map: [RegExp, string][]): string | undefined {
 	return undefined;
 }
 
+export function matchAll(text: string, map: [RegExp, string][]): string[] {
+	return map.filter(([regex]) => regex.test(text)).map(([_, value]) => value);
+}
+
 export function inferProductAttributes(name: string): ProductAttributes {
 	const attrs: ProductAttributes = {};
 
@@ -171,6 +181,15 @@ export function inferProductAttributes(name: string): ProductAttributes {
 
 	const season = matchFirst(name, SEASON_MAP);
 	if (season) attrs.season = season;
+
+	const hasStretch = matchFirst(name, STRETCH_MAP);
+	if (hasStretch) attrs.hasStretch = true;
+
+	const hasPockets = matchFirst(name, POCKET_MAP);
+	if (hasPockets) attrs.hasPockets = true;
+
+	const accents = matchAll(name, ACCENTS_MAP);
+	if (accents) attrs.accents = accents;
 
 	return attrs;
 }

@@ -196,6 +196,31 @@ describe("parseEmailToFormData — default fields", () => {
 	});
 });
 
+describe("parseEmailToFormData — attribute-driven care", () => {
+	it("adds 'Wash inside out' when the product is jeans", () => {
+		const result = parse("Levi's High Rise Skinny Jeans", "", "");
+		expect(result.care).toContain("Wash inside out");
+	});
+
+	it("adds 'Wash with like colors' when the item is white", () => {
+		const result = parse("Cotton Tee in White", "", "");
+		expect(result.color).toBe("White");
+		expect(result.care).toContain("Wash with like colors");
+	});
+
+	it("adds both tags for white jeans", () => {
+		const result = parse("White Wide Leg Jeans", "", "");
+		expect(result.care).toContain("Wash inside out");
+		expect(result.care).toContain("Wash with like colors");
+	});
+
+	it("does not add attribute care tags for an unrelated item", () => {
+		const result = parse("Black Silk Cami", "", "");
+		expect(result.care).not.toContain("Wash inside out");
+		expect(result.care).not.toContain("Wash with like colors");
+	});
+});
+
 describe("parseEmailToFormData — purchase date", () => {
 	it("stores the email date as an ISO purchaseDate", () => {
 		const result = parseEmailToFormData("Order", "", "", "Fri, 15 Mar 2024 10:30:00 -0700");
