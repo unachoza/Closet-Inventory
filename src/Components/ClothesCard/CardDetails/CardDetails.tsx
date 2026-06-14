@@ -46,12 +46,13 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// fields on the item. Deduped + joined so empty fields collapse gracefully.
 	const style = item.style;
 	const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
-	const styleConstruction = dedupeJoin([style?.fit, style?.rise, style?.hemLength || style?.topLength, style?.pattern, style?.accents]);
+	const styleConstruction = dedupeJoin([style?.fit, style?.rise, style?.hemLength || style?.topLength, style?.pattern]);
 	console.log({ styleConstruction });
 	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
 	const hasStyle = Object.keys(otherStyles).length > 0;
 
 	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", style?.accents].filter((t): t is string => !!t);
+	console.log({ featureTags });
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
