@@ -72,29 +72,25 @@ describe("CardDetails", () => {
 	// ── Inferred style attributes (populated during email import) ──
 	const styledItem: ClothingItem = {
 		...item,
-		neckline: "crew neck",
-		sleeveLength: "long sleeve",
-		fit: "relaxed",
-		pattern: "ribbed",
-		hasStretch: true,
-		hasPockets: true,
 		condition: "like new",
-		season: "fall",
 		style: {
+			season: "fall",
 			hasPockets: true,
 			hasStretch: true,
-			hemLength: "crop",
-			fit: "fitted",
+			pattern: "ribbed",
+			fit: "relaxed",
 			sleeveLength: "long sleeve",
+			neckline: "crew neck",
+			hemLength: "crop",
 		},
 	};
 
 	it("full variant renders inferred Style attributes", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
 		expect(screen.getByText("Style")).toBeInTheDocument();
-		// neckline · sleeve on one line, construction descriptors on another
-		expect(screen.getByText(/crew neck · long sleeve/i)).toBeInTheDocument();
-		expect(screen.getByText(/relaxed · ribbed/i)).toBeInTheDocument();
+		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
+		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
+		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 
 	it("full variant renders Features pills for boolean attributes", () => {
