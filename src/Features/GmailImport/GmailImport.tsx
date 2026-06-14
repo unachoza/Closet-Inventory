@@ -6,6 +6,7 @@ import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
+import { inferCare } from "../../utils/inferCare";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
 import normalizeColor from "../../utils/normalizeColors";
@@ -130,6 +131,10 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			const emailDate = selectedEmail?.date;
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 			const style = inferProductAttributes(product.name);
+			// Color: prefer the structured value from the email HTML; otherwise
+			// scan the item name (e.g. "Babaton Deep Taupe ... Dress" → Brown).
+			const color = product.color || normalizeColor(extractColorFromName(product.name));
+			const material = normalizeMaterial(product.material || emailData.material);
 			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
@@ -138,14 +143,15 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				brand: product.brand || emailData.brand,
 				price: product.price,
 				category: emailData.category,
-				// Color: prefer the structured value from the email HTML; otherwise
-				// scan the item name (e.g. "Babaton Deep Taupe ... Dress" → Brown).
-				color: product.color || normalizeColor(extractColorFromName(product.name)),
+				color,
 				size: product.size,
-				material: normalizeMaterial(product.material || emailData.material),
+				material,
 				onSale: product.onSale,
 				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
 				condition: emailData.condition,
+				// Recompute care from the RESOLVED color/material — the card's color
+				// (e.g. "Color: White") isn't visible to parseEmailToFormData.
+				care: inferCare(product.name, color, material),
 				style,
 			});
 		},
@@ -163,8 +169,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 			const items = products.map((product) => {
 				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
-				const material = product.material && product.material.length > 0 ? product.material : emailData.material;
 				const style = inferProductAttributes(product.name);
+				const color = product.color || normalizeColor(extractColorFromName(product.name));
+				const material = normalizeMaterial(product.material || emailData.material);
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
@@ -172,11 +179,14 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					brand: product.brand || emailData.brand,
 					price: product.price,
 					category: emailData.category,
-					color: product.color || normalizeColor(extractColorFromName(product.name)),
+					color,
 					size: product.size,
 					material,
 					onSale: product.onSale,
 					condition: emailData.condition,
+					// Recompute care from the RESOLVED color/material (card color isn't
+					// visible to parseEmailToFormData).
+					care: inferCare(product.name, color, material),
 					style,
 				} as Partial<ClothingItem>;
 			});
