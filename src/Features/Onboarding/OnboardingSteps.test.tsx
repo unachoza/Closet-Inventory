@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { OnboardingExpanded } from "./SevenStepOnboarding";
+import { OnboardingExpanded } from "./OnboardingSteps";
 
 const next = () => fireEvent.click(screen.getByRole("button", { name: /^next$/i }));
 const advanceToLast = () => {

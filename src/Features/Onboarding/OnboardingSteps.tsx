@@ -17,7 +17,7 @@ import {
 	X,
 	Menu,
 } from "lucide-react";
-import "./SevenStepsOnboarding.css";
+import "./OnboardingSteps.css";
 import logo from "../../assets/hangerLogo.png";
 import { carouselCategories } from "../../utils/constants";
 
@@ -601,10 +601,12 @@ function StepAdvancedSearchDemo() {
 			setTags([ADV_TAGS[0]]);
 		}, 2000);
 		const t3 = setTimeout(() => setTags([...ADV_TAGS]), 2600);
-		const t4 = setTimeout(() => setHighlightSearch(true), 3000);
+		const t4 = setTimeout(() => setActiveNav(3), 3200);
+		const t5 = setTimeout(() => setActiveNav(4), 3800);
+		const t6 = setTimeout(() => setHighlightSearch(true), 4200);
 		return () => {
 			senderTimers.forEach(clearTimeout);
-			[t1, t2, t3, t4].forEach(clearTimeout);
+			[t1, t2, t3, t4, t5, t6].forEach(clearTimeout);
 		};
 	}, []);
 
