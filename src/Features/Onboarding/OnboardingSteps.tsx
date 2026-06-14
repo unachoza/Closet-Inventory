@@ -550,7 +550,7 @@ function Step5Demo() {
 // ─── Step 6: Search & filter ────────────────────────────────────────────────────
 
 const closetItems = [
-	{ label: "Sleeveless Top", bg: "#78716c" },
+	{ label: "Strappy Top", bg: "#78716c" },
 	{ label: "Wide Leg Jeans", bg: "#334155" },
 	{ label: "Linen Blazer", bg: "#451a03" },
 	{ label: "Slip Dress", bg: "#881337" },
@@ -558,32 +558,94 @@ const closetItems = [
 	{ label: "Trousers", bg: "#3f3f46" },
 ];
 
+const SEARCH_QUERY = "going out";
+const SEARCH_FILTER_CHIP = "Sleeveless";
+// "going out" narrows to these three going-out pieces…
+const QUERY_DROPS = ["Wide Leg Jeans", "Cardigan", "Trousers"];
+// …then the Sleeveless chip drops the blazer, leaving Strappy Top + Slip Dress.
+const CHIP_DROPS = ["Linen Blazer"];
+
 function Step6Demo() {
-	const filters = ["Cotton", "Brown", "Tops"];
+	const [query, setQuery] = useState("");
+	const [chipShown, setChipShown] = useState(false);
+	// Two-stage removal: fade out first, then collapse out of the grid so it reflows.
+	const [out, setOut] = useState<Set<string>>(new Set());
+	const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+	const [resultCount, setResultCount] = useState(closetItems.length);
+
+	useEffect(() => {
+		const timers: ReturnType<typeof setTimeout>[] = [];
+
+		// 1. Type the query.
+		const TYPE_START = 400;
+		const TYPE_MS = 95;
+		[...SEARCH_QUERY].forEach((_, i) => {
+			timers.push(setTimeout(() => setQuery(SEARCH_QUERY.slice(0, i + 1)), TYPE_START + i * TYPE_MS));
+		});
+		const queryEnd = TYPE_START + SEARCH_QUERY.length * TYPE_MS;
+
+		// 2. Query narrows the grid to the going-out three (fade, then collapse).
+		timers.push(
+			setTimeout(() => {
+				setOut(new Set(QUERY_DROPS));
+				setResultCount(closetItems.length - QUERY_DROPS.length);
+			}, queryEnd + 350),
+		);
+		timers.push(setTimeout(() => setCollapsed(new Set(QUERY_DROPS)), queryEnd + 700));
+
+		// 3. A filter chip lands and drops the blazer, settling on the final two.
+		const chipAt = queryEnd + 1450;
+		timers.push(setTimeout(() => setChipShown(true), chipAt));
+		timers.push(
+			setTimeout(() => {
+				setOut(new Set([...QUERY_DROPS, ...CHIP_DROPS]));
+				setResultCount(closetItems.length - QUERY_DROPS.length - CHIP_DROPS.length);
+			}, chipAt + 350),
+		);
+		timers.push(setTimeout(() => setCollapsed(new Set([...QUERY_DROPS, ...CHIP_DROPS])), chipAt + 700));
+
+		return () => timers.forEach(clearTimeout);
+	}, []);
+
 	return (
 		<div className="ob-demo-shell ob-search-wrap">
 			<div className="ob-search-bar">
 				<Search className="ob-search-icon" />
-				<span className="ob-search-text">summer top</span>
-				<span className="ob-search-count">4 results</span>
+				{query ? (
+					<span className="ob-search-text ob-search-text--typed">
+						{query}
+						<span className="ob-field-cursor" />
+					</span>
+				) : (
+					<span className="ob-search-text">
+						Search your closet
+						<span className="ob-field-cursor" />
+					</span>
+				)}
+				<span className="ob-search-count">{resultCount} results</span>
 			</div>
 			<div className="ob-filter-chips">
-				{filters.map((f) => (
-					<div key={f} className="ob-filter-chip">
-						{f}
+				{chipShown && (
+					<div className="ob-filter-chip ob-filter-chip--in">
+						{SEARCH_FILTER_CHIP}
 						<X className="ob-chip-x" />
 					</div>
-				))}
+				)}
 			</div>
 			<div className="ob-closet-grid">
-				{closetItems.map((item) => (
-					<div key={item.label} className="ob-closet-card" style={{ background: item.bg }}>
-						<div className="ob-closet-card-body">
-							<div className="ob-closet-card-icon" />
+				{closetItems.map((item) => {
+					let cls = "ob-closet-card";
+					if (out.has(item.label)) cls += " ob-closet-card--out";
+					if (collapsed.has(item.label)) cls += " ob-closet-card--collapsed";
+					return (
+						<div key={item.label} className={cls} style={{ background: item.bg }}>
+							<div className="ob-closet-card-body">
+								<div className="ob-closet-card-icon" />
+							</div>
+							<div className="ob-closet-card-label">{item.label}</div>
 						</div>
-						<div className="ob-closet-card-label">{item.label}</div>
-					</div>
-				))}
+					);
+				})}
 			</div>
 		</div>
 	);

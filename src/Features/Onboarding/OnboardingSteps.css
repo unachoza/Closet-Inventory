@@ -22,7 +22,7 @@
   --blue: rgb(19, 17, 146);
   --blue-text: rgb(165, 180, 252);
   --blue-faint: rgba(19, 17, 146, 0.16);
-  --blue-border: rgba(19, 17, 146, 0.5);
+  --blue-border: rgba(19, 17, 146, 0.75);
   --blue-dim: rgba(19, 17, 146, 0.35);
   --green: rgb(17, 146, 90);
   --green-text: rgb(165, 245, 177);
@@ -1438,9 +1438,33 @@ height: 100%;
 
 .ob-closet-card {
   border-radius: 12px;
+  height: 150px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Stage 1: fade + shrink as the search/filter excludes the item. */
+.ob-closet-card--out {
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+}
+
+/* Stage 2: drop out of the grid so the remaining results reflow. */
+.ob-closet-card--collapsed {
+  display: none;
+}
+
+/* Typed search text reads as entered (vs the muted placeholder). */
+.ob-search-text--typed {
+  color: var(--white-90);
+}
+
+/* Filter chip animates in once applied. */
+.ob-filter-chip--in {
+  animation: ob-tag-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .ob-closet-card-body {
