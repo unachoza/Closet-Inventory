@@ -7,7 +7,13 @@ interface FilteredItemGridProps {
 	items: ClothingItem[];
 	matchKeysById: Map<string, string[]>;
 	totalCount: number;
+	/** Signature of the active filter/search/sort state. Changing it remounts the
+	 *  container so the entrance stagger replays. It intentionally does NOT include
+	 *  item count, so removing an item animates in place (popLayout) instead of
+	 *  blanking and re-staggering the whole grid. */
+	gridKey: string;
 	onEditItem?: (item: ClothingItem) => void;
+	onRemoveItem?: (id: string) => void;
 }
 
 // Static — no need to recreate on every render
@@ -33,29 +39,38 @@ const cardVariants: Variants = {
 	exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
 };
 
-const FilteredItemGrid = ({ items, matchKeysById, totalCount, onEditItem }: FilteredItemGridProps) => {
+const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, onEditItem, onRemoveItem }: FilteredItemGridProps) => {
 	return (
 		<>
 			<p className="entire-closet__meta">
 				Showing <strong>{items.length}</strong> of {totalCount} items
 			</p>
 			<div className="filtered-items-parent"role="list">
-				<AnimatePresence mode="wait">
-					<motion.div
-						key={`${items.length}-${totalCount}`} // <--- important: remounts when category changes
-						className="items-grid"
-						variants={containerVariants}
-						initial="hidden"
-						animate="show"
-						exit="exit"
-					>
+				{/* Container is keyed by the filter/search/sort signature so it remounts
+				    (and re-staggers) only when the query shape changes. It is NOT wrapped
+				    in AnimatePresence — the per-item AnimatePresence below owns removal,
+				    so a single delete animates out + shifts the rest (popLayout + layout),
+				    mirroring the carousel view instead of blanking the whole grid. */}
+				<motion.div
+					key={gridKey}
+					className="items-grid"
+					variants={containerVariants}
+					initial="hidden"
+					animate="show"
+				>
+					<AnimatePresence mode="popLayout">
 						{items.map((item) => (
-							<motion.div key={item.id} role="listitem" variants={cardVariants}>
-								<FilteredCard item={item} matchKeys={matchKeysById.get(item.id) ?? []} onEditItem={onEditItem} />
+							<motion.div key={item.id} role="listitem" variants={cardVariants} exit="exit" layout>
+								<FilteredCard
+								item={item}
+								matchKeys={matchKeysById.get(item.id) ?? []}
+								onEditItem={onEditItem}
+								onRemoveItem={onRemoveItem}
+							/>
 							</motion.div>
 						))}
-					</motion.div>
-				</AnimatePresence>
+					</AnimatePresence>
+				</motion.div>
 				{items.length === 0 && (
 					<div className="filtered-item-grid__empty">
 						<p>No items match your search or filters.</p>

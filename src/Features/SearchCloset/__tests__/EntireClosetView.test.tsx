@@ -13,14 +13,21 @@ import { ViewProvider } from "../../../context/ViewContext";
 import EntireClosetView from "../EntireClosetView";
 import type { ClothingItem } from "../../../utils/types";
 
+// Module-level spy so the closet mock and the assertions share one reference.
+const { removeItemSpy } = vi.hoisted(() => ({ removeItemSpy: vi.fn() }));
+
 // ── Mocks ─────────────────────────────────────────────────────────────────────
-// Render a simple count + list so we can assert on filtered/sorted output
+// Render a simple count + list so we can assert on filtered/sorted output.
+// Each card exposes a Remove button so we can verify onRemoveItem is threaded
+// all the way down (regression: RemoveButtonWhileOverview — remove in the
+// search/entire-closet view was a no-op because onRemoveItem was never passed).
 vi.mock("../FilteredItemGrid", () => ({
-	default: ({ items }: { items: ClothingItem[] }) => (
+	default: ({ items, onRemoveItem }: { items: ClothingItem[]; onRemoveItem?: (id: string) => void }) => (
 		<div data-testid="item-grid">
 			{items.map((item) => (
 				<div key={item.id} data-testid="card" data-category={item.category}>
 					{item.name}
+					<button onClick={() => onRemoveItem?.(item.id)}>Remove {item.name}</button>
 				</div>
 			))}
 		</div>
@@ -46,7 +53,7 @@ const CLOSET: ClothingItem[] = [
 ];
 
 vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({ closet: CLOSET }),
+	useLocalStorageCloset: () => ({ closet: CLOSET, removeItem: removeItemSpy }),
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -123,6 +130,12 @@ describe("EntireClosetView — data pipeline", () => {
 		const cards = screen.getAllByTestId("card");
 		expect(cards[0]).toHaveTextContent("Zara Dress");
 		expect(cards[2]).toHaveTextContent("Levi Jeans");
+	});
+
+	it("Remove on a card calls removeItem with that item's id (regression: RemoveButtonWhileOverview)", () => {
+		renderView();
+		fireEvent.click(screen.getByRole("button", { name: "Remove Zara Dress" }));
+		expect(removeItemSpy).toHaveBeenCalledWith("2");
 	});
 
 	it("filter + sort work together", () => {

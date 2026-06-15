@@ -13,14 +13,14 @@ interface EntireClosetViewProps {
 }
 
 const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
-	const { closet } = useLocalStorageCloset();
+	const { closet, removeItem } = useLocalStorageCloset();
 
 	// 1. Filter by dimension checkboxes
 	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } = useClosetFilters(closet);
 
 	// 2. Fuzzy search over filtered items — driven by the single NavBar search
 	// box via SearchContext (shared source of truth).
-	const { searchResults, getMatchKeys } = useSearch();
+	const { searchResults, getMatchKeys, debouncedQuery } = useSearch();
 
 	// 3. Sort the search results
 	const { sortKey, setSortKey, sortedItems } = useClosetSort();
@@ -31,6 +31,15 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 
 	// Match metadata for highlighting which fields were hit
 	const matchKeysById = useMemo(() => getMatchKeys(filteredItems), [getMatchKeys, filteredItems]);
+
+	// Replay the grid's stagger when the *query shape* changes (filters / search /
+	// sort) — but NOT when an item is simply removed. Keying on this signature
+	// (instead of item count) lets removals animate in place via popLayout, the
+	// same way the carousel view shifts cards over. See FilteredItemGrid.
+	const gridKey = useMemo(
+		() => `${JSON.stringify(filters)}|${debouncedQuery}|${sortKey}`,
+		[filters, debouncedQuery, sortKey],
+	);
 
 	return (
 		<main className="entire-closet" aria-label="Entire closet view">
@@ -43,7 +52,14 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				onToggleFilter={toggleFilter}
 				onClearAll={clearAll}
 			/>
-			<FilteredItemGrid items={displayed} matchKeysById={matchKeysById} totalCount={closet.length} onEditItem={onEditItem} />
+			<FilteredItemGrid
+				items={displayed}
+				matchKeysById={matchKeysById}
+				totalCount={closet.length}
+				gridKey={gridKey}
+				onEditItem={onEditItem}
+				onRemoveItem={removeItem}
+			/>
 		</main>
 	);
 };

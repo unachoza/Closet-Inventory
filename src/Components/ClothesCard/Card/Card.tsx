@@ -135,7 +135,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 					{/* Front */}
 					<div className="card-front">
 						<div className="card-image">
-							<img src={item.imageURL} alt={item.name} />
+							<img src={item.imageURL || undefined} alt={item.name} />
 						</div>
 						<div className="card-name-overlay">
 							<span className="card-name-label">{item.name || item.brand || item.category}</span>
