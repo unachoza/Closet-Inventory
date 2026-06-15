@@ -90,8 +90,9 @@ describe("CardDetails", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
 		expect(screen.getByText("Style")).toBeInTheDocument();
 		// neckline · sleeve on one line, construction descriptors on another
-		expect(screen.getByText(/crew neck · long sleeve/i)).toBeInTheDocument();
-		expect(screen.getByText(/relaxed · ribbed/i)).toBeInTheDocument();
+		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
+		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
+		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 
 	it("full variant renders Features pills for boolean attributes", () => {
@@ -100,6 +101,29 @@ describe("CardDetails", () => {
 		expect(screen.getByText("Features")).toBeInTheDocument();
 		expect(screen.getByText("Stretch")).toBeInTheDocument();
 		expect(screen.getByText("Pockets")).toBeInTheDocument();
+	});
+
+	it("renders each accent as its own pill (regression: CardDetailsFeaturesPill)", () => {
+		const multiAccent: ClothingItem = {
+			...item,
+			style: { accents: ["buttons", "zipper"] },
+		};
+		render(<CardDetails item={multiAccent} variant="full" />);
+
+		expect(screen.getByText("buttons")).toBeInTheDocument();
+		expect(screen.getByText("zipper")).toBeInTheDocument();
+		// The bug rendered both joined into a single "buttonszipper" pill.
+		expect(screen.queryByText("buttonszipper")).not.toBeInTheDocument();
+	});
+
+	it("hides Features section when accents is an empty array (regression: NoFeaturesGetsEmptyPill)", () => {
+		const emptyAccents: ClothingItem = {
+			...item,
+			style: { accents: [] },
+		};
+		render(<CardDetails item={emptyAccents} variant="full" />);
+
+		expect(screen.queryByText("Features")).not.toBeInTheDocument();
 	});
 
 	it("full variant renders Identity with condition + price, no leaked template text", () => {

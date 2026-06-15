@@ -49,7 +49,13 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
 	const hasStyle = Object.keys(otherStyles).length > 0;
 
-	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", style?.accents].filter((t): t is string => !!t);
+	// accents is `string | string[]` — normalize to an array so each accent
+	// (e.g. "buttons", "zipper") renders as its own pill, and an empty array
+	// contributes nothing (no ghost pill).
+	const accentTags = Array.isArray(style?.accents) ? style.accents : style?.accents ? [style.accents] : [];
+	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", ...accentTags].filter(
+		(t): t is string => !!t
+	);
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
