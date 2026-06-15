@@ -17,36 +17,10 @@
 /**** COMPONENTS ****/
 
 /* ── Shared button system ────────────────────────────────────────────────────
-   Canonical button styling. New buttons should use `.btn` + a variant rather
-   than re-rolling per-feature classes (we currently have ~45 bespoke ones).
-   The base `button {}` rule in index.css still provides the default chrome;
-   these add consistent color/padding/radius via tokens. */
-.btn {
-  padding: var(--button-padding);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--text-base);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease, transform 0.2s ease;
-}
-
-.btn--primary {
-  background: var(--color-primary);
-  color: var(--White);
-}
-.btn--primary:hover {
-  background: var(--color-primary-hover);
-}
-
-.btn--ghost {
-  background: transparent;
-  color: var(--White);
-  border: var(--border-white-sm);
-}
-
-.btn--pill {
-  border-radius: var(--border-radius-pill);
-}
+   MOVED → src/styles/primitives.css (now brand-terracotta on semantic tokens,
+   not the legacy blue --color-primary). `.btn` + `.btn--primary/secondary/ghost/
+   danger` live there as the single source of truth. The `.btn--pill` modifier
+   was dropped — use `.pill`/`.tag` for chips. See docs/DESIGN_SYSTEM.md. */
 
 .button-container{
   display: flex;

@@ -249,36 +249,58 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   letter-spacing: 0.05em;
 }
 
-/* Base Component Applications */
-body {
-  background-color: var(--bg-canvas);
-  color: var(--text-primary);
-  margin: 0;
-  padding: var(--primitive-spacing-xl);
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* NOTE: `body`, `.card`, and other component rules intentionally do NOT live in
+   this file. Per DESIGN_SYSTEM.md, tokens.css defines tokens + theme-agnostic
+   typography utilities only — component styling lives in each feature's CSS.
+   (A generic `.card` here collided with the ClothesCard `.card`; the editorial
+   canvas background-image is set in index.css.) */
+
+/* Component rules (.btn, .panel, .field, .pill...) live in styles/primitives.css,
+   not here — tokens.css is tokens + token-utilities only. */
+
+
+/* ------------------------------------------------------------------------
+   5. GLASS CANVAS SURFACE
+   A frosted, semi-opaque surface for content that floats over the editorial
+   background image — enough opacity to keep text legible (Principle #1: Calm
+   Over Busy) while letting the closet image read through. Theme-aware.
+   ------------------------------------------------------------------------ */
+:root {
+  /* Frosted surface tint + blur. "Solid glass" = opaque enough to read on. */
+  --bg-surface-glass: rgba(250, 248, 245, 0.72); /* alabaster @ 72% */
+  --effect-blur-glass: blur(18px) saturate(115%);
+  --border-hairline: rgba(132, 112, 87, 0.22); /* taupe @ 22% */
+  /* Stronger borders for inputs / focus (semantic, used by form controls). */
+  --border-strong: var(--primitive-neutral-dark-walnut);
+  --border-brand: var(--primitive-brand-muted-clay);
 }
 
-.card {
-  background-color: var(--bg-surface-primary);
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-surface-glass: rgba(35, 22, 18, 0.55); /* ink-espresso @ 55% */
+    --border-hairline: rgba(243, 238, 231, 0.14);
+  }
+}
+
+[data-theme="dark"] {
+  --bg-surface-glass: rgba(35, 22, 18, 0.55);
+  --border-hairline: rgba(243, 238, 231, 0.14);
+}
+
+.glass-canvas {
+  background-color: var(--bg-surface-glass);
+  /* Vendor-prefixed first for Safari/iOS. */
+  -webkit-backdrop-filter: var(--effect-blur-glass);
+  backdrop-filter: var(--effect-blur-glass);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--layout-radius-card);
-  padding: var(--layout-gap-card);
-  box-shadow: var(--elevation-low);
-  margin-bottom: var(--layout-gap-grid);
+  box-shadow: var(--elevation-high);
 }
 
-.btn-primary {
-  background-color: var(--bg-surface-brand);
-  color: var(--text-on-brand);
-  font-family: var(--primitive-font-family-sans);
-  font-size: var(--primitive-font-size-sm);
-  font-weight: var(--primitive-font-weight-medium);
-  border: none;
-  border-radius: var(--layout-radius-button);
-  padding: var(--layout-padding-tight) var(--primitive-spacing-md);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--primitive-brand-deep-umber);
+/* Progressive enhancement: if the browser can't blur, lean fully opaque so
+   text never sits on a busy photo. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-canvas {
+    background-color: var(--bg-surface-primary);
+  }
 }

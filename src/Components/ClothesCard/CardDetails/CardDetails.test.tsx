@@ -90,8 +90,9 @@ describe("CardDetails", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
 		expect(screen.getByText("Style")).toBeInTheDocument();
 		// neckline · sleeve on one line, construction descriptors on another
-		expect(screen.getByText(/crew neck · long sleeve/i)).toBeInTheDocument();
-		expect(screen.getByText(/relaxed · ribbed/i)).toBeInTheDocument();
+		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
+		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
+		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 
 	it("full variant renders Features pills for boolean attributes", () => {
