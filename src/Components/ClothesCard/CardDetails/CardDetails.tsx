@@ -46,8 +46,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// fields on the item. Deduped + joined so empty fields collapse gracefully.
 	const style = item.style;
 	// const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
-	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
-	const hasStyle = Object.keys(otherStyles).length > 0;
+	// Only the fields the Style section actually renders gate `hasStyle`.
+	// `season` shows in Identity and `pattern` isn't rendered, so keying off the
+	// full object would render an empty "Style" header for season/pattern-only
+	// items (the ghost-section bug — see NoFeaturesGetsEmptyPill).
+	const hasStyle = !!(style?.fit || style?.neckline || style?.sleeveLength || style?.hemLength || style?.rise);
 
 	// accents is `string | string[]` — normalize to an array so each accent
 	// (e.g. "buttons", "zipper") renders as its own pill, and an empty array

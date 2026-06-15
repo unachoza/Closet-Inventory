@@ -142,4 +142,24 @@ describe("CardDetails", () => {
 		expect(screen.queryByText("Style")).not.toBeInTheDocument();
 		expect(screen.queryByText("Features")).not.toBeInTheDocument();
 	});
+
+	it("hides the Style section when only season/pattern are set (regression: ghost Style header)", () => {
+		// season renders in Identity, pattern renders nowhere — neither should
+		// make the Style section appear with no content beneath it.
+		const seasonPatternOnly: ClothingItem = {
+			...item,
+			style: { season: "fall", pattern: "ribbed" },
+		};
+		render(<CardDetails item={seasonPatternOnly} variant="full" />);
+
+		expect(screen.queryByText("Style")).not.toBeInTheDocument();
+	});
+
+	it("shows the Style section when a rendered attribute is present", () => {
+		const withFit: ClothingItem = { ...item, style: { fit: "relaxed", season: "fall" } };
+		render(<CardDetails item={withFit} variant="full" />);
+
+		expect(screen.getByText("Style")).toBeInTheDocument();
+		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
+	});
 });
