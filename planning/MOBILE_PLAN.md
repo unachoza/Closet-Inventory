@@ -1,4 +1,4 @@
-# Mobile Plan & Audit
+# Mobile Plan & Audit - 6/7/2026
 
 > Scope: evaluate the **mobile** experience of Closet Inventory, surface the real
 > gaps, and lay out a sequenced plan of wins, refactors, and bigger bets.
