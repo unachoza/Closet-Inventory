@@ -143,9 +143,9 @@ border-brand: #ab7a68 (Focus indicators, premium components)
 
   /* Border Radii (Intentional, structured, sharp luxury feel) */
   --primitive-radius-none: 0px;
-  --primitive-radius-sm: 2px;
-  --primitive-radius-md: 4px;
-  --primitive-radius-lg: 8px;
+  --primitive-radius-sm: 5px;
+  --primitive-radius-md: 10px;
+  --primitive-radius-lg: 15px;
 
 
   /* ------------------------------------------------------------------------

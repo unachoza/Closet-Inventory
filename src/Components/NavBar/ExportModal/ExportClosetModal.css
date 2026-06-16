@@ -10,10 +10,10 @@
 	display: inline-block;
 	margin-bottom: var(--spacing-200, 1rem);
 	padding: 0.3rem 0.8rem;
-	border: 1px solid rgba(99, 179, 237, 0.35);
+	border: 1px solid rgba(178, 134, 117, 0.35);
 	border-radius: var(--border-radius-ty, 4px);
-	background: rgba(99, 179, 237, 0.15);
-	color: #93c5fd;
+	background: rgba(178, 134, 117, 0.15);
+	color: var(--primitive-brand-muted-clay);
 	font-size: 0.82rem;
 	font-weight: 500;
 }
@@ -52,7 +52,7 @@
 	width: 5px;
 	height: 5px;
 	border-radius: 50%;
-	background: #93c5fd;
+	background: var(--primitive-brand-muted-clay);
 	content: "";
 }
 
@@ -73,7 +73,7 @@
 }
 
 .ecm-btn--confirm {
-	background: var(--button-backround-blue, #2563eb);
+	background: var(--button-backround-blue, var(--primitive-brand-deep-umber));
 	color: var(--White, #fff);
 }
 
