@@ -95,6 +95,7 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   /* Brand Terracotta & Clays */
   --primitive-brand-rose-terracotta: #b28675;
   --primitive-brand-muted-clay: #ab7a68;
+  /* #987264 */
   --primitive-brand-deep-umber: #8f6256;
 
   /* Deep Neutrals (Dark Theme Bases & Light Theme Typography) */
@@ -104,11 +105,15 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --primitive-neutral-dark-ink-espresso: #231612;
   --primitive-neutral-dark-warm-charcoal: #2f1e19;
   --primitive-neutral-dark-roasted-brown: #3d2822;
+  --Modal-dark-grey-light-red-background: #7b7777;
 
   /* Light Neutrals (Light Theme Bases & Dark Theme Typography) */
   --primitive-neutral-light-alabaster: #faf8f5;
   --primitive-neutral-light-sand: #f3eee7;
   --primitive-neutral-light-white: #ffffff;
+  --contrast-white-against-grey-backdrop: #fff7f7;
+  --contrast-muted-white-against-grey-backdrop: #efe7e7;
+  --pill-backdrop-pastel-terrocata: rgb(239 211 200 / 71%);
 
   /* Desaturated Luxe Status Colors */
   --primitive-status-success-sage: #6e7a68;
