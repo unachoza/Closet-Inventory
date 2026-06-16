@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { arrayMove } from "@dnd-kit/sortable";
 import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData } from "../utils/types";
 import { normalizeMaterial } from "../utils/materialUtils";
@@ -96,5 +97,16 @@ export function useLocalStorageCloset() {
 		setCloset([]);
 	};
 
-	return { closet: normalizedCloset, addItem, addFullItem, importItems, removeItem, updateItem, getCloset, clearCloset };
+	const reorderItems = (activeId: string, overId: string) => {
+		setCloset((prev: ClothingItem[]) => {
+			const oldIndex = prev.findIndex((item) => item.id === activeId);
+			const newIndex = prev.findIndex((item) => item.id === overId);
+			if (oldIndex === -1 || newIndex === -1) return prev;
+			const updated = arrayMove([...prev], oldIndex, newIndex);
+			safeSetItem(STORAGE_KEY, JSON.stringify(updated));
+			return updated;
+		});
+	};
+
+	return { closet: normalizedCloset, addItem, addFullItem, importItems, removeItem, updateItem, getCloset, clearCloset, reorderItems };
 }
