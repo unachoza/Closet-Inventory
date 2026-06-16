@@ -4,6 +4,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./tokens.css"; // canonical design tokens — imported first so the cascade resolves
 import "./styles/primitives.css"; // canonical component primitives (.btn/.panel/.field/.pill)
 import "./index.css";
+import "./styles/typography.css"; // editorial type adoption — loads AFTER index.css to win the cascade
 import App from "./App.tsx";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
