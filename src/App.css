@@ -33,7 +33,6 @@
 
 /* Button */
 .back-button {
-  position: fixed;
   padding: 0.6rem 1.5rem;
   border-radius: var(--border-radius-sm);
   background: var(--color-primary);

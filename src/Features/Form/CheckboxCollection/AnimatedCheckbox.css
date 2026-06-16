@@ -1,5 +1,5 @@
 :root {
-      --Check-Blue: #2563eb
+      --Check-Blue: var(--primitive-brand-deep-umber)
 }
 
 label.animated-checkbox {
@@ -22,9 +22,9 @@ label.animated-checkbox {
       align-items: center;
       width: 2rem;
       height: 2rem;
-      border: solid var(--Black);
+      border: solid var(--border-strong);
       border-radius: .15em;
-      background-color: inherit;
+      background-color: var(--bg-surface-primary);
       transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
@@ -43,7 +43,7 @@ label.animated-checkbox {
 .checkbox-svg {
       width: 2rem;
       height: 2rem;
-      color: var(--White);
+      color: var(--text-on-brand);
 }
 
 .checkbox-label {
@@ -57,7 +57,7 @@ label.animated-checkbox {
 }
 
 .checkbox-root:hover { 
-      box-shadow: 2px 2px 1.25rem var(--Black);
+      box-shadow: var(--elevation-low);
       border-color: var(--Check-Blue);
 }
  
