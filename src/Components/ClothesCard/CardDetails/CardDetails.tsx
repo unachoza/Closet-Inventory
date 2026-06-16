@@ -135,7 +135,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						{hasIdentity && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Identity" />
-								<p className="card-details__identity-text">
+								< div className="card-details__identity-text">
 									{purchasedLabel && (
 										<>
 											Purchased {purchasedLabel}
@@ -145,7 +145,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 									)}
 									{item.condition && <p className="card-details__identity-text">Condition: {item.condition}</p>}
 									{item.price && <p className="card-details__identity-text">Price: {item.price}</p>}
-								</p>
+								</div>
 							</div>
 						)}
 						{occasions.length > 0 && (
