@@ -533,7 +533,7 @@
 .filtered-card {
 	display: flex;
 	flex-direction: column;
-	background-color: var(--Dark-Grey);
+	background-color: var(--bg-surface-primary);
 	gap: var(--spacing-50);
 }
 

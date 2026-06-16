@@ -1,4 +1,5 @@
 import { Option, Step, MaterialBlend } from "./types.ts";
+import { DressIcon, HoodieIcon, HighHeelIcon, TShirtIcon, PantsIcon, SockIcon, MoonStarsIcon , PersonSimpleRunIcon} from "@phosphor-icons/react";
 
 const b = (material: string, percentage: number): MaterialBlend => ({ material, percentage });
 
@@ -75,18 +76,18 @@ export const careExamples = ["dry clean only", "hand wash", "cold water", "hot w
 
 // Categories for the carousel
 export const carouselCategories = [
-	{ label: "Tops", icon: "👕" },
-	{ label: "Bottoms", icon: "👖" },
-	{ label: "Dresses", icon: "👗" },
+	{ label: "Tops", icon: TShirtIcon },
+	{ label: "Bottoms", icon: PantsIcon },
+	{ label: "Dresses", icon: DressIcon },
 	{ label: "Coats", icon: "🧥" },
-	{ label: "Sweaters", icon: "🧶" },
-	{ label: "Athleisure", icon: "🏋️‍♀️" },
+	{ label: "Sweaters", icon: HoodieIcon },
+	{ label: "Athleisure", icon: PersonSimpleRunIcon },
 	{ label: "Lingerie", icon: "🎀" },
-	{ label: "Socks", icon: "🧦" },
+	{ label: "Socks", icon: SockIcon },
 	{ label: "Underwear", icon: "🩲" },
 	{ label: "body", icon: "🕴️" },
-	{ label: "Shoes", icon: "👠" },
-	{ label: "Sleep", icon: "😴" },
+	{ label: "Shoes", icon: HighHeelIcon },
+	{ label: "Sleep", icon: MoonStarsIcon },
 ];
 
 export const categoryOptions: Option[] = [
