@@ -15,8 +15,8 @@
 }
 
 .advanced-search-toggle:hover {
-	color: var(--White);
-	border-color: var(--White);
+	color: #fff;
+	border-color: #fff;
 }
 
 .advanced-search-form {
@@ -39,7 +39,7 @@
 
 .advanced-search-fieldset legend {
 	padding: 0 var(--spacing-50);
-	color: var(--White);
+	color: #fff;
 	font-size: 1rem;
 	font-weight: 500;
 }
@@ -56,10 +56,10 @@
 	display: inline-flex;
 	align-items: center;
 	padding: 0.2rem 0.6rem;
-	border: solid 1px black;
+	border: 1px solid rgba(178, 134, 117, 0.6);
 	border-radius: var(--border-radius-ty);
-	background: rgba(37, 99, 235, 0.5);
-	color: var(--White);
+	background: rgba(178, 134, 117, 0.35);
+	color: #fff;
 	font-size: 0.78rem;
 	line-height: 1.4;
 	gap: 4px;
@@ -80,7 +80,7 @@
 	border: none;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, 0.15);
-	color: var(--White);
+	color: #fff;
 	font-size: 0.75rem;
 	line-height: 1;
 	cursor: pointer;
@@ -91,7 +91,7 @@
 }
 
 .advanced-search-hint {
-	color: var(--White);
+	color: #fff;
 	font-size: 0.8rem;
 	font-style: italic;
 }
@@ -106,18 +106,18 @@
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: var(--border-radius-ty);
 	background: rgba(0, 0, 0, 0.3);
-	color: var(--White);
+	color: #fff;
 	font-size: 0.85rem;
 	flex: 1;
 }
 
 .advanced-search-input::placeholder {
-	color: var(--White);
+	color: #fff;
 }
 
 .advanced-search-input:focus {
-	border-color: var(--Focus-Blue);
-	outline: 1px solid var(--Focus-Blue);
+	border-color: var(--border-brand);
+	outline: 1px solid var(--border-brand);
 }
 
 .advanced-search-add-btn {
@@ -126,7 +126,7 @@
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: var(--border-radius-ty);
 	background: rgba(255, 255, 255, 0.08);
-	color: var(--White);
+	color: #fff;
 	font-size: 0.82rem;
 	cursor: pointer;
 }
@@ -145,7 +145,7 @@
 	display: flex;
 	flex-direction: column;
 	min-width: 140px;
-	color: var(--White);
+	color: #fff;
 	font-size: 0.85rem;
 	flex: 1;
 	gap: 4px;
@@ -163,7 +163,7 @@
 	padding: 0.5rem 1.5rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
-	color: var(--White);
+	color: #fff;
 	font-size: 0.9rem;
 	font-weight: 500;
 	cursor: pointer;
@@ -180,7 +180,7 @@
 }
 
 .advanced-search-submit--fetch {
-	background: var(--button-backround-blue);
+	background: var(--bg-surface-brand);
 }
 
 .advanced-search-submit--filter {
@@ -194,7 +194,7 @@
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: var(--border-radius-sm);
 	background: transparent;
-	color: var(--Op-Light-Grey);
+	color: rgba(255,255,255,0.55);
 	font-size: 0.85rem;
 	font-weight: 500;
 	cursor: pointer;
@@ -203,9 +203,9 @@
 }
 
 .advanced-search-clear-btn:hover {
-	background: rgba(220, 38, 38, 0.1);
-	color: #ff6b6b;
-	border-color: #ff6b6b;
+	background: color-mix(in srgb, var(--status-error) 10%, transparent);
+	color: var(--status-error);
+	border-color: var(--status-error);
 }
 
 .advanced-search-clear-btn:disabled {
@@ -226,8 +226,8 @@
 }
 
 .advanced-search-status--fetch {
-	background: rgba(37, 99, 235, 0.15);
-	color: #93bbfd;
+	background: rgba(178, 134, 117, 0.15);
+	color: #e8c4b8;
 }
 
 .advanced-search-status--filter {

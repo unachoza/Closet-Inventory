@@ -127,11 +127,6 @@ export default function EmailPreview({ email, onConfirmImport, onImportProduct, 
 				)}
 			</div>
 
-			<div className="gmail-preview-actions">
-				<button className="gmail-import-btn" onClick={onConfirmImport} type="button">
-					Import Entire Email
-				</button>
-			</div>
 		</div>
 	);
 }
