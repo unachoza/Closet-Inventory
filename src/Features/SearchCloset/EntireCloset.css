@@ -34,8 +34,10 @@
 	position: relative;
 	display: flex;
 	align-items: center;
-	min-width: 180px;
-	flex: 1;
+	/* Small basis so the search box, filter toggle and sort select share one row
+	   at the closet column width; it still flex-grows to fill the leftover space. */
+	min-width: 140px;
+	flex: 1 1 140px;
 }
 
 .search-sort-bar__icon {
