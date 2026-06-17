@@ -129,23 +129,23 @@ describe("parseEmailToFormData — category inference", () => {
 		expect(parse("Ribbed Bodysuit").category).toBe("body");
 	});
 
-	it('infers "lingerie" from "bra"', () => {
-		expect(parse("The Bra").category).toBe("lingerie");
+	it('infers "intimates" from "bra"', () => {
+		expect(parse("The Bra").category).toBe("intimates");
 	});
 
 	it('infers "underwear" from "briefs"', () => {
 		expect(parse("Cotton Briefs 3-Pack").category).toBe("underwear");
 	});
 
-	it('infers "lingerie" from "teddy"', () => {
-		expect(parse("Floral Lace Zip Up Teddy").category).toBe("lingerie");
+	it('infers "intimates" from "teddy"', () => {
+		expect(parse("Floral Lace Zip Up Teddy").category).toBe("intimates");
 	});
 
 	it('defaults occasion to "everyday" for underwear', () => {
 		expect(parse("Cotton Briefs 3-Pack").occasion).toBe("everyday");
 	});
 
-	it('defaults occasion to "everyday" for lingerie', () => {
+	it('defaults occasion to "everyday" for intimates', () => {
 		expect(parse("Floral Lace Zip Up Teddy").occasion).toBe("everyday");
 	});
 
@@ -267,10 +267,10 @@ describe("parseEmailToFormData — color extraction from subject", () => {
 });
 
 describe("parse augmented style data", () => {
-	it("gleans style data from context clues and item name", () => {})
+	it("gleans style data from context clues and item name", () => {});
 	//wide leg
 	//weave pattern - herringbone, houndstooth, plaid, tweed
-})
+});
 describe("parseEmailToFormData — material inference", () => {
 	it("infers a single material from the item name", () => {
 		const result = parse("Thanks for your purchase", "POLYAMIDE BLEND STRAPPY DRESS", "sales@zara.com");
