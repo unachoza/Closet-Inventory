@@ -1,4 +1,16 @@
 import { Option, Step, MaterialBlend } from "./types.ts";
+import TopIcon from "../assets/clothes-icons/blouse.svg";
+import BottomIcon from "../assets/clothes-icons/trousers.svg";
+import SweaterIcon from "../assets/clothes-icons/sweater.svg";
+import CoatIcon from "../assets/clothes-icons/raincoat.svg";
+import DressIcon1 from "../assets/clothes-icons/dress1.svg";
+import GymClothesIcon from "../assets/clothes-icons/gym-clothes.svg";
+import PajamasIcon from "../assets/clothes-icons/pajamas.svg";
+import UnderwearIcon from "../assets/clothes-icons/underwear.svg";
+import HeelIcon from "../assets/clothes-icons/heel.svg";
+import IntimatesIcon from "../assets/clothes-icons/intimates.svg";
+import SocksIcon from "../assets/clothes-icons/socks.svg";
+import JumpsuitIcon from "../assets/clothes-icons/jumpsuit.svg";
 
 const b = (material: string, percentage: number): MaterialBlend => ({ material, percentage });
 
@@ -75,18 +87,18 @@ export const careExamples = ["dry clean only", "hand wash", "cold water", "hot w
 
 // Categories for the carousel
 export const carouselCategories = [
-	{ label: "Tops", icon: "👕" },
-	{ label: "Bottoms", icon: "👖" },
-	{ label: "Dresses", icon: "👗" },
-	{ label: "Coats", icon: "🧥" },
-	{ label: "Sweaters", icon: "🧶" },
-	{ label: "Athleisure", icon: "🏋️‍♀️" },
-	{ label: "Lingerie", icon: "🎀" },
-	{ label: "Socks", icon: "🧦" },
-	{ label: "Underwear", icon: "🩲" },
-	{ label: "body", icon: "🕴️" },
-	{ label: "Shoes", icon: "👠" },
-	{ label: "Sleep", icon: "😴" },
+	{ label: "Tops", icon: TopIcon },
+	{ label: "Bottoms", icon: BottomIcon },
+	{ label: "Dresses", icon: DressIcon1 },
+	{ label: "Coats", icon: CoatIcon },
+	{ label: "Sweaters", icon: SweaterIcon },
+	{ label: "Athleisure", icon: GymClothesIcon },
+	{ label: "Intimates", icon: IntimatesIcon },
+	{ label: "Socks", icon: SocksIcon },
+	{ label: "Underwear", icon: UnderwearIcon },
+	{ label: "body", icon: JumpsuitIcon },
+	{ label: "Shoes", icon: HeelIcon },
+	{ label: "Sleep", icon: PajamasIcon },
 ];
 
 export const categoryOptions: Option[] = [
@@ -96,7 +108,7 @@ export const categoryOptions: Option[] = [
 	{ value: "coats", label: "Coats" },
 	{ value: "sweaters", label: "Sweaters" },
 	{ value: "athleisure", label: "Athleisure" },
-	{ value: "lingerie", label: "Lingerie" },
+	{ value: "intimates", label: "Intimates" },
 	{ value: "socks", label: "Socks" },
 	{ value: "underwear", label: "Underwear" },
 ];
@@ -238,7 +250,7 @@ export const MY_CLOSET_DATA = [
 		],
 		occasion: "elevated",
 		purchaseDate: "2024-08-20T03:24:08.000Z",
-		care: ["hand wash", 'hang dry'],
+		care: ["hand wash", "hang dry"],
 		notes: [
 			"loose everywhere",
 			"with tags",
@@ -262,7 +274,7 @@ export const MY_CLOSET_DATA = [
 		],
 		occasion: "going out",
 		age: "one year",
-		care: ["hand wash","hang dry"],
+		care: ["hand wash", "hang dry"],
 		notes: ["lost at the dry clearns on the upper east side"],
 		onSale: true,
 	},

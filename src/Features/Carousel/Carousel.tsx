@@ -36,6 +36,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 					<AnimatePresence>
 						{visibleIndices.map((index, i) => {
 							const item = carouselCategories[index];
+							const icon = item.icon;
 							return (
 								// TODO: Change the clothes cards to buttons that update the category state when clicked.
 								<motion.div
@@ -47,7 +48,8 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 									className="clothes-card"
 									onClick={() => setCategory(item.label as CategoryType)}
 								>
-									<div className="emoji">{item.icon}</div>
+									<img src={icon} alt={icon} className="carousel-icons" />
+									{/* <div className="emoji">{item.icon}</div> */}
 									<div className="emoji-text">{item.label}</div>
 								</motion.div>
 							);
