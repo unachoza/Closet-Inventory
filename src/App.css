@@ -5,11 +5,12 @@
   height: 100vh;
 }
 
-/* Scroll region beneath the persistent sticky NavBar */
+/* Scroll region beneath the persistent sticky NavBar NO DISPLAY FLEX */
 .app-content{
   flex: 1;
   overflow-y: auto;
   width: 100vw;
+
 }
 /* Button color tokens now live centrally in index.css (:root).
    The legacy --button-backround-* names are aliased there for compatibility. */

@@ -49,7 +49,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 									onClick={() => setCategory(item.label as CategoryType)}
 								>
 									{/* <div className="emoji">{item.icon}</div> */} 
-									<Icon size={40}/>
+									<img src={Icon} alt={Icon} className="carousel-icons"/>
 									<div className="emoji-text">{item.label}</div>
 								</motion.div>
 							);
