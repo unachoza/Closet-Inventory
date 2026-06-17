@@ -47,7 +47,8 @@
 	border-radius: var(--border-radius-md);
 	background-color: color-mix(in srgb, var(--bg-surface-primary) 85%, transparent);
   backdrop-filter: blur(4px);
-	box-shadow: var(--elevation-low);
+	box-shadow: var(--elevation-high);
+  box-shadow: 5px 5px 24px 7px rgb(73 47 40 / 44%);;
 	color: var(--text-primary);
 	cursor: pointer;
   border: solid 1px var(--text-color);
