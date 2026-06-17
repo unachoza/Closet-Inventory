@@ -19,7 +19,8 @@ form {
 	padding: 1rem 1.5rem .8rem 1.5rem;
 	border: 1px solid var(--border-hairline);
 	border-radius: var(--layout-radius-card);
-	background: var(--bg-surface-primary);
+	background: color-mix(in srgb, var(--bg-surface-primary), transparent 15%);
+	backdrop-filter: var(--effect-blur-glass);
 	box-shadow: var(--elevation-high);
 
 }

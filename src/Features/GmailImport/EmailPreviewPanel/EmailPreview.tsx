@@ -8,7 +8,6 @@ import "./EmailPreviewPanel.css";
 
 interface EmailPreviewProps {
 	email: GmailEmail;
-	onConfirmImport: () => void;
 	onImportProduct: (product: ExtractedProduct) => void;
 	onImportAllProducts?: (products: ExtractedProduct[]) => void;
 }
@@ -54,7 +53,7 @@ async function enrichProductColors(products: readonly ExtractedProduct[]): Promi
 	return enriched;
 }
 
-export default function EmailPreview({ email, onConfirmImport, onImportProduct, onImportAllProducts }: EmailPreviewProps) {
+export default function EmailPreview({ email, onImportProduct, onImportAllProducts }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
 	// Step 1: synchronous parse

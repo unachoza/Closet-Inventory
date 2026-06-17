@@ -172,7 +172,7 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --status-info: var(--primitive-status-info-slate);
 
   --elevation-low: 0 2px 8px rgba(73, 47, 40, 0.04);
-  --elevation-high: 0 8px 24px rgba(73, 47, 40, 0.06);
+  --elevation-high: 0 8px 24px rgba(73, 47, 40, 0.124);
 
   /* Layout and Structural tokens shared between modes */
   --layout-gap-grid: var(--primitive-spacing-lg);

@@ -116,14 +116,6 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		setSelectedEmail(undefined);
 	}, []);
 
-	const handleConfirmImport = useCallback(() => {
-		if (!selectedEmail) return;
-
-		onSourceEmailChange?.(selectedEmailId);
-		const prefilled = parseEmailToFormData(selectedEmail.subject, selectedEmail.body, selectedEmail.from, selectedEmail.date);
-		onImport({ ...prefilled, material: normalizeMaterial(prefilled.material) });
-	}, [selectedEmail, selectedEmailId, onImport, onSourceEmailChange]);
-
 	const handleImportProduct = useCallback(
 		(product: ExtractedProduct) => {
 			const emailFrom = selectedEmail?.from ?? "";
@@ -293,7 +285,6 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 							</button>
 							<EmailPreview
 								email={selectedEmail}
-								onConfirmImport={handleConfirmImport}
 								onImportProduct={handleImportProduct}
 								onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
 							/>
