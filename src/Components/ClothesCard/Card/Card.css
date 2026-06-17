@@ -47,7 +47,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 1rem;
+      padding: .75rem;
       border-radius: var(--border-radius-sm);
       background: var(--bg-surface-secondary);
 }
@@ -121,12 +121,12 @@
 .card:hover .card-name-overlay {
 	transform: translateY(-10px);
 	opacity: 1;
-	background: rgba(30, 20, 15, 0.85);
+	background: color-mix(in srgb, var(--bg-surface-secondary), transparent 20%)
 }
 
 .card-name-label {
-	display: block;
-	color: #fff;
+      color: var(--text-primary);
+      display: block;
 	font-size: 0.9rem;
 	font-weight: 600;
 	text-align: center;
