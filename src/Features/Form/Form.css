@@ -15,7 +15,6 @@ form {
 	height: 95%;
 	max-width: var(--Form-width);
 	margin: .5rem auto;
-	/* padding: var(--Form-padding); */
 	padding: 1rem 1.5rem .8rem 1.5rem;
 	border: 1px solid var(--border-hairline);
 	border-radius: var(--layout-radius-card);
@@ -188,6 +187,7 @@ button.submit:hover {
   }
 
   .form {
+	height: 95%;
     margin: 0.25rem;
     border-radius: var(--border-radius-sm);
   }
@@ -214,10 +214,12 @@ button.submit:hover {
   }
 
   form {
+	height: 95%;
     height: clamp(28rem, 70vh, 56.25rem);
   }
 
   .form-step {
-    height: clamp(28rem, 70vh, 56.25rem);
+    /* height: clamp(28rem, 70vh, 56.25rem); */
+    height: fit-content;
   }
 }

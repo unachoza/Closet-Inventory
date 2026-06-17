@@ -14,6 +14,19 @@ export const CARE_MAP: [keyword: string, emoji: string, label: string][] = [
 	["hot water", "🔥", "Warm wash"],
 ];
 
+export const BRAND_CARE_MAP: [keyword: string, emoji: string, label: string][] = [
+	["dry clean", "🧺", "Dry clean"],
+	["hand wash", "👐", "Hand wash"],
+	["cold water", "🧼", "Cold wash"],
+	["cold wash", "🧼", "Cold wash"],
+	["machine wash", "🧼", "Machine wash"],
+	["no bleach", "🚫", "No bleach"],
+	["hang dry", "💨", "Hang dry"],
+	["lay flat", "📐", "Lay flat"],
+	["low heat", "🌡️", "Low heat"],
+	["tumble", "🌀", "Tumble dry"],
+	["hot water", "🔥", "Warm wash"],
+];
 export interface CareItem {
 	emoji: string;
 	label: string;
