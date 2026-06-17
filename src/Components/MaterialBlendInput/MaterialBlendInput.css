@@ -72,7 +72,7 @@ input.mbi__material-input {
 
 .mbi__pct-input {
 	width: 2.5rem;
-    	padding: 0rem 0.6rem;
+    	padding: 0rem 0.4rem;
     	border: 1px solid black;
     	color: var(--text-primary);
     	text-align: right;

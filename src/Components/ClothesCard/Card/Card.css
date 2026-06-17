@@ -119,9 +119,10 @@
 }
 
 .card:hover .card-name-overlay {
-	transform: translateY(-10px);
+	transform: translateY(-8px);
 	opacity: 1;
-	background: color-mix(in srgb, var(--bg-surface-secondary), transparent 20%)
+	background: color-mix(in srgb, var(--bg-surface-secondary), transparent 30%);
+      backdrop-filter: var(--effect-blur-glass);
 }
 
 .card-name-label {
