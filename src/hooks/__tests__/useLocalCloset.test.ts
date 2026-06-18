@@ -126,4 +126,65 @@ describe("useLocalStorageClosetBase", () => {
 
 		expect(result.current.closet[0].material).toEqual([{ material: "cotton", percentage: 100 }]);
 	});
+
+	describe("reorderItems", () => {
+		const seedThree = (result: { current: ReturnType<typeof useLocalStorageClosetBase> }) => {
+			act(() => result.current.addFullItem(makeItem({ id: "a" })));
+			act(() => result.current.addFullItem(makeItem({ id: "b" })));
+			act(() => result.current.addFullItem(makeItem({ id: "c" })));
+		};
+
+		it("moves an item to a later position and persists the new order", () => {
+			const { result } = renderHook(() => useLocalStorageClosetBase());
+			seedThree(result);
+
+			// Drag "a" onto "c" → a slides after b (arrayMove semantics: [b, c, a]).
+			act(() => result.current.reorderItems("a", "c"));
+
+			expect(result.current.closet.map((i) => i.id)).toEqual(["b", "c", "a"]);
+			expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).map((i: ClothingItem) => i.id)).toEqual(["b", "c", "a"]);
+		});
+
+		it("moves an item to an earlier position", () => {
+			const { result } = renderHook(() => useLocalStorageClosetBase());
+			seedThree(result);
+
+			// Drag "c" onto "a" → [c, a, b].
+			act(() => result.current.reorderItems("c", "a"));
+
+			expect(result.current.closet.map((i) => i.id)).toEqual(["c", "a", "b"]);
+		});
+
+		it("is a no-op when active and over ids are the same", () => {
+			const { result } = renderHook(() => useLocalStorageClosetBase());
+			seedThree(result);
+
+			act(() => result.current.reorderItems("b", "b"));
+
+			expect(result.current.closet.map((i) => i.id)).toEqual(["a", "b", "c"]);
+		});
+
+		it("is a no-op when either id is not in the closet", () => {
+			const { result } = renderHook(() => useLocalStorageClosetBase());
+			seedThree(result);
+
+			act(() => result.current.reorderItems("a", "missing"));
+			expect(result.current.closet.map((i) => i.id)).toEqual(["a", "b", "c"]);
+
+			act(() => result.current.reorderItems("missing", "a"));
+			expect(result.current.closet.map((i) => i.id)).toEqual(["a", "b", "c"]);
+		});
+
+		it("does not mutate the previous closet array (immutability)", () => {
+			const { result } = renderHook(() => useLocalStorageClosetBase());
+			seedThree(result);
+			const before = result.current.closet;
+
+			act(() => result.current.reorderItems("a", "c"));
+
+			// Original reference still holds the original order.
+			expect(before.map((i) => i.id)).toEqual(["a", "b", "c"]);
+			expect(result.current.closet).not.toBe(before);
+		});
+	});
 });

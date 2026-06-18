@@ -194,7 +194,7 @@ business model depend on is unbuilt. Actual build order:
 - ✅ localStorage persistence
 - ✅ Export Closet / Download CSV Button
 - ✅  "View more" expand/collapse on item cards - PR #43
-- 🔲 Visual cohesion polish (spacing, color, typography consistency)
+- 🚧 Visual cohesion polish (spacing, color, typography consistency)
 
 ---
 

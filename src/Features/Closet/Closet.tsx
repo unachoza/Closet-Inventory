@@ -1,5 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
+import { DndContext, DragEndEvent, PointerSensor, KeyboardSensor, useSensor, useSensors, closestCenter } from "@dnd-kit/core";
+import { SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from "@dnd-kit/sortable";
+import { SortableWrapper } from "../../Components/SortableWrapper/SortableWrapper";
 import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
@@ -41,7 +44,12 @@ const cardVariants: Variants = {
 const ITEMS_PER_PAGE = 6;
 
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
-	const { closet, removeItem } = useLocalStorageCloset();
+	const { closet, removeItem, reorderItems } = useLocalStorageCloset();
+
+	const sensors = useSensors(
+		useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+	);
 
 	const normalizedCategory = selectedCategory?.trim().toLowerCase() || "";
 
@@ -75,6 +83,11 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 		goToPage(1);
 	}, [selectedCategory]);
 
+	const handleDragEnd = ({ active, over }: DragEndEvent) => {
+		if (!over || active.id === over.id) return;
+		reorderItems(active.id as string, over.id as string);
+	};
+
 	const hasItems = paginatedItems.length > 0;
 	const emptyLabel = selectedCategory?.trim() ? selectedCategory : "your closet";
 
@@ -82,28 +95,25 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 		<>
 			<div className="items-overview">
 				{hasItems ? (
-					<motion.div
-						// Remount on category OR page change so the stagger replays. The
-						// container's `staggerChildren` only orchestrates its children from
-						// `hidden`→`show` when the parent mounts/re-keys; without `currentPage`
-						// in the key, paging in new cards left them stuck at the `hidden`
-						// variant (opacity:0 — present in the DOM but invisible). No
-						// `mode="wait"` AnimatePresence here, so remounting is safe and can
-						// never strand the grid waiting on an exit (the blank-screen bug).
-						key={`${normalizedCategory || "all"}-${currentPage}`}
-						className="items-grid"
-						variants={containerVariants}
-						initial="hidden"
-						animate="show"
-					>
-						<AnimatePresence mode="popLayout">
-							{paginatedItems.map((item: ClothingItem) => (
-								<motion.div key={item.id} variants={cardVariants} exit="exit" layout>
-									<ClothingCard item={item} onEditItem={onEditItem} onRemoveItem={removeItem} />
-								</motion.div>
-							))}
-						</AnimatePresence>
-					</motion.div>
+					<DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+						<SortableContext items={paginatedItems.map((i) => i.id)} strategy={rectSortingStrategy}>
+							<motion.div
+								key={`${normalizedCategory || "all"}-${currentPage}`}
+								className="items-grid"
+								variants={containerVariants}
+								initial="hidden"
+								animate="show"
+							>
+								<AnimatePresence mode="popLayout">
+									{paginatedItems.map((item: ClothingItem) => (
+										<SortableWrapper key={item.id} id={item.id} variants={cardVariants}>
+											<ClothingCard item={item} onEditItem={onEditItem} onRemoveItem={removeItem} />
+										</SortableWrapper>
+									))}
+								</AnimatePresence>
+							</motion.div>
+						</SortableContext>
+					</DndContext>
 				) : (
 					<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
 				)}

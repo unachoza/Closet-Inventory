@@ -1,0 +1,49 @@
+.sortable-wrapper {
+	position: relative;
+}
+
+.sortable-wrapper--dragging {
+	opacity: 0.45;
+	z-index: 10;
+}
+
+.drag-handle {
+	position: absolute;
+	top: 6px;
+	left: 6px;
+	z-index: 2;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--border-radius-ty, 4px);
+	background: var(--bg-surface-primary);
+	color: var(--text-muted);
+	cursor: grab;
+	opacity: 0;
+	transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.sortable-wrapper:hover .drag-handle,
+.sortable-wrapper--dragging .drag-handle {
+	opacity: 1;
+}
+
+.drag-handle:hover {
+	color: var(--text-secondary);
+	border-color: var(--border-brand);
+}
+
+.drag-handle:active {
+	cursor: grabbing;
+}
+
+/* Touch: always show handle on touch devices */
+@media (hover: none) {
+	.drag-handle {
+		opacity: 1;
+	}
+}
