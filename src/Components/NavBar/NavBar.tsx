@@ -155,7 +155,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 				>
 					<Menu size={24} />
 				</button>
-				<h1 className="page-title">My Closet Inventory</h1>
+				{!isClosetView && <h1 className="page-title">Nothing To Wear</h1>}
 			</div>
 
 			<div className="nav-right">{!isClosetView && <div className="nav-actions">{navActions}</div>}</div>

@@ -11,7 +11,7 @@ const CATEGORY_GROUPS: Record<string, string> = {
 	coats: "coats",
 	sweater: "sweaters",
 	sweaters: "sweaters",
-	lingerie: "lingerie",
+	intimates: "intimates",
 	active: "active",
 	sock: "socks",
 	socks: "socks",

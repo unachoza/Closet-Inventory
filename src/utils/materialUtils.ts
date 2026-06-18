@@ -34,6 +34,50 @@ export const MATERIAL_COLORS: Record<string, string> = {
 	bamboo: "#bef264", // lime-300
 };
 
+export const BRAND_MATERIAL_COLORS: Record<string, string> = {
+	// Natural plant fibers — sage & linen greens
+	cotton: "#c8d4c0", // sage-light — natural, breathable
+	linen: "#d4c4b0", // warm linen — raw, organic
+	bamboo: "#a3b89e", // sage-mid — eco, fresh
+
+	// Protein / luxury fibers — blush & terracotta
+	silk: "#e8d5cc", // pale blush — smooth, delicate
+	wool: "#ba9259", // ochre — warm, cozy (primitive-status-warning-ochre)
+	cashmere: "#9e7840", // deep gold — sumptuous, rare
+	lace: "#eeddd8", // faintest blush — airy, delicate
+
+	// Cellulosic semi-synthetics — taupe & rosy-neutral
+	modal: "#c4b8aa", // warm taupe — soft drape
+	rayon: "#9e8b78", // mid taupe — semi-natural
+	viscose: "#b09088", // rosy taupe — flowing
+	cupro: "#d4a8a0", // dusty rose — silk-like hand
+	lyocell: "#bdb0a2", // greige — sustainable cellulosic
+
+	// Synthetics — blue-slate family
+	polyester: "#5a6b7c", // info slate (primitive-status-info-slate)
+	nylon: "#4a5a6c", // deep slate — technical, durable
+	acrylic: "#7a8a8c", // cool slate-taupe — synthetic
+
+	// Stretch fibers — muted crimson (same hue family, same synonyms)
+	spandex: "#b86b63", // muted crimson — stretch, energy
+	elastane: "#b86b63", // muted crimson — synonym for spandex
+	lycra: "#b86b63", // muted crimson — brand name for elastane
+
+	// Structured / heavy fabrics — deep umber & espresso
+	denim: "#4a5e72", // deep blue-slate — structured, workhorse
+	leather: "#492f28", // espresso (primitive-neutral-dark-espresso)
+	suede: "#675647", // walnut (primitive-neutral-dark-walnut)
+	corduroy: "#3d2822", // roasted brown (primitive-neutral-dark-roasted-brown)
+	tweed: "#847057", // taupe (primitive-neutral-dark-taupe)
+	velvet: "#8f6256", // deep umber (primitive-brand-deep-umber) — rich, plush
+
+	// Surface / drape fabrics — terracotta family
+	chiffon: "#f5f0ea", // near-alabaster — sheer, weightless
+	satin: "#c9a090", // polished terracotta — gleaming surface
+	jersey: "#8a7060", // warm mid-brown — casual, lived-in
+	fleece: "#8a9e84", // sage — soft, cozy
+};
+
 /** Returns a CSS color string for any material, falling back to a
  *  deterministic hue so unknown fibers still get a consistent color. */
 export function getMaterialColor(material: string): string {

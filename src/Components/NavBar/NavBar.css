@@ -10,11 +10,14 @@
     width: 100vw;
      height: var(--header-height);
     padding: 0 20px;
-    border: var(--border-black-sm);
-    background-color: rgba(0, 0, 0, 0.53);
-    box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    color: white;
-    border-bottom: 1px solid var(--border-color);
+    border: 1px solid var(--border-hairline);
+    /* NOTE: no backdrop-filter here — it creates a containing block for the
+       position:fixed nav drawer/overlay (descendants), collapsing the drawer to
+       the nav's height. Use a solid surface instead. */
+    background-color: var(--bg-surface-primary);
+    box-shadow: var(--elevation-low);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-hairline);
 }
 
 .nav-left {
@@ -29,10 +32,10 @@
       align-items: center;
       border: none;
       background: none;
-      color: var(--primary-color);
+      color: var(--text-primary);
       font-size: 24px;
       cursor: pointer;
-    
+
 }
 
 .page-title {
@@ -80,32 +83,33 @@
     flex-direction: column;
     align-items: center;
     margin: 0;
-    border: solid white 1px;
-    border-radius: 6px;
-    background-color: var(--primary-color);
-    color: var(--text-primary);
+    border: 1px solid var(--bg-surface-brand);
+    border-radius: var(--layout-radius-button);
+    background-color: var(--bg-surface-brand);
+    color: var(--text-on-brand);
     font-size: 12px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, border-color 0.2s;
     white-space: nowrap;
 }
 
 .action-btn:hover {
-      background-color: var(--cream);
-      color: var(--Soft-Black);
+      background-color: var(--primitive-brand-deep-umber);
+      border-color: var(--primitive-brand-deep-umber);
+      color: var(--text-on-brand);
 }
 
 .action-btn.secondary {
       width: 100%;
-      background-color: var(--pill-bg);
+      border-color: var(--border-strong);
+      background-color: transparent;
       color: var(--text-primary);
 }
 
 .action-btn.secondary:hover {
-       border: solid black 1px;
-      background-color: #d3d9df;
-       color: var(--Soft-Black);
-
+      border-color: var(--text-primary);
+      background-color: var(--bg-surface-secondary);
+      color: var(--text-primary);
 }
 
 .search-container {
@@ -117,25 +121,27 @@
 .search-input {
       width: 250px;
       padding: 8px 12px 8px 36px;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--border-strong);
       border-radius: 20px;
+      background-color: var(--bg-surface-primary);
       font-size: 14px;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       outline: none;
 }
 
 .search-input:focus {
-      border-color: var(--secondary-color);
+      border-color: var(--border-brand);
+      box-shadow: 0 0 0 2px var(--border-hairline);
 }
 
 div.search-container > input {
-      color: black;
+      color: var(--text-primary);
 }
 
 .search-icon {
       position: absolute;
       left: 10px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       pointer-events: none;
 }
 
@@ -158,10 +164,9 @@ div.search-container > input {
       width: 260px;
       max-width: 80vw;
       padding: 16px;
-        border: var(--border-black-sm);
-    background-color: rgba(0, 0, 0, 0.65);
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
-    box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border-hairline);
+      background-color: var(--bg-surface-primary);
+      box-shadow: var(--elevation-high);
       animation: nav-drawer-in 0.2s ease;
       gap: 16px;
 }
@@ -181,7 +186,7 @@ div.search-container > input {
       align-items: center;
       border: none;
       background: none;
-      color: var(--primary-color);
+      color: var(--text-primary);
       cursor: pointer;
       align-self: flex-end;
 }
@@ -261,11 +266,11 @@ div.search-container > input {
 	gap: 12px;
 	max-width: 360px;
 	padding: 12px 14px;
-	background: #fde8e8;
-	color: #8a1f1f;
-	border: 1px solid #f5c2c2;
-	border-radius: 8px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	background: var(--bg-surface-primary);
+	color: var(--status-error);
+	border: 1px solid var(--status-error);
+	border-radius: var(--layout-radius-card);
+	box-shadow: var(--elevation-high);
 	font-size: 0.9rem;
 }
 

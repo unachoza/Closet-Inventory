@@ -5,3 +5,10 @@
   flex-wrap: wrap;
   height: 18.75rem;
 }
+
+@media (max-width: 480px) {
+ .options-container {
+    height: fit-content;
+    padding-bottom: 1rem;
+  }
+}

@@ -325,7 +325,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							Skip This Item
 						</button>
 					)}
-					<button type="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
+					<button type="submit" className="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
 				</div>
 			</motion.form>
 		</div>

@@ -1,0 +1,26 @@
+/* MAIN FORM */
+
+/* EDIT FORM */
+
+.form-luxe {}
+
+.luxe-form-group {}
+.luxe-form-label {}
+
+button[type="submit"]{}
+
+button[type="submit"]:disabled,
+.btn-submit-luxe:disabled {}
+
+.luxe-form-error-msg {}
+
+.luxe-form-input{}
+.luxe-form-input::placeholder {}
+.luxe-form-input:focus{}
+
+.hint{}
+.remove-icon{}
+.luxe-form-success-message {}
+.luxe-form-error-message {}
+
+.close-icon{}

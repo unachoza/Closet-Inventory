@@ -4,9 +4,10 @@
       height: 100%;
       max-width: var(--Form-width);
       margin: .2rem auto;
-      border: var(--Dark-Grey) .5rem solid;
-      background: var(--Dark-Grey);
-      background: linear-gradient(180deg, rgb(120 172 191 / 70%) 0%, rgb(103 131 133 / 76%) 50%);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--layout-radius-card);
+      background: var(--bg-surface-primary);
+      box-shadow: var(--elevation-high);
 }
 
 .edit-form.form > form {
@@ -17,7 +18,7 @@
 }
 
 .edit-form  .card-title{
-      color: white
+      color: var(--text-primary)
 }
 
 .form-fields{
@@ -27,16 +28,15 @@
       overflow-y: auto;
       height: 100%;
       padding: 10px;
-      border: solid #000000 1px;
-      box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
-      border-radius: 5px;
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--layout-radius-card);
       gap: 0.5rem 1rem;
 }
 
 .edit-form.form label{
       margin: 0;
       gap: .25rem;
-      color: white;
+      color: var(--text-secondary);
       font-size: .8rem;
       width: 100%;
 }
@@ -45,31 +45,32 @@ input[type="text"] {
       width: 100%;
       box-sizing: border-box;
       height: 2.5rem;
-      border: solid black 2px;
+      border: 1px solid var(--border-strong);
       box-shadow: none;
-      color: black;
+      background: var(--bg-surface-primary);
+      color: var(--text-primary);
       text-transform: capitalize;
 }
 
 /*TODO:Doesnt work with the current structure of the form, but it is meant to target the label text when the input is focused. It should be adjusted to fit the actual structure of the form.*/
 span.label-text:has(input:focus),
 span.label-text:has(+ input:focus) {
-      color: white;
+      color: var(--text-primary);
       font-size: .8rem;
       font-weight: 600;
       transition: color 0.2s;
-}   
+}
 
 .edit-form input:focus-visible {
-      background: none;
-      background: linear-gradient(180deg, rgba(142, 205, 228, 0.7) 0%, rgba(132, 170, 172, 0.76) 50%);
-      outline: -webkit-focus-ring-color auto 2px;
+      background: var(--bg-surface-primary);
+      outline: 2px solid var(--border-brand);
+      outline-offset: 0;
 }
 
 label:has(.textarea) {
       grid-column: 1 / -1;
       height: 125px;
-      color: black;
+      color: var(--text-secondary);
       font-size: .8rem;
       font-weight: 600;
 }
@@ -82,22 +83,23 @@ textarea {
       box-sizing: border-box;
       height: 9rem;
       padding: var(--spacing-100) var(--spacing-200);
-      border: solid black 2px;
+      border: 1px solid var(--border-strong);
       border-radius: var(--border-radius-sm);
-      background: #00000024;
+      background: var(--bg-surface-primary);
       box-shadow: none;
       font-family: var(--font-ui);
       font-size: 1rem;
+      color: var(--text-primary);
       text-transform: capitalize;
       gap: .5rem;
 }
 
 textarea::placeholder{
-      color: rgb(226, 223, 223);
+      color: var(--text-muted);
 }
 
 .edit-form.form label >span {
-      color: white;
+      color: var(--text-secondary);
       font-size: .8rem;
       font-weight: 600;
 }
@@ -121,7 +123,7 @@ form > div > label.animated-checkbox  .checkbox-label {
 }
 
 label.animated-checkbox button.checkbox-root {
-      border: solid black 2px;
+      border: 1px solid var(--border-strong);
 }
 
 /* Image preview for create mode */
@@ -134,7 +136,7 @@ label.animated-checkbox button.checkbox-root {
 .edit-form-preview-img {
       max-width: 120px;
       max-height: 120px;
-      border: 2px solid rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-hairline);
       border-radius: var(--border-radius-sm);
       object-fit: cover;
 }
@@ -149,10 +151,10 @@ label.animated-checkbox button.checkbox-root {
 .edit-form-queue-badge {
       display: inline-block;
       padding: 0.25rem 0.75rem;
-      border: 1px solid rgba(37, 99, 235, 0.35);
+      border: 1px solid var(--border-brand);
       border-radius: var(--border-radius-ty, 4px);
-      background: rgba(37, 99, 235, 0.2);
-      color: #93bbfd;
+      background: var(--bg-surface-secondary);
+      color: var(--text-secondary);
       font-size: 0.82rem;
       font-weight: 500;
 }
@@ -160,24 +162,23 @@ label.animated-checkbox button.checkbox-root {
 /* Return to email button */
 .edit-form-return-btn {
     position: absolute;
-         display: inline-flex;
+    display: inline-flex;
     align-items: center;
     padding: 0.35rem 0.8rem;
-    border: solid 1px;
+    border: 1px solid var(--border-strong);
     border-radius: var(--border-radius-ty, 4px);
-    background: var(--color-primary-muted);
-    /* color: #1a1a1a; */
+    background: transparent;
+    color: var(--text-primary);
     font-size: 0.82rem;
     font-weight: 500;
     cursor: pointer;
     transition: background 0.15s ease;
     gap: 0.3rem;
     margin-bottom: var(--spacing-200, 1rem);
-
 }
 
 .edit-form-return-btn:hover {
-      background: rgba(0, 0, 0, 0.15);
+      background: var(--bg-surface-secondary);
 }
 
 /* Action buttons row (Add to Closet + Skip) */
@@ -192,26 +193,21 @@ label.animated-checkbox button.checkbox-root {
 /* Skip / "Do NOT add" button */
 .edit-form-skip-btn {
       padding: 0.5rem 1rem;
-      border: 1px solid rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-strong);
       border-radius: var(--border-radius-sm);
-      background: rgba(0, 0, 0, 0.06);
-      color: #1a1a1a;
+      background: transparent;
+      color: var(--text-primary);
       font-size: 0.9rem;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .edit-form-skip-btn:hover {
-      background: rgba(220, 38, 38, 0.12);
-      color: #b91c1c;
-      border-color: rgba(220, 38, 38, 0.3);
+      background: var(--bg-surface-secondary);
+      color: var(--status-error);
+      border-color: var(--status-error);
 }
-
-.edit-form-return-btn:hover {
-      background: rgba(0, 0, 0, 0.15);
-}
-
 
 .close-icon {
       position: relative;
@@ -221,9 +217,9 @@ label.animated-checkbox button.checkbox-root {
       height: 35px;
       margin: -18px;
       padding: 3px;
-      border: solid #2a2929 2px;
+      border: 1px solid var(--border-strong);
       border-radius: 50%;
-      color: white;
+      color: var(--text-primary);
       cursor: pointer;
 }
 
@@ -234,13 +230,13 @@ label.animated-checkbox button.checkbox-root {
       flex-direction: column;
       margin: 0.25rem 0;
       padding: 0.75rem 0.25rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid var(--border-hairline);
+      border-top: 1px solid var(--border-hairline);
       gap: 0.75rem;
 }
 
 .edit-form-material__label {
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--text-muted);
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
@@ -312,7 +308,6 @@ label.animated-checkbox button.checkbox-root {
 }
   input[type="text"] {
     height: 2.3rem;
-    border: solid black 1.3px;
   }
   .edit-form-actions{
       /* margin-bottom: 5rem; */
@@ -331,30 +326,31 @@ label.animated-checkbox button.checkbox-root {
 .edit-form-condition__select {
 	height: 2.3rem;
 	padding: 0 0.5rem;
-	border: solid black 1.3px;
+	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-ty, 4px);
 	text-transform: capitalize;
-      background-color: #00000024;
-      width: 100%;
+	background-color: var(--bg-surface-primary);
+	color: var(--text-primary);
+	width: 100%;
 }
 
 .edit-form-purchase-date__display:disabled {
-	color: var(--Soft-Black, #333);
-	background: rgba(255, 255, 255, 0.55);
+	color: var(--text-muted);
+	background: var(--bg-surface-secondary);
 	cursor: not-allowed;
-	opacity: 1; /* keep the captured date legible rather than greyed out */
+	opacity: 1;
 }
 
 .edit-form-purchase-date__input {
 	height: 2.3rem;
-	border: solid black 1.3px;
+	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-ty, 4px);
-      background-color: #00000024;
-      color: white;
+	background-color: var(--bg-surface-primary);
+	color: var(--text-primary);
 }
 
 .edit-form-purchase-date__hint {
-	color: var(--Soft-Black, #333);
+	color: var(--text-muted);
 	font-size: 0.7rem;
 	font-style: italic;
 }

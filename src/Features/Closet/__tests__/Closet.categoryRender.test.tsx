@@ -21,20 +21,7 @@ vi.mock("../../hooks/useLocalCloset", () => ({
 }));
 
 // Labels exactly as the Carousel passes them via setCategory(item.label)
-const carouselLabels = [
-	"Tops",
-	"Bottoms",
-	"Dresses",
-	"Coats",
-	"Sweaters",
-	"Athleisure",
-	"Lingerie",
-	"Socks",
-	"Underwear",
-	"body",
-	"Shoes",
-	"Sleep",
-];
+const carouselLabels = ["Tops", "Bottoms", "Dresses", "Coats", "Sweaters", "Athleisure", "Intimates", "Socks", "Underwear", "body", "Shoes", "Sleep"];
 
 describe("Closet — carousel category clicks never blank the screen", () => {
 	it.each(carouselLabels)("renders cards or a no-items message for '%s'", (label) => {
