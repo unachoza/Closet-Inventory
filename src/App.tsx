@@ -153,7 +153,7 @@ function AppShell() {
 		return <OnboardingExpanded onComplete={handleComplete} />;
 	}
 	return (
-		<div className="main">
+		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>
 			<NavBar
 				onAddItem={handleAddItem}
 				onExportCloset={handleExportCloset}

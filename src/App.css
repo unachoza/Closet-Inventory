@@ -5,6 +5,40 @@
   height: 100vh;
 }
 
+/* ── Background photo as adaptive backdrop ────────────────────────────────────
+   The closet photo lives on :root. On the carousel (view-hero) it stays sharp
+   and prominent — the "this is my closet" moment. On every other view
+   (view-browse) a fixed scrim with backdrop-blur steps the photo back so the
+   garment cards become the focus. The scrim sits between the :root background
+   and the app content (z-index 0; content is lifted to z-index 1 below). */
+.main::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+  backdrop-filter: blur(0);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.main.view-browse::before {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(8px) saturate(105%);
+}
+
+/* Lift the scrollable content above the scrim layer. Scoped to .app-content
+   only — a blanket `.main > *` rule would override the NavBar's own
+   position:sticky / z-index:100 and drop the nav drawer below everything. */
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main::before { transition: none; }
+}
+
 /* Scroll region beneath the persistent sticky NavBar NO DISPLAY FLEX */
 .app-content{
   flex: 1;
