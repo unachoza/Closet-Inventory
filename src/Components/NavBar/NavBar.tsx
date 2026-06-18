@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
-import { Menu, Search, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route } from "lucide-react";
+import { Menu, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
-import { useSearch } from "../../context/SearchContext";
 import { ClothingItem, ViewType } from "../../utils/types";
 import ExportClosetModal from "./ExportModal/ExportClosetModal";
 import type { ExportFormat } from "../../utils/exportCloset";
@@ -26,7 +25,6 @@ interface NavBarProps {
 
 const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0 }: NavBarProps) => {
 	const { view, setView } = useView();
-	const { searchQuery, setSearchQuery } = useSearch();
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [exportModalOpen, setExportModalOpen] = useState(false);
 
@@ -36,7 +34,8 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 	const [importError, setImportError] = useState<string | null>(null);
 
 	// "entireCloset" is the searchable all-items experience. In that mode the
-	// nav actions collapse into the hamburger drawer and only search shows.
+	// nav actions collapse into the hamburger drawer (search + sort live together
+	// in the sticky SearchSortBar below the nav).
 	const isClosetView = view === "entireCloset";
 	const showBackToCarousel = view !== "carousel";
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -146,7 +145,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 	);
 
 	return (
-		<header className={`top-nav${isClosetView ? " top-nav--search" : ""}`}>
+		<header className="top-nav">
 			<div className="nav-left">
 				<button
 					className="hamburger-btn"
@@ -158,20 +157,6 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 				</button>
 				{!isClosetView && <h1 className="page-title">Nothing To Wear</h1>}
 			</div>
-
-			{isClosetView && (
-				<div className="search-container">
-					<Search size={18} className="search-icon" />
-					<input
-						type="text"
-						placeholder="Search items, brands, colors..."
-						className="search-input"
-						aria-label="Search closet"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-					/>
-				</div>
-			)}
 
 			<div className="nav-right">{!isClosetView && <div className="nav-actions">{navActions}</div>}</div>
 

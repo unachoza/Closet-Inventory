@@ -35,8 +35,10 @@
 	position: relative;
 	display: flex;
 	align-items: center;
-	min-width: 180px;
-	flex: 1;
+	/* Small basis so the search box, filter toggle and sort select share one row
+	   at the closet column width; it still flex-grows to fill the leftover space. */
+	min-width: 140px;
+	flex: 1 1 140px;
 }
 
 .search-sort-bar__icon {
@@ -229,7 +231,10 @@
 .filter-side-panel {
 	position: fixed;
 	top: 0;
-	left: 0;
+	/* Slides from the right to match the Filters trigger (right edge of the
+	   toolbar). Nav drawer stays on the left to match the hamburger — each
+	   panel enters from the side of the control that opens it. */
+	right: 0;
 	z-index: 201;
 	display: flex;
 	flex-direction: column;
