@@ -5,11 +5,46 @@
   height: 100vh;
 }
 
-/* Scroll region beneath the persistent sticky NavBar */
+/* ── Background photo as adaptive backdrop ────────────────────────────────────
+   The closet photo lives on :root. On the carousel (view-hero) it stays sharp
+   and prominent — the "this is my closet" moment. On every other view
+   (view-browse) a fixed scrim with backdrop-blur steps the photo back so the
+   garment cards become the focus. The scrim sits between the :root background
+   and the app content (z-index 0; content is lifted to z-index 1 below). */
+.main::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+  backdrop-filter: blur(0);
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.main.view-browse::before {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(8px) saturate(105%);
+}
+
+/* Lift the scrollable content above the scrim layer. Scoped to .app-content
+   only — a blanket `.main > *` rule would override the NavBar's own
+   position:sticky / z-index:100 and drop the nav drawer below everything. */
+.app-content {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main::before { transition: none; }
+}
+
+/* Scroll region beneath the persistent sticky NavBar NO DISPLAY FLEX */
 .app-content{
   flex: 1;
   overflow-y: auto;
   width: 100vw;
+
 }
 /* Button color tokens now live centrally in index.css (:root).
    The legacy --button-backround-* names are aliased there for compatibility. */
@@ -17,36 +52,10 @@
 /**** COMPONENTS ****/
 
 /* ── Shared button system ────────────────────────────────────────────────────
-   Canonical button styling. New buttons should use `.btn` + a variant rather
-   than re-rolling per-feature classes (we currently have ~45 bespoke ones).
-   The base `button {}` rule in index.css still provides the default chrome;
-   these add consistent color/padding/radius via tokens. */
-.btn {
-  padding: var(--button-padding);
-  border-radius: var(--border-radius-sm);
-  font-size: var(--text-base);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.25s ease, transform 0.2s ease;
-}
-
-.btn--primary {
-  background: var(--color-primary);
-  color: var(--White);
-}
-.btn--primary:hover {
-  background: var(--color-primary-hover);
-}
-
-.btn--ghost {
-  background: transparent;
-  color: var(--White);
-  border: var(--border-white-sm);
-}
-
-.btn--pill {
-  border-radius: var(--border-radius-pill);
-}
+   MOVED → src/styles/primitives.css (now brand-terracotta on semantic tokens,
+   not the legacy blue --color-primary). `.btn` + `.btn--primary/secondary/ghost/
+   danger` live there as the single source of truth. The `.btn--pill` modifier
+   was dropped — use `.pill`/`.tag` for chips. See docs/DESIGN_SYSTEM.md. */
 
 .button-container{
   display: flex;
@@ -59,11 +68,10 @@
 
 /* Button */
 .back-button {
-  position: fixed;
   padding: 0.6rem 1.5rem;
   border-radius: var(--border-radius-sm);
   background: var(--color-primary);
-  color: var(--White);
+  color: #fff;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;

@@ -4,7 +4,7 @@ import { normalizeMaterial } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { normalizeToString } from "../../../utils/normalizeToString";
 import { parseCareItems } from "../../../utils/careUtils";
-import { toAbsoluteDate } from "../../../utils/dateUtils"
+import { toAbsoluteDate } from "../../../utils/dateUtils";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
 
@@ -45,14 +45,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// inferProductAttributes — populated during email import), NOT as flat
 	// fields on the item. Deduped + joined so empty fields collapse gracefully.
 	const style = item.style;
-	const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
-	const styleConstruction = dedupeJoin([style?.fit, style?.rise, style?.hemLength || style?.topLength, style?.pattern]);
-	console.log({ styleConstruction });
+	// const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
 	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
 	const hasStyle = Object.keys(otherStyles).length > 0;
 
 	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", style?.accents].filter((t): t is string => !!t);
-	console.log({ featureTags });
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
@@ -138,7 +135,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						{hasIdentity && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Identity" />
-								<p className="card-details__identity-text">
+								< div className="card-details__identity-text">
 									{purchasedLabel && (
 										<>
 											Purchased {purchasedLabel}
@@ -148,7 +145,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 									)}
 									{item.condition && <p className="card-details__identity-text">Condition: {item.condition}</p>}
 									{item.price && <p className="card-details__identity-text">Price: {item.price}</p>}
-								</p>
+								</div>
 							</div>
 						)}
 						{occasions.length > 0 && (

@@ -57,4 +57,29 @@ describe("inferCareFromMaterial", () => {
 		// Should have at least one "Washing" and one "Drying" instruction
 		expect(care.length).toBeGreaterThanOrEqual(2);
 	});
+
+	// ── Fiber-trait rules (apply across the whole blend) ──
+	it("adds 'Line dry' for linen or rayon", () => {
+		expect(inferCareFromMaterial([{ material: "linen", percentage: 100 }])).toContain("Line dry");
+		expect(inferCareFromMaterial([{ material: "rayon", percentage: 100 }])).toContain("Line dry");
+	});
+
+	it("adds 'Do not use fabric softeners' for nylon or polyester", () => {
+		expect(inferCareFromMaterial([{ material: "nylon", percentage: 100 }])).toContain("Do not use fabric softeners");
+		expect(inferCareFromMaterial([{ material: "polyester", percentage: 100 }])).toContain("Do not use fabric softeners");
+	});
+
+	it("applies a trait rule even for a secondary blend material", () => {
+		// Cotton primary (fiber care) + rayon secondary (trait rule).
+		const care = inferCareFromMaterial([
+			{ material: "cotton", percentage: 70 },
+			{ material: "rayon", percentage: 30 },
+		]);
+		expect(care).toContain("Line dry");
+		expect(care.some((c) => c.toLowerCase().includes("wash"))).toBe(true);
+	});
+
+	it("does not add trait tags for unrelated fibers", () => {
+		expect(inferCareFromMaterial([{ material: "cotton", percentage: 100 }])).not.toContain("Line dry");
+	});
 });

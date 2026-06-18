@@ -44,6 +44,30 @@
     ],
     "media-feature-range-notation": "prefix",
     "media-feature-name-no-unknown": true,
-    "media-feature-name-no-vendor-prefix": true
+    "media-feature-name-no-vendor-prefix": true,
+
+    "declaration-property-value-disallowed-list": [
+      {
+        "/.+/": [
+          "/#3b82f6/i",
+          "/#2563eb/i",
+          "/#007aff/i",
+          "/#646cff/i",
+          "/#4ab6f5/i",
+          "/#1f36b9/i",
+          "/#93c5fd/i",
+          "/#2264f3/i",
+          "/#2564eb/i",
+          "/rgb\\(\\s*19,\\s*17,\\s*146/",
+          "/rgb\\(\\s*14,\\s*13,\\s*110/",
+          "/rgba\\(\\s*99,\\s*179,\\s*237/",
+          "/rgba\\(\\s*0,\\s*122,\\s*255/"
+        ]
+      },
+      {
+        "message": "Retired legacy blue — use a brand token: var(--bg-surface-brand) / var(--primitive-brand-rose-terracotta|deep-umber|muted-clay). See docs/DESIGN_SYSTEM.md.",
+        "severity": "error"
+      }
+    ]
   }
 }

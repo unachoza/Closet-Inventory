@@ -90,7 +90,6 @@ describe("CardDetails", () => {
 		expect(screen.getByText("Style")).toBeInTheDocument();
 		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
 		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
-		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 
 	it("full variant renders Features pills for boolean attributes", () => {

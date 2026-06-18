@@ -52,26 +52,18 @@ describe("NavBar", () => {
 			expect(screen.getByRole("button", { name: /Fabric Guide/i })).toBeInTheDocument();
 		});
 
-		it("hides the title and inline actions in the entire-closet view, showing only search", () => {
+		it("shows the title and collapses inline actions in the entire-closet view", () => {
 			renderNav({ initialView: "entireCloset" });
-			expect(screen.queryByRole("heading", { name: /My Closet Inventory/i })).not.toBeInTheDocument();
-			expect(screen.getByRole("textbox", { name: /Search closet/i })).toBeInTheDocument();
+			expect(screen.getByRole("heading", { name: /My Closet Inventory/i })).toBeInTheDocument();
 			// Inline actions are collapsed (only the hamburger drawer holds them now).
 			expect(screen.queryByRole("button", { name: /View All/i })).not.toBeInTheDocument();
 		});
 
-		it("does not render the search box outside the overview view", () => {
+		it("never renders the search box (search now lives in the SearchSortBar)", () => {
+			renderNav({ initialView: "entireCloset" });
+			expect(screen.queryByRole("textbox", { name: /Search closet/i })).not.toBeInTheDocument();
 			renderNav({ initialView: "carousel" });
 			expect(screen.queryByRole("textbox", { name: /Search closet/i })).not.toBeInTheDocument();
-		});
-	});
-
-	describe("search", () => {
-		it("writes the search input value into SearchContext", () => {
-			renderNav({ initialView: "entireCloset" });
-			const input = screen.getByRole("textbox", { name: /Search closet/i });
-			fireEvent.change(input, { target: { value: "brown" } });
-			expect(screen.getByTestId("current-query")).toHaveTextContent("brown");
 		});
 	});
 

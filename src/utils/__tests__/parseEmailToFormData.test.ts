@@ -129,23 +129,23 @@ describe("parseEmailToFormData — category inference", () => {
 		expect(parse("Ribbed Bodysuit").category).toBe("body");
 	});
 
-	it('infers "lingerie" from "bra"', () => {
-		expect(parse("The Bra").category).toBe("lingerie");
+	it('infers "intimates" from "bra"', () => {
+		expect(parse("The Bra").category).toBe("intimates");
 	});
 
 	it('infers "underwear" from "briefs"', () => {
 		expect(parse("Cotton Briefs 3-Pack").category).toBe("underwear");
 	});
 
-	it('infers "lingerie" from "teddy"', () => {
-		expect(parse("Floral Lace Zip Up Teddy").category).toBe("lingerie");
+	it('infers "intimates" from "teddy"', () => {
+		expect(parse("Floral Lace Zip Up Teddy").category).toBe("intimates");
 	});
 
 	it('defaults occasion to "everyday" for underwear', () => {
 		expect(parse("Cotton Briefs 3-Pack").occasion).toBe("everyday");
 	});
 
-	it('defaults occasion to "everyday" for lingerie', () => {
+	it('defaults occasion to "everyday" for intimates', () => {
 		expect(parse("Floral Lace Zip Up Teddy").occasion).toBe("everyday");
 	});
 
@@ -196,6 +196,31 @@ describe("parseEmailToFormData — default fields", () => {
 	});
 });
 
+describe("parseEmailToFormData — attribute-driven care", () => {
+	it("adds 'Wash inside out' when the product is jeans", () => {
+		const result = parse("Levi's High Rise Skinny Jeans", "", "");
+		expect(result.care).toContain("Wash inside out");
+	});
+
+	it("adds 'Wash with like colors' when the item is white", () => {
+		const result = parse("Cotton Tee in White", "", "");
+		expect(result.color).toBe("White");
+		expect(result.care).toContain("Wash with like colors");
+	});
+
+	it("adds both tags for white jeans", () => {
+		const result = parse("White Wide Leg Jeans", "", "");
+		expect(result.care).toContain("Wash inside out");
+		expect(result.care).toContain("Wash with like colors");
+	});
+
+	it("does not add attribute care tags for an unrelated item", () => {
+		const result = parse("Black Silk Cami", "", "");
+		expect(result.care).not.toContain("Wash inside out");
+		expect(result.care).not.toContain("Wash with like colors");
+	});
+});
+
 describe("parseEmailToFormData — purchase date", () => {
 	it("stores the email date as an ISO purchaseDate", () => {
 		const result = parseEmailToFormData("Order", "", "", "Fri, 15 Mar 2024 10:30:00 -0700");
@@ -242,10 +267,10 @@ describe("parseEmailToFormData — color extraction from subject", () => {
 });
 
 describe("parse augmented style data", () => {
-	it("gleans style data from context clues and item name", () => {})
+	it("gleans style data from context clues and item name", () => {});
 	//wide leg
 	//weave pattern - herringbone, houndstooth, plaid, tweed
-})
+});
 describe("parseEmailToFormData — material inference", () => {
 	it("infers a single material from the item name", () => {
 		const result = parse("Thanks for your purchase", "POLYAMIDE BLEND STRAPPY DRESS", "sales@zara.com");

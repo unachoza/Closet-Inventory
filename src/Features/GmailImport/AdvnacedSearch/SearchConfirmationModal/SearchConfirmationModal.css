@@ -9,9 +9,9 @@
 }
 
 .scm-mode-badge--fetch {
-	border: 1px solid rgba(37, 99, 235, 0.35);
-	background: rgba(37, 99, 235, 0.2);
-	color: #93bbfd;
+	border: 1px solid rgba(178, 134, 117, 0.35);
+	background: rgba(178, 134, 117, 0.2);
+	color: #e8c4b8;
 }
 
 .scm-mode-badge--filter {
@@ -22,13 +22,13 @@
 
 .scm-mode-hint {
 	margin: 0 0 var(--spacing-200, 1rem);
-	color: var(--Medium-Grey, #888);
+	color: rgba(255, 255, 255, 0.45);
 	font-size: 0.8rem;
 	line-height: 1.4;
 }
 
 .scm-empty {
-	color: var(--Medium-Grey, #888);
+	color: rgba(255, 255, 255, 0.45);
 	font-size: 0.85rem;
 	font-style: italic;
 }
@@ -94,7 +94,7 @@
 }
 
 .scm-btn--confirm {
-	background: var(--button-backround-blue, #2563eb);
+	background: var(--bg-surface-brand);
 	color: var(--White, #fff);
 }
 
@@ -106,7 +106,7 @@
 
 .scm-btn--cancel {
 	background: transparent;
-	color: var(--Medium-Grey, #888);
+	color: rgba(255, 255, 255, 0.45);
 }
 
 .scm-btn--cancel:hover {

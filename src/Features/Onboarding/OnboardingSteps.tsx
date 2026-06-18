@@ -19,6 +19,7 @@ import {
 import "./OnboardingSteps.css";
 import logo from "../../assets/hangerLogo.png";
 import { carouselCategories } from "../../utils/constants";
+import "../Carousel/Carousel.css";
 
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
@@ -90,7 +91,7 @@ function Step1Demo() {
 					{carouselCategories.slice(1, 4).map(({ label, icon }) => {
 						return (
 							<div key={label} className=" ob-nav-ghost-tile clothes-card emoji">
-								{icon}
+								<img src={icon} alt={icon} className="carousel-icons" />
 							</div>
 						);
 					})}

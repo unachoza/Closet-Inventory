@@ -2,7 +2,7 @@ label {
 	display: flex;
 	justify-content: center;
 	border-radius: var(--border-radius-ty);
-	color: white;
+	color: var(--text-secondary);
 	font-size: 1.5rem;
 	font-weight: 600;
 	margin-bottom: .5rem;
@@ -19,11 +19,11 @@ label {
 	justify-content: space-between;
 	align-items: center;
 	padding: .5rem;
-	border: var(--border-black-sm);
+	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-ty);
-	background-color: var(--Background-color);
-	color: var(--Black);
-	cursor: pointer;;
+	background-color: var(--bg-surface-primary);
+	color: var(--text-primary);
+	cursor: pointer;
 }
 
 .dropdown-selected {
@@ -45,9 +45,9 @@ label {
 	overflow: hidden; /*important for dropdown affect */
 	width: 100%;
 	max-height: 0; /*important for dropdown affect */
-	border: var(--border-black-sm);
-	background-color: var(--Background-color);
-	color: var(--Black);
+	border: 1px solid var(--border-hairline);
+	background-color: var(--bg-surface-primary);
+	color: var(--text-primary);
 	transition: max-height 0.3s ease;
 	border-top: none;
 }
@@ -59,9 +59,9 @@ label {
 .dropdown-option {
 	padding: .5rem;
 	cursor: pointer;
-	border-top: 1px solid #000;
+	border-top: 1px solid var(--border-hairline);
 }
 
 .dropdown-option:hover {
-	background-color: #f2f2f2;
+	background-color: var(--bg-surface-secondary);
 }
