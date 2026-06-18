@@ -224,18 +224,21 @@
 .filter-side-panel {
 	position: fixed;
 	top: 0;
-	left: 0;
+	/* Slides from the right to match the Filters trigger (right edge of the
+	   toolbar). Nav drawer stays on the left to match the hamburger — each
+	   panel enters from the side of the control that opens it. */
+	right: 0;
 	z-index: 201;
 	display: flex;
 	flex-direction: column;
 	width: 320px;
 	max-width: 85vw;
 	background: rgba(12, 12, 18, 0.98);
-	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+	box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
 	transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-	transform: translateX(-100%);
+	transform: translateX(100%);
 	backdrop-filter: var(--blur, blur(12px));
-	border-right: 1px solid rgba(255, 255, 255, 0.12);
+	border-left: 1px solid rgba(255, 255, 255, 0.12);
 	/* dvh tracks the actual visible viewport as Safari chrome shows/hides.
 	   Falls back to 100vh on browsers that don't support dvh yet. */
 	height: 100vh;
