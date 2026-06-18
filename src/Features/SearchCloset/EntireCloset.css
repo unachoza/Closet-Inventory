@@ -203,7 +203,7 @@
 	border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* ── Filter side panel (slides in from the left) ── */
+/* ── Filter side panel (slides in from the right) ── */
 .filter-panel-backdrop {
 	position: fixed;
 	z-index: 200;
@@ -232,8 +232,7 @@
 	box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
 	transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 	transform: translateX(-100%);
-	backdrop-filter: var(--blur, blur(12px));
-	border-right: 1px solid rgba(255, 255, 255, 0.12);
+	border-right: 1px solid var(--border-hairline);
 	/* dvh tracks the actual visible viewport as Safari chrome shows/hides.
 	   Falls back to 100vh on browsers that don't support dvh yet. */
 	height: 100vh;
