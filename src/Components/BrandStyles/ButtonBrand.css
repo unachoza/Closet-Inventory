@@ -1,0 +1,16 @@
+close-button{}
+submit-button{}
+back-button{}
+next-button{}
+cancel-button{}
+cta-button{}
+
+	/* BUTTONS — single source of truth for button colors.
+	   (Previously split into App.css with a "backround" typo; the typo'd
+	   names below are kept as aliases so existing references keep working.) */
+	--color-primary: var(--primitive-brand-rose-terracotta);
+	--color-primary-hover: var(--primitive-brand-deep-umber);
+	--color-primary-muted: rgba(178, 134, 117, 0.58);
+	--color-green-muted: rgb(17 146 113 / 58%);
+	--color-green-hover: rgb(10, 172, 131);
+	--color-green: rgb(17 146 113);
