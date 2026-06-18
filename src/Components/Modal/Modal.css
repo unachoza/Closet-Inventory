@@ -4,18 +4,19 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background: rgba(0, 0, 0, 0.6);
+	background: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(4px);
 	inset: 0;
 }
 
 .modal-panel {
+	max-width: 430px;
 	width: 90%;
 	max-height: 80vh;
-	border: 1px solid rgba(255, 255, 255, 0.15);
+	border: 1px solid var(--text-primary);
 	border-radius: var(--border-radius-sm);
-	background: var(--Dark-Grey, #1a1a1a);
-	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+	background: var(--Modal-dark-grey-light-red-background);
+	box-shadow: var(--elevation-high);
 	overflow-y: auto;
 }
 
@@ -25,12 +26,12 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	border-bottom: 1px solid var(--border-hairline);
 }
 
 .modal-title {
 	margin: 0;
-	color: var(--White, #fff);
+	color: var(--text-primary);
 	font-size: 1.1rem;
 	font-weight: 600;
 }
@@ -43,10 +44,11 @@
 	height: 28px;
 	margin: 0;
 	padding: 0;
-	border: none;
+	border: 1px solid var(--border-strong);
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.08);
-	color: var(--Op-Light-Grey, #aaa);
+	/* background: var(--bg-surface-secondary); */
+	background: #898682;
+	color: var(--text-secondary);
 	font-size: 1.2rem;
 	line-height: 1;
 	cursor: pointer;
@@ -54,13 +56,15 @@
 }
 
 .modal-close-btn:hover {
-	background: rgba(255, 255, 255, 0.18);
-	color: var(--White, #fff);
+	background: var(--bg-surface-secondary);
+	background: #b2afaa;
+	color: var(--text-primary);
+	border-color: var(--border-brand);
 }
 
 /* Body */
 .modal-body {
-	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
+	padding: var(--spacing-100, .5rem) var(--spacing-300, 1.5rem);
 }
 
 /* Footer */
@@ -68,6 +72,6 @@
 	display: flex;
 	justify-content: flex-end;
 	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
-	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	border-top: 1px solid var(--border-hairline);
 	gap: var(--spacing-100, 0.5rem);
 }

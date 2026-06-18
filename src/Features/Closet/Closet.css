@@ -18,12 +18,12 @@
       display: flex;
       justify-content: space-around;
       flex-wrap: wrap;
-      gap: 2px
+      gap: 10px;
+      padding: .5rem 2rem;
 }
 
 p.no-results {
-  color: var(--White);
-
+  color: var(--text-primary);
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */

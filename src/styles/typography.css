@@ -1,0 +1,31 @@
+/* =============================================================================
+   EDITORIAL TYPOGRAPHY ADOPTION
+   -----------------------------------------------------------------------------
+   Applies the two type voices app-wide (Principle: Editorial Over Corporate):
+     • Lora serif  → headers & titles (the editorial moments)
+     • DM Sans     → body & functional/analytical text
+   Lora + Playfair are loaded via the @import in index.html. Imported after
+   primitives.css so it wins over component defaults. See docs/DESIGN_SYSTEM.md.
+   ============================================================================= */
+
+body {
+	font-family: var(--primitive-font-family-sans);
+}
+
+/* Editorial serif headers — the brand's voice. */
+h1,
+h2,
+h3,
+h4,
+.page-title,
+.card-name-label,
+.card-name,
+.card-details__name,
+.emoji-text,
+.ob-title,
+.modal-title,
+.section-title {
+	font-family: var(--primitive-font-family-serif);
+	font-weight: var(--primitive-font-weight-medium);
+	letter-spacing: -0.01em;
+}

@@ -10,7 +10,7 @@
 }
 
 .image-uploader-label {
-      color: var(--White);
+      color: var(--text-secondary);
       font-weight: 500;
       margin-bottom: .25rem;
 }
@@ -21,21 +21,22 @@
       align-items: center;
       width: 11.25rem;
       height: 11.25rem;
-      border: 0.125rem dashed var(--White);
+      border: 0.125rem dashed var(--border-strong);
       border-radius: 0.75rem;
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: var(--bg-surface-secondary);
       cursor: pointer;
       transition: all 0.2s ease;
 }
 
 .image-uploader-box:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: var(--bg-surface-secondary);
+      border-color: var(--border-brand);
       transform: scale(1.02);
 }
 
 .image-placeholder {
-      color: var(--White);
-      opacity: 0.7;
+      color: var(--text-muted);
+      opacity: 1;
       font-size: 0.9rem;
       text-align: center;
 }
@@ -48,7 +49,7 @@
 }
 
 .remove{
-      background: var(--Remove-Red)
+      background: var(--primitive-status-error-crimson);
 }
 
 .remove:hover {

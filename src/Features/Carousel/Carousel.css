@@ -4,14 +4,15 @@
 }
 
 .group-with-arrow-buttons {
-	position: relative; 
-	display: flex; 
-	justify-content: space-between; 
-	align-items: center; 
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	width: 100%;
-	width: 50rem; 
-	max-width: 39rem; 
+	/* width: 50rem; */
+	/* max-width: 39rem; */
 	padding: 1rem;
+
 }
 
 .carousel-icons {
@@ -19,21 +20,42 @@
   width: 80px;
 }
 
+.directions-icons{
+   height: 50px;
+    width: 40px;
+    border-radius: var(--border-radius-md);
+    /* background-color: color-mix(in srgb, var(--bg-surface-primary) 85%, transparent); */
+    /* backdrop-filter: blur(4px); */
+    /* box-shadow: var(--elevation-high); */
+    /* box-shadow: 5px 5px 24px 7px rgb(73 47 40 / 44%); */
+    /* color: var(--text-primary); */
+    cursor: pointer;
+    /* border: solid 1px var(--text-color); */
+}
+
+.arrow-button{
+        background-color: color-mix(in srgb, var(--bg-surface-primary) 85%, transparent);
+    backdrop-filter: blur(4px);
+    box-shadow: 5px 5px 24px 7px rgb(73 47 40 / 44%);
+    cursor: pointer;
+    border: solid 1px var(--text-color);
+}
+
 .emoji {
-	font-size: 4rem; 
+	font-size: 4rem;
 }
 
 .emoji-text {
-	font-size: 1.5rem; 
+	font-size: 1.5rem;
 }
 
-.view-three { 
-	display: flex; 
-	flex-direction: row; 
-	justify-content: center; 
-	width: 15.625rem;
+.view-three {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	/* width: 15.625rem; */
 	gap: 1rem;
-	margin-left: 1rem; 
+	margin-left: 1rem;
 	margin-right: 1rem;
 }
 
@@ -47,23 +69,25 @@
 	border-radius: var(--border-radius-md);
 	background-color: color-mix(in srgb, var(--bg-surface-primary) 85%, transparent);
   backdrop-filter: blur(4px);
-	box-shadow: var(--elevation-low);
+	box-shadow: var(--elevation-high);
+  box-shadow: 5px 5px 24px 7px rgb(73 47 40 / 44%);;
 	color: var(--text-primary);
 	cursor: pointer;
   border: solid 1px var(--text-color);
 }
 
 .clothes-card:hover {
-	box-shadow: 0 .5rem 1rem -.15rem rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); 
-	border-color: var(--Outline-Blue);
+	box-shadow: var(--elevation-high);
+	border-color: var(--border-brand);
 }
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
   .group-with-arrow-buttons {
     width: 100%;
     max-width: 100%;
-   padding: .5rem 0;
+    padding: .5rem 0;
   }
 
   .emoji {
@@ -77,21 +101,20 @@
   .view-three {
     width: auto;
     gap: 0.5rem;
-  margin: 0 .4rem;
+    margin: 0 .4rem;
   }
 
   .clothes-card {
     min-width: 7rem;
     padding: 0.5rem;
     font-size: 0.85rem;
-    border: solid black 1.5px;
-    
+    border: 1px solid var(--border-strong);
   }
 }
 
 @media (max-width: 480px) {
   .emoji {
-  font-size: 3.3rem;
+    font-size: 3.3rem;
   }
 
   .emoji-text {
@@ -100,14 +123,23 @@
   }
 
   .clothes-card {
-           min-width: 5.5rem;
-        min-height: 6rem;
+    min-width: 5.5rem;
+    min-height: 6rem;
     padding: 0.4rem;
   }
 
   button.arrow-button {
-   padding: .6rem .8rem;
-   border: solid black 1.5px;
-   margin: 0
+    padding: .6rem .8rem;
+    border: 1px solid var(--border-strong);
+    margin: 0
   }
+
+ .view-three { 
+  gap: .25rem;
+ }
+
+.directions-icons {
+  height: 35px;
+    width: 20px;
+}
 }

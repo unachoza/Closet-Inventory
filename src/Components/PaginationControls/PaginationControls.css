@@ -1,26 +1,25 @@
-
-
 .pagination-controls {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	color: var(--White);
+	color: var(--text-primary);
 	gap: 1rem;
 	margin-top: 1.5rem;
 }
 
 .pagination-controls button {
 	padding: var(--padding-rectangle-sm);
-	border: var(--border-black-sm);
+	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-ty);
-	background: #111;
-	color: var(--White);
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
 	cursor: pointer;
-	transition: background 0.2s ease;
+	transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .pagination-controls button:hover:not(:disabled) {
-	background: var(--Op-Black);
+	background: var(--bg-surface-secondary);
+	border-color: var(--border-brand);
 }
 
 .pagination-controls button:disabled {
@@ -42,8 +41,9 @@
     width: 100%;
     margin: 0;
     padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom, 0px));
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: var(--blur, blur(12px));
+    background: var(--bg-surface-glass);
+    backdrop-filter: var(--effect-blur-glass);
+    border-top: 1px solid var(--border-hairline);
   }
 }
 

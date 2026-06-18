@@ -9,10 +9,11 @@
 
 .product-card-list-title {
 	margin: 0;
-	color: var(--Op-Light-Grey);
-	color: var(--Focus-Mustard);
+	color: rgba(255,255,255,0.55);
+	color: #492f28;
 	font-size: 0.9rem;
 	font-weight: 500;
+	font-family: 'DM SANS';
 }
 
 .product-card {
@@ -62,7 +63,7 @@
 }
 
 .product-card-brand {
-	color: var(--Op-Light-Grey);
+	color: rgba(255,255,255,0.55);
 	font-size: 0.75rem;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
@@ -75,6 +76,8 @@
 	font-weight: 600;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	font-family: "DM Sans"
+
 }
 
 .product-card-meta {
@@ -85,13 +88,13 @@
 }
 
 .product-card-price {
-	color: var(--Focus-Mustard);
+	color: #492f28;
 	font-size: 0.8rem;
 	font-weight: 600;
 }
 
 .product-card-tag {
-	color: var(--Op-Light-Grey);
+	color: rgba(255,255,255,0.55);
 	font-size: 0.78rem;
 }
 
@@ -106,7 +109,7 @@
 	border: none;
 	border-radius: var(--border-radius-ty);
 	background: var(--color-primary);
-	color: var(--White);
+	color: #fff;
 	font-size: 0.8rem;
 	font-weight: 500;
 	cursor: pointer;

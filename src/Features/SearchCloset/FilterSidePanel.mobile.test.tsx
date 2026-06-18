@@ -17,7 +17,7 @@ const emptyFilters: FilterState = {
 	brand: [],
 	material: [],
 	occasion: [],
-	care: []
+	care: [],
 };
 
 const filterOptions: FilterOptions = {
@@ -28,14 +28,23 @@ const filterOptions: FilterOptions = {
 		{ value: "coats", count: 2 },
 		{ value: "sweaters", count: 6 },
 		{ value: "active", count: 2 },
-		{ value: "lingerie", count: 1 },
+		{ value: "intimates", count: 1 },
 		{ value: "socks", count: 1 },
 	],
-	color: [{ value: "Black", count: 8 }, { value: "White", count: 4 }],
-	brand: [{ value: "Nike", count: 3 }, { value: "Zara", count: 2 }],
+	color: [
+		{ value: "Black", count: 8 },
+		{ value: "White", count: 4 },
+	],
+	brand: [
+		{ value: "Nike", count: 3 },
+		{ value: "Zara", count: 2 },
+	],
 	material: [{ value: "cotton", count: 6 }],
-	occasion: [{ value: "casual", count: 7 }, { value: "formal", count: 2 }],
-	care: []
+	occasion: [
+		{ value: "casual", count: 7 },
+		{ value: "formal", count: 2 },
+	],
+	care: [],
 };
 
 const baseProps = {

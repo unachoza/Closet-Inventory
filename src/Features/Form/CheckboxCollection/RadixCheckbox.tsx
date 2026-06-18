@@ -33,6 +33,8 @@ const AnimatedCheckbox = ({ label, checked = false, onCheckedChange, id }: Anima
 
 	const color = isColorName(label.toLowerCase()) ? label.toLowerCase() : "inherit";
 
+	const isColor = color !== "inherit";
+
 	return (
 		<label className="animated-checkbox">
 			<Checkbox.Root
@@ -40,10 +42,7 @@ const AnimatedCheckbox = ({ label, checked = false, onCheckedChange, id }: Anima
 				checked={checked}
 				onCheckedChange={onCheckedChange}
 				className="checkbox-root"
-				style={{
-					backgroundColor: checked ? color : "inherit",
-					borderColor: checked ? color : "#000",
-				}}
+				style={isColor && checked ? { backgroundColor: color, borderColor: color } : undefined}
 			>
 				<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="checkbox-inner">
 					<Checkbox.Indicator forceMount>
