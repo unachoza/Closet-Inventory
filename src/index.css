@@ -41,11 +41,6 @@
 	--Op-Light-Grey: #888;
 	--Lightest-Grey: #bcbcbc;
 
-	--Focus-Blue: var(--primitive-brand-muted-clay);
-	--Outline-Blue: var(--primitive-brand-muted-clay);
-	--Focus-Mustard: var(--primitive-brand-deep-umber);
-	--Background-color:  rgba(120, 172, 191, 0.396) ;
-	/* linear-gradient(180deg, rgba(120, 172, 191, 1) 0%, rgba(103, 131, 133, 1) 50%); */
 
 	/* BUTTONS — single source of truth for button colors.
 	   (Previously split into App.css with a "backround" typo; the typo'd

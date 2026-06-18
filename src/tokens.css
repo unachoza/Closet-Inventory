@@ -121,6 +121,11 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --primitive-status-warning-ochre: #ba9259;
   --primitive-status-info-slate: #5a6b7c;
 
+  /* Action Colors */
+  --Brand-hover-highlight: #b2867552;
+  --Light-hover-highlight: #f3eee7;
+
+
   /* Typography Attributes */
   --primitive-font-family-serif: "Lora", serif;
   --primitive-font-family-sans: "DM Sans", sans-serif;

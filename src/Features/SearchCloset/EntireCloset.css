@@ -225,7 +225,7 @@
 	opacity: 1;
 	visibility: visible;
 }
-
+/* ============== FILTER PANEL ============== */
 .filter-side-panel {
 	position: fixed;
 	top: 0;
@@ -414,6 +414,7 @@
 	flex-direction: column;
 	gap: 2px;
 	padding-bottom: var(--spacing-150, 0.75rem);
+	margin: 0 1rem;
 }
 .filter-accordion__body > label {
 	display: flex;
@@ -439,11 +440,50 @@
 }
 
 .filter-accordion__option input[type="checkbox"] {
-	width: 15px;
-	height: 15px;
+	/* Opt out of native rendering so the Figma border / radius / background
+	   are actually honored (accent-color alone only tints the checked fill). */
+	appearance: none;
+	-webkit-appearance: none;
+	width: 18px;
+	height: 18px;
+	margin: 0;
+	/* Reset the global `input` padding (TextInput.css) — with border-box it was
+	   inflating the box to 35x19 because it can't shrink below padding+border. */
+	padding: 0;
 	cursor: pointer;
-	accent-color: var(--bg-surface-brand);
 	flex-shrink: 0;
+	border-radius: var(--primitive-radius-sm);
+	border: 1px solid var(  --primitive-neutral-dark-walnut);
+	background: var(--bg-surface-primary);
+	display: grid;
+	place-content: center;
+	transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.filter-accordion__option input[type="checkbox"]:checked {
+	background: var(--bg-surface-brand);
+	border-color: var(--bg-surface-brand);
+}
+
+/* Checkmark drawn with a rotated box-shadow-free ::after tick */
+.filter-accordion__option input[type="checkbox"]::after {
+	content: "";
+	width: 4px;
+	height: 8px;
+	border: solid var(--text-on-brand);
+	border-width: 0 1.5px 1.5px 0;
+	transform: rotate(45deg) translateY(-1px);
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.filter-accordion__option input[type="checkbox"]:checked::after {
+	opacity: 1;
+}
+
+.filter-accordion__option input[type="checkbox"]:focus-visible {
+	outline: 2px solid var(--border-focus, var(--bg-surface-brand));
+	outline-offset: 2px;
 }
 
 .filter-accordion__option-value {
@@ -455,6 +495,17 @@
 	color: var(--text-muted);
 	font-size: 0.74rem;
 	margin-left: auto;
+}
+
+button.filter-accordion__header:hover{
+	transform: none;
+	box-shadow: none;
+}
+
+button.filter-accordion__header:focus{
+	outline: none;
+    background-color: var(--Light-hover-highlight);
+    box-shadow: inset 3px 0 0 0 var(--primitive-brand-rose-terracotta);
 }
 
 /* ── Results meta ── */
