@@ -232,6 +232,11 @@
    CARD
 ========================= */
 
+button.closet-card {
+	display: flex;
+	flex-direction: column;
+}
+
 .closet-card {
 	position: relative;
 
@@ -267,6 +272,9 @@
 
 	background: var(--color-surface-secondary);
 	background-color: aqua;
+	    border: solid black 2px;
+    height: 200px;
+
 }
 
 .closet-card__image {
@@ -354,7 +362,7 @@
 
 .closet-card__details {
 	padding: 0.625rem;
-
+	color: black;
 	border: 1px solid var(--color-border);
 	border-top: none;
 

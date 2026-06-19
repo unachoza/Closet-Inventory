@@ -112,7 +112,7 @@
 	overflow: hidden;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 508px) {
 	.app__desktop {
 		display: flex;
 	}
@@ -140,7 +140,7 @@
 	overflow: hidden;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 508px) {
 	.app__mobile {
 		display: none;
 	}
@@ -162,7 +162,7 @@
 	background: var(--color-card);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 508px) {
 	.app__nav {
 		display: none;
 	}

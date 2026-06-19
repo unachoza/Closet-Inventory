@@ -2,6 +2,7 @@ import { Upload, X, Plus, Check, ShoppingBag, Sparkles, Camera, Star, User, Shir
 import { ClothingItem, Category } from "../utils/types";
 import { CATEGORIES, INITIAL_CLOSET, OVERLAY_ORDER, OVERLAY_STYLE } from "../utils/data";
 import { useRef } from "react";
+import "./AvatarPanel.css";
 
 interface AvatarPanelProps {
 	avatarUrl: string;
