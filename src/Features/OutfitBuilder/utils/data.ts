@@ -1,9 +1,9 @@
 import { ClothingItem, Category, ItemCategory } from "./types";
 
-const CATEGORIES: Category[] = ["All", "Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Accessories"];
-const ITEM_CATEGORIES: ItemCategory[] = ["Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Accessories"];
+export const CATEGORIES: Category[] = ["All", "Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Accessories"];
+export const ITEM_CATEGORIES: ItemCategory[] = ["Tops", "Bottoms", "Dresses", "Outerwear", "Shoes", "Accessories"];
 
-const INITIAL_CLOSET: ClothingItem[] = [
+export const INITIAL_CLOSET: ClothingItem[] = [
   {
     id: "t1", name: "White Oxford Shirt", category: "Tops", brand: "COS", colorHex: "#F5F5F0",
     imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop&auto=format",
@@ -42,7 +42,7 @@ const INITIAL_CLOSET: ClothingItem[] = [
   },
 ];
 
-const OVERLAY_STYLE: Record<ItemCategory, React.CSSProperties> = {
+export const OVERLAY_STYLE: Record<ItemCategory, React.CSSProperties> = {
   Tops:       { top: "8%",  left: "5%",  right: "5%",  height: "45%", objectFit: "contain", objectPosition: "top center" },
   Bottoms:    { top: "48%", left: "5%",  right: "5%",  bottom: "2%",  objectFit: "contain", objectPosition: "bottom center" },
   Dresses:    { top: "8%",  left: "5%",  right: "5%",  bottom: "2%",  objectFit: "contain", objectPosition: "top center" },
@@ -51,12 +51,14 @@ const OVERLAY_STYLE: Record<ItemCategory, React.CSSProperties> = {
   Accessories:{ top: "12%", left: "0%",  right: "0%",  height: "30%", objectFit: "contain", objectPosition: "top center" },
 };
 
-const ZONE_GROUPS: ItemCategory[][] = [
+export const ZONE_GROUPS: ItemCategory[][] = [
   ["Tops", "Dresses", "Outerwear"],
   ["Bottoms"],
   ["Shoes"],
   ["Accessories"],
 ];
 
-const OVERLAY_ORDER: ItemCategory[] = ["Bottoms", "Dresses", "Tops", "Shoes", "Accessories", "Outerwear"];
+export const OVERLAY_ORDER: ItemCategory[] = ["Bottoms", "Dresses", "Tops", "Shoes", "Accessories", "Outerwear"];
 
+export const DEFAULT_AVATAR =
+  "https://images.unsplash.com/photo-1529139574466-a303027bc541?w=700&h=1050&fit=crop&auto=format&q=80";
