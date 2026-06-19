@@ -1,35 +1,28 @@
 import { useState } from "react";
 import { ShoppingBag, X, User, Shirt } from "lucide-react";
 
-import { ClothingItem, Category, MobileView } from "./utils/types"
+import { ClothingItem, Category, MobileView } from "./utils/types";
 import { INITIAL_CLOSET, DEFAULT_AVATAR } from "./utils/data";
-import { getZone } from "./utils/getZone"
+import { getZone } from "./utils/getZone";
 
 import AvatarPanel from "./AvatarPanel/AvatarPanel";
 import ClosetPanel from "./ClosetPanel/ClosetPanel";
 import { AddItemModal } from "./AddItemModal/AddItemModal";
 
-import "./App.css";
+import "./OutfitBuilder.css";
 
-export default function App() {
-	const [closet, setCloset] =
-		useState<ClothingItem[]>(INITIAL_CLOSET);
+export default function OutfitBuilder() {
+	const [closet, setCloset] = useState<ClothingItem[]>(INITIAL_CLOSET);
 
-	const [avatarUrl, setAvatarUrl] =
-		useState<string>(DEFAULT_AVATAR);
+	const [avatarUrl, setAvatarUrl] = useState<string>(DEFAULT_AVATAR);
 
-	const [activeCategory, setActiveCategory] =
-		useState<Category>("All");
+	const [activeCategory, setActiveCategory] = useState<Category>("All");
 
-	const [selectedItems, setSelectedItems] = useState<
-		Record<string, ClothingItem>
-	>({});
+	const [selectedItems, setSelectedItems] = useState<Record<string, ClothingItem>>({});
 
-	const [isAddingItem, setIsAddingItem] =
-		useState(false);
+	const [isAddingItem, setIsAddingItem] = useState(false);
 
-	const [mobileView, setMobileView] =
-		useState<MobileView>("closet");
+	const [mobileView, setMobileView] = useState<MobileView>("closet");
 
 	const toggleItem = (item: ClothingItem) => {
 		setSelectedItems((prev) => {
@@ -44,9 +37,7 @@ export default function App() {
 
 			if (zone !== -1) {
 				Object.values(next).forEach((sel) => {
-					if (
-						getZone(sel.category) === zone
-					) {
+					if (getZone(sel.category) === zone) {
 						delete next[sel.id];
 					}
 				});
@@ -57,18 +48,14 @@ export default function App() {
 		});
 	};
 
-	const handleAvatarUpload = (
-		e: React.ChangeEvent<HTMLInputElement>,
-	) => {
+	const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
 			setAvatarUrl(URL.createObjectURL(file));
 		}
 	};
 
-	const addItem = (
-		data: Omit<ClothingItem, "id">,
-	) => {
+	const addItem = (data: Omit<ClothingItem, "id">) => {
 		setCloset((prev) => [
 			{
 				id: `custom-${Date.now()}`,
@@ -88,18 +75,11 @@ export default function App() {
 			{/* ================= HEADER ================= */}
 			<header className="app__header">
 				<div className="app__brand">
-					<ShoppingBag
-						className="app__brand-icon"
-						strokeWidth={1.5}
-					/>
+					<ShoppingBag className="app__brand-icon" strokeWidth={1.5} />
 
-					<span className="app__brand-title">
-						wardrobe
-					</span>
+					<span className="app__brand-title">wardrobe</span>
 
-					<span className="app__brand-subtitle">
-						/studio
-					</span>
+					<span className="app__brand-subtitle">/studio</span>
 				</div>
 
 				<div className="app__header-actions">
@@ -107,18 +87,10 @@ export default function App() {
 						<>
 							<span className="app__status">
 								{selectedList.length} piece
-								{selectedList.length !== 1
-									? "s"
-									: ""}{" "}
-								styled
+								{selectedList.length !== 1 ? "s" : ""} styled
 							</span>
 
-							<button
-								className="app__clear-btn"
-								onClick={() =>
-									setSelectedItems({})
-								}
-							>
+							<button className="app__clear-btn" onClick={() => setSelectedItems({})}>
 								<X size={12} />
 								Clear look
 							</button>
@@ -133,9 +105,7 @@ export default function App() {
 					<AvatarPanel
 						avatarUrl={avatarUrl}
 						selectedItems={selectedItems}
-						onAvatarUpload={
-							handleAvatarUpload
-						}
+						onAvatarUpload={handleAvatarUpload}
 						onRemoveItem={toggleItem}
 					/>
 				</aside>
@@ -144,14 +114,10 @@ export default function App() {
 					<ClosetPanel
 						closet={closet}
 						activeCategory={activeCategory}
-						setActiveCategory={
-							setActiveCategory
-						}
+						setActiveCategory={setActiveCategory}
 						selectedItems={selectedItems}
 						onToggleItem={toggleItem}
-						onAddItem={() =>
-							setIsAddingItem(true)
-						}
+						onAddItem={() => setIsAddingItem(true)}
 					/>
 				</main>
 			</div>
@@ -162,12 +128,8 @@ export default function App() {
 					<div className="app__mobile-view">
 						<AvatarPanel
 							avatarUrl={avatarUrl}
-							selectedItems={
-								selectedItems
-							}
-							onAvatarUpload={
-								handleAvatarUpload
-							}
+							selectedItems={selectedItems}
+							onAvatarUpload={handleAvatarUpload}
 							onRemoveItem={toggleItem}
 						/>
 					</div>
@@ -175,19 +137,11 @@ export default function App() {
 					<div className="app__mobile-view">
 						<ClosetPanel
 							closet={closet}
-							activeCategory={
-								activeCategory
-							}
-							setActiveCategory={
-								setActiveCategory
-							}
-							selectedItems={
-								selectedItems
-							}
+							activeCategory={activeCategory}
+							setActiveCategory={setActiveCategory}
+							selectedItems={selectedItems}
 							onToggleItem={toggleItem}
-							onAddItem={() =>
-								setIsAddingItem(true)
-							}
+							onAddItem={() => setIsAddingItem(true)}
 						/>
 					</div>
 				)}
@@ -195,57 +149,26 @@ export default function App() {
 
 			{/* ================= MOBILE NAV ================= */}
 			<nav className="app__nav">
-				<button
-					className={`app__nav-btn ${
-						mobileView === "look"
-							? "is-active"
-							: ""
-					}`}
-					onClick={() =>
-						setMobileView("look")
-					}
-				>
+				<button className={`app__nav-btn ${mobileView === "look" ? "is-active" : ""}`} onClick={() => setMobileView("look")}>
 					<div className="app__nav-icon-wrap">
 						<User size={20} />
-						{hasOutfit && (
-							<span className="app__dot" />
-						)}
+						{hasOutfit && <span className="app__dot" />}
 					</div>
 
-					<span className="app__nav-label">
-						My Look
-					</span>
+					<span className="app__nav-label">My Look</span>
 				</button>
 
 				<div className="app__divider" />
 
-				<button
-					className={`app__nav-btn ${
-						mobileView === "closet"
-							? "is-active"
-							: ""
-					}`}
-					onClick={() =>
-						setMobileView("closet")
-					}
-				>
+				<button className={`app__nav-btn ${mobileView === "closet" ? "is-active" : ""}`} onClick={() => setMobileView("closet")}>
 					<Shirt size={20} />
 
-					<span className="app__nav-label">
-						Closet
-					</span>
+					<span className="app__nav-label">Closet</span>
 				</button>
 			</nav>
 
 			{/* ================= MODAL ================= */}
-			{isAddingItem && (
-				<AddItemModal
-					onClose={() =>
-						setIsAddingItem(false)
-					}
-					onAdd={addItem}
-				/>
-			)}
+			{isAddingItem && <AddItemModal onClose={() => setIsAddingItem(false)} onAdd={addItem} />}
 		</div>
 	);
 }

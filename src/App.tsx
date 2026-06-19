@@ -14,6 +14,7 @@ import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
 import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
+import OutfitBuilder from "./Features/OutfitBuilder/OutfitBuilder";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
@@ -214,7 +215,8 @@ function App() {
 	return (
 		<ViewProvider initialView="carousel">
 			<SearchProvider>
-				<AppShell />
+				{/* <AppShell /> */}
+				<OutfitBuilder />
 			</SearchProvider>
 		</ViewProvider>
 	);
