@@ -138,6 +138,7 @@
 
 	backdrop-filter: blur(12px);
 	background: rgb(255 255 255 / 92%);
+	height: 40px;
 }
 
 .avatar-panel__color-dot {

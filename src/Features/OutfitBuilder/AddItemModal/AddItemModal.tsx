@@ -10,10 +10,7 @@ interface AddItemModalProps {
 	onAdd: (item: Omit<ClothingItem, "id">) => void;
 }
 
-export function AddItemModal({
-	onClose,
-	onAdd,
-}: AddItemModalProps) {
+export function AddItemModal({ onClose, onAdd }: AddItemModalProps) {
 	const [name, setName] = useState("");
 	const [category, setCategory] = useState<ItemCategory | null>(null);
 	const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -38,53 +35,40 @@ export function AddItemModal({
 	const submit = () => {
 		if (!imageUrl || !category || !name.trim()) return;
 
-		onAdd({
+		const newItem = {
 			name: name.trim(),
 			category,
 			imageUrl,
 			colorHex: "#888888",
-		});
+		};
+		console.log("added new item", { newItem });
+		onAdd(newItem);
 
 		onClose();
 	};
 
 	return (
 		<div className="add-modal" onClick={onClose}>
-			<div
-				className="add-modal__panel"
-				onClick={(e) => e.stopPropagation()}
-			>
+			<div className="add-modal__panel" onClick={(e) => e.stopPropagation()}>
 				{/* Drag handle */}
 				<div className="add-modal__handle" />
 
 				{/* Header */}
 				<div className="add-modal__header">
 					<div>
-						<h3 className="add-modal__title">
-							Add to Closet
-						</h3>
+						<h3 className="add-modal__title">Add to Closet</h3>
 
-						<p className="add-modal__subtitle">
-							Upload a photo from your closet
-						</p>
+						<p className="add-modal__subtitle">Upload a photo from your closet</p>
 					</div>
 
-					<button
-						type="button"
-						className="add-modal__close"
-						onClick={onClose}
-					>
+					<button type="button" className="add-modal__close" onClick={onClose}>
 						<X size={16} strokeWidth={1.5} />
 					</button>
 				</div>
 
 				{/* Drop zone */}
 				<div
-					className={`add-modal__dropzone ${
-						dragging
-							? "add-modal__dropzone--active"
-							: ""
-					}`}
+					className={`add-modal__dropzone ${dragging ? "add-modal__dropzone--active" : ""}`}
 					onClick={() => inputRef.current?.click()}
 					onDragOver={(e) => {
 						e.preventDefault();
@@ -95,11 +79,7 @@ export function AddItemModal({
 				>
 					{imageUrl ? (
 						<>
-							<img
-								src={imageUrl}
-								alt="Preview"
-								className="add-modal__preview"
-							/>
+							<img src={imageUrl} alt="Preview" className="add-modal__preview" />
 
 							<button
 								type="button"
@@ -138,14 +118,7 @@ export function AddItemModal({
 				<div className="add-modal__field">
 					<label>Item name</label>
 
-					<input
-						type="text"
-						value={name}
-						onChange={(e) =>
-							setName(e.target.value)
-						}
-						placeholder="e.g. Blue linen blazer"
-					/>
+					<input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Blue linen blazer" />
 				</div>
 
 				{/* Category */}
@@ -154,21 +127,14 @@ export function AddItemModal({
 
 					<div className="add-modal__grid">
 						{ITEM_CATEGORIES.map((cat) => {
-							const isActive =
-								category === cat;
+							const isActive = category === cat;
 
 							return (
 								<button
 									key={cat}
 									type="button"
-									className={`add-modal__category ${
-										isActive
-											? "add-modal__category--active"
-											: ""
-									}`}
-									onClick={() =>
-										setCategory(cat)
-									}
+									className={`add-modal__category ${isActive ? "add-modal__category--active" : ""}`}
+									onClick={() => setCategory(cat)}
 								>
 									{cat}
 								</button>
@@ -178,16 +144,7 @@ export function AddItemModal({
 				</div>
 
 				{/* Submit */}
-				<button
-					type="button"
-					className="add-modal__submit"
-					onClick={submit}
-					disabled={
-						!imageUrl ||
-						!category ||
-						!name.trim()
-					}
-				>
+				<button type="button" className="add-modal__submit" onClick={submit} disabled={!imageUrl || !category || !name.trim()}>
 					Add to closet
 				</button>
 			</div>
