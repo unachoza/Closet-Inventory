@@ -160,25 +160,26 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 > ✅ = Shipped (on `main`) &nbsp;|&nbsp; 🚧 = In open PR / review &nbsp;|&nbsp; 🔲 = Planned
 
-> **Version numbers are scope groupings, not build order.** The actual near-term sequence is mobile-first (below). Some items already exist as code but live in open PRs, not yet on `main` — those note the PR number.
+> **Version numbers are scope groupings, not build order.** The actual near-term sequence is below. Some items already exist as code but live in open PRs, not yet on `main` — those note the PR number.
 
 ---
 
-### 🎯 Near-Term Priority Order (mobile-first)
+### 🎯 Near-Term Priority Order
 
-The closet is responsive today, but the mobile experience the product and
-business model depend on is unbuilt. Actual build order:
+> Re-sequenced 2026-06-20. Full reasoning + dev-day estimates in
+> [planning/STRATEGY_REVIEW_2026-06-20.md](./planning/STRATEGY_REVIEW_2026-06-20.md).
 
-
-1. **Mobile UI polish** (from v2.0) — touch-target audit (44×44px) and a bottom nav / "Add Item" FAB so the primary action isn't buried in the hamburger drawer.
-2. **PWA scaffolding** (pulled forward from v2.0) — `manifest.json`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen.
-3. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
+1. **Known-bug cleanup + green suite** — strip debug logs, then land the trust-eroding core-loop bugs *with regression tests*: material filter returns nothing, remove doesn't re-render the grid, MonthYearPicker fabricated age, import-non-clothing skip, title-case CAPS. Cheap, high-confidence, makes everything after trustworthy. (~5.5–6 dev-days)
+2. **Stand up the cloud layer** — ⚠️ **gated by an open decision:** [Firestore (merge PR #44) vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md). Resolve that first; "merge #44" is only the answer if Firestore wins. Pair with the **base64 → object-storage** image fix. (~2.5–10.5 dev-days, path-dependent)
+3. **Mobile UI polish + PWA** — touch-target audit (44×44px), bottom nav / "Add Item" FAB (primary action out of the hamburger), and PWA scaffolding (`vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons). **Load-bearing** for monetization ("no App Store / no 30% cut"), offline-first, and add-to-home-screen. (~7.5–9.5 dev-days)
+4. **v2.2 web-engagement** — scrape richer product details from retailer PDPs to feed the existing inference pipeline. ⚠️ Do the [feasibility spike first](./planning/EngagingWebForProductDetails.md) — verified 2026-06-20 that Cloudflare bot-blocking returns `403` to plain fetches of major retailers. (~10–14.5 dev-days)
 
 **Cross-version dependencies:**
 
-- `wornCount` (in v1.2) is required by **v7.0** lifespan tracker and **v8.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
-- **v4.0 backend** (Firestore) gates **v6.1** social and **v9.0** monetization (`isPremium` read). It's effectively done in [#44](https://github.com/unachoza/Closet-Inventory/pull/44), so v9.0 is closer than its number implies.
-- **v9.0 monetization** also depends on the **PWA** install path (priority 3).
+- `wornCount` (in v5) is required by the **v9.0** lifespan tracker and **v10.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
+- The **cloud backend** (v5.1) gates **v8.1** social and **v1.0 monetization** (`isPremium` read). Resolve the [DB decision](./planning/BACKEND_DATABASE_DECISION.md) before building on it — if Supabase wins, migrate *before* #44 ships, never after.
+- **Monetization** also depends on the **PWA** install path (priority 3).
+- **Camera-roll import** (v3.1) is the fastest logging path for the mobile persona and the only path for in-store / second-hand items — slot it after the image-storage fix (it multiplies the base64 ceiling).
 
 ---
 
@@ -241,9 +242,19 @@ business model depend on is unbuilt. Actual build order:
 
 ### v2.2 — Engaging the Web for missing details
 
+> Full design + risks + estimates: [planning/EngagingWebForProductDetails.md](./planning/EngagingWebForProductDetails.md).
+> Core idea: `brand + name` (from email) → resolve retailer PDP URL → scrape the rich blocks
+> (`[data-testid="product-description"]`, `[data-testid="materials-and-care-copy"]`, etc.) → feed the
+> **existing** `inferProductAttributes` / `resolveMaterials` pipeline. The scraper is a *text-source
+> upgrade*, not new inference code.
+
+- 🔲 Server-side fetch layer (browser CORS + Cloudflare/Akamai bot-blocking make client-side scraping impossible — **verified `403` against Aritzia 2026-06-20**); host depends on the [backend/DB decision](./planning/BACKEND_DATABASE_DECISION.md)
+- 🔲 Layered URL resolution — retailer-direct first, Google Custom Search API fallback
+- 🔲 JSON-LD-first extraction + per-retailer `data-testid` selector packs (same maintenance treadmill as the email parsers)
+- 🔲 "Find full details ✨" button on the import-review card (user-triggered, reviewable, cached)
+- 🔲 Search for item material breakdown + descriptions from retailer PDPs
 - 🔲 "Find image" flow for items imported without photos
-- 🔲 search for item material breakdown and item descriptions from retailer websites
-- 🔲 Engaging Internet Archive for older details
+- 🔲 Engaging Internet Archive for older / discontinued items
 
 ---
 
@@ -310,7 +321,8 @@ business model depend on is unbuilt. Actual build order:
 
 ### v5.1 — Backend & Database
 
-> ⚠️ The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these ✅ as "built, pending merge."
+> ⚠️ **OPEN DECISION before this ships: [Firestore vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md).**
+> The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these 🚧 as "built on the Firestore path, pending the DB decision + merge." If Supabase wins (better fit for v5 SQL analytics + v8 relational social/RLS + image storage + the v2.2 scraper backend), #44 is replaced rather than merged — decide *before* it ships.
 
 - 🚧 Firestore NoSQL database with per-user closet collection
 - 🚧 Offline-first: localStorage as cache, Firestore sync on sign-in
@@ -325,6 +337,8 @@ business model depend on is unbuilt. Actual build order:
 
 - 🔲 Trip setup form (destination type, duration, luggage size)
 - 🔲 Suggested packing checklist pulled from closet by occasion tag
+- 🔲 see closet and select items 
+- 🔲 calculate suggestions based on how many days 
 - 🔲 `usePackingList` hook
 - 🔲 Packing lists saved to Firestore
 
@@ -347,7 +361,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v8.1 — Social & Sharing
+### v8 — Social & Sharing
 
 - 🔲 "Share closet" read-only invite link
 - 🔲 "Request to borrow" button
