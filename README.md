@@ -390,7 +390,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ---
 
-### v1.0 — Monetization (Stripe)
+### v11 — Monetization (Stripe)
 
 > Distributed as a PWA — no App Store, no 30% Apple cut. Stripe takes ~2.9% + 30¢ per transaction. You keep ~97%.
 
@@ -403,6 +403,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 **Premium tier (Stripe subscription)**
 
 - Unlimited items
+- Enriched Product Details surfaced from deep internet research
 - Gmail import
 - Firestore cloud sync + multi-device access
 - AI camera roll import (v2.1)
