@@ -21,27 +21,24 @@ import { OnboardingExpanded } from "./Features/Onboarding/OnboardingSteps";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
+		imageURL: "",
+		name: "",
+		category: "",
+		color: "",
+		size: "",
+		brand: "",
+		price: "",
+		material: [],
+		occasion: "",
+		age: "",
+		condition: "new",
+		care: "",
+		onSale: false,
+		notes: "",
+		// Spread carries all prefilled fields including `style` and any future
+		// ClothingItem properties — nothing is silently dropped by enumeration.
+		...prefilled,
 		id: prefilled.id || crypto.randomUUID(),
-		imageURL: prefilled.imageURL ?? "",
-		name: prefilled.name ?? "",
-		category: prefilled.category ?? "",
-		color: prefilled.color ?? "",
-		size: prefilled.size ?? "",
-		brand: prefilled.brand ?? "",
-		price: prefilled.price ?? "",
-		material: prefilled.material ?? [],
-		occasion: prefilled.occasion ?? "",
-		age: prefilled.age ?? "",
-		condition: prefilled.condition ?? "new",
-		// Carry the email's purchase date through — earlier this was dropped by the
-		// explicit literal, so imported items lost their factual age and showed "new".
-		purchaseDate: prefilled.purchaseDate,
-		care: prefilled.care ?? "",
-		onSale: prefilled.onSale ?? false,
-		notes: prefilled.notes ?? "",
-		// Inferred style attributes (neckline, fit, etc.) from email import — carry
-		// them through so CardDetails can show the Style/Features sections.
-		style: prefilled.style,
 	};
 }
 
@@ -153,7 +150,7 @@ function AppShell() {
 		return <OnboardingExpanded onComplete={handleComplete} />;
 	}
 	return (
-		<div className="main">
+		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>
 			<NavBar
 				onAddItem={handleAddItem}
 				onExportCloset={handleExportCloset}

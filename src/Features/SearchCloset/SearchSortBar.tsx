@@ -1,5 +1,6 @@
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Search, X } from "lucide-react";
 import { SortKey, SORT_LABELS } from "../../hooks/useClosetSort";
+import { useSearch } from "../../context/SearchContext";
 import "./EntireCloset.css";
 
 interface SearchSortBarProps {
@@ -29,10 +30,29 @@ const SearchSortBar = ({
 	onToggleFilters,
 	activeFilterCount,
 }: SearchSortBarProps) => {
+	const { searchQuery, setSearchQuery } = useSearch();
+
 	return (
 		<div className="search-sort-bar">
-			{/* Search lives in the NavBar (single source of truth) — this row
-			    only carries the filter toggle and sort control. */}
+			{/* Search — reads/writes the shared SearchContext, so it stays the single
+			    source of truth even though it now lives on the same row as the filter
+			    and sort controls. */}
+			<div className="search-sort-bar__search-wrap">
+				<Search size={16} className="search-sort-bar__icon" />
+				<input
+					type="text"
+					className="search-sort-bar__input"
+					placeholder="Search items, brands, colors..."
+					aria-label="Search closet"
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+				/>
+				{searchQuery && (
+					<button className="search-sort-bar__clear-btn" aria-label="Clear search" onClick={() => setSearchQuery("")}>
+						<X size={14} />
+					</button>
+				)}
+			</div>
 
 			{/* Filter toggle */}
 			<button

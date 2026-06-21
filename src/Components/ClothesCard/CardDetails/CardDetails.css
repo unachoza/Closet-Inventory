@@ -1,6 +1,6 @@
 /* Main container */
 .card-details {
-	background: linear-gradient(180deg, #78acbf 0%, #678385 100%);
+	background: var(--bg-surface-primary);
 	border-radius: 12px;
 	width: 100%;
 	height: 100%;
@@ -54,13 +54,13 @@
 	justify-content: center;
 	position: absolute;
 	top: .5rem;
-      right: .5rem;
+	right: .5rem;
 	width: 24px;
 	height: 24px;
 	border-radius: 50%;
-	border: 1px solid rgba(42, 48, 45, 0.9);
-	background: rgba(42, 48, 45, 0.5);
-	color: var(--White);
+	border: 1px solid var(--border-strong);
+	background: var(--bg-surface-secondary);
+	color: var(--text-primary);
 	font-size: 11px;
 	cursor: pointer;
 	line-height: 1;
@@ -69,13 +69,13 @@
 }
 
 .card-details__close:hover {
-	background: rgba(42, 48, 45, 0.7);
+	background: var(--border-hairline);
 }
 
 .card-details__name {
 	font-size: 22px;
 	font-weight: 700;
-	color: var(--Dark-Grey);
+	color: var(--text-primary);
 	line-height: 1.2;
 	margin: 0 0 3px 0;
 	text-align: left;
@@ -83,13 +83,13 @@
 
 .card-details__brand {
 	font-size: 12px;
-	color: var(--Op-Black);
+	color: var(--text-secondary);
 	margin: 0px;
 	text-align: left;
 	text-transform: capitalize;
 }
 
-/* Translucent grey pills with a defining border — category / size / care / occasion / .pill / .tag */
+/* Pills with hairline border — category / size / care / occasion / .pill / .tag */
 .card-details__category-tag,
 .card-details__size-pill,
 .card-details__care-pill,
@@ -102,9 +102,9 @@
 	padding: 4px 10px;
 	font-size: 11px;
 	font-weight: 500;
-	color: var(--White);
-	background: rgba(42, 48, 45, 0.45);
-	border: 1px solid rgba(42, 48, 45, 0.9);
+	color: var(--text-secondary);
+	background: var(--bg-surface-secondary);
+	border: 1px solid var(--border-hairline);
 	border-radius: 5px;
 	white-space: nowrap;
 	text-transform: capitalize;
@@ -125,7 +125,7 @@
 /* Divider */
 .card-details__divider {
 	height: 1px;
-	background: rgba(0, 0, 0, 0.18);
+	background: var(--border-hairline);
 }
 
 /* Color + Size row */
@@ -145,19 +145,18 @@
 	height: 11px;
 	border-radius: 50%;
 	background: #b2b2bc;
-	border: 1.5px solid var(--Dark-Grey);
+	border: 1.5px solid var(--border-strong);
 	flex-shrink: 0;
 }
 
 .card-details__color-name {
 	font-size: 13px;
-	color: var(--Dark-Grey);
+	color: var(--text-primary);
 	font-weight: 500;
 	text-transform: capitalize;
 }
 
 /* Composition section */
-/* Composition — the bar + dot legend are rendered by <MaterialCompositionBar>. */
 .card-details__composition {
 	display: flex;
 	flex-direction: column;
@@ -186,7 +185,7 @@
 .card-details__section-title-label {
 	font-size: 10px;
 	font-weight: 700;
-	color: var(--Dark-Grey);
+	color: var(--text-muted);
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
 	flex-shrink: 0;
@@ -195,7 +194,7 @@
 .card-details__section-title-divider {
 	flex: 1;
 	height: 1px;
-	background: rgba(0, 0, 0, 0.18);
+	background: var(--border-hairline);
 }
 
 /* Expanded section */
@@ -213,7 +212,7 @@
 
 .card-details__identity-text {
 	font-size: 12px;
-	color: var(--Op-Black);
+	color: var(--text-primary);
 	line-height: 2;
 	margin: 0;
 	text-align: left;
@@ -228,7 +227,7 @@
 
 .card-details__notes-text {
 	font-size: 11px;
-	color: var(--Op-Black);
+	color: var(--text-secondary);
 	line-height: 1.65;
 	margin: 0;
 	font-style: italic;
@@ -238,10 +237,10 @@
 /* Buttons section */
 .card-details__buttons {
 	display: flex;
-   	gap: 15px;
+	gap: 15px;
 }
 
-.card-details__buttons > button{
+.card-details__buttons > button {
 	margin: 0;
 }
 
@@ -249,9 +248,9 @@
 	flex: 1;
 	padding: 9px 12px;
 	border-radius: 8px;
-	border: 1.5px solid var(--Dark-Grey);
-	background: rgba(42, 48, 45, 0.5);
-	color: var(--White);
+	border: 1px solid var(--border-strong);
+	background: var(--bg-surface-secondary);
+	color: var(--text-primary);
 	font-size: 12px;
 	font-weight: 600;
 	cursor: pointer;
@@ -260,40 +259,40 @@
 }
 
 .card-details__button:hover {
-	background: rgba(42, 48, 45, 0.68);
+	background: var(--border-hairline);
 }
 
 .card-details__button--remove {
-	border-color: rgba(150, 40, 40, 0.9);
-	background: rgba(150, 40, 40, 0.7);
-	color: var(--White);
+	border-color: var(--primitive-status-error-crimson);
+	background: color-mix(in srgb, var(--primitive-status-error-crimson) 70%, transparent);
+	color: #fff;
 	font-weight: 600;
 }
 
 .card-details__button--remove:hover {
-	background: rgba(150, 40, 40, 0.66);
+	background: color-mix(in srgb, var(--primitive-status-error-crimson) 60%, transparent);
 }
 
 .card-details__button--cancel {
-	border-color: var(--Dark-Grey);
+	border-color: var(--border-strong);
 	background: transparent;
-	color: var(--Dark-Grey);
+	color: var(--text-primary);
 	font-weight: 500;
 }
 
 .card-details__button--cancel:hover {
-	background: rgba(0, 0, 0, 0.08);
+	background: var(--bg-surface-secondary);
 }
 
 .card-details__button--confirm {
-	border-color: rgba(150, 40, 40, 0.95);
-	background: rgba(150, 40, 40, 0.6);
-	color: var(--White);
+	border-color: var(--status-error);
+	background: color-mix(in srgb, var(--status-error) 60%, transparent);
+	color: #fff;
 	font-weight: 700;
 }
 
 .card-details__button--confirm:hover {
-	background: rgba(150, 40, 40, 0.75);
+	background: color-mix(in srgb, var(--status-error) 75%, transparent);
 }
 
 /* Confirm section */
@@ -308,7 +307,7 @@
 	margin: 0;
 	text-align: center;
 	font-size: 12px;
-	color: var(--Dark-Grey);
+	color: var(--text-primary);
 	font-weight: 500;
 }
 
@@ -317,27 +316,41 @@
 	width: 100%;
 	padding: 11px 16px;
 	border-radius: 8px;
-	border: 1.5px solid var(--Dark-Grey);
-	background: rgba(42, 48, 45, 0.5);
-	color: var(--White);
+	border: 1px solid var(--border-brand);
+	background: var(--bg-surface-brand);
+	color: var(--text-on-brand);
 	font-size: 13px;
 	font-weight: 600;
 	cursor: pointer;
 	font-family: inherit;
 	transition: all 0.2s ease;
 	margin: 0;
+	justify-content: center;
 }
 
 .card-details__toggle-details:hover {
-	background: rgba(42, 48, 45, 0.68);
+	background: var(--primitive-brand-deep-umber);
+	border-color: var(--primitive-brand-deep-umber);
 }
 
 @media (max-width: 480px) {
   .card-details__close {
-   top: 0;
-   right: 0;
+    top: 0;
+    right: 0;
   }
   .card-details__name {
-font-size: 1.1rem;
+    font-size: 1.05rem;
+  }
+  .card-details__scrollable {
+    padding: 14px;
+  }
+  .card-details__toggle-details {
+    padding: 9px 18px;
+  }
+  .card-details__footer {
+    padding: 5px 10px 10px;
+  }
+  .card-details__name {
+    width: calc(var(--card-width) - 10px);
   }
 }

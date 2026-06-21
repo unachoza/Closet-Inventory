@@ -161,10 +161,7 @@ describe("real emails > Anthropologie ($-prefixed prices)", () => {
 
 	it("detects both items with clean fields", () => {
 		expect(products).toHaveLength(2);
-		expect(products.map((p) => p.name)).toEqual([
-			"Neha Seamless Ruffled Briefs",
-			"Waverly High-Waisted Briefs",
-		]);
+		expect(products.map((p) => p.name)).toEqual(["Neha Seamless Ruffled Briefs", "Waverly High-Waisted Briefs"]);
 	});
 
 	it("emits a concrete color (so UI image-color detection won't guess)", () => {
@@ -228,10 +225,7 @@ describe("real emails > SKIMS (Shopify notification)", () => {
 	});
 
 	it("strips the '× N' quantity and '| COLOR' suffix from the name", () => {
-		expect(products.map((p) => p.name)).toEqual([
-			"FITS EVERYBODY HIGH WAISTED THONG",
-			"SUMMER MESH MID WAIST THONG",
-		]);
+		expect(products.map((p) => p.name)).toEqual(["FITS EVERYBODY HIGH WAISTED THONG", "SUMMER MESH MID WAIST THONG"]);
 	});
 
 	it("parses color and size from the variant line", () => {
@@ -260,12 +254,7 @@ describe("real emails > Old Navy (POS receipt)", () => {
 
 	it("detects the 4 purchased items and excludes the bag fee", () => {
 		expect(products).toHaveLength(4);
-		expect(products.map((p) => p.name)).toEqual([
-			"Cozy Crew Socks",
-			"Cozy Crew Socks",
-			"Low-Cut Socks 4-Pack",
-			"Crew-Socks 4-Pack",
-		]);
+		expect(products.map((p) => p.name)).toEqual(["Cozy Crew Socks", "Cozy Crew Socks", "Low-Cut Socks 4-Pack", "Crew-Socks 4-Pack"]);
 	});
 
 	it("reads the net (post-discount) price, not the original", () => {
@@ -273,12 +262,7 @@ describe("real emails > Old Navy (POS receipt)", () => {
 	});
 
 	it("captures the register SKU as the item number", () => {
-		expect(products.map((p) => p.itemNumber)).toEqual([
-			"608308-151-0000",
-			"608308-121-0000",
-			"209795-021-0000",
-			"209788-021-0000",
-		]);
+		expect(products.map((p) => p.itemNumber)).toEqual(["608308-151-0000", "608308-121-0000", "209795-021-0000", "209788-021-0000"]);
 	});
 
 	it("flags every item on sale (original unit price exceeds net)", () => {
@@ -337,7 +321,7 @@ describe("enrichment > brand falls back to the email sender", () => {
 	});
 });
 
-describe("enrichment > socks/underwear/lingerie default to everyday occasion", () => {
+describe("enrichment > socks/underwear/intimates default to everyday occasion", () => {
 	it("defaults socks to everyday", () => {
 		const data = parseEmailToFormData("Cozy Crew Socks", "<p>Cozy Crew Socks</p>", "Old Navy <orders@oldnavy.com>");
 		expect(data.occasion).toBe("everyday");

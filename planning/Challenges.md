@@ -1,4 +1,6 @@
-### challenges
+### challenges - Written 2026-06-7
+
+decisions about databases and role level security and relational and sql vs firestore. decided on relational tables being very important, and supabase being the way to go 
 
 React Race conditions, closing form and returning to overview before addItem posted to localStorage
 https://framermotion.framer.website/documentation/introduction
@@ -13,7 +15,7 @@ lots of form inputs re renders use memo for performance
 Resize Observer
 https://medium.com/@chamaraS/resizeobserver-for-react-developers-a91df3608944
 
-Temu anti email scrapping pattern 
+Temu anti email scrapping pattern
 Because the product data is baked into an image (not HTML elements), no DOM parser can extract individual items from this email format. This is a deliberate anti-scraping pattern Temu uses.
 
 //CSS organization
@@ -53,53 +55,54 @@ text-align: center;
 cursor: pointer;
 }
 
-
 Inner Soft Shadow Effect
 https://www.codementor.io/@zara-z/how-to-make-an-inner-shadow-effect-with-css-1odkuw71cl
 box-shadow: inset 6px 6px 10px 0 rgb(0,0,0, .5), inset -6px -6px 10px 0 rgb(255,255,255, .5)
 
-
 ////////////Playwrite config
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+/\*\*
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
-export default defineConfig({
+- Read environment variables from file.
+- https://github.com/motdotla/dotenv
+  \*/
+  // import dotenv from 'dotenv';
+  // import path from 'path';
+  // dotenv.config({ path: path.resolve(\_\_dirname, '.env') });
+
+/\*\*
+
+- See https://playwright.dev/docs/test-configuration.
+  _/
+  export default defineConfig({
   testDir: './tests',
-  /* Run tests in files in parallel */
+  /_ Run tests in files in parallel _/
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  /_ Fail the build on CI if you accidentally left test.only in the source code. _/
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
+  /_ Retry on CI only _/
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
+  /_ Opt out of parallel tests on CI. _/
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  /_ Reporter to use. See https://playwright.dev/docs/test-reporters _/
   reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  /_ Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. _/
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
+  /_ Base URL to use in actions like `await page.goto('')`. \*/
+  // baseURL: 'http://localhost:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-  },
+            /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+            trace: 'on-first-retry',
 
-  /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+     },
+
+/_ Configure projects for major browsers _/
+projects: [
+{
+name: 'chromium',
+use: { ...devices['Desktop Chrome'] },
+},
 
     {
       name: 'firefox',
@@ -130,44 +133,36 @@ export default defineConfig({
     //   name: 'Google Chrome',
     //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
     // },
-  ],
 
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+],
+
+/_ Run your local dev server before starting the tests _/
+// webServer: {
+// command: 'npm run start',
+// url: 'http://localhost:3000',
+// reuseExistingServer: !process.env.CI,
+// },
 });
-
-
-
 
 /////////////playwrite.yml
 name: Playwright Tests
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+push:
+branches: [ main, master ]
+pull_request:
+branches: [ main, master ]
 jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+test:
+timeout-minutes: 60
+runs-on: ubuntu-latest
+steps: - uses: actions/checkout@v4 - uses: actions/setup-node@v4
+with:
+node-version: lts/\* - name: Install dependencies
+run: npm ci - name: Install Playwright Browsers
+run: npx playwright install --with-deps - name: Run Playwright tests
+run: npx playwright test - uses: actions/upload-artifact@v4
+if: ${{ !cancelled() }}
+with:
+name: playwright-report
+path: playwright-report/
+retention-days: 30

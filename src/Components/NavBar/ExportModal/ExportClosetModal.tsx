@@ -31,14 +31,14 @@ export default function ExportClosetModal({ isOpen, itemCount, onConfirm, onCanc
 			isOpen={isOpen}
 			onClose={onCancel}
 			title="Download Your Closet"
-			maxWidth={420}
+			maxWidth={430}
 			footer={
 				<>
-					<button className="ecm-btn ecm-btn--confirm" onClick={() => onConfirm(format)} type="button">
-						{confirmLabel}
-					</button>
 					<button className="ecm-btn ecm-btn--cancel" onClick={onCancel} type="button">
 						Cancel
+					</button>
+					<button className="ecm-btn ecm-btn--confirm" onClick={() => onConfirm(format)} type="button">
+						{confirmLabel}
 					</button>
 				</>
 			}

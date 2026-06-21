@@ -12,16 +12,16 @@ export const options: Option[] = [
 	{ value: "dresses", label: "Dresses" },
 	{ value: "coats", label: "Coats" },
 	{ value: "sweaters", label: "Sweaters" },
-	{ value: "lingerie", label: "Lingerie" },
+	{ value: "intimates", label: "Intimates" },
 	{ value: "socks", label: "Socks" },
 	{ value: "underwear", label: "Underwear" },
 ];
 
 //Fibers
 export const materials = {
-	natural: ["wool", "linen", "cotton", "silk", "hemp", "cashmere", "bamboo", "ramie", "leather", "suede"], 
-	semiSynthetic: ["rayon", "viscos", "modal", "lyocell","tencel"],
+	natural: ["wool", "linen", "cotton", "silk", "hemp", "cashmere", "bamboo", "ramie", "leather", "suede"],
+	semiSynthetic: ["rayon", "viscos", "modal", "lyocell", "tencel"],
 	//viscos and rayon when wet weaken
 	//modal and tencel -> Lenzing closed loop?
-	synthetic: ["polyester", "acrylic", "nylon", "spandex"]
-}
+	synthetic: ["polyester", "acrylic", "nylon", "spandex"],
+};

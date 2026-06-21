@@ -1,26 +1,32 @@
 .ecm-description {
 	margin: 0 0 var(--spacing-200, 1rem);
-	color: var(--Lightest-Grey, #bcbcbc);
+	color: var(--contrast-muted-white-against-grey-backdrop);
 	font-size: 0.9rem;
 	line-height: 1.5;
 	text-align: left;
+}
+
+.ecm-count-badge-container{
+	display: flex;
+    	justify-content: center;
+    	gap: 5px;
 }
 
 .ecm-count-badge {
 	display: inline-block;
 	margin-bottom: var(--spacing-200, 1rem);
 	padding: 0.3rem 0.8rem;
-	border: 1px solid rgba(99, 179, 237, 0.35);
+	border: 1px solid var(--text-primary);
 	border-radius: var(--border-radius-ty, 4px);
-	background: rgba(99, 179, 237, 0.15);
-	color: #93c5fd;
+	background: var(--pill-backdrop-pastel-terrocata);
+	color: var(--primitive-brand-deep-umber);
 	font-size: 0.82rem;
 	font-weight: 500;
 }
 
 .ecm-section-label {
 	margin: 0 0 var(--spacing-100, 0.5rem);
-	color: var(--Op-Light-Grey, #aaa);
+	color: var(--contrast-muted-white-against-grey-backdrop);
 	font-size: 0.75rem;
 	font-weight: 500;
 	text-transform: uppercase;
@@ -32,7 +38,7 @@
 	flex-direction: column;
 	margin: 0;
 	padding: var(--spacing-100, 0.5rem) var(--spacing-200, 1rem);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: var(--border-radius-ty, 4px);
 	background: rgba(255, 255, 255, 0.04);
 	gap: 6px;
@@ -43,7 +49,7 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	color: var(--White, #fff);
+	color: var(--contrast-white-against-grey-backdrop);
 	font-size: 0.85rem;
 }
 
@@ -52,7 +58,8 @@
 	width: 5px;
 	height: 5px;
 	border-radius: 50%;
-	background: #93c5fd;
+	/* background: var(--primitive-brand-muted-clay); */
+	background: var(--primitive-brand-deep-umber);
 	content: "";
 }
 
@@ -64,6 +71,8 @@
 	border-radius: var(--border-radius-ty, 4px);
 	font-size: 0.85rem;
 	font-weight: 500;
+	width: 100%;
+    	justify-content: center;
 	cursor: pointer;
 	transition: filter 0.15s ease;
 }
@@ -73,15 +82,16 @@
 }
 
 .ecm-btn--confirm {
-	background: var(--button-backround-blue, #2563eb);
-	color: var(--White, #fff);
+	background: var(--button-backround-blue, var(--primitive-brand-deep-umber));
+	color: var(--text-on-brand, #fff);
 }
 
 .ecm-btn--cancel {
 	background: transparent;
-	color: var(--Medium-Grey, #888);
+	color: var(--text-on-brand);
 }
 
 .ecm-btn--cancel:hover {
-	color: var(--White, #fff);
+	color: var(--text-on-brand);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 }

@@ -1,0 +1,112 @@
+# Strategy Review — Repo Health, Strengths/Weaknesses & What's Next - Written 2026-06-20
+
+> **Date:** 2026-06-20 &nbsp;·&nbsp; **Audience:** personal strategy notes (polished, but for me).
+> Companion to [README.md](../README.md) roadmap, [FORWARD_PLAN.md](./FORWARD_PLAN.md),
+> [BACKEND_DATABASE_DECISION.md](./BACKEND_DATABASE_DECISION.md),
+> [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md), [TESTING_ROADMAP.md](./TESTING_ROADMAP.md).
+> Re-read the date above before trusting this — it goes stale as the code moves.
+
+---
+
+## Snapshot (as of 2026-06-20)
+
+- `main` is **localStorage-only**; the entire cloud layer is in open [PR #44](https://github.com/unachoza/Closet-Inventory/pull/44).
+- 74 test files; design-token system (`tokens.css`) layered over legacy `index.css`.
+- Recently merged: unified search/filter (#69), filter-drawer fixes (#70), design-principles pass (#64). Filter drawer now slides from the right (this session).
+- Rich client-side email-import + inference pipeline (multi-retailer parsers + ~8 `infer*` utils).
+
+---
+
+## Strengths (what's genuinely good)
+
+1. **The inference pipeline is the crown jewel.** `inferProductAttributes`, `inferMaterialFromName`, `resolveMaterials`, the care-inference chain — turning a thin product name into structured attributes + material blends is real, differentiated product value. It's also the leverage point for v2.2 (feed it richer text → better output, no new inference code).
+2. **Clean separation of concerns.** `utils/` (pure, testable predicates) vs `hooks/` (stateful React) vs `Features/` (composition) is disciplined. Pure functions like `hasRequiredItemInfo` make the write path defensible and unit-testable.
+3. **Design-token foundation exists.** `tokens.css` (primitive→semantic, light/dark) is the right architecture, even mid-migration off `index.css`.
+4. **Planning hygiene is unusually strong.** Dated, cross-linked planning docs that *reconcile roadmap vs. reality* (FORWARD_PLAN explicitly calls out "done in docs ≠ done on main"). This is rare and worth keeping.
+5. **Multi-retailer email parsing actually works against real fixtures** — not a toy.
+
+---
+
+## Weaknesses (what's holding it back)
+
+1. **The "done" gap.** The README marks cloud sync, monetization scaffolding, etc. as shipped-ish, but `main` is localStorage-only. Anyone (including future-me) building on a ✅ that's actually in a branch will get burned. *Mitigated* by FORWARD_PLAN's reconciliation, but the source roadmap still over-claims.
+2. **`ClothingItem` has a `[key: string]: any` index signature.** It silently hides flat-vs-nested mismatches (e.g. `style` attributes) from `tsc`. It's a deliberate footgun that has already caused real bugs (the `formData[key]` indexing error this session was a symptom of the same loose typing). Tightening this is high-leverage.
+3. **Base64-in-localStorage image ceiling** (~5MB Safari, fails silently) — a *live* limitation today, and it gets worse the instant camera import (v3.1) lands. Flagged 🔴 in MOBILE_PLAN.
+4. **Known correctness bugs with no regression tests** — material filter returns nothing, remove doesn't re-render the grid (two `useLocalCloset` instances), MonthYearPicker fabricated age. These erode trust in the core loop.
+5. **Branch sprawl.** ~30 branches, several overlapping (multiple email/* and mobile/* lines). Risk of lost work and merge conflicts (already hit one this session). Worth a prune.
+6. **CSS direction kept regressing** (filter drawer left/right flip-flopped across merges) — a symptom of the dual `index.css`/`tokens.css` layers and merge churn. The token cutover needs to finish.
+7. **Mobile is responsive but not *mobile-first*** — the product/business model depends on mobile (PWA, no App Store cut), yet bottom nav / FAB / PWA are unbuilt.
+
+---
+
+## Recommended sequence (your ranking, with the DB contradiction resolved)
+
+You ranked: **(1) known bugs → (2) merge cloud DB → (3) mobile + PWA → (4) v2.2 web-engagement.**
+That order is sound. One fix: **#2 is gated by the [DB decision](./BACKEND_DATABASE_DECISION.md)** — "merge cloud DB" only means "merge #44" *if Firestore wins*. Decide first, then execute.
+
+Estimates are **ideal dev-days** (focused, uninterrupted). Real calendar time runs longer.
+
+### Priority 1 — Known bugs + green suite *(trust the core loop)*
+> Small, high-confidence, each shippable alone. Do these first; they make everything after trustworthy.
+
+| Task | Est. |
+|---|---|
+| Strip debug `console.log`s, get suite fully green (precondition) | 0.5 |
+| **Material filter returns nothing** — extract `MaterialBlend` names before compare; + regression test | 0.5 |
+| **Remove doesn't re-render grid** — route removal through shared `ClosetContext` instead of a 2nd `useLocalCloset`; + test | 1 |
+| **MonthYearPicker fabricated age** — verify commit-to-`purchaseDate` across edit/create; + test | 1 |
+| **Import-non-clothing** — skip items that can't map to a category (big for Amazon); + test | 1 |
+| **Title-case CAPS** (Zara/Aritzia/Shein) cleanup | 0.5 |
+| **Tighten `ClothingItem` typing** — remove/narrow the `[key: string]: any` footgun | 1–1.5 |
+| **Subtotal** | **~5.5–6 days** |
+
+### Priority 2 — Stand up the cloud layer *(gated by DB decision)*
+> **Resolve [BACKEND_DATABASE_DECISION.md](./BACKEND_DATABASE_DECISION.md) first.**
+
+| Task | Est. |
+|---|---|
+| Make the call: merge Firestore #44, or pivot to Supabase | decision, not days |
+| *If Firestore:* rebase #44, resolve conflicts, QA seed/sync, ship | 1–2 |
+| *If Supabase:* schema + RLS + auth/Gmail-token re-wire + port `useCloudCloset` | 5–8 |
+| **Image storage: base64 → object storage** (do alongside, before camera import) | 1.5–2.5 |
+| **Subtotal** | **~2.5–10.5 days** (path-dependent) |
+
+### Priority 3 — Mobile + PWA *(the business model's load-bearing layer)*
+| Task | Est. |
+|---|---|
+| Touch-target audit (44×44px) | 1 |
+| Bottom nav + "Add Item" FAB (primary action out of the hamburger) | 2–3 |
+| PWA scaffolding — `vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons | 2–3 |
+| Offline support via SW cache (pairs with offline-first DB) | 1.5 |
+| **Decoupled early win:** `wornCount` field + "Log a Wear" button (unblocks v5/v7/v8) | 1 |
+| **Subtotal** | **~7.5–9.5 days** |
+
+### Priority 4 — v2.2 Web-engagement *(quality upgrade, gated on DB)*
+> Full plan + risks in [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md). Do the **Phase-0 feasibility spike** before committing — Cloudflare bot-blocking (verified against Aritzia today) is the swing variable.
+
+| Phase | Est. |
+|---|---|
+| Feasibility spike (Tier-C scraping API returns rendered DOM) | 1–1.5 |
+| Backend `/enrich` + URL resolver + cache | 3–4 |
+| Extraction (JSON-LD-first + 2 retailer packs) | 2–3 |
+| Client integration + review UX | 2–3 |
+| Hardening + more retailer packs | 2–3 |
+| **Subtotal** | **~10–14.5 days** |
+
+---
+
+## Quick wins to slot between the big rocks *(palate cleansers)*
+
+From [QUICK_WINS.md](./QUICK_WINS.md) / [FORWARD_PLAN.md](./FORWARD_PLAN.md) — small, close to existing architecture:
+
+- 🟢 Sort by real `purchaseDate` (~0.25d) — `useClosetSort` still fakes age via condition labels.
+- 🟢 "Dry clean only" quick-filter pill (~0.25d) — `care` already indexed.
+- 🟡 Stats strip (`useClosetStats`, in-memory) — total items / spend / avg (~1d, no chart lib).
+- 🟠 Finish the `index.css` → `tokens.css` cutover (stops CSS-direction regressions) (~2–3d, ongoing).
+- 🧹 Prune dead branches (~0.5d) — reduce the ~30-branch sprawl.
+
+---
+
+## One-paragraph "what should I actually do Monday"
+
+Decide the [database question](./BACKEND_DATABASE_DECISION.md) on paper (it gates priorities 2 and 4 and shouldn't wait). Then spend the first focused block on **Priority 1** — strip logs, green the suite, and land the four known-bug fixes *with regression tests*, because they're cheap and they make the core loop trustworthy. Tighten `ClothingItem`'s typing while you're in there. Only then move to the cloud layer per your DB call. Keep v2.2 parked until after a 1-day feasibility spike proves the scraping path actually returns data past Cloudflare — don't let the most interesting feature jump its priority.

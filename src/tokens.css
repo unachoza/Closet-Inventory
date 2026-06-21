@@ -1,0 +1,316 @@
+/* //Colors// */
+
+├── Brand Terracotta (Focal / 10%)
+│   ├── #b28675 (Rose Terracotta)
+│   ├── #ab7a68 (Muted Clay)
+│   └── #8f6256 (Deep Umber)
+│
+├── Deep Neutrals (Structure & Typography / 30%)
+│   ├── #492f28 (Espresso Marron)
+│   ├── #675647 (Warm Walnut)
+│   └── #847057 (Classic Taupe)
+│
+├── Light Neutrals (Editorial Canvas / 60%) [Added for completeness]
+│   ├── #faf8f5 (Alabaster Linen)
+│   └── #f3eee7 (Soft Sand)
+
+
+/* //Semantic Tokens// */
+These tokens map the raw colors to their actual utility across your user interface.
+🏛️ Surface Tokens (Backgrounds)
+bg-canvas: #faf8f5 (The main editorial backdrop; clean, high-end, gallery-like)
+bg-surface-primary: #ffffff (Card containers, analytical data blocks)
+bg-surface-secondary: #f3eee7 (Table headers, sidebar navigation, subtle separation)
+bg-surface-brand: #b28675 (Primary action items, luxe highlights)
+bg-surface-dark: #492f28 (High-contrast footer or premium interactive zones)
+
+✍️ Text & Typography Tokens
+text-primary: #492f28 (Editorial headers, high-density body text, maximum legibility)
+text-secondary: #675647 (Subheadings, captions, secondary analytical labels)
+text-muted: #847057 (Form placeholders, disabled states, metadata)
+text-on-brand: #ffffff (Crisp contrast on terracotta buttons)
+text-link: #8f6256 (Sophisticated, non-blue interactive links)
+
+📐 Border & Stroke Tokens
+border-hairline: #847057 with 20% opacity (Fine, sharp lines separating layout grids)
+border-strong: #675647 (Input fields, active UI boundaries)
+border-brand: #ab7a68 (Focus indicators, premium components)
+
+
+
+:root {
+      /* Colors */
+      --Black: #000000;
+      --White: #FFFFFF;
+    
+      --Grey-950: #111517;
+      --Grey-400: #808080;
+      --Grey-350: #979797;
+      --Grey-300: #B2B2B2;
+      --Grey-250: #C4C4C4;
+      --Grey-50: #FCFCFC;
+
+      --Primary-Pink:       #b28675;
+      --Primary-Pink-Muted: #ab7a68;
+      --Primary-Pink-Darker: #8f6256;
+
+      --Secondary-Marron: #492f28;
+
+      --Third-Brown: #675647;
+      --Fourth-Brown: #847057;
+    
+      --Blue-950: #202C36;
+      --Blue-900: #2B3844;
+ 
+    
+      /* Typography */
+
+      /* Spacing */
+      --spacing-50: .25rem;
+      --spacing-100: .5rem;
+      --spacing-200: 1rem;
+      --spacing-300: 1.5rem;
+      --spacing-400: 2rem;
+      --spacing-500: 2.5rem;
+      --spacing-600: 3rem;
+      --spacing-700: 3.5rem;
+      --spacing-800: 4rem;
+      --spacing-900: 4.5rem;
+      --spacing-1000: 5rem;
+      --spacing-1100: 5.25rem;
+    }
+
+
+
+    /* ==========================================================================
+   DESIGN SYSTEM PROPERTY CUSTOM VARIABLES (CSS VARIABLES)
+   Theme: Editorial, Calm, Luxe, Analytical
+   ========================================================================== */
+
+:root {
+  /* ------------------------------------------------------------------------
+     1. PRIMITIVE TOKENS (Raw Core Values)
+     ------------------------------------------------------------------------ */
+  
+  /* Brand Terracotta & Clays */
+  --primitive-brand-rose-terracotta: #b28675;
+  --primitive-brand-muted-clay: #ab7a68;
+  /* #987264 */
+  --primitive-brand-deep-umber: #8f6256;
+
+  /* Deep Neutrals (Dark Theme Bases & Light Theme Typography) */
+  --primitive-neutral-dark-espresso: #492f28;
+  --primitive-neutral-dark-walnut: #675647;
+  --primitive-neutral-dark-taupe: #847057;
+  --primitive-neutral-dark-ink-espresso: #231612;
+  --primitive-neutral-dark-warm-charcoal: #2f1e19;
+  --primitive-neutral-dark-roasted-brown: #3d2822;
+  --Modal-dark-grey-light-red-background: #7b7777;
+
+  /* Light Neutrals (Light Theme Bases & Dark Theme Typography) */
+  --primitive-neutral-light-alabaster: #faf8f5;
+  --primitive-neutral-light-sand: #f3eee7;
+  --primitive-neutral-light-white: #ffffff;
+  --contrast-white-against-grey-backdrop: #fff7f7;
+  --contrast-muted-white-against-grey-backdrop: #efe7e7;
+  --pill-backdrop-pastel-terrocata: rgb(239 211 200 / 71%);
+
+  /* Desaturated Luxe Status Colors */
+  --primitive-status-success-sage: #6e7a68;
+  --primitive-status-error-crimson: #964b43;
+  --primitive-status-warning-ochre: #ba9259;
+  --primitive-status-info-slate: #5a6b7c;
+
+  /* Action Colors */
+  --Brand-hover-highlight: #b2867552;
+  --Light-hover-highlight: #f3eee7;
+
+
+  /* Typography Attributes */
+  --primitive-font-family-serif: "Lora", serif;
+  --primitive-font-family-sans: "DM Sans", sans-serif;
+  
+  --primitive-font-size-xs: 12px;
+  --primitive-font-size-sm: 14px;
+  --primitive-font-size-base: 16px;
+  --primitive-font-size-lg: 20px;
+  --primitive-font-size-xl: 28px;
+
+  --primitive-font-weight-regular: 400;
+  --primitive-font-weight-medium: 500;
+  --primitive-font-weight-bold: 700;
+
+  --primitive-line-height-tight: 1.2;
+  --primitive-line-height-normal: 1.5;
+
+  /* Spacing Scale */
+  --primitive-spacing-xs: 4px;
+  --primitive-spacing-sm: 8px;
+  --primitive-spacing-md: 16px;
+  --primitive-spacing-lg: 24px;
+  --primitive-spacing-xl: 32px;
+  --primitive-spacing-xxl: 48px;
+
+  /* Border Radii (Intentional, structured, sharp luxury feel) */
+  --primitive-radius-none: 0px;
+  --primitive-radius-sm: 5px;
+  --primitive-radius-md: 10px;
+  --primitive-radius-lg: 15px;
+
+
+  /* ------------------------------------------------------------------------
+     2. SEMANTIC TOKENS - LIGHT MODE (Default Canvas Setting)
+     ------------------------------------------------------------------------ */
+  --bg-canvas: var(--primitive-neutral-light-alabaster);
+  --bg-surface-primary: var(--primitive-neutral-light-white);
+  --bg-surface-secondary: var(--primitive-neutral-light-sand);
+  --bg-surface-brand: var(--primitive-brand-rose-terracotta);
+
+  --text-primary: var(--primitive-neutral-dark-espresso);
+  --text-secondary: var(--primitive-neutral-dark-walnut);
+  --text-muted: var(--primitive-neutral-dark-taupe);
+  --text-on-brand: var(--primitive-neutral-light-white);
+
+  --status-success: var(--primitive-status-success-sage);
+  --status-error: var(--primitive-status-error-crimson);
+  --status-warning: var(--primitive-status-warning-ochre);
+  --status-info: var(--primitive-status-info-slate);
+
+  --elevation-low: 0 2px 8px rgba(73, 47, 40, 0.04);
+  --elevation-high: 0 8px 24px rgba(73, 47, 40, 0.124);
+
+  /* Layout and Structural tokens shared between modes */
+  --layout-gap-grid: var(--primitive-spacing-lg);
+  --layout-gap-card: var(--primitive-spacing-md);
+  --layout-padding-tight: var(--primitive-spacing-sm);
+  
+  --layout-radius-card: var(--primitive-radius-md);
+  --layout-radius-button: var(--primitive-radius-sm);
+  --layout-radius-sharp: var(--primitive-radius-none);
+}
+
+
+/* ------------------------------------------------------------------------
+   3. SEMANTIC TOKENS - DARK MODE OPT-IN
+   Activated via user system preference OR a data-theme attribute on root
+   ------------------------------------------------------------------------ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-canvas: var(--primitive-neutral-dark-ink-espresso);
+    --bg-surface-primary: var(--primitive-neutral-dark-warm-charcoal);
+    --bg-surface-secondary: var(--primitive-neutral-dark-roasted-brown);
+    --bg-surface-brand: var(--primitive-brand-rose-terracotta);
+
+    --text-primary: var(--primitive-neutral-light-sand);
+    --text-secondary: var(--primitive-brand-muted-clay);
+    --text-muted: var(--primitive-neutral-dark-taupe);
+    --text-on-brand: var(--primitive-neutral-light-white);
+
+    --elevation-low: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --elevation-high: 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* Explicit class-based override option for Dark Theme toggle */
+[data-theme="dark"] {
+  --bg-canvas: var(--primitive-neutral-dark-ink-espresso);
+  --bg-surface-primary: var(--primitive-neutral-dark-warm-charcoal);
+  --bg-surface-secondary: var(--primitive-neutral-dark-roasted-brown);
+  --bg-surface-brand: var(--primitive-brand-rose-terracotta);
+
+  --text-primary: var(--primitive-neutral-light-sand);
+  --text-secondary: var(--primitive-brand-muted-clay);
+  --text-muted: var(--primitive-neutral-dark-taupe);
+  --text-on-brand: var(--primitive-neutral-light-white);
+
+  --elevation-low: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --elevation-high: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ------------------------------------------------------------------------
+   4. COMPONENT & TYPOGRAPHY IMPLEMENTATION UTILITIES
+   ------------------------------------------------------------------------ */
+
+/* Text Styles */
+.editorial-header {
+  font-family: var(--primitive-font-family-serif);
+  font-size: var(--primitive-font-size-xl);
+  font-weight: var(--primitive-font-weight-bold);
+  line-height: var(--primitive-line-height-tight);
+  color: var(--text-primary);
+}
+
+.analytical-body {
+  font-family: var(--primitive-font-family-sans);
+  font-size: var(--primitive-font-size-base);
+  font-weight: var(--primitive-font-weight-regular);
+  line-height: var(--primitive-line-height-normal);
+  color: var(--text-primary);
+}
+
+.data-label {
+  font-family: var(--primitive-font-family-sans);
+  font-size: var(--primitive-font-size-sm);
+  font-weight: var(--primitive-font-weight-medium);
+  line-height: var(--primitive-line-height-tight);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* NOTE: `body`, `.card`, and other component rules intentionally do NOT live in
+   this file. Per DESIGN_SYSTEM.md, tokens.css defines tokens + theme-agnostic
+   typography utilities only — component styling lives in each feature's CSS.
+   (A generic `.card` here collided with the ClothesCard `.card`; the editorial
+   canvas background-image is set in index.css.) */
+
+/* Component rules (.btn, .panel, .field, .pill...) live in styles/primitives.css,
+   not here — tokens.css is tokens + token-utilities only. */
+
+
+/* ------------------------------------------------------------------------
+   5. GLASS CANVAS SURFACE
+   A frosted, semi-opaque surface for content that floats over the editorial
+   background image — enough opacity to keep text legible (Principle #1: Calm
+   Over Busy) while letting the closet image read through. Theme-aware.
+   ------------------------------------------------------------------------ */
+:root {
+  /* Frosted surface tint + blur. "Solid glass" = opaque enough to read on. */
+  --bg-surface-glass: rgba(250, 248, 245, 0.72); /* alabaster @ 72% */
+  --effect-blur-glass: blur(18px) saturate(115%);
+  --border-hairline: rgba(132, 112, 87, 0.22); /* taupe @ 22% */
+  /* Stronger borders for inputs / focus (semantic, used by form controls). */
+  --border-strong: var(--primitive-neutral-dark-walnut);
+  --border-brand: var(--primitive-brand-muted-clay);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-surface-glass: rgba(35, 22, 18, 0.55); /* ink-espresso @ 55% */
+    --border-hairline: rgba(243, 238, 231, 0.14);
+  }
+}
+
+[data-theme="dark"] {
+  --bg-surface-glass: rgba(35, 22, 18, 0.55);
+  --border-hairline: rgba(243, 238, 231, 0.14);
+}
+
+.glass-canvas {
+  background-color: var(--bg-surface-glass);
+  /* Vendor-prefixed first for Safari/iOS. */
+  -webkit-backdrop-filter: var(--effect-blur-glass);
+  backdrop-filter: var(--effect-blur-glass);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--layout-radius-card);
+  box-shadow: var(--elevation-high);
+}
+
+/* Progressive enhancement: if the browser can't blur, lean fully opaque so
+   text never sits on a busy photo. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-canvas {
+    background-color: var(--bg-surface-primary);
+  }
+}

@@ -25,22 +25,13 @@ const OCCASION_MAP: [RegExp, string][] = [
 	],
 
 	// Sports
-	[
-		/\b(gym|yoga|athletic|sport|workout|running|cycling|activewear|training|legging|leggings)\b/i,
-		"athleisure",
-	],
+	[/\b(gym|yoga|athletic|sport|workout|running|cycling|activewear|training|legging|leggings)\b/i, "athleisure"],
 
 	// Vacation
-	[
-		/\b(vacation|vacay|beach|resort|tropical|swim|bikini|one[- ]?piece|sarong|caftan|cover[- ]?up)\b/i,
-		"vacation",
-	],
+	[/\b(vacation|vacay|beach|resort|tropical|swim|bikini|one[- ]?piece|sarong|caftan|cover[- ]?up)\b/i, "vacation"],
 
 	// Holiday
-	[
-		/\b(christmas|festive|holiday\s*party|nye|new\s*year|thanksgiving|velvet|metallic|rhinestone)\b/i,
-		"holiday",
-	],
+	[/\b(christmas|festive|holiday\s*party|nye|new\s*year|thanksgiving|velvet|metallic|rhinestone)\b/i, "holiday"],
 
 	// Church
 	[/\b(church|sunday\s*best|sunday\s*mass)\b/i, "church"],
@@ -60,7 +51,7 @@ const OCCASION_MAP: [RegExp, string][] = [
 
 const VALID_TAGS = new Set<string>(occasionExamples);
 
-const EVERYDAY_CATEGORIES = new Set(["underwear", "lingerie", "socks"]);
+const EVERYDAY_CATEGORIES = new Set(["underwear", "intimates", "socks"]);
 
 export function inferStyleTagsFromName(name: string, category?: string): string[] {
 	const combined = `${name} ${category ?? ""}`;

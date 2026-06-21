@@ -1,5 +1,5 @@
 import { screen, render } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import CheckboxCollection from "./CheckboxCollection.tsx";
 
@@ -12,11 +12,12 @@ describe("The Checkbox Component", () => {
 				detailOptions={["red", "blue", "green"]}
 				onToggleDetail={mockToggle}
 				formData={{
-					type: "",
+					id: "test",
+					category: "tops",
 					color: "",
 					size: "",
 					brand: "",
-					material: "",
+					material: [],
 					occasion: "",
 					age: "",
 					care: "",

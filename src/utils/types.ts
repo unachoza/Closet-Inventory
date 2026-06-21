@@ -45,7 +45,7 @@ export interface ItemFormData {
 	image?: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "lingerie" | "athleisure" | "socks" | "underwear" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "underwear" | null;
 
 export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "journey" | "entireCloset";
 
@@ -70,7 +70,7 @@ export interface InputProps {
 	errorMessage?: string;
 	placeholder: string;
 	onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
-	handleFormUpdate: SetStateAction<string | any>;
+	handleFormUpdate: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string, label?: string) => void;
 	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 

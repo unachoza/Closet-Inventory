@@ -1,0 +1,244 @@
+/* =============================================================================
+   COMPONENT PRIMITIVES — canonical, reusable UI building blocks.
+   -----------------------------------------------------------------------------
+   The single source of truth for buttons, panels, fields, and pills. Adopt
+   these classes instead of re-rolling per-feature variants. Every value here
+   references a SEMANTIC or SCALE token from tokens.css — no raw hex, no
+   primitive colors. See docs/DESIGN_SYSTEM.md.
+
+   Imported after tokens.css, before feature CSS, in main.tsx.
+   ============================================================================= */
+
+/* ── BUTTONS ─────────────────────────────────────────────────────────────────
+   Base + variant. Brand primary is terracotta. Overrides the bare button{}
+   chrome from index.css. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitive-spacing-sm);
+  width: auto;
+  margin: 0;
+  padding: var(--primitive-spacing-sm) var(--primitive-spacing-md);
+  border: 1px solid transparent;
+  border-radius: var(--layout-radius-button);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--primitive-font-family-sans);
+  font-size: var(--primitive-font-size-sm);
+  font-weight: var(--primitive-font-weight-medium);
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--border-brand);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--bg-surface-brand);
+  border-color: var(--bg-surface-brand);
+  color: var(--text-on-brand);
+}
+.btn--primary:hover {
+  background: var(--primitive-brand-deep-umber);
+  border-color: var(--primitive-brand-deep-umber);
+}
+
+.btn--secondary {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+.btn--secondary:hover {
+  border-color: var(--text-primary);
+  background: var(--bg-surface-secondary);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+}
+.btn--ghost:hover {
+  background: var(--bg-surface-secondary);
+  color: var(--text-primary);
+}
+
+.btn--danger {
+  background: var(--status-error);
+  border-color: var(--status-error);
+  color: var(--text-on-brand);
+}
+.btn--danger:hover {
+  filter: brightness(0.92);
+}
+
+/* Modifiers */
+.btn--sm {
+  padding: var(--primitive-spacing-xs) var(--primitive-spacing-sm);
+  font-size: var(--primitive-font-size-xs);
+}
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+
+/* ── PANELS / CARDS ──────────────────────────────────────────────────────────
+   Generic content surface. (.card is the bespoke ClothesCard — not this.) */
+.panel {
+  padding: var(--layout-gap-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--layout-radius-card);
+  background: var(--bg-surface-primary);
+  color: var(--text-primary);
+  box-shadow: var(--elevation-low);
+}
+
+.panel--raised {
+  box-shadow: var(--elevation-high);
+}
+
+/* Floats over the closet background image (frosted). Composes .glass-canvas. */
+.panel--glass {
+  background: var(--bg-surface-glass);
+  -webkit-backdrop-filter: var(--effect-blur-glass);
+  backdrop-filter: var(--effect-blur-glass);
+  border-color: var(--border-hairline);
+  box-shadow: var(--elevation-high);
+}
+
+
+/* ── FORM FIELDS ─────────────────────────────────────────────────────────────
+   Wrap each control in .field. Focus ring is brand, never blue. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitive-spacing-xs);
+  text-align: left;
+}
+
+.label {
+  color: var(--text-secondary);
+  font-family: var(--primitive-font-family-sans);
+  font-size: var(--primitive-font-size-sm);
+  font-weight: var(--primitive-font-weight-medium);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: var(--primitive-spacing-sm) var(--primitive-spacing-md);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--layout-radius-button);
+  background: var(--bg-surface-primary);
+  color: var(--text-primary);
+  font-family: var(--primitive-font-family-sans);
+  font-size: var(--primitive-font-size-base);
+  line-height: var(--primitive-line-height-normal);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--border-brand);
+  box-shadow: 0 0 0 2px var(--border-hairline);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.field__hint {
+  color: var(--text-muted);
+  font-size: var(--primitive-font-size-xs);
+}
+
+/* Error state */
+.field--error .input,
+.field--error .select,
+.field--error .textarea {
+  border-color: var(--status-error);
+}
+.field--error .field__hint {
+  color: var(--status-error);
+}
+
+
+/* ── TAGS & PILLS ────────────────────────────────────────────────────────────
+   One chip primitive for metadata (size, category, care, occasion, features).
+   Replaces .filter-pill / .scm-pill / .ob-pill / .card-details__*-pill as files
+   migrate. */
+.pill,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitive-spacing-xs);
+  padding: var(--primitive-spacing-xs) var(--primitive-spacing-sm);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--layout-radius-button);
+  background: var(--bg-surface-secondary);
+  color: var(--text-secondary);
+  font-family: var(--primitive-font-family-sans);
+  font-size: var(--primitive-font-size-xs);
+  font-weight: var(--primitive-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: capitalize;
+}
+
+.pill--sm {
+  padding: 3px var(--primitive-spacing-xs);
+  font-size: 10px;
+}
+
+.pill--brand {
+  border-color: var(--bg-surface-brand);
+  background: var(--bg-surface-brand);
+  color: var(--text-on-brand);
+}
+.pill--success {
+  border-color: var(--status-success);
+  color: var(--status-success);
+  background: transparent;
+}
+.pill--warning {
+  border-color: var(--status-warning);
+  color: var(--status-warning);
+  background: transparent;
+}
+.pill--error {
+  border-color: var(--status-error);
+  color: var(--status-error);
+  background: transparent;
+}

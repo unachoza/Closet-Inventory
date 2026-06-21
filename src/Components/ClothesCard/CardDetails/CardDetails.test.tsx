@@ -72,24 +72,22 @@ describe("CardDetails", () => {
 	// ── Inferred style attributes (populated during email import) ──
 	const styledItem: ClothingItem = {
 		...item,
-		// Inferred attributes live on the nested `style` object (matches the
-		// import path: inferProductAttributes(...) → item.style).
-		style: {
-			neckline: "crew neck",
-			sleeveLength: "long sleeve",
-			fit: "relaxed",
-			pattern: "ribbed",
-			hasStretch: true,
-			hasPockets: true,
-			season: "fall",
-		},
 		condition: "like new",
+		style: {
+			season: "fall",
+			hasPockets: true,
+			hasStretch: true,
+			pattern: "ribbed",
+			fit: "relaxed",
+			sleeveLength: "long sleeve",
+			neckline: "crew neck",
+			hemLength: "crop",
+		},
 	};
 
 	it("full variant renders inferred Style attributes", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
-		expect(screen.getByText("Style")).toBeInTheDocument();
-		// neckline · sleeve on one line, construction descriptors on another
+		expect(screen.getByText("Style & Construction")).toBeInTheDocument();
 		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
 		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
 		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
@@ -139,7 +137,7 @@ describe("CardDetails", () => {
 	it("hides Style and Features sections when no attributes were inferred", () => {
 		render(<CardDetails item={item} variant="full" />);
 
-		expect(screen.queryByText("Style")).not.toBeInTheDocument();
+		expect(screen.queryByText("Style & Construction")).not.toBeInTheDocument();
 		expect(screen.queryByText("Features")).not.toBeInTheDocument();
 	});
 

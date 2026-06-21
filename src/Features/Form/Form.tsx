@@ -1,4 +1,4 @@
-import { useState, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
+import React, { useState, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
 import { motion } from "framer-motion";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
@@ -48,8 +48,10 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	const { addItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 
-	const toggleValue = (value: string, label: string) => {
-		setFormData((prev) => ({ ...prev, [label]: value }));
+	const toggleValue = (value: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => {
+		const str = typeof value === "string" ? value : value.target.value;
+		if (!label) return;
+		setFormData((prev) => ({ ...prev, [label]: str }));
 	};
 
 	// Capture only the purchase date — factual age is derived from it at display time

@@ -45,12 +45,8 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// inferProductAttributes — populated during email import), NOT as flat
 	// fields on the item. Deduped + joined so empty fields collapse gracefully.
 	const style = item.style;
-	// const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
-	// Only the fields the Style section actually renders gate `hasStyle`.
-	// `season` shows in Identity and `pattern` isn't rendered, so keying off the
-	// full object would render an empty "Style" header for season/pattern-only
-	// items (the ghost-section bug — see NoFeaturesGetsEmptyPill).
-	const hasStyle = !!(style?.fit || style?.neckline || style?.sleeveLength || style?.hemLength || style?.rise);
+	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
+	const hasStyle = Object.keys(otherStyles).length > 0;
 
 	// accents is `string | string[]` — normalize to an array so each accent
 	// (e.g. "buttons", "zipper") renders as its own pill, and an empty array
@@ -121,9 +117,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<div className="card-details__expanded">
 						{hasStyle && (
 							<div className="card-details__expanded-subsection">
-								<SectionTitle label="Style" />
+								<SectionTitle label="Style & Construction" />
 								{style?.fit && <p className="card-details__identity-text">Fit: {style.fit}</p>}
+								{style?.pattern && <p className="card-details__identity-text">Pattern: {style.pattern}</p>}
 								{style?.neckline && <p className="card-details__identity-text">Neckline: {style?.neckline}</p>}
+								{style?.topLength && <p className="card-details__identity-text">Length: {style?.topLength}</p>}
 								{style?.sleeveLength && <p className="card-details__identity-text">Sleeve: {style?.sleeveLength}</p>}
 								{style?.hemLength && <p className="card-details__identity-text">Hem Length: {style?.hemLength}</p>}
 								{style?.rise && <p className="card-details__identity-text">Rise: {style?.rise}</p>}
@@ -144,7 +142,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						{hasIdentity && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Identity" />
-								<div className="card-details__identity-text">
+								< div className="card-details__identity-text">
 									{purchasedLabel && (
 										<p className="card-details__identity-text">
 											Purchased {purchasedLabel}

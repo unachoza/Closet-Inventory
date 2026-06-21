@@ -9,11 +9,14 @@ export interface Option {
 
 interface DropdownProps {
 	options: Option[];
-	setFormData: Dispatch<SetStateAction<ItemFormData>>;
 	formField: string;
+	/** Standard form usage: dispatch updates into ItemFormData state. */
+	setFormData?: Dispatch<SetStateAction<ItemFormData>>;
+	/** Non-form usage (e.g. MonthYearPicker): called with the selected value string. */
+	onSelect?: (value: string) => void;
 }
 
-function DropDownSelect({ options, setFormData, formField }: DropdownProps) {
+function DropDownSelect({ options, setFormData, onSelect, formField }: DropdownProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [selected, setSelected] = useState(options[0]);
 	const dropdownRef = useRef<HTMLDivElement>(null);
@@ -21,14 +24,15 @@ function DropDownSelect({ options, setFormData, formField }: DropdownProps) {
 	const toggleDropdown = () => {
 		setIsOpen((prev) => !prev);
 	};
-	const updateForm = (key: string, newValue: string) => {
-		setFormData((prev: any) => ({ ...prev, [key]: newValue }));
-	};
 
 	const handleOptionClick = (option: Option) => {
 		setSelected(option);
 		setIsOpen(false);
-		updateForm(formField, option.value);
+		if (onSelect) {
+			onSelect(option.value);
+		} else if (setFormData) {
+			setFormData((prev: ItemFormData) => ({ ...prev, [formField]: option.value }));
+		}
 	};
 
 	// Close the dropdown when clicking outside

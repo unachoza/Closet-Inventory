@@ -26,24 +26,27 @@ export default function ImportClosetModal({
 			isOpen={isOpen}
 			onClose={onCancel}
 			title="Upload Your Closet"
-			maxWidth={420}
+			maxWidth={430}
 			footer={
 				<>
-					<button className="ecm-btn ecm-btn--confirm" onClick={onConfirm} type="button">
-						Import Closet
-					</button>
 					<button className="ecm-btn ecm-btn--cancel" onClick={onCancel} type="button">
 						Cancel
+					</button>
+					<button className="ecm-btn ecm-btn--confirm" onClick={onConfirm} type="button">
+						Import Closet
 					</button>
 				</>
 			}
 		>
 			<p className="ecm-description">Choose how you'd like to import this closet file.</p>
+			<div className="ecm-count-badge-container">
+
 			<div className="ecm-count-badge">
 				Found {importItemCount} item{importItemCount !== 1 ? "s" : ""} in this file
 			</div>
 			<div className="ecm-count-badge">
 				Current closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
+			</div>
 			</div>
 			<div className="ecm-description">
 				<label className="import-option">
