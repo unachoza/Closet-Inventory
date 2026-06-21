@@ -173,10 +173,9 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 > Re-sequenced 2026-06-20. Full reasoning + dev-day estimates in
 > [planning/STRATEGY_REVIEW_2026-06-20.md](./planning/STRATEGY_REVIEW_2026-06-20.md).
 
-1. **Known-bug cleanup + green suite** — strip debug logs, then land the trust-eroding core-loop bugs _with regression tests_: material filter returns nothing, remove doesn't re-render the grid, MonthYearPicker fabricated age, import-non-clothing skip, title-case CAPS. Cheap, high-confidence, makes everything after trustworthy. (~5.5–6 dev-days)
-2. **Stand up the cloud layer** — ⚠️ **gated by an open decision:** [Firestore (merge PR #44) vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md). Resolve that first; "merge #44" is only the answer if Firestore wins. Pair with the **base64 → object-storage** image fix. (~2.5–10.5 dev-days, path-dependent)
-3. **Mobile UI polish + PWA** — touch-target audit (44×44px), bottom nav / "Add Item" FAB (primary action out of the hamburger), and PWA scaffolding (`vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons). **Load-bearing** for monetization ("no App Store / no 30% cut"), offline-first, and add-to-home-screen. (~7.5–9.5 dev-days)
-4. **v2.2 web-engagement** — scrape richer product details from retailer PDPs to feed the existing inference pipeline. ⚠️ Do the [feasibility spike first](./planning/EngagingWebForProductDetails.md) — verified 2026-06-20 that Cloudflare bot-blocking returns `403` to plain fetches of major retailers. (~10–14.5 dev-days)
+1. **Stand up the cloud layer** — ⚠️ **gated by an open decision:** [Firestore (merge PR #44) vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md). Resolve that first; "merge #44" is only the answer if Firestore wins. Pair with the **base64 → object-storage** image fix. (~2.5–10.5 dev-days, path-dependent)
+2. **Mobile UI polish + PWA** — touch-target audit (44×44px), bottom nav / "Add Item" FAB (primary action out of the hamburger), and PWA scaffolding (`vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons). **Load-bearing** for monetization ("no App Store / no 30% cut"), offline-first, and add-to-home-screen. (~7.5–9.5 dev-days)
+3. **v2.2 web-engagement** — scrape richer product details from retailer PDPs to feed the existing inference pipeline. ⚠️ Do the [feasibility spike first](./planning/EngagingWebForProductDetails.md) — verified 2026-06-20 that Cloudflare bot-blocking returns `403` to plain fetches of major retailers. (~10–14.5 dev-days)
 
 **Cross-version dependencies:**
 
@@ -453,11 +452,3 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - 🔲 Free item limit enforced in `useCloudCloset` / `useLocalCloset`
 
 ---
-
-## 🐛 Known Bugs
-
-- \*\*Email Horizontal Scroll - some email previews don't format nicely, creating difficult to view horizontal scroll. Tried fixing with .gmail-container:has(.display-email-preview-panel){max-width: 1175px;} but didnt' work accross the board
-
-- \*\*ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
-
-- **ErrorBoundaries, error messages, user feedback, try again messages don't have adequate contrast

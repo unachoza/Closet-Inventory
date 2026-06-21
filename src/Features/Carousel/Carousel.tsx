@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { carouselCategories } from "../../utils/constants";
 import { CategoryType, CarouselProps } from "../../utils/types";
 import "./Carousel.css";
-import leftIcon from "../../assets/directions-icons/left-arrow.svg"
-import rightIcon from "../../assets/directions-icons/right-arrow.svg"
+import leftIcon from "../../assets/directions-icons/left-arrow.svg";
+import rightIcon from "../../assets/directions-icons/right-arrow.svg";
 
 const Carousel = ({ setCategory }: CarouselProps) => {
 	const [visibleIndices, setVisibleIndices] = useState([0, 1, 2]);
@@ -39,7 +39,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 			{/* Carousel */}
 			<div className="group-with-arrow-buttons">
 				<button onClick={handlePrev} className="arrow-button left" aria-label="Previous category">
-					<img src={leftIcon} alt="" className="directions-icons" />
+					<img src={leftIcon} alt="left arrow icon" className="directions-icons" />
 				</button>
 				<div className="view-three">
 					<AnimatePresence>
@@ -63,7 +63,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 													type: "spring",
 													stiffness: 200,
 													damping: 21,
-											  }
+												}
 											: { duration: 0.3 }
 									}
 									className="clothes-card"
@@ -78,7 +78,7 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 					</AnimatePresence>
 				</div>
 				<button onClick={handleNext} className="arrow-button right" aria-label="Next category">
-					<img src={rightIcon} alt="" className="directions-icons" />
+					<img src={rightIcon} alt="right arrow icon" className="directions-icons" />
 				</button>
 			</div>
 		</motion.div>
