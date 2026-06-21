@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import FilterSidePanel from "./FilterSidePanel";
 import type { FilterState, FilterOptions } from "../../hooks/useClosetFilters";
 
@@ -28,6 +30,30 @@ const baseProps = {
 	onToggle: vi.fn(),
 	onClearAll: vi.fn(),
 };
+
+// Regression: filter panel has reverted to left-side entry multiple times via
+// merge conflicts. Assert the CSS properties that control slide direction.
+describe("FilterSidePanel CSS — slide direction regression", () => {
+	const css = readFileSync(resolve(__dirname, "EntireCloset.css"), "utf8");
+
+	// Extract just the .filter-side-panel block (stops before the next rule)
+	const panelBlock = css.match(/\.filter-side-panel\s*\{([^}]*)\}/)?.[1] ?? "";
+
+	it("panel is anchored to the right edge (not left)", () => {
+		expect(panelBlock).toMatch(/right\s*:\s*0/);
+		expect(panelBlock).not.toMatch(/left\s*:\s*0/);
+	});
+
+	it("panel slides in from the right (translateX positive)", () => {
+		expect(panelBlock).toMatch(/transform\s*:\s*translateX\(100%\)/);
+		expect(panelBlock).not.toMatch(/translateX\(-100%\)/);
+	});
+
+	it("panel has border-left, not border-right", () => {
+		expect(panelBlock).toMatch(/border-left\s*:/);
+		expect(panelBlock).not.toMatch(/border-right\s*:/);
+	});
+});
 
 describe("FilterSidePanel", () => {
 	it("panel is not visible when open is false", () => {
