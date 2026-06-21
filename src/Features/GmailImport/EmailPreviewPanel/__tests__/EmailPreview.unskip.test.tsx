@@ -85,8 +85,16 @@ function renderPreview(onImportProduct = vi.fn(), onImportAllProducts = vi.fn())
 }
 
 function openSkippedDrawer() {
+	// The wrapper div has role="button" and its text includes "skipped"
 	const toggle = screen.getByRole("button", { name: /skipped/i });
 	fireEvent.click(toggle);
+}
+
+function getIncludeButtons() {
+	// Scope to the skipped list to avoid matching the wrapper role="button"
+	const list = document.querySelector(".gmail-skipped-list");
+	if (!list) return [];
+	return Array.from(list.querySelectorAll(".gmail-skipped-include-btn"));
 }
 
 // ── Tests ──────────────────────────────────────────────────────────────────
@@ -116,7 +124,7 @@ describe("EmailPreview — skipped items drawer", () => {
 	it("shows an Include button for each skipped item", () => {
 		renderPreview();
 		openSkippedDrawer();
-		expect(screen.getByRole("button", { name: /include/i })).toBeInTheDocument();
+		expect(getIncludeButtons()).toHaveLength(1);
 	});
 });
 
@@ -129,7 +137,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview();
 		openSkippedDrawer();
 
-		fireEvent.click(screen.getByRole("button", { name: /include/i }));
+		fireEvent.click(getIncludeButtons()[0]);
 
 		await waitFor(() => {
 			expect(screen.getByText(`Import ${ACCESSORY.name}`)).toBeInTheDocument();
@@ -140,7 +148,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview();
 		openSkippedDrawer();
 
-		fireEvent.click(screen.getByRole("button", { name: /include/i }));
+		fireEvent.click(getIncludeButtons()[0]);
 
 		await waitFor(() => {
 			expect(screen.queryByText(ACCESSORY.name, { selector: ".gmail-skipped-item-name" })).not.toBeInTheDocument();
@@ -151,7 +159,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview();
 		openSkippedDrawer();
 
-		fireEvent.click(screen.getByRole("button", { name: /include/i }));
+		fireEvent.click(getIncludeButtons()[0]);
 
 		await waitFor(() => {
 			expect(screen.queryByRole("button", { name: /skipped/i })).not.toBeInTheDocument();
@@ -163,7 +171,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview(onImportProduct);
 		openSkippedDrawer();
 
-		fireEvent.click(screen.getByRole("button", { name: /include/i }));
+		fireEvent.click(getIncludeButtons()[0]);
 
 		await waitFor(() => screen.getByText(`Import ${ACCESSORY.name}`));
 		fireEvent.click(screen.getByText(`Import ${ACCESSORY.name}`));
@@ -176,8 +184,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview();
 		openSkippedDrawer();
 
-		const includeButtons = screen.getAllByRole("button", { name: /include/i });
-		fireEvent.click(includeButtons[0]);
+		fireEvent.click(getIncludeButtons()[0]);
 
 		await waitFor(() => {
 			expect(screen.getByText(BELT.name)).toBeInTheDocument();
@@ -189,7 +196,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview();
 		openSkippedDrawer();
 
-		for (const btn of screen.getAllByRole("button", { name: /include/i })) {
+		for (const btn of getIncludeButtons()) {
 			fireEvent.click(btn);
 		}
 
@@ -205,7 +212,7 @@ describe("EmailPreview — unskip (Include button)", () => {
 		renderPreview(vi.fn(), onImportAllProducts);
 		openSkippedDrawer();
 
-		fireEvent.click(screen.getByRole("button", { name: /include/i }));
+		fireEvent.click(getIncludeButtons()[0]);
 
 		await waitFor(() => screen.getByRole("button", { name: /import all/i }));
 		fireEvent.click(screen.getByRole("button", { name: /import all/i }));

@@ -138,16 +138,18 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 			)}
 
 			{!imageBasedRetailer && skippedProducts.length > 0 && (
-				<div className="gmail-preview-skipped-notice">
-					<button
-						className="gmail-skipped-toggle"
-						onClick={() => setShowSkipped(!showSkipped)}
-						type="button"
-						aria-expanded={showSkipped}
-					>
+				<div
+					className={`gmail-preview-skipped-notice${showSkipped ? " is-open" : ""}`}
+					onClick={() => setShowSkipped(!showSkipped)}
+					role="button"
+					tabIndex={0}
+					aria-expanded={showSkipped}
+					onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setShowSkipped(!showSkipped)}
+				>
+					<div className="gmail-skipped-toggle">
 						<span className="gmail-skipped-chevron">{showSkipped ? "▼" : "▶"}</span>
 						{skippedProducts.length} item{skippedProducts.length !== 1 ? "s" : ""} skipped — not clothing
-					</button>
+					</div>
 					{showSkipped && (
 						<ul className="gmail-skipped-list">
 							{skippedProducts.map((product) => (
@@ -156,7 +158,7 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 									<button
 										className="gmail-skipped-include-btn"
 										type="button"
-										onClick={() => handleUnskip(product)}
+										onClick={(e) => { e.stopPropagation(); handleUnskip(product); }}
 									>
 										Include
 									</button>

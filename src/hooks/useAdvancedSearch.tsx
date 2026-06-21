@@ -19,7 +19,7 @@ export interface GmailEmailMeta {
 	readonly subject: string;
 	readonly from: string;
 	readonly date: string;
-	readonly snippet: string;
+	readonly snippet?: string;
 	readonly body?: string;
 }
 
@@ -241,8 +241,8 @@ function filterEmails(emails: GmailEmailMeta[], params: AdvancedSearchParams): G
 
 		// Body keywords filter against snippet (body is lazy-loaded)
 		if (params.bodyKeywords.length > 0) {
-			const lowerSnippet = email.snippet.toLowerCase();
-			const matchesKeyword = params.bodyKeywords.some((kw) => lowerSnippet.includes(kw.toLowerCase()));
+			const lowerSnippet = email.snippet?.toLowerCase();
+			const matchesKeyword = params.bodyKeywords.some((kw) => lowerSnippet?.includes(kw.toLowerCase()));
 			if (!matchesKeyword) return false;
 		}
 
