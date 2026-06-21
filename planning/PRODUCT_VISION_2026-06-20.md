@@ -1,4 +1,4 @@
-# Product Vision — "Nothing To Wear"
+# Product Vision — "Nothing To Wear" - Written 2026-06-20
 
 > **Date:** 2026-06-20 &nbsp;·&nbsp; **Audience:** personal strategy notes (the story I tell about this app).
 > Companion to [COMPETITIVE_ANALYSIS_2026-06-20.md](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md),

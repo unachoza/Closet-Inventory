@@ -1,5 +1,4 @@
-# Strategy Review — Repo Health, Strengths/Weaknesses & What's Next
-## Written 2026-06-20.
+# Strategy Review — Repo Health, Strengths/Weaknesses & What's Next - Written 2026-06-20
 
 > **Date:** 2026-06-20 &nbsp;·&nbsp; **Audience:** personal strategy notes (polished, but for me).
 > Companion to [README.md](../README.md) roadmap, [FORWARD_PLAN.md](./FORWARD_PLAN.md),
