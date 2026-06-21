@@ -166,6 +166,13 @@ filter bugs are confirmed via E2E) → (2) finish E2E: fix filter pill test, upd
 gmail-import selectors, add Gmail OAuth path → (3) backfill the ~12–15 unit/component
 gaps opportunistically. Chasing the long tail of "every file has a test" is **not**
 where the risk is; the filter bugs are.
+| **E2E** | **Mobile-only (14 tests, 2 mobile projects)** | **Add desktop projects + core flows; biggest breadth gap** |
+
+**Priority:** (0) green + de-noise (incl. re-blessing the 2 stale e2e snapshots) →
+(1) regression tests for the known bugs, landed with their fixes → (2) broaden E2E:
+desktop projects + the critical-flow set → (3) backfill the ~12–15 unit/component
+gaps opportunistically. Chasing the long tail of "every file has a test" is **not**
+where the risk is; desktop + real-browser breadth is.
 
 ---
 
