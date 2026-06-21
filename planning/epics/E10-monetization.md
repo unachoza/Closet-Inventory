@@ -16,7 +16,7 @@ _As a power user, I want to subscribe so that I unlock unlimited items, import, 
 
 ## US-10.2 — Free tier that converts
 _As a new user, I want a useful free tier so that I try before I buy._
-- [ ] Free: up to 30 items, manual entry, local only
+- [ ] Free: up to 35 items, manual entry, local only
 - [ ] Premium: unlimited, email/web import, cloud sync, social/borrow, camera import
 - [ ] Item-limit enforcement in the closet hook
 
