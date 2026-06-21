@@ -110,6 +110,64 @@ describe("real emails > Banana Republic Factory (no photos)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// American Apparel — header-mapped column table (Qty|Style|Description|Size|Color|Price|Amount)
+// ---------------------------------------------------------------------------
+
+describe("real emails > American Apparel (column-header table)", () => {
+	const products = parseProductsFromEmail(loadFixture("american-apparel-table.html"));
+
+	it("detects all 6 items using Description as the name (not the Style code)", () => {
+		expect(products).toHaveLength(6);
+		expect(products.map((p) => p.name)).toEqual([
+			"Nylon Tricot Triangle Bikini Top",
+			"Nylon Tricot Flat Bikini Bottom",
+			"Triangle Bikini Top",
+			"Crisscross Overall One-Piece Swimsu",
+			"Cotton Spandex Mock Neck Cutout 'Ry",
+			"Metallic Jersey Short Sleeve Tunic",
+		]);
+	});
+
+	it("maps the Price, Size, Color, and Style columns", () => {
+		const top = products[0];
+		expect(top.price).toBe("$3.90");
+		expect(top.size).toBe("S");
+		expect(top.color).toBe("fuchsia");
+		expect(top.itemNumber).toBe("RNT01");
+		expect(products[2].price).toBe("$24.00");
+		expect(products[3].color).toBe("ceramic green");
+	});
+
+	it("ignores the Subtotal / Shipping / Total summary rows", () => {
+		expect(products.some((p) => /subtotal|shipping|total/i.test(p.name))).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Zara (2015) — header-mapped table with currency-code prices, SKU reference
+// ---------------------------------------------------------------------------
+
+describe("real emails > Zara 2015 (column-header table)", () => {
+	const products = parseProductsFromEmail(loadFixture("zara-2015-table.html"));
+
+	it("detects all 5 items (regression: previously returned none)", () => {
+		expect(products).toHaveLength(5);
+		expect(products.map((p) => p.name)).toEqual(["CHECK TOP", "TRENCH-STYLE DRESS", "FAUX SUEDE DRESS", "MARL TOP", "DRAPED TOP"]);
+	});
+
+	it("reads currency-code prices and the SKU reference", () => {
+		expect(products[0].price).toBe("$25.99");
+		expect(products[1].price).toBe("$39.99");
+		expect(products[0].itemNumber).toBe("0/3666/153/823/03");
+		expect(products.every((p) => p.size === "M")).toBe(true);
+	});
+
+	it("does not parse the Total products / Total footer rows", () => {
+		expect(products.some((p) => /total/i.test(p.name))).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Banana Republic / Athleta — older template: <b> name + Color:/Size:/Price: labels
 // ---------------------------------------------------------------------------
 

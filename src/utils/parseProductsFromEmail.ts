@@ -2390,6 +2390,128 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+// ── Column-header table strategy ─────────────────────────
+
+type ColumnField = "name" | "price" | "size" | "color" | "itemNumber" | "qty";
+
+// Header label → field. Checked against the lowercased, punctuation-stripped
+// header cell text (exact match) so "Price" maps but "Price each" does not.
+const COLUMN_HEADER_LABELS: Record<string, ColumnField> = {
+	description: "name",
+	item: "name",
+	product: "name",
+	"item description": "name",
+	price: "price",
+	amount: "price",
+	size: "size",
+	color: "color",
+	colour: "color",
+	reference: "itemNumber",
+	style: "itemNumber",
+	ref: "itemNumber",
+	sku: "itemNumber",
+	qty: "qty",
+	quantity: "qty",
+	units: "qty",
+	unit: "qty",
+};
+
+// Rows whose name cell is one of these are order summary lines, not products.
+const SUMMARY_ROW_RE = /^(sub\s?total|total|shipping|delivery|estimated\s+tax|sales\s+tax|tax|discount|grand\s+total)\b/i;
+
+function classifyColumnHeader(text: string): ColumnField | undefined {
+	const key = text.trim().toLowerCase().replace(/[:#*]/g, "").replace(/\s+/g, " ").trim();
+	return COLUMN_HEADER_LABELS[key];
+}
+
+function priceFromCell(text: string): string {
+	const fromExtract = extractPrices(text)[0];
+	if (fromExtract) return fromExtract;
+	// Bare decimal/integer ("3.90") with no $ or currency code.
+	const m = text.match(/(\d{1,6}(?:\.\d{2})?)/);
+	return m ? `$${m[1]}` : "";
+}
+
+/**
+ * Strategy: Generic column-header order table.
+ *
+ * Handles plain tabular receipts where a header row (<thead> or the first <tr>)
+ * names the columns — Description / Price / Size / Color / Reference(SKU) /
+ * Qty / Amount — and each body <tr> is a product mapped positionally to those
+ * columns. Covers American Apparel (Qty|Style|Description|Size|Color|Price|
+ * Amount) and older Zara order tables (Description|Reference|Size|Units|Amount,
+ * currency-code prices). No product images.
+ *
+ * Guard: a header row must resolve BOTH a name column and a price column. Runs
+ * after the image/bold/labeled layouts so it only intercepts what would
+ * otherwise fall through to the loose text-only fallback. Summary rows
+ * (Subtotal/Total/Tax/Shipping) and colspan footer rows are skipped.
+ */
+function extractFromColumnHeaderTable(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const table of Array.from(doc.querySelectorAll("table"))) {
+		const rows = Array.from(table.querySelectorAll("tr"));
+		if (rows.length < 2) continue;
+
+		// Find the header row and build field → column-index map.
+		let headerRow: Element | null = null;
+		const fieldCol: Partial<Record<ColumnField, number>> = {};
+
+		for (const row of rows) {
+			const ths = directChildren(row, "th");
+			const cells = ths.length > 0 ? ths : directChildren(row, "td");
+			if (cells.length < 3) continue;
+
+			const map: Partial<Record<ColumnField, number>> = {};
+			cells.forEach((cell, i) => {
+				const field = classifyColumnHeader(getCellText(cell));
+				if (field && map[field] === undefined) map[field] = i;
+			});
+
+			if (map.name !== undefined && map.price !== undefined) {
+				headerRow = row;
+				Object.assign(fieldCol, map);
+				break;
+			}
+		}
+
+		if (!headerRow) continue;
+
+		const maxCol = Math.max(...Object.values(fieldCol).filter((v): v is number => v !== undefined));
+		let pastHeader = false;
+
+		for (const row of rows) {
+			if (row === headerRow) {
+				pastHeader = true;
+				continue;
+			}
+			if (!pastHeader) continue;
+
+			const cells = directChildren(row, "td");
+			// Footer/summary rows use colspan and have fewer cells than the header.
+			if (cells.length <= maxCol) continue;
+
+			const name = getCellText(cells[fieldCol.name as number]);
+			if (!name || SUMMARY_ROW_RE.test(name)) continue;
+
+			const price = fieldCol.price !== undefined ? priceFromCell(getCellText(cells[fieldCol.price])) : "";
+			const size = fieldCol.size !== undefined ? getCellText(cells[fieldCol.size]) : "";
+			const color = fieldCol.color !== undefined ? getCellText(cells[fieldCol.color]).toLowerCase() : "";
+			const itemNumber = fieldCol.itemNumber !== undefined ? getCellText(cells[fieldCol.itemNumber]) : "";
+
+			const dedupeKey = `${name}|${color}|${size}|${itemNumber}`.toLowerCase();
+			if (seen.has(dedupeKey)) continue;
+			seen.add(dedupeKey);
+
+			products.push({ imageUrl: "", name, brand: "", price, color, size, itemNumber, material: "", onSale: false });
+		}
+	}
+
+	return products;
+}
+
 /**
  * Strategy: Banana Republic / Athleta (older Gap Inc. template).
  *
@@ -2676,6 +2798,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromOrderContainerRows,
 		extractFromZaraMjmlLayout, // Zara MJML single-column rows (product-img/size/price classes)
 		extractFromDivLayout,
+		extractFromColumnHeaderTable, // Generic header-mapped order tables (American Apparel, older Zara)
 		extractFromTextOnlyRows,
 		extractFromReceiptText, // Old Navy / Gap Inc. monospace POS receipt
 		extractFromImages,
