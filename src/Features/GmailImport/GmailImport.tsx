@@ -15,6 +15,8 @@ import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
 import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "./constants";
 import { inferProductAttributes } from "../../utils/inferProductAttributes";
+import { toTitleCase } from "../../utils/toTitleCase";
+import { condenseName } from "../../utils/condenseName";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -131,7 +133,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			onImport({
 				...emailData,
 				imageURL: product.imageUrl,
-				name: product.name,
+				name: toTitleCase(condenseName(product.name, product.brand)),
 				brand: product.brand || emailData.brand,
 				price: product.price,
 				category: emailData.category,
@@ -167,7 +169,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
-					name: product.name,
+					name: toTitleCase(condenseName(product.name, product.brand)),
 					brand: product.brand || emailData.brand,
 					price: product.price,
 					category: emailData.category,

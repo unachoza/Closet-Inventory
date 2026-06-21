@@ -27,7 +27,6 @@ export type ClothingItem = {
 	onSale?: boolean;
 	notes?: string | string[];
 	style?: ProductAttributes;
-	[key: string]: any;
 };
 
 export interface ItemFormData {
@@ -71,7 +70,7 @@ export interface InputProps {
 	errorMessage?: string;
 	placeholder: string;
 	onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
-	handleFormUpdate: SetStateAction<string | any>;
+	handleFormUpdate: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string, label?: string) => void;
 	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 

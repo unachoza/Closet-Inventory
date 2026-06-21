@@ -47,16 +47,16 @@ const MonthYearPicker = ({ selectedDate, onSelectDate }: MonthYearPickerProps) =
 			<DropDownSelect
 				options={monthOptions}
 				formField="month"
-				setFormData={(monthValue: any) => {
-					const monthOption = monthOptions.find((m) => m.value === monthValue);
+				onSelect={(value) => {
+					const monthOption = monthOptions.find((m) => m.value === value);
 					if (monthOption) setSelectedMonth(monthOption);
 				}}
 			/>
 			<DropDownSelect
 				options={yearOptions}
 				formField="year"
-				setFormData={(yearValue: any) => {
-					const yearOption = yearOptions.find((y) => y.value === yearValue);
+				onSelect={(value) => {
+					const yearOption = yearOptions.find((y) => y.value === value);
 					if (yearOption) setSelectedYear(yearOption);
 				}}
 			/>

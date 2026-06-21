@@ -20,24 +20,9 @@ import close from "../../../assets/close.svg";
  *  initial state and when the item prop changes (batch import queue). */
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	return {
-		name: item.name,
-		size: item.size,
-		brand: item.brand,
+		...item,
 		material: normalizeMaterial(item.material),
-		occasion: item.occasion,
-		age: item.age,
 		condition: matchedCondition(item.condition, item.age) ?? "new",
-		purchaseDate: item.purchaseDate,
-		care: item.care,
-		price: item.price,
-		onSale: item.onSale,
-		notes: item.notes,
-		imageURL: item.imageURL,
-		category: item.category,
-		color: item.color,
-		// Inferred style attributes aren't edited in the form, but must ride along
-		// so they survive the save and reach CardDetails.
-		style: item.style,
 	};
 }
 
@@ -75,8 +60,19 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// auto-rendered as generic editable text inputs. They get bespoke controls:
 	// condition → a fixed-option selector, purchaseDate → a disabled display
 	// (or a manual-entry prompt when an import has no date), factual age → read-only.
-	const { id, imageURL, onSale, notes, material: _material, age: _age, condition: _condition, purchaseDate: _purchaseDate, style, ...remaining } = item;
-	const inputsToSeperate = { id, onSale, notes , style};
+	const {
+		id,
+		imageURL,
+		onSale,
+		notes,
+		material: _material,
+		age: _age,
+		condition: _condition,
+		purchaseDate: _purchaseDate,
+		style,
+		...remaining
+	} = item;
+	const inputsToSeperate = { id, onSale, notes, style };
 	const { updateItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
 	// Parent renders <EditItemView key={item.id} ...> so React remounts the
@@ -87,7 +83,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// Stable ref — uses functional update so it never needs formData in deps.
 	// TextInput is wrapped in memo(), so a stable handleChange means only the
 	// TextInput whose value actually changed will re-render (not all 10+).
-	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {
+		if (typeof e === "string") return;
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	}, []);
@@ -113,26 +110,15 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			const imageURL = formData.imageURL || useStockPhoto(formData.category as CategoryType);
 			const displayName = formData.name || (formData.brand ? `${formData.brand} ${formData.category}` : formData.category) || "New Item";
 			addFullItem({
+				...item,
+				...formData,
 				id: item.id || crypto.randomUUID(),
 				imageURL,
 				name: displayName,
-				category: formData.category ?? "",
-				color: formData.color?.toLowerCase() ?? "",
-				size: formData.size ?? "",
-				brand: formData.brand ?? "",
-				price: formData.price ?? "",
+				color: (formData.color ?? "").toLowerCase(),
 				material: normalizeMaterial(formData.material),
-				occasion: formData.occasion ?? "",
-				age: formData.age ?? "",
 				condition: formData.condition ?? "new",
-				// Preserve the captured purchase date so the card can compute factual age.
-				purchaseDate: formData.purchaseDate,
-				care: formData.care ?? "",
-				onSale: formData.onSale ?? false,
-				notes: formData.notes ?? "",
-				// Persist the inferred style attributes onto the saved item.
-				style: formData.style,
-			});
+			} as ClothingItem);
 			showToast(`${displayName} added to your closet!`);
 
 			// In batch mode, advance to next item instead of going to carousel
@@ -249,7 +235,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							key={key}
 							name={key}
 							label={key}
-							value={normalizeToString(formData[key] ?? value)}
+							value={normalizeToString(formData[key as keyof ClothingItem] ?? value)}
 							placeholder={!value ? `Enter ${key}` : ""}
 							handleFormUpdate={handleChange}
 						/>
@@ -325,7 +311,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							Skip This Item
 						</button>
 					)}
-					<button type="submit" className="submit">{isCreateMode ? "Add to Closet" : "Save Changes"}</button>
+					<button type="submit" className="submit">
+						{isCreateMode ? "Add to Closet" : "Save Changes"}
+					</button>
 				</div>
 			</motion.form>
 		</div>

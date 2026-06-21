@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mockGmail, DEFAULT_MOCK_EMAILS } from "./helpers/mockGmail";
+import { skipOnboarding } from "./helpers/navHelpers";
 
 /**
  * Mobile UX for the Gmail import flow, with Gmail fully mocked (see mockGmail).
@@ -21,6 +22,7 @@ async function gotoGmail(page: Page) {
 
 test.describe("Gmail import — mobile", () => {
 	test.beforeEach(async ({ page }) => {
+		await skipOnboarding(page);
 		await mockGmail(page);
 	});
 
