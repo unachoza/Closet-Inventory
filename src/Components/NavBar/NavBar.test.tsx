@@ -39,30 +39,23 @@ function renderNav({ initialView = "carousel", onAddItem, onExportCloset, closet
 
 describe("NavBar", () => {
 	describe("layout by view", () => {
-		it("shows the page title in the default (carousel) view", () => {
+		it("shows the page title in carousel view", () => {
 			renderNav({ initialView: "carousel" });
-			expect(screen.getByRole("heading", { name: /My Closet Inventory/i })).toBeInTheDocument();
+			expect(screen.getByRole("heading", { name: /Nothing To Wear/i })).toBeInTheDocument();
 		});
 
-		it("shows inline action buttons when not in the closet/overview view", () => {
+		it("shows the page title in entire closet view", () => {
+			renderNav({ initialView: "entireCloset" });
+			expect(screen.getByRole("heading", { name: /Nothing To Wear/i })).toBeInTheDocument();
+		});
+
+		it("never renders the search box in carousel view", () => {
 			renderNav({ initialView: "carousel" });
-			expect(screen.getByRole("button", { name: /Add Item/i })).toBeInTheDocument();
-			expect(screen.getByRole("button", { name: /View All/i })).toBeInTheDocument();
-			expect(screen.getByRole("button", { name: /Import Gmail/i })).toBeInTheDocument();
-			expect(screen.getByRole("button", { name: /Fabric Guide/i })).toBeInTheDocument();
-		});
-
-		it("shows the title and collapses inline actions in the entire-closet view", () => {
-			renderNav({ initialView: "entireCloset" });
-			expect(screen.getByRole("heading", { name: /My Closet Inventory/i })).toBeInTheDocument();
-			// Inline actions are collapsed (only the hamburger drawer holds them now).
-			expect(screen.queryByRole("button", { name: /View All/i })).not.toBeInTheDocument();
-		});
-
-		it("never renders the search box (search now lives in the SearchSortBar)", () => {
-			renderNav({ initialView: "entireCloset" });
 			expect(screen.queryByRole("textbox", { name: /Search closet/i })).not.toBeInTheDocument();
-			renderNav({ initialView: "carousel" });
+		});
+
+		it("never renders the search box in entire closet view", () => {
+			renderNav({ initialView: "entireCloset" });
 			expect(screen.queryByRole("textbox", { name: /Search closet/i })).not.toBeInTheDocument();
 		});
 	});
@@ -70,11 +63,13 @@ describe("NavBar", () => {
 	describe("Back to Carousel", () => {
 		it("is hidden on the carousel view", () => {
 			renderNav({ initialView: "carousel" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			expect(screen.queryByRole("button", { name: /Back to Carousel/i })).not.toBeInTheDocument();
 		});
 
-		it("is visible on other views and navigates back to the carousel", () => {
+		it("is visible in drawer on other views and navigates back to the carousel", () => {
 			renderNav({ initialView: "overview" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			const back = screen.getByRole("button", { name: /Back to Carousel/i });
 			expect(back).toBeInTheDocument();
 			fireEvent.click(back);
@@ -85,18 +80,21 @@ describe("NavBar", () => {
 	describe("navigation actions", () => {
 		it("View All navigates to the entire-closet view", () => {
 			renderNav({ initialView: "carousel" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /View All/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("entireCloset");
 		});
 
 		it("Import Gmail navigates to the gmail view", () => {
 			renderNav({ initialView: "carousel" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /Import Gmail/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("gmail");
 		});
 
 		it("Fabric Guide navigates to the fabric view", () => {
 			renderNav({ initialView: "carousel" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /Fabric Guide/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("fabric");
 		});
@@ -104,12 +102,14 @@ describe("NavBar", () => {
 		it("Add Item uses the onAddItem callback when provided", () => {
 			const onAddItem = vi.fn();
 			renderNav({ initialView: "carousel", onAddItem });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /Add Item/i }));
 			expect(onAddItem).toHaveBeenCalledTimes(1);
 		});
 
 		it("Add Item falls back to navigating to the form view without a callback", () => {
 			renderNav({ initialView: "carousel" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /Add Item/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("form");
 		});
@@ -118,16 +118,19 @@ describe("NavBar", () => {
 	describe("Download Closet", () => {
 		it("does not render the Download Closet button when onExportCloset is not provided", () => {
 			renderNav({ initialView: "carousel" });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			expect(screen.queryByRole("button", { name: /download closet/i })).not.toBeInTheDocument();
 		});
 
 		it("renders the Download Closet button when onExportCloset is provided", () => {
 			renderNav({ initialView: "carousel", onExportCloset: vi.fn() });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			expect(screen.getByRole("button", { name: /download closet/i })).toBeInTheDocument();
 		});
 
 		it("opens the export confirmation modal when Download Closet is clicked", () => {
 			renderNav({ initialView: "carousel", onExportCloset: vi.fn(), closetItemCount: 8 });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
 			expect(screen.getByRole("dialog")).toBeInTheDocument();
 			expect(screen.getByText(/download your closet/i)).toBeInTheDocument();
@@ -135,6 +138,7 @@ describe("NavBar", () => {
 
 		it("shows the correct item count in the modal", () => {
 			renderNav({ initialView: "carousel", onExportCloset: vi.fn(), closetItemCount: 5 });
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
 			expect(screen.getByText("5 items will be exported")).toBeInTheDocument();
 		});
@@ -143,6 +147,7 @@ describe("NavBar", () => {
 			const onExportCloset = vi.fn();
 			renderNav({ initialView: "carousel", onExportCloset, closetItemCount: 3 });
 
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
 			expect(screen.getByRole("dialog")).toBeInTheDocument();
 
@@ -155,6 +160,7 @@ describe("NavBar", () => {
 			const onExportCloset = vi.fn();
 			renderNav({ initialView: "carousel", onExportCloset });
 
+			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
 			fireEvent.click(screen.getByRole("button", { name: /download closet/i }));
 			fireEvent.click(screen.getByRole("button", { name: /cancel/i }));
 

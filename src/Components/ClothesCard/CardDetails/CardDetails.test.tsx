@@ -157,7 +157,7 @@ describe("CardDetails", () => {
 		const withFit: ClothingItem = { ...item, style: { fit: "relaxed", season: "fall" } };
 		render(<CardDetails item={withFit} variant="full" />);
 
-		expect(screen.getByText("Style")).toBeInTheDocument();
+		expect(screen.getByText("Style & Construction")).toBeInTheDocument();
 		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 });

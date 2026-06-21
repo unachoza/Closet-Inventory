@@ -38,8 +38,8 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 
 			{/* Carousel */}
 			<div className="group-with-arrow-buttons">
-				<button onClick={handlePrev} className="arrow-button left">
-					<img src={leftIcon} alt={leftIcon} className="directions-icons" />
+				<button onClick={handlePrev} className="arrow-button left" aria-label="Previous category">
+					<img src={leftIcon} alt="" className="directions-icons" />
 				</button>
 				<div className="view-three">
 					<AnimatePresence>
@@ -77,8 +77,8 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 						})}
 					</AnimatePresence>
 				</div>
-				<button onClick={handleNext} className="arrow-button right">
-				<img src={rightIcon} alt={rightIcon} className="directions-icons" />
+				<button onClick={handleNext} className="arrow-button right" aria-label="Next category">
+					<img src={rightIcon} alt="" className="directions-icons" />
 				</button>
 			</div>
 		</motion.div>

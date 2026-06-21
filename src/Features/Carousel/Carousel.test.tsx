@@ -1,11 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import Carousel from "./Carousel";
 
 describe("Carousel Component", () => {
 	const mockSetCategory = vi.fn();
-	
+
 	it("renders three carousel items at a time", () => {
 		render(<Carousel setCategory={vi.fn()} />);
 		expect(screen.getAllByText(/tops|dresses|bottoms/i).length).toBe(3);
@@ -15,7 +15,7 @@ describe("Carousel Component", () => {
 		const user = userEvent.setup();
 		render(<Carousel setCategory={vi.fn()} />);
 
-		const nextButton = screen.getByRole("button", { name: "▶" });
+		const nextButton = screen.getByRole("button", { name: "Next category" });
 		await user.click(nextButton);
 
 		expect(screen.getByText(/coats|sweaters/i)).toBeInTheDocument();
