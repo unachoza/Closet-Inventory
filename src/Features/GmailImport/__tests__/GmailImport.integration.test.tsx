@@ -340,7 +340,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		});
 
 		// Verify form fields are pre-populated with parsed product data
-		expect(screen.getByLabelText("name")).toHaveValue("SHORT JACQUARD JUMPSUIT");
+		expect(screen.getByLabelText("name")).toHaveValue("Short Jacquard Jumpsuit");
 		expect(screen.getByLabelText("color")).toHaveValue("Bluish");
 		expect(screen.getByLabelText("size")).toHaveValue("M");
 		expect(screen.getByLabelText("price")).toHaveValue("$29.99");
@@ -381,7 +381,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 			expect(screen.getByText("Import Item")).toBeInTheDocument();
 		});
 
-		expect(screen.getByLabelText("name")).toHaveValue("KNOTTED TOP");
+		expect(screen.getByLabelText("name")).toHaveValue("Knotted Top");
 		expect(screen.getByLabelText("color")).toHaveValue("Red");
 		expect(screen.getByLabelText("size")).toHaveValue("L");
 		expect(screen.getByLabelText("price")).toHaveValue("$19.99");
@@ -410,7 +410,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByText(/Item 1 of 5/)).toBeInTheDocument();
 
 		// First item in queue should be pre-populated
-		expect(screen.getByLabelText("name")).toHaveValue("SHORT JACQUARD JUMPSUIT");
+		expect(screen.getByLabelText("name")).toHaveValue("Short Jacquard Jumpsuit");
 		expect(screen.getByLabelText("color")).toHaveValue("Bluish");
 		expect(screen.getByLabelText("size")).toHaveValue("M");
 		expect(screen.getByLabelText("price")).toHaveValue("$29.99");
@@ -444,7 +444,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 			expect(screen.getByText(/Item 2 of 5/)).toBeInTheDocument();
 		});
 
-		expect(screen.getByLabelText("name")).toHaveValue("KNOTTED TOP");
+		expect(screen.getByLabelText("name")).toHaveValue("Knotted Top");
 		expect(screen.getByLabelText("color")).toHaveValue("Red");
 		expect(screen.getByLabelText("size")).toHaveValue("L");
 		expect(screen.getByLabelText("price")).toHaveValue("$19.99");
@@ -478,7 +478,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 			expect(screen.getByText(/Item 2 of 5/)).toBeInTheDocument();
 		});
 
-		expect(screen.getByLabelText("name")).toHaveValue("KNOTTED TOP");
+		expect(screen.getByLabelText("name")).toHaveValue("Knotted Top");
 	});
 
 	it("Return to Email Preview navigates back to gmail view", async () => {
