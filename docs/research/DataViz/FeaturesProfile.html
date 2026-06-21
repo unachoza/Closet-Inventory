@@ -1,0 +1,94 @@
+<h2 class="sr-only">
+	Radar chart comparing Nothing To Wear against 5 competitors across 6 dimensions: inventory management, auto-import, fabric intelligence, social
+	features, AI styling, and design polish.
+</h2>
+
+<div style="padding: 1.5rem 0 0.5rem; font-size: 13px; color: var(--color-text-secondary)">
+	<span style="font-size: 15px; font-weight: 500; color: var(--color-text-primary)">Feature profile — NTW vs. competitors</span>
+	<span style="margin-left: 12px">Click a legend item to toggle</span>
+</div>
+
+<div id="legend" style="display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0 8px; font-size: 12px"></div>
+
+<div style="position: relative; width: 100%; height: 420px">
+	<canvas
+		id="radarChart"
+		role="img"
+		aria-label="Radar chart comparing Nothing To Wear, Whering, Acloset, Alta, Fits, and Stylebook across six product dimensions. NTW leads on inventory management and fabric intelligence but trails on social features and AI styling."
+		>Scores out of 10: NTW: inventory 9, auto-import 8, fabric intelligence 10, social 3, AI styling 2, design polish 6. Whering: 2,5,1,9,8,8.
+		Acloset: 3,7,2,4,9,8. Alta: 1,3,1,4,9,9. Fits: 4,5,1,4,7,8. Stylebook: 6,1,1,1,2,4.</canvas
+	>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+	const labels = [
+		"Inventory\nmanagement",
+		"Auto-import\n& ingestion",
+		"Fabric\nintelligence",
+		"Social &\ncommunity",
+		"AI styling\n& outfits",
+		"Design\npolish",
+	];
+
+	const apps = [
+		{ label: "NTW", data: [9, 8, 10, 3, 2, 6], color: "#534AB7", dash: [] },
+		{ label: "Whering", data: [2, 5, 1, 9, 8, 8], color: "#1D9E75", dash: [6, 3] },
+		{ label: "Acloset", data: [3, 7, 2, 4, 9, 8], color: "#D85A30", dash: [3, 3] },
+		{ label: "Alta", data: [1, 3, 1, 4, 9, 9], color: "#D4537E", dash: [8, 3, 2, 3] },
+		{ label: "Fits", data: [4, 5, 1, 4, 7, 8], color: "#BA7517", dash: [4, 4] },
+		{ label: "Stylebook", data: [6, 1, 1, 1, 2, 4], color: "#888780", dash: [2, 2] },
+	];
+
+	const isDark = matchMedia("(prefers-color-scheme: dark)").matches;
+	const gridColor = isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
+	const tickColor = isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.4)";
+	const labelColor = isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)";
+
+	const datasets = apps.map((a) => ({
+		label: a.label,
+		data: a.data,
+		borderColor: a.color,
+		backgroundColor: a.label === "NTW" ? a.color + "22" : "transparent",
+		borderWidth: a.label === "NTW" ? 2.5 : 1.5,
+		borderDash: a.dash,
+		pointRadius: a.label === "NTW" ? 4 : 2.5,
+		pointBackgroundColor: a.color,
+		pointBorderColor: a.color,
+	}));
+
+	const chart = new Chart(document.getElementById("radarChart"), {
+		type: "radar",
+		data: { labels, datasets },
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: { legend: { display: false } },
+			scales: {
+				r: {
+					min: 0,
+					max: 10,
+					ticks: { stepSize: 2, color: tickColor, font: { size: 11 }, backdropColor: "transparent" },
+					grid: { color: gridColor },
+					angleLines: { color: gridColor },
+					pointLabels: { color: labelColor, font: { size: 12 } },
+				},
+			},
+		},
+	});
+
+	const leg = document.getElementById("legend");
+	apps.forEach((a, i) => {
+		const el = document.createElement("span");
+		el.style.cssText =
+			"display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);";
+		el.innerHTML = `<span style="width:20px;height:3px;background:${a.color};display:inline-block;border-radius:2px;flex-shrink:0;"></span><span style="font-size:12px;color:var(--color-text-primary);">${a.label}</span>`;
+		el.addEventListener("click", () => {
+			const meta = chart.getDatasetMeta(i);
+			meta.hidden = !meta.hidden;
+			el.style.opacity = meta.hidden ? "0.4" : "1";
+			chart.update();
+		});
+		leg.appendChild(el);
+	});
+</script>

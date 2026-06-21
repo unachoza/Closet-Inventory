@@ -1,0 +1,136 @@
+
+<h2 class="sr-only">Strategic positioning map: x-axis is styling focus vs inventory focus, y-axis is manual entry vs auto-import. NTW occupies the top-right quadrant (inventory + auto-import) alone.</h2>
+
+<div style="padding: 1.5rem 0 0.5rem;">
+  <span style="font-size: 15px; font-weight: 500; color: var(--color-text-primary);">Strategic positioning map</span>
+  <span style="font-size: 12px; color: var(--color-text-secondary); margin-left: 12px;">bubble size = relative user base</span>
+</div>
+
+<div id="quadrant-labels" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; font-size: 11px; color: var(--color-text-secondary);">
+  <span style="text-align:left; padding-left: 60px;">← styling-first, manual entry</span>
+  <span style="text-align:right; padding-right: 8px;">inventory-first, manual entry →</span>
+</div>
+
+<div style="position: relative; width: 100%; height: 420px;">
+  <canvas id="bubbleChart" role="img" aria-label="Positioning map showing all competitors clustered in the styling-focused, low auto-import quadrant. NTW is alone in the inventory + auto-import quadrant.">NTW: inventory focus 9, auto-import 8. All competitors score below 5 on inventory focus. Fits is highest on auto-import among competitors at 5.</canvas>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; font-size: 11px; color: var(--color-text-secondary);">
+  <span style="text-align:left; padding-left: 60px;">← styling-first, auto-import</span>
+  <span style="text-align:right; padding-right: 8px;">inventory-first, auto-import →</span>
+</div>
+
+<div id="bubble-legend" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px;"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+const axisColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.35)';
+
+const competitors = [
+  { label: 'NTW', x: 8.8, y: 8.5, r: 6, color: '#534AB7', note: 'early stage' },
+  { label: 'Whering', x: 2.2, y: 5.0, r: 20, color: '#1D9E75', note: '7M users' },
+  { label: 'Acloset', x: 3.0, y: 6.8, r: 20, color: '#D85A30', note: '7M users' },
+  { label: 'Alta', x: 1.5, y: 3.5, r: 9, color: '#D4537E', note: '~500K' },
+  { label: 'Fits', x: 3.8, y: 5.2, r: 8, color: '#BA7517', note: '~200K' },
+  { label: 'Stylebook', x: 5.5, y: 1.2, r: 7, color: '#888780', note: '~100K' },
+  { label: 'OpenWardrobe', x: 2.8, y: 3.8, r: 7, color: '#0F6E56', note: '~200K' },
+  { label: 'Indyx', x: 2.0, y: 2.5, r: 5, color: '#3C3489', note: 'small' },
+];
+
+const datasets = competitors.map(c => ({
+  label: c.label,
+  data: [{ x: c.x, y: c.y, r: c.r }],
+  backgroundColor: c.color + (c.label === 'NTW' ? 'cc' : '55'),
+  borderColor: c.color,
+  borderWidth: c.label === 'NTW' ? 2 : 1,
+}));
+
+const chart = new Chart(document.getElementById('bubbleChart'), {
+  type: 'bubble',
+  data: { datasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const c = competitors[ctx.datasetIndex];
+            return `${c.label} · users: ${c.note}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        min: 0, max: 11,
+        title: { display: true, text: '← styling focus    |    inventory & logistics focus →', color: axisColor, font: { size: 12 } },
+        grid: { color: gridColor },
+        ticks: { display: false },
+        border: { color: gridColor },
+      },
+      y: {
+        min: 0, max: 11,
+        title: { display: true, text: '← manual entry    |    auto-import & AI ingestion →', color: axisColor, font: { size: 12 }, rotation: 270 },
+        grid: { color: gridColor },
+        ticks: { display: false },
+        border: { color: gridColor },
+      }
+    },
+    layout: { padding: { top: 20, right: 30, bottom: 10, left: 10 } }
+  },
+  plugins: [{
+    id: 'quadrant-bg',
+    beforeDraw(chart) {
+      const { ctx, chartArea: { left, top, right, bottom, width, height } } = chart;
+      const midX = left + width / 2;
+      const midY = top + height / 2;
+      ctx.save();
+      ctx.fillStyle = isDark ? 'rgba(83,74,183,0.06)' : 'rgba(83,74,183,0.05)';
+      ctx.fillRect(midX, top, right - midX, midY - top);
+      ctx.fillStyle = isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.025)';
+      ctx.fillRect(left, top, midX - left, midY - top);
+      ctx.fillRect(left, midY, midX - left, bottom - midY);
+      ctx.fillRect(midX, midY, right - midX, bottom - midY);
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(midX, top); ctx.lineTo(midX, bottom); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(left, midY); ctx.lineTo(right, midY); ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle = isDark ? 'rgba(83,74,183,0.7)' : 'rgba(83,74,183,0.6)';
+      ctx.font = '500 11px sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('NTW\'s white space ↗', right - 8, top + 18);
+      ctx.restore();
+    },
+    afterDatasetsDraw(chart) {
+      const { ctx, scales: { x, y } } = chart;
+      ctx.save();
+      ctx.font = '500 12px sans-serif';
+      ctx.textAlign = 'center';
+      competitors.forEach((c, i) => {
+        const px = x.getPixelForValue(c.x);
+        const py = y.getPixelForValue(c.y);
+        ctx.fillStyle = c.color;
+        const offset = c.r + 10;
+        const labelY = c.label === 'NTW' ? py - offset : (c.y > 5.5 ? py - offset : py + offset + 4);
+        ctx.fillText(c.label, px, labelY);
+      });
+      ctx.restore();
+    }
+  }]
+});
+
+const leg = document.getElementById('bubble-legend');
+competitors.forEach(c => {
+  const el = document.createElement('span');
+  el.style.cssText = 'display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary);';
+  el.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${c.color};display:inline-block;flex-shrink:0;"></span>${c.label} <span style="color:var(--color-text-secondary);opacity:0.7;">(${c.note})</span>`;
+  leg.appendChild(el);
+});
+</script>
