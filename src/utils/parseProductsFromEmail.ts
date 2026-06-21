@@ -18,6 +18,7 @@ export interface ExtractedProduct {
 	readonly name: string;
 	readonly brand: string;
 	readonly price: string;
+	readonly originalPrice?: string;
 	readonly color: string;
 	readonly size: string;
 	readonly itemNumber: string;
@@ -97,7 +98,25 @@ function extractPrices(text: string): string[] {
 	return codePrices;
 }
 
-function getSalePrice(td: Element): string {
+interface CellPricing {
+	readonly price: string;
+	readonly originalPrice: string;
+}
+
+/**
+ * Extract the current (paid) price and, when present, the struck-through
+ * original price from a price cell.
+ *
+ * Sale layouts pair a line-through original with a colored sale price, e.g.
+ *   <span style="text-decoration:line-through;">$88.00</span>
+ *   <span style="color:#ff3366">$34.99</span>
+ * The struck span is the original; the colored (non-struck) span is what was paid.
+ */
+function getCellPricing(td: Element): CellPricing {
+	// Struck-through original (sale marker).
+	const struckEl = td.querySelector("s, strike, del, [style*='line-through']");
+	const originalPrice = struckEl ? (extractPrices(struckEl.textContent ?? "")[0] ?? "") : "";
+
 	// Look for colored/styled price spans (sale price indicators)
 	const coloredSpans = td.querySelectorAll("span[style]");
 	for (const span of coloredSpans) {
@@ -105,13 +124,21 @@ function getSalePrice(td: Element): string {
 		// Sale prices often use red/pink colors, not line-through
 		if ((style.includes("color") && !style.includes("line-through")) || style.includes("#ff") || style.includes("red")) {
 			const prices = extractPrices(span.textContent ?? "");
-			if (prices.length > 0) return prices[0];
+			if (prices.length > 0) return { price: prices[0], originalPrice };
 		}
 	}
 
-	// Fallback: get the last price in the cell (usually the current price)
+	// Fallback: get the last price in the cell (usually the current price).
+	// If there are two prices and the first is higher, treat it as the original.
 	const allPrices = extractPrices(td.textContent ?? "");
-	return allPrices.length > 0 ? allPrices[allPrices.length - 1] : "";
+	const price = allPrices.length > 0 ? allPrices[allPrices.length - 1] : "";
+	let inferredOriginal = originalPrice;
+	if (!inferredOriginal && allPrices.length >= 2) {
+		const first = parseFloat(allPrices[0].replace("$", ""));
+		const last = parseFloat(price.replace("$", ""));
+		if (last < first) inferredOriginal = allPrices[0];
+	}
+	return { price, originalPrice: inferredOriginal };
 }
 
 function getCellText(td: Element): string {
@@ -245,15 +272,17 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 		let size = "";
 		let color = "";
 		let price = "";
+		let originalPrice = "";
 
 		for (const td of otherCells) {
 			const text = getCellText(td);
 			if (!text) continue;
 
 			// Check if this cell has a price
-			const cellPrice = getSalePrice(td);
-			if (cellPrice && !price) {
-				price = cellPrice;
+			const cellPricing = getCellPricing(td);
+			if (cellPricing.price && !price) {
+				price = cellPricing.price;
+				originalPrice = cellPricing.originalPrice;
 				continue;
 			}
 
@@ -284,11 +313,12 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 			name,
 			brand,
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
 			material: "",
-			onSale: false,
+			onSale: Boolean(originalPrice),
 		});
 	}
 
@@ -704,6 +734,7 @@ function extractFromAttributeTableRows(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(onSale && struck ? { originalPrice: struck } : {}),
 			color: color.toLowerCase(),
 			size,
 			itemNumber,
@@ -763,6 +794,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 		let size = "";
 		let color = "";
 		let price = "";
+		let originalPrice = "";
 		let onSale = false;
 
 		for (const p of paragraphs) {
@@ -778,6 +810,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 				const priceMatch = remaining.match(/(\d{1,5}(?:\.\d{2})?)/);
 				if (priceMatch) {
 					price = `$${priceMatch[1]}`;
+					originalPrice = extractPrices(strikeText)[0] ?? "";
 					onSale = true;
 					continue;
 				}
@@ -832,6 +865,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber: "",
@@ -968,9 +1002,10 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 		// Use paid price if available, otherwise list price
 		const price = paidPrice || (listPrice > 0 ? `$${listPrice.toFixed(2)}` : "");
 
-		// If paid < list, item is on sale
+		// If paid < list, item is on sale; original price is the labeled "Price:" field
 		const paidNum = paidPrice ? parseFloat(paidPrice.replace("$", "")) : 0;
 		const onSale = listPrice > 0 && paidNum > 0 && paidNum < listPrice;
+		const originalPrice = onSale ? `$${listPrice.toFixed(2)}` : "";
 
 		// Deduplicate by name + color + size (same style in different colors are separate items)
 		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
@@ -982,6 +1017,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
@@ -1087,12 +1123,15 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 
 			// Extract price (with sale detection via line-through)
 			let price = "";
+			let originalPrice = "";
 			let onSale = false;
 
 			if (priceCol) {
 				const strikeDiv = priceCol.querySelector("div[style*='line-through']");
 				if (strikeDiv) {
 					onSale = true;
+					const strikePm = (strikeDiv.textContent ?? "").trim().match(/\$\d{1,5}(?:\.\d{2})?/);
+					if (strikePm) originalPrice = strikePm[0];
 					// Sale price is in the bold (non-strikethrough) div
 					const priceDivs = Array.from(priceCol.querySelectorAll("div"));
 					for (const div of priceDivs) {
@@ -1116,7 +1155,10 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 						if (allPrices.length >= 2) {
 							const first = parseFloat(allPrices[0].replace("$", ""));
 							const last = parseFloat(price.replace("$", ""));
-							if (last < first) onSale = true;
+							if (last < first) {
+								onSale = true;
+								originalPrice = allPrices[0];
+							}
 						}
 					}
 				}
@@ -1130,6 +1172,7 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 				name,
 				brand: "",
 				price,
+				...(originalPrice ? { originalPrice } : {}),
 				color,
 				size,
 				itemNumber: "",
@@ -2202,18 +2245,64 @@ function extractFromReceiptText(doc: Document): ExtractedProduct[] {
 /**
  * Extract the current (sale) price from a cell that may carry a "Price:" /
  * "Total:" label and a strikethrough original. Amounts may be written
- * "$7.46" or bare "7.46". Returns the non-struck amount and a sale flag.
+ * "$7.46" or bare "7.46". Returns the non-struck amount, the struck original
+ * (when present), and a sale flag.
  */
-function parseLabeledStruckPrice(cell: Element): { price: string; onSale: boolean } {
+function parseLabeledStruckPrice(cell: Element | null | undefined): { price: string; originalPrice: string; onSale: boolean } {
+	if (!cell) return { price: "", originalPrice: "", onSale: false };
+
 	const strikeEl = cell.querySelector(".strike, s, strike, del, [style*='line-through']");
 	const struckText = strikeEl ? getCellText(strikeEl) : "";
+	const origMatch = struckText.match(/(\d{1,6}(?:\.\d{2})?)/);
+	const originalPrice = origMatch ? `$${origMatch[1]}` : "";
 
 	let text = getCellText(cell).replace(/^(price|total)\s*:?\s*/i, "");
 	if (struckText) text = text.replace(struckText, " ");
 
 	const m = text.match(/(\d{1,6}(?:\.\d{2})?)/);
 	const price = m ? `$${m[1]}` : "";
-	return { price, onSale: Boolean(struckText) };
+	return { price, originalPrice, onSale: Boolean(struckText) };
+}
+
+/** Parse a quantity from a cell like "Qty: 5" or a bare "5". Defaults to 1. */
+function parseQuantity(cell: Element | null | undefined): number {
+	if (!cell) return 1;
+	const m = getCellText(cell).match(/(\d{1,4})/);
+	const qty = m ? parseInt(m[1], 10) : 1;
+	return qty > 0 ? qty : 1;
+}
+
+/**
+ * Resolve unit price + original price for an Anthropologie product container.
+ *
+ * The struck original may appear on the per-unit price cell (single-qty orders)
+ * OR only on the line-total cells (multi-qty orders). When only the total is
+ * struck, the per-unit original is derived as `totalOriginal / qty`.
+ */
+function resolveAnthroPricing(container: Element): { price: string; originalPrice: string; onSale: boolean } {
+	const largeCells = Array.from(container.querySelectorAll("td.item-price-large"));
+	// 3-column layout is [unit price, qty, line total].
+	const unitCell = largeCells[0] ?? container.querySelector("td.product-price");
+	const totalCell = (largeCells.length >= 3 ? largeCells[2] : null) ?? container.querySelector("td.product-total");
+	const qtyCell = largeCells[1] ?? container.querySelector("td.product-qty");
+
+	const unit = parseLabeledStruckPrice(unitCell);
+	let { price, originalPrice, onSale } = unit;
+
+	// Per-unit original missing but the line total is struck → derive unit original.
+	if (!originalPrice && totalCell) {
+		const total = parseLabeledStruckPrice(totalCell);
+		if (total.originalPrice) {
+			const qty = parseQuantity(qtyCell);
+			const origNum = parseFloat(total.originalPrice.replace("$", ""));
+			if (qty > 0 && origNum > 0) {
+				originalPrice = `$${(origNum / qty).toFixed(2)}`;
+				onSale = true;
+			}
+		}
+	}
+
+	return { price, originalPrice, onSale };
 }
 
 /**
@@ -2258,13 +2347,13 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 		const itemNumber = stripLabel(detailsCell?.querySelector("td.product-style"), /^style\s*no\.?\s*:?\s*/i);
 
 		let price = "";
+		let originalPrice = "";
 		let onSale = false;
 		let imageUrl = "";
 
 		const container = nameCell.closest("td.item-table-container");
 		if (container) {
-			const priceCell = container.querySelector("td.product-price") ?? container.querySelector("td.item-price-large");
-			if (priceCell) ({ price, onSale } = parseLabeledStruckPrice(priceCell));
+			({ price, originalPrice, onSale } = resolveAnthroPricing(container));
 
 			const img = container.querySelector("td.item-image img");
 			if (img && isProductImage(img as HTMLImageElement)) {
@@ -2276,7 +2365,7 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 		if (seen.has(dedupeKey)) continue;
 		seen.add(dedupeKey);
 
-		products.push({ imageUrl, name, brand: "", price, color, size, itemNumber, material: "", onSale });
+		products.push({ imageUrl, name, brand: "", price, ...(originalPrice ? { originalPrice } : {}), color, size, itemNumber, material: "", onSale });
 	}
 
 	return products;

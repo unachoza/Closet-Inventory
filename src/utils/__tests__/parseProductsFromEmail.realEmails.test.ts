@@ -144,6 +144,11 @@ describe("real emails > Anthropologie (bare prices)", () => {
 		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 
+	it("captures the struck-through original price even without a $ prefix", () => {
+		expect(byName(products, "Neha Seamless Ruffled Briefs")?.originalPrice).toBe("$9.95");
+		expect(byName(products, "Waverly High-Waisted Briefs")?.originalPrice).toBe("$14.95");
+	});
+
 	it("captures the Style No. as the item number and the product image", () => {
 		const neha = byName(products, "Neha Seamless Ruffled Briefs");
 		expect(neha?.itemNumber).toBe("4140341870052");
@@ -171,6 +176,12 @@ describe("real emails > Anthropologie ($-prefixed prices)", () => {
 	it("reads the $-prefixed sale price, not the struck original", () => {
 		expect(byName(products, "Neha Seamless Ruffled Briefs")?.price).toBe("$7.46");
 		expect(byName(products, "Waverly High-Waisted Briefs")?.price).toBe("$11.21");
+	});
+
+	it("captures the struck original price and flags the sale", () => {
+		expect(byName(products, "Neha Seamless Ruffled Briefs")?.originalPrice).toBe("$9.95");
+		expect(byName(products, "Waverly High-Waisted Briefs")?.originalPrice).toBe("$14.95");
+		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 });
 

@@ -493,6 +493,39 @@ describe("parseProductsFromEmail", () => {
 			const products = parseProductsFromEmail(aritzia);
 			expect(products[0].price).toBe("$12.50");
 		});
+
+		it("captures the struck-through original price", () => {
+			const products = parseProductsFromEmail(aritzia);
+			expect(products[0].originalPrice).toBe("$25.00");
+			expect(products[1].originalPrice).toBe("$110.00");
+		});
+
+		it("flags items with a struck original as on sale", () => {
+			const products = parseProductsFromEmail(aritzia);
+			expect(products[0].onSale).toBe(true);
+			expect(products[1].onSale).toBe(true);
+		});
+
+		it("leaves originalPrice undefined and onSale false at full price", () => {
+			const fullPrice = html(`
+				<table>
+					<tr>
+						<td>${productImg("https://assets.aritzia.com/skirt.jpg", 40, 51)}</td>
+						<td width="16">${spacerImg(16, 1)}</td>
+						<td>Wilfred<br><a>AGENCY SKIRT</a><br>Item no: 55512</td>
+						<td>S</td>
+						<td>NAVY</td>
+						<td>1</td>
+						<td>$98.00</td>
+						<td>$98.00</td>
+					</tr>
+				</table>
+			`);
+			const products = parseProductsFromEmail(fullPrice);
+			expect(products[0].price).toBe("$98.00");
+			expect(products[0].originalPrice).toBeUndefined();
+			expect(products[0].onSale).toBe(false);
+		});
 	});
 
 	// -----------------------------------------------------------------------
@@ -1617,6 +1650,57 @@ describe("Strategy: Shopify order template (SKIMS)", () => {
 		const products = parseProductsFromEmail(skimsHtml);
 		expect(products[0].imageUrl).toContain("SKIMS-item1.jpg");
 		expect(products[1].imageUrl).toContain("SKIMS-item2.jpg");
+	});
+});
+
+describe("Anthropologie: per-unit original derived from struck line total", () => {
+	// Multi-qty order where only the line total carries the struck original
+	// (38.85 / 64.75 for qty 5). The per-unit original is 64.75 / 5 = 12.95.
+	const multiQty = html(`
+		<table><tbody><tr>
+		<td class="item-table-container">
+			<table class="full-width-fixed">
+				<tr>
+					<td class="item-image" rowspan="2">
+						<a href="https://anthropologie.com/x"><img width="129" border="0"
+							src="https://images.anthropologie.com/is/image/Anthropologie/61737771_001_b"
+							alt="Classic High-Waisted Briefs"></a>
+					</td>
+					<td class="item-details">
+						<table class="full-width">
+							<tr class="product-name-large"><td class="item-detail-row product-name"><h4>Classic High-Waisted Briefs</h4></td></tr>
+							<tr><td class="item-detail-row product-style"><label>Style No.&nbsp;</label><span>61737771</span></td></tr>
+							<tr><td class="item-detail-row product-color"><label>Color:&nbsp;</label><span>BLACK</span></td></tr>
+							<tr><td class="item-detail-row product-size"><label>Size:&nbsp;</label><span>S</span></td></tr>
+						</table>
+					</td>
+					<td class="item-price-large" style="text-align:left;">7.77<br></td>
+					<td class="item-price-large" style="text-align:center;">5</td>
+					<td class="item-price-large" style="text-align: right;">38.85<br><span class="strike">64.75</span></td>
+				</tr>
+				<tr>
+					<td class="product-specs" colspan="4">
+						<table class="full-width">
+							<tr class="item-price-small"><td class="item-detail-row product-price"><label>Price: </label>7.77</td></tr>
+							<tr class="item-price-small"><td class="item-detail-row product-qty"><label>Qty: </label>5</td></tr>
+							<tr class="item-price-small"><td class="item-detail-row product-total"><label>Total: </label>38.85 <span class="strike">64.75</span></td></tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+		</tr></tbody></table>
+	`);
+
+	it("uses the per-unit sale price, not the line total", () => {
+		const products = parseProductsFromEmail(multiQty);
+		expect(products[0].price).toBe("$7.77");
+	});
+
+	it("derives the per-unit original (struck total / qty) and flags the sale", () => {
+		const products = parseProductsFromEmail(multiQty);
+		expect(products[0].originalPrice).toBe("$12.95");
+		expect(products[0].onSale).toBe(true);
 	});
 });
 
