@@ -1,13 +1,32 @@
 # Backend & Database Decision — Firestore vs. Supabase
 ## Written 2026-06-20.
 
-> **Date:** 2026-06-20 &nbsp;·&nbsp; **Status:** OPEN — decision required before the cloud milestone ships.
+> **Date:** 2026-06-20 &nbsp;·&nbsp; **Status:** LEANING SUPABASE (updated 2026-06-20 — see "Decision update" below).
 > **Audience:** personal strategy notes.
 > This doc is the **single source of truth** for the backend choice. The README roadmap,
-> [STRATEGY_REVIEW_2026-06-20.md](./STRATEGY_REVIEW_2026-06-20.md), and
+> [STRATEGY_REVIEW_2026-06-20.md](./STRATEGY_REVIEW_2026-06-20.md),
+> [COMPETITIVE_ANALYSIS_2026-06-20.md](./COMPETITIVE_ANALYSIS_2026-06-20.md), and
 > [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md) all defer to it.
 > Until this is resolved, **priority #2 ("stand up the cloud DB") is ambiguous** — it means
 > either "merge PR #44 (Firestore)" or "pivot to Supabase." Resolve this first.
+
+---
+
+## ⭐ Decision update (2026-06-20) — the swing vote is in
+
+The original recommendation hinged on one question: *"Is v8 social/sharing committed, or someday-maybe?"*
+**Answer (founder, 2026-06-20): committed — it's the main differentiator.** The [competitive
+analysis](./COMPETITIVE_ANALYSIS_2026-06-20.md) reinforces this: borrowing + the status/location/availability
+spine is the uncompeted core, and those are *inherently relational, access-controlled queries*
+("what has my cousin borrowed", "show everything clean + at home + not on loan", "everything in the Aspen house").
+
+That tips the recommendation from "merge Firestore #44" to **lean Supabase**, because:
+- **Row-Level Security** is the natural enforcement layer for shared-closet access + per-item/category privacy.
+- **Status & location** become first-class queryable columns (`WHERE status='clean' AND location='home'`) — exactly the relational filtering Firestore is weakest at.
+- It still folds in image storage + the v2.2 scraper backend on one platform.
+
+**The corollary is now load-bearing:** if going Supabase, do it **before** #44 ships. Migrating live Firestore
+user data later is the worst path. The rest of this doc is the original even-handed comparison that led here.
 
 ---
 
@@ -113,8 +132,35 @@ The one thing **not** to do: merge #44, then migrate to Supabase later for v8. T
 
 ---
 
+## Does the DB choice affect email-provider expansion? (Hotmail/Outlook/Yahoo/iCloud/Proton/AOL)
+
+**Short answer: no — the DB choice is largely orthogonal.** What gates multi-provider import is *having a
+backend at all* (which is this decision) plus the provider's protocol, not whether that backend is Firestore
+or Supabase. Both can host the token store and the fetch functions.
+
+Providers split into two protocol classes, and **that** split is what matters:
+
+| Provider | Protocol | Backend need | Notes |
+|---|---|---|---|
+| Gmail | Google API (OAuth) | token refresh server-side | already wired |
+| **Hotmail + Outlook.com** | **Microsoft Graph (OAuth)** | one integration | ⭐ **Hotmail and Outlook.com are the same Microsoft consumer mail — a single Graph integration covers BOTH.** Your #1 priority is cheaper than it looks. |
+| Yahoo Mail | IMAP (OAuth) | **server-side IMAP** | browsers can't speak IMAP (raw TCP, not HTTP) — mandatory backend |
+| iCloud Mail | IMAP (app-specific password) | server-side IMAP | no public API; app-password + IMAP only |
+| AOL Mail | IMAP (OAuth, Yahoo-owned) | server-side IMAP | same stack as Yahoo |
+| **ProtonMail** | **none usable from a web app** | ❌ | E2E-encrypted; no standard IMAP without Proton **Bridge** (desktop-only). **Effectively infeasible for a web app — drop it or treat as "export a file" only.** |
+
+**Implications:**
+- **OAuth-API providers** (Gmail, Microsoft Graph) are the easy tier — same shape as today's Gmail flow.
+- **IMAP providers** (Yahoo, iCloud, AOL) need a server-side IMAP client. This is a backend *capability*, not a DB feature — so it's neutral to Firestore-vs-Supabase **with one nuance:** Supabase **Edge Functions run Deno**, where IMAP libraries are less mature than Node's (`imapflow`, `node-imap`). That's *not* a blocker — you can run a small **Node** service (Cloud Run / Render / Fly) alongside Supabase Postgres for the IMAP work. Just don't assume Edge Functions alone will carry heavy IMAP.
+- **ProtonMail** is the only true wall, and it's a protocol wall, not a DB one.
+
+**Net:** prioritize **Microsoft Graph next** (covers Hotmail #1 *and* Outlook in one build), then a shared **IMAP service** for Yahoo/iCloud/AOL, and **shelve ProtonMail**. None of this changes the Firestore-vs-Supabase math — but it *does* reinforce "you need a real backend," which is this decision.
+
+---
+
 ## Open questions to resolve before acting
 
-- [ ] Is v8 social/sharing committed near-term, or parked? (This is the swing vote.)
+- [x] Is v8 social/sharing committed near-term, or parked? → **Committed (2026-06-20). Swing vote favors Supabase.**
 - [ ] Confirm current Firestore aggregation limits against the live docs before relying on client-side compute as the v5 plan.
 - [ ] If Supabase: prototype the Gmail access-token flow under Supabase Auth **first** — that's the riskiest unknown, spike it before committing.
+- [ ] Decide IMAP host (Supabase Edge/Deno vs. a small Node service) before starting Yahoo/iCloud/AOL — affects the v2.3 estimate, not the DB choice.
