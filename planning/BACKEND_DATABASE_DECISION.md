@@ -5,7 +5,7 @@
 > **Audience:** personal strategy notes.
 > This doc is the **single source of truth** for the backend choice. The README roadmap,
 > [STRATEGY_REVIEW_2026-06-20.md](./STRATEGY_REVIEW_2026-06-20.md),
-> [COMPETITIVE_ANALYSIS_2026-06-20.md](./COMPETITIVE_ANALYSIS_2026-06-20.md), and
+> [COMPETITIVE_ANALYSIS_2026-06-20.md](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md), and
 > [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md) all defer to it.
 > Until this is resolved, **priority #2 ("stand up the cloud DB") is ambiguous** — it means
 > either "merge PR #44 (Firestore)" or "pivot to Supabase." Resolve this first.
@@ -16,7 +16,7 @@
 
 The original recommendation hinged on one question: *"Is v8 social/sharing committed, or someday-maybe?"*
 **Answer (founder, 2026-06-20): committed — it's the main differentiator.** The [competitive
-analysis](./COMPETITIVE_ANALYSIS_2026-06-20.md) reinforces this: borrowing + the status/location/availability
+analysis](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md) reinforces this: borrowing + the status/location/availability
 spine is the uncompeted core, and those are *inherently relational, access-controlled queries*
 ("what has my cousin borrowed", "show everything clean + at home + not on loan", "everything in the Aspen house").
 

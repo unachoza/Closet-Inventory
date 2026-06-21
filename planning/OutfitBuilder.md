@@ -10,7 +10,7 @@
 ## The strategic framing
 
 The outfit builder is **table-stakes** — every competitor (Whering, Acloset, Alta, Stylebook) has one
-([competitive analysis](./COMPETITIVE_ANALYSIS_2026-06-20.md)). So:
+([competitive analysis](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md)). So:
 
 - **Don't** out-engineer them on avatars/AR/ML. That's a money pit on their home turf.
 - **Do** add a thin, opinionated **"why this works" intelligence layer** they lack: color theory + Kibbe
