@@ -1,4 +1,4 @@
-# Testing Roadmap (v2)
+# Testing Roadmap (v2) - Written 2026-06-14
 
 > Written 2026-06-14. Supersedes the framing in [TESTING_PLAN.md](./TESTING_PLAN.md),
 > whose "Current State" is badly stale (it says 22 test files / ~30%).

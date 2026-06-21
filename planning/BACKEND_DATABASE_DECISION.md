@@ -1,5 +1,4 @@
-# Backend & Database Decision — Firestore vs. Supabase
-## Written 2026-06-20.
+# Backend & Database Decision — Firestore vs. Supabase - Written 2026-06-20.
 
 > **Date:** 2026-06-20 &nbsp;·&nbsp; **Status:** ✅ DECIDED — **Supabase** (committed 2026-06-20; rationale in "Decision update" below).
 > **Audience:** personal strategy notes.
