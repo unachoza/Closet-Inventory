@@ -15,6 +15,7 @@ export type ClothingItem = {
 	size: string;
 	brand: string;
 	price?: string;
+	originalPrice?: string;
 	material: MaterialBlend[];
 	occasion: string;
 	/** Legacy free-text age (e.g. "1 year"). Superseded by purchaseDate (factual age) + condition (subjective state). Kept for back-compat display fallback. */
