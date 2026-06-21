@@ -1,4 +1,4 @@
-# Design Plan
+# Design Plan - Written 2026-06-15
 
 Create design governance for product.
 Marry Closet Intelligence + Emotional Fashion UX && A Recognizable Visual Taste

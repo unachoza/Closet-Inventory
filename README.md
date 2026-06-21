@@ -1,6 +1,10 @@
-# Closet Inventory
+# Nothing To Wear
 
-A personal wardrobe management app that lets users upload, categorize, search, and organize clothing items — with Gmail import, Firestore sync, and a fabric care guide.
+> _Working title: "Nothing To Wear" (formerly "My Closet Inventory" formerly formerly "Our Closet")._
+
+A wardrobe **inventory & logistics** app — not just an outfit planner. It tracks what you own, **what state it's in** (clean / dirty / at the dry cleaner / traveling / on loan), **where it is** (home, storage, a friend's suitcase), and lets you share and borrow with people you trust. Auto-imports purchases from your inbox, infers material/care/style, and answers the question the name asks: _do I actually have nothing to wear, or is it just out of sight, dirty, or lent out?_
+
+Built around low-friction ingestion (email + camera), a fabric-care knowledge layer, and the social/borrow loop that started it all (see [planning/PRODUCT_VISION_2026-06-20.md](./planning/PRODUCT_VISION_2026-06-20.md)).
 
 ---
 
@@ -160,25 +164,26 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 > ✅ = Shipped (on `main`) &nbsp;|&nbsp; 🚧 = In open PR / review &nbsp;|&nbsp; 🔲 = Planned
 
-> **Version numbers are scope groupings, not build order.** The actual near-term sequence is mobile-first (below). Some items already exist as code but live in open PRs, not yet on `main` — those note the PR number.
+> **Version numbers are scope groupings, not build order.** The actual near-term sequence is below. Some items already exist as code but live in open PRs, not yet on `main` — those note the PR number.
 
 ---
 
-### 🎯 Near-Term Priority Order (mobile-first)
+### 🎯 Near-Term Priority Order
 
-The closet is responsive today, but the mobile experience the product and
-business model depend on is unbuilt. Actual build order:
+> Re-sequenced 2026-06-20. Full reasoning + dev-day estimates in
+> [planning/STRATEGY_REVIEW_2026-06-20.md](./planning/STRATEGY_REVIEW_2026-06-20.md).
 
-
-1. **Mobile UI polish** (from v2.0) — touch-target audit (44×44px) and a bottom nav / "Add Item" FAB so the primary action isn't buried in the hamburger drawer.
-2. **PWA scaffolding** (pulled forward from v2.0) — `manifest.json`, service worker, iOS meta tags, app icons. **Load-bearing** for v9.0 monetization ("no App Store / no 30% cut"), v4.0 offline-first, and add-to-home-screen.
-3. **Camera capture / camera-roll import** (v2.1, pulled ahead of v1.2 analytics) — fastest item-logging path for the mobile persona; email import only covers online purchases.
+1. **Known-bug cleanup + green suite** — strip debug logs, then land the trust-eroding core-loop bugs *with regression tests*: material filter returns nothing, remove doesn't re-render the grid, MonthYearPicker fabricated age, import-non-clothing skip, title-case CAPS. Cheap, high-confidence, makes everything after trustworthy. (~5.5–6 dev-days)
+2. **Stand up the cloud layer** — ⚠️ **gated by an open decision:** [Firestore (merge PR #44) vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md). Resolve that first; "merge #44" is only the answer if Firestore wins. Pair with the **base64 → object-storage** image fix. (~2.5–10.5 dev-days, path-dependent)
+3. **Mobile UI polish + PWA** — touch-target audit (44×44px), bottom nav / "Add Item" FAB (primary action out of the hamburger), and PWA scaffolding (`vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons). **Load-bearing** for monetization ("no App Store / no 30% cut"), offline-first, and add-to-home-screen. (~7.5–9.5 dev-days)
+4. **v2.2 web-engagement** — scrape richer product details from retailer PDPs to feed the existing inference pipeline. ⚠️ Do the [feasibility spike first](./planning/EngagingWebForProductDetails.md) — verified 2026-06-20 that Cloudflare bot-blocking returns `403` to plain fetches of major retailers. (~10–14.5 dev-days)
 
 **Cross-version dependencies:**
 
-- `wornCount` (in v1.2) is required by **v7.0** lifespan tracker and **v8.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
-- **v4.0 backend** (Firestore) gates **v6.1** social and **v9.0** monetization (`isPremium` read). It's effectively done in [#44](https://github.com/unachoza/Closet-Inventory/pull/44), so v9.0 is closer than its number implies.
-- **v9.0 monetization** also depends on the **PWA** install path (priority 3).
+- `wornCount` (in v5) is required by the **v9.0** lifespan tracker and **v10.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
+- The **cloud backend** (v5.1) gates **v8.1** social and **v1.0 monetization** (`isPremium` read). Resolve the [DB decision](./planning/BACKEND_DATABASE_DECISION.md) before building on it — if Supabase wins, migrate *before* #44 ships, never after.
+- **Monetization** also depends on the **PWA** install path (priority 3).
+- **Camera-roll import** (v3.1) is the fastest logging path for the mobile persona and the only path for in-store / second-hand items — slot it after the image-storage fix (it multiplies the base64 ceiling).
 
 ---
 
@@ -211,6 +216,23 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
+### ⭐ v1.5 — Wardrobe Status, Location & Availability _(the "Nothing To Wear" core — uncompeted)_
+
+> The flagship differentiator and the founding idea: knowing not just *what* you own but *what state
+> it's in* and *where it is*. No competitor tracks this (verified 2026-06-20). It's the spine that
+> connects inventory → laundry → travel → social/borrow. Full spec + data model + UI:
+> [planning/WardrobeStatusAndLocation.md](./planning/WardrobeStatusAndLocation.md).
+
+- 🔲 Item `status` enum — clean / dirty / at dry cleaner / needs repair / traveling / on loan / packed
+- 🔲 Item `location` field — home label / storage unit / suitcase (presets + free-text); multi-home support
+- 🔲 Status & location filters + "where is it / what state is it in" quick views
+- 🔲 Quick status actions on the card (mark dirty / mark clean / send to cleaner / pack)
+- 🔲 **Laundry forecast** — per-category clean-vs-dirty ratio + "time to do laundry" nudge (needs `wornCount`)
+- 🔲 **Availability** = clean + home + not on loan → the gate that feeds v7 outfit suggestions and v8 borrowing
+- 🔲 `wornCount` + "Log a Wear" (decoupled early win; also unblocks v5 analytics, v9 lifespan, v10 sustainability)
+
+---
+
 ### v2 — Auto Email Import
 
 - ✅ Gmail OAuth import screen
@@ -232,8 +254,9 @@ business model depend on is unbuilt. Actual build order:
 - ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
 - 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
-- 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
-- 🚧  Don't import items that can't be mapped to a category (big for Amazon emails)
+- ✅ Fast fashion retailer support - Temu (data embedded in images, OCR required)
+- 🔲 Full Amazon support - import-non-clothing skip
+- 🚧 Don't import items that can't be mapped to a category (big for Amazon emails)
 - 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 - 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 
@@ -241,15 +264,30 @@ business model depend on is unbuilt. Actual build order:
 
 ### v2.2 — Engaging the Web for missing details
 
+> Full design + risks + estimates: [planning/EngagingWebForProductDetails.md](./planning/EngagingWebForProductDetails.md).
+> Core idea: `brand + name` (from email) → resolve retailer PDP URL → scrape the rich blocks
+> (`[data-testid="product-description"]`, `[data-testid="materials-and-care-copy"]`, etc.) → feed the
+> **existing** `inferProductAttributes` / `resolveMaterials` pipeline. The scraper is a *text-source
+> upgrade*, not new inference code.
+
+- 🔲 Server-side fetch layer (browser CORS + Cloudflare/Akamai bot-blocking make client-side scraping impossible — **verified `403` against Aritzia 2026-06-20**); host depends on the [backend/DB decision](./planning/BACKEND_DATABASE_DECISION.md)
+- 🔲 Layered URL resolution — retailer-direct first, Google Custom Search API fallback
+- 🔲 JSON-LD-first extraction + per-retailer `data-testid` selector packs (same maintenance treadmill as the email parsers)
+- 🔲 "Find full details ✨" button on the import-review card (user-triggered, reviewable, cached)
+- 🔲 Search for item material breakdown + descriptions from retailer PDPs
 - 🔲 "Find image" flow for items imported without photos
-- 🔲 search for item material breakdown and item descriptions from retailer websites
-- 🔲 Engaging Internet Archive for older details
+- 🔲 Engaging Internet Archive for older / discontinued items
 
 ---
 
 ### v2.3 - Expanding Email Provider Scope
 
-- 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
+- 🔲 Additional email providers 
+- 🔲 Hotmail / Outlook (Microsoft Graph)
+- 🔲 Yahoo Mail - server-side IMAP client — a backend required,
+- 🔲 iCloud Mail -IMAP, which browsers cannot speak (it's raw TCP, not HTTP)
+- 🔲 AOL Mail - IMAP, which browsers cannot speak (it's raw TCP, not HTTP)
+- 🔲 Proton Mail - end-to-end encrypted with no usable IMAP 
 
 ---
 
@@ -270,6 +308,8 @@ business model depend on is unbuilt. Actual build order:
 ### v3.1 — Camera Roll Import
 
 > Pulled **ahead of v1.2 analytics** — for the mobile persona, photographing an item is the fastest way to log one, and it's the only import path for in-store / second-hand purchases (email import covers online only).
+
+- consider phone permissions of access to camera roll
 
 - 🔲 "Import from Camera Roll" button — native `<input type="file" accept="image/*">` opens iOS/Android photo library (no native app required)
 - 🔲 "Take Photo" button — `capture="environment"` opens camera directly
@@ -310,7 +350,8 @@ business model depend on is unbuilt. Actual build order:
 
 ### v5.1 — Backend & Database
 
-> ⚠️ The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these ✅ as "built, pending merge."
+> ⚠️ **OPEN DECISION before this ships: [Firestore vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md).**
+> The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these 🚧 as "built on the Firestore path, pending the DB decision + merge." If Supabase wins (better fit for v5 SQL analytics + v8 relational social/RLS + image storage + the v2.2 scraper backend), #44 is replaced rather than merged — decide *before* it ships.
 
 - 🚧 Firestore NoSQL database with per-user closet collection
 - 🚧 Offline-first: localStorage as cache, Firestore sync on sign-in
@@ -325,6 +366,8 @@ business model depend on is unbuilt. Actual build order:
 
 - 🔲 Trip setup form (destination type, duration, luggage size)
 - 🔲 Suggested packing checklist pulled from closet by occasion tag
+- 🔲 see closet and select items 
+- 🔲 calculate suggestions based on how many days 
 - 🔲 `usePackingList` hook
 - 🔲 Packing lists saved to Firestore
 
@@ -338,16 +381,23 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v7.0 — Outfit Builder
+### v7.0 — Outfit Builder ("the Clueless closet")
 
-- 🔲 Split-pane: closet grid (left) + outfit canvas (right)
-- 🔲 Drag-and-drop via `@dnd-kit/core`
+> Everyone who's seen the prototype wants this. Strategy: **keep the build lightweight, make the
+> *suggestions* smart** by folding in color theory + Kibbe body types + style archetypes — a layer
+> competitors don't have. Avatar-overlay visualizer already prototyped in branch `V7-Outfit-Builder`.
+> Full spec: [planning/OutfitBuilder.md](./planning/OutfitBuilder.md).
+
+- 🚧 Avatar-overlay visualizer — superimpose closet items onto a user avatar by zone (tops/bottoms/feet) — _prototyped in `V7-Outfit-Builder`_
+- 🔲 Split-pane: closet grid + outfit canvas; drag-and-drop via `@dnd-kit/core`
 - 🔲 `Outfit` data model + `useOutfits` hook
 - 🔲 Weather-based suggestions (Open-Meteo API + `navigator.geolocation`)
+- 🔲 **Smart-suggestion layer (the differentiator):** color-harmony pairing, Kibbe-aware silhouette matching, style-archetype filters — lightweight rules on existing attributes, not heavy ML
+- 🔲 **Availability-aware:** only suggest items that are clean + home + not on loan (depends on the Status & Location milestone)
 
 ---
 
-### v8.1 — Social & Sharing
+### v8 — Social & Sharing
 
 - 🔲 "Share closet" read-only invite link
 - 🔲 "Request to borrow" button
@@ -375,7 +425,7 @@ business model depend on is unbuilt. Actual build order:
 
 ---
 
-### v1.0 — Monetization (Stripe)
+### v11 — Monetization (Stripe)
 
 > Distributed as a PWA — no App Store, no 30% Apple cut. Stripe takes ~2.9% + 30¢ per transaction. You keep ~97%.
 
@@ -388,6 +438,7 @@ business model depend on is unbuilt. Actual build order:
 **Premium tier (Stripe subscription)**
 
 - Unlimited items
+- Enriched Product Details surfaced from deep internet research
 - Gmail import
 - Firestore cloud sync + multi-device access
 - AI camera roll import (v2.1)
