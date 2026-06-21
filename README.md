@@ -1,6 +1,10 @@
-# Closet Inventory
+# Nothing To Wear
 
-A personal wardrobe management app that lets users upload, categorize, search, and organize clothing items — with Gmail import, Firestore sync, and a fabric care guide.
+> _Working title: "Nothing To Wear" (formerly Closet Inventory / "Our Closet")._
+
+A wardrobe **inventory & logistics** app — not just an outfit planner. It tracks what you own, **what state it's in** (clean / dirty / at the dry cleaner / traveling / on loan), **where it is** (home, storage, a friend's suitcase), and lets you share and borrow with people you trust. Auto-imports purchases from your inbox, infers material/care/style, and answers the question the name asks: _do I actually have nothing to wear, or is it just out of sight, dirty, or lent out?_
+
+Built around low-friction ingestion (email + camera), a fabric-care knowledge layer, and the social/borrow loop that started it all (see [planning/PRODUCT_VISION_2026-06-20.md](./planning/PRODUCT_VISION_2026-06-20.md)).
 
 ---
 
@@ -212,6 +216,23 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ---
 
+### ⭐ v1.5 — Wardrobe Status, Location & Availability _(the "Nothing To Wear" core — uncompeted)_
+
+> The flagship differentiator and the founding idea: knowing not just *what* you own but *what state
+> it's in* and *where it is*. No competitor tracks this (verified 2026-06-20). It's the spine that
+> connects inventory → laundry → travel → social/borrow. Full spec + data model + UI:
+> [planning/WardrobeStatusAndLocation.md](./planning/WardrobeStatusAndLocation.md).
+
+- 🔲 Item `status` enum — clean / dirty / at dry cleaner / needs repair / traveling / on loan / packed
+- 🔲 Item `location` field — home label / storage unit / suitcase (presets + free-text); multi-home support
+- 🔲 Status & location filters + "where is it / what state is it in" quick views
+- 🔲 Quick status actions on the card (mark dirty / mark clean / send to cleaner / pack)
+- 🔲 **Laundry forecast** — per-category clean-vs-dirty ratio + "time to do laundry" nudge (needs `wornCount`)
+- 🔲 **Availability** = clean + home + not on loan → the gate that feeds v7 outfit suggestions and v8 borrowing
+- 🔲 `wornCount` + "Log a Wear" (decoupled early win; also unblocks v5 analytics, v9 lifespan, v10 sustainability)
+
+---
+
 ### v2 — Auto Email Import
 
 - ✅ Gmail OAuth import screen
@@ -352,12 +373,19 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ---
 
-### v7.0 — Outfit Builder
+### v7.0 — Outfit Builder ("the Clueless closet")
 
-- 🔲 Split-pane: closet grid (left) + outfit canvas (right)
-- 🔲 Drag-and-drop via `@dnd-kit/core`
+> Everyone who's seen the prototype wants this. Strategy: **keep the build lightweight, make the
+> *suggestions* smart** by folding in color theory + Kibbe body types + style archetypes — a layer
+> competitors don't have. Avatar-overlay visualizer already prototyped in branch `V7-Outfit-Builder`.
+> Full spec: [planning/OutfitBuilder.md](./planning/OutfitBuilder.md).
+
+- 🚧 Avatar-overlay visualizer — superimpose closet items onto a user avatar by zone (tops/bottoms/feet) — _prototyped in `V7-Outfit-Builder`_
+- 🔲 Split-pane: closet grid + outfit canvas; drag-and-drop via `@dnd-kit/core`
 - 🔲 `Outfit` data model + `useOutfits` hook
 - 🔲 Weather-based suggestions (Open-Meteo API + `navigator.geolocation`)
+- 🔲 **Smart-suggestion layer (the differentiator):** color-harmony pairing, Kibbe-aware silhouette matching, style-archetype filters — lightweight rules on existing attributes, not heavy ML
+- 🔲 **Availability-aware:** only suggest items that are clean + home + not on loan (depends on the Status & Location milestone)
 
 ---
 
