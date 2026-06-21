@@ -52,9 +52,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// (e.g. "buttons", "zipper") renders as its own pill, and an empty array
 	// contributes nothing (no ghost pill).
 	const accentTags = Array.isArray(style?.accents) ? style.accents : style?.accents ? [style.accents] : [];
-	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", ...accentTags].filter(
-		(t): t is string => !!t
-	);
+	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", ...accentTags].filter((t): t is string => !!t);
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
@@ -142,7 +140,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						{hasIdentity && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Identity" />
-								< div className="card-details__identity-text">
+								<div className="card-details__identity-text">
 									{purchasedLabel && (
 										<p className="card-details__identity-text">
 											Purchased {purchasedLabel}
@@ -156,13 +154,16 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						)}
 						{occasions.length > 0 && (
 							<div className="card-details__expanded-subsection">
-								<SectionTitle label="Occasion" />
+								<SectionTitle label="Occasion & Season" />
 								<div className="card-details__occasion-pills">
 									{occasions.map((o) => (
 										<span key={o} className="card-details__occasion-pill  pill">
 											{o}
 										</span>
 									))}
+									{item.style?.season && (
+										<span className="card-details__occasion-pill  pill">{item.style.season}</span>
+									)}
 								</div>
 							</div>
 						)}

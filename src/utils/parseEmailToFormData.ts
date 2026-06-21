@@ -48,7 +48,20 @@ const BRAND_PATTERNS: Record<string, string> = {
 	depop: "depop",
 	ebay: "ebay",
 	amazon: "amazon",
+	vinted: "vinted",
+	"the realreal": "the realreal",
+	quince: "quince",
+	madewell: "madewell",
+	"white house black market": "white house black market",
+	spanx: "spanx",
+	"all saints": "all saints",
+	cos: "cos",
+	alo: "alo",
+	abercrombie: "abercrombie",
+	"j crew": "j crew",
 };
+
+const RESELLERS = ["poshmark", "depop", "ebay", "vinted", "threadup", "the realreal"];
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
 	dress: "dresses",
@@ -78,6 +91,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	bodysuit: "body",
 	jumpsuit: "body",
 	skort: "bottoms",
+	culottes: "bottoms",
 	balconette: "intimates",
 	plunge: "intimates",
 	thong: "underwear",
@@ -123,6 +137,16 @@ function stripHtml(html: string): string {
 	return doc.body.textContent ?? "";
 }
 
+function isFromReseller(from: string): boolean {
+	const fromLower = from.toLowerCase();
+	return RESELLERS.some((reseller) => fromLower.includes(reseller));
+}
+
+function hasNewTags(text: string): boolean {
+	const lower = text.toLowerCase();
+	return /\b(nwt|new\s+with\s+tags?)\b/i.test(lower);
+}
+
 export function parseEmailToFormData(subject: string, body: string, from: string, date?: string): Partial<ItemFormData> {
 	const plainBody = stripHtml(body);
 	const combinedText = `${subject} ${plainBody}`;
@@ -161,6 +185,18 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	const parsed = new Date(date ?? "");
 	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
 
+	// For reseller platforms, only infer condition if explicitly marked NWT/new with tags
+	let condition: string | undefined;
+	if (isFromReseller(from)) {
+		if (hasNewTags(combinedText)) {
+			condition = "new";
+		}
+		// Otherwise leave condition undefined (user will set it)
+	} else {
+		// Retail sources: infer condition from purchase date
+		condition = defaultConditionForPurchaseDate(purchaseDate);
+	}
+
 	const result = {
 		...formItem,
 		brand,
@@ -172,9 +208,10 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		...(inferencedCare.length > 0 && { care: inferencedCare }),
 		occasion: styleTags[0] ?? "",
 		// Default condition is seeded from the order's age (a years-old purchase
-		// shouldn't default to "new"). The user can adjust it during import review.
+		// shouldn't default to "new"). For resellers, condition is only set if explicitly
+		// marked NWT. The user can adjust it during import review.
 		// Factual age comes from purchaseDate.
-		condition: defaultConditionForPurchaseDate(purchaseDate),
+		...(condition && { condition }),
 		...(purchaseDate ? { purchaseDate } : {}),
 		...attrs,
 		...semantic,
