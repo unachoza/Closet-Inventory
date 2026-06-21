@@ -50,8 +50,11 @@ export function inferCareFromAttributes(name?: string, color?: string, materials
 			}
 		}
 	}
-	for (const [pattern, careTags] of COLOR_CARE_RULES) {
-		if (pattern.test(colorText)) tags.push(...careTags);
+	// Shoes don't get laundry-based color rules (wash with darks, etc.)
+	if (!isShoe) {
+		for (const [pattern, careTags] of COLOR_CARE_RULES) {
+			if (pattern.test(colorText)) tags.push(...careTags);
+		}
 	}
 
 	return [...new Set(tags)];

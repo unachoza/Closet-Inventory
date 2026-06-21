@@ -185,13 +185,11 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	const parsed = new Date(date ?? "");
 	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
 
-	// For reseller platforms, only infer condition if explicitly marked NWT/new with tags
+	// For reseller platforms, default to "good" (unknown secondhand condition);
+	// only upgrade to "new" if the listing explicitly says NWT/new with tags.
 	let condition: string | undefined;
 	if (isFromReseller(from)) {
-		if (hasNewTags(combinedText)) {
-			condition = "new";
-		}
-		// Otherwise leave condition undefined (user will set it)
+		condition = hasNewTags(combinedText) ? "new" : "good";
 	} else {
 		// Retail sources: infer condition from purchase date
 		condition = defaultConditionForPurchaseDate(purchaseDate);

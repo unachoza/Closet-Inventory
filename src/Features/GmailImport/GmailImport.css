@@ -490,6 +490,7 @@
   .display-email-preview-panel > .gmail-preview-panel {
     position: fixed;
     inset: 0;
+    margin-top: 7vh;
     z-index: 1000;
     width: 100%;
     max-height: none;
