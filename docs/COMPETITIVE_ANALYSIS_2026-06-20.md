@@ -4,7 +4,7 @@
 > Feature claims below were verified by fetching each competitor's live site on 2026-06-20
 > (marketing pages — treat as "what they advertise," not a code audit). Re-verify before trusting;
 > these apps iterate fast.
-> Companion to [STRATEGY_REVIEW_2026-06-20.md](./STRATEGY_REVIEW_2026-06-20.md) and the README roadmap.
+> Companion to [STRATEGY_REVIEW_2026-06-20.md](../planning/STRATEGY_REVIEW_2026-06-20.md) and the README roadmap.
 
 ---
 

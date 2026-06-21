@@ -2,7 +2,7 @@
 
 > **Date:** 2026-06-20 &nbsp;·&nbsp; **Status:** SPEC (pre-build). &nbsp;·&nbsp; **Audience:** personal build notes.
 > The flagship differentiator from [PRODUCT_VISION_2026-06-20.md](./PRODUCT_VISION_2026-06-20.md) +
-> [COMPETITIVE_ANALYSIS_2026-06-20.md](./COMPETITIVE_ANALYSIS_2026-06-20.md), fleshed into buildable pieces:
+> [COMPETITIVE_ANALYSIS_2026-06-20.md](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md), fleshed into buildable pieces:
 > data model → business logic → UI. Maps to README milestone **v1.5**.
 
 ---

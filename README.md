@@ -303,6 +303,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 > Pulled **ahead of v1.2 analytics** — for the mobile persona, photographing an item is the fastest way to log one, and it's the only import path for in-store / second-hand purchases (email import covers online only).
 
+- consider phone permissions of access to camera roll
+
 - 🔲 "Import from Camera Roll" button — native `<input type="file" accept="image/*">` opens iOS/Android photo library (no native app required)
 - 🔲 "Take Photo" button — `capture="environment"` opens camera directly
 - 🔲 AI clothing detection via Vision API (GPT-4o) — send image, receive structured metadata (category, color, approximate brand)

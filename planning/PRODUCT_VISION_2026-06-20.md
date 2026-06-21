@@ -1,7 +1,7 @@
 # Product Vision — "Nothing To Wear"
 
 > **Date:** 2026-06-20 &nbsp;·&nbsp; **Audience:** personal strategy notes (the story I tell about this app).
-> Companion to [COMPETITIVE_ANALYSIS_2026-06-20.md](./COMPETITIVE_ANALYSIS_2026-06-20.md),
+> Companion to [COMPETITIVE_ANALYSIS_2026-06-20.md](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md),
 > [WardrobeStatusAndLocation.md](./WardrobeStatusAndLocation.md), and the README.
 
 ---
@@ -52,7 +52,7 @@ actually tells you the truth about itself.
 | A knowledge layer (fabric/care) | A resale marketplace |
 
 > Outfit building, analytics, and styling are **supporting cast** — table-stakes we do well, not the thesis.
-> (See [competitive analysis](./COMPETITIVE_ANALYSIS_2026-06-20.md): those are where competitors already compete.)
+> (See [competitive analysis](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md): those are where competitors already compete.)
 
 ---
 
