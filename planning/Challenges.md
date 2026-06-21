@@ -1,5 +1,16 @@
 ### challenges - Written 2026-06-7
 
+maintaining annimations from parent to child, wanting to staggar all, but then have the animation on removal broke the connection
+
+Problem: The closet grid's entrance stagger was dead — cards rendered instantly with no animation on load, filter, sort, or search. An inner AnimatePresence (added for smooth removal) severed Framer's parent-to-child variant propagation, so cards never inherited the staggered orchestration.
+
+Fix: Each card now owns its initial/animate/exit with a per-index custom delay. 
+
+The remove-from-overview bug fix is what broke the stagger. To make a removed item disappear smoothly (animate out + reflow), someone added the inner AnimatePresence mode="popLayout" and switched the entrance to parent staggerChildren orchestration. That inner AnimatePresence severed Framer's variant propagation — so removal worked, but the entrance stagger silently died as collateral damage.
+
+The real fix decouples them: each card owns its own entrance animation (per-index custom delay), and the inner AnimatePresence still handles removal — so both work without fighting each other.
+
+
 decisions about databases and role level security and relational and sql vs firestore. decided on relational tables being very important, and supabase being the way to go 
 
 React Race conditions, closing form and returning to overview before addItem posted to localStorage
