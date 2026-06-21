@@ -1,11 +1,12 @@
 import "./CheckboxCollection.css";
 import AnimatedCheckbox from "./RadixCheckbox";
+import type { ItemFormData } from "../../../utils/types";
 
 interface CheckboxCollectionProps {
 	label: string;
 	detailOptions: string[];
 	onToggleDetail: (value: string, label: string) => void;
-	formData: Record<string, string>;
+	formData: ItemFormData;
 }
 
 const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: CheckboxCollectionProps) => {
@@ -18,7 +19,7 @@ const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: 
 						<AnimatedCheckbox
 							key={detail}
 							label={detail}
-							checked={formData[label] === detail}
+							checked={formData[label as keyof ItemFormData] === detail}
 							onCheckedChange={() => onToggleDetail(detail, label)}
 						/>
 					);

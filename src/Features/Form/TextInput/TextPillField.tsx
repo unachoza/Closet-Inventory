@@ -44,7 +44,7 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 				type="text"
 				className={className}
 				value={inputValue}
-				handleFormUpdate={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+				handleFormUpdate={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => { if (typeof e !== "string") setInputValue(e.target.value); }}
 				placeholder={placeholder}
 				onKeyDown={handleKeyDown}
 			/>
