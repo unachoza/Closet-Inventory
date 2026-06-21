@@ -24,7 +24,7 @@
  */
 import { render } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
-import type { ReactNode } from "react";
+import { createElement, type ReactNode } from "react";
 import FilteredItemGrid from "../FilteredItemGrid";
 import type { ClothingItem } from "../../../utils/types";
 
@@ -60,12 +60,7 @@ vi.mock("framer-motion", () => {
 			if (custom !== undefined) dataProps["data-custom"] = String(custom);
 			if (variants) dataProps["data-has-variants"] = "true";
 			if (layout) dataProps["data-layout"] = "true";
-			const Tag = tag as keyof JSX.IntrinsicElements;
-			return (
-				<Tag {...rest} {...dataProps}>
-					{children}
-				</Tag>
-			);
+			return createElement(tag, { ...rest, ...dataProps }, children);
 		};
 	// Memoize one component per tag — returning a fresh function each access would
 	// make React treat every render as a new component type and remount endlessly,
@@ -74,7 +69,7 @@ vi.mock("framer-motion", () => {
 	return {
 		motion: new Proxy(
 			{},
-			{ get: (_t, tag: string) => (cache[tag] ??= mk(tag)) },
+			{ get: (_t, tag) => (cache[tag as string] ??= mk(tag as string)) },
 		),
 		AnimatePresence: ({ children }: { children?: ReactNode }) => <>{children}</>,
 	};

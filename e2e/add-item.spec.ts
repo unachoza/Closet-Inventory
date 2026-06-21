@@ -63,8 +63,10 @@ test.describe("Add Item — 9-step form", () => {
 		await expect(form.getByText(/photo/i).first()).toBeVisible();
 		await form.getByRole("button", { name: /submit/i }).click();
 
-		// Toast confirms success
-		await expect(page.getByText(/added to your closet/i)).toBeVisible({ timeout: 5000 });
+		// Toast confirms success. Target the visible toast specifically — the toast
+		// also mounts an aria-live status announcement with the same text, so a loose
+		// getByText matches two nodes (strict-mode violation).
+		await expect(page.locator(".toast-text")).toContainText(/added to your closet/i, { timeout: 5000 });
 
 		// Back in the grid with at least one card
 		await expect(page.getByTestId("clothes-card").first()).toBeVisible({ timeout: 5000 });

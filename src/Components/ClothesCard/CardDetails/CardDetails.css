@@ -345,7 +345,9 @@
     padding: 14px;
   }
   .card-details__toggle-details {
-    padding: 9px 18px;
+    /* >=44px tall tap target (Apple/Material guideline): 15px top+bottom + ~14px
+       line box clears 44px at the 13px font size. */
+    padding: 15px 18px;
   }
   .card-details__footer {
     padding: 5px 10px 10px;

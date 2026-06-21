@@ -45,7 +45,9 @@ test.describe("Gmail import — mobile", () => {
 		await gotoGmail(page);
 
 		await page.locator(".advanced-search-toggle").tap();
-		const input = page.locator(".advanced-search-input").first();
+		// Advanced search is now a step wizard (MobileAdvancedSearchFlow); the first
+		// step exposes a `.sw-input` text field.
+		const input = page.locator(".sw-input").first();
 		await expect(input).toBeVisible();
 
 		// The search input shouldn't overflow the viewport width.
