@@ -1,15 +1,16 @@
-export function inferSemanticAttributes(text: string) {
+import type { ClothingItem } from "./types";
+
+export function inferSemanticAttributes(text: string): Partial<ClothingItem> {
 	const lower = text.toLowerCase();
-	const result: any = {};
+	const result: Partial<ClothingItem> = {};
 
 	// blazer → care override
 	if (/\bblazer\b/i.test(lower)) {
 		result.care = "dry clean only";
 	}
 
-	// contour → bodycon style + going-out occasion
+	// contour → bodycon fit, going-out occasion
 	if (/\bcontour\b/i.test(lower)) {
-		result.style = "bodycon";
 		result.occasion = "going-out";
 	}
 

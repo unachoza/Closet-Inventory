@@ -1,12 +1,19 @@
 import "./CheckboxCollection.css";
 import AnimatedCheckbox from "./RadixCheckbox";
 
-const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: any) => {
+interface CheckboxCollectionProps {
+	label: string;
+	detailOptions: string[];
+	onToggleDetail: (value: string, label: string) => void;
+	formData: Record<string, string>;
+}
+
+const CheckboxCollection = ({ label, detailOptions, onToggleDetail, formData }: CheckboxCollectionProps) => {
 	return (
 		<div className="form-step">
 			<label>{label}</label>
 			<div className="options-container">
-				{detailOptions.map((detail: any) => {
+				{detailOptions.map((detail: string) => {
 					return (
 						<AnimatedCheckbox
 							key={detail}

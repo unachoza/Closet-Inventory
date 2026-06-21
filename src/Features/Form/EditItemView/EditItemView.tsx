@@ -72,7 +72,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// Stable ref — uses functional update so it never needs formData in deps.
 	// TextInput is wrapped in memo(), so a stable handleChange means only the
 	// TextInput whose value actually changed will re-render (not all 10+).
-	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {
+		if (typeof e === "string") return;
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	}, []);
