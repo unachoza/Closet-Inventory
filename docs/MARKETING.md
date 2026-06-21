@@ -88,7 +88,7 @@ between *storage* and *a stylist*.
 
 **Free → Premium, distributed as a PWA — you keep ~97% (Stripe ~2.9%, no Apple 30%).**
 
-- **Free** earns trust: up to 30 items, manual entry, local storage. Enough to feel value, not enough to live in.
+- **Free** earns trust: up to 35 items, manual entry, local storage. Enough to feel value, not enough to live in.
 - **Premium** sells the magic: unlimited items, Gmail import, cloud sync across devices, AI camera import. The wedge feature (import) is the paywall — because it's the feature that's *worth* paying for and the one nobody else has.
 
 > The PWA distribution isn't just margin — it's the **"no App Store gatekeeper"**

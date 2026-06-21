@@ -1,6 +1,6 @@
 # Nothing To Wear
 
-> _Working title: "Nothing To Wear" (formerly Closet Inventory / "Our Closet")._
+> _Working title: "Nothing To Wear" (formerly "My Closet Inventory" formerly formerly "Our Closet")._
 
 A wardrobe **inventory & logistics** app — not just an outfit planner. It tracks what you own, **what state it's in** (clean / dirty / at the dry cleaner / traveling / on loan), **where it is** (home, storage, a friend's suitcase), and lets you share and borrow with people you trust. Auto-imports purchases from your inbox, infers material/care/style, and answers the question the name asks: _do I actually have nothing to wear, or is it just out of sight, dirty, or lent out?_
 
@@ -254,8 +254,9 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
 - 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
-- 🔲 Remaining retailer coverage — full Amazon support; Temu (data embedded in images, OCR required)
-- 🚧  Don't import items that can't be mapped to a category (big for Amazon emails)
+- ✅ Fast fashion retailer support - Temu (data embedded in images, OCR required)
+- 🔲 Full Amazon support - import-non-clothing skip
+- 🚧 Don't import items that can't be mapped to a category (big for Amazon emails)
 - 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 - 🚧 Firebase Auth integration _(in PR [#44](https://github.com/unachoza/Closet-Inventory/pull/44) — not yet on `main`)_
 
@@ -281,7 +282,12 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ### v2.3 - Expanding Email Provider Scope
 
-- 🔲 Additional email providers — Hotmail / Outlook (Microsoft Graph), Yahoo Mail (IMAP/OAuth, requires a backend)
+- 🔲 Additional email providers 
+- 🔲 Hotmail / Outlook (Microsoft Graph)
+- 🔲 Yahoo Mail - server-side IMAP client — a backend required,
+- 🔲 iCloud Mail -IMAP, which browsers cannot speak (it's raw TCP, not HTTP)
+- 🔲 AOL Mail - IMAP, which browsers cannot speak (it's raw TCP, not HTTP)
+- 🔲 Proton Mail - end-to-end encrypted with no usable IMAP 
 
 ---
 
