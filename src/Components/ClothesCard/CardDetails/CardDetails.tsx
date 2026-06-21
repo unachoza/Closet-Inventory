@@ -45,7 +45,6 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// inferProductAttributes — populated during email import), NOT as flat
 	// fields on the item. Deduped + joined so empty fields collapse gracefully.
 	const style = item.style;
-	// const dedupeJoin = (parts: (string | undefined)[]) => [...new Set(parts.filter((p): p is string => !!p))].join(" · ");
 	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
 	const hasStyle = Object.keys(otherStyles).length > 0;
 
@@ -112,9 +111,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<div className="card-details__expanded">
 						{hasStyle && (
 							<div className="card-details__expanded-subsection">
-								<SectionTitle label="Style" />
+								<SectionTitle label="Style & Construction" />
 								{style?.fit && <p className="card-details__identity-text">Fit: {style.fit}</p>}
+								{style?.pattern && <p className="card-details__identity-text">Pattern: {style.pattern}</p>}
 								{style?.neckline && <p className="card-details__identity-text">Neckline: {style?.neckline}</p>}
+								{style?.topLength && <p className="card-details__identity-text">Length: {style?.topLength}</p>}
 								{style?.sleeveLength && <p className="card-details__identity-text">Sleeve: {style?.sleeveLength}</p>}
 								{style?.hemLength && <p className="card-details__identity-text">Hem Length: {style?.hemLength}</p>}
 								{style?.rise && <p className="card-details__identity-text">Rise: {style?.rise}</p>}

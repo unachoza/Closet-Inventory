@@ -24,4 +24,15 @@ describe("toTitleCase", () => {
 	it("returns empty/whitespace input unchanged", () => {
 		expect(toTitleCase("")).toBe("");
 	});
+
+	// Regression: retailer names arrive ALL CAPS from Zara/Aritzia/Shein emails.
+	// toTitleCase is applied at import time (GmailImport.tsx) so stored names are clean.
+	it.each([
+		["RIBBED KNIT MIDI SKIRT", "Ribbed Knit Midi Skirt"],
+		["SCULPT KNIT RACER MINI DRESS", "Sculpt Knit Racer Mini Dress"],
+		["OVERSIZED PRINTED T-SHIRT", "Oversized Printed T-Shirt"],
+		["RELAXED FIT JEANS WITH BELT", "Relaxed Fit Jeans With Belt"],
+	])('retailer ALL CAPS "%s" -> "%s"', (input, expected) => {
+		expect(toTitleCase(input)).toBe(expected);
+	});
 });

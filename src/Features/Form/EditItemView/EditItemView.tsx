@@ -223,7 +223,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							key={key}
 							name={key}
 							label={key}
-							value={normalizeToString(formData[key] ?? value)}
+							value={normalizeToString(formData[key as keyof ClothingItem] ?? value)}
 							placeholder={!value ? `Enter ${key}` : ""}
 							handleFormUpdate={handleChange}
 						/>
