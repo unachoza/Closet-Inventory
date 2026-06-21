@@ -255,6 +255,7 @@ export function useAdvancedSearch() {
 
 	const [filteredEmails, setFilteredEmails] = useState<GmailEmailMeta[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
+	const [isFetchingMore, setIsFetchingMore] = useState(false);
 	const [isFetchingBody, setIsFetchingBody] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [hasNextPage, setHasNextPage] = useState(false);
@@ -366,8 +367,7 @@ export function useAdvancedSearch() {
 		async (accessToken: string) => {
 			if (!cache.nextPageToken) return;
 
-			setIsSearching(true);
-			setSearchMode("fetch");
+			setIsFetchingMore(true);
 			setError(null);
 
 			try {
@@ -394,8 +394,7 @@ export function useAdvancedSearch() {
 				const message = err instanceof Error ? err.message : "Failed to load more emails";
 				setError(message);
 			} finally {
-				setIsSearching(false);
-				setSearchMode(null);
+				setIsFetchingMore(false);
 			}
 		},
 		[cache, fetchEmailList, setCache],
@@ -444,6 +443,7 @@ export function useAdvancedSearch() {
 	return {
 		emails: filteredEmails,
 		isSearching,
+		isFetchingMore,
 		isFetchingBody,
 		error,
 		searchEmails,

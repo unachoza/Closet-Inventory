@@ -448,6 +448,55 @@
 	color: #f5cc62;
 }
 
+.gmail-preview-skipped-notice {
+	border: 1px solid rgba(165, 180, 252, 0.25);
+	border-radius: var(--border-radius-sm);
+	background: rgba(19, 17, 146, 0.18);
+	overflow: hidden;
+}
+
+.gmail-skipped-toggle {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-100, 8px);
+	width: 100%;
+	padding: var(--spacing-075, 6px) var(--spacing-200);
+	border: none;
+	background: none;
+	color: rgb(165, 180, 252);
+	font-size: 0.85rem;
+	text-align: left;
+	cursor: pointer;
+	font: inherit;
+	transition: background 0.2s;
+}
+
+.gmail-skipped-toggle:hover {
+	background: rgba(165, 180, 252, 0.08);
+}
+
+.gmail-skipped-chevron {
+	display: inline-flex;
+	width: 12px;
+	flex-shrink: 0;
+	transition: transform 0.2s;
+}
+
+.gmail-skipped-list {
+	list-style: none;
+	margin: 0;
+	padding: 0 var(--spacing-200) var(--spacing-100) calc(var(--spacing-200) + 20px);
+	border-top: 1px solid rgba(165, 180, 252, 0.15);
+	background: rgba(19, 17, 146, 0.12);
+}
+
+.gmail-skipped-item {
+	margin: 4px 0;
+	color: rgba(165, 180, 252, 0.85);
+	font-size: 0.8rem;
+	line-height: 1.4;
+}
+
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;
@@ -546,6 +595,20 @@
   .gmail-preview-panel {
     max-height: 380px;
   }
+}
+
+.gmail-skeleton-row {
+	height: 52px;
+	border-radius: var(--border-radius-sm, 4px);
+	background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 75%);
+	background-size: 200% 100%;
+	animation: gmail-shimmer 1.4s ease-in-out infinite;
+	margin-top: 4px;
+}
+
+@keyframes gmail-shimmer {
+	0% { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
 }
 
 @media (max-width: 480px) {
