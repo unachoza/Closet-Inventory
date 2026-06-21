@@ -197,14 +197,14 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 							</div>
 						) : (
 							<div className="card-details__buttons">
+								<button onClick={onEdit} className="card-details__button">
+									Edit
+								</button>
 								<button
 									onClick={() => setConfirming(true)}
 									className="card-details__button card-details__button--remove"
 								>
 									Remove
-								</button>
-								<button onClick={onEdit} className="card-details__button">
-									Edit
 								</button>
 							</div>
 						)}
