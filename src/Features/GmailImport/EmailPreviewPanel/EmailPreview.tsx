@@ -73,10 +73,22 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 	// When detected, parsed products are false positives from the image fallback strategy.
 	const imageBasedRetailer = useMemo(() => detectImageBasedRetailer(email.body, email.from), [email.body, email.from]);
 
-	const { clothing: effectiveProducts, skipped: skippedProducts } = useMemo(() => {
+	const { clothing: initialClothing, skipped: initialSkipped } = useMemo(() => {
 		if (imageBasedRetailer) return { clothing: [], skipped: [] };
 		return partitionByCategory(parsedProducts);
 	}, [imageBasedRetailer, parsedProducts]);
+
+	// User can "unskip" individual items — move them into the importable list.
+	const [unskipped, setUnskipped] = useState<ExtractedProduct[]>([]);
+	const effectiveProducts = useMemo(() => [...initialClothing, ...unskipped], [initialClothing, unskipped]);
+	const skippedProducts = useMemo(
+		() => initialSkipped.filter((p) => !unskipped.some((u) => u.name === p.name)),
+		[initialSkipped, unskipped],
+	);
+
+	const handleUnskip = (product: ExtractedProduct) => {
+		setUnskipped((prev) => [...prev, product]);
+	};
 
 	const [showSkipped, setShowSkipped] = useState(false);
 
@@ -140,7 +152,14 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 						<ul className="gmail-skipped-list">
 							{skippedProducts.map((product) => (
 								<li key={product.name} className="gmail-skipped-item">
-									{product.name}
+									<span className="gmail-skipped-item-name">{product.name}</span>
+									<button
+										className="gmail-skipped-include-btn"
+										type="button"
+										onClick={() => handleUnskip(product)}
+									>
+										Include
+									</button>
 								</li>
 							))}
 						</ul>

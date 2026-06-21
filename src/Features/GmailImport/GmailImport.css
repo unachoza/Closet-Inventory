@@ -491,10 +491,40 @@
 }
 
 .gmail-skipped-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--spacing-100, 8px);
 	margin: 4px 0;
 	color: rgba(165, 180, 252, 0.85);
 	font-size: 0.8rem;
 	line-height: 1.4;
+}
+
+.gmail-skipped-item-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gmail-skipped-include-btn {
+	flex-shrink: 0;
+	padding: 2px 8px;
+	border: 1px solid rgba(165, 180, 252, 0.4);
+	border-radius: var(--border-radius-sm, 4px);
+	background: none;
+	color: rgba(165, 180, 252, 0.9);
+	font-size: 0.75rem;
+	font: inherit;
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+}
+
+.gmail-skipped-include-btn:hover {
+	background: rgba(165, 180, 252, 0.12);
+	border-color: rgba(165, 180, 252, 0.7);
 }
 
 .gmail-preview-panel{
