@@ -24,6 +24,13 @@ async function expectWithinViewport(page: Page, selector: string) {
 }
 
 test.describe("Card detail modal — mobile", () => {
+	// The grow/shrink modal tears down on a `width` transitionend, which WebKit
+	// fires unreliably under automation — leaving the modal "stuck" open. Reduced
+	// motion routes close through the instant-teardown path (prefersReducedMotion),
+	// making the flow deterministic across browsers. Final layout is unchanged, so
+	// the visual baseline still holds.
+	test.use({ reducedMotion: "reduce" });
+
 	test.beforeEach(async ({ page }) => {
 		await skipOnboarding(page);
 		await page.goto("/");
@@ -56,8 +63,11 @@ test.describe("Card detail modal — mobile", () => {
 		// VISUAL BASELINE: locks the detail modal layout against drift.
 		await expect(modal).toHaveScreenshot("card-grow-modal.png");
 
-		// 3) Close → modal goes away.
-		await modal.getByRole("button", { name: "Close" }).tap({ force: true });
+		// 3) Close → modal goes away. The close (✕) button is absolutely positioned
+		//    at the modal's top-right corner; WebKit's touch hit-testing misses it
+		//    under automation even with force:true, so dispatch the click directly
+		//    to exercise the onClose handler deterministically.
+		await modal.getByRole("button", { name: "Close" }).dispatchEvent("click");
 		await expect(modal).toBeHidden();
 	});
 

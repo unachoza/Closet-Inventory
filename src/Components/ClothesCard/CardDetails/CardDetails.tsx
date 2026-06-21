@@ -48,7 +48,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
 	const hasStyle = Object.keys(otherStyles).length > 0;
 
-	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", style?.accents].filter((t): t is string => !!t);
+	// accents is `string | string[]` — normalize to an array so each accent
+	// (e.g. "buttons", "zipper") renders as its own pill, and an empty array
+	// contributes nothing (no ghost pill).
+	const accentTags = Array.isArray(style?.accents) ? style.accents : style?.accents ? [style.accents] : [];
+	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", ...accentTags].filter((t): t is string => !!t);
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
@@ -136,13 +140,12 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						{hasIdentity && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Identity" />
-								< div className="card-details__identity-text">
+								<div className="card-details__identity-text">
 									{purchasedLabel && (
-										<>
+										<p className="card-details__identity-text">
 											Purchased {purchasedLabel}
 											{ageLabel ? ` - ${ageLabel} ago` : ""}
-											<br />
-										</>
+										</p>
 									)}
 									{item.condition && <p className="card-details__identity-text">Condition: {item.condition}</p>}
 									{item.price && <p className="card-details__identity-text">Price: {item.price}</p>}
@@ -151,13 +154,16 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 						)}
 						{occasions.length > 0 && (
 							<div className="card-details__expanded-subsection">
-								<SectionTitle label="Occasion" />
+								<SectionTitle label="Occasion & Season" />
 								<div className="card-details__occasion-pills">
 									{occasions.map((o) => (
 										<span key={o} className="card-details__occasion-pill  pill">
 											{o}
 										</span>
 									))}
+									{item.style?.season && (
+										<span className="card-details__occasion-pill  pill">{item.style.season}</span>
+									)}
 								</div>
 							</div>
 						)}
@@ -191,14 +197,14 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 							</div>
 						) : (
 							<div className="card-details__buttons">
+								<button onClick={onEdit} className="card-details__button">
+									Edit
+								</button>
 								<button
 									onClick={() => setConfirming(true)}
 									className="card-details__button card-details__button--remove"
 								>
 									Remove
-								</button>
-								<button onClick={onEdit} className="card-details__button">
-									Edit
 								</button>
 							</div>
 						)}

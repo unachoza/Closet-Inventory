@@ -33,10 +33,6 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 	const [importMode, setImportMode] = useState<"replace" | "merge">("merge");
 	const [importError, setImportError] = useState<string | null>(null);
 
-	// "entireCloset" is the searchable all-items experience. In that mode the
-	// nav actions collapse into the hamburger drawer (search + sort live together
-	// in the sticky SearchSortBar below the nav).
-	const isClosetView = view === "entireCloset";
 	const showBackToCarousel = view !== "carousel";
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -155,10 +151,8 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 				>
 					<Menu size={24} />
 				</button>
-				{!isClosetView && <h1 className="page-title">Nothing To Wear</h1>}
+				<h1 className="page-title">Nothing To Wear</h1>
 			</div>
-
-			<div className="nav-right">{!isClosetView && <div className="nav-actions">{navActions}</div>}</div>
 
 			{drawerOpen && (
 				<>

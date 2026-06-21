@@ -6,7 +6,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: center;
     width: 100vw;
      height: var(--header-height);
     padding: 0 20px;
@@ -204,17 +203,8 @@ div.search-container > input {
 
 /* -------------------------------------------------------------------------
  * Mobile / narrow screens
- *
- * The four inline nav action buttons (Add Item, View All, Import Gmail,
- * Fabric Guide) don't fit alongside the title on small screens — they were
- * wrapping and overflowing the header. Below the breakpoint we hide the
- * inline actions (they remain reachable via the always-present hamburger
- * drawer) and let the title claim the freed horizontal space.
  * ---------------------------------------------------------------------- */
 @media (max-width: 768px) {
-      .nav-actions {
-            display: none;
-      }
 
       /* Let the title take up the available width next to the hamburger. */
       .nav-left {

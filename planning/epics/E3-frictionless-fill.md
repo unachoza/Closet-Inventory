@@ -30,6 +30,12 @@ _As Maya, I want to photograph an item so that logging an in-store / second-hand
 
 ---
 
+## Known bugs
+- `E3-bug.1` **Email preview horizontal scroll** — some Gmail previews don't format nicely and create an awkward horizontal scroll. Attempted `.gmail-container:has(.display-email-preview-panel){max-width:1175px}` but it didn't hold across the board. Needs a robust preview-width / overflow fix in `EmailPreview`.
+- _Skip non-clothing / uncategorizable imports (esp. Amazon) is tracked in **E0 US-0.5** (`E0-5.1`), the last open E0 item._
+
+---
+
 ## Dependencies
 - v2.2 web enrichment + IMAP need **E1 backend**. Camera import needs **E1 image storage** (base64 ceiling).
 - **Expand this epic into full stories/tickets when it's scheduled.**

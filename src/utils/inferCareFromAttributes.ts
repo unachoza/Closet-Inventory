@@ -1,9 +1,13 @@
+import type { MaterialBlend } from "./types";
+
 // Care tags inferred from a garment's NAME + COLOR, as opposed to its material
 // (see inferCareFromMaterial). Some care guidance depends on what the item is or
 // its color rather than its fiber content.
 
 // Name-keyword → care tags. Order matters only for output ordering.
 const NAME_CARE_RULES: [RegExp, string[]][] = [
+	[/\blazers?\b/i, ["Dry clean"]],
+	[/\b(shoes?|sneakers?|boots?|heels?|flats?|loafers?|pumps?|sandals?)\b/i, ["Wipe with damp cloth"]],
 	[/\bjeans?\b/i, ["Wash inside out"]],
 	[/\b(fleece|sherpa)\b/i, ["Wash inside out", "Air dry"]],
 	[/\b(beaded|sequins?|sequined|embroidered)\b/i, ["Wash in a mesh laundry bag", "Hand wash only"]],
@@ -23,19 +27,34 @@ const COLOR_CARE_RULES: [RegExp, string[]][] = [
  * Infers extra care instructions from a product's name and color.
  * Pure: returns a deduped (possibly empty) list of care strings, never mutates.
  *
- * @param name  product name (or any text to scan, e.g. subject + body)
- * @param color color text — raw card value preferred (e.g. "Navy", "White")
+ * @param name      product name (or any text to scan, e.g. subject + body)
+ * @param color     color text — raw card value preferred (e.g. "Navy", "White")
+ * @param materials optional material blend — used for special cases like leather shoes
  */
-export function inferCareFromAttributes(name?: string, color?: string): string[] {
+export function inferCareFromAttributes(name?: string, color?: string, materials?: MaterialBlend[]): string[] {
 	const tags: string[] = [];
 	const nameText = name ?? "";
 	const colorText = color ?? "";
 
+	// Check if this is a shoe with leather material
+	const isShoe = /\b(shoes?|sneakers?|boots?|heels?|flats?|loafers?|pumps?|sandals?)\b/i.test(nameText);
+	const hasLeather = materials?.some((m) => /\bleather\b/i.test(m.material)) ?? false;
+
 	for (const [pattern, careTags] of NAME_CARE_RULES) {
-		if (pattern.test(nameText)) tags.push(...careTags);
+		if (pattern.test(nameText)) {
+			// Override default shoe care if it has leather
+			if (isShoe && hasLeather && careTags.includes("Wipe with damp cloth")) {
+				tags.push("Use soft Horsehair Brush");
+			} else {
+				tags.push(...careTags);
+			}
+		}
 	}
-	for (const [pattern, careTags] of COLOR_CARE_RULES) {
-		if (pattern.test(colorText)) tags.push(...careTags);
+	// Shoes don't get laundry-based color rules (wash with darks, etc.)
+	if (!isShoe) {
+		for (const [pattern, careTags] of COLOR_CARE_RULES) {
+			if (pattern.test(colorText)) tags.push(...careTags);
+		}
 	}
 
 	return [...new Set(tags)];

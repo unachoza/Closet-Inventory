@@ -189,7 +189,7 @@ export function inferProductAttributes(name: string): ProductAttributes {
 	if (hasPockets) attrs.hasPockets = true;
 
 	const accents = matchAll(name, ACCENTS_MAP);
-	if (accents) attrs.accents = accents;
+	if (accents.length) attrs.accents = accents;
 
 	return attrs;
 }

@@ -31,6 +31,7 @@ export default defineConfig({
 	expect: {
 		toHaveScreenshot: {
 			animations: "disabled",
+			caret: "hide",
 			maxDiffPixelRatio: 0.02,
 		},
 	},
@@ -47,10 +48,14 @@ export default defineConfig({
 		{
 			name: "Desktop Chrome",
 			use: { ...devices["Desktop Chrome"] },
+			// *.mobile.spec.ts use touch (.tap()) + phone-viewport assertions; desktop
+			// contexts have no touch support, so scope them to the mobile projects.
+			testIgnore: /\.mobile\.spec\.ts$/,
 		},
 		{
 			name: "Desktop Safari (WebKit)",
 			use: { ...devices["Desktop Safari"] },
+			testIgnore: /\.mobile\.spec\.ts$/,
 		},
 	],
 

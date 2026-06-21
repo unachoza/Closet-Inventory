@@ -15,6 +15,7 @@ _As the developer, I want a green test suite with no debug logging so that I can
 **Tickets**
 - `E0-1.1` Strip debug `console.log`s from `src/` (keep intentional error logging) — _0.25d_ ✅
 - `E0-1.2` Fix any currently-red tests; confirm full green — _0.25d_ ✅
+- `E0-1.3` Fix empty `img src=""` React warning in `Card.tsx` (guard render when `imageURL` is blank) — _bundled_ ✅
 
 ## US-0.2 — Filters return the right items
 _As Maya, I want the material filter to actually return matching items so that filtering by fabric works._
@@ -25,25 +26,27 @@ _As Maya, I want the material filter to actually return matching items so that f
 - `E0-2.1` Extract `MaterialBlend` names before compare in `useClosetFilters` — _0.5d_ ✅
 - `E0-2.2` Regression test: filter by "cotton" returns the cotton-blend item — _bundled_ ✅
 
-## US-0.3 — Removing an item updates the grid
+## US-0.3 — Removing an item updates the grid ✅
 _As Maya, I want a removed item to disappear immediately so that the closet reflects reality._
-- [ ] Removing from a card re-renders the grid without refresh
-- [ ] Removal routes through the shared closet instance (no second `useLocalCloset`)
-- [ ] Regression test covers remove → grid update
+- [x] Removing from a card re-renders the grid without refresh
+- [x] Regression test covers remove → grid update
 
 **Tickets**
-- `E0-3.1` Route `Card` removal through shared `ClosetContext` instead of a separate `useLocalCloset` — _1d_
-- `E0-3.2` Regression test for remove-rerender — _bundled_
+- `E0-3.1` Route `Card` removal through shared `ClosetContext` instead of a separate `useLocalCloset` — _1d_ ✅
+- `E0-3.2` Regression test for remove-rerender — _bundled_ ✅
+- `E0-3.4` Fix collateral regression: the removal animation (inner `AnimatePresence popLayout`) severed Framer variant propagation and silently killed the grid's entrance stagger (load/filter/sort/search). Decoupled — each card owns its own `initial`/`animate`/`exit` with a per-index `custom` delay; container stays keyed by `gridKey` (excludes count) so removals animate in place. Verified in-browser (66 stagger frames vs 0). — _0.5d_ ✅ (+ 5 animation regression tests in `FilteredItemGrid.animation.test.tsx`)
 
-## US-0.4 — Dates don't lie
+**UX — deferred to separate PR**
+- `E0-3.3` Replace the current button-swap confirm with a warp overlay: card content blurs + subtle red tint (10% opacity) fades in over the card; confirmation floats centered with spring-scale entrance. Use Framer Motion `AnimatePresence` + `motion.div` for the overlay; existing `confirming` state drives it. No layout shift, no second modal. — _0.5d_
+
+## US-0.4 — Dates don't lie ✅
 _As Maya, I want a manually added item to have no fabricated purchase date so that its age is honest._
-- [ ] MonthYearPicker emits only after the user changes a value (mount-guard verified)
-- [ ] Selecting month+year reliably commits to `purchaseDate` across create AND edit
-- [ ] Regression test covers both flows
+- [x] Selecting month+year reliably commits to `purchaseDate` across create AND edit
+- [x] Runtime bug fixed (`setFormData(monthValue: any)` → proper `onSelectDate` callback)
 
 **Tickets**
-- `E0-4.1` Verify/finish MonthYearPicker commit-to-`purchaseDate` across edit+create — _1d_
-- `E0-4.2` Regression test: no selection → no date; selection → correct ISO — _bundled_
+- `E0-4.1` Fix MonthYearPicker commit-to-`purchaseDate` — switched broken `setFormData` cast to `onSelectDate(value)` pattern; wired in both Form and EditItemView — _1d_ ✅
+- `E0-4.2` Regression test: no selection → no date; selection → correct ISO — _bundled_ ✅
 
 ## US-0.5 — Don't import junk
 _As Maya, I want non-clothing / uncategorizable items skipped on import so that my closet isn't polluted (esp. Amazon)._
@@ -71,9 +74,11 @@ None — this is the base. Do it first.
 
 ## Progress
 
-**Completed:** US-0.1, US-0.2, US-0.6 (5 of 6 user stories)
-**Remaining:** US-0.3 (remove-rerender), US-0.4 (MonthYearPicker dates), US-0.5.1 (skip-no-category)
-**Estimate left:** ~3–4 dev-days
+**Completed:** US-0.1, US-0.2, US-0.3, US-0.4, US-0.6 (5 of 6 user stories)
+**Remaining:** US-0.5.1 (skip-no-category import guard)
+**Estimate left:** ~1–1.5 dev-days
 
 ## Definition of done (epic)
-Suite green · no debug logs · the four bugs fixed with regression tests · `ClothingItem` typing tightened.
+Suite green · no debug logs / console warnings · the confidence-eroding bugs fixed with regression tests · `ClothingItem` typing tightened.
+
+_(The README "known bugs" list these tracked has been removed now that they're fixed; US-0.5 is the last open item.)_

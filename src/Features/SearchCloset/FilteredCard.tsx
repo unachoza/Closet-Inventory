@@ -7,12 +7,13 @@ interface FilteredCardProps {
 	item: ClothingItem;
 	matchKeys: string[];
 	onEditItem?: (item: ClothingItem) => void;
+	onRemoveItem?: (id: string) => void;
 }
 
-const FilteredCard = ({ item, matchKeys, onEditItem }: FilteredCardProps) => {
+const FilteredCard = ({ item, matchKeys, onEditItem, onRemoveItem }: FilteredCardProps) => {
 	return (
 		<div className="filtered-card">
-			<ClothingCard item={item} onEditItem={onEditItem} />
+			<ClothingCard item={item} onEditItem={onEditItem} onRemoveItem={onRemoveItem} />
 			<FilterMatchPills matchKeys={matchKeys} />
 		</div>
 	);

@@ -508,7 +508,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		});
 	});
 
-	it("Import Entire Email button navigates to EditItemView with brand pre-filled", async () => {
+	it("Import All button imports all products with brand pre-filled", async () => {
 		render(<TestHarness />);
 
 		const checkbox = screen.getByRole("checkbox", { name: /Select email/ });
@@ -518,8 +518,8 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 			expect(screen.getByText(/Detected 5 items/)).toBeInTheDocument();
 		});
 
-		// Click "Import Entire Email" (bottom action, uses parseEmailToFormData)
-		fireEvent.click(screen.getByText("Import Entire Email"));
+		// Click "Import All 5 Items" button when multiple products are detected
+		fireEvent.click(screen.getByRole("button", { name: /Import All/ }));
 
 		await waitFor(() => {
 			expect(screen.getByText("Import Item")).toBeInTheDocument();

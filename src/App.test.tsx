@@ -82,13 +82,14 @@ beforeEach(() => {
 describe("App — view transitions", () => {
 	it("starts in carousel view with the page heading visible", () => {
 		render(<App />);
-		expect(screen.getByRole("heading", { name: /my closet inventory/i })).toBeInTheDocument();
+		expect(screen.getByRole("heading", { name: /nothing to wear/i })).toBeInTheDocument();
 		expect(screen.getByTestId("view-carousel")).toBeInTheDocument();
 		expect(screen.getByTestId("view-closet")).toBeInTheDocument();
 	});
 
 	it("Add Item navigates to form view", () => {
 		render(<App />);
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /add item/i }));
 		expect(screen.getByTestId("view-form")).toBeInTheDocument();
 		expect(screen.queryByTestId("view-carousel")).not.toBeInTheDocument();
@@ -96,6 +97,7 @@ describe("App — view transitions", () => {
 
 	it("from form view, Back to Carousel returns to carousel", () => {
 		render(<App />);
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /add item/i }));
 		expect(screen.getByTestId("view-form")).toBeInTheDocument();
 		// The form stub has a "Back to Carousel" button — click it by test id
@@ -106,6 +108,7 @@ describe("App — view transitions", () => {
 
 	it("Import Gmail navigates to gmail view", () => {
 		render(<App />);
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /import gmail/i }));
 		expect(screen.getByTestId("view-gmail")).toBeInTheDocument();
 		expect(screen.queryByTestId("view-carousel")).not.toBeInTheDocument();
@@ -113,19 +116,23 @@ describe("App — view transitions", () => {
 
 	it("Back to Carousel from gmail returns to carousel", () => {
 		render(<App />);
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /import gmail/i }));
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /back to carousel/i }));
 		expect(screen.getByTestId("view-carousel")).toBeInTheDocument();
 	});
 
 	it("Fabric Guide navigates to fabric view", () => {
 		render(<App />);
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /fabric guide/i }));
 		expect(screen.getByTestId("view-fabric")).toBeInTheDocument();
 	});
 
 	it("View All navigates to entire closet view", () => {
 		render(<App />);
+		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /view all/i }));
 		expect(screen.getByTestId("view-entire-closet")).toBeInTheDocument();
 	});
