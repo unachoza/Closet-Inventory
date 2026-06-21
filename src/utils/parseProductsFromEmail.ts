@@ -344,11 +344,16 @@ function parseColorFromSkuLine(text: string): string {
 }
 
 /**
- * Parse "1 unit / $ 14.90" or "2 units / $ 29.80" into "$14.90"
+ * Parse a "qty / price" line into the price. Handles both the $-prefixed
+ * form ("1 unit / $ 14.90") and the currency-code form Zara uses
+ * ("1 unit / 12.99 USD", where &nbsp; decodes to a non-breaking space).
  */
 function parsePriceFromUnitLine(text: string): string {
 	const match = text.match(/\$\s*(\d{1,5}(?:\.\d{2})?)/);
-	return match ? `$${match[1]}` : "";
+	if (match) return `$${match[1]}`;
+	// Fall back to the "12.99 USD" / "69.90 EUR" currency-code format.
+	const codePrices = extractPrices(text);
+	return codePrices.length > 0 ? codePrices[0] : "";
 }
 
 /**
@@ -830,9 +835,11 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 					}
 				}
 
-				// Regular price (no strikethrough): standalone number like "$71.25" or "71.25"
+				// Regular price (no strikethrough): standalone number like "$71.25" or
+				// "71.25". Require a $ prefix OR a decimal — a bare integer is a size
+				// (e.g. ALDO lists shoe size "7" on its own line), not a price.
 				if (!price) {
-					const priceMatch = line.match(/^\$?\s*(\d{1,5}(?:\.\d{2})?)\s*$/);
+					const priceMatch = line.match(/^\$\s*(\d{1,5}(?:\.\d{2})?)\s*$/) || line.match(/^(\d{1,5}\.\d{2})\s*$/);
 					if (priceMatch) {
 						price = `$${priceMatch[1]}`;
 						continue;
@@ -1305,10 +1312,15 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 
 		// Extract price
 		let price = "";
+		let originalPrice = "";
 		let onSale = false;
 		if (priceCol) {
+			// Struck-through original (e.g. "Was $90.00").
 			const strikeEl = priceCol.querySelector("[style*='line-through'], s, strike, del");
-			if (strikeEl) onSale = true;
+			if (strikeEl) {
+				onSale = true;
+				originalPrice = extractPrices(strikeEl.textContent ?? "")[0] ?? "";
+			}
 
 			const allPrices = extractPrices(priceCol.textContent ?? "");
 			if (allPrices.length > 0) {
@@ -1316,7 +1328,10 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 				if (allPrices.length >= 2) {
 					const first = parseFloat(allPrices[0].replace("$", ""));
 					const last = parseFloat(price.replace("$", ""));
-					if (last < first) onSale = true;
+					if (last < first) {
+						onSale = true;
+						if (!originalPrice) originalPrice = allPrices[0];
+					}
 				}
 			}
 		}
@@ -1329,6 +1344,7 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber: "",
@@ -1877,6 +1893,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 		const siblings = allPs.slice(boldIdx + 1);
 
 		let price = "";
+		let originalPrice = "";
 		let color = "";
 		let size = "";
 		let onSale = false;
@@ -1886,10 +1903,11 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 		for (const p of siblings) {
 			const text = (p.textContent ?? "").replace(/\s+/g, " ").trim();
 
-			// Price line: contains a strikethrough span
+			// Price line: contains a strikethrough span ("Was $90.00" struck + colored sale price)
 			const strikeEl = p.querySelector("span[style*='line-through'], s, del");
 			if (strikeEl) {
 				onSale = true;
+				originalPrice = extractPrices(strikeEl.textContent ?? "")[0] ?? "";
 				// Sale price: colored span or last price in the paragraph
 				const coloredSpan = p.querySelector("span[style*='color']");
 				if (coloredSpan) {
@@ -1898,7 +1916,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 				}
 				if (!price) {
 					const prices = extractPrices(text);
-					const origPrice = parseFloat((extractPrices(strikeEl.textContent ?? "")[0] ?? "0").replace("$", ""));
+					const origPrice = parseFloat((originalPrice || "0").replace("$", ""));
 					price = prices.find((p) => parseFloat(p.replace("$", "")) < origPrice) ?? prices[prices.length - 1] ?? "";
 				}
 				continue;
@@ -1934,6 +1952,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
@@ -2371,6 +2390,146 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Strategy: Banana Republic / Athleta (older Gap Inc. template).
+ *
+ * Each item is a bold name (<b>) followed by a nested 2-column attribute table
+ * of labeled rows: "Color:" / "Size:" / "Price:" / "Qty:". There are no product
+ * images and no SKU line.
+ *
+ * Guard: requires the <b> name to resolve Color + Size + a "Price:" label. The
+ * "Price:" label distinguishes it from Victoria's Secret (no Price: label, has a
+ * 6-digit SKU) and CUUP (uses <th> + a bold span). Header/price bolds (e.g.
+ * "YOUR ORDER", "$70.97") are filtered by name guards.
+ */
+function extractFromGapIncLabeledLayout(doc: Document): ExtractedProduct[] {
+	const bolds = Array.from(doc.querySelectorAll("td b, td strong"));
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const bold of bolds) {
+		const name = getCellText(bold);
+		if (!name || name.length < 3) continue;
+		// Skip prices ("$70.97") and order/summary headers ("YOUR ORDER (2 items)").
+		if (/^\$/.test(name) || /^\d/.test(name)) continue;
+		if (/\b(order|items?|subtotal|total|qty|quantity|price|color|size|shipping)\b/i.test(name)) continue;
+
+		const block = bold.closest("table");
+		if (!block) continue;
+
+		const color = getAttributeByLabel(block, "color");
+		const size = getAttributeByLabel(block, "size");
+		const priceRaw = getAttributeByLabel(block, "price");
+		// Require all three labels — this is what makes the layout unambiguous.
+		if (!color || !size || !priceRaw) continue;
+
+		const price = extractPrices(priceRaw)[0] ?? "";
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color: color.toLowerCase(),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Zara MJML single-column layout (newer Zara order/shipping emails).
+ *
+ * Unlike the older `rd-product-col` div layout, each product is a vertical run
+ * of sibling <tr> rows distinguished by class:
+ *   td.product-img    — product photo (anchors each item)
+ *   td.product-size   — size ("S", "8")
+ *   (plain row)       — UPPERCASE product name
+ *   (plain row)       — "Color SKU" (e.g. "Black 0/7901/290/800/02")
+ *   td.product-unit / td.product-unit-label — quantity
+ *   td.product-price  — "21.54 USD" (currency-code form, no $)
+ *
+ * Items are segmented by the product-img rows; "Products" titles, item counters,
+ * and "Shipping NNNNN" headers sit outside any product run and are skipped.
+ */
+function extractFromZaraMjmlLayout(doc: Document): ExtractedProduct[] {
+	const imgCells = Array.from(doc.querySelectorAll("td.product-img"));
+	if (imgCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const imgCell of imgCells) {
+		const imgRow = imgCell.closest("tr");
+		const img = imgCell.querySelector("img");
+		if (!imgRow || !img || !isProductImage(img as HTMLImageElement)) continue;
+
+		const imageUrl = img.getAttribute("src") ?? "";
+
+		let size = "";
+		let price = "";
+		let name = "";
+		let color = "";
+
+		// Walk following sibling rows until the next product image.
+		for (let row = imgRow.nextElementSibling; row; row = row.nextElementSibling) {
+			if (row.querySelector("td.product-img")) break;
+
+			const cell = row.querySelector("td");
+			if (!cell) continue;
+
+			if (cell.classList.contains("product-size")) {
+				if (!size) size = getCellText(cell);
+			} else if (cell.classList.contains("product-price")) {
+				if (!price) price = extractPrices(getCellText(cell))[0] ?? "";
+			} else if (
+				cell.classList.contains("product-unit") ||
+				cell.classList.contains("product-unit-label") ||
+				cell.classList.contains("product-custom-warn")
+			) {
+				continue;
+			} else {
+				const text = getCellText(cell);
+				if (!text) continue;
+				// Color line carries a Zara SKU ("Black 0/7901/290/800/02").
+				if (/\d\/\d{3,4}\//.test(text)) {
+					if (!color) color = parseColorFromSkuLine(text);
+				} else if (!name) {
+					name = text;
+				}
+			}
+		}
+
+		if (!name) continue;
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 /** Strip a leading VS color code ("54A2 Black" -> "black", "Black" -> "black"). */
 function cleanVSColor(raw: string): string {
 	const parts = raw.trim().split(/\s+/);
@@ -2418,18 +2577,22 @@ function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
 		const itemNumber = skuCell ? getCellText(skuCell) : "";
 		if (!itemNumber) continue;
 
-		// Price block: first $ amount is the paid line total; a higher trailing
-		// amount is the struck original (sale).
+		// Price block: first $ amount is the paid line total; the highest trailing
+		// amount is the struck original (sale). A middle "-$X (Offers & Discounts)"
+		// line is the discount and is ignored for the original.
 		const prices = extractPrices(getCellText(block));
 		const price = prices[0] ?? "";
 		const amounts = prices.map((p) => parseFloat(p.replace("$", "")));
-		const onSale = amounts.length > 1 && Math.max(...amounts) > amounts[0];
+		const maxAmount = amounts.length > 0 ? Math.max(...amounts) : 0;
+		const onSale = amounts.length > 1 && maxAmount > amounts[0];
+		const originalPrice = onSale ? `$${maxAmount.toFixed(2)}` : "";
 
 		const product: ExtractedProduct = {
 			imageUrl: "",
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
@@ -2506,10 +2669,12 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromPoshmarkLayout, // Poshmark td.price 3-cell rows
 		extractFromAnthropologieLayout, // Anthropologie item-detail-row labeled tables
 		extractFromVictoriasSecretLayout, // VS bold name + Color/Size/Qty attribute table
+		extractFromGapIncLabeledLayout, // Banana Republic / Athleta bold name + Color:/Size:/Price: labels
 		extractFromTargetLayout, // Target product-block 2-column layout
 		extractFromTableRows,
 		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
+		extractFromZaraMjmlLayout, // Zara MJML single-column rows (product-img/size/price classes)
 		extractFromDivLayout,
 		extractFromTextOnlyRows,
 		extractFromReceiptText, // Old Navy / Gap Inc. monospace POS receipt

@@ -427,6 +427,23 @@ describe("parseProductsFromEmail", () => {
 			const hasParagraphMatch = products.some((p) => p.name === "Just some text here" && p.size !== "" && p.price !== "");
 			expect(hasParagraphMatch).toBe(false);
 		});
+
+		it("does not mistake a bare shoe size for the price (ALDO)", () => {
+			// ALDO lists the shoe size "7" on its own line; the real price is $59.98
+			// in a sibling cell. A bare integer must not be parsed as the price.
+			const aldo = html(`
+				<table><tr>
+					<td>${productImg("https://media.aldoshoes.com/nometnu.jpg", 80, 80, "NOMETNU")}</td>
+					<td>
+						<p>NOMETNU</p>
+						<p>7<br>Black<br>Qty. 1.00<br></p>
+						<p>$59.98</p>
+					</td>
+				</tr></table>
+			`);
+			const [p] = parseProductsFromEmail(aldo);
+			expect(p.price).toBe("$59.98");
+		});
 	});
 
 	// -----------------------------------------------------------------------
@@ -651,6 +668,26 @@ describe("parseProductsFromEmail", () => {
 		it("extracts size", () => {
 			const products = parseProductsFromEmail(zara);
 			expect(products[0].size).toBe("S");
+		});
+
+		it("parses the currency-code price form Zara uses (12.99 USD, no $)", () => {
+			// Real Zara emails write "1 unit / 12.99&nbsp;USD" — &nbsp; decodes to a
+			// non-breaking space and there is no $ prefix.
+			const zaraUsd = html(`
+				<table>
+					<tr>
+						<td class="rd-product-col">
+							${productImg("https://static.zara.net/dress.jpg")}
+							<div>Combination Tulle Dress</div>
+							<div>Black 0/0858/504/800/02</div>
+							<div>1  unit     / 12.99 USD    </div>
+							<div>S</div>
+						</td>
+					</tr>
+				</table>
+			`);
+			const products = parseProductsFromEmail(zaraUsd);
+			expect(products[0].price).toBe("$12.99");
 		});
 	});
 
@@ -1149,6 +1186,13 @@ describe("parseProductsFromEmail > Strategy: bold-paragraph layout (Banana Repub
 	it("marks items as on sale", () => {
 		const products = parseProductsFromEmail(brfHtml);
 		expect(products.every(p => p.onSale)).toBe(true);
+	});
+
+	it("captures the struck-through 'Was $X' original price", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].originalPrice).toBe("$90.00");
+		expect(products[2].originalPrice).toBe("$400.00");
+		expect(products[3].originalPrice).toBe("$80.00");
 	});
 
 	it("extracts size from SIZE | COLOR field", () => {

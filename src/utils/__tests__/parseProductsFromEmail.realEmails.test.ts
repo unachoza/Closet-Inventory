@@ -110,6 +110,77 @@ describe("real emails > Banana Republic Factory (no photos)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// Banana Republic / Athleta — older template: <b> name + Color:/Size:/Price: labels
+// ---------------------------------------------------------------------------
+
+describe("real emails > Banana Republic (labeled <b> layout, no photos)", () => {
+	const products = parseProductsFromEmail(loadFixture("banana-republic-labeled.html"));
+
+	it("detects the 2 items and ignores the 'YOUR ORDER' header and price bolds", () => {
+		expect(products).toHaveLength(2);
+		expect(products.map((p) => p.name)).toEqual(["High-Rise Flare Tuxedo Pant", "TENCEL Flight Jumpsuit"]);
+	});
+
+	it("strips the trademark mark from the name (TENCEL™ -> TENCEL)", () => {
+		// The raw name is "TENCEL™ Flight Jumpsuit" (&#153 decodes to ™); the card
+		// then title-cases it to "Tencel Flight Jumpsuit".
+		expect(byName(products, "TENCEL Flight Jumpsuit")).toBeDefined();
+		expect(products.some((p) => p.name.includes("™"))).toBe(false);
+	});
+
+	it("reads the labeled price, color, and size", () => {
+		const pant = byName(products, "High-Rise Flare Tuxedo Pant");
+		expect(pant?.price).toBe("$70.97");
+		expect(pant?.color).toBe("black");
+		expect(pant?.size).toBe("4 Regular");
+		expect(byName(products, "TENCEL Flight Jumpsuit")?.price).toBe("$110.99");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Zara — newer MJML single-column layout (product-img / product-size / product-price)
+// ---------------------------------------------------------------------------
+
+describe("real emails > Zara (MJML single-column order)", () => {
+	const products = parseProductsFromEmail(loadFixture("zara-mjml-order.html"));
+
+	it("detects both items (regression: previously returned none)", () => {
+		expect(products).toHaveLength(2);
+		expect(products.map((p) => p.name)).toEqual(["PLEATED SHORTS", "PLATFORM HEELED ANKLE BOOTS"]);
+	});
+
+	it("reads the currency-code price (21.54 USD -> $21.54)", () => {
+		expect(byName(products, "PLEATED SHORTS")?.price).toBe("$21.54");
+		expect(byName(products, "PLATFORM HEELED ANKLE BOOTS")?.price).toBe("$41.94");
+	});
+
+	it("parses color from the 'Color SKU' line and size from the size row", () => {
+		const shorts = byName(products, "PLEATED SHORTS");
+		expect(shorts?.color).toBe("Black");
+		expect(shorts?.size).toBe("S");
+		expect(byName(products, "PLATFORM HEELED ANKLE BOOTS")?.size).toBe("8");
+	});
+
+	it("does not parse the 'Products' title or item counter as a product", () => {
+		expect(products.some((p) => /products|items/i.test(p.name))).toBe(false);
+	});
+});
+
+describe("real emails > Zara (MJML, 3 items across 2 shipments)", () => {
+	const products = parseProductsFromEmail(loadFixture("zara-mjml-shipments.html"));
+
+	it("detects all 3 items, keeping the two same-named tanks (different colors)", () => {
+		expect(products).toHaveLength(3);
+		expect(products.map((p) => p.name)).toEqual(["RIBBED TANK TOP", "RIBBED TANK TOP", "TEXTURED CROPPED T-SHIRT"]);
+		expect(products.map((p) => p.color)).toEqual(["Blue", "Black", "Black"]);
+	});
+
+	it("does not parse 'Shipping NNNNN' headers as products", () => {
+		expect(products.some((p) => /shipping/i.test(p.name))).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Anthropologie — item-detail-row labeled tables (bare and $-prefixed prices)
 // ---------------------------------------------------------------------------
 
@@ -219,6 +290,12 @@ describe("real emails > Victoria's Secret", () => {
 		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 
+	it("captures the trailing original price, ignoring the -$X discount line", () => {
+		// Each block is "$paid / -$discount (Offers & Discounts) / $original".
+		// The original is the highest amount, not the middle discount line.
+		expect(products.map((p) => p.originalPrice)).toEqual(["$12.50", "$42.00", "$10.50", "$21.00"]);
+	});
+
 	it("has no per-item image (VS shows only marketing banners)", () => {
 		for (const p of products) expect(p.imageUrl).toBe("");
 	});
@@ -301,7 +378,8 @@ describe("real emails > Target (product blocks)", () => {
 		expect(products.map((p) => p.name)).toEqual([
 			"EcoTools Exfoliating Shower Gloves - Pink",
 			"Native Body Wash - Eucalyptus & Mint - Sulfate Free - 18 fl oz",
-			'70"x71" Lightweight Color Shower Liner Clay - Room Essentials™: PEVA, Buttonhole Top, Easy to Clean',
+			// Trademark marks are stripped during cleaning ("Room Essentials™" -> "Room Essentials").
+			'70"x71" Lightweight Color Shower Liner Clay - Room Essentials : PEVA, Buttonhole Top, Easy to Clean',
 			"Native Body Wash - Lavender & Rose - Sulfate Free - 18 fl oz",
 		]);
 	});
