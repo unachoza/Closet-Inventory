@@ -1,4 +1,4 @@
-# Testing Plan
+# Testing Plan - Written 2026-06-14
 
 > ⚠️ **The "Current State" below is stale.** As of 2026-06-14 the suite is
 > **70 test files / ~915 cases** — most of Week 1–3 here is already done. See

@@ -1,5 +1,4 @@
-# Forward Plan — Reconciliation & Next Steps
-## Written 2026-06-14.
+# Forward Plan — Reconciliation & Next Steps - Written 2026-06-14.
 
 > Written 2026-06-14. Companion to [README.md](../README.md) roadmap,
 > [QUICK_WINS.md](./QUICK_WINS.md), [MOBILE_PLAN.md](./MOBILE_PLAN.md).
