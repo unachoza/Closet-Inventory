@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { GMAIL_SEARCH_SUBJECTS, GMAIL_SEARCH_BODY_KEYWORDS } from "../constants";
+import { GMAIL_SEARCH_SUBJECTS, GMAIL_SEARCH_BODY_KEYWORDS, GMAIL_EXCLUDE_SENDERS } from "../constants";
 import { MobileSearchWizard } from "../AdvnacedSearch/MobileAdvancedSearchFlow/MobileAdvancedSearchFlow";
 import { DesktopSearchSplitPanel } from "../AdvnacedSearch/DesktopAdvancedSearchFlow/DesktopAdvancedSearchFlow";
 
@@ -16,7 +16,7 @@ export interface AdvancedSearchParams {
 
 export const DEFAULT_SEARCH_PARAMS: AdvancedSearchParams = {
 	subjects: GMAIL_SEARCH_SUBJECTS,
-	excludedSenders: [],
+	excludedSenders: GMAIL_EXCLUDE_SENDERS,
 	bodyKeywords: GMAIL_SEARCH_BODY_KEYWORDS,
 	from: "",
 	after: "",
@@ -34,7 +34,7 @@ export const AdvancedSearchUI = ({ onSearch, loading, cachedCount }: AdvancedSea
 	const [from, setFrom] = useState("");
 	const [after, setAfter] = useState("");
 	const [before, setBefore] = useState("");
-	const [excludedSenders, setExcludedSenders] = useState<string[]>([]);
+	const [excludedSenders, setExcludedSenders] = useState<string[]>([...GMAIL_EXCLUDE_SENDERS]);
 	const [bodyKeywords, setBodyKeywords] = useState<string[]>([...GMAIL_SEARCH_BODY_KEYWORDS]);
 	const [subjects, setSubjects] = useState<string[]>([...GMAIL_SEARCH_SUBJECTS]);
 

@@ -3,6 +3,7 @@ import { useLocalStorage } from "./uselocalStorage";
 import {
 	GMAIL_API_BASE,
 	GMAIL_SEARCH_SUBJECTS,
+	GMAIL_EXCLUDE_SENDERS,
 	MAX_EMAIL_RESULTS,
 	GMAIL_CACHE_KEY,
 	GMAIL_CACHE_BODIES_KEY,
@@ -169,6 +170,14 @@ function buildApiQuery(params?: AdvancedSearchParams): string {
 	if (subjects.length > 0) {
 		const subjectClauses = subjects.map((s) => `subject:"${s}"`).join(" OR ");
 		parts.push(`(${subjectClauses})`);
+	}
+
+	// Exclude noise senders at the API level so they never hit the quota.
+	// Merge the static denylist with any per-search exclusions the user added.
+	const allExcluded = [...new Set([...GMAIL_EXCLUDE_SENDERS, ...(params?.excludedSenders ?? [])])];
+	if (allExcluded.length > 0) {
+		const excludeClauses = allExcluded.map((s) => `-from:${s}`).join(" ");
+		parts.push(excludeClauses);
 	}
 
 	// From sender
