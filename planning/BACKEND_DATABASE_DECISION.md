@@ -1,7 +1,7 @@
 # Backend & Database Decision — Firestore vs. Supabase
 ## Written 2026-06-20.
 
-> **Date:** 2026-06-20 &nbsp;·&nbsp; **Status:** LEANING SUPABASE (updated 2026-06-20 — see "Decision update" below).
+> **Date:** 2026-06-20 &nbsp;·&nbsp; **Status:** ✅ DECIDED — **Supabase** (committed 2026-06-20; rationale in "Decision update" below).
 > **Audience:** personal strategy notes.
 > This doc is the **single source of truth** for the backend choice. The README roadmap,
 > [STRATEGY_REVIEW_2026-06-20.md](./STRATEGY_REVIEW_2026-06-20.md),
@@ -12,7 +12,7 @@
 
 ---
 
-## ⭐ Decision update (2026-06-20) — the swing vote is in
+## ✅ Decision (2026-06-20) — Supabase, committed
 
 The original recommendation hinged on one question: *"Is v8 social/sharing committed, or someday-maybe?"*
 **Answer (founder, 2026-06-20): committed — it's the main differentiator.** The [competitive
@@ -20,13 +20,17 @@ analysis](./COMPETITIVE_ANALYSIS_2026-06-20.md) reinforces this: borrowing + the
 spine is the uncompeted core, and those are *inherently relational, access-controlled queries*
 ("what has my cousin borrowed", "show everything clean + at home + not on loan", "everything in the Aspen house").
 
-That tips the recommendation from "merge Firestore #44" to **lean Supabase**, because:
-- **Row-Level Security** is the natural enforcement layer for shared-closet access + per-item/category privacy.
-- **Status & location** become first-class queryable columns (`WHERE status='clean' AND location='home'`) — exactly the relational filtering Firestore is weakest at.
-- It still folds in image storage + the v2.2 scraper backend on one platform.
+**Decision: build on Supabase.** Reasons, in priority order:
+1. **Row-Level Security** is the natural enforcement layer for shared-closet access + per-item/category privacy (v8). This is the load-bearing one.
+2. **Status & location** ([WardrobeStatusAndLocation.md](./WardrobeStatusAndLocation.md)) become first-class queryable columns (`WHERE status='clean' AND location='home' AND on_loan IS false`) — exactly the relational filtering Firestore is weakest at, and the core of the "Nothing To Wear" inventory thesis.
+3. **Platform unification** — Postgres + Storage (kills the base64 image ceiling) + Edge Functions (v2.2 scraper host) + Auth on one platform.
 
-**The corollary is now load-bearing:** if going Supabase, do it **before** #44 ships. Migrating live Firestore
-user data later is the worst path. The rest of this doc is the original even-handed comparison that led here.
+**Consequences — act in this order:**
+- **Do NOT merge PR #44 (Firestore).** It becomes reference material, not the path. Close or park it.
+- **Pivot now, while `main` is still localStorage-only** — migrating live Firestore user data later is the worst path. There is no live cloud data to migrate today, which is exactly why now is the cheapest moment.
+- **Spike the riskiest unknown first:** the Gmail access-token flow under Supabase Auth (the Gmail import currently rides Firebase Auth + gapi). Prove that before porting the rest.
+
+The rest of this doc is the original even-handed comparison that led here — kept for the reasoning trail.
 
 ---
 
