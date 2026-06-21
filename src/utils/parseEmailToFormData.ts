@@ -130,6 +130,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	wedge: "shoes",
 	clog: "shoes",
 	platform: "shoes",
+	pajama: "pajama"
 };
 
 function extractBrand(text: string, from: string): string {
