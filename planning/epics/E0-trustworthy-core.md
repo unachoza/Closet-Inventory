@@ -15,6 +15,7 @@ _As the developer, I want a green test suite with no debug logging so that I can
 **Tickets**
 - `E0-1.1` Strip debug `console.log`s from `src/` (keep intentional error logging) — _0.25d_ ✅
 - `E0-1.2` Fix any currently-red tests; confirm full green — _0.25d_ ✅
+- `E0-1.3` Fix empty `img src=""` React warning in `Card.tsx` (guard render when `imageURL` is blank) — _bundled_ ✅
 
 ## US-0.2 — Filters return the right items
 _As Maya, I want the material filter to actually return matching items so that filtering by fabric works._
@@ -33,6 +34,7 @@ _As Maya, I want a removed item to disappear immediately so that the closet refl
 **Tickets**
 - `E0-3.1` Route `Card` removal through shared `ClosetContext` instead of a separate `useLocalCloset` — _1d_ ✅
 - `E0-3.2` Regression test for remove-rerender — _bundled_ ✅
+- `E0-3.4` Fix collateral regression: the removal animation (inner `AnimatePresence popLayout`) severed Framer variant propagation and silently killed the grid's entrance stagger (load/filter/sort/search). Decoupled — each card owns its own `initial`/`animate`/`exit` with a per-index `custom` delay; container stays keyed by `gridKey` (excludes count) so removals animate in place. Verified in-browser (66 stagger frames vs 0). — _0.5d_ ✅ (+ 5 animation regression tests in `FilteredItemGrid.animation.test.tsx`)
 
 **UX — deferred to separate PR**
 - `E0-3.3` Replace the current button-swap confirm with a warp overlay: card content blurs + subtle red tint (10% opacity) fades in over the card; confirmation floats centered with spring-scale entrance. Use Framer Motion `AnimatePresence` + `motion.div` for the overlay; existing `confirming` state drives it. No layout shift, no second modal. — _0.5d_
@@ -77,4 +79,6 @@ None — this is the base. Do it first.
 **Estimate left:** ~1–1.5 dev-days
 
 ## Definition of done (epic)
-Suite green · no debug logs · the four bugs fixed with regression tests · `ClothingItem` typing tightened.
+Suite green · no debug logs / console warnings · the confidence-eroding bugs fixed with regression tests · `ClothingItem` typing tightened.
+
+_(The README "known bugs" list these tracked has been removed now that they're fixed; US-0.5 is the last open item.)_

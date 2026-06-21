@@ -431,7 +431,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 **Free tier**
 
-- Up to 30 closet items
+- Up to 35 closet items
 - Manual item entry
 - Local storage only
 
@@ -456,23 +456,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ## 🐛 Known Bugs
 
-- **DatePicker (`MonthYearPicker`) needs a thorough pass.** Root issue: the picker's `useEffect` fired on mount, emitting its _default_ (current month/year) before the user chose anything — so manually added items received an unintended purchase date and showed a fabricated age (e.g. "Purchased: 5 months ago"). A mount guard now prevents the picker from emitting until the user actually changes a dropdown, which stops the fabricated-age behavior. Still pending: full verification that selecting a month + year reliably commits to `purchaseDate` across edit/create flows. The EditItemView import flow sidesteps this entirely with a native `<input type="date">` (reliable) for the no-email-date manual-entry fallback.
-
 - \*\*Email Horizontal Scroll - some email previews don't format nicely, creating difficult to view horizontal scroll. Tried fixing with .gmail-container:has(.display-email-preview-panel){max-width: 1175px;} but didnt' work accross the board
-
-- \*\*ZaraAndAritziaNormalizedNameCAPSLOCK - title to string removing caps lock has improved but for Zara and Aritizia titles still no, and shein has be defaulting to CAPS but just store name, not rest of name in item title
 
 - \*\*ImportingNonClothesORAccessories - if it can't be mapped to a category, don't import it, this will be huge with amazon emails
 
-- \*\*Safari Gmail Auth - get's stuck
-
-- \*\*CardDetailsFeaturesPill - if item as mutliple accents, they are rendered/ displayed in one pill. ie 'buttonszipper' shoud be two pills
-
-- \*\*RemoveButtonWhileOverview - if user is on overview and views an item, clicks remove, the card just flips back, closet does not get updated
-
--- \*\*NoFeaturesGetsEmptyPill - if an item doesn't have any style features, that section of card detais still renders with a ghoast pill
-- **NoFeaturesGetsEmptyPill - if an item doesn't have any style features, that section of card detais still renders with a ghoast pill
-
 - **ErrorBoundaries, error messages, user feedback, try again messages don't have adequate contrast
-
--- \*\*ErrorBoundaries, error messages, user feedback, try again messages don't have adequate contrast

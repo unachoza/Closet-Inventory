@@ -10,6 +10,8 @@
 _As Maya, I want care guidance per item so that I don't ruin my clothes._
 - [x] Material→care mapping; washing/drying inferred on import
 - [x] Interactive fabric guide + fiber-journey visualization
+- [x] Name/category care rules: blazer → "Dry clean"; shoes → "Wipe with damp cloth" (leather shoes → "Use soft Horsehair Brush"); shoes skip laundry color rules (`inferCareFromAttributes`)
+- [x] Reseller condition seeding: imports from Poshmark/Depop/eBay/Vinted/ThredUp/The RealReal default to "good" (not "new"), upgraded to "new" only on explicit NWT/"new with tags" (`parseEmailToFormData`)
 
 ## US-8.2 — Track an item's life
 _As Maya, I want to log repairs and see estimated lifespan so that I care for pieces long-term._
