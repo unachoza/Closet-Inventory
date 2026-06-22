@@ -6,6 +6,13 @@
 
 ---
 
+## US-3.0 — Broaden retailer parser coverage (Gmail) ✅ shipped
+_As a Gmail user, I want more of my order emails recognized so that fewer purchases need manual entry._
+- [x] 8 new brand-specific strategies (PR #73) — Shopbop/East Dane, Brooks Brothers, SwimOutlet, Lulus, Nike/Jordan, Blush Mark, Nordstrom, plus Savage X Fenty order-level discount handling
+- [x] New layout strategies — older Banana Republic/Athleta labeled template, Zara MJML single-column, generic column-header tables (American Apparel, 2015 Zara)
+- [x] Sale + `originalPrice` capture (struck/colored/"Was $X"/list-vs-paid) with discount % badge; order-level discounts spread evenly across line items
+- [x] `™®©` symbol stripping from product names; all backed by real-email fixtures
+
 ## US-3.1 — Import from more inboxes
 _As a user on Hotmail/Outlook/Yahoo, I want to import purchases from my provider so that Gmail isn't the only option._
 - [ ] Microsoft Graph (Hotmail + Outlook — one integration) ⭐ next priority
