@@ -1886,42 +1886,34 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
  */
 
 /**
+ * Parse order-level discount fraction from raw HTML before the DOM is pruned.
+ * Looks for a Subtotal + Promotions pair in the raw text (works even if the
+ * DOM pre-processor removes nodes).
+ */
+function parseBRDiscountFraction(html: string): number {
+	// Non-greedy scan: find the first $ after "Subtotal" and the first -$ after "Promotions".
+	// Using [\s\S]*? so HTML tag content (which may contain hyphens) doesn't break the match.
+	const subtotalMatch = html.match(/[Ss]ubtotal[\s\S]*?\$([\d,.]+)/);
+	const promoMatch = html.match(/[Pp]romotions[\s\S]*?-\$([\d,.]+)/);
+	if (!subtotalMatch || !promoMatch) return 0;
+	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+	const promo = parseFloat(promoMatch[1].replace(/,/g, ""));
+	if (subtotal <= 0 || promo <= 0 || promo >= subtotal) return 0;
+	return promo / subtotal;
+}
+
+/**
  * Strategy: Banana Republic / Gap Inc. 2020 labeled-attribute layout with order-level discount.
  *
  * Signal: a <td> containing <b>YOUR ORDER</b> (item count header) is present.
  * Each item has a <b>ItemName</b> followed by a nested Color:/Size:/Price:/Qty: label table.
- * Order-level promotions are in a SUMMARY OF CHARGES section with Subtotal + Promotions rows.
- * The discount percentage is computed from Subtotal and Promotions and applied to every item.
+ * The discount fraction is pre-computed from the raw HTML before DOM pruning.
  */
-function extractFromBananaRepublic2020Layout(doc: Document): ExtractedProduct[] {
+function extractFromBananaRepublic2020Layout(doc: Document, discountFraction: number): ExtractedProduct[] {
 	// Signal: must have a bold "YOUR ORDER" header to avoid false-positives
 	const allBolds = Array.from(doc.querySelectorAll("td b, td strong"));
 	const hasYourOrder = allBolds.some((b) => /^YOUR ORDER$/i.test((b.textContent ?? "").trim()));
 	if (!hasYourOrder) return [];
-
-	// Parse SUMMARY OF CHARGES: find Subtotal and Promotions amounts
-	let discountFraction = 0;
-	const tds = Array.from(doc.querySelectorAll("td"));
-	for (let i = 0; i < tds.length - 1; i++) {
-		const label = getCellText(tds[i]).toLowerCase();
-		if (/^subtotal/.test(label)) {
-			const subtotalText = getCellText(tds[i + 1]);
-			const subtotal = parseFloat(subtotalText.replace(/[^0-9.]/g, ""));
-			// Look ahead for a Promotions row
-			for (let j = i + 2; j < Math.min(i + 10, tds.length - 1); j++) {
-				const nextLabel = getCellText(tds[j]).toLowerCase();
-				if (/^promotions/.test(nextLabel)) {
-					const promoText = getCellText(tds[j + 1]);
-					const promoAmt = Math.abs(parseFloat(promoText.replace(/[^0-9.]/g, "")));
-					if (subtotal > 0 && promoAmt > 0) {
-						discountFraction = promoAmt / subtotal;
-					}
-					break;
-				}
-			}
-			break;
-		}
-	}
 
 	const products: ExtractedProduct[] = [];
 	const seen = new Set<string>();
@@ -2876,8 +2868,19 @@ function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	if (!html.trim()) return [];
 
+	// Parse order-level discount from raw HTML BEFORE DOMParser and pruning —
+	// removePostTotalContent strips the Subtotal sibling td and Promotions rows.
+	const brDiscountFraction = parseBRDiscountFraction(html);
+
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
+
+	// Banana Republic / Gap Inc. order emails place an "Order total:" summary box
+	// ABOVE the itemized "YOUR ORDER" section, so removePostTotalContent would
+	// strip the products. This strategy has a strong signal (YOUR ORDER bold +
+	// Color/Size/Price labels), so run it on the un-pruned DOM first.
+	const brItems = extractFromBananaRepublic2020Layout(doc, brDiscountFraction);
+	if (brItems.length > 0) return brItems.map(enrichProduct);
 
 	// Pre-process: strip content after order total markers so suggested/
 	// recommended product sections don't produce false positive detections.
@@ -2911,7 +2914,6 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromAmazonLayout,
 		extractFromSHEINLayout, // SHEIN ltwebstatic CDN
 		extractFromAttributeTableRows,
-		extractFromBananaRepublic2020Layout, // Banana Republic 2020 labeled-attribute layout with order-level discount
 		extractFromBoldParagraphLayout, // Gap / Banana Republic Factory
 		extractFromParagraphLayout,
 		extractFromPoshmarkLayout, // Poshmark td.price 3-cell rows
