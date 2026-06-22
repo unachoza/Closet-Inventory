@@ -90,6 +90,7 @@ export const STYLE_MAP: [RegExp, string][] = [
 
 const RISE_MAP: [RegExp, string][] = [
 	[/\bhigh[- ]?(waist|rise)\b/i, "high waist"],
+	[/\bhigh[- ]?(waisted|rise)\b/i, "high waist"],
 	[/\bmid[- ]?(waist|rise)\b/i, "mid rise"],
 	[/\blow[- ]?(waist|rise)\b/i, "low rise"],
 ];
@@ -117,6 +118,7 @@ export const ACCENTS_MAP: [RegExp, string][] = [
 	[/\bripped\b/i, "ripped"],
 	[/\bruched\b/i, "ruched"],
 	[/\bruffles?\b/i, "ruffles"],
+	[/\bpleated?\b/i, "pleated"],
 	[/\bsequins?\b/i, "sequins"],
 	[/\brhinestones?\b/i, "rhinestones"],
 	[/\bstudded\b/i, "studded"],
