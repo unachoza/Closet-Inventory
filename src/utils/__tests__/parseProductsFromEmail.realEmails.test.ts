@@ -321,6 +321,66 @@ describe("real emails > Nike 2025 (dynamic product container)", () => {
 	});
 });
 
+// Blush Mark 2022 — /products/ anchors wrapping image + "Dress Color:/Size:/Qty:"
+// labels. Previously a tracking paragraph was emitted as one junk item with no
+// attributes; now all 4 items are detected with color/size.
+describe("real emails > Blush Mark 2022", () => {
+	const products = parseProductsFromEmail(loadFixture("blushmark-2022.html"));
+
+	it("detects all 4 items with color and size", () => {
+		expect(products).toHaveLength(4);
+		expect(products[0]).toMatchObject({ size: "M", color: "multicolor", price: "$17.99" });
+		expect(products[0].name).toMatch(/random print deep v neck/i);
+		expect(products.map((p) => p.size)).toEqual(["M", "one-size", "S", "S"]);
+	});
+});
+
+// Nordstrom 2026 (forwarded) — nordstrommedia image + name link + "Size X" / "Price: $X".
+// Previously the image fallback dropped size and price.
+describe("real emails > Nordstrom 2026 (forwarded)", () => {
+	const products = parseProductsFromEmail(loadFixture("nordstrom-2026.html"));
+
+	it("reads size and price for each item", () => {
+		expect(products).toHaveLength(2);
+		expect(products[0]).toMatchObject({ size: "Medium", price: "$29.99" });
+		expect(products[1]).toMatchObject({ size: "Medium", price: "$33.74" });
+		expect(products.every((p) => p.size && p.price)).toBe(true);
+	});
+});
+
+// Brooks Brothers 2017 — order-level "Order Discount ($X)" applied evenly across
+// items (originalPrice = list, price = discounted). Discount is parsed from raw
+// HTML before pruning (the "ORDER TOTAL" header would otherwise strip the rows).
+describe("real emails > Brooks Brothers 2017 (order discount)", () => {
+	const products = parseProductsFromEmail(loadFixture("brooks-brothers-2017-discount.html"));
+
+	it("applies the order discount evenly", () => {
+		expect(products).toHaveLength(2);
+		// subtotal 396.00, discount 278.19 → 70.25% off → 198 * 0.29749 = 58.90
+		expect(products[0]).toMatchObject({ originalPrice: "$198.00", price: "$58.90", onSale: true });
+		expect(products[1]).toMatchObject({ originalPrice: "$198.00", price: "$58.90", onSale: true });
+	});
+
+	it("leaves non-discount Brooks orders unchanged", () => {
+		const plain = parseProductsFromEmail(loadFixture("brooks-brothers-2017.html"));
+		expect(plain[0]).toMatchObject({ price: "$50.49", onSale: false });
+		expect(plain[0].originalPrice).toBeUndefined();
+	});
+});
+
+// Savage X Fenty 2023 — multiple order-level discount lines summed and applied
+// evenly to the (already correctly detected) items.
+describe("real emails > Savage X Fenty 2023 (multi-line discount)", () => {
+	const products = parseProductsFromEmail(loadFixture("savagex-2023.html"));
+
+	it("applies the summed discount evenly", () => {
+		expect(products.length).toBeGreaterThanOrEqual(2);
+		// subtotal 364.70, discounts 120.90 + 150.37 = 271.27 → 74.38% off
+		const pant = products.find((p) => /sleep pant/i.test(p.name));
+		expect(pant).toMatchObject({ originalPrice: "$49.95", price: "$12.80", onSale: true });
+	});
+});
+
 // American Apparel 2013 — real full order-confirmation email. The outer 700px
 // layout table holds bold headings ("Thank You.", "Billing Address", …) plus a
 // Qty/Style/Description/Size/Color/Price column-header product table. Previously

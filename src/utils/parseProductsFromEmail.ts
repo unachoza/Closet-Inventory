@@ -1911,6 +1911,53 @@ function parseBRDiscountFraction(html: string): number {
 }
 
 /**
+ * Order-level discount fraction from an "Order Subtotal $X" + parenthesized
+ * "Order Discount ($Y)" pair (Brooks Brothers). Parsed from raw HTML before DOM
+ * pruning, since the "ORDER TOTAL" header would otherwise strip these rows.
+ */
+function parseOrderDiscountFraction(html: string): number {
+	const subtotalMatch = html.match(/order\s+subtotal[\s\S]*?\$([\d,]+\.\d{2})/i);
+	const discountMatch = html.match(/order\s+discount[\s\S]*?\(\s*\$?([\d,]+\.\d{2})\s*\)/i);
+	if (!subtotalMatch || !discountMatch) return 0;
+	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+	const discount = parseFloat(discountMatch[1].replace(/,/g, ""));
+	if (subtotal <= 0 || discount <= 0 || discount >= subtotal) return 0;
+	return discount / subtotal;
+}
+
+/**
+ * Savage X Fenty order-level discount fraction. SxF lists a SUBTOTAL then one or
+ * more discount rows whose amounts use a "$-X.XX" form; the total of those over
+ * the subtotal is the fraction. Guarded by the SxF sender/CDN signal so it only
+ * applies to Savage X Fenty emails.
+ */
+function parseSavageXDiscountFraction(html: string): number {
+	if (!/savagex\.com|info\.savagex/i.test(html)) return 0;
+	const subtotalMatch = html.match(/subtotal:?[\s\S]*?\$([\d,]+\.\d{2})/i);
+	if (!subtotalMatch) return 0;
+	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+	const discounts = Array.from(html.matchAll(/\$-\s*([\d,]+\.\d{2})/g)).map((m) =>
+		parseFloat(m[1].replace(/,/g, ""))
+	);
+	const totalDiscount = discounts.reduce((sum, d) => sum + d, 0);
+	if (subtotal <= 0 || totalDiscount <= 0 || totalDiscount >= subtotal) return 0;
+	return totalDiscount / subtotal;
+}
+
+/** Apply an order-level discount fraction to a product's price (originalPrice = list). */
+function applyDiscountFraction(p: ExtractedProduct, fraction: number): ExtractedProduct {
+	if (p.onSale || !p.price) return p;
+	const listNum = parseFloat(p.price.replace(/[^0-9.]/g, ""));
+	if (!listNum) return p;
+	return {
+		...p,
+		price: `$${(listNum * (1 - fraction)).toFixed(2)}`,
+		originalPrice: p.price,
+		onSale: true,
+	};
+}
+
+/**
  * Strategy: Banana Republic / Gap Inc. 2020 labeled-attribute layout with order-level discount.
  *
  * Signal: a <td> containing <b>YOUR ORDER</b> (item count header) is present.
@@ -2599,7 +2646,7 @@ function extractFromShopbopLayout(doc: Document): ExtractedProduct[] {
  *
  * Signal: product images on the Brooks Brothers scene7 CDN.
  */
-function extractFromBrooksBrothersLayout(doc: Document): ExtractedProduct[] {
+function extractFromBrooksBrothersLayout(doc: Document, discountFraction = 0): ExtractedProduct[] {
 	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
 		/brooksbrothers\.scene7\.com\/is\/image/i.test(img.getAttribute("src") ?? "")
 	);
@@ -2630,7 +2677,16 @@ function extractFromBrooksBrothersLayout(doc: Document): ExtractedProduct[] {
 		const itemNumber = itemMatch ? itemMatch[1].trim() : "";
 
 		// Price: the item row carries a single $ amount (order totals live elsewhere).
-		const price = extractPrices(getCellText(row))[0] ?? "";
+		const listPrice = extractPrices(getCellText(row))[0] ?? "";
+		let price = listPrice;
+		let originalPrice: string | undefined;
+		let onSale = false;
+		if (discountFraction > 0 && listPrice) {
+			const listNum = parseFloat(listPrice.replace(/[^0-9.]/g, ""));
+			price = `$${(listNum * (1 - discountFraction)).toFixed(2)}`;
+			originalPrice = listPrice;
+			onSale = true;
+		}
 
 		const key = `${name}|${color}|${size}`.toLowerCase();
 		if (seen.has(key)) continue;
@@ -2641,11 +2697,12 @@ function extractFromBrooksBrothersLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
 			material: "",
-			onSale: false,
+			onSale,
 		});
 	}
 
@@ -2836,6 +2893,111 @@ function extractFromNikeLayout(doc: Document): ExtractedProduct[] {
 			brand: "Nike",
 			price,
 			color: extractColorFromName(name),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Blush Mark order/shipment confirmation.
+ *
+ * Each product is an <a href=".../products/..."> wrapping an image + a details
+ * block with "Dress Color: X" / "Size: Y" / "Qty: N" labels and a "US$X" price.
+ * Signal: product anchors on the Blush Mark products path.
+ */
+function extractFromBlushMarkLayout(doc: Document): ExtractedProduct[] {
+	const anchors = Array.from(doc.querySelectorAll('a[href*="blushmark.com/products/"]')).filter((a) =>
+		/color:/i.test(getCellText(a)) && a.querySelector("img")
+	);
+	if (anchors.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const anchor of anchors) {
+		const img = anchor.querySelector("img");
+		const name = (img?.getAttribute("alt") ?? "").trim().replace(/\s+/g, " ");
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const text = getCellText(anchor);
+		const colorMatch = text.match(/color:\s*(.+?)\s*(?:size:|qty:|$)/i);
+		const sizeMatch = text.match(/\bsize:\s*(.+?)\s*(?:qty:|color:|us\$|$)/i);
+		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const price = extractPrices(text)[0] ?? "";
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl: img?.getAttribute("src") ?? "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Nordstrom shipment/delivery confirmation (incl. forwarded).
+ *
+ * Each product row has a nordstrommedia image and a detail cell with a bold name
+ * link, an UPPERCASE "COLOR STYLE CODE," span + a "Size X" span, and a "Price: $X"
+ * line. The generic image fallback otherwise loses the size and price.
+ */
+function extractFromNordstromLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/n\.nordstrommedia\.com\/it\//i.test(img.getAttribute("src") ?? "")
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const row = img.closest("tr");
+		if (!row) continue;
+
+		// Detail cell: descendant cell with the bold name link + "Price:" text.
+		const detailCell = Array.from(row.querySelectorAll("td")).find(
+			(td) => td.querySelector("a") && /price:/i.test(getCellText(td))
+		);
+		if (!detailCell) continue;
+
+		const nameLink = detailCell.querySelector("a");
+		const name = (nameLink?.textContent ?? "").trim().replace(/\s+/g, " ");
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const text = getCellText(detailCell);
+		const sizeMatch = text.match(/\bSize\s+([A-Za-z0-9-]+)/i);
+		const priceMatch = text.match(/Price:\s*(\$[\d.,]+)/i);
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const price = priceMatch ? priceMatch[1] : "";
+
+		// Color: the UPPERCASE span text before the style code; fall back to a known color word.
+		const colorSpan = Array.from(detailCell.querySelectorAll("span")).find((s) =>
+			/text-transform:\s*uppercase/i.test(s.getAttribute("style") ?? "")
+		);
+		const colorRaw = colorSpan ? getCellText(colorSpan).replace(/,.*$/, "").trim() : "";
+		const color = extractColorFromName(colorRaw) || colorRaw.toLowerCase();
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand: "",
+			price,
+			color,
 			size,
 			itemNumber: "",
 			material: "",
@@ -3259,6 +3421,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// Parse order-level discount from raw HTML BEFORE DOMParser and pruning —
 	// removePostTotalContent strips the Subtotal sibling td and Promotions rows.
 	const brDiscountFraction = parseBRDiscountFraction(html);
+	const orderDiscountFraction = parseOrderDiscountFraction(html);
 
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
@@ -3310,10 +3473,12 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromGapIncLabeledLayout, // Banana Republic / Athleta bold name + Color:/Size:/Price: labels
 		extractFromTargetLayout, // Target product-block 2-column layout
 		extractFromShopbopLayout, // Shopbop/East Dane: Description cell = nested image+name, struck original price
-		extractFromBrooksBrothersLayout, // Brooks Brothers: scene7 image + Color:/Size:/Item#: labeled detail cell
+		(doc) => extractFromBrooksBrothersLayout(doc, orderDiscountFraction), // Brooks Brothers: scene7 image + Color:/Size:/Item#: labeled detail cell + order-level discount
 		extractFromSwimOutletLayout, // SwimOutlet: productdetails link + SKU/COLOR/SIZE label row
 		extractFromLulusLayout, // Lulus: product-CDN image + <br>-delimited name/brand/color/size/price
 		extractFromNikeLayout, // Nike/Jordan: x_dynamicProductContainer__name/__price/Size: divs
+		extractFromBlushMarkLayout, // Blush Mark: /products/ anchor + Dress Color:/Size:/Qty: labels
+		extractFromNordstromLayout, // Nordstrom: nordstrommedia image + name link + Size/Price detail
 		extractFromTableRows,
 		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
@@ -3325,9 +3490,17 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromImages,
 	];
 
+	// Savage X Fenty spreads an order-level discount across multiple promo lines
+	// ("2 for $29 Bras", "70% Off"). Computed from raw HTML and applied evenly to
+	// the detected items (guarded by the SxF signal so no other email is affected).
+	const sxfDiscountFraction = parseSavageXDiscountFraction(html);
+
 	for (const strategy of strategies) {
 		const raw = strategy(doc);
-		if (raw.length > 0) return raw.map(enrichProduct);
+		if (raw.length > 0) {
+			const enriched = raw.map(enrichProduct);
+			return sxfDiscountFraction > 0 ? enriched.map((p) => applyDiscountFraction(p, sxfDiscountFraction)) : enriched;
+		}
 	}
 
 	return [];
