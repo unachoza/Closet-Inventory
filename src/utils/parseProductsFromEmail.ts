@@ -1844,18 +1844,15 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : "";
 		const prices = extractPrices(priceText);
 		const totalPrice = prices[0] ?? "";
-		const price = totalPrice && qty > 1
-			? `$${(parseFloat(totalPrice.replace("$", "")) / qty).toFixed(2)}`
-			: totalPrice;
+		const price = totalPrice && qty > 1 ? `$${(parseFloat(totalPrice.replace("$", "")) / qty).toFixed(2)}` : totalPrice;
 
 		// Sale detection: struck-through original price present
 		const delEl = row.querySelector("del.order-list__item-original-price");
 		const onSale = Boolean(delEl);
 		const delPrices = delEl ? extractPrices(delEl.textContent ?? "") : [];
 		const originalPriceTotal = delPrices[0] ?? "";
-		const originalPrice = originalPriceTotal && qty > 1
-			? `$${(parseFloat(originalPriceTotal.replace("$", "")) / qty).toFixed(2)}`
-			: originalPriceTotal;
+		const originalPrice =
+			originalPriceTotal && qty > 1 ? `$${(parseFloat(originalPriceTotal.replace("$", "")) / qty).toFixed(2)}` : originalPriceTotal;
 
 		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
 		if (seenKeys.has(dedupeKey)) continue;
@@ -1936,9 +1933,7 @@ function parseSavageXDiscountFraction(html: string): number {
 	const subtotalMatch = html.match(/subtotal:?[\s\S]*?\$([\d,]+\.\d{2})/i);
 	if (!subtotalMatch) return 0;
 	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
-	const discounts = Array.from(html.matchAll(/\$-\s*([\d,]+\.\d{2})/g)).map((m) =>
-		parseFloat(m[1].replace(/,/g, ""))
-	);
+	const discounts = Array.from(html.matchAll(/\$-\s*([\d,]+\.\d{2})/g)).map((m) => parseFloat(m[1].replace(/,/g, "")));
 	const totalDiscount = discounts.reduce((sum, d) => sum + d, 0);
 	if (subtotal <= 0 || totalDiscount <= 0 || totalDiscount >= subtotal) return 0;
 	return totalDiscount / subtotal;
@@ -2537,7 +2532,18 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 		if (seen.has(dedupeKey)) continue;
 		seen.add(dedupeKey);
 
-		products.push({ imageUrl, name, brand: "", price, ...(originalPrice ? { originalPrice } : {}), color, size, itemNumber, material: "", onSale });
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
 	}
 
 	return products;
@@ -2557,7 +2563,7 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
  */
 function extractFromShopbopLayout(doc: Document): ExtractedProduct[] {
 	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
-		/\/Shopbop\/p\/prod\/products\//i.test(img.getAttribute("src") ?? "")
+		/\/Shopbop\/p\/prod\/products\//i.test(img.getAttribute("src") ?? ""),
 	);
 	if (productImgs.length === 0) return [];
 
@@ -2648,7 +2654,7 @@ function extractFromShopbopLayout(doc: Document): ExtractedProduct[] {
  */
 function extractFromBrooksBrothersLayout(doc: Document, discountFraction = 0): ExtractedProduct[] {
 	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
-		/brooksbrothers\.scene7\.com\/is\/image/i.test(img.getAttribute("src") ?? "")
+		/brooksbrothers\.scene7\.com\/is\/image/i.test(img.getAttribute("src") ?? ""),
 	);
 	if (productImgs.length === 0) return [];
 
@@ -2660,9 +2666,7 @@ function extractFromBrooksBrothersLayout(doc: Document, discountFraction = 0): E
 		if (!row) continue;
 
 		// Detail cell = the descendant cell whose text carries the Color:/Size: labels.
-		const detailCell = Array.from(row.querySelectorAll("td")).find((td) =>
-			/color:/i.test(getCellText(td)) && /size:/i.test(getCellText(td))
-		);
+		const detailCell = Array.from(row.querySelectorAll("td")).find((td) => /color:/i.test(getCellText(td)) && /size:/i.test(getCellText(td)));
 		if (!detailCell) continue;
 
 		const text = getCellText(detailCell);
@@ -2780,7 +2784,7 @@ const SIZE_WORD_RE = /^(x{0,3}small|x{0,3}large|medium|one\s*size|x{0,3}s|x{0,2}
 
 function extractFromLulusLayout(doc: Document): ExtractedProduct[] {
 	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
-		/lulus\.com\/images\/product\//i.test(img.getAttribute("src") ?? "")
+		/lulus\.com\/images\/product\//i.test(img.getAttribute("src") ?? ""),
 	);
 	if (productImgs.length === 0) return [];
 
@@ -2911,8 +2915,8 @@ function extractFromNikeLayout(doc: Document): ExtractedProduct[] {
  * Signal: product anchors on the Blush Mark products path.
  */
 function extractFromBlushMarkLayout(doc: Document): ExtractedProduct[] {
-	const anchors = Array.from(doc.querySelectorAll('a[href*="blushmark.com/products/"]')).filter((a) =>
-		/color:/i.test(getCellText(a)) && a.querySelector("img")
+	const anchors = Array.from(doc.querySelectorAll('a[href*="blushmark.com/products/"]')).filter(
+		(a) => /color:/i.test(getCellText(a)) && a.querySelector("img"),
 	);
 	if (anchors.length === 0) return [];
 
@@ -2957,7 +2961,7 @@ function extractFromBlushMarkLayout(doc: Document): ExtractedProduct[] {
  */
 function extractFromNordstromLayout(doc: Document): ExtractedProduct[] {
 	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
-		/n\.nordstrommedia\.com\/it\//i.test(img.getAttribute("src") ?? "")
+		/n\.nordstrommedia\.com\/it\//i.test(img.getAttribute("src") ?? ""),
 	);
 	if (productImgs.length === 0) return [];
 
@@ -2969,9 +2973,7 @@ function extractFromNordstromLayout(doc: Document): ExtractedProduct[] {
 		if (!row) continue;
 
 		// Detail cell: descendant cell with the bold name link + "Price:" text.
-		const detailCell = Array.from(row.querySelectorAll("td")).find(
-			(td) => td.querySelector("a") && /price:/i.test(getCellText(td))
-		);
+		const detailCell = Array.from(row.querySelectorAll("td")).find((td) => td.querySelector("a") && /price:/i.test(getCellText(td)));
 		if (!detailCell) continue;
 
 		const nameLink = detailCell.querySelector("a");
@@ -2986,7 +2988,7 @@ function extractFromNordstromLayout(doc: Document): ExtractedProduct[] {
 
 		// Color: the UPPERCASE span text before the style code; fall back to a known color word.
 		const colorSpan = Array.from(detailCell.querySelectorAll("span")).find((s) =>
-			/text-transform:\s*uppercase/i.test(s.getAttribute("style") ?? "")
+			/text-transform:\s*uppercase/i.test(s.getAttribute("style") ?? ""),
 		);
 		const colorRaw = colorSpan ? getCellText(colorSpan).replace(/,.*$/, "").trim() : "";
 		const color = extractColorFromName(colorRaw) || colorRaw.toLowerCase();
@@ -3078,10 +3080,7 @@ function extractFromColumnHeaderTable(doc: Document): ExtractedProduct[] {
 		rows.push(...directChildren(table, "tr"));
 
 		// Rows from <thead>, <tbody>, <tfoot> sections
-		for (const section of directChildren(table, "thead").concat(
-			directChildren(table, "tbody"),
-			directChildren(table, "tfoot")
-		)) {
+		for (const section of directChildren(table, "thead").concat(directChildren(table, "tbody"), directChildren(table, "tfoot"))) {
 			rows.push(...directChildren(section, "tr"));
 		}
 
@@ -3473,7 +3472,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromGapIncLabeledLayout, // Banana Republic / Athleta bold name + Color:/Size:/Price: labels
 		extractFromTargetLayout, // Target product-block 2-column layout
 		extractFromShopbopLayout, // Shopbop/East Dane: Description cell = nested image+name, struck original price
-		(doc) => extractFromBrooksBrothersLayout(doc, orderDiscountFraction), // Brooks Brothers: scene7 image + Color:/Size:/Item#: labeled detail cell + order-level discount
+		(doc: Document) => extractFromBrooksBrothersLayout(doc, orderDiscountFraction), // Brooks Brothers: scene7 image + Color:/Size:/Item#: labeled detail cell + order-level discount
 		extractFromSwimOutletLayout, // SwimOutlet: productdetails link + SKU/COLOR/SIZE label row
 		extractFromLulusLayout, // Lulus: product-CDN image + <br>-delimited name/brand/color/size/price
 		extractFromNikeLayout, // Nike/Jordan: x_dynamicProductContainer__name/__price/Size: divs
