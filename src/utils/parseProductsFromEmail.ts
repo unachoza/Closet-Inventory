@@ -19,6 +19,7 @@ export interface ExtractedProduct {
 	readonly brand: string;
 	readonly price: string;
 	readonly originalPrice?: string;
+	readonly qty?: number;
 	readonly color: string;
 	readonly size: string;
 	readonly itemNumber: string;
@@ -1798,6 +1799,8 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			.replace(/&nbsp;/g, " ")
 			.trim()
 			.replace(/\s+/g, " ");
+		const qtyMatch = rawTitle.match(/[×x]\s*(\d+)\s*$/);
+		const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
 		const withoutQty = rawTitle.replace(/\s*[×x]\s*\d+\s*$/, "").trim();
 		const pipeIdx = withoutQty.lastIndexOf(" | ");
 		const name = pipeIdx !== -1 ? withoutQty.slice(0, pipeIdx).trim() : withoutQty;
@@ -1828,15 +1831,23 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			}
 		}
 
-		// Price: read directly from the dedicated price element
+		// Price: read directly from the dedicated price element, divide by qty for per-unit
 		const priceEl = row.querySelector("p.order-list__item-price");
 		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : "";
 		const prices = extractPrices(priceText);
-		const price = prices[0] ?? "";
+		const totalPrice = prices[0] ?? "";
+		const price = totalPrice && qty > 1
+			? `$${(parseFloat(totalPrice.replace("$", "")) / qty).toFixed(2)}`
+			: totalPrice;
 
 		// Sale detection: struck-through original price present
 		const delEl = row.querySelector("del.order-list__item-original-price");
 		const onSale = Boolean(delEl);
+		const delPrices = delEl ? extractPrices(delEl.textContent ?? "") : [];
+		const originalPriceTotal = delPrices[0] ?? "";
+		const originalPrice = originalPriceTotal && qty > 1
+			? `$${(parseFloat(originalPriceTotal.replace("$", "")) / qty).toFixed(2)}`
+			: originalPriceTotal;
 
 		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
 		if (seenKeys.has(dedupeKey)) continue;
@@ -1847,11 +1858,13 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber: "",
 			material: "",
 			onSale,
+			...(qty > 1 ? { qty } : {}),
 		});
 	}
 
@@ -1871,6 +1884,99 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
  * Guard: requires both a bold-name <p> and a SIZE|COLOR <p> (or price) to avoid
  * false-positives on shipping/promo rows that also contain bold text.
  */
+
+/**
+ * Strategy: Banana Republic / Gap Inc. 2020 labeled-attribute layout with order-level discount.
+ *
+ * Signal: a <td> containing <b>YOUR ORDER</b> (item count header) is present.
+ * Each item has a <b>ItemName</b> followed by a nested Color:/Size:/Price:/Qty: label table.
+ * Order-level promotions are in a SUMMARY OF CHARGES section with Subtotal + Promotions rows.
+ * The discount percentage is computed from Subtotal and Promotions and applied to every item.
+ */
+function extractFromBananaRepublic2020Layout(doc: Document): ExtractedProduct[] {
+	// Signal: must have a bold "YOUR ORDER" header to avoid false-positives
+	const allBolds = Array.from(doc.querySelectorAll("td b, td strong"));
+	const hasYourOrder = allBolds.some((b) => /^YOUR ORDER$/i.test((b.textContent ?? "").trim()));
+	if (!hasYourOrder) return [];
+
+	// Parse SUMMARY OF CHARGES: find Subtotal and Promotions amounts
+	let discountFraction = 0;
+	const tds = Array.from(doc.querySelectorAll("td"));
+	for (let i = 0; i < tds.length - 1; i++) {
+		const label = getCellText(tds[i]).toLowerCase();
+		if (/^subtotal/.test(label)) {
+			const subtotalText = getCellText(tds[i + 1]);
+			const subtotal = parseFloat(subtotalText.replace(/[^0-9.]/g, ""));
+			// Look ahead for a Promotions row
+			for (let j = i + 2; j < Math.min(i + 10, tds.length - 1); j++) {
+				const nextLabel = getCellText(tds[j]).toLowerCase();
+				if (/^promotions/.test(nextLabel)) {
+					const promoText = getCellText(tds[j + 1]);
+					const promoAmt = Math.abs(parseFloat(promoText.replace(/[^0-9.]/g, "")));
+					if (subtotal > 0 && promoAmt > 0) {
+						discountFraction = promoAmt / subtotal;
+					}
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+	const skipPattern = /\b(order|summary|charges|subtotal|total|qty|quantity|price|color|size|shipping|promotions)\b/i;
+
+	for (const bold of allBolds) {
+		const name = getCellText(bold);
+		if (!name || name.length < 3) continue;
+		if (/^\$/.test(name) || /^\d/.test(name)) continue;
+		if (skipPattern.test(name)) continue;
+
+		const block = bold.closest("table");
+		if (!block) continue;
+
+		const color = getAttributeByLabel(block, "color");
+		const size = getAttributeByLabel(block, "size");
+		const priceRaw = getAttributeByLabel(block, "price");
+		if (!color || !size || !priceRaw) continue;
+
+		const listPrice = extractPrices(priceRaw)[0] ?? "";
+		if (!listPrice) continue;
+
+		let price = listPrice;
+		let originalPrice: string | undefined;
+		let onSale = false;
+
+		if (discountFraction > 0) {
+			const listNum = parseFloat(listPrice.replace(/[^0-9.]/g, ""));
+			const saleNum = parseFloat((listNum * (1 - discountFraction)).toFixed(2));
+			price = `$${saleNum.toFixed(2)}`;
+			originalPrice = listPrice.startsWith("$") ? listPrice : `$${listPrice}`;
+			onSale = true;
+		}
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color: color.toLowerCase(),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale,
+			...(originalPrice ? { originalPrice } : {}),
+		});
+	}
+
+	return products;
+}
+
 function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 	const products: ExtractedProduct[] = [];
 	const seenKeys = new Set<string>();
@@ -2452,8 +2558,26 @@ function extractFromColumnHeaderTable(doc: Document): ExtractedProduct[] {
 	const seen = new Set<string>();
 
 	for (const table of Array.from(doc.querySelectorAll("table"))) {
-		const rows = Array.from(table.querySelectorAll("tr"));
+		// Collect rows from direct table sections only (thead, tbody, tfoot, or direct tr).
+		// This avoids mixing rows from nested tables.
+		let rows: Element[] = [];
+
+		// Direct <tr> children (if table has no section wrappers)
+		rows.push(...directChildren(table, "tr"));
+
+		// Rows from <thead>, <tbody>, <tfoot> sections
+		for (const section of directChildren(table, "thead").concat(
+			directChildren(table, "tbody"),
+			directChildren(table, "tfoot")
+		)) {
+			rows.push(...directChildren(section, "tr"));
+		}
+
 		if (rows.length < 2) continue;
+
+		// Skip very large tables (likely layout containers, not product tables).
+		// Product tables typically have header + 2-20 items, layout tables have 20+ rows.
+		if (rows.length > 30) continue;
 
 		// Find the header row and build field → column-index map.
 		let headerRow: Element | null = null;
@@ -2767,7 +2891,8 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  4. Amazon MJML columns — img.productImage + mj-column divs
 	//  5. SHEIN side-by-side tables — ltwebstatic.com CDN + grey span name
 	//  6. H&M nested attribute table — two-cell rows with Color+Size table
-	//  7. Bold-paragraph single-column (Gap/Banana Republic Factory)
+	//  7. Banana Republic 2020 labeled-attribute layout with order-level promotion discount
+	//  7b. Bold-paragraph single-column (Gap/Banana Republic Factory)
 	//  8. Paragraph-based two-cell rows (Princess Polly) — <p> elements
 	//  9. Poshmark 3-cell rows — td.item image + nested name table + td.price
 	// 10. Anthropologie item-detail-row — labeled product-name/color/size cells
@@ -2786,6 +2911,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromAmazonLayout,
 		extractFromSHEINLayout, // SHEIN ltwebstatic CDN
 		extractFromAttributeTableRows,
+		extractFromBananaRepublic2020Layout, // Banana Republic 2020 labeled-attribute layout with order-level discount
 		extractFromBoldParagraphLayout, // Gap / Banana Republic Factory
 		extractFromParagraphLayout,
 		extractFromPoshmarkLayout, // Poshmark td.price 3-cell rows
