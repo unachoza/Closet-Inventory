@@ -1678,10 +1678,17 @@ describe("Strategy: Shopify order template (SKIMS)", () => {
 		expect(products[1].size).toBe("XS");
 	});
 
-	it("reads price from p.order-list__item-price (not from discount text)", () => {
+	it("reads per-unit price (line total ÷ qty) from p.order-list__item-price", () => {
 		const products = parseProductsFromEmail(skimsHtml);
-		expect(products[0].price).toBe("$60.00");
-		expect(products[1].price).toBe("$40.00");
+		// qty 5: $60.00 / 5 = $12.00, $40.00 / 5 = $8.00
+		expect(products[0].price).toBe("$12.00");
+		expect(products[1].price).toBe("$8.00");
+	});
+
+	it("captures the quantity from the × N suffix", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].qty).toBe(5);
+		expect(products[1].qty).toBe(5);
 	});
 
 	it("marks the discounted item as on sale", () => {

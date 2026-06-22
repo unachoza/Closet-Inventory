@@ -2640,6 +2640,24 @@ function extractFromColumnHeaderTable(doc: Document): ExtractedProduct[] {
  * 6-digit SKU) and CUUP (uses <th> + a bold span). Header/price bolds (e.g.
  * "YOUR ORDER", "$70.97") are filtered by name guards.
  */
+/**
+ * Like getAttributeByLabel but requires the label cell to end with a colon
+ * ("Color:" not "Color"). This distinguishes real BR/Athleta attribute blocks
+ * from column-header tables (American Apparel) whose header row has bare
+ * "Size"/"Color"/"Price" cells that would otherwise be misread as labels.
+ */
+function getAttributeByColonLabel(cell: Element, label: string): string {
+	const cells = Array.from(cell.querySelectorAll("td"));
+	for (let i = 0; i < cells.length - 1; i++) {
+		const raw = getCellText(cells[i]).trim();
+		if (!raw.endsWith(":")) continue;
+		if (raw.replace(/:$/, "").trim().toLowerCase() === label) {
+			return getCellText(cells[i + 1]).trim();
+		}
+	}
+	return "";
+}
+
 function extractFromGapIncLabeledLayout(doc: Document): ExtractedProduct[] {
 	const bolds = Array.from(doc.querySelectorAll("td b, td strong"));
 	const products: ExtractedProduct[] = [];
@@ -2655,9 +2673,9 @@ function extractFromGapIncLabeledLayout(doc: Document): ExtractedProduct[] {
 		const block = bold.closest("table");
 		if (!block) continue;
 
-		const color = getAttributeByLabel(block, "color");
-		const size = getAttributeByLabel(block, "size");
-		const priceRaw = getAttributeByLabel(block, "price");
+		const color = getAttributeByColonLabel(block, "color");
+		const size = getAttributeByColonLabel(block, "size");
+		const priceRaw = getAttributeByColonLabel(block, "price");
 		// Require all three labels — this is what makes the layout unambiguous.
 		if (!color || !size || !priceRaw) continue;
 
