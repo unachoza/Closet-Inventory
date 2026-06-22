@@ -175,6 +175,152 @@ describe("real emails > American Apparel (full email with nested table)", () => 
 	});
 });
 
+// Victoria's Secret 2018 — older template whose SKU is alphanumeric ("DE-369-810"),
+// not a 6-digit code. Previously the SKU guard rejected the item and the image
+// fallback emitted 3 junk banners; the relaxed SKU pattern now detects the item.
+describe("real emails > Victoria's Secret 2018 (alphanumeric SKU)", () => {
+	const products = parseProductsFromEmail(loadFixture("victorias-secret-2018.html"));
+
+	it("detects the single real item (not banner images)", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0]).toMatchObject({
+			name: "Front-close Bralette",
+			size: "M",
+			price: "$14.50",
+			originalPrice: "$24.50",
+			onSale: true,
+			itemNumber: "DE-369-810",
+		});
+	});
+});
+
+// Victoria's Secret 2021 — multi-quantity items. Qty is read from the "Qty"
+// attribute row and surfaced on the card.
+describe("real emails > Victoria's Secret 2021 (quantity)", () => {
+	const products = parseProductsFromEmail(loadFixture("victorias-secret-2021-qty.html"));
+
+	it("captures per-item quantity", () => {
+		const cheeky = products.find((p) => /no-show cheeky/i.test(p.name));
+		const brief = products.find((p) => /stretch cotton high-leg/i.test(p.name));
+		expect(cheeky).toMatchObject({ qty: 4, price: "$24.00", originalPrice: "$42.00", color: "black" });
+		expect(brief).toMatchObject({ qty: 2, price: "$12.00", originalPrice: "$21.00", color: "black" });
+	});
+});
+
+// Shopbop 2021 — Description column embeds a nested image+name table, with a
+// struck-through original price in a sibling cell. Previously the generic table
+// strategy picked the price cell as the name and dedup collapsed both items to
+// one ("$108.50 $155.00", size "1"). The dedicated strategy now detects both.
+describe("real emails > Shopbop 2021 (nested description + sale price)", () => {
+	const products = parseProductsFromEmail(loadFixture("shopbop-2021.html"));
+
+	it("detects both FARM Rio items with sale + original price", () => {
+		expect(products).toHaveLength(2);
+		expect(products[0]).toMatchObject({
+			brand: "FARM Rio",
+			name: "Tie Dye Bananas Pajama Shirt",
+			size: "M",
+			color: "multi",
+			price: "$108.50",
+			originalPrice: "$155.00",
+			onSale: true,
+		});
+		expect(products[1]).toMatchObject({
+			name: "Tie Dye Bananas Pajama Pants",
+			size: "S",
+			price: "$108.50",
+			originalPrice: "$155.00",
+		});
+	});
+
+	it("does not emit a price string as a product name", () => {
+		expect(products.some((p) => /^\$/.test(p.name))).toBe(false);
+	});
+});
+
+// Brooks Brothers 2017 — scene7 product image + a detail cell with "PRODUCT NAME"
+// then labeled "Color:/Size:/Item#:" rows. Previously the generic table strategy
+// read the whole cell as the name with no size and a wrong inferred color.
+describe("real emails > Brooks Brothers 2017 (labeled receipt)", () => {
+	const single = parseProductsFromEmail(loadFixture("brooks-brothers-2017.html"));
+	const two = parseProductsFromEmail(loadFixture("brooks-brothers-2017-two.html"));
+
+	it("parses name/color/size/item# from the labeled detail cell", () => {
+		expect(single).toHaveLength(1);
+		expect(single[0]).toMatchObject({
+			size: "8",
+			color: "black",
+			price: "$50.49",
+			itemNumber: "WX00387",
+		});
+		expect(single[0].name).toMatch(/ponte knit fit-and-flare dress/i);
+		expect(/color:|size:|item#/i.test(single[0].name)).toBe(false);
+	});
+
+	it("detects both items in a 2-item order", () => {
+		expect(two).toHaveLength(2);
+		expect(two.map((p) => p.color)).toEqual(["navy", "navy"]);
+		expect(two.map((p) => p.size)).toEqual(["10", "10"]);
+		expect(two.map((p) => p.itemNumber)).toEqual(["SX00046", "SX00023"]);
+	});
+});
+
+// SwimOutlet 2017 — PRICE/QTY/TOTAL row with a separate "SKU | COLOR | SIZE"
+// label row. Previously the QTY column ("1") was read as the size and the color
+// was wrong; the label row is now parsed for color/size/SKU.
+describe("real emails > SwimOutlet 2017 (label row color/size)", () => {
+	const products = parseProductsFromEmail(loadFixture("swimoutlet-2017.html"));
+
+	it("reads color and size from the label row, not the qty column", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0]).toMatchObject({
+			size: "32",
+			color: "magenta",
+			price: "$20.99",
+			itemNumber: "SWC020-Magenta-32",
+		});
+	});
+});
+
+// Lulus 2021 — 2-cell rows (product image + <br>-delimited name/brand/color/size/
+// price). Previously no structured strategy matched, so the image fallback emitted
+// the 3 products plus a "Contact Us" footer image and an analytics pixel as junk,
+// and color was wrong. Now detected directly with color/size, no junk.
+describe("real emails > Lulus 2021 (br-delimited details)", () => {
+	const products = parseProductsFromEmail(loadFixture("lulus-2021.html"));
+
+	it("detects exactly the 3 products, no footer/analytics junk", () => {
+		expect(products).toHaveLength(3);
+		expect(products.some((p) => /contact us|remaining items|shipped/i.test(p.name))).toBe(false);
+	});
+
+	it("reads color (black, not tan) and size for each item", () => {
+		expect(products.map((p) => p.color)).toEqual(["black", "black", "black"]);
+		expect(products.map((p) => p.size)).toEqual(["Small", "Small", "Small"]);
+		const xoxo = products.find((p) => /xoxo/i.test(p.name));
+		expect(xoxo).toMatchObject({ color: "black", price: "$28.00", brand: "Lulus" });
+	});
+});
+
+// Nike 2025 (forwarded) — dynamic product container with class-tagged name/price
+// divs + a "Size:" line. Previously the swoosh logo ("Nike Logo") and product photo
+// ("product") fell through to the image fallback as 2 junk items with no data.
+describe("real emails > Nike 2025 (dynamic product container)", () => {
+	const products = parseProductsFromEmail(loadFixture("nike-2025.html"));
+
+	it("detects the single shoe, not the swoosh logo", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0]).toMatchObject({
+			brand: "Nike",
+			size: "M 9.5 / W 11",
+			color: "black",
+			price: "$200.00",
+		});
+		expect(products[0].name).toMatch(/air jordan 3 retro/i);
+		expect(products.some((p) => /nike logo|^product$/i.test(p.name))).toBe(false);
+	});
+});
+
 // American Apparel 2013 — real full order-confirmation email. The outer 700px
 // layout table holds bold headings ("Thank You.", "Billing Address", …) plus a
 // Qty/Style/Description/Size/Color/Price column-header product table. Previously

@@ -1,4 +1,4 @@
-import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize } from "./parseNameHelpers";
+import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize, extractColorFromName } from "./parseNameHelpers";
 import { cleanProductName } from "./cleanProductName";
 import { inferProductAttributes } from "./inferProductAttributes";
 
@@ -64,6 +64,14 @@ const SKIP_IMG_PATTERNS = [
 	"caret",
 	"star",
 	"rating",
+	// Analytics / open-tracking pixels (never products)
+	"google-analytics",
+	"/collect?",
+	"convertro",
+	"amazon-adsystem",
+	"awstrack",
+	"doubleclick",
+	"open.aspx",
 ];
 
 /**
@@ -2488,6 +2496,356 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 	return products;
 }
 
+/**
+ * Strategy: Shopbop / East Dane order confirmation.
+ *
+ * Products sit in a Description/Qty/Price/Item Total column table, but the
+ * Description cell embeds a nested image+text table, so the generic table-row
+ * strategy mis-picks the price cell as the name (and dedups two items into one
+ * because both share the same price text). Each product's description cell has
+ * <br>-delimited lines: brand, product name, "Color, Size", then an alphanumeric
+ * SKU. The sale price is the unit price; a struck-through span holds the original.
+ *
+ * Signal: product images on the Shopbop CDN path (.../Shopbop/p/prod/products/).
+ */
+function extractFromShopbopLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/\/Shopbop\/p\/prod\/products\//i.test(img.getAttribute("src") ?? "")
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const imgTd = img.closest("td");
+		const innerRow = imgTd?.closest("tr");
+		if (!imgTd || !innerRow) continue;
+
+		const descTd = directChildren(innerRow, "td").find((td) => td !== imgTd && getCellText(td).length > 0);
+		if (!descTd) continue;
+
+		const lines = getTextLines(descTd)
+			.map((l) => l.trim())
+			.filter(Boolean);
+		if (lines.length < 2) continue;
+
+		// SKU line: long alphanumeric token (e.g. "FARMR303151A57D115").
+		const skuIdx = lines.findIndex((l) => /^[A-Z0-9]{8,}$/.test(l));
+		const itemNumber = skuIdx >= 0 ? lines[skuIdx] : "";
+		const infoLines = skuIdx >= 0 ? lines.slice(0, skuIdx) : lines;
+
+		// "Color, Size" line (e.g. "Multi, M").
+		let color = "";
+		let size = "";
+		let nameLines = infoLines;
+		const csIdx = infoLines.findIndex((l) => l.split(",").length === 2);
+		if (csIdx >= 0) {
+			const [c, s] = infoLines[csIdx].split(",").map((x) => x.trim());
+			color = c.toLowerCase();
+			size = s;
+			nameLines = infoLines.slice(0, csIdx);
+		}
+		if (nameLines.length === 0) continue;
+
+		const brand = nameLines.length >= 2 ? nameLines[0] : "";
+		const name = nameLines.length >= 2 ? nameLines.slice(1).join(" ") : nameLines[0];
+		if (!name) continue;
+
+		// Price from the outer product row: struck span = original, unit price = paid.
+		const outerRow = descTd.closest("table")?.closest("tr") ?? null;
+		let price = "";
+		let originalPrice = "";
+		let onSale = false;
+		if (outerRow) {
+			const strikeEl = outerRow.querySelector("[style*='line-through'], s, strike, del");
+			if (strikeEl) {
+				originalPrice = extractPrices(strikeEl.textContent ?? "")[0] ?? "";
+				onSale = Boolean(originalPrice);
+			}
+			const allPrices = extractPrices(getCellText(outerRow));
+			price = allPrices.find((p) => p !== originalPrice) ?? allPrices[0] ?? "";
+		}
+
+		const key = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(key)) continue;
+		seen.add(key);
+
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand,
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Brooks Brothers order/shipment confirmation.
+ *
+ * Each receipt row holds a scene7 product image, a detail cell ("PRODUCT NAME"
+ * then labeled rows "Color: X" / "Size: Y" / "Item#: Z"), and a price cell. The
+ * generic table strategy reads the whole detail cell as the name and never
+ * parses the labels. Here the labels sit in nested rows (not td pairs), so the
+ * concatenated cell text is regex-parsed.
+ *
+ * Signal: product images on the Brooks Brothers scene7 CDN.
+ */
+function extractFromBrooksBrothersLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/brooksbrothers\.scene7\.com\/is\/image/i.test(img.getAttribute("src") ?? "")
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const row = img.closest("tr");
+		if (!row) continue;
+
+		// Detail cell = the descendant cell whose text carries the Color:/Size: labels.
+		const detailCell = Array.from(row.querySelectorAll("td")).find((td) =>
+			/color:/i.test(getCellText(td)) && /size:/i.test(getCellText(td))
+		);
+		if (!detailCell) continue;
+
+		const text = getCellText(detailCell);
+		const name = text.split(/\s*color:/i)[0].trim();
+		if (!name) continue;
+
+		const colorMatch = text.match(/color:\s*(.+?)\s*(?:size:|item#?:|$)/i);
+		const sizeMatch = text.match(/size:\s*(.+?)\s*(?:item#?:|color:|$)/i);
+		const itemMatch = text.match(/item#?:\s*([A-Z0-9-]+)/i);
+		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const itemNumber = itemMatch ? itemMatch[1].trim() : "";
+
+		// Price: the item row carries a single $ amount (order totals live elsewhere).
+		const price = extractPrices(getCellText(row))[0] ?? "";
+
+		const key = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(key)) continue;
+		seen.add(key);
+
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: SwimOutlet.com order confirmation.
+ *
+ * Each product is a PRICE/QTY/TOTAL row plus a sibling row with
+ * "SKU: ... | COLOR: Magenta | SIZE: 32" labels. The generic table strategy
+ * mistakes the QTY column ("1") for the size and never reads the label row.
+ *
+ * Signal: product-detail anchors (productdetails.asp), which are distinct from
+ * the SearchResults.asp nav/footer links.
+ */
+function extractFromSwimOutletLayout(doc: Document): ExtractedProduct[] {
+	const links = Array.from(doc.querySelectorAll('a[href*="productdetails.asp"]'));
+	if (links.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const link of links) {
+		const name = (link.textContent ?? "").trim().replace(/\s+/g, " ");
+		if (name.length < 5 || seen.has(name.toLowerCase())) continue;
+
+		// The enclosing product table also holds the COLOR:/SIZE: label row.
+		const container = link.closest("table");
+		if (!container) continue;
+		const text = getCellText(container);
+		if (!/color:/i.test(text) || !/size:/i.test(text)) continue;
+
+		seen.add(name.toLowerCase());
+
+		const colorMatch = text.match(/\bcolor:\s*([A-Za-z][A-Za-z /]*?)\s*(?:\||size:|sku:|$)/i);
+		const sizeMatch = text.match(/\bsize:\s*([A-Za-z0-9.\/]+)/i);
+		const skuMatch = text.match(/\bsku:\s*([A-Za-z0-9-]+)/i);
+		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const itemNumber = skuMatch ? skuMatch[1].trim() : "";
+
+		// Price: the first $ amount in the product row (line price; QTY/TOTAL follow).
+		const imgRow = link.closest("tr");
+		const price = extractPrices(imgRow ? getCellText(imgRow) : text)[0] ?? "";
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Lulus order/shipment confirmation.
+ *
+ * Each item is a 2-cell row: a product image (lulus.com/images/product/...) and
+ * a details cell with <br>-delimited lines: bold product name, "Lulus", color,
+ * size (full words like "Small"), price, qty. The details have no labels, so the
+ * generic strategies miss it and the image fallback grabs footer/analytics images
+ * instead. This reads the lines directly.
+ *
+ * Signal: product images on the Lulus product CDN path.
+ */
+const SIZE_WORD_RE = /^(x{0,3}small|x{0,3}large|medium|one\s*size|x{0,3}s|x{0,2}l|m)$/i;
+
+function extractFromLulusLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/lulus\.com\/images\/product\//i.test(img.getAttribute("src") ?? "")
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const row = img.closest("tr");
+		if (!row) continue;
+
+		// Details cell = the sibling cell carrying the bold name + attribute lines.
+		const detailsCell = directChildren(row, "td").find((td) => !td.contains(img) && td.querySelector("b"));
+		if (!detailsCell) continue;
+
+		const boldName = (detailsCell.querySelector("b")?.textContent ?? "").trim();
+		const name = boldName.replace(/\s+/g, " ");
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const lines = getTextLines(detailsCell)
+			.map((l) => l.trim())
+			.filter(Boolean);
+
+		let brand = "";
+		let color = "";
+		let size = "";
+		let price = "";
+		for (const line of lines) {
+			if (line === name) continue;
+			if (/^\$/.test(line) && !price) {
+				price = extractPrices(line)[0] ?? "";
+				continue;
+			}
+			if (/^lulus$/i.test(line) && !brand) {
+				brand = "Lulus";
+				continue;
+			}
+			if (!size && SIZE_WORD_RE.test(line)) {
+				size = line;
+				continue;
+			}
+			if (!color) {
+				const c = extractColorFromName(line);
+				if (c && c === line.toLowerCase()) color = c;
+			}
+		}
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand,
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Nike / Jordan order confirmation (dynamic product container).
+ *
+ * Each product is a stack of class-tagged divs: `__name`, `__price`, a bare
+ * `__base` line for the category ("Men's Shoes") and one for "Size: ...". The
+ * swoosh logo (alt "Nike Logo") and the product photo (alt "product") otherwise
+ * fall through to the image fallback as junk. Color is inferred from the name
+ * (e.g. "Black Cat" → black).
+ *
+ * Signal: the `x_dynamicProductContainer__name` class.
+ */
+function extractFromNikeLayout(doc: Document): ExtractedProduct[] {
+	const nameDivs = Array.from(doc.querySelectorAll(".x_dynamicProductContainer__name"));
+	if (nameDivs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const nameDiv of nameDivs) {
+		const name = getCellText(nameDiv);
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const container = nameDiv.closest('table[class*="dynamicProduct"]') ?? nameDiv.closest("table");
+		if (!container) continue;
+
+		const priceEl = container.querySelector(".x_dynamicProductContainer__price");
+		const price = priceEl ? (extractPrices(getCellText(priceEl))[0] ?? "") : "";
+
+		// "Size: M 9.5 / W 11" lives in a bare __base div.
+		let size = "";
+		for (const base of Array.from(container.querySelectorAll(".x_dynamicProductContainer__base"))) {
+			const t = getCellText(base);
+			const m = t.match(/^size:\s*(.+)$/i);
+			if (m) {
+				size = m[1].trim();
+				break;
+			}
+		}
+
+		const img = container.querySelector("img");
+		const imageUrl = img?.getAttribute("src") ?? "";
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl,
+			name,
+			brand: "Nike",
+			price,
+			color: extractColorFromName(name),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 // ── Column-header table strategy ─────────────────────────
 
 type ColumnField = "name" | "price" | "size" | "color" | "itemNumber" | "qty";
@@ -2828,10 +3186,21 @@ function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
 		const size = getAttributeByLabel(block, "size");
 		if (!color || !size) continue;
 
-		// SKU: a cell whose text is only 6+ digits.
-		const skuCell = Array.from(block.querySelectorAll("td")).find((td) => /^\d{6,}$/.test(getCellText(td)));
-		const itemNumber = skuCell ? getCellText(skuCell) : "";
+		// SKU: a cell whose first <br>-delimited line is a pure 6+ digit code
+		// (e.g. "26191609") or VS's alphanumeric-dashed style (e.g. "DE-369-810").
+		// A SKU is still REQUIRED so this strategy stays distinct from BR/Athleta
+		// blocks (bold name + Color:/Size: labels but no standalone SKU line).
+		const SKU_RE = /^(?:\d{6,}|[A-Z]{1,4}-\d[\dA-Z-]*)$/i;
+		const skuCell = Array.from(block.querySelectorAll("td")).find((td) => {
+			const first = getTextLines(td)[0] ?? "";
+			return SKU_RE.test(first);
+		});
+		const itemNumber = skuCell ? (getTextLines(skuCell)[0] ?? "") : "";
 		if (!itemNumber) continue;
+
+		// Quantity (VS uses a "Qty" attribute row). Captured discreetly for the card.
+		const qtyRaw = getAttributeByLabel(block, "qty");
+		const qty = qtyRaw ? parseInt(qtyRaw, 10) : 1;
 
 		// Price block: first $ amount is the paid line total; the highest trailing
 		// amount is the struck original (sale). A middle "-$X (Offers & Discounts)"
@@ -2854,6 +3223,7 @@ function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
 			itemNumber,
 			material: "",
 			onSale,
+			...(qty > 1 ? { qty } : {}),
 		};
 
 		if (!bySku.has(itemNumber)) order.push(itemNumber);
@@ -2939,6 +3309,11 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromVictoriasSecretLayout, // VS bold name + Color/Size/Qty attribute table
 		extractFromGapIncLabeledLayout, // Banana Republic / Athleta bold name + Color:/Size:/Price: labels
 		extractFromTargetLayout, // Target product-block 2-column layout
+		extractFromShopbopLayout, // Shopbop/East Dane: Description cell = nested image+name, struck original price
+		extractFromBrooksBrothersLayout, // Brooks Brothers: scene7 image + Color:/Size:/Item#: labeled detail cell
+		extractFromSwimOutletLayout, // SwimOutlet: productdetails link + SKU/COLOR/SIZE label row
+		extractFromLulusLayout, // Lulus: product-CDN image + <br>-delimited name/brand/color/size/price
+		extractFromNikeLayout, // Nike/Jordan: x_dynamicProductContainer__name/__price/Size: divs
 		extractFromTableRows,
 		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
