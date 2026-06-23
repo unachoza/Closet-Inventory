@@ -5,7 +5,7 @@
  * The "Include" button moves a skipped item into the importable list
  * without a page transition.
  */
-import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { ExtractedProduct } from "../../../../utils/parseProductsFromEmail";
 
@@ -65,9 +65,9 @@ vi.mock("../../ProductCard/ProductCard", () => ({
 import EmailPreview from "../EmailPreview";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const SHIRT: ExtractedProduct = { name: "Blue Shirt", price: 30, color: "Blue", size: "M", brand: "Gap", imageUrl: "", onSale: false, material: [] };
-const ACCESSORY: ExtractedProduct = { name: "Leather Accessory", price: 15, color: "", size: "", brand: "Gap", imageUrl: "", onSale: false, material: [] };
-const BELT: ExtractedProduct = { name: "Canvas Accessory Belt", price: 20, color: "Tan", size: "S", brand: "Gap", imageUrl: "", onSale: false, material: [] };
+const SHIRT: ExtractedProduct = { name: "Blue Shirt", price: 30, color: "Blue", size: "M", brand: "Gap", imageUrl: "", onSale: false, material: "" };
+const ACCESSORY: ExtractedProduct = { name: "Leather Accessory", price: 15, color: "", size: "", brand: "Gap", imageUrl: "", onSale: false, material: "" };
+const BELT: ExtractedProduct = { name: "Canvas Accessory Belt", price: 20, color: "Tan", size: "S", brand: "Gap", imageUrl: "", onSale: false, material: "" };
 
 const MOCK_EMAIL = {
 	id: "e1", threadId: "t1",
