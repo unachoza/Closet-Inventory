@@ -119,7 +119,8 @@ describe("useLocalStorageClosetBase", () => {
 	});
 
 	it("normalises legacy string material fields to MaterialBlend[] on read", () => {
-		const legacyItem = { ...makeItem({ id: "legacy" }), material: "cotton" } as any;
+		// Legacy on-disk shape: `material` was a plain string before the MaterialBlend[] migration.
+		const legacyItem = { ...makeItem({ id: "legacy" }), material: "cotton" } as unknown as ClothingItem;
 		localStorage.setItem(STORAGE_KEY, JSON.stringify([legacyItem]));
 
 		const { result } = renderHook(() => useLocalStorageClosetBase());

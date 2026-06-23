@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import type { ClothingItem } from "../../utils/types";
 
-// Type for the item being edited (customize as needed)
-export type EditItem = any;
+// The item currently being edited.
+export type EditItem = ClothingItem;
 
 interface EditContextType {
 	editItem: EditItem | null;

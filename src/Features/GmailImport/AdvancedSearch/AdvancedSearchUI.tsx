@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { GMAIL_SEARCH_SUBJECTS, GMAIL_SEARCH_BODY_KEYWORDS, GMAIL_EXCLUDE_SENDERS } from "../constants";
-import { MobileSearchWizard } from "../AdvnacedSearch/MobileAdvancedSearchFlow/MobileAdvancedSearchFlow";
-import { DesktopSearchSplitPanel } from "../AdvnacedSearch/DesktopAdvancedSearchFlow/DesktopAdvancedSearchFlow";
+import { MobileSearchWizard } from "./MobileAdvancedSearchFlow/MobileAdvancedSearchFlow";
+import { DesktopSearchSplitPanel } from "./DesktopAdvancedSearchFlow/DesktopAdvancedSearchFlow";
 
 export type SearchMode = "fetch" | "filter";
 

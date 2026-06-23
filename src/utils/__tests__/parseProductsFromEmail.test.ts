@@ -680,7 +680,7 @@ describe("parseProductsFromEmail", () => {
 							${productImg("https://static.zara.net/dress.jpg")}
 							<div>Combination Tulle Dress</div>
 							<div>Black 0/0858/504/800/02</div>
-							<div>1  unit     / 12.99 USD    </div>
+							<div>1  unit     / 12.99\u00A0USD    </div>
 							<div>S</div>
 						</td>
 					</tr>
