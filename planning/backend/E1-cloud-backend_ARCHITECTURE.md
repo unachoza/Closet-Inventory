@@ -188,6 +188,9 @@ React ──GraphQL: enrichItem(imgPath)──► BFF privileged resolver
 - **graphql-armor depth/cost limits** — the correct DoS defense (not "hide the schema").
 - **`pg_cron` purge** of expired OAuth/refresh tokens.
 - **Service-role key server-only**, never in client-reachable resolvers.
+- **DOMPurify on all rendered email HTML** (shipped, branch `security-xss`) — untrusted inbox HTML goes through `DOMPurify.sanitize` before `dangerouslySetInnerHTML`.
+- **No secrets/PII in persistent browser storage** (shipped, branch `security-xss`) — Gmail token is in-memory only; fetched email bodies are sessionStorage (tab-scoped), cleared on logout. Server-side token storage is the E1 target.
+- **CSP `script-src 'self'`** — defense-in-depth backstop to DOMPurify; set at the hosting/`index.html` layer once verified against the Google OAuth SDK.
 
 **Drop / defer (mismatched to a personal closet PWA):**
 

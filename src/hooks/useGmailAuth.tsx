@@ -1,38 +1,43 @@
 import { useCallback, useEffect, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
-import { useLocalStorage } from "./uselocalStorage";
 
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
-const AUTH_STORAGE_KEY = "gmail_auth_token";
+// Legacy key — the access token used to be persisted here. We now keep it in
+// memory only and purge this key on mount (see below).
+const LEGACY_TOKEN_KEY = "gmail_auth_token";
 
-interface StoredAuth {
+interface GmailAuth {
 	readonly accessToken: string;
 	readonly expiresAt: number; // timestamp in ms
 }
 
-const EMPTY_AUTH: StoredAuth = {
+const EMPTY_AUTH: GmailAuth = {
 	accessToken: "",
 	expiresAt: 0,
 };
 
-function isTokenValid(auth: StoredAuth): boolean {
+function isTokenValid(auth: GmailAuth): boolean {
 	if (!auth.accessToken) return false;
 	// Add 60s buffer so we don't use a token that's about to expire
 	return Date.now() < auth.expiresAt - 60_000;
 }
 
 export function useGmailAuth() {
-	// Only the token is persisted. error/isLoading are transient UI state — if they
-	// were persisted, an interrupted login (e.g. a blocked popup on Safari) would
-	// leave isLoading=true stored forever, permanently disabling the Connect button.
-	const [storedAuth, setStoredAuth] = useLocalStorage<StoredAuth>(AUTH_STORAGE_KEY, EMPTY_AUTH);
+	// The Gmail access token is kept in MEMORY ONLY — never in localStorage.
+	// A persisted gmail.readonly token is a standing XSS target: any script that
+	// runs on the page could read it straight out of storage. In-memory means it
+	// dies on reload (cost: re-auth after a refresh, which is cheap). Server-side
+	// token storage is the longer-term home (E1 cloud backend).
+	const [auth, setAuth] = useState<GmailAuth>(EMPTY_AUTH);
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	// One-time cleanup: drop stale loading/error flags persisted by older builds so
-	// users currently trapped on "Connecting..." recover on next load.
+	// One-time cleanup: purge credentials persisted by older builds — including
+	// the access token itself, which used to live in localStorage — so no stale
+	// token lingers on disk for existing users after this upgrade.
 	useEffect(() => {
 		try {
+			window.localStorage.removeItem(LEGACY_TOKEN_KEY);
 			window.localStorage.removeItem("gmail_auth_loading");
 			window.localStorage.removeItem("gmail_auth_error");
 		} catch {
@@ -40,7 +45,7 @@ export function useGmailAuth() {
 		}
 	}, []);
 
-	const authenticated = isTokenValid(storedAuth);
+	const authenticated = isTokenValid(auth);
 
 	const login = useGoogleLogin({
 		scope: GMAIL_SCOPE,
@@ -48,7 +53,7 @@ export function useGmailAuth() {
 			// Google tokens typically expire in 3600 seconds (1 hour)
 			const expiresInMs = (tokenResponse.expires_in ?? 3600) * 1000;
 
-			setStoredAuth({
+			setAuth({
 				accessToken: tokenResponse.access_token,
 				expiresAt: Date.now() + expiresInMs,
 			});
@@ -56,12 +61,12 @@ export function useGmailAuth() {
 			setIsLoading(false);
 		},
 		onError: (err) => {
-			setStoredAuth(EMPTY_AUTH);
+			setAuth(EMPTY_AUTH);
 			setError(err.error_description ?? "Failed to authenticate with Google");
 			setIsLoading(false);
 		},
 		onNonOAuthError: () => {
-			setStoredAuth(EMPTY_AUTH);
+			setAuth(EMPTY_AUTH);
 			setError("Authentication popup was closed");
 			setIsLoading(false);
 		},
@@ -81,12 +86,12 @@ export function useGmailAuth() {
 	}, [login, setIsLoading, setError]);
 
 	const logout = useCallback(() => {
-		setStoredAuth(EMPTY_AUTH);
+		setAuth(EMPTY_AUTH);
 		setError(null);
-	}, [setStoredAuth, setError]);
+	}, [setAuth, setError]);
 
 	return {
-		accessToken: authenticated ? storedAuth.accessToken : null,
+		accessToken: authenticated ? auth.accessToken : null,
 		isAuthenticated: authenticated,
 		error,
 		isLoading,

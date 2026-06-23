@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import { useAdvancedSearch } from "../useAdvancedSearch";
-import { GMAIL_CACHE_KEY } from "../../Features/GmailImport/constants";
+import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "../../Features/GmailImport/constants";
 import type { GmailEmailMeta } from "../useAdvancedSearch";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -25,13 +25,16 @@ const emptyParams = {
 };
 
 function seedCache(emails: GmailEmailMeta[]) {
-	localStorage.setItem(
+	sessionStorage.setItem(
 		GMAIL_CACHE_KEY,
 		JSON.stringify({ timestamp: Date.now(), emails, nextPageToken: null }),
 	);
 }
 
-beforeEach(() => localStorage.clear());
+beforeEach(() => {
+	localStorage.clear();
+	sessionStorage.clear();
+});
 
 // ── filterCachedEmails ────────────────────────────────────────────────────────
 // These tests exercise the client-side filtering logic without any API calls.
@@ -163,9 +166,37 @@ describe("useAdvancedSearch — initial state", () => {
 		expect(result.current.error).toBeNull();
 	});
 
-	it("reports cachedCount from pre-existing localStorage cache", () => {
+	it("reports cachedCount from pre-existing sessionStorage cache", () => {
 		seedCache([makeEmail({ id: "a" }), makeEmail({ id: "b" })]);
 		const { result } = renderHook(() => useAdvancedSearch());
 		expect(result.current.cachedCount).toBe(2);
+	});
+
+	it("keeps cached inbox content out of localStorage (sessionStorage only)", () => {
+		seedCache([makeEmail({ id: "a" })]);
+		renderHook(() => useAdvancedSearch());
+		expect(localStorage.getItem(GMAIL_CACHE_KEY)).toBeNull();
+		expect(localStorage.getItem(GMAIL_CACHE_BODIES_KEY)).toBeNull();
+	});
+
+	it("purges legacy caches that older builds left in localStorage", () => {
+		localStorage.setItem(GMAIL_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), emails: [], nextPageToken: null }));
+		localStorage.setItem(GMAIL_CACHE_BODIES_KEY, JSON.stringify({ a: "<p>leaked body</p>" }));
+
+		renderHook(() => useAdvancedSearch());
+
+		expect(localStorage.getItem(GMAIL_CACHE_KEY)).toBeNull();
+		expect(localStorage.getItem(GMAIL_CACHE_BODIES_KEY)).toBeNull();
+	});
+
+	it("clearCache wipes cached emails", () => {
+		seedCache([makeEmail({ id: "a" }), makeEmail({ id: "b" })]);
+		const { result } = renderHook(() => useAdvancedSearch());
+		expect(result.current.cachedCount).toBe(2);
+
+		act(() => result.current.clearCache());
+
+		expect(result.current.cachedCount).toBe(0);
+		expect(result.current.emails).toHaveLength(0);
 	});
 });

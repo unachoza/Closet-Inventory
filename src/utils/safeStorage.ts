@@ -1,18 +1,34 @@
 /**
- * Best-effort localStorage write that never throws.
+ * Best-effort Web Storage writes that never throw.
  *
- * Safari caps localStorage at ~5MB and throws QuotaExceededError once full;
+ * Safari caps storage at ~5MB and throws QuotaExceededError once full;
  * private mode throws SecurityError on write. Persistence is best-effort — the
  * app keeps its in-memory state working rather than crashing on a failed write.
- *
- * @returns true if the value was persisted, false if storage rejected it.
  */
-export function safeSetItem(key: string, value: string): boolean {
+
+function safeSet(storage: Storage, key: string, value: string): boolean {
 	try {
-		window.localStorage.setItem(key, value);
+		storage.setItem(key, value);
 		return true;
 	} catch (error) {
-		console.warn(`safeSetItem: could not persist "${key}" (storage full or unavailable)`, error);
+		console.warn(`safeSet: could not persist "${key}" (storage full or unavailable)`, error);
 		return false;
 	}
+}
+
+/**
+ * Best-effort localStorage write. Survives a tab close.
+ * @returns true if persisted, false if storage rejected it.
+ */
+export function safeSetItem(key: string, value: string): boolean {
+	return safeSet(window.localStorage, key, value);
+}
+
+/**
+ * Best-effort sessionStorage write. Cleared when the tab closes — use for
+ * sensitive data (e.g. fetched email bodies) that should not linger on disk.
+ * @returns true if persisted, false if storage rejected it.
+ */
+export function safeSetSessionItem(key: string, value: string): boolean {
+	return safeSet(window.sessionStorage, key, value);
 }
