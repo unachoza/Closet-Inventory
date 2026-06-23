@@ -17,7 +17,7 @@ export interface ExtractedProduct {
 	readonly imageUrl: string;
 	readonly name: string;
 	readonly brand: string;
-	readonly price: string;
+	readonly price: string | number;
 	readonly originalPrice?: string;
 	readonly qty?: number;
 	readonly color: string;

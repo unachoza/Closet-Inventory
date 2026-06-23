@@ -65,12 +65,14 @@ const RESELLERS = ["poshmark", "depop", "ebay", "vinted", "threadup", "the realr
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
 	dress: "dresses",
+	// bottoms
 	skirt: "bottoms",
 	pant: "bottoms",
 	jean: "bottoms",
 	culottes: "bottoms",
 	trouser: "bottoms",
 	short: "bottoms",
+	skort: "bottoms",
 	top: "tops",
 	blouse: "tops",
 	shirt: "tops",
@@ -86,15 +88,15 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	bra: "intimates",
 	bralette: "intimates",
 	lingerie: "intimates",
-	//TODO 
+	//TODO
 	//not always!
 	plunge: "intimates",
 	balconette: "intimates",
 	demi: "intimates",
 	scoop: "intimates",
-	//TODO 
+	//TODO
 	//not always!
-	racerback: "intimates", 
+	racerback: "intimates",
 	underwire: "intimates",
 	padded: "intimates",
 	unpadded: "intimates",
@@ -108,7 +110,6 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	swimsuit: "intimates",
 	bodysuit: "body",
 	jumpsuit: "body",
-	skort: "bottoms",
 	cheeky: "intimates",
 	thong: "intimates",
 	briefs: "intimates",
@@ -137,7 +138,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	wedge: "shoes",
 	clog: "shoes",
 	platform: "shoes",
-	pajama: "pajama"
+	pajama: "pajama",
 };
 
 function extractBrand(text: string, from: string): string {
