@@ -18,6 +18,8 @@
 
 This is a **refined Path A** — a gateway, but a *RLS-preserving* one. It reconciles "I want GraphQL + custom AI control" with "RLS is the load-bearing reason I picked Supabase."
 
+> **No AI?** The custom gateway loses its main justification — go **Path B (`pg_graphql`-native)** instead. See [Variant: No AI](#variant-no-ai--pg_graphql-native-becomes-the-default).
+
 ---
 
 ## ⚠️ Why the original Path A needs correcting
@@ -192,6 +194,62 @@ React ──GraphQL: enrichItem(imgPath)──► BFF privileged resolver
 - Disabling PostgREST/pg_graphql to "hide the schema" — obscurity, and it discards RLS-aware auto-CRUD.
 - App-layer AES-256 field encryption for "supplier contacts" — there are no suppliers; rely on Postgres at-rest encryption + RLS.
 - Private VPC peering — unnecessary infra/cost at this scale; TLS + RLS + scoped keys suffice.
+
+---
+
+## Variant: No AI → Path B (`pg_graphql`-native) becomes the default
+
+> If the roadmap drops the AI features (v3.1 vision pre-fill, any LLM enrichment), the custom GraphQL BFF
+> loses its main justification. **Don't build a server you don't need.**
+
+**What changes:** the strongest reason for a custom gateway was "a place to run custom AI logic + hold the
+AI vendor key." Remove AI and the gateway's remaining jobs (forward JWT for RLS, curate schema) are either
+already done by `pg_graphql` or not worth a whole service.
+
+**What stays (server work that exists AI-or-not — none of it is GraphQL):**
+
+- Gmail / Microsoft Graph **OAuth token refresh** → Edge Function (server-side secret)
+- **Stripe webhook** → `users.is_premium` (v11) → Edge Function
+- **IMAP fetch** for Yahoo/iCloud/AOL (v2.3) → small **Node** worker (`imapflow`; Deno IMAP libs are weak)
+- **v2.2 PDP scraper** → Edge Function
+
+**Revised topology (no AI):**
+
+```text
+        [ React PWA ]
+             │  GraphQL + JWT
+             ▼
+   [ Supabase pg_graphql ]  ◄── RLS enforced natively, zero resolvers
+             │
+             ▼
+   [ Postgres + RLS ]
+        ▲           ▲
+        │           │ service_role (server-only)
+        │      ┌────┴───────────────────────────────┐
+        │      │ Edge Functions + Node IMAP worker   │
+        │      │  • OAuth refresh · Stripe · scraper │
+        │      │  • IMAP (Render/Fly)                │
+        │      └─────────────────────────────────────┘
+```
+
+**Decision table:**
+
+| | With AI | Without AI |
+|---|---|---|
+| GraphQL surface | Custom **Yoga BFF** (refined Path A) | **`pg_graphql` native** (Path B) |
+| Custom GraphQL server to build/deploy/monitor | Yes | **No** |
+| Privileged logic host | BFF resolvers + Edge Functions | Edge Functions + Node IMAP worker |
+| RLS enforcement | JWT forwarded by BFF | Native in `pg_graphql` |
+| Long-running Node host | BFF + IMAP | **Only** the IMAP worker (v2.3) |
+
+**Two things that would bring the BFF back even without AI:**
+
+1. You want **centralized query depth/cost limiting** beyond what Supabase gives on `pg_graphql` (graphql-armor as a chokepoint).
+2. You want a **curated/aggregated schema** that doesn't mirror tables 1:1.
+
+If neither applies, **go Path B** — it's strictly less to build, and the right-sizing in the Security section gets *more* true, not less.
+
+**One trade-off to accept:** exposing `pg_graphql` directly to the browser means you lose the BFF as a chokepoint for abusive queries — so lean harder on **RLS + Supabase's built-in rate limits**.
 
 ---
 
