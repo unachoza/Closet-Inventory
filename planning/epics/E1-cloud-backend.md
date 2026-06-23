@@ -40,6 +40,79 @@ _As Maya, I want a sync indicator so that I know my data is safe / when I'm offl
 **Tickets**
 - `E1-3.1` Sync-status indicator in NavBar — _0.5d_
 
+## US-1.4 — Trust NTW with my login & profile data
+_As Maya, I want to trust NTW with my Google login and personal profile info so that my identity, photos, and wardrobe data can't be leaked or accessed by anyone but me._
+- [ ] Handle client credentials & user tokens securely
+- [ ] Cross-account protection & user-flow protection
+
+> **Context — don't repeat the Tea App breach.** The Tea app leaked users' faces, legal
+> names, and home addresses (multiple federal class-actions) because of avoidable cloud-storage
+> and credential mistakes. Each precaution below maps to a specific failure they committed.
+
+**Precautions checklist (each = a Tea App "sin" to avoid)**
+- [ ] **No unsecured buckets** — every Supabase Storage bucket is private by default; access only via authenticated, signed URLs (no public/direct-URL downloads). _(Tea: open Firebase bucket, anyone with the URL)_
+- [ ] **RLS everywhere** — owner-only Row Level Security on every table *and* Storage object; verify a second account cannot read another user's rows/files. _(Tea: no access controls)_
+- [ ] **Data minimization** — only collect what's needed; if any verification image/ID is ever introduced, delete immediately after use and prove deletion. _(Tea: promised deletion, kept images for years)_
+- [ ] **No orphaned legacy data** — when migrating off base64 / PR #44 / any old store, securely wipe or migrate-and-delete the old data; never leave legacy copies behind. _(Tea: left data in old unsecured store after migrating)_
+- [ ] **Encryption at rest & in transit** — confirm Supabase encryption at rest is on; all transport over HTTPS/TLS. _(Tea: files + 1M+ DMs stored unencrypted)_
+- [ ] **No hardcoded secrets** — API keys/client tokens in env vars only, never committed; rotate anything ever exposed; scan source + git history for leaked keys. _(Tea: keys hardcoded in source)_
+- [ ] **Routine security audits** — dependency/secret scanning in CI, periodic access review, and monitoring/alerting for anomalous access or exposure. _(Tea: no testing or monitoring)_
+- [ ] **Token handling** — Gmail access/refresh tokens stored securely (not localStorage in plaintext if avoidable), least-privilege scopes, short-lived where possible, revocable on sign-out.
+
+**Tickets**
+- `E1-4.1` Bucket privacy + signed-URL-only access pattern (audit `E1-2.1` storage pipeline) — _0.5d_
+- `E1-4.2` RLS verification tests — second-account read/write attempts must fail (tables + Storage) — _0.5–1d_
+- `E1-4.3` Secret hygiene: env-only config, `.env` gitignored, git-history secret scan + CI secret/dep scanning, key rotation runbook — _0.5–1d_
+- `E1-4.4` Gmail token storage & scope review (least-privilege, secure storage, revoke-on-logout) — _0.5–1d_
+- `E1-4.5` Data-minimization + legacy-wipe checklist enforced in the base64→Storage migration (`E1-2.2`) — _bundled_
+
+### Broader hardening checklist (beyond the Tea App list)
+
+**Auth & session**
+- [ ] Short-lived access tokens + refresh-token rotation; sign-out revokes the session everywhere
+- [ ] Enable Supabase **leaked-password protection** (HaveIBeenPwned) and a CAPTCHA on auth to blunt credential-stuffing/bots
+- [ ] Offer MFA where Supabase supports it; enforce email verification before first write
+
+**Authorization (defense in depth)**
+- [ ] RLS is the *only* security boundary — never rely on client-side checks; default-deny, add explicit allow policies
+- [ ] Audit any Postgres `SECURITY DEFINER` functions/views (they bypass RLS); keep them minimal and reviewed
+- [ ] Anon key only on the client; **`service_role` key never ships to the browser** (server/edge functions only)
+
+**Input validation & injection / XSS**
+- [ ] ⚠️ **Replace the hand-rolled email-HTML sanitizer with DOMPurify** — current `createSanitizedHtml` in `EmailPreview.tsx` strips `<script>/<iframe>` but NOT inline handlers (`onerror`, `onload`), `javascript:`/`data:` URLs, or `<svg onload>`, then renders via `dangerouslySetInnerHTML` (live XSS on untrusted email)
+- [ ] Validate every input at the boundary with Zod (form data, parsed email fields, API/edge-function payloads)
+- [ ] Supabase client uses parameterized queries — never string-concatenate SQL in edge functions
+
+**Network & transport**
+- [ ] Content-Security-Policy header (lock down script/style/img/connect sources)
+- [ ] HSTS + HTTPS-only; secure cookies (`HttpOnly`, `Secure`, `SameSite`) for any session cookie
+- [ ] Lock CORS to known origins on edge functions (no `*` in production)
+
+**Storage upload safety**
+- [ ] Validate file type + size on upload; reject non-image content; cap dimensions/bytes
+- [ ] Short-expiry signed URLs; no long-lived/public links to user images
+
+**Privacy & compliance**
+- [ ] Privacy policy + ToS; explicit consent for the Gmail scope at connect time
+- [ ] Self-serve **account deletion + data export** (GDPR/CCPA right-to-erasure / portability) — delete rows *and* Storage objects
+- [ ] ⚠️ **Google OAuth restricted-scope review** — `gmail.readonly` is a *restricted* scope; a public production app needs Google's verification + an annual third-party **CASA security assessment**. Scope this early (long lead time)
+
+**Operational**
+- [ ] Separate dev / prod Supabase projects; no prod data in dev
+- [ ] Backups + point-in-time recovery enabled and restore-tested
+- [ ] Logging hygiene — never log tokens, OAuth codes, or PII; error messages don't leak internals
+- [ ] Dependency security in CI (`npm audit` / Dependabot, lockfile committed)
+- [ ] Written incident-response + breach-notification plan before public launch
+
+**Tickets (hardening)**
+- `E1-4.6` Swap email sanitizer to DOMPurify; add XSS regression tests (event-handler / `javascript:` / `<svg onload>` payloads) — _0.5d_
+- `E1-4.7` CSP + HSTS + secure-cookie + CORS-allowlist config — _0.5–1d_
+- `E1-4.8` Self-serve account deletion + data export (rows + Storage) — _1–1.5d_
+- `E1-4.9` Google OAuth verification + CASA assessment scoping (start early) — _tbd, long lead_
+- `E1-4.10` Supabase platform hardening: leaked-password protection, CAPTCHA, `service_role` audit, `SECURITY DEFINER` review — _0.5d_
+- `E1-4.11` Upload validation (type/size/dimensions) + short-expiry signed URLs — _0.5d_
+- `E1-4.12` Backups/PITR enabled + restore test; dev/prod project split; logging-hygiene pass — _0.5–1d_
+
 ---
 
 ## Dependencies
@@ -48,4 +121,4 @@ _As Maya, I want a sync indicator so that I know my data is safe / when I'm offl
 - Decommission PR #44 (reference only).
 
 ## Definition of done (epic)
-Signed-in users have a private, synced, offline-capable closet on Supabase; images in Storage; sync state visible; Gmail import still works under Supabase Auth.
+Signed-in users have a private, synced, offline-capable closet on Supabase; images in Storage; sync state visible; Gmail import still works under Supabase Auth; **US-1.4 security precautions checklist fully verified** (private buckets, RLS proven against a second account, no hardcoded secrets, encryption at rest/in transit, no orphaned legacy data, secure token handling).

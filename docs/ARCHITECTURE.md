@@ -148,6 +148,14 @@ flowchart TD
   EIV -->|Skip / Add| ADV[handleQueueAdvance → next or back to gmail]
 ```
 
+**Category gate + unskip (PR #72):** before products reach the import handler,
+`EmailPreview` runs `partitionByCategory` over the parsed list — items that can't map
+to a category (and false positives from image-based retailers) are split into a
+**skipped** bucket and excluded from import. The user can expand the "N items skipped —
+not clothing" notice and click **Include** to move a false positive back into the
+importable list (local `unskipped` state). Noise senders are filtered upstream via
+`GMAIL_EXCLUDE_SENDERS` in the default query.
+
 **Gotcha (documented in FORWARD_PLAN):** `care` must be computed in the *handler*
 from the **resolved** color, because the email's product-card color (`Color: White`)
 isn't visible to `parseEmailToFormData` (which only sees the subject). Likewise the

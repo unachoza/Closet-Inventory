@@ -239,6 +239,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Structured item extraction (name, price, brand, category) from email HTML
 - ✅ Multi-retailer HTML parsers — Anthropologie, Aritzia, Banana Republic, Express, Old Navy, Shein, Skims, Target, Victoria's Secret, Zara (+ partial Amazon); tested against real-email fixtures
 - ✅ Advanced Gmail search — subject/body keyword + date-range query builder with confirmation modal and 24h email cache
+- ✅ Cache-aware searching — distinguishes a brand-new fetch from a filter over cached results (`searchMode` + cached-count surfaced in the UI), with a manual "Clear cache" control
+- ✅ Noise-sender exclusion — non-retail senders (Spotify, Eventbrite, DoorDash, United, FedEx, CVS, etc.) filtered out of the default query
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
 - ✅ Multi-retailer email parsing (Express, Banana Republic Factory, Anthropologie, SKIMS, Poshmark, SHEIN)
@@ -252,11 +254,12 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Title-case display transform for product names (display-only, non-mutating)
 - ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
-- 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
+- ✅ Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
 - ✅ Fast fashion retailer support - Temu (data embedded in images, OCR required)
-- 🔲 Full Amazon support - import-non-clothing skip
-- 🚧 Don't import items that can't be mapped to a category (big for Amazon emails)
-- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
+- ✅ Full Amazon support - import-non-clothing skip
+- ✅ Don't import items that can't be mapped to a category (big for Amazon emails)
+- ✅ Review skipped items — collapsible "N items skipped — not clothing" list with an "Include" button to recover false positives back into the import
+- ✅ Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 
 ---
 

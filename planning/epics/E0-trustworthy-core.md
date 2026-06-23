@@ -48,15 +48,18 @@ _As Maya, I want a manually added item to have no fabricated purchase date so th
 - `E0-4.1` Fix MonthYearPicker commit-to-`purchaseDate` — switched broken `setFormData` cast to `onSelectDate(value)` pattern; wired in both Form and EditItemView — _1d_ ✅
 - `E0-4.2` Regression test: no selection → no date; selection → correct ISO — _bundled_ ✅
 
-## US-0.5 — Don't import junk
+## US-0.5 — Don't import junk ✅
 _As Maya, I want non-clothing / uncategorizable items skipped on import so that my closet isn't polluted (esp. Amazon)._
-- [ ] Items that can't map to a category are skipped, not imported as blanks
-- [ ] Skip count surfaced to the user ("3 items skipped — no category")
-- [ ] Test covers an Amazon-style mixed email
+- [x] Items that can't map to a category are skipped, not imported as blanks
+- [x] Skip count surfaced to the user ("3 items skipped — not clothing")
+- [x] User can review the skipped list and "Include" individual items back into the import (false-positive recovery)
+- [x] Noise senders (Spotify, Eventbrite, DoorDash, United, FedEx, CVS, etc.) excluded from the default Gmail query
+- [x] Test covers an Amazon-style mixed email and the unskip flow
 
 **Tickets**
-- `E0-5.1` Skip-on-no-category guard in the import pipeline — _1d_
+- `E0-5.1` Skip-on-no-category guard in the import pipeline (`partitionByCategory` in `EmailPreview`) — _1d_ ✅
 - `E0-5.2` Title-case CAPS cleanup for Zara/Aritzia/Shein names — _0.5d_ ✅ (+ `condenseName` utility for long marketplace names)
+- `E0-5.3` "Include" / unskip UI in `EmailPreview` for false positives + `GMAIL_EXCLUDE_SENDERS` list + category-keyword cleanup (pajamas, skort) — _bundled_ ✅ (PR #72)
 
 ## US-0.6 — Types that catch mistakes
 _As the developer, I want `ClothingItem` typed tightly so that flat-vs-nested mismatches fail at compile time, not runtime._
@@ -74,11 +77,10 @@ None — this is the base. Do it first.
 
 ## Progress
 
-**Completed:** US-0.1, US-0.2, US-0.3, US-0.4, US-0.6 (5 of 6 user stories)
-**Remaining:** US-0.5.1 (skip-no-category import guard)
-**Estimate left:** ~1–1.5 dev-days
+**Completed:** US-0.1, US-0.2, US-0.3, US-0.4, US-0.5, US-0.6 (6 of 6 user stories) ✅
+**Remaining:** none — epic complete. (Optional UX polish `E0-3.3` warp-overlay confirm deferred to a separate PR.)
 
-## Definition of done (epic)
+## Definition of done (epic) ✅
 Suite green · no debug logs / console warnings · the confidence-eroding bugs fixed with regression tests · `ClothingItem` typing tightened.
 
-_(The README "known bugs" list these tracked has been removed now that they're fixed; US-0.5 is the last open item.)_
+_(US-0.5 "Don't import junk" shipped in PR #72: skip-on-no-category guard + "Include" recovery UI + excluded senders + category-keyword cleanup.)_

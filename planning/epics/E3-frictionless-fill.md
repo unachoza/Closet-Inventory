@@ -28,11 +28,21 @@ _As Maya, I want to photograph an item so that logging an in-store / second-hand
 
 **Ticket stubs:** `<input capture>` flow · Vision API call · pre-fill review screen.
 
+## US-3.4 — Efficient, transparent Gmail API usage
+_As a user, I want imports to reuse cached emails and clearly tell me what they're doing so that I'm not waiting on (or paying for) redundant Gmail API calls._
+- [ ] Cache all fetched emails (metadata + bodies) and clear the cache deliberately — never leave a stale or oversized cache around
+- [ ] Make a brand-new fetch visibly distinct from a filter over cached results; prefer the cache and minimize live API calls wherever possible
+- [ ] More descriptive UI about what was fetched — date range of emails, cached vs. fresh count, last-fetched indicator
+
+**Ticket stubs:** cache lifecycle + invalidation/TTL audit · fetch-vs-cache mode indicator + cache-first routing · date-range / cached-count status UI in the search bar.
+
 ---
+
+## Shipped
+- ✅ **Skip non-clothing / uncategorizable imports** (esp. Amazon) with a reviewable "Include" recovery list, excluded noise senders, and category-keyword cleanup — shipped in **PR #72** (tracked under **E0 US-0.5**).
 
 ## Known bugs
 - `E3-bug.1` **Email preview horizontal scroll** — some Gmail previews don't format nicely and create an awkward horizontal scroll. Attempted `.gmail-container:has(.display-email-preview-panel){max-width:1175px}` but it didn't hold across the board. Needs a robust preview-width / overflow fix in `EmailPreview`.
-- _Skip non-clothing / uncategorizable imports (esp. Amazon) is tracked in **E0 US-0.5** (`E0-5.1`), the last open E0 item._
 
 ---
 
