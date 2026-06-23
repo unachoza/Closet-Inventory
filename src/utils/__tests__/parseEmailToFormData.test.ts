@@ -326,3 +326,17 @@ describe("parseEmailToFormData — material inference", () => {
 		]);
 	});
 });
+
+describe("parseEmailToFormData — color-driven care", () => {
+	it("adds the like-colors tag when 'white' is in the product name, not the subject", () => {
+		const result = parse("Thanks for your purchase", "White Cotton Oxford Shirt", "sales@gap.com");
+		const care = Array.isArray(result.care) ? result.care : [result.care];
+		expect(care).toContain("Wash with like colors only");
+	});
+
+	it("does not add the like-colors tag for a non-white item", () => {
+		const result = parse("Thanks for your purchase", "Black Cotton Oxford Shirt", "sales@gap.com");
+		const care = Array.isArray(result.care) ? result.care : [result.care];
+		expect(care).not.toContain("Wash with like colors only");
+	});
+});

@@ -65,11 +65,14 @@ const RESELLERS = ["poshmark", "depop", "ebay", "vinted", "threadup", "the realr
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
 	dress: "dresses",
+	// bottoms
 	skirt: "bottoms",
 	pant: "bottoms",
 	jean: "bottoms",
+	culottes: "bottoms",
 	trouser: "bottoms",
 	short: "bottoms",
+	skort: "bottoms",
 	top: "tops",
 	blouse: "tops",
 	shirt: "tops",
@@ -85,22 +88,33 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	bra: "intimates",
 	bralette: "intimates",
 	lingerie: "intimates",
+	//TODO
+	//not always!
+	plunge: "intimates",
+	balconette: "intimates",
+	demi: "intimates",
+	scoop: "intimates",
+	//TODO
+	//not always!
+	racerback: "intimates",
+	underwire: "intimates",
+	padded: "intimates",
+	unpadded: "intimates",
+	unlined: "intimates",
 	sock: "socks",
-	underwear: "underwear",
+	tights: "socks",
+	underwear: "intimates",
 	legging: "active",
 	sports: "active",
 	jersey: "active",
 	swimsuit: "intimates",
 	bodysuit: "body",
 	jumpsuit: "body",
-	skort: "bottoms",
-	culottes: "bottoms",
-	balconette: "intimates",
-	plunge: "intimates",
-	thong: "underwear",
-	briefs: "underwear",
-	brief: "underwear",
-	panty: "underwear",
+	cheeky: "intimates",
+	thong: "intimates",
+	briefs: "intimates",
+	brief: "intimates",
+	panty: "intimates",
 	bikini: "intimates",
 	teddy: "intimates",
 	intimate: "intimates",
@@ -110,6 +124,8 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	kimonos: "sleep",
 	boots: "shoes",
 	loafers: "shoes",
+	shoe: "shoes",
+	loafer: "shoes",
 	slipper: "shoes",
 	sandal: "shoes",
 	sneaker: "shoes",
@@ -117,6 +133,10 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	platform: "shoes",
 	flat: "shoes",
 	mule: "shoes",
+	slingback: "shoes",
+	pump: "shoes",
+	wedge: "shoes",
+	clog: "shoes",
 };
 
 function extractBrand(text: string, from: string): string {
@@ -137,6 +157,11 @@ function extractCategory(text: string): string {
 		}
 	}
 	return "";
+}
+
+/** Returns the clothing category for a product name, or "" if none matches. */
+export function categoryFromName(name: string): string {
+	return extractCategory(name);
 }
 
 function stripHtml(html: string): string {
@@ -168,8 +193,9 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 
 	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
 	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
-	// Fallback: scan product name for a known color word (e.g. "Deep Taupe" in Aritzia subjects)
-	const color = normalizeColor(inlineColor || extractColorFromName(subject));
+	// Fallback chain: inline pattern → subject scan → body scan (for per-product
+	// imports where the product name arrives as body, not subject).
+	const color = normalizeColor(inlineColor || extractColorFromName(subject) || extractColorFromName(plainBody));
 
 	// Clean name: strip brand prefix, gender junk, SEO noise, inline color/size suffix
 	const nameFromSubject = stripBrandFromName(subject, brand);

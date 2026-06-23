@@ -6,7 +6,7 @@
 
 ---
 
-## US-0.1 — A clean, green starting line
+## US-0.1 — A clean, green starting line ✅
 _As the developer, I want a green test suite with no debug logging so that I can build on a known-good base and trust CI._
 - [x] `npm test` passes with zero failures
 - [x] No stray `console.log` in `src/` production paths
@@ -17,7 +17,7 @@ _As the developer, I want a green test suite with no debug logging so that I can
 - `E0-1.2` Fix any currently-red tests; confirm full green — _0.25d_ ✅
 - `E0-1.3` Fix empty `img src=""` React warning in `Card.tsx` (guard render when `imageURL` is blank) — _bundled_ ✅
 
-## US-0.2 — Filters return the right items
+## US-0.2 — Filters return the right items ✅
 _As Maya, I want the material filter to actually return matching items so that filtering by fabric works._
 - [x] Selecting a material returns items whose `MaterialBlend[]` contains it
 - [x] Regression test covers the blend-name extraction
@@ -58,7 +58,7 @@ _As Maya, I want non-clothing / uncategorizable items skipped on import so that 
 - `E0-5.1` Skip-on-no-category guard in the import pipeline — _1d_
 - `E0-5.2` Title-case CAPS cleanup for Zara/Aritzia/Shein names — _0.5d_ ✅ (+ `condenseName` utility for long marketplace names)
 
-## US-0.6 — Types that catch mistakes
+## US-0.6 — Types that catch mistakes ✅
 _As the developer, I want `ClothingItem` typed tightly so that flat-vs-nested mismatches fail at compile time, not runtime._
 - [x] Remove or narrow the `[key: string]: any` index signature
 - [x] `style`/nested-attribute access is type-checked

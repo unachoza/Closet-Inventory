@@ -3,6 +3,7 @@ import { useLocalStorage } from "./uselocalStorage";
 import {
 	GMAIL_API_BASE,
 	GMAIL_SEARCH_SUBJECTS,
+	GMAIL_EXCLUDE_SENDERS,
 	MAX_EMAIL_RESULTS,
 	GMAIL_CACHE_KEY,
 	GMAIL_CACHE_BODIES_KEY,
@@ -18,7 +19,7 @@ export interface GmailEmailMeta {
 	readonly subject: string;
 	readonly from: string;
 	readonly date: string;
-	readonly snippet: string;
+	readonly snippet?: string;
 	readonly body?: string;
 }
 
@@ -171,6 +172,14 @@ function buildApiQuery(params?: AdvancedSearchParams): string {
 		parts.push(`(${subjectClauses})`);
 	}
 
+	// Exclude noise senders at the API level so they never hit the quota.
+	// Merge the static denylist with any per-search exclusions the user added.
+	const allExcluded = [...new Set([...GMAIL_EXCLUDE_SENDERS, ...(params?.excludedSenders ?? [])])];
+	if (allExcluded.length > 0) {
+		const excludeClauses = allExcluded.map((s) => `-from:${s}`).join(" ");
+		parts.push(excludeClauses);
+	}
+
 	// From sender
 	if (params?.from?.trim()) {
 		parts.push(`from:${params.from.trim()}`);
@@ -232,8 +241,8 @@ function filterEmails(emails: GmailEmailMeta[], params: AdvancedSearchParams): G
 
 		// Body keywords filter against snippet (body is lazy-loaded)
 		if (params.bodyKeywords.length > 0) {
-			const lowerSnippet = email.snippet.toLowerCase();
-			const matchesKeyword = params.bodyKeywords.some((kw) => lowerSnippet.includes(kw.toLowerCase()));
+			const lowerSnippet = email.snippet?.toLowerCase();
+			const matchesKeyword = params.bodyKeywords.some((kw) => lowerSnippet?.includes(kw.toLowerCase()));
 			if (!matchesKeyword) return false;
 		}
 
@@ -255,6 +264,7 @@ export function useAdvancedSearch() {
 
 	const [filteredEmails, setFilteredEmails] = useState<GmailEmailMeta[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
+	const [isFetchingMore, setIsFetchingMore] = useState(false);
 	const [isFetchingBody, setIsFetchingBody] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [hasNextPage, setHasNextPage] = useState(false);
@@ -366,8 +376,7 @@ export function useAdvancedSearch() {
 		async (accessToken: string) => {
 			if (!cache.nextPageToken) return;
 
-			setIsSearching(true);
-			setSearchMode("fetch");
+			setIsFetchingMore(true);
 			setError(null);
 
 			try {
@@ -394,8 +403,7 @@ export function useAdvancedSearch() {
 				const message = err instanceof Error ? err.message : "Failed to load more emails";
 				setError(message);
 			} finally {
-				setIsSearching(false);
-				setSearchMode(null);
+				setIsFetchingMore(false);
 			}
 		},
 		[cache, fetchEmailList, setCache],
@@ -444,6 +452,7 @@ export function useAdvancedSearch() {
 	return {
 		emails: filteredEmails,
 		isSearching,
+		isFetchingMore,
 		isFetchingBody,
 		error,
 		searchEmails,

@@ -82,4 +82,30 @@ describe("inferCareFromMaterial", () => {
 	it("does not add trait tags for unrelated fibers", () => {
 		expect(inferCareFromMaterial([{ material: "cotton", percentage: 100 }])).not.toContain("Line dry");
 	});
+
+	// ── Color-driven care ──
+	it("appends a like-colors tag for white items", () => {
+		const care = inferCareFromMaterial([{ material: "cotton", percentage: 100 }], "White");
+		expect(care).toContain("Wash with like colors only");
+		expect(care.some((c) => c.toLowerCase().includes("wash"))).toBe(true);
+	});
+
+	it("matches white case-insensitively and ignores surrounding whitespace", () => {
+		expect(inferCareFromMaterial([], " white ")).toContain("Wash with like colors only");
+	});
+
+	it("adds the like-colors tag even when the material is unknown", () => {
+		const care = inferCareFromMaterial([], "White");
+		expect(care).toEqual(["Wash with like colors only"]);
+	});
+
+	it("does not add the like-colors tag for non-white colors", () => {
+		const care = inferCareFromMaterial([{ material: "cotton", percentage: 100 }], "Black");
+		expect(care).not.toContain("Wash with like colors only");
+	});
+
+	it("omits the like-colors tag when no color is provided", () => {
+		const care = inferCareFromMaterial([{ material: "cotton", percentage: 100 }]);
+		expect(care).not.toContain("Wash with like colors only");
+	});
 });

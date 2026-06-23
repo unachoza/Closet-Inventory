@@ -17,7 +17,7 @@ export interface ExtractedProduct {
 	readonly imageUrl: string;
 	readonly name: string;
 	readonly brand: string;
-	readonly price: string;
+	readonly price: string | number;
 	readonly originalPrice?: string;
 	readonly qty?: number;
 	readonly color: string;
@@ -2024,12 +2024,12 @@ function parseSavageXDiscountFraction(html: string): number {
 /** Apply an order-level discount fraction to a product's price (originalPrice = list). */
 function applyDiscountFraction(p: ExtractedProduct, fraction: number): ExtractedProduct {
 	if (p.onSale || !p.price) return p;
-	const listNum = parseFloat(p.price.replace(/[^0-9.]/g, ""));
+	const listNum = parseFloat(String(p.price).replace(/[^0-9.]/g, ""));
 	if (!listNum) return p;
 	return {
 		...p,
 		price: `$${(listNum * (1 - fraction)).toFixed(2)}`,
-		originalPrice: p.price,
+		originalPrice: String(p.price),
 		onSale: true,
 	};
 }

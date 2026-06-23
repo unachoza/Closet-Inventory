@@ -44,7 +44,7 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 	const showPlaceholder = !product.imageUrl || imgFailed;
 	const discountPercent =
 		product.price && product.originalPrice
-			? computeDiscountPercent(product.price, product.originalPrice)
+			? computeDiscountPercent(String(product.price), product.originalPrice)
 			: null;
 
 	return (

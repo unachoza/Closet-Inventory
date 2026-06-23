@@ -12,5 +12,5 @@ import { inferCareFromAttributes } from "./inferCareFromAttributes";
  * (e.g. white → "Wash with like colors") fire.
  */
 export function inferCare(name: string, color: string, materials: MaterialBlend[]): string[] {
-	return [...new Set([...inferCareFromMaterial(materials), ...inferCareFromAttributes(name, color, materials)])];
+	return [...new Set([...inferCareFromMaterial(materials, color), ...inferCareFromAttributes(name, color, materials)])];
 }
