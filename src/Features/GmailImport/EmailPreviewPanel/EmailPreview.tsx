@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import DOMPurify from "dompurify";
 import type { GmailEmail } from "../../../hooks/useAdvancedSearch";
 import type { ExtractedProduct } from "../../../utils/parseProductsFromEmail";
 import { parseProductsFromEmail, detectImageBasedRetailer } from "../../../utils/parseProductsFromEmail";
@@ -19,18 +20,20 @@ interface EmailPreviewProps {
 	onImportAllProducts?: (products: ExtractedProduct[]) => void;
 }
 
+// Order-confirmation emails are untrusted HTML. DOMPurify strips scripts,
+// inline event handlers (onerror/onload/…), javascript: URLs, and embedded
+// SVG/MathML script vectors — the classes the old tag-only filter missed.
+// Registered once on the singleton; force every surviving link to open in a
+// new tab without exposing window.opener.
+DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+	if (node.tagName === "A") {
+		node.setAttribute("target", "_blank");
+		node.setAttribute("rel", "noopener noreferrer");
+	}
+});
+
 function createSanitizedHtml(html: string): string {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(html, "text/html");
-
-	doc.querySelectorAll("script, iframe, object, embed, form").forEach((el) => el.remove());
-
-	doc.querySelectorAll("a").forEach((anchor) => {
-		anchor.setAttribute("target", "_blank");
-		anchor.setAttribute("rel", "noopener noreferrer");
-	});
-
-	return doc.body.innerHTML;
+	return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 }
 
 function isHtml(text: string): boolean {
@@ -66,7 +69,7 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 	// Step 1: synchronous parse
 	const parsedProducts = useMemo(() => parseProductsFromEmail(email.body), [email.body]);
 
-	// DOMParser + sanitization is expensive — only re-run when email body changes
+	// Sanitization is expensive — only re-run when the email body changes
 	const sanitizedBody = useMemo(() => (htmlContent ? createSanitizedHtml(email.body) : ""), [email.body, htmlContent]);
 
 	// Always run image-based retailer detection (e.g. Temu renders products as PNGs).
