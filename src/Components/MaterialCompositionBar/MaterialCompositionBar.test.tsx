@@ -4,7 +4,7 @@ import MaterialCompositionBar from "./MaterialCompositionBar";
 
 describe("MaterialCompositionBar", () => {
 	it("does not crash when blend is undefined", () => {
-		const { container } = render(<MaterialCompositionBar blend={undefined as any} />);
+		const { container } = render(<MaterialCompositionBar blend={undefined} />);
 
 		expect(container.firstChild).toBeInTheDocument();
 		// expect(screen.getAllByTestId("material-segment")).toHaveLength(0);

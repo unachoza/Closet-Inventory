@@ -15,9 +15,9 @@ const stockPhotoMap: StockPhotoMapType = {
 	// swim: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.54.40_AM_ml9yqu.png",
 };
 
-const useStockPhoto = (category: CategoryType): string => {
+const getStockPhoto = (category: CategoryType): string => {
 	if (!category) return "";
 	return stockPhotoMap[category];
 };
 
-export default useStockPhoto;
+export default getStockPhoto;

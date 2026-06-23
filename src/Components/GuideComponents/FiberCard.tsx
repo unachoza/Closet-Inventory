@@ -34,7 +34,7 @@ const FiberCard = ({ fiber, onClick }: { fiber: Fiber; onClick: () => void }) =>
 				<p className="fiber-source">{fiber.source}</p>
 				<p>{fiber.description}</p>
 				<div className="fiber-props">
-					{fiber.properties.map((p: any) => (
+					{fiber.properties.map((p) => (
 						<PropBar key={p.label} label={p.label} value={p.value} color={p.color} />
 					))}
 				</div>

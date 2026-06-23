@@ -335,7 +335,7 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 		// When imgCell itself has substantial text (image + name in same cell),
 		// prefer it as the name source over other cells (which may be SKU/reference).
 		// Detect SKU-like strings (e.g. "0/4331/014/600/04") so they aren't mistaken for names.
-		const looksLikeSku = (t: string) => /^\d[\d/\-]+$/.test(t.trim());
+		const looksLikeSku = (t: string) => /^\d[\d/-]+$/.test(t.trim());
 		const imgTextLooksLikeName = imgCellText.length > 5 && !looksLikeSku(imgCellText);
 		const textCellsAreSkus = textCells.length > 0 && textCells.every((td) => looksLikeSku(getCellText(td)));
 		let nameCell: Element;
@@ -743,7 +743,7 @@ function getTextLines(el: Element): string[] {
 		.replace(/<br\s*\/?>/gi, "\n")
 		.replace(/<[^>]*>/g, " ")
 		.replace(/&nbsp;/gi, " ")
-		.replace(/ /g, " ")
+		.replace(/\u00A0/g, " ")
 		.split("\n")
 		.map((line) => line.trim().replace(/\s+/g, " "))
 		.filter((line) => line.length > 0);
@@ -2544,7 +2544,8 @@ function resolveAnthroPricing(container: Element): { price: string; originalPric
 	const qtyCell = largeCells[1] ?? container.querySelector("td.product-qty");
 
 	const unit = parseLabeledStruckPrice(unitCell);
-	let { price, originalPrice, onSale } = unit;
+	const { price } = unit;
+	let { originalPrice, onSale } = unit;
 
 	// Per-unit original missing but the line total is struck → derive unit original.
 	if (!originalPrice && totalCell) {
@@ -2833,7 +2834,7 @@ function extractFromSwimOutletLayout(doc: Document): ExtractedProduct[] {
 		seen.add(name.toLowerCase());
 
 		const colorMatch = text.match(/\bcolor:\s*([A-Za-z][A-Za-z /]*?)\s*(?:\||size:|sku:|$)/i);
-		const sizeMatch = text.match(/\bsize:\s*([A-Za-z0-9.\/]+)/i);
+		const sizeMatch = text.match(/\bsize:\s*([A-Za-z0-9./]+)/i);
 		const skuMatch = text.match(/\bsku:\s*([A-Za-z0-9-]+)/i);
 		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
 		const size = sizeMatch ? sizeMatch[1].trim() : "";
@@ -3164,7 +3165,7 @@ function extractFromColumnHeaderTable(doc: Document): ExtractedProduct[] {
 	for (const table of Array.from(doc.querySelectorAll("table"))) {
 		// Collect rows from direct table sections only (thead, tbody, tfoot, or direct tr).
 		// This avoids mixing rows from nested tables.
-		let rows: Element[] = [];
+		const rows: Element[] = [];
 
 		// Direct <tr> children (if table has no section wrappers)
 		rows.push(...directChildren(table, "tr"));

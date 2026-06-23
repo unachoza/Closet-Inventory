@@ -13,7 +13,7 @@ import Closet from "./../Closet";
  * storage hook are stubbed) so the actual matching + render path is exercised.
  */
 vi.mock("../../Components/ClothesCard/Card/Card", () => ({
-	default: ({ item }: { item: any }) => <div data-testid="clothes-card">{item.name}</div>,
+	default: ({ item }: { item: { name: string } }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 
 vi.mock("../../hooks/useLocalCloset", () => ({

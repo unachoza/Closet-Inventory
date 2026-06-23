@@ -23,7 +23,7 @@ import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
 import MonthYearPicker from "./DatePicker/MonthYearPicker";
 import ImageUploaderInput from "./ImageUploader/ImageUploader";
-import useStockPhoto from "../../hooks/useStockPhoto";
+import getStockPhoto from "../../utils/getStockPhoto";
 import { useToast } from "../../Components/Toast/Toast";
 
 // MULTI-STEP(9) FORM
@@ -210,7 +210,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 								<label className="step-label">or use default image?</label>
 								<div className="image-uploader-box">
 									<img
-										src={useStockPhoto(formData.category as CategoryType)}
+										src={getStockPhoto(formData.category as CategoryType)}
 										className="image-preview"
 										alt="preview"
 									/>

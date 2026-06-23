@@ -179,7 +179,7 @@ function AppShell() {
 							{view === "carousel" && (
 								<>
 									<div data-testid="carousel">
-										<Carousel setCategory={setSelectedCategory as any} />
+										<Carousel setCategory={setSelectedCategory} />
 									</div>
 									<div data-testid="closet-container">
 										<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />

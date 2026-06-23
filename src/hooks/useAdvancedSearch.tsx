@@ -9,8 +9,8 @@ import {
 	GMAIL_CACHE_BODIES_KEY,
 	GMAIL_CACHE_TTL_MS,
 } from "../Features/GmailImport/constants";
-import type { AdvancedSearchParams } from "../Features/GmailImport/AdvnacedSearch/AdvancedSearchUI";
-import type { SearchMode } from "../Features/GmailImport/AdvnacedSearch/AdvancedSearchUI";
+import type { AdvancedSearchParams } from "../Features/GmailImport/AdvancedSearch/AdvancedSearchUI";
+import type { SearchMode } from "../Features/GmailImport/AdvancedSearch/AdvancedSearchUI";
 
 // Lightweight email metadata (no body — saves API calls)
 export interface GmailEmailMeta {

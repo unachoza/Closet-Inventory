@@ -1,7 +1,7 @@
 import "./EditItemView.css";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
-import useStockPhoto from "../../../hooks/useStockPhoto";
+import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
 // import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
@@ -109,7 +109,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		e.preventDefault();
 
 		if (isCreateMode) {
-			const imageURL = formData.imageURL || useStockPhoto(formData.category as CategoryType);
+			const imageURL = formData.imageURL || getStockPhoto(formData.category as CategoryType);
 			const displayName = formData.name || (formData.brand ? `${formData.brand} ${formData.category}` : formData.category) || "New Item";
 			addFullItem({
 				...item,

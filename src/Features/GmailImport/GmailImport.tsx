@@ -4,7 +4,7 @@ import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
-import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvnacedSearch/AdvancedSearchUI";
+import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
 import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
 import { inferCare } from "../../utils/inferCare";
 import { normalizeMaterial } from "../../utils/materialUtils";

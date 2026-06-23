@@ -3,7 +3,8 @@ import { getMaterialColor, blendTotal } from "../../utils/materialUtils";
 import "./MaterialCompositionBar.css";
 
 interface MaterialCompositionBarProps {
-	blend: MaterialBlend[];
+	/** Material blend; tolerates undefined (renders an empty bar). */
+	blend: MaterialBlend[] | undefined;
 	/** Show the legend below the bar (default true) */
 	showLegend?: boolean;
 	/** Compact mode: smaller bar height, no legend label text */

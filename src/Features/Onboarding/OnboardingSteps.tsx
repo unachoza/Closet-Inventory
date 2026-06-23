@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import {
 	ChevronRight,
 	ChevronLeft,
@@ -24,9 +24,9 @@ import "../Carousel/Carousel.css";
 // ─── Step 0: Welcome ────────────────────────────────────────────────────────────
 
 const welcomeFeatures = [
-	{ dot: "#e8453c", text: "Import from Gmail automatically" },
-	{ dot: "#2bbfb3", text: "Learn fabric care for every item" },
-	{ dot: "#2563eb", text: "Search & filter your whole closet" },
+	{ dot: "var(--coral)", text: "Import from Gmail automatically" },
+	{ dot: "var(--dot-teal)", text: "Learn fabric care for every item" },
+	{ dot: "var(--dot-blue)", text: "Search & filter your whole closet" },
 ];
 
 function WelcomeStepDemo() {
@@ -143,7 +143,8 @@ function Step2Demo() {
 	const toggle = (i: number) =>
 		setChecked((prev) => {
 			const next = new Set(prev);
-			next.has(i) ? next.delete(i) : next.add(i);
+			if (next.has(i)) next.delete(i);
+			else next.add(i);
 			return next;
 		});
 
@@ -184,7 +185,7 @@ const parsedItems = [
 		price: "$14.90",
 		size: "S",
 		color: "Brown",
-		bg: "#78716c",
+		bg: "var(--garment-stone)",
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150747/Screenshot_2026-06-10_at_9.02.32_PM_ddjuk6.png",
 	},
 	{
@@ -192,7 +193,7 @@ const parsedItems = [
 		price: "$12.90",
 		size: "S",
 		color: "Tan",
-		bg: "#92400e",
+		bg: "var(--garment-amber-dark)",
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151252/Screenshot_2026-06-10_at_9.13.32_PM_elrnha.png",
 	},
 	{
@@ -200,7 +201,7 @@ const parsedItems = [
 		price: "$29.90",
 		size: "S",
 		color: "Raspberry",
-		bg: "#9f1239",
+		bg: "var(--garment-rose-dark)",
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781150851/Screenshot_2026-06-10_at_9.06.54_PM_h3kjkd.png",
 	},
 	{
@@ -208,7 +209,7 @@ const parsedItems = [
 		price: "$12.90",
 		size: "M",
 		color: "White",
-		bg: "#d6d3d1",
+		bg: "var(--garment-stone-light)",
 		imgURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781151106/Screenshot_2026-06-10_at_9.11.29_PM_nl3nxc.png",
 	},
 ];
@@ -274,39 +275,63 @@ const reviewFields = [
 
 const NAME_TARGET = "Strappy Top";
 
+type Step4State = {
+	editing: string | null;
+	autoEditName: boolean;
+	typing: boolean;
+	nameValue: string;
+	addPulse: boolean;
+};
+
+type Step4Action =
+	| { type: "START_EDIT" }
+	| { type: "TYPE_CHAR"; value: string }
+	| { type: "COMMIT_EDIT" }
+	| { type: "PULSE_ADD" }
+	| { type: "SET_EDITING"; field: string | null };
+
+const step4Initial: Step4State = {
+	editing: null,
+	autoEditName: false,
+	typing: false,
+	nameValue: reviewFields[0].value,
+	addPulse: false,
+};
+
+function step4Reducer(state: Step4State, action: Step4Action): Step4State {
+	switch (action.type) {
+		case "START_EDIT":
+			return { ...state, autoEditName: true, typing: true, nameValue: "" };
+		case "TYPE_CHAR":
+			return { ...state, nameValue: action.value };
+		case "COMMIT_EDIT":
+			return { ...state, typing: false, autoEditName: false };
+		case "PULSE_ADD":
+			return { ...state, addPulse: true };
+		case "SET_EDITING":
+			return { ...state, editing: action.field };
+	}
+}
+
 function Step4Demo() {
-	const [editing, setEditing] = useState<string | null>(null);
-	const [autoEditName, setAutoEditName] = useState(false);
-	const [typing, setTyping] = useState(false);
-	const [nameValue, setNameValue] = useState(reviewFields[0].value);
-	const [addPulse, setAddPulse] = useState(false);
+	const [state, dispatch] = useReducer(step4Reducer, step4Initial);
+	const { editing, autoEditName, typing, nameValue, addPulse } = state;
 
 	useEffect(() => {
 		const timers: ReturnType<typeof setTimeout>[] = [];
 		// 1. Tap the NAME field → highlight + clear, ready to retype.
-		timers.push(
-			setTimeout(() => {
-				setAutoEditName(true);
-				setTyping(true);
-				setNameValue("");
-			}, 800),
-		);
+		timers.push(setTimeout(() => dispatch({ type: "START_EDIT" }), 800));
 		// 2. Type the corrected name one character at a time.
 		const TYPE_START = 1100;
 		const TYPE_MS = 90;
 		[...NAME_TARGET].forEach((_, i) => {
-			timers.push(setTimeout(() => setNameValue(NAME_TARGET.slice(0, i + 1)), TYPE_START + i * TYPE_MS));
+			timers.push(setTimeout(() => dispatch({ type: "TYPE_CHAR", value: NAME_TARGET.slice(0, i + 1) }), TYPE_START + i * TYPE_MS));
 		});
 		const typedAt = TYPE_START + NAME_TARGET.length * TYPE_MS;
 		// 3. Commit the edit (drop the highlight + cursor).
-		timers.push(
-			setTimeout(() => {
-				setTyping(false);
-				setAutoEditName(false);
-			}, typedAt + 400),
-		);
+		timers.push(setTimeout(() => dispatch({ type: "COMMIT_EDIT" }), typedAt + 400));
 		// 4. Pulse "Add to Closet" to point at the next action.
-		timers.push(setTimeout(() => setAddPulse(true), typedAt + 800));
+		timers.push(setTimeout(() => dispatch({ type: "PULSE_ADD" }), typedAt + 800));
 		return () => timers.forEach(clearTimeout);
 	}, []);
 
@@ -343,7 +368,7 @@ function Step4Demo() {
 					return (
 						<button
 							key={f.key}
-							onClick={() => setEditing(editing === f.key ? null : f.key)}
+							onClick={() => dispatch({ type: "SET_EDITING", field: editing === f.key ? null : f.key })}
 							className={`ob-field-btn${isEditing ? " ob-field-btn--editing" : ""}`}
 						>
 							<div className="ob-caps">{f.label}</div>
@@ -386,15 +411,41 @@ const NOTES_TARGET = "Bought for work";
 // Mock photo for the "upload" step
 const UPLOADED_PHOTO = "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378933/Screenshot_2025-10-13_at_11.07.40_AM_ywvcnu.png";
 
+type Step5State = {
+	step: number;
+	done: boolean;
+	picked: Set<string>;
+	notes: string;
+	uploaded: boolean;
+};
+
+type Step5Action =
+	| { type: "SET_STEP"; step: number }
+	| { type: "PICK"; label: string }
+	| { type: "TYPE_NOTE"; value: string }
+	| { type: "UPLOAD" }
+	| { type: "FINISH" };
+
+const step5Initial: Step5State = { step: 0, done: false, picked: new Set(), notes: "", uploaded: false };
+
+function step5Reducer(state: Step5State, action: Step5Action): Step5State {
+	switch (action.type) {
+		case "SET_STEP":
+			return { ...state, step: action.step };
+		case "PICK":
+			return { ...state, picked: new Set([...state.picked, action.label]) };
+		case "TYPE_NOTE":
+			return { ...state, notes: action.value };
+		case "UPLOAD":
+			return { ...state, uploaded: true };
+		case "FINISH":
+			return { ...state, done: true };
+	}
+}
+
 function Step5Demo() {
-	const [step, setStep] = useState(0);
-	const [done, setDone] = useState(false);
-	// Which choice steps have been "clicked" (chip grey → blue a beat after the step appears).
-	const [picked, setPicked] = useState<Set<string>>(new Set());
-	// Typed-out note on the Details step.
-	const [notes, setNotes] = useState("");
-	// Mock photo upload on the Photo step (drop zone → image lands).
-	const [uploaded, setUploaded] = useState(false);
+	const [state, dispatch] = useReducer(step5Reducer, step5Initial);
+	const { step, done, picked, notes, uploaded } = state;
 
 	useEffect(() => {
 		// Choice steps keep the steady cadence; the Details + Photo steps get extra
@@ -408,12 +459,12 @@ function Step5Demo() {
 
 		// Category → Color → Size → Details advance on the steady 1300ms cadence.
 		for (let i = 1; i <= detailsIdx; i++) {
-			timers.push(setTimeout(() => setStep(i), i * STEP_MS));
+			timers.push(setTimeout(() => dispatch({ type: "SET_STEP", step: i }), i * STEP_MS));
 		}
 		// Choice steps: chips appear grey, then the picked one highlights blue.
 		formStepLabels.forEach((lbl, i) => {
 			if (formStepSelection[lbl]) {
-				timers.push(setTimeout(() => setPicked((p) => new Set([...p, lbl])), i * STEP_MS + PICK_DELAY));
+				timers.push(setTimeout(() => dispatch({ type: "PICK", label: lbl }), i * STEP_MS + PICK_DELAY));
 			}
 		});
 
@@ -421,18 +472,18 @@ function Step5Demo() {
 		const NOTE_START = detailsIdx * STEP_MS + 500;
 		const NOTE_MS = 90;
 		[...NOTES_TARGET].forEach((_, i) => {
-			timers.push(setTimeout(() => setNotes(NOTES_TARGET.slice(0, i + 1)), NOTE_START + i * NOTE_MS));
+			timers.push(setTimeout(() => dispatch({ type: "TYPE_NOTE", value: NOTES_TARGET.slice(0, i + 1) }), NOTE_START + i * NOTE_MS));
 		});
 		const noteEnd = NOTE_START + NOTES_TARGET.length * NOTE_MS;
 
 		// Photo: linger on the finished note, reveal the drop zone, then mock an upload.
 		const photoAt = noteEnd + 900;
-		timers.push(setTimeout(() => setStep(photoIdx), photoAt));
+		timers.push(setTimeout(() => dispatch({ type: "SET_STEP", step: photoIdx }), photoAt));
 		const uploadAt = photoAt + 900;
-		timers.push(setTimeout(() => setUploaded(true), uploadAt));
+		timers.push(setTimeout(() => dispatch({ type: "UPLOAD" }), uploadAt));
 
 		// Success once the photo has "uploaded".
-		timers.push(setTimeout(() => setDone(true), uploadAt + 1000));
+		timers.push(setTimeout(() => dispatch({ type: "FINISH" }), uploadAt + 1000));
 		return () => timers.forEach(clearTimeout);
 	}, []);
 
@@ -538,12 +589,12 @@ function Step5Demo() {
 // ─── Step 6: Search & filter ────────────────────────────────────────────────────
 
 const closetItems = [
-	{ label: "Strappy Top", bg: "#78716c" },
-	{ label: "Wide Leg Jeans", bg: "#334155" },
-	{ label: "Linen Blazer", bg: "#451a03" },
-	{ label: "Slip Dress", bg: "#881337" },
-	{ label: "Cardigan", bg: "#404040" },
-	{ label: "Trousers", bg: "#3f3f46" },
+	{ label: "Strappy Top", bg: "var(--garment-stone)" },
+	{ label: "Wide Leg Jeans", bg: "var(--garment-slate)" },
+	{ label: "Linen Blazer", bg: "var(--garment-brown)" },
+	{ label: "Slip Dress", bg: "var(--garment-crimson)" },
+	{ label: "Cardigan", bg: "var(--garment-charcoal)" },
+	{ label: "Trousers", bg: "var(--garment-zinc)" },
 ];
 
 const SEARCH_QUERY = "going out";
@@ -553,13 +604,52 @@ const QUERY_DROPS = ["Wide Leg Jeans", "Cardigan", "Trousers"];
 // …then the Sleeveless chip drops the blazer, leaving Strappy Top + Slip Dress.
 const CHIP_DROPS = ["Linen Blazer"];
 
+type Step6State = {
+	query: string;
+	chipShown: boolean;
+	out: Set<string>;
+	collapsed: Set<string>;
+	resultCount: number;
+};
+
+type Step6Action =
+	| { type: "TYPE_QUERY"; value: string }
+	| { type: "QUERY_FADE"; drops: string[] }
+	| { type: "QUERY_COLLAPSE"; drops: string[] }
+	| { type: "SHOW_CHIP" }
+	| { type: "CHIP_FADE"; drops: string[] }
+	| { type: "CHIP_COLLAPSE"; drops: string[] };
+
+const step6Initial: Step6State = {
+	query: "",
+	chipShown: false,
+	out: new Set(),
+	collapsed: new Set(),
+	resultCount: closetItems.length,
+};
+
+function step6Reducer(state: Step6State, action: Step6Action): Step6State {
+	switch (action.type) {
+		case "TYPE_QUERY":
+			return { ...state, query: action.value };
+		case "QUERY_FADE":
+			return { ...state, out: new Set(action.drops), resultCount: closetItems.length - action.drops.length };
+		case "QUERY_COLLAPSE":
+			return { ...state, collapsed: new Set(action.drops) };
+		case "SHOW_CHIP":
+			return { ...state, chipShown: true };
+		case "CHIP_FADE": {
+			const all = [...state.out, ...action.drops];
+			return { ...state, out: new Set(all), resultCount: closetItems.length - all.length };
+		}
+		case "CHIP_COLLAPSE":
+			return { ...state, collapsed: new Set([...state.collapsed, ...action.drops]) };
+	}
+}
+
 function Step6Demo() {
-	const [query, setQuery] = useState("");
-	const [chipShown, setChipShown] = useState(false);
-	// Two-stage removal: fade out first, then collapse out of the grid so it reflows.
-	const [out, setOut] = useState<Set<string>>(new Set());
-	const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-	const [resultCount, setResultCount] = useState(closetItems.length);
+	const [state, dispatch] = useReducer(step6Reducer, step6Initial);
+	const { query, chipShown, out, collapsed, resultCount } = state;
 
 	useEffect(() => {
 		const timers: ReturnType<typeof setTimeout>[] = [];
@@ -568,29 +658,19 @@ function Step6Demo() {
 		const TYPE_START = 400;
 		const TYPE_MS = 95;
 		[...SEARCH_QUERY].forEach((_, i) => {
-			timers.push(setTimeout(() => setQuery(SEARCH_QUERY.slice(0, i + 1)), TYPE_START + i * TYPE_MS));
+			timers.push(setTimeout(() => dispatch({ type: "TYPE_QUERY", value: SEARCH_QUERY.slice(0, i + 1) }), TYPE_START + i * TYPE_MS));
 		});
 		const queryEnd = TYPE_START + SEARCH_QUERY.length * TYPE_MS;
 
 		// 2. Query narrows the grid to the going-out three (fade, then collapse).
-		timers.push(
-			setTimeout(() => {
-				setOut(new Set(QUERY_DROPS));
-				setResultCount(closetItems.length - QUERY_DROPS.length);
-			}, queryEnd + 350),
-		);
-		timers.push(setTimeout(() => setCollapsed(new Set(QUERY_DROPS)), queryEnd + 700));
+		timers.push(setTimeout(() => dispatch({ type: "QUERY_FADE", drops: QUERY_DROPS }), queryEnd + 350));
+		timers.push(setTimeout(() => dispatch({ type: "QUERY_COLLAPSE", drops: QUERY_DROPS }), queryEnd + 700));
 
 		// 3. A filter chip lands and drops the blazer, settling on the final two.
 		const chipAt = queryEnd + 1450;
-		timers.push(setTimeout(() => setChipShown(true), chipAt));
-		timers.push(
-			setTimeout(() => {
-				setOut(new Set([...QUERY_DROPS, ...CHIP_DROPS]));
-				setResultCount(closetItems.length - QUERY_DROPS.length - CHIP_DROPS.length);
-			}, chipAt + 350),
-		);
-		timers.push(setTimeout(() => setCollapsed(new Set([...QUERY_DROPS, ...CHIP_DROPS])), chipAt + 700));
+		timers.push(setTimeout(() => dispatch({ type: "SHOW_CHIP" }), chipAt));
+		timers.push(setTimeout(() => dispatch({ type: "CHIP_FADE", drops: CHIP_DROPS }), chipAt + 350));
+		timers.push(setTimeout(() => dispatch({ type: "CHIP_COLLAPSE", drops: CHIP_DROPS }), chipAt + 700));
 
 		return () => timers.forEach(clearTimeout);
 	}, []);
@@ -655,7 +735,7 @@ const fabrics: {
 }[] = [
 	{
 		name: "Cotton",
-		dot: "#5a7a60", // natural (plant) → sage
+		dot: "var(--fiber-natural)", // natural (plant) → sage
 		type: "Natural Fiber - Plant",
 		properties: [
 			{ label: "Breathability", level: "High" },
@@ -672,7 +752,7 @@ const fabrics: {
 	},
 	{
 		name: "Polyester",
-		dot: "#8b5a7a", // synthetic → mauve
+		dot: "var(--fiber-synthetic)", // synthetic → mauve
 		type: "Synthetic",
 		properties: [
 			{ label: "Breathability", level: "Low" },
@@ -686,7 +766,7 @@ const fabrics: {
 	},
 	{
 		name: "Silk",
-		dot: "#5a7a60", // natural (animal) → sage
+		dot: "var(--fiber-natural)", // natural (animal) → sage
 		type: "Natural Fiber - Animal",
 		properties: [
 			{ label: "Breathability", level: "High" },
@@ -867,15 +947,15 @@ type StepDef = {
 };
 
 const EMAIL_IMPORT_STYLE: React.CSSProperties = {
-	background: "rgba(19,17,146,0.30)",
-	color: "rgb(199,210,254)",
-	border: "1px solid rgba(199,210,254,0.25)",
+	background: "var(--indigo-faint)",
+	color: "var(--indigo-text)",
+	border: "1px solid var(--indigo-border)",
 };
 
 const STEPS: StepDef[] = [
 	{
 		group: "Welcome",
-		groupStyle: { background: "rgba(232,69,60,0.12)", color: "#e8453c", border: "1px solid rgba(232,69,60,0.25)" },
+		groupStyle: { background: "var(--coral-faint)", color: "var(--coral)", border: "1px solid var(--coral-border)" },
 		title: "Closet Inventory",
 		description: "A personal wardrobe management app. Upload your closet, learn fabric care, and more!",
 		demo: <WelcomeStepDemo />,
@@ -921,7 +1001,7 @@ const STEPS: StepDef[] = [
 	},
 	{
 		group: "Manual Entry",
-		groupStyle: { background: "rgba(245,158,11,0.15)", color: "rgb(251,191,36)", border: "1px solid rgba(245,158,11,0.2)" },
+		groupStyle: { background: "var(--amber-faint)", color: "var(--amber-text)", border: "1px solid var(--amber-border)" },
 		title: "Add items manually too",
 		description:
 			"Use the guided step-by-step form for items you own but didn't buy online — snap a photo, fill what you know, and you're done.",
@@ -929,7 +1009,7 @@ const STEPS: StepDef[] = [
 	},
 	{
 		group: "Search & Filter",
-		groupStyle: { background: "rgba(168,85,247,0.15)", color: "rgb(192,132,252)", border: "1px solid rgba(168,85,247,0.2)" },
+		groupStyle: { background: "var(--purple-faint)", color: "var(--purple-text)", border: "1px solid var(--purple-border)" },
 		title: "Find anything instantly",
 		description:
 			"Fuzzy search by name, brand, or material. Stack filters — color, category, price — to narrow the exact piece you're looking for.",
@@ -937,7 +1017,7 @@ const STEPS: StepDef[] = [
 	},
 	{
 		group: "Fabric Guide",
-		groupStyle: { background: "rgba(34,197,94,0.15)", color: "rgb(74,222,128)", border: "1px solid rgba(34,197,94,0.2)" },
+		groupStyle: { background: "var(--emerald-faint)", color: "var(--emerald-text)", border: "1px solid var(--emerald-border)" },
 		title: "Know how to care for it",
 		description: "The Fabric Guide shows breathability, durability, and exact care instructions for every material in your closet.",
 		demo: <Step7Demo />,

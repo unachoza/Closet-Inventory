@@ -4,7 +4,7 @@ import type { CategoryType, ClothingItem, ItemFormData } from "../utils/types";
 import { normalizeMaterial } from "../utils/materialUtils";
 import { useLocalStorage } from "./uselocalStorage";
 import { safeSetItem } from "../utils/safeStorage";
-import useStockPhoto from "./useStockPhoto";
+import getStockPhoto from "../utils/getStockPhoto";
 
 const STORAGE_KEY = "my_closet_key";
 // const STORAGE_KEY = "my_closet_key_v2";
@@ -24,7 +24,7 @@ export function useLocalStorageCloset() {
 				{
 					...newItem,
 					id: crypto.randomUUID(),
-					imageURL: photo ? photo : useStockPhoto(newItem.category as CategoryType),
+					imageURL: photo ? photo : getStockPhoto(newItem.category as CategoryType),
 					name: newItem.brand ? `${newItem.brand} ${newItem.category}` : newItem.category,
 					material: normalizeMaterial(newItem.material),
 				},
@@ -71,7 +71,7 @@ export function useLocalStorageCloset() {
 					if (updatedData.imageURL) {
 						updatedItem.imageURL = updatedData.imageURL;
 					} else if (updatedData.category) {
-						updatedItem.imageURL = useStockPhoto(updatedData.category as CategoryType);
+						updatedItem.imageURL = getStockPhoto(updatedData.category as CategoryType);
 					}
 					return updatedItem;
 				}
