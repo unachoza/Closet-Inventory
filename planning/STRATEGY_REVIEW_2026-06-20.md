@@ -1,9 +1,9 @@
 # Strategy Review — Repo Health, Strengths/Weaknesses & What's Next - Written 2026-06-20
 
 > **Date:** 2026-06-20 &nbsp;·&nbsp; **Audience:** personal strategy notes (polished, but for me).
-> Companion to [README.md](../README.md) roadmap, [FORWARD_PLAN.md](./FORWARD_PLAN.md),
+> Companion to [README.md](../README.md) roadmap, [archive/FORWARD_PLAN.md](./archive/FORWARD_PLAN.md),
 > [BACKEND_DATABASE_DECISION.md](./BACKEND_DATABASE_DECISION.md),
-> [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md), [TESTING_ROADMAP.md](./TESTING_ROADMAP.md).
+> [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md), [archive/TESTING_ROADMAP.md](./archive/TESTING_ROADMAP.md).
 > Re-read the date above before trusting this — it goes stale as the code moves.
 
 ---
@@ -97,7 +97,7 @@ Estimates are **ideal dev-days** (focused, uninterrupted). Real calendar time ru
 
 ## Quick wins to slot between the big rocks *(palate cleansers)*
 
-From [QUICK_WINS.md](./QUICK_WINS.md) / [FORWARD_PLAN.md](./FORWARD_PLAN.md) — small, close to existing architecture:
+From [archive/QUICK_WINS.md](./archive/QUICK_WINS.md) / [archive/FORWARD_PLAN.md](./archive/FORWARD_PLAN.md) — small, close to existing architecture:
 
 - 🟢 Sort by real `purchaseDate` (~0.25d) — `useClosetSort` still fakes age via condition labels.
 - 🟢 "Dry clean only" quick-filter pill (~0.25d) — `care` already indexed.

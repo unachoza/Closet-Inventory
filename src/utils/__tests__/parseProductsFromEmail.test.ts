@@ -427,6 +427,23 @@ describe("parseProductsFromEmail", () => {
 			const hasParagraphMatch = products.some((p) => p.name === "Just some text here" && p.size !== "" && p.price !== "");
 			expect(hasParagraphMatch).toBe(false);
 		});
+
+		it("does not mistake a bare shoe size for the price (ALDO)", () => {
+			// ALDO lists the shoe size "7" on its own line; the real price is $59.98
+			// in a sibling cell. A bare integer must not be parsed as the price.
+			const aldo = html(`
+				<table><tr>
+					<td>${productImg("https://media.aldoshoes.com/nometnu.jpg", 80, 80, "NOMETNU")}</td>
+					<td>
+						<p>NOMETNU</p>
+						<p>7<br>Black<br>Qty. 1.00<br></p>
+						<p>$59.98</p>
+					</td>
+				</tr></table>
+			`);
+			const [p] = parseProductsFromEmail(aldo);
+			expect(p.price).toBe("$59.98");
+		});
 	});
 
 	// -----------------------------------------------------------------------
@@ -492,6 +509,39 @@ describe("parseProductsFromEmail", () => {
 		it("reads sale price from colored span", () => {
 			const products = parseProductsFromEmail(aritzia);
 			expect(products[0].price).toBe("$12.50");
+		});
+
+		it("captures the struck-through original price", () => {
+			const products = parseProductsFromEmail(aritzia);
+			expect(products[0].originalPrice).toBe("$25.00");
+			expect(products[1].originalPrice).toBe("$110.00");
+		});
+
+		it("flags items with a struck original as on sale", () => {
+			const products = parseProductsFromEmail(aritzia);
+			expect(products[0].onSale).toBe(true);
+			expect(products[1].onSale).toBe(true);
+		});
+
+		it("leaves originalPrice undefined and onSale false at full price", () => {
+			const fullPrice = html(`
+				<table>
+					<tr>
+						<td>${productImg("https://assets.aritzia.com/skirt.jpg", 40, 51)}</td>
+						<td width="16">${spacerImg(16, 1)}</td>
+						<td>Wilfred<br><a>AGENCY SKIRT</a><br>Item no: 55512</td>
+						<td>S</td>
+						<td>NAVY</td>
+						<td>1</td>
+						<td>$98.00</td>
+						<td>$98.00</td>
+					</tr>
+				</table>
+			`);
+			const products = parseProductsFromEmail(fullPrice);
+			expect(products[0].price).toBe("$98.00");
+			expect(products[0].originalPrice).toBeUndefined();
+			expect(products[0].onSale).toBe(false);
 		});
 	});
 
@@ -618,6 +668,26 @@ describe("parseProductsFromEmail", () => {
 		it("extracts size", () => {
 			const products = parseProductsFromEmail(zara);
 			expect(products[0].size).toBe("S");
+		});
+
+		it("parses the currency-code price form Zara uses (12.99 USD, no $)", () => {
+			// Real Zara emails write "1 unit / 12.99&nbsp;USD" — &nbsp; decodes to a
+			// non-breaking space and there is no $ prefix.
+			const zaraUsd = html(`
+				<table>
+					<tr>
+						<td class="rd-product-col">
+							${productImg("https://static.zara.net/dress.jpg")}
+							<div>Combination Tulle Dress</div>
+							<div>Black 0/0858/504/800/02</div>
+							<div>1  unit     / 12.99 USD    </div>
+							<div>S</div>
+						</td>
+					</tr>
+				</table>
+			`);
+			const products = parseProductsFromEmail(zaraUsd);
+			expect(products[0].price).toBe("$12.99");
 		});
 	});
 
@@ -1118,6 +1188,13 @@ describe("parseProductsFromEmail > Strategy: bold-paragraph layout (Banana Repub
 		expect(products.every(p => p.onSale)).toBe(true);
 	});
 
+	it("captures the struck-through 'Was $X' original price", () => {
+		const products = parseProductsFromEmail(brfHtml);
+		expect(products[0].originalPrice).toBe("$90.00");
+		expect(products[2].originalPrice).toBe("$400.00");
+		expect(products[3].originalPrice).toBe("$80.00");
+	});
+
 	it("extracts size from SIZE | COLOR field", () => {
 		const products = parseProductsFromEmail(brfHtml);
 		expect(products[0].size).toBe("S");
@@ -1601,10 +1678,17 @@ describe("Strategy: Shopify order template (SKIMS)", () => {
 		expect(products[1].size).toBe("XS");
 	});
 
-	it("reads price from p.order-list__item-price (not from discount text)", () => {
+	it("reads per-unit price (line total ÷ qty) from p.order-list__item-price", () => {
 		const products = parseProductsFromEmail(skimsHtml);
-		expect(products[0].price).toBe("$60.00");
-		expect(products[1].price).toBe("$40.00");
+		// qty 5: $60.00 / 5 = $12.00, $40.00 / 5 = $8.00
+		expect(products[0].price).toBe("$12.00");
+		expect(products[1].price).toBe("$8.00");
+	});
+
+	it("captures the quantity from the × N suffix", () => {
+		const products = parseProductsFromEmail(skimsHtml);
+		expect(products[0].qty).toBe(5);
+		expect(products[1].qty).toBe(5);
 	});
 
 	it("marks the discounted item as on sale", () => {
@@ -1617,6 +1701,57 @@ describe("Strategy: Shopify order template (SKIMS)", () => {
 		const products = parseProductsFromEmail(skimsHtml);
 		expect(products[0].imageUrl).toContain("SKIMS-item1.jpg");
 		expect(products[1].imageUrl).toContain("SKIMS-item2.jpg");
+	});
+});
+
+describe("Anthropologie: per-unit original derived from struck line total", () => {
+	// Multi-qty order where only the line total carries the struck original
+	// (38.85 / 64.75 for qty 5). The per-unit original is 64.75 / 5 = 12.95.
+	const multiQty = html(`
+		<table><tbody><tr>
+		<td class="item-table-container">
+			<table class="full-width-fixed">
+				<tr>
+					<td class="item-image" rowspan="2">
+						<a href="https://anthropologie.com/x"><img width="129" border="0"
+							src="https://images.anthropologie.com/is/image/Anthropologie/61737771_001_b"
+							alt="Classic High-Waisted Briefs"></a>
+					</td>
+					<td class="item-details">
+						<table class="full-width">
+							<tr class="product-name-large"><td class="item-detail-row product-name"><h4>Classic High-Waisted Briefs</h4></td></tr>
+							<tr><td class="item-detail-row product-style"><label>Style No.&nbsp;</label><span>61737771</span></td></tr>
+							<tr><td class="item-detail-row product-color"><label>Color:&nbsp;</label><span>BLACK</span></td></tr>
+							<tr><td class="item-detail-row product-size"><label>Size:&nbsp;</label><span>S</span></td></tr>
+						</table>
+					</td>
+					<td class="item-price-large" style="text-align:left;">7.77<br></td>
+					<td class="item-price-large" style="text-align:center;">5</td>
+					<td class="item-price-large" style="text-align: right;">38.85<br><span class="strike">64.75</span></td>
+				</tr>
+				<tr>
+					<td class="product-specs" colspan="4">
+						<table class="full-width">
+							<tr class="item-price-small"><td class="item-detail-row product-price"><label>Price: </label>7.77</td></tr>
+							<tr class="item-price-small"><td class="item-detail-row product-qty"><label>Qty: </label>5</td></tr>
+							<tr class="item-price-small"><td class="item-detail-row product-total"><label>Total: </label>38.85 <span class="strike">64.75</span></td></tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+		</tr></tbody></table>
+	`);
+
+	it("uses the per-unit sale price, not the line total", () => {
+		const products = parseProductsFromEmail(multiQty);
+		expect(products[0].price).toBe("$7.77");
+	});
+
+	it("derives the per-unit original (struck total / qty) and flags the sale", () => {
+		const products = parseProductsFromEmail(multiQty);
+		expect(products[0].originalPrice).toBe("$12.95");
+		expect(products[0].onSale).toBe(true);
 	});
 });
 

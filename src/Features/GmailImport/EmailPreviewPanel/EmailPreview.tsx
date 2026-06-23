@@ -2,9 +2,16 @@ import { useMemo, useState, useEffect } from "react";
 import type { GmailEmail } from "../../../hooks/useAdvancedSearch";
 import type { ExtractedProduct } from "../../../utils/parseProductsFromEmail";
 import { parseProductsFromEmail, detectImageBasedRetailer } from "../../../utils/parseProductsFromEmail";
+import { categoryFromName } from "../../../utils/parseEmailToFormData";
 import { detectDominantColor } from "../../../utils/detectColorFromImage";
 import ProductCardList from "../ProductCard/ProductCard";
 import "./EmailPreviewPanel.css";
+
+function partitionByCategory(products: ExtractedProduct[]): { clothing: ExtractedProduct[]; skipped: ExtractedProduct[] } {
+	const clothing = products.filter((p) => categoryFromName(p.name) !== "");
+	const skipped = products.filter((p) => categoryFromName(p.name) === "");
+	return { clothing, skipped };
+}
 
 interface EmailPreviewProps {
 	email: GmailEmail;
@@ -66,7 +73,24 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 	// When detected, parsed products are false positives from the image fallback strategy.
 	const imageBasedRetailer = useMemo(() => detectImageBasedRetailer(email.body, email.from), [email.body, email.from]);
 
-	const effectiveProducts = useMemo(() => (imageBasedRetailer ? [] : parsedProducts), [imageBasedRetailer, parsedProducts]);
+	const { clothing: initialClothing, skipped: initialSkipped } = useMemo(() => {
+		if (imageBasedRetailer) return { clothing: [], skipped: [] };
+		return partitionByCategory(parsedProducts);
+	}, [imageBasedRetailer, parsedProducts]);
+
+	// User can "unskip" individual items — move them into the importable list.
+	const [unskipped, setUnskipped] = useState<ExtractedProduct[]>([]);
+	const effectiveProducts = useMemo(() => [...initialClothing, ...unskipped], [initialClothing, unskipped]);
+	const skippedProducts = useMemo(
+		() => initialSkipped.filter((p) => !unskipped.some((u) => u.name === p.name)),
+		[initialSkipped, unskipped],
+	);
+
+	const handleUnskip = (product: ExtractedProduct) => {
+		setUnskipped((prev) => [...prev, product]);
+	};
+
+	const [showSkipped, setShowSkipped] = useState(false);
 
 	// Step 2: async color enrichment
 	const [enrichedProducts, setEnrichedProducts] = useState<ExtractedProduct[]>(effectiveProducts);
@@ -104,6 +128,44 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 						<strong>Import Entire Email</strong> below to start a blank item with the brand pre-filled, then add details
 						manually.
 					</p>
+				</div>
+			)}
+
+			{!imageBasedRetailer && enrichedProducts.length === 0 && (
+				<div className="gmail-preview-image-notice">
+					<p>No clothing items detected in this email.</p>
+				</div>
+			)}
+
+			{!imageBasedRetailer && skippedProducts.length > 0 && (
+				<div
+					className={`gmail-preview-skipped-notice${showSkipped ? " is-open" : ""}`}
+					onClick={() => setShowSkipped(!showSkipped)}
+					role="button"
+					tabIndex={0}
+					aria-expanded={showSkipped}
+					onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setShowSkipped(!showSkipped)}
+				>
+					<div className="gmail-skipped-toggle">
+						<span className="gmail-skipped-chevron">{showSkipped ? "▼" : "▶"}</span>
+						{skippedProducts.length} item{skippedProducts.length !== 1 ? "s" : ""} skipped — not clothing
+					</div>
+					{showSkipped && (
+						<ul className="gmail-skipped-list">
+							{skippedProducts.map((product) => (
+								<li key={product.name} className="gmail-skipped-item">
+									<span className="gmail-skipped-item-name">{product.name}</span>
+									<button
+										className="gmail-skipped-include-btn"
+										type="button"
+										onClick={(e) => { e.stopPropagation(); handleUnskip(product); }}
+									>
+										Include
+									</button>
+								</li>
+							))}
+						</ul>
+					)}
 				</div>
 			)}
 

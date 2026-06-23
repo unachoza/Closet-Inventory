@@ -6,6 +6,13 @@
 
 ---
 
+## US-3.0 — Broaden retailer parser coverage (Gmail) ✅ shipped
+_As a Gmail user, I want more of my order emails recognized so that fewer purchases need manual entry._
+- [x] 8 new brand-specific strategies (PR #73) — Shopbop/East Dane, Brooks Brothers, SwimOutlet, Lulus, Nike/Jordan, Blush Mark, Nordstrom, plus Savage X Fenty order-level discount handling
+- [x] New layout strategies — older Banana Republic/Athleta labeled template, Zara MJML single-column, generic column-header tables (American Apparel, 2015 Zara)
+- [x] Sale + `originalPrice` capture (struck/colored/"Was $X"/list-vs-paid) with discount % badge; order-level discounts spread evenly across line items
+- [x] `™®©` symbol stripping from product names; all backed by real-email fixtures
+
 ## US-3.1 — Import from more inboxes
 _As a user on Hotmail/Outlook/Yahoo, I want to import purchases from my provider so that Gmail isn't the only option._
 - [ ] Microsoft Graph (Hotmail + Outlook — one integration) ⭐ next priority
@@ -35,6 +42,21 @@ _As a user, I want imports to reuse cached emails and clearly tell me what they'
 - [ ] More descriptive UI about what was fetched — date range of emails, cached vs. fresh count, last-fetched indicator
 
 **Ticket stubs:** cache lifecycle + invalidation/TTL audit · fetch-vs-cache mode indicator + cache-first routing · date-range / cached-count status UI in the search bar.
+## US-3.4 — Fewer, smarter Gmail calls
+_As a user, I want the importer to reuse cached emails and be clear about what it's fetching so that I'm not burning API quota or waiting on redundant calls._
+- [ ] Cache all fetched emails + bodies; deliberate, careful cache invalidation (don't clear on every visit)
+- [ ] Distinguish an entirely-new query from a cache-reusable one; default to cache, only hit the API when the query shape actually changed
+- [ ] Surface what's cached vs fetched, and the date range covered, in the UI (e.g. "showing N of M cached · fetched Jun 1–21")
+
+**Ticket stubs:** cache-key by query signature · new-vs-cached resolver · "fetched range" indicator in the search header.
+
+## US-3.5 — Cleaner import results
+_As Maya, I want obvious non-purchases filtered out and a way to recover anything wrongly skipped so that the import list is trustworthy and reversible._
+- [ ] Tighten the default search query to exclude noise senders (Eventbrite, DoorDash, …)
+- [ ] "Review skipped" affordance — show what was filtered/uncategorized, with one-tap add-back
+- [ ] (The core skip-on-no-category guard lives in **E0 US-0.5** (`E0-5.1`); this story is the surrounding UX.)
+
+**Ticket stubs:** sender denylist on the default query · skipped-items drawer + restore action.
 
 ---
 

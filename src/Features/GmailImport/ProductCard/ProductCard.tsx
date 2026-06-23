@@ -30,11 +30,22 @@ function ImagePlaceholder() {
 	);
 }
 
+function computeDiscountPercent(price: string, originalPrice: string): number | null {
+	const paid = parseFloat(price.replace("$", ""));
+	const orig = parseFloat(originalPrice.replace("$", ""));
+	if (!paid || !orig || orig <= paid) return null;
+	return Math.round((1 - paid / orig) * 100);
+}
+
 const ProductCard = memo(function ProductCard({ product, onImport }: ProductCardProps) {
 	const [imgFailed, setImgFailed] = useState(false);
 	const handleImgError = useCallback(() => setImgFailed(true), []);
 
 	const showPlaceholder = !product.imageUrl || imgFailed;
+	const discountPercent =
+		product.price && product.originalPrice
+			? computeDiscountPercent(String(product.price), product.originalPrice)
+			: null;
 
 	return (
 		<div className="product-card">
@@ -54,11 +65,22 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 				{product.brand && <span className="product-card-brand">{product.brand}</span>}
 				<h4 className="product-card-name">{toTitleCase(product.name)}</h4>
 				<div className="product-card-meta">
-					{product.price && <span className="product-card-price">{product.price}</span>}
-					{product.onSale && <span className="product-card-tag product-card-sale">Sale</span>}
+					<span className="product-card-price-group">
+						{product.price && <span className="product-card-price">{product.price}</span>}
+						{product.originalPrice && (
+							<s className="product-card-original-price">{product.originalPrice}</s>
+						)}
+						{discountPercent !== null && (
+							<span className="product-card-discount">-{discountPercent}%</span>
+						)}
+					</span>
+					{product.onSale && !discountPercent && (
+						<span className="product-card-tag product-card-sale">Sale</span>
+					)}
 					{product.size && <span className="product-card-tag">Size: {product.size}</span>}
 					{product.color && <span className="product-card-tag">Color: {product.color}</span>}
 					{product.material && <span className="product-card-tag">Material: {product.material}</span>}
+					{product.qty && product.qty > 1 && <span className="product-card-tag product-card-qty">Qty: {product.qty}</span>}
 				</div>
 			</div>
 			<button className="product-card-import-btn" onClick={() => onImport(product)} type="button">
