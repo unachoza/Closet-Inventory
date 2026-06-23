@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useLocalStorage } from "./uselocalStorage";
+import { useState, useCallback, useEffect } from "react";
+import { useSessionStorage } from "./useSessionStorage";
 import {
 	GMAIL_API_BASE,
 	GMAIL_SEARCH_SUBJECTS,
@@ -259,8 +259,22 @@ const EMPTY_CACHE: CacheEnvelope = {
 };
 
 export function useAdvancedSearch() {
-	const [cache, setCache] = useLocalStorage<CacheEnvelope>(GMAIL_CACHE_KEY, EMPTY_CACHE);
-	const [bodiesCache, setBodiesCache] = useLocalStorage<Record<string, string>>(GMAIL_CACHE_BODIES_KEY, {});
+	// Gmail caches live in sessionStorage, not localStorage: the bodies cache holds
+	// raw inbox content (PII) and the metadata cache holds senders/subjects. Keeping
+	// them tab-scoped means they don't linger on disk where any XSS could read them.
+	const [cache, setCache] = useSessionStorage<CacheEnvelope>(GMAIL_CACHE_KEY, EMPTY_CACHE);
+	const [bodiesCache, setBodiesCache] = useSessionStorage<Record<string, string>>(GMAIL_CACHE_BODIES_KEY, {});
+
+	// One-time migration: purge the same keys from localStorage, where older builds
+	// persisted them, so no stale inbox content survives this upgrade on disk.
+	useEffect(() => {
+		try {
+			window.localStorage.removeItem(GMAIL_CACHE_KEY);
+			window.localStorage.removeItem(GMAIL_CACHE_BODIES_KEY);
+		} catch {
+			// Storage unavailable (e.g. private mode) — nothing to clean up.
+		}
+	}, []);
 
 	const [filteredEmails, setFilteredEmails] = useState<GmailEmailMeta[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
@@ -437,6 +451,15 @@ export function useAdvancedSearch() {
 		[bodiesCache, setBodiesCache],
 	);
 
+	// Wipe both caches and reset results — used on logout so no inbox content
+	// (metadata or bodies) is left behind for the next user of the device.
+	const clearCache = useCallback(() => {
+		setCache(EMPTY_CACHE);
+		setBodiesCache({});
+		setFilteredEmails([]);
+		setHasNextPage(false);
+	}, [setCache, setBodiesCache]);
+
 	// Re-filter cached emails with new params (zero API calls)
 	const filterCachedEmails = useCallback(
 		(params: AdvancedSearchParams) => {
@@ -459,6 +482,7 @@ export function useAdvancedSearch() {
 		fetchNextPage,
 		fetchEmailBody,
 		filterCachedEmails,
+		clearCache,
 		hasNextPage,
 		cachedCount: cache.emails.length,
 		searchMode,

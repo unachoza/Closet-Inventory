@@ -13,7 +13,6 @@ import normalizeColor from "../../utils/normalizeColors";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
-import { GMAIL_CACHE_KEY, GMAIL_CACHE_BODIES_KEY } from "./constants";
 import { inferProductAttributes } from "../../utils/inferProductAttributes";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
@@ -40,6 +39,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		hasNextPage,
 		fetchEmailBody,
 		filterCachedEmails,
+		clearCache,
 		cachedCount,
 		searchMode,
 	} = useAdvancedSearch();
@@ -49,12 +49,17 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 	// Find the selected email and ensure it has a body (fetch if needed)
 	const [selectedEmail, setSelectedEmail] = useState<GmailEmail | undefined>(undefined);
 
-	// Clear Gmail email and bodies cache from localStorage
+	// Clear the in-memory + sessionStorage Gmail caches (metadata + bodies).
 	const handleClearCache = useCallback(() => {
-		localStorage.removeItem(GMAIL_CACHE_KEY);
-		localStorage.removeItem(GMAIL_CACHE_BODIES_KEY);
-		window.location.reload();
-	}, []);
+		clearCache();
+		setSelectedEmailId(null);
+	}, [clearCache]);
+
+	// Log out and wipe cached inbox content so nothing is left for the next user.
+	const handleLogout = useCallback(() => {
+		clearCache();
+		logout();
+	}, [clearCache, logout]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -225,7 +230,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					<button className="gmail-search-btn" onClick={handleDefaultSearch} disabled={isSearching} type="button">
 						{isSearching ? "Searching..." : emails.length > 0 ? "Search Again" : "Search Emails"}
 					</button>
-					<button className="gmail-logout-btn" onClick={logout} type="button">
+					<button className="gmail-logout-btn" onClick={handleLogout} type="button">
 						Disconnect
 					</button>
 					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button" style={{ marginLeft: 8 }}>
