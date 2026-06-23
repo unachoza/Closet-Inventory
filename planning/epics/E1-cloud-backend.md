@@ -57,7 +57,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] **Encryption at rest & in transit** — confirm Supabase encryption at rest is on; all transport over HTTPS/TLS. _(Tea: files + 1M+ DMs stored unencrypted)_
 - [ ] **No hardcoded secrets** — API keys/client tokens in env vars only, never committed; rotate anything ever exposed; scan source + git history for leaked keys. _(Tea: keys hardcoded in source)_
 - [ ] **Routine security audits** — dependency/secret scanning in CI, periodic access review, and monitoring/alerting for anomalous access or exposure. _(Tea: no testing or monitoring)_
-- [ ] **Token handling** — Gmail access/refresh tokens stored securely (not localStorage in plaintext if avoidable), least-privilege scopes, short-lived where possible, revocable on sign-out.
+- [x] ✅ **Token handling (interim, branch `security-xss`)** — Gmail access token moved out of localStorage to **in-memory only** (`useGmailAuth`); legacy persisted token purged on mount; cleared on sign-out. Server-side token storage + refresh remains the E1 target (`E1-4.4`). Scope is already least-privilege (`gmail.readonly`).
 
 **Tickets**
 - `E1-4.1` Bucket privacy + signed-URL-only access pattern (audit `E1-2.1` storage pipeline) — _0.5d_
@@ -79,12 +79,13 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] Anon key only on the client; **`service_role` key never ships to the browser** (server/edge functions only)
 
 **Input validation & injection / XSS**
-- [ ] ⚠️ **Replace the hand-rolled email-HTML sanitizer with DOMPurify** — current `createSanitizedHtml` in `EmailPreview.tsx` strips `<script>/<iframe>` but NOT inline handlers (`onerror`, `onload`), `javascript:`/`data:` URLs, or `<svg onload>`, then renders via `dangerouslySetInnerHTML` (live XSS on untrusted email)
+- [x] ✅ **Replaced the hand-rolled email-HTML sanitizer with DOMPurify** (branch `security-xss`) — `createSanitizedHtml` in `EmailPreview.tsx` now calls `DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })`; inline handlers (`onerror`/`onload`), `javascript:`/`data:` URLs, and `<svg onload>` are all stripped. Regression tests in `EmailPreview.xss.test.tsx`.
+- [x] ✅ **Moved fetched email bodies (PII) off localStorage** (branch `security-xss`) — `gmail_email_bodies_cache` + `gmail_emails_cache` now live in **sessionStorage** (tab-scoped), are cleared on logout, and legacy localStorage copies are purged on mount. Tests in `useAdvancedSearch.test.ts`.
 - [ ] Validate every input at the boundary with Zod (form data, parsed email fields, API/edge-function payloads)
 - [ ] Supabase client uses parameterized queries — never string-concatenate SQL in edge functions
 
 **Network & transport**
-- [ ] Content-Security-Policy header (lock down script/style/img/connect sources)
+- [ ] **Content-Security-Policy — `script-src 'self'`** as the defense-in-depth backstop to the DOMPurify fix (blocks inline/injected script execution even if a sanitizer is ever bypassed). Set at the hosting layer (Vercel/Netlify headers) or an `index.html` `<meta>` tag; verify it doesn't break the Google OAuth SDK or inline styles before enabling. Then lock down `style-src`/`img-src`/`connect-src` (Supabase, Gmail API, Cloudinary origins).
 - [ ] HSTS + HTTPS-only; secure cookies (`HttpOnly`, `Secure`, `SameSite`) for any session cookie
 - [ ] Lock CORS to known origins on edge functions (no `*` in production)
 
