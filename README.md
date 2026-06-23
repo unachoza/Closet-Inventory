@@ -256,11 +256,11 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Order-level discounts distributed evenly across line items when there's no per-item sale price (Brooks Brothers, Savage X Fenty)
 - ✅ Multi-quantity order support — Anthropologie derive per-unit original price from `totalOriginal ÷ qty`
 - ✅ Currency-code price parsing — handle Zara `12.99 USD` format (no `$` symbol)
-- 🔲 Parsing strategies for additional retailers (Gap, Walmart, Levi's)
+- ✅ Parsing strategies for additional retailers (Gap, Walmart, Levi's)
 - ✅ Fast fashion retailer support - Temu (data embedded in images, OCR required)
 - 🔲 Full Amazon support - import-non-clothing skip
 - 🚧 Don't import items that can't be mapped to a category (big for Amazon emails)
-- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
+- ✅ Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 
 ---
 

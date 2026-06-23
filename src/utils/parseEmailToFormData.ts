@@ -89,6 +89,8 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	underwear: "underwear",
 	legging: "active",
 	sports: "active",
+	jersey: "active",
+	swimsuit: "intimates",
 	bodysuit: "body",
 	jumpsuit: "body",
 	skort: "bottoms",
