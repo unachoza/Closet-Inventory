@@ -237,11 +237,11 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Gmail OAuth import screen
 - ✅ Gmail API email thread parsing
 - ✅ Structured item extraction (name, price, brand, category) from email HTML
-- ✅ Multi-retailer HTML parsers — Anthropologie, Aritzia, Banana Republic, Express, Old Navy, Shein, Skims, Target, Victoria's Secret, Zara (+ partial Amazon); tested against real-email fixtures
+- ✅ Multi-retailer HTML parsers — Anthropologie, American Apparel, ALDO, Aritzia, Banana Republic (Factory + Athleta older template), Blush Mark, Brooks Brothers, Express, Lulus, Nike/Jordan, Nordstrom, Old Navy, Poshmark, Savage X Fenty, Shein, Shopbop/East Dane, Skims, SwimOutlet, Target, Victoria's Secret, Zara (3 templates: rd-product-col div, MJML single-column, 2015 header table), ThredUp (+ partial Amazon); brand-specific strategies keyed on CDN/class signals run ahead of the generic table/image fallbacks; tested against real-email fixtures
 - ✅ Advanced Gmail search — subject/body keyword + date-range query builder with confirmation modal and 24h email cache
 - ✅ Batch import queue ("Import All Items" from a single email)
 - ✅ Deduplication check — skip if item UUID already exists
-- ✅ Multi-retailer email parsing (Express, Banana Republic Factory, Anthropologie, SKIMS, Poshmark, SHEIN)
+- ✅ Product name symbol cleanup — strips `™®©` trademark/registered/copyright marks
 
 ---
 
@@ -252,11 +252,15 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - ✅ Title-case display transform for product names (display-only, non-mutating)
 - ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
-- 🔲 Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
+- ✅ **Sale pricing & savings tracking** — capture `originalPrice` from struck-through values, colored sale prices, "Was $X" text, or list-vs-paid amounts; compute discount % badge on product card
+- ✅ Order-level discounts distributed evenly across line items when there's no per-item sale price (Brooks Brothers, Savage X Fenty)
+- ✅ Multi-quantity order support — Anthropologie derive per-unit original price from `totalOriginal ÷ qty`
+- ✅ Currency-code price parsing — handle Zara `12.99 USD` format (no `$` symbol)
+- ✅ Parsing strategies for additional retailers (Gap, Walmart, Levi's)
 - ✅ Fast fashion retailer support - Temu (data embedded in images, OCR required)
 - 🔲 Full Amazon support - import-non-clothing skip
 - 🚧 Don't import items that can't be mapped to a category (big for Amazon emails)
-- 🔲 Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
+- ✅ Retailer-specific parsers (Amazon, additional Shein variants, Temu — note: Temu embeds data in images, OCR required)
 
 ---
 
