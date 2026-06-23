@@ -44,6 +44,41 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --green: #16a34a;
   --green-faint: rgba(22, 163, 74, 0.8);
+
+  /* ── Group badge palette ─────────────────────────────────────── */
+  --coral: #e8453c;
+  --coral-faint: rgba(232, 69, 60, 0.12);
+  --coral-border: rgba(232, 69, 60, 0.25);
+  --coral-glow: rgba(232, 69, 60, 0.22);
+  --indigo-faint: rgba(19, 17, 146, 0.30);
+  --indigo-text: rgb(199, 210, 254);
+  --indigo-border: rgba(199, 210, 254, 0.25);
+  --amber-faint: rgba(245, 158, 11, 0.15);
+  --amber-text: rgb(251, 191, 36);
+  --amber-border: rgba(245, 158, 11, 0.20);
+  --purple-faint: rgba(168, 85, 247, 0.15);
+  --purple-text: rgb(192, 132, 252);
+  --purple-border: rgba(168, 85, 247, 0.20);
+  --emerald-faint: rgba(34, 197, 94, 0.15);
+  --emerald-text: rgb(74, 222, 128);
+  --emerald-border: rgba(34, 197, 94, 0.20);
+
+  /* ── Feature / fiber dots ────────────────────────────────────── */
+  --dot-teal: #2bbfb3;
+  --dot-blue: #2563eb;
+  --fiber-natural: #5a7a60;
+  --fiber-synthetic: #8b5a7a;
+
+  /* ── Garment placeholder backgrounds ────────────────────────── */
+  --garment-stone: #78716c;
+  --garment-amber-dark: #92400e;
+  --garment-rose-dark: #9f1239;
+  --garment-stone-light: #d6d3d1;
+  --garment-slate: #334155;
+  --garment-brown: #451a03;
+  --garment-crimson: #881337;
+  --garment-charcoal: #404040;
+  --garment-zinc: #3f3f46;
 }
 
 /* ─── Page layout ────────────────────────────────────────────────────────────── */
@@ -260,7 +295,7 @@ gap: 10px;
   transform: translateX(-50%);
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(232,69,60,0.22) 0%, transparent 65%);
+  background: radial-gradient(circle, var(--coral-glow) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -275,7 +310,7 @@ gap: 10px;
   padding: 8px;
   position: relative;
   z-index: 1;
-  box-shadow: 0 4px 24px rgba(232,69,60,0.25), 0 0 0 1px rgba(255,255,255,0.08);
+  box-shadow: 0 4px 24px var(--coral-border), 0 0 0 1px var(--white-08);
   margin-top: 10px;
 }
 
@@ -989,7 +1024,7 @@ gap: 10px;
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: #78716c;
+  background: var(--garment-stone);
   display: flex;
   align-items: center;
   justify-content: center;
