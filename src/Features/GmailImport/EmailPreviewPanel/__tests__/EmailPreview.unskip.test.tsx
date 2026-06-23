@@ -65,9 +65,9 @@ vi.mock("../../ProductCard/ProductCard", () => ({
 import EmailPreview from "../EmailPreview";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const SHIRT: ExtractedProduct = { name: "Blue Shirt", price: 30, color: "Blue", size: "M", brand: "Gap", imageUrl: "", onSale: false, material: "" };
-const ACCESSORY: ExtractedProduct = { name: "Leather Accessory", price: 15, color: "", size: "", brand: "Gap", imageUrl: "", onSale: false, material: "" };
-const BELT: ExtractedProduct = { name: "Canvas Accessory Belt", price: 20, color: "Tan", size: "S", brand: "Gap", imageUrl: "", onSale: false, material: "" };
+const SHIRT: ExtractedProduct = { name: "Blue Shirt", price: 30, color: "Blue", size: "M", brand: "Gap", imageUrl: "", onSale: false, material: "", itemNumber: "" };
+const ACCESSORY: ExtractedProduct = { name: "Leather Accessory", price: 15, color: "", size: "", brand: "Gap", imageUrl: "", onSale: false, material: "", itemNumber: "" };
+const BELT: ExtractedProduct = { name: "Canvas Accessory Belt", price: 20, color: "Tan", size: "S", brand: "Gap", imageUrl: "", onSale: false, material: "", itemNumber: "" };
 
 const MOCK_EMAIL = {
 	id: "e1", threadId: "t1",

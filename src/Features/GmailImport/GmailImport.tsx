@@ -136,7 +136,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				imageURL: product.imageUrl,
 				name: toTitleCase(condenseName(product.name, product.brand)),
 				brand: product.brand || emailData.brand,
-				price: product.price,
+				price: String(product.price),
 				originalPrice: product.originalPrice,
 				qty: product.qty,
 				category: emailData.category,
