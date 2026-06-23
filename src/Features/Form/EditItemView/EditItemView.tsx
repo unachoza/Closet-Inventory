@@ -70,6 +70,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		condition: _condition,
 		purchaseDate: _purchaseDate,
 		style,
+		originalPrice: _originalPrice,
+		qty: _qty,
 		...remaining
 	} = item;
 	const inputsToSeperate = { id, onSale, notes, style };
@@ -240,6 +242,15 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							handleFormUpdate={handleChange}
 						/>
 					))}
+					{onSale && (
+						<TextInput
+							name="originalPrice"
+							label="original price"
+							value={normalizeToString(formData.originalPrice ?? _originalPrice ?? "")}
+							placeholder="Enter original price"
+							handleFormUpdate={handleChange}
+						/>
+					)}
 					{formData.purchaseDate ? (
 						<label className="edit-form-purchase-date">
 							purchase date

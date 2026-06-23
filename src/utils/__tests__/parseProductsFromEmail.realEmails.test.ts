@@ -110,6 +110,407 @@ describe("real emails > Banana Republic Factory (no photos)", () => {
 });
 
 // ---------------------------------------------------------------------------
+// American Apparel — header-mapped column table (Qty|Style|Description|Size|Color|Price|Amount)
+// ---------------------------------------------------------------------------
+
+describe("real emails > American Apparel (column-header table)", () => {
+	const products = parseProductsFromEmail(loadFixture("american-apparel-table.html"));
+
+	it("detects all 6 items using Description as the name (not the Style code)", () => {
+		expect(products).toHaveLength(6);
+		expect(products.map((p) => p.name)).toEqual([
+			"Nylon Tricot Triangle Bikini Top",
+			"Nylon Tricot Flat Bikini Bottom",
+			"Triangle Bikini Top",
+			"Crisscross Overall One-Piece Swimsu",
+			"Cotton Spandex Mock Neck Cutout 'Ry",
+			"Metallic Jersey Short Sleeve Tunic",
+		]);
+	});
+
+	it("maps the Price, Size, Color, and Style columns", () => {
+		const top = products[0];
+		expect(top.price).toBe("$3.90");
+		expect(top.size).toBe("S");
+		expect(top.color).toBe("fuchsia");
+		expect(top.itemNumber).toBe("RNT01");
+		expect(products[2].price).toBe("$24.00");
+		expect(products[3].color).toBe("ceramic green");
+	});
+
+	it("ignores the Subtotal / Shipping / Total summary rows", () => {
+		expect(products.some((p) => /subtotal|shipping|total/i.test(p.name))).toBe(false);
+	});
+});
+
+describe("real emails > American Apparel (full email with nested table)", () => {
+	const products = parseProductsFromEmail(loadFixture("american-apparel-full-email.html"));
+
+	it("detects all 4 items from the nested product table (not billing/shipping text)", () => {
+		expect(products).toHaveLength(4);
+		expect(products.map((p) => p.name)).toEqual([
+			"Printed Cotton Spandex Jersey Sleev",
+			"Sparkle Crop Tank",
+			"Frankie Jumpsuit",
+			"Ponte Foil Tank Dress",
+		]);
+	});
+
+	it("correctly extracts price, size, and color", () => {
+		expect(products[0]).toMatchObject({
+			price: "$5.20",
+			size: "L",
+			color: "leopard",
+			itemNumber: "8369P",
+		});
+		expect(products[1]).toMatchObject({
+			price: "$12.40",
+			size: "M/L",
+			color: "black opal",
+		});
+	});
+
+	it("ignores summary rows and address sections", () => {
+		expect(products.some((p) => /billing|shipping|total|subtotal|thank you/i.test(p.name))).toBe(false);
+	});
+});
+
+// Victoria's Secret 2018 — older template whose SKU is alphanumeric ("DE-369-810"),
+// not a 6-digit code. Previously the SKU guard rejected the item and the image
+// fallback emitted 3 junk banners; the relaxed SKU pattern now detects the item.
+describe("real emails > Victoria's Secret 2018 (alphanumeric SKU)", () => {
+	const products = parseProductsFromEmail(loadFixture("victorias-secret-2018.html"));
+
+	it("detects the single real item (not banner images)", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0]).toMatchObject({
+			name: "Front-close Bralette",
+			size: "M",
+			price: "$14.50",
+			originalPrice: "$24.50",
+			onSale: true,
+			itemNumber: "DE-369-810",
+		});
+	});
+});
+
+// Victoria's Secret 2021 — multi-quantity items. Qty is read from the "Qty"
+// attribute row and surfaced on the card.
+describe("real emails > Victoria's Secret 2021 (quantity)", () => {
+	const products = parseProductsFromEmail(loadFixture("victorias-secret-2021-qty.html"));
+
+	it("captures per-item quantity", () => {
+		const cheeky = products.find((p) => /no-show cheeky/i.test(p.name));
+		const brief = products.find((p) => /stretch cotton high-leg/i.test(p.name));
+		expect(cheeky).toMatchObject({ qty: 4, price: "$24.00", originalPrice: "$42.00", color: "black" });
+		expect(brief).toMatchObject({ qty: 2, price: "$12.00", originalPrice: "$21.00", color: "black" });
+	});
+});
+
+// Shopbop 2021 — Description column embeds a nested image+name table, with a
+// struck-through original price in a sibling cell. Previously the generic table
+// strategy picked the price cell as the name and dedup collapsed both items to
+// one ("$108.50 $155.00", size "1"). The dedicated strategy now detects both.
+describe("real emails > Shopbop 2021 (nested description + sale price)", () => {
+	const products = parseProductsFromEmail(loadFixture("shopbop-2021.html"));
+
+	it("detects both FARM Rio items with sale + original price", () => {
+		expect(products).toHaveLength(2);
+		expect(products[0]).toMatchObject({
+			brand: "FARM Rio",
+			name: "Tie Dye Bananas Pajama Shirt",
+			size: "M",
+			color: "multi",
+			price: "$108.50",
+			originalPrice: "$155.00",
+			onSale: true,
+		});
+		expect(products[1]).toMatchObject({
+			name: "Tie Dye Bananas Pajama Pants",
+			size: "S",
+			price: "$108.50",
+			originalPrice: "$155.00",
+		});
+	});
+
+	it("does not emit a price string as a product name", () => {
+		expect(products.some((p) => /^\$/.test(p.name))).toBe(false);
+	});
+});
+
+// Brooks Brothers 2017 — scene7 product image + a detail cell with "PRODUCT NAME"
+// then labeled "Color:/Size:/Item#:" rows. Previously the generic table strategy
+// read the whole cell as the name with no size and a wrong inferred color.
+describe("real emails > Brooks Brothers 2017 (labeled receipt)", () => {
+	const single = parseProductsFromEmail(loadFixture("brooks-brothers-2017.html"));
+	const two = parseProductsFromEmail(loadFixture("brooks-brothers-2017-two.html"));
+
+	it("parses name/color/size/item# from the labeled detail cell", () => {
+		expect(single).toHaveLength(1);
+		expect(single[0]).toMatchObject({
+			size: "8",
+			color: "black",
+			price: "$50.49",
+			itemNumber: "WX00387",
+		});
+		expect(single[0].name).toMatch(/ponte knit fit-and-flare dress/i);
+		expect(/color:|size:|item#/i.test(single[0].name)).toBe(false);
+	});
+
+	it("detects both items in a 2-item order", () => {
+		expect(two).toHaveLength(2);
+		expect(two.map((p) => p.color)).toEqual(["navy", "navy"]);
+		expect(two.map((p) => p.size)).toEqual(["10", "10"]);
+		expect(two.map((p) => p.itemNumber)).toEqual(["SX00046", "SX00023"]);
+	});
+});
+
+// SwimOutlet 2017 — PRICE/QTY/TOTAL row with a separate "SKU | COLOR | SIZE"
+// label row. Previously the QTY column ("1") was read as the size and the color
+// was wrong; the label row is now parsed for color/size/SKU.
+describe("real emails > SwimOutlet 2017 (label row color/size)", () => {
+	const products = parseProductsFromEmail(loadFixture("swimoutlet-2017.html"));
+
+	it("reads color and size from the label row, not the qty column", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0]).toMatchObject({
+			size: "32",
+			color: "magenta",
+			price: "$20.99",
+			itemNumber: "SWC020-Magenta-32",
+		});
+	});
+});
+
+// Lulus 2021 — 2-cell rows (product image + <br>-delimited name/brand/color/size/
+// price). Previously no structured strategy matched, so the image fallback emitted
+// the 3 products plus a "Contact Us" footer image and an analytics pixel as junk,
+// and color was wrong. Now detected directly with color/size, no junk.
+describe("real emails > Lulus 2021 (br-delimited details)", () => {
+	const products = parseProductsFromEmail(loadFixture("lulus-2021.html"));
+
+	it("detects exactly the 3 products, no footer/analytics junk", () => {
+		expect(products).toHaveLength(3);
+		expect(products.some((p) => /contact us|remaining items|shipped/i.test(p.name))).toBe(false);
+	});
+
+	it("reads color (black, not tan) and size for each item", () => {
+		expect(products.map((p) => p.color)).toEqual(["black", "black", "black"]);
+		expect(products.map((p) => p.size)).toEqual(["Small", "Small", "Small"]);
+		const xoxo = products.find((p) => /xoxo/i.test(p.name));
+		expect(xoxo).toMatchObject({ color: "black", price: "$28.00", brand: "Lulus" });
+	});
+});
+
+// Nike 2025 (forwarded) — dynamic product container with class-tagged name/price
+// divs + a "Size:" line. Previously the swoosh logo ("Nike Logo") and product photo
+// ("product") fell through to the image fallback as 2 junk items with no data.
+describe("real emails > Nike 2025 (dynamic product container)", () => {
+	const products = parseProductsFromEmail(loadFixture("nike-2025.html"));
+
+	it("detects the single shoe, not the swoosh logo", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0]).toMatchObject({
+			brand: "Nike",
+			size: "M 9.5 / W 11",
+			color: "black",
+			price: "$200.00",
+		});
+		expect(products[0].name).toMatch(/air jordan 3 retro/i);
+		expect(products.some((p) => /nike logo|^product$/i.test(p.name))).toBe(false);
+	});
+});
+
+// Blush Mark 2022 — /products/ anchors wrapping image + "Dress Color:/Size:/Qty:"
+// labels. Previously a tracking paragraph was emitted as one junk item with no
+// attributes; now all 4 items are detected with color/size.
+describe("real emails > Blush Mark 2022", () => {
+	const products = parseProductsFromEmail(loadFixture("blushmark-2022.html"));
+
+	it("detects all 4 items with color and size", () => {
+		expect(products).toHaveLength(4);
+		expect(products[0]).toMatchObject({ size: "M", color: "multicolor", price: "$17.99" });
+		expect(products[0].name).toMatch(/random print deep v neck/i);
+		expect(products.map((p) => p.size)).toEqual(["M", "one-size", "S", "S"]);
+	});
+});
+
+// Nordstrom 2026 (forwarded) — nordstrommedia image + name link + "Size X" / "Price: $X".
+// Previously the image fallback dropped size and price.
+describe("real emails > Nordstrom 2026 (forwarded)", () => {
+	const products = parseProductsFromEmail(loadFixture("nordstrom-2026.html"));
+
+	it("reads size and price for each item", () => {
+		expect(products).toHaveLength(2);
+		expect(products[0]).toMatchObject({ size: "Medium", price: "$29.99" });
+		expect(products[1]).toMatchObject({ size: "Medium", price: "$33.74" });
+		expect(products.every((p) => p.size && p.price)).toBe(true);
+	});
+});
+
+// Brooks Brothers 2017 — order-level "Order Discount ($X)" applied evenly across
+// items (originalPrice = list, price = discounted). Discount is parsed from raw
+// HTML before pruning (the "ORDER TOTAL" header would otherwise strip the rows).
+describe("real emails > Brooks Brothers 2017 (order discount)", () => {
+	const products = parseProductsFromEmail(loadFixture("brooks-brothers-2017-discount.html"));
+
+	it("applies the order discount evenly", () => {
+		expect(products).toHaveLength(2);
+		// subtotal 396.00, discount 278.19 → 70.25% off → 198 * 0.29749 = 58.90
+		expect(products[0]).toMatchObject({ originalPrice: "$198.00", price: "$58.90", onSale: true });
+		expect(products[1]).toMatchObject({ originalPrice: "$198.00", price: "$58.90", onSale: true });
+	});
+
+	it("leaves non-discount Brooks orders unchanged", () => {
+		const plain = parseProductsFromEmail(loadFixture("brooks-brothers-2017.html"));
+		expect(plain[0]).toMatchObject({ price: "$50.49", onSale: false });
+		expect(plain[0].originalPrice).toBeUndefined();
+	});
+});
+
+// Savage X Fenty 2023 — multiple order-level discount lines summed and applied
+// evenly to the (already correctly detected) items.
+describe("real emails > Savage X Fenty 2023 (multi-line discount)", () => {
+	const products = parseProductsFromEmail(loadFixture("savagex-2023.html"));
+
+	it("applies the summed discount evenly", () => {
+		expect(products.length).toBeGreaterThanOrEqual(2);
+		// subtotal 364.70, discounts 120.90 + 150.37 = 271.27 → 74.38% off
+		const pant = products.find((p) => /sleep pant/i.test(p.name));
+		expect(pant).toMatchObject({ originalPrice: "$49.95", price: "$12.80", onSale: true });
+	});
+});
+
+// American Apparel 2013 — real full order-confirmation email. The outer 700px
+// layout table holds bold headings ("Thank You.", "Billing Address", …) plus a
+// Qty/Style/Description/Size/Color/Price column-header product table. Previously
+// extractFromGapIncLabeledLayout misread the header row's bare Size/Color/Price
+// cells as attribute labels and emitted 8 junk items; now the colon-strict label
+// guard defers to the column-header table and all 9 line items are detected.
+describe("real emails > American Apparel 2013 (full email)", () => {
+	const products = parseProductsFromEmail(loadFixture("american-apparel-2013-full.html"));
+
+	it("detects all 9 product line items", () => {
+		expect(products).toHaveLength(9);
+	});
+
+	it("does not emit billing/shipping/footer headings as products", () => {
+		expect(
+			products.some((p) => /thank you|billing|charges|returns|customer service|or call|llc/i.test(p.name))
+		).toBe(false);
+	});
+
+	it("reads size/color/price from the column-header table", () => {
+		expect(products[0]).toMatchObject({
+			name: "Nylon Tricot Side-Tie Bikini Bottom",
+			size: "L",
+			color: "coral ice",
+			price: "$7.00",
+		});
+	});
+
+	it("keeps the three Super Sheer Pantyhose distinct by color", () => {
+		const sheer = products.filter((p) => /super sheer pantyhose/i.test(p.name));
+		expect(sheer.map((p) => p.color).sort()).toEqual(["cactus", "snorkel", "virtual pink"]);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Zara (2015) — header-mapped table with currency-code prices, SKU reference
+// ---------------------------------------------------------------------------
+
+describe("real emails > Zara 2015 (column-header table)", () => {
+	const products = parseProductsFromEmail(loadFixture("zara-2015-table.html"));
+
+	it("detects all 5 items (regression: previously returned none)", () => {
+		expect(products).toHaveLength(5);
+		expect(products.map((p) => p.name)).toEqual(["CHECK TOP", "TRENCH-STYLE DRESS", "FAUX SUEDE DRESS", "MARL TOP", "DRAPED TOP"]);
+	});
+
+	it("reads currency-code prices and the SKU reference", () => {
+		expect(products[0].price).toBe("$25.99");
+		expect(products[1].price).toBe("$39.99");
+		expect(products[0].itemNumber).toBe("0/3666/153/823/03");
+		expect(products.every((p) => p.size === "M")).toBe(true);
+	});
+
+	it("does not parse the Total products / Total footer rows", () => {
+		expect(products.some((p) => /total/i.test(p.name))).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Banana Republic / Athleta — older template: <b> name + Color:/Size:/Price: labels
+// ---------------------------------------------------------------------------
+
+describe("real emails > Banana Republic (labeled <b> layout, no photos)", () => {
+	const products = parseProductsFromEmail(loadFixture("banana-republic-labeled.html"));
+
+	it("detects the 2 items and ignores the 'YOUR ORDER' header and price bolds", () => {
+		expect(products).toHaveLength(2);
+		expect(products.map((p) => p.name)).toEqual(["High-Rise Flare Tuxedo Pant", "TENCEL Flight Jumpsuit"]);
+	});
+
+	it("strips the trademark mark from the name (TENCEL™ -> TENCEL)", () => {
+		// The raw name is "TENCEL™ Flight Jumpsuit" (&#153 decodes to ™); the card
+		// then title-cases it to "Tencel Flight Jumpsuit".
+		expect(byName(products, "TENCEL Flight Jumpsuit")).toBeDefined();
+		expect(products.some((p) => p.name.includes("™"))).toBe(false);
+	});
+
+	it("reads the labeled price, color, and size", () => {
+		const pant = byName(products, "High-Rise Flare Tuxedo Pant");
+		expect(pant?.price).toBe("$70.97");
+		expect(pant?.color).toBe("black");
+		expect(pant?.size).toBe("4 Regular");
+		expect(byName(products, "TENCEL Flight Jumpsuit")?.price).toBe("$110.99");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Zara — newer MJML single-column layout (product-img / product-size / product-price)
+// ---------------------------------------------------------------------------
+
+describe("real emails > Zara (MJML single-column order)", () => {
+	const products = parseProductsFromEmail(loadFixture("zara-mjml-order.html"));
+
+	it("detects both items (regression: previously returned none)", () => {
+		expect(products).toHaveLength(2);
+		expect(products.map((p) => p.name)).toEqual(["PLEATED SHORTS", "PLATFORM HEELED ANKLE BOOTS"]);
+	});
+
+	it("reads the currency-code price (21.54 USD -> $21.54)", () => {
+		expect(byName(products, "PLEATED SHORTS")?.price).toBe("$21.54");
+		expect(byName(products, "PLATFORM HEELED ANKLE BOOTS")?.price).toBe("$41.94");
+	});
+
+	it("parses color from the 'Color SKU' line and size from the size row", () => {
+		const shorts = byName(products, "PLEATED SHORTS");
+		expect(shorts?.color).toBe("Black");
+		expect(shorts?.size).toBe("S");
+		expect(byName(products, "PLATFORM HEELED ANKLE BOOTS")?.size).toBe("8");
+	});
+
+	it("does not parse the 'Products' title or item counter as a product", () => {
+		expect(products.some((p) => /products|items/i.test(p.name))).toBe(false);
+	});
+});
+
+describe("real emails > Zara (MJML, 3 items across 2 shipments)", () => {
+	const products = parseProductsFromEmail(loadFixture("zara-mjml-shipments.html"));
+
+	it("detects all 3 items, keeping the two same-named tanks (different colors)", () => {
+		expect(products).toHaveLength(3);
+		expect(products.map((p) => p.name)).toEqual(["RIBBED TANK TOP", "RIBBED TANK TOP", "TEXTURED CROPPED T-SHIRT"]);
+		expect(products.map((p) => p.color)).toEqual(["Blue", "Black", "Black"]);
+	});
+
+	it("does not parse 'Shipping NNNNN' headers as products", () => {
+		expect(products.some((p) => /shipping/i.test(p.name))).toBe(false);
+	});
+});
+
+// ---------------------------------------------------------------------------
 // Anthropologie — item-detail-row labeled tables (bare and $-prefixed prices)
 // ---------------------------------------------------------------------------
 
@@ -144,6 +545,11 @@ describe("real emails > Anthropologie (bare prices)", () => {
 		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 
+	it("captures the struck-through original price even without a $ prefix", () => {
+		expect(byName(products, "Neha Seamless Ruffled Briefs")?.originalPrice).toBe("$9.95");
+		expect(byName(products, "Waverly High-Waisted Briefs")?.originalPrice).toBe("$14.95");
+	});
+
 	it("captures the Style No. as the item number and the product image", () => {
 		const neha = byName(products, "Neha Seamless Ruffled Briefs");
 		expect(neha?.itemNumber).toBe("4140341870052");
@@ -171,6 +577,12 @@ describe("real emails > Anthropologie ($-prefixed prices)", () => {
 	it("reads the $-prefixed sale price, not the struck original", () => {
 		expect(byName(products, "Neha Seamless Ruffled Briefs")?.price).toBe("$7.46");
 		expect(byName(products, "Waverly High-Waisted Briefs")?.price).toBe("$11.21");
+	});
+
+	it("captures the struck original price and flags the sale", () => {
+		expect(byName(products, "Neha Seamless Ruffled Briefs")?.originalPrice).toBe("$9.95");
+		expect(byName(products, "Waverly High-Waisted Briefs")?.originalPrice).toBe("$14.95");
+		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 });
 
@@ -208,6 +620,12 @@ describe("real emails > Victoria's Secret", () => {
 		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 
+	it("captures the trailing original price, ignoring the -$X discount line", () => {
+		// Each block is "$paid / -$discount (Offers & Discounts) / $original".
+		// The original is the highest amount, not the middle discount line.
+		expect(products.map((p) => p.originalPrice)).toEqual(["$12.50", "$42.00", "$10.50", "$21.00"]);
+	});
+
 	it("has no per-item image (VS shows only marketing banners)", () => {
 		for (const p of products) expect(p.imageUrl).toBe("");
 	});
@@ -234,9 +652,15 @@ describe("real emails > SKIMS (Shopify notification)", () => {
 		expect(products[1].size).toBe("XS");
 	});
 
-	it("reads the line price from the price cell, not the in-description discount", () => {
-		expect(products[0].price).toBe("$60.00");
-		expect(products[1].price).toBe("$40.00");
+	it("reads per-unit price (line total ÷ qty) from the price cell", () => {
+		// qty 5: $60.00 / 5 = $12.00, $40.00 / 5 = $8.00
+		expect(products[0].price).toBe("$12.00");
+		expect(products[1].price).toBe("$8.00");
+	});
+
+	it("captures the quantity from the × N suffix in the title", () => {
+		expect(products[0].qty).toBe(5);
+		expect(products[1].qty).toBe(5);
 	});
 
 	it("flags sale only when a struck original price is present", () => {
@@ -269,9 +693,65 @@ describe("real emails > Old Navy (POS receipt)", () => {
 		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 
+	it("captures the original (pre-discount) unit price from the '1 @ X' line", () => {
+		expect(products.map((p) => p.originalPrice)).toEqual(["$5.00", "$5.00", "$9.99", "$9.99"]);
+	});
+
+	it("derives quantity from the 'N-Pack' name (single socks have no qty)", () => {
+		expect(products.map((p) => p.qty)).toEqual([undefined, undefined, 4, 4]);
+	});
+
 	it("does not pick up the barcode image or summary lines as products", () => {
 		for (const p of products) expect(p.imageUrl).toBe("");
 		expect(products.map((p) => p.name)).not.toContain("Bag fee");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Walmart — items table only; excludes decorative imagery + "Explore more savings"
+// ---------------------------------------------------------------------------
+
+describe("real emails > Walmart 2022 delivered (itemName span)", () => {
+	const products = parseProductsFromEmail(loadFixture("walmart-2022-delivered.html"));
+
+	it("extracts the single line item, not the header/feedback images", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0].name).toBe("Hanger Central Velvet Heavy Weight Clothing Hanger, 100 Pack, Black");
+		expect(products[0].price).toBe("$37.98");
+	});
+
+	it("does not import decorative imagery or the cross-sell tile", () => {
+		const names = products.map((p) => p.name);
+		expect(names).not.toContain("Walmart Home Page");
+		expect(names).not.toContain("Feedback Image");
+		expect(names).not.toContain("Wonder Hanger Max, Steel Grey, 10 Pack");
+	});
+});
+
+describe("real emails > Walmart 2018 processing (Item | Qty | Total table)", () => {
+	const products = parseProductsFromEmail(loadFixture("walmart-2018-processing.html"));
+
+	it("reads the bold /ip/ product-link name, not the banner alt", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0].name).toBe('Mainstays 9" High Velocity 3-Speed Fan, Model #MF-9, Black');
+		expect(products[0].price).toBe("$14.24");
+	});
+});
+
+describe("real emails > Walmart 2021 shipped (Items + Other items)", () => {
+	const products = parseProductsFromEmail(loadFixture("walmart-2021-shipped.html"));
+
+	it("captures both the primary item and the 'Other items' row", () => {
+		expect(products.map((p) => p.name)).toEqual([
+			// "for Women" is stripped as gender junk by cleanProductName.
+			"Gilbin Ultra Soft High Waist Yoga Stretch Mini-Bike Shorts -Many Colors-One Size & Plus Size (Black S-L)",
+			"High Weight Capacity Non-slip Velvet Clothes Hangers, Pack of 100, Black",
+		]);
+		expect(products.map((p) => p.price)).toEqual(["$11.95", "$33.99"]);
+	});
+
+	it("excludes the 'Explore more savings' recommendation tile (no Qty line)", () => {
+		expect(products.map((p) => p.name)).not.toContain('Mainstays Flexible Black Laundry Hamper, 20"');
 	});
 });
 
@@ -290,7 +770,8 @@ describe("real emails > Target (product blocks)", () => {
 		expect(products.map((p) => p.name)).toEqual([
 			"EcoTools Exfoliating Shower Gloves - Pink",
 			"Native Body Wash - Eucalyptus & Mint - Sulfate Free - 18 fl oz",
-			'70"x71" Lightweight Color Shower Liner Clay - Room Essentials™: PEVA, Buttonhole Top, Easy to Clean',
+			// Trademark marks are stripped during cleaning ("Room Essentials™" -> "Room Essentials").
+			'70"x71" Lightweight Color Shower Liner Clay - Room Essentials : PEVA, Buttonhole Top, Easy to Clean',
 			"Native Body Wash - Lavender & Rose - Sulfate Free - 18 fl oz",
 		]);
 	});
@@ -330,5 +811,29 @@ describe("enrichment > socks/underwear/intimates default to everyday occasion", 
 	it("defaults underwear to everyday", () => {
 		const data = parseEmailToFormData("Waverly High-Waisted Briefs", "<p>briefs</p>", "Anthropologie <o@anthropologie.com>");
 		expect(data.occasion).toBe("everyday");
+	});
+});
+
+describe("banana-republic-2020", () => {
+	// Subtotal $181.96, Promotions -$90.98 → 50% discount applied to each item's list price
+	it("detects 2 items with promotion discount applied", () => {
+		const products = parseProductsFromEmail(loadFixture("banana-republic-2020.html"));
+		expect(products).toHaveLength(2);
+
+		const pant = products.find((p) => /flare tuxedo pant/i.test(p.name));
+		expect(pant).toBeDefined();
+		expect(pant!.originalPrice).toBe("$70.97");
+		expect(pant!.price).toBe("$35.48"); // 50% off $70.97, floating-point rounds down
+		expect(pant!.onSale).toBe(true);
+		expect(pant!.color).toBe("black");
+		expect(pant!.size).toBe("4 Regular");
+
+		const jumpsuit = products.find((p) => /flight jumpsuit/i.test(p.name));
+		expect(jumpsuit).toBeDefined();
+		expect(jumpsuit!.originalPrice).toBe("$110.99");
+		expect(jumpsuit!.price).toBe("$55.49"); // 50% off $110.99, floating-point rounds down
+		expect(jumpsuit!.onSale).toBe(true);
+		expect(jumpsuit!.color).toBe("black");
+		expect(jumpsuit!.size).toBe("4");
 	});
 });

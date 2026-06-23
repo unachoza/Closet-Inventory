@@ -1,0 +1,42 @@
+<!-- Walmart 2021 "part of your order has shipped" — trimmed. Two real items: the
+     primary "Items" row + an "Other items in your order" row. Both link to tracker
+     URLs (not /ip/) and are followed by "Qty: N". An "Explore more savings" tile
+     (also a tracker link, but NO "Qty:") must be excluded. -->
+<div class="body">
+  <img src="https://i5.walmartimages.com/dfw/4ff9c6c9-e783/k2-_5168b443.v1.png" alt="Walmart homepage">
+  <h1>Part of your order has shipped</h1>
+
+  <!-- Items -->
+  <table class="setDisplayWidthInner"><tbody>
+    <tr><td><h3>Items</h3></td></tr>
+    <tr>
+      <td align="left" style="width:542px">
+        <a href="https://rptrcks.walmart.com/comm-smart-app/clickTracker?a=1" rel="noopener noreferrer"><span style="font-size:16px">Gilbin Ultra Soft High Waist Yoga Stretch Mini-Bike Shorts for Women-Many Colors-One Size &amp; Plus Size (Black S-L)</span></a>
+        <span style="font-size:12px">Qty: 1</span>
+      </td>
+      <td align="right" valign="top"><span style="font-size:16px">$11.95</span></td>
+    </tr>
+  </tbody></table>
+
+  <!-- Other items in your order -->
+  <table class="setDisplayWidthInner"><tbody>
+    <tr><td><h3>Other items in your order</h3></td></tr>
+    <tr>
+      <td align="left" class="col_left_orderbreak" style="width:75%">
+        <a href="https://rptrcks.walmart.com/comm-smart-app/clickTracker?a=2" rel="noopener noreferrer"><span style="font-size:16px">High Weight Capacity Non-slip Velvet Clothes Hangers, Pack of 100, Black</span></a>
+        <span style="font-size:12px">Qty: 1</span>
+      </td>
+      <td align="right" valign="top" class="col_right_orderbreak"><span>Processing</span><br><span>$33.99</span></td>
+    </tr>
+  </tbody></table>
+
+  <!-- Explore more savings (must NOT be imported — tracker link, no Qty) -->
+  <table id="recommendation"><tbody>
+    <tr><td><span>Explore more savings</span></td></tr>
+    <tr><td>
+      <table class="fourUpImgContainer"><tbody>
+        <tr><td><a href="https://rptrcks.walmart.com/comm-smart-app/clickTracker?a=9"><font>Mainstays Flexible Black Laundry Hamper, 20"</font></a></td></tr>
+      </tbody></table>
+    </td></tr>
+  </tbody></table>
+</div>

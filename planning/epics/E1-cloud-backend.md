@@ -40,6 +40,10 @@ _As Maya, I want a sync indicator so that I know my data is safe / when I'm offl
 **Tickets**
 - `E1-3.1` Sync-status indicator in NavBar — _0.5d_
 
+## US-1.4 - Know my data is secure
+_As Maya, I want to trust NTW with my google login and personal profile info
+- [ ] Handle client credentials & user tokens securely
+- [ ] cross account protection & user flow protection 
 ---
 
 ## Dependencies

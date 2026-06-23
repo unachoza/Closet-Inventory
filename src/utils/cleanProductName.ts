@@ -42,6 +42,7 @@ export function cleanProductName(name: string): string {
 	}
 
 	return result
+		.replace(/[™®©]/g, " ")           // trademark/registered/copyright marks (e.g. "TENCEL™")
 		.replace(/\s*[,|•·]\s*$/g, "")   // trailing separators
 		.replace(/^\s*[,|•·]\s*/g, "")   // leading separators
 		.replace(/\s{2,}/g, " ")          // collapse whitespace

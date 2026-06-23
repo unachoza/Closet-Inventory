@@ -1,4 +1,4 @@
-import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize } from "./parseNameHelpers";
+import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize, extractColorFromName } from "./parseNameHelpers";
 import { cleanProductName } from "./cleanProductName";
 import { inferProductAttributes } from "./inferProductAttributes";
 
@@ -18,6 +18,8 @@ export interface ExtractedProduct {
 	readonly name: string;
 	readonly brand: string;
 	readonly price: string;
+	readonly originalPrice?: string;
+	readonly qty?: number;
 	readonly color: string;
 	readonly size: string;
 	readonly itemNumber: string;
@@ -62,6 +64,14 @@ const SKIP_IMG_PATTERNS = [
 	"caret",
 	"star",
 	"rating",
+	// Analytics / open-tracking pixels (never products)
+	"google-analytics",
+	"/collect?",
+	"convertro",
+	"amazon-adsystem",
+	"awstrack",
+	"doubleclick",
+	"open.aspx",
 ];
 
 /**
@@ -97,7 +107,25 @@ function extractPrices(text: string): string[] {
 	return codePrices;
 }
 
-function getSalePrice(td: Element): string {
+interface CellPricing {
+	readonly price: string;
+	readonly originalPrice: string;
+}
+
+/**
+ * Extract the current (paid) price and, when present, the struck-through
+ * original price from a price cell.
+ *
+ * Sale layouts pair a line-through original with a colored sale price, e.g.
+ *   <span style="text-decoration:line-through;">$88.00</span>
+ *   <span style="color:#ff3366">$34.99</span>
+ * The struck span is the original; the colored (non-struck) span is what was paid.
+ */
+function getCellPricing(td: Element): CellPricing {
+	// Struck-through original (sale marker).
+	const struckEl = td.querySelector("s, strike, del, [style*='line-through']");
+	const originalPrice = struckEl ? (extractPrices(struckEl.textContent ?? "")[0] ?? "") : "";
+
 	// Look for colored/styled price spans (sale price indicators)
 	const coloredSpans = td.querySelectorAll("span[style]");
 	for (const span of coloredSpans) {
@@ -105,13 +133,21 @@ function getSalePrice(td: Element): string {
 		// Sale prices often use red/pink colors, not line-through
 		if ((style.includes("color") && !style.includes("line-through")) || style.includes("#ff") || style.includes("red")) {
 			const prices = extractPrices(span.textContent ?? "");
-			if (prices.length > 0) return prices[0];
+			if (prices.length > 0) return { price: prices[0], originalPrice };
 		}
 	}
 
-	// Fallback: get the last price in the cell (usually the current price)
+	// Fallback: get the last price in the cell (usually the current price).
+	// If there are two prices and the first is higher, treat it as the original.
 	const allPrices = extractPrices(td.textContent ?? "");
-	return allPrices.length > 0 ? allPrices[allPrices.length - 1] : "";
+	const price = allPrices.length > 0 ? allPrices[allPrices.length - 1] : "";
+	let inferredOriginal = originalPrice;
+	if (!inferredOriginal && allPrices.length >= 2) {
+		const first = parseFloat(allPrices[0].replace("$", ""));
+		const last = parseFloat(price.replace("$", ""));
+		if (last < first) inferredOriginal = allPrices[0];
+	}
+	return { price, originalPrice: inferredOriginal };
 }
 
 function getCellText(td: Element): string {
@@ -181,6 +217,88 @@ function parseNameCell(td: Element): ParsedNameCell {
 }
 
 /**
+ * Strategy: Walmart order emails (delivered / shipped / processing).
+ *
+ * Walmart wraps the real line items in an items table but surrounds them with
+ * decorative imagery (logo, banner, "How was your experience?" feedback, social
+ * icons, order barcode) and an "Explore more savings" cross-sell grid. The
+ * generic image fallback turned all of that alt-text into bogus products
+ * ("Walmart Homepage", "Part Of Your Order Has Shipped", "Twitter", …) while
+ * missing the actual purchase. This strategy targets only the purchased line
+ * items, keyed on three Walmart shapes seen across template years:
+ *   A. <span class="itemName-…">  with a sibling $price + "Qty: N"   (delivered)
+ *   B. <a href="…/ip/…">  bold name inside an Item | Qty | Total table (processing)
+ *   C. a product link followed by a "Qty: N" line — the "Items" table and the
+ *      "Other items in your order" rows                              (shipped)
+ * Recommendation tiles carry no "Qty:" and link to tracker URLs (not /ip/), so
+ * they're excluded naturally; removePostTotalContent also strips everything
+ * after "Order total". Guard: only fires on Walmart signals.
+ */
+function extractFromWalmartLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/walmartimages\.com|rptrcks\.walmart|w-mt\.co/i.test(html)) return [];
+
+	const PRICE = /\$\d{1,5}\.\d{2}/;
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	const add = (rawName: string, scope: Element | null): void => {
+		const name = (rawName ?? "").replace(/\s+/g, " ").trim();
+		if (name.length < 4) return;
+		const key = name.toLowerCase();
+		if (seen.has(key)) return;
+
+		const scopeText = scope?.textContent ?? "";
+		const priceMatch = scopeText.match(PRICE);
+		// Look one cell to the right for the price (Item | Qty | Total layout).
+		const rightText = scope?.closest("tr")?.textContent ?? scopeText;
+		const price = priceMatch ? priceMatch[0] : (rightText.match(PRICE)?.[0] ?? "");
+		if (!price) return;
+
+		const qtyMatch = scopeText.match(/Qty:\s*(\d{1,3})/i);
+		const qty = qtyMatch ? Math.max(1, parseInt(qtyMatch[1], 10)) : 1;
+
+		seen.add(key);
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			...(qty > 1 ? { qty } : {}),
+			color: "",
+			size: "",
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	};
+
+	// Pattern A — itemName-* spans: climb to the ancestor that also holds the price.
+	for (const span of Array.from(doc.querySelectorAll('span[class*="itemName-"]'))) {
+		let scope: Element | null = span;
+		for (let i = 0; i < 6 && scope && !PRICE.test(scope.textContent ?? ""); i++) {
+			scope = scope.parentElement;
+		}
+		add(span.textContent ?? "", scope ?? span.parentElement);
+	}
+
+	// Pattern B — product link to a Walmart product page (/ip/<id>) in a Qty/Total row.
+	for (const a of Array.from(doc.querySelectorAll('a[href*="/ip/"]'))) {
+		add(a.textContent ?? "", a.closest("tr") ?? a.parentElement);
+	}
+
+	// Pattern C — a "Qty: N" line marks a real line item; the name is the first
+	// product link in that cell (covers "Items" + "Other items in your order").
+	for (const td of Array.from(doc.querySelectorAll("td"))) {
+		if (!/Qty:\s*\d/i.test(td.textContent ?? "")) continue;
+		const link = td.querySelector("a");
+		if (link) add(link.textContent ?? "", td);
+	}
+
+	return products;
+}
+
+/**
  * Strategy 2: Find <tr> rows with 4+ cells that contain a product image,
  * then read sibling <td> cells for size, color, price, etc.
  * Common for Aritzia, Nordstrom, and other traditional retailers.
@@ -245,15 +363,17 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 		let size = "";
 		let color = "";
 		let price = "";
+		let originalPrice = "";
 
 		for (const td of otherCells) {
 			const text = getCellText(td);
 			if (!text) continue;
 
 			// Check if this cell has a price
-			const cellPrice = getSalePrice(td);
-			if (cellPrice && !price) {
-				price = cellPrice;
+			const cellPricing = getCellPricing(td);
+			if (cellPricing.price && !price) {
+				price = cellPricing.price;
+				originalPrice = cellPricing.originalPrice;
 				continue;
 			}
 
@@ -284,11 +404,12 @@ function extractFromTableRows(doc: Document): ExtractedProduct[] {
 			name,
 			brand,
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
 			material: "",
-			onSale: false,
+			onSale: Boolean(originalPrice),
 		});
 	}
 
@@ -314,11 +435,16 @@ function parseColorFromSkuLine(text: string): string {
 }
 
 /**
- * Parse "1 unit / $ 14.90" or "2 units / $ 29.80" into "$14.90"
+ * Parse a "qty / price" line into the price. Handles both the $-prefixed
+ * form ("1 unit / $ 14.90") and the currency-code form Zara uses
+ * ("1 unit / 12.99 USD", where &nbsp; decodes to a non-breaking space).
  */
 function parsePriceFromUnitLine(text: string): string {
 	const match = text.match(/\$\s*(\d{1,5}(?:\.\d{2})?)/);
-	return match ? `$${match[1]}` : "";
+	if (match) return `$${match[1]}`;
+	// Fall back to the "12.99 USD" / "69.90 EUR" currency-code format.
+	const codePrices = extractPrices(text);
+	return codePrices.length > 0 ? codePrices[0] : "";
 }
 
 /**
@@ -704,6 +830,7 @@ function extractFromAttributeTableRows(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(onSale && struck ? { originalPrice: struck } : {}),
 			color: color.toLowerCase(),
 			size,
 			itemNumber,
@@ -763,6 +890,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 		let size = "";
 		let color = "";
 		let price = "";
+		let originalPrice = "";
 		let onSale = false;
 
 		for (const p of paragraphs) {
@@ -778,6 +906,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 				const priceMatch = remaining.match(/(\d{1,5}(?:\.\d{2})?)/);
 				if (priceMatch) {
 					price = `$${priceMatch[1]}`;
+					originalPrice = extractPrices(strikeText)[0] ?? "";
 					onSale = true;
 					continue;
 				}
@@ -797,9 +926,11 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 					}
 				}
 
-				// Regular price (no strikethrough): standalone number like "$71.25" or "71.25"
+				// Regular price (no strikethrough): standalone number like "$71.25" or
+				// "71.25". Require a $ prefix OR a decimal — a bare integer is a size
+				// (e.g. ALDO lists shoe size "7" on its own line), not a price.
 				if (!price) {
-					const priceMatch = line.match(/^\$?\s*(\d{1,5}(?:\.\d{2})?)\s*$/);
+					const priceMatch = line.match(/^\$\s*(\d{1,5}(?:\.\d{2})?)\s*$/) || line.match(/^(\d{1,5}\.\d{2})\s*$/);
 					if (priceMatch) {
 						price = `$${priceMatch[1]}`;
 						continue;
@@ -832,6 +963,7 @@ function extractFromParagraphLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber: "",
@@ -968,9 +1100,10 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 		// Use paid price if available, otherwise list price
 		const price = paidPrice || (listPrice > 0 ? `$${listPrice.toFixed(2)}` : "");
 
-		// If paid < list, item is on sale
+		// If paid < list, item is on sale; original price is the labeled "Price:" field
 		const paidNum = paidPrice ? parseFloat(paidPrice.replace("$", "")) : 0;
 		const onSale = listPrice > 0 && paidNum > 0 && paidNum < listPrice;
+		const originalPrice = onSale ? `$${listPrice.toFixed(2)}` : "";
 
 		// Deduplicate by name + color + size (same style in different colors are separate items)
 		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
@@ -982,6 +1115,7 @@ function extractFromLabeledFieldLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
@@ -1087,12 +1221,15 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 
 			// Extract price (with sale detection via line-through)
 			let price = "";
+			let originalPrice = "";
 			let onSale = false;
 
 			if (priceCol) {
 				const strikeDiv = priceCol.querySelector("div[style*='line-through']");
 				if (strikeDiv) {
 					onSale = true;
+					const strikePm = (strikeDiv.textContent ?? "").trim().match(/\$\d{1,5}(?:\.\d{2})?/);
+					if (strikePm) originalPrice = strikePm[0];
 					// Sale price is in the bold (non-strikethrough) div
 					const priceDivs = Array.from(priceCol.querySelectorAll("div"));
 					for (const div of priceDivs) {
@@ -1116,7 +1253,10 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 						if (allPrices.length >= 2) {
 							const first = parseFloat(allPrices[0].replace("$", ""));
 							const last = parseFloat(price.replace("$", ""));
-							if (last < first) onSale = true;
+							if (last < first) {
+								onSale = true;
+								originalPrice = allPrices[0];
+							}
 						}
 					}
 				}
@@ -1130,6 +1270,7 @@ function extractFromReactEmailLayout(doc: Document): ExtractedProduct[] {
 				name,
 				brand: "",
 				price,
+				...(originalPrice ? { originalPrice } : {}),
 				color,
 				size,
 				itemNumber: "",
@@ -1262,10 +1403,15 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 
 		// Extract price
 		let price = "";
+		let originalPrice = "";
 		let onSale = false;
 		if (priceCol) {
+			// Struck-through original (e.g. "Was $90.00").
 			const strikeEl = priceCol.querySelector("[style*='line-through'], s, strike, del");
-			if (strikeEl) onSale = true;
+			if (strikeEl) {
+				onSale = true;
+				originalPrice = extractPrices(strikeEl.textContent ?? "")[0] ?? "";
+			}
 
 			const allPrices = extractPrices(priceCol.textContent ?? "");
 			if (allPrices.length > 0) {
@@ -1273,7 +1419,10 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 				if (allPrices.length >= 2) {
 					const first = parseFloat(allPrices[0].replace("$", ""));
 					const last = parseFloat(price.replace("$", ""));
-					if (last < first) onSale = true;
+					if (last < first) {
+						onSale = true;
+						if (!originalPrice) originalPrice = allPrices[0];
+					}
 				}
 			}
 		}
@@ -1286,6 +1435,7 @@ function extractFromOrderContainerRows(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber: "",
@@ -1739,6 +1889,8 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			.replace(/&nbsp;/g, " ")
 			.trim()
 			.replace(/\s+/g, " ");
+		const qtyMatch = rawTitle.match(/[×x]\s*(\d+)\s*$/);
+		const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
 		const withoutQty = rawTitle.replace(/\s*[×x]\s*\d+\s*$/, "").trim();
 		const pipeIdx = withoutQty.lastIndexOf(" | ");
 		const name = pipeIdx !== -1 ? withoutQty.slice(0, pipeIdx).trim() : withoutQty;
@@ -1769,15 +1921,20 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			}
 		}
 
-		// Price: read directly from the dedicated price element
+		// Price: read directly from the dedicated price element, divide by qty for per-unit
 		const priceEl = row.querySelector("p.order-list__item-price");
 		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : "";
 		const prices = extractPrices(priceText);
-		const price = prices[0] ?? "";
+		const totalPrice = prices[0] ?? "";
+		const price = totalPrice && qty > 1 ? `$${(parseFloat(totalPrice.replace("$", "")) / qty).toFixed(2)}` : totalPrice;
 
 		// Sale detection: struck-through original price present
 		const delEl = row.querySelector("del.order-list__item-original-price");
 		const onSale = Boolean(delEl);
+		const delPrices = delEl ? extractPrices(delEl.textContent ?? "") : [];
+		const originalPriceTotal = delPrices[0] ?? "";
+		const originalPrice =
+			originalPriceTotal && qty > 1 ? `$${(parseFloat(originalPriceTotal.replace("$", "")) / qty).toFixed(2)}` : originalPriceTotal;
 
 		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
 		if (seenKeys.has(dedupeKey)) continue;
@@ -1788,11 +1945,13 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber: "",
 			material: "",
 			onSale,
+			...(qty > 1 ? { qty } : {}),
 		});
 	}
 
@@ -1812,6 +1971,136 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
  * Guard: requires both a bold-name <p> and a SIZE|COLOR <p> (or price) to avoid
  * false-positives on shipping/promo rows that also contain bold text.
  */
+
+/**
+ * Parse order-level discount fraction from raw HTML before the DOM is pruned.
+ * Looks for a Subtotal + Promotions pair in the raw text (works even if the
+ * DOM pre-processor removes nodes).
+ */
+function parseBRDiscountFraction(html: string): number {
+	// Non-greedy scan: find the first $ after "Subtotal" and the first -$ after "Promotions".
+	// Using [\s\S]*? so HTML tag content (which may contain hyphens) doesn't break the match.
+	const subtotalMatch = html.match(/[Ss]ubtotal[\s\S]*?\$([\d,.]+)/);
+	const promoMatch = html.match(/[Pp]romotions[\s\S]*?-\$([\d,.]+)/);
+	if (!subtotalMatch || !promoMatch) return 0;
+	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+	const promo = parseFloat(promoMatch[1].replace(/,/g, ""));
+	if (subtotal <= 0 || promo <= 0 || promo >= subtotal) return 0;
+	return promo / subtotal;
+}
+
+/**
+ * Order-level discount fraction from an "Order Subtotal $X" + parenthesized
+ * "Order Discount ($Y)" pair (Brooks Brothers). Parsed from raw HTML before DOM
+ * pruning, since the "ORDER TOTAL" header would otherwise strip these rows.
+ */
+function parseOrderDiscountFraction(html: string): number {
+	const subtotalMatch = html.match(/order\s+subtotal[\s\S]*?\$([\d,]+\.\d{2})/i);
+	const discountMatch = html.match(/order\s+discount[\s\S]*?\(\s*\$?([\d,]+\.\d{2})\s*\)/i);
+	if (!subtotalMatch || !discountMatch) return 0;
+	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+	const discount = parseFloat(discountMatch[1].replace(/,/g, ""));
+	if (subtotal <= 0 || discount <= 0 || discount >= subtotal) return 0;
+	return discount / subtotal;
+}
+
+/**
+ * Savage X Fenty order-level discount fraction. SxF lists a SUBTOTAL then one or
+ * more discount rows whose amounts use a "$-X.XX" form; the total of those over
+ * the subtotal is the fraction. Guarded by the SxF sender/CDN signal so it only
+ * applies to Savage X Fenty emails.
+ */
+function parseSavageXDiscountFraction(html: string): number {
+	if (!/savagex\.com|info\.savagex/i.test(html)) return 0;
+	const subtotalMatch = html.match(/subtotal:?[\s\S]*?\$([\d,]+\.\d{2})/i);
+	if (!subtotalMatch) return 0;
+	const subtotal = parseFloat(subtotalMatch[1].replace(/,/g, ""));
+	const discounts = Array.from(html.matchAll(/\$-\s*([\d,]+\.\d{2})/g)).map((m) => parseFloat(m[1].replace(/,/g, "")));
+	const totalDiscount = discounts.reduce((sum, d) => sum + d, 0);
+	if (subtotal <= 0 || totalDiscount <= 0 || totalDiscount >= subtotal) return 0;
+	return totalDiscount / subtotal;
+}
+
+/** Apply an order-level discount fraction to a product's price (originalPrice = list). */
+function applyDiscountFraction(p: ExtractedProduct, fraction: number): ExtractedProduct {
+	if (p.onSale || !p.price) return p;
+	const listNum = parseFloat(p.price.replace(/[^0-9.]/g, ""));
+	if (!listNum) return p;
+	return {
+		...p,
+		price: `$${(listNum * (1 - fraction)).toFixed(2)}`,
+		originalPrice: p.price,
+		onSale: true,
+	};
+}
+
+/**
+ * Strategy: Banana Republic / Gap Inc. 2020 labeled-attribute layout with order-level discount.
+ *
+ * Signal: a <td> containing <b>YOUR ORDER</b> (item count header) is present.
+ * Each item has a <b>ItemName</b> followed by a nested Color:/Size:/Price:/Qty: label table.
+ * The discount fraction is pre-computed from the raw HTML before DOM pruning.
+ */
+function extractFromBananaRepublic2020Layout(doc: Document, discountFraction: number): ExtractedProduct[] {
+	// Signal: must have a bold "YOUR ORDER" header to avoid false-positives
+	const allBolds = Array.from(doc.querySelectorAll("td b, td strong"));
+	const hasYourOrder = allBolds.some((b) => /^YOUR ORDER$/i.test((b.textContent ?? "").trim()));
+	if (!hasYourOrder) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+	const skipPattern = /\b(order|summary|charges|subtotal|total|qty|quantity|price|color|size|shipping|promotions)\b/i;
+
+	for (const bold of allBolds) {
+		const name = getCellText(bold);
+		if (!name || name.length < 3) continue;
+		if (/^\$/.test(name) || /^\d/.test(name)) continue;
+		if (skipPattern.test(name)) continue;
+
+		const block = bold.closest("table");
+		if (!block) continue;
+
+		const color = getAttributeByLabel(block, "color");
+		const size = getAttributeByLabel(block, "size");
+		const priceRaw = getAttributeByLabel(block, "price");
+		if (!color || !size || !priceRaw) continue;
+
+		const listPrice = extractPrices(priceRaw)[0] ?? "";
+		if (!listPrice) continue;
+
+		let price = listPrice;
+		let originalPrice: string | undefined;
+		let onSale = false;
+
+		if (discountFraction > 0) {
+			const listNum = parseFloat(listPrice.replace(/[^0-9.]/g, ""));
+			const saleNum = parseFloat((listNum * (1 - discountFraction)).toFixed(2));
+			price = `$${saleNum.toFixed(2)}`;
+			originalPrice = listPrice.startsWith("$") ? listPrice : `$${listPrice}`;
+			onSale = true;
+		}
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color: color.toLowerCase(),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale,
+			...(originalPrice ? { originalPrice } : {}),
+		});
+	}
+
+	return products;
+}
+
 function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 	const products: ExtractedProduct[] = [];
 	const seenKeys = new Set<string>();
@@ -1834,6 +2123,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 		const siblings = allPs.slice(boldIdx + 1);
 
 		let price = "";
+		let originalPrice = "";
 		let color = "";
 		let size = "";
 		let onSale = false;
@@ -1843,10 +2133,11 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 		for (const p of siblings) {
 			const text = (p.textContent ?? "").replace(/\s+/g, " ").trim();
 
-			// Price line: contains a strikethrough span
+			// Price line: contains a strikethrough span ("Was $90.00" struck + colored sale price)
 			const strikeEl = p.querySelector("span[style*='line-through'], s, del");
 			if (strikeEl) {
 				onSale = true;
+				originalPrice = extractPrices(strikeEl.textContent ?? "")[0] ?? "";
 				// Sale price: colored span or last price in the paragraph
 				const coloredSpan = p.querySelector("span[style*='color']");
 				if (coloredSpan) {
@@ -1855,7 +2146,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 				}
 				if (!price) {
 					const prices = extractPrices(text);
-					const origPrice = parseFloat((extractPrices(strikeEl.textContent ?? "")[0] ?? "0").replace("$", ""));
+					const origPrice = parseFloat((originalPrice || "0").replace("$", ""));
 					price = prices.find((p) => parseFloat(p.replace("$", "")) < origPrice) ?? prices[prices.length - 1] ?? "";
 				}
 				continue;
@@ -1891,6 +2182,7 @@ function extractFromBoldParagraphLayout(doc: Document): ExtractedProduct[] {
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
@@ -2182,16 +2474,24 @@ function extractFromReceiptText(doc: Document): ExtractedProduct[] {
 		if (seen.has(itemNumber)) continue;
 		seen.add(itemNumber);
 
+		// "Low-Cut Socks 4-Pack" → a pack of 4 units. Surface that count as qty;
+		// otherwise fall back to the receipt's purchased quantity ("1 @ 9.99").
+		const packMatch = name.match(/(\d{1,3})\s*-?\s*pack/i);
+		const qty = packMatch ? parseInt(packMatch[1], 10) : parseInt(skuMatch[2], 10);
+
+		const onSale = original > paid;
 		products.push({
 			imageUrl: "",
 			name,
 			brand: "",
 			price: `$${paid.toFixed(2)}`,
+			...(onSale ? { originalPrice: `$${original.toFixed(2)}` } : {}),
+			...(qty > 1 ? { qty } : {}),
 			color: "",
 			size: "",
 			itemNumber,
 			material: "",
-			onSale: original > paid,
+			onSale,
 		});
 	}
 
@@ -2202,18 +2502,64 @@ function extractFromReceiptText(doc: Document): ExtractedProduct[] {
 /**
  * Extract the current (sale) price from a cell that may carry a "Price:" /
  * "Total:" label and a strikethrough original. Amounts may be written
- * "$7.46" or bare "7.46". Returns the non-struck amount and a sale flag.
+ * "$7.46" or bare "7.46". Returns the non-struck amount, the struck original
+ * (when present), and a sale flag.
  */
-function parseLabeledStruckPrice(cell: Element): { price: string; onSale: boolean } {
+function parseLabeledStruckPrice(cell: Element | null | undefined): { price: string; originalPrice: string; onSale: boolean } {
+	if (!cell) return { price: "", originalPrice: "", onSale: false };
+
 	const strikeEl = cell.querySelector(".strike, s, strike, del, [style*='line-through']");
 	const struckText = strikeEl ? getCellText(strikeEl) : "";
+	const origMatch = struckText.match(/(\d{1,6}(?:\.\d{2})?)/);
+	const originalPrice = origMatch ? `$${origMatch[1]}` : "";
 
 	let text = getCellText(cell).replace(/^(price|total)\s*:?\s*/i, "");
 	if (struckText) text = text.replace(struckText, " ");
 
 	const m = text.match(/(\d{1,6}(?:\.\d{2})?)/);
 	const price = m ? `$${m[1]}` : "";
-	return { price, onSale: Boolean(struckText) };
+	return { price, originalPrice, onSale: Boolean(struckText) };
+}
+
+/** Parse a quantity from a cell like "Qty: 5" or a bare "5". Defaults to 1. */
+function parseQuantity(cell: Element | null | undefined): number {
+	if (!cell) return 1;
+	const m = getCellText(cell).match(/(\d{1,4})/);
+	const qty = m ? parseInt(m[1], 10) : 1;
+	return qty > 0 ? qty : 1;
+}
+
+/**
+ * Resolve unit price + original price for an Anthropologie product container.
+ *
+ * The struck original may appear on the per-unit price cell (single-qty orders)
+ * OR only on the line-total cells (multi-qty orders). When only the total is
+ * struck, the per-unit original is derived as `totalOriginal / qty`.
+ */
+function resolveAnthroPricing(container: Element): { price: string; originalPrice: string; onSale: boolean } {
+	const largeCells = Array.from(container.querySelectorAll("td.item-price-large"));
+	// 3-column layout is [unit price, qty, line total].
+	const unitCell = largeCells[0] ?? container.querySelector("td.product-price");
+	const totalCell = (largeCells.length >= 3 ? largeCells[2] : null) ?? container.querySelector("td.product-total");
+	const qtyCell = largeCells[1] ?? container.querySelector("td.product-qty");
+
+	const unit = parseLabeledStruckPrice(unitCell);
+	let { price, originalPrice, onSale } = unit;
+
+	// Per-unit original missing but the line total is struck → derive unit original.
+	if (!originalPrice && totalCell) {
+		const total = parseLabeledStruckPrice(totalCell);
+		if (total.originalPrice) {
+			const qty = parseQuantity(qtyCell);
+			const origNum = parseFloat(total.originalPrice.replace("$", ""));
+			if (qty > 0 && origNum > 0) {
+				originalPrice = `$${(origNum / qty).toFixed(2)}`;
+				onSale = true;
+			}
+		}
+	}
+
+	return { price, originalPrice, onSale };
 }
 
 /**
@@ -2258,13 +2604,13 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 		const itemNumber = stripLabel(detailsCell?.querySelector("td.product-style"), /^style\s*no\.?\s*:?\s*/i);
 
 		let price = "";
+		let originalPrice = "";
 		let onSale = false;
 		let imageUrl = "";
 
 		const container = nameCell.closest("td.item-table-container");
 		if (container) {
-			const priceCell = container.querySelector("td.product-price") ?? container.querySelector("td.item-price-large");
-			if (priceCell) ({ price, onSale } = parseLabeledStruckPrice(priceCell));
+			({ price, originalPrice, onSale } = resolveAnthroPricing(container));
 
 			const img = container.querySelector("td.item-image img");
 			if (img && isProductImage(img as HTMLImageElement)) {
@@ -2276,7 +2622,774 @@ function extractFromAnthropologieLayout(doc: Document): ExtractedProduct[] {
 		if (seen.has(dedupeKey)) continue;
 		seen.add(dedupeKey);
 
-		products.push({ imageUrl, name, brand: "", price, color, size, itemNumber, material: "", onSale });
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Shopbop / East Dane order confirmation.
+ *
+ * Products sit in a Description/Qty/Price/Item Total column table, but the
+ * Description cell embeds a nested image+text table, so the generic table-row
+ * strategy mis-picks the price cell as the name (and dedups two items into one
+ * because both share the same price text). Each product's description cell has
+ * <br>-delimited lines: brand, product name, "Color, Size", then an alphanumeric
+ * SKU. The sale price is the unit price; a struck-through span holds the original.
+ *
+ * Signal: product images on the Shopbop CDN path (.../Shopbop/p/prod/products/).
+ */
+function extractFromShopbopLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/\/Shopbop\/p\/prod\/products\//i.test(img.getAttribute("src") ?? ""),
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const imgTd = img.closest("td");
+		const innerRow = imgTd?.closest("tr");
+		if (!imgTd || !innerRow) continue;
+
+		const descTd = directChildren(innerRow, "td").find((td) => td !== imgTd && getCellText(td).length > 0);
+		if (!descTd) continue;
+
+		const lines = getTextLines(descTd)
+			.map((l) => l.trim())
+			.filter(Boolean);
+		if (lines.length < 2) continue;
+
+		// SKU line: long alphanumeric token (e.g. "FARMR303151A57D115").
+		const skuIdx = lines.findIndex((l) => /^[A-Z0-9]{8,}$/.test(l));
+		const itemNumber = skuIdx >= 0 ? lines[skuIdx] : "";
+		const infoLines = skuIdx >= 0 ? lines.slice(0, skuIdx) : lines;
+
+		// "Color, Size" line (e.g. "Multi, M").
+		let color = "";
+		let size = "";
+		let nameLines = infoLines;
+		const csIdx = infoLines.findIndex((l) => l.split(",").length === 2);
+		if (csIdx >= 0) {
+			const [c, s] = infoLines[csIdx].split(",").map((x) => x.trim());
+			color = c.toLowerCase();
+			size = s;
+			nameLines = infoLines.slice(0, csIdx);
+		}
+		if (nameLines.length === 0) continue;
+
+		const brand = nameLines.length >= 2 ? nameLines[0] : "";
+		const name = nameLines.length >= 2 ? nameLines.slice(1).join(" ") : nameLines[0];
+		if (!name) continue;
+
+		// Price from the outer product row: struck span = original, unit price = paid.
+		const outerRow = descTd.closest("table")?.closest("tr") ?? null;
+		let price = "";
+		let originalPrice = "";
+		let onSale = false;
+		if (outerRow) {
+			const strikeEl = outerRow.querySelector("[style*='line-through'], s, strike, del");
+			if (strikeEl) {
+				originalPrice = extractPrices(strikeEl.textContent ?? "")[0] ?? "";
+				onSale = Boolean(originalPrice);
+			}
+			const allPrices = extractPrices(getCellText(outerRow));
+			price = allPrices.find((p) => p !== originalPrice) ?? allPrices[0] ?? "";
+		}
+
+		const key = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(key)) continue;
+		seen.add(key);
+
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand,
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Brooks Brothers order/shipment confirmation.
+ *
+ * Each receipt row holds a scene7 product image, a detail cell ("PRODUCT NAME"
+ * then labeled rows "Color: X" / "Size: Y" / "Item#: Z"), and a price cell. The
+ * generic table strategy reads the whole detail cell as the name and never
+ * parses the labels. Here the labels sit in nested rows (not td pairs), so the
+ * concatenated cell text is regex-parsed.
+ *
+ * Signal: product images on the Brooks Brothers scene7 CDN.
+ */
+function extractFromBrooksBrothersLayout(doc: Document, discountFraction = 0): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/brooksbrothers\.scene7\.com\/is\/image/i.test(img.getAttribute("src") ?? ""),
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const row = img.closest("tr");
+		if (!row) continue;
+
+		// Detail cell = the descendant cell whose text carries the Color:/Size: labels.
+		const detailCell = Array.from(row.querySelectorAll("td")).find((td) => /color:/i.test(getCellText(td)) && /size:/i.test(getCellText(td)));
+		if (!detailCell) continue;
+
+		const text = getCellText(detailCell);
+		const name = text.split(/\s*color:/i)[0].trim();
+		if (!name) continue;
+
+		const colorMatch = text.match(/color:\s*(.+?)\s*(?:size:|item#?:|$)/i);
+		const sizeMatch = text.match(/size:\s*(.+?)\s*(?:item#?:|color:|$)/i);
+		const itemMatch = text.match(/item#?:\s*([A-Z0-9-]+)/i);
+		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const itemNumber = itemMatch ? itemMatch[1].trim() : "";
+
+		// Price: the item row carries a single $ amount (order totals live elsewhere).
+		const listPrice = extractPrices(getCellText(row))[0] ?? "";
+		let price = listPrice;
+		let originalPrice: string | undefined;
+		let onSale = false;
+		if (discountFraction > 0 && listPrice) {
+			const listNum = parseFloat(listPrice.replace(/[^0-9.]/g, ""));
+			price = `$${(listNum * (1 - discountFraction)).toFixed(2)}`;
+			originalPrice = listPrice;
+			onSale = true;
+		}
+
+		const key = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(key)) continue;
+		seen.add(key);
+
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand: "",
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: SwimOutlet.com order confirmation.
+ *
+ * Each product is a PRICE/QTY/TOTAL row plus a sibling row with
+ * "SKU: ... | COLOR: Magenta | SIZE: 32" labels. The generic table strategy
+ * mistakes the QTY column ("1") for the size and never reads the label row.
+ *
+ * Signal: product-detail anchors (productdetails.asp), which are distinct from
+ * the SearchResults.asp nav/footer links.
+ */
+function extractFromSwimOutletLayout(doc: Document): ExtractedProduct[] {
+	const links = Array.from(doc.querySelectorAll('a[href*="productdetails.asp"]'));
+	if (links.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const link of links) {
+		const name = (link.textContent ?? "").trim().replace(/\s+/g, " ");
+		if (name.length < 5 || seen.has(name.toLowerCase())) continue;
+
+		// The enclosing product table also holds the COLOR:/SIZE: label row.
+		const container = link.closest("table");
+		if (!container) continue;
+		const text = getCellText(container);
+		if (!/color:/i.test(text) || !/size:/i.test(text)) continue;
+
+		seen.add(name.toLowerCase());
+
+		const colorMatch = text.match(/\bcolor:\s*([A-Za-z][A-Za-z /]*?)\s*(?:\||size:|sku:|$)/i);
+		const sizeMatch = text.match(/\bsize:\s*([A-Za-z0-9.\/]+)/i);
+		const skuMatch = text.match(/\bsku:\s*([A-Za-z0-9-]+)/i);
+		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const itemNumber = skuMatch ? skuMatch[1].trim() : "";
+
+		// Price: the first $ amount in the product row (line price; QTY/TOTAL follow).
+		const imgRow = link.closest("tr");
+		const price = extractPrices(imgRow ? getCellText(imgRow) : text)[0] ?? "";
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Lulus order/shipment confirmation.
+ *
+ * Each item is a 2-cell row: a product image (lulus.com/images/product/...) and
+ * a details cell with <br>-delimited lines: bold product name, "Lulus", color,
+ * size (full words like "Small"), price, qty. The details have no labels, so the
+ * generic strategies miss it and the image fallback grabs footer/analytics images
+ * instead. This reads the lines directly.
+ *
+ * Signal: product images on the Lulus product CDN path.
+ */
+const SIZE_WORD_RE = /^(x{0,3}small|x{0,3}large|medium|one\s*size|x{0,3}s|x{0,2}l|m)$/i;
+
+function extractFromLulusLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/lulus\.com\/images\/product\//i.test(img.getAttribute("src") ?? ""),
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const row = img.closest("tr");
+		if (!row) continue;
+
+		// Details cell = the sibling cell carrying the bold name + attribute lines.
+		const detailsCell = directChildren(row, "td").find((td) => !td.contains(img) && td.querySelector("b"));
+		if (!detailsCell) continue;
+
+		const boldName = (detailsCell.querySelector("b")?.textContent ?? "").trim();
+		const name = boldName.replace(/\s+/g, " ");
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const lines = getTextLines(detailsCell)
+			.map((l) => l.trim())
+			.filter(Boolean);
+
+		let brand = "";
+		let color = "";
+		let size = "";
+		let price = "";
+		for (const line of lines) {
+			if (line === name) continue;
+			if (/^\$/.test(line) && !price) {
+				price = extractPrices(line)[0] ?? "";
+				continue;
+			}
+			if (/^lulus$/i.test(line) && !brand) {
+				brand = "Lulus";
+				continue;
+			}
+			if (!size && SIZE_WORD_RE.test(line)) {
+				size = line;
+				continue;
+			}
+			if (!color) {
+				const c = extractColorFromName(line);
+				if (c && c === line.toLowerCase()) color = c;
+			}
+		}
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand,
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Nike / Jordan order confirmation (dynamic product container).
+ *
+ * Each product is a stack of class-tagged divs: `__name`, `__price`, a bare
+ * `__base` line for the category ("Men's Shoes") and one for "Size: ...". The
+ * swoosh logo (alt "Nike Logo") and the product photo (alt "product") otherwise
+ * fall through to the image fallback as junk. Color is inferred from the name
+ * (e.g. "Black Cat" → black).
+ *
+ * Signal: the `x_dynamicProductContainer__name` class.
+ */
+function extractFromNikeLayout(doc: Document): ExtractedProduct[] {
+	const nameDivs = Array.from(doc.querySelectorAll(".x_dynamicProductContainer__name"));
+	if (nameDivs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const nameDiv of nameDivs) {
+		const name = getCellText(nameDiv);
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const container = nameDiv.closest('table[class*="dynamicProduct"]') ?? nameDiv.closest("table");
+		if (!container) continue;
+
+		const priceEl = container.querySelector(".x_dynamicProductContainer__price");
+		const price = priceEl ? (extractPrices(getCellText(priceEl))[0] ?? "") : "";
+
+		// "Size: M 9.5 / W 11" lives in a bare __base div.
+		let size = "";
+		for (const base of Array.from(container.querySelectorAll(".x_dynamicProductContainer__base"))) {
+			const t = getCellText(base);
+			const m = t.match(/^size:\s*(.+)$/i);
+			if (m) {
+				size = m[1].trim();
+				break;
+			}
+		}
+
+		const img = container.querySelector("img");
+		const imageUrl = img?.getAttribute("src") ?? "";
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl,
+			name,
+			brand: "Nike",
+			price,
+			color: extractColorFromName(name),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Blush Mark order/shipment confirmation.
+ *
+ * Each product is an <a href=".../products/..."> wrapping an image + a details
+ * block with "Dress Color: X" / "Size: Y" / "Qty: N" labels and a "US$X" price.
+ * Signal: product anchors on the Blush Mark products path.
+ */
+function extractFromBlushMarkLayout(doc: Document): ExtractedProduct[] {
+	const anchors = Array.from(doc.querySelectorAll('a[href*="blushmark.com/products/"]')).filter(
+		(a) => /color:/i.test(getCellText(a)) && a.querySelector("img"),
+	);
+	if (anchors.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const anchor of anchors) {
+		const img = anchor.querySelector("img");
+		const name = (img?.getAttribute("alt") ?? "").trim().replace(/\s+/g, " ");
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const text = getCellText(anchor);
+		const colorMatch = text.match(/color:\s*(.+?)\s*(?:size:|qty:|$)/i);
+		const sizeMatch = text.match(/\bsize:\s*(.+?)\s*(?:qty:|color:|us\$|$)/i);
+		const color = colorMatch ? colorMatch[1].trim().toLowerCase() : "";
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const price = extractPrices(text)[0] ?? "";
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl: img?.getAttribute("src") ?? "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Nordstrom shipment/delivery confirmation (incl. forwarded).
+ *
+ * Each product row has a nordstrommedia image and a detail cell with a bold name
+ * link, an UPPERCASE "COLOR STYLE CODE," span + a "Size X" span, and a "Price: $X"
+ * line. The generic image fallback otherwise loses the size and price.
+ */
+function extractFromNordstromLayout(doc: Document): ExtractedProduct[] {
+	const productImgs = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/n\.nordstrommedia\.com\/it\//i.test(img.getAttribute("src") ?? ""),
+	);
+	if (productImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of productImgs) {
+		const row = img.closest("tr");
+		if (!row) continue;
+
+		// Detail cell: descendant cell with the bold name link + "Price:" text.
+		const detailCell = Array.from(row.querySelectorAll("td")).find((td) => td.querySelector("a") && /price:/i.test(getCellText(td)));
+		if (!detailCell) continue;
+
+		const nameLink = detailCell.querySelector("a");
+		const name = (nameLink?.textContent ?? "").trim().replace(/\s+/g, " ");
+		if (!name || seen.has(name.toLowerCase())) continue;
+
+		const text = getCellText(detailCell);
+		const sizeMatch = text.match(/\bSize\s+([A-Za-z0-9-]+)/i);
+		const priceMatch = text.match(/Price:\s*(\$[\d.,]+)/i);
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+		const price = priceMatch ? priceMatch[1] : "";
+
+		// Color: the UPPERCASE span text before the style code; fall back to a known color word.
+		const colorSpan = Array.from(detailCell.querySelectorAll("span")).find((s) =>
+			/text-transform:\s*uppercase/i.test(s.getAttribute("style") ?? ""),
+		);
+		const colorRaw = colorSpan ? getCellText(colorSpan).replace(/,.*$/, "").trim() : "";
+		const color = extractColorFromName(colorRaw) || colorRaw.toLowerCase();
+
+		seen.add(name.toLowerCase());
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+// ── Column-header table strategy ─────────────────────────
+
+type ColumnField = "name" | "price" | "size" | "color" | "itemNumber" | "qty";
+
+// Header label → field. Checked against the lowercased, punctuation-stripped
+// header cell text (exact match) so "Price" maps but "Price each" does not.
+const COLUMN_HEADER_LABELS: Record<string, ColumnField> = {
+	description: "name",
+	item: "name",
+	product: "name",
+	"item description": "name",
+	price: "price",
+	amount: "price",
+	size: "size",
+	color: "color",
+	colour: "color",
+	reference: "itemNumber",
+	style: "itemNumber",
+	ref: "itemNumber",
+	sku: "itemNumber",
+	qty: "qty",
+	quantity: "qty",
+	units: "qty",
+	unit: "qty",
+};
+
+// Rows whose name cell is one of these are order summary lines, not products.
+const SUMMARY_ROW_RE = /^(sub\s?total|total|shipping|delivery|estimated\s+tax|sales\s+tax|tax|discount|grand\s+total)\b/i;
+
+function classifyColumnHeader(text: string): ColumnField | undefined {
+	const key = text.trim().toLowerCase().replace(/[:#*]/g, "").replace(/\s+/g, " ").trim();
+	return COLUMN_HEADER_LABELS[key];
+}
+
+function priceFromCell(text: string): string {
+	const fromExtract = extractPrices(text)[0];
+	if (fromExtract) return fromExtract;
+	// Bare decimal/integer ("3.90") with no $ or currency code.
+	const m = text.match(/(\d{1,6}(?:\.\d{2})?)/);
+	return m ? `$${m[1]}` : "";
+}
+
+/**
+ * Strategy: Generic column-header order table.
+ *
+ * Handles plain tabular receipts where a header row (<thead> or the first <tr>)
+ * names the columns — Description / Price / Size / Color / Reference(SKU) /
+ * Qty / Amount — and each body <tr> is a product mapped positionally to those
+ * columns. Covers American Apparel (Qty|Style|Description|Size|Color|Price|
+ * Amount) and older Zara order tables (Description|Reference|Size|Units|Amount,
+ * currency-code prices). No product images.
+ *
+ * Guard: a header row must resolve BOTH a name column and a price column. Runs
+ * after the image/bold/labeled layouts so it only intercepts what would
+ * otherwise fall through to the loose text-only fallback. Summary rows
+ * (Subtotal/Total/Tax/Shipping) and colspan footer rows are skipped.
+ */
+function extractFromColumnHeaderTable(doc: Document): ExtractedProduct[] {
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const table of Array.from(doc.querySelectorAll("table"))) {
+		// Collect rows from direct table sections only (thead, tbody, tfoot, or direct tr).
+		// This avoids mixing rows from nested tables.
+		let rows: Element[] = [];
+
+		// Direct <tr> children (if table has no section wrappers)
+		rows.push(...directChildren(table, "tr"));
+
+		// Rows from <thead>, <tbody>, <tfoot> sections
+		for (const section of directChildren(table, "thead").concat(directChildren(table, "tbody"), directChildren(table, "tfoot"))) {
+			rows.push(...directChildren(section, "tr"));
+		}
+
+		if (rows.length < 2) continue;
+
+		// Skip very large tables (likely layout containers, not product tables).
+		// Product tables typically have header + 2-20 items, layout tables have 20+ rows.
+		if (rows.length > 30) continue;
+
+		// Find the header row and build field → column-index map.
+		let headerRow: Element | null = null;
+		const fieldCol: Partial<Record<ColumnField, number>> = {};
+
+		for (const row of rows) {
+			const ths = directChildren(row, "th");
+			const cells = ths.length > 0 ? ths : directChildren(row, "td");
+			if (cells.length < 3) continue;
+
+			const map: Partial<Record<ColumnField, number>> = {};
+			cells.forEach((cell, i) => {
+				const field = classifyColumnHeader(getCellText(cell));
+				if (field && map[field] === undefined) map[field] = i;
+			});
+
+			if (map.name !== undefined && map.price !== undefined) {
+				headerRow = row;
+				Object.assign(fieldCol, map);
+				break;
+			}
+		}
+
+		if (!headerRow) continue;
+
+		const maxCol = Math.max(...Object.values(fieldCol).filter((v): v is number => v !== undefined));
+		let pastHeader = false;
+
+		for (const row of rows) {
+			if (row === headerRow) {
+				pastHeader = true;
+				continue;
+			}
+			if (!pastHeader) continue;
+
+			const cells = directChildren(row, "td");
+			// Footer/summary rows use colspan and have fewer cells than the header.
+			if (cells.length <= maxCol) continue;
+
+			const name = getCellText(cells[fieldCol.name as number]);
+			if (!name || SUMMARY_ROW_RE.test(name)) continue;
+
+			const price = fieldCol.price !== undefined ? priceFromCell(getCellText(cells[fieldCol.price])) : "";
+			const size = fieldCol.size !== undefined ? getCellText(cells[fieldCol.size]) : "";
+			const color = fieldCol.color !== undefined ? getCellText(cells[fieldCol.color]).toLowerCase() : "";
+			const itemNumber = fieldCol.itemNumber !== undefined ? getCellText(cells[fieldCol.itemNumber]) : "";
+
+			const dedupeKey = `${name}|${color}|${size}|${itemNumber}`.toLowerCase();
+			if (seen.has(dedupeKey)) continue;
+			seen.add(dedupeKey);
+
+			products.push({ imageUrl: "", name, brand: "", price, color, size, itemNumber, material: "", onSale: false });
+		}
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Banana Republic / Athleta (older Gap Inc. template).
+ *
+ * Each item is a bold name (<b>) followed by a nested 2-column attribute table
+ * of labeled rows: "Color:" / "Size:" / "Price:" / "Qty:". There are no product
+ * images and no SKU line.
+ *
+ * Guard: requires the <b> name to resolve Color + Size + a "Price:" label. The
+ * "Price:" label distinguishes it from Victoria's Secret (no Price: label, has a
+ * 6-digit SKU) and CUUP (uses <th> + a bold span). Header/price bolds (e.g.
+ * "YOUR ORDER", "$70.97") are filtered by name guards.
+ */
+/**
+ * Like getAttributeByLabel but requires the label cell to end with a colon
+ * ("Color:" not "Color"). This distinguishes real BR/Athleta attribute blocks
+ * from column-header tables (American Apparel) whose header row has bare
+ * "Size"/"Color"/"Price" cells that would otherwise be misread as labels.
+ */
+function getAttributeByColonLabel(cell: Element, label: string): string {
+	const cells = Array.from(cell.querySelectorAll("td"));
+	for (let i = 0; i < cells.length - 1; i++) {
+		const raw = getCellText(cells[i]).trim();
+		if (!raw.endsWith(":")) continue;
+		if (raw.replace(/:$/, "").trim().toLowerCase() === label) {
+			return getCellText(cells[i + 1]).trim();
+		}
+	}
+	return "";
+}
+
+function extractFromGapIncLabeledLayout(doc: Document): ExtractedProduct[] {
+	const bolds = Array.from(doc.querySelectorAll("td b, td strong"));
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const bold of bolds) {
+		const name = getCellText(bold);
+		if (!name || name.length < 3) continue;
+		// Skip prices ("$70.97") and order/summary headers ("YOUR ORDER (2 items)").
+		if (/^\$/.test(name) || /^\d/.test(name)) continue;
+		if (/\b(order|items?|subtotal|total|qty|quantity|price|color|size|shipping)\b/i.test(name)) continue;
+
+		const block = bold.closest("table");
+		if (!block) continue;
+
+		const color = getAttributeByColonLabel(block, "color");
+		const size = getAttributeByColonLabel(block, "size");
+		const priceRaw = getAttributeByColonLabel(block, "price");
+		// Require all three labels — this is what makes the layout unambiguous.
+		if (!color || !size || !priceRaw) continue;
+
+		const price = extractPrices(priceRaw)[0] ?? "";
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			color: color.toLowerCase(),
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Zara MJML single-column layout (newer Zara order/shipping emails).
+ *
+ * Unlike the older `rd-product-col` div layout, each product is a vertical run
+ * of sibling <tr> rows distinguished by class:
+ *   td.product-img    — product photo (anchors each item)
+ *   td.product-size   — size ("S", "8")
+ *   (plain row)       — UPPERCASE product name
+ *   (plain row)       — "Color SKU" (e.g. "Black 0/7901/290/800/02")
+ *   td.product-unit / td.product-unit-label — quantity
+ *   td.product-price  — "21.54 USD" (currency-code form, no $)
+ *
+ * Items are segmented by the product-img rows; "Products" titles, item counters,
+ * and "Shipping NNNNN" headers sit outside any product run and are skipped.
+ */
+function extractFromZaraMjmlLayout(doc: Document): ExtractedProduct[] {
+	const imgCells = Array.from(doc.querySelectorAll("td.product-img"));
+	if (imgCells.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const imgCell of imgCells) {
+		const imgRow = imgCell.closest("tr");
+		const img = imgCell.querySelector("img");
+		if (!imgRow || !img || !isProductImage(img as HTMLImageElement)) continue;
+
+		const imageUrl = img.getAttribute("src") ?? "";
+
+		let size = "";
+		let price = "";
+		let name = "";
+		let color = "";
+
+		// Walk following sibling rows until the next product image.
+		for (let row = imgRow.nextElementSibling; row; row = row.nextElementSibling) {
+			if (row.querySelector("td.product-img")) break;
+
+			const cell = row.querySelector("td");
+			if (!cell) continue;
+
+			if (cell.classList.contains("product-size")) {
+				if (!size) size = getCellText(cell);
+			} else if (cell.classList.contains("product-price")) {
+				if (!price) price = extractPrices(getCellText(cell))[0] ?? "";
+			} else if (
+				cell.classList.contains("product-unit") ||
+				cell.classList.contains("product-unit-label") ||
+				cell.classList.contains("product-custom-warn")
+			) {
+				continue;
+			} else {
+				const text = getCellText(cell);
+				if (!text) continue;
+				// Color line carries a Zara SKU ("Black 0/7901/290/800/02").
+				if (/\d\/\d{3,4}\//.test(text)) {
+					if (!color) color = parseColorFromSkuLine(text);
+				} else if (!name) {
+					name = text;
+				}
+			}
+		}
+
+		if (!name) continue;
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
 	}
 
 	return products;
@@ -2324,28 +3437,44 @@ function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
 		const size = getAttributeByLabel(block, "size");
 		if (!color || !size) continue;
 
-		// SKU: a cell whose text is only 6+ digits.
-		const skuCell = Array.from(block.querySelectorAll("td")).find((td) => /^\d{6,}$/.test(getCellText(td)));
-		const itemNumber = skuCell ? getCellText(skuCell) : "";
+		// SKU: a cell whose first <br>-delimited line is a pure 6+ digit code
+		// (e.g. "26191609") or VS's alphanumeric-dashed style (e.g. "DE-369-810").
+		// A SKU is still REQUIRED so this strategy stays distinct from BR/Athleta
+		// blocks (bold name + Color:/Size: labels but no standalone SKU line).
+		const SKU_RE = /^(?:\d{6,}|[A-Z]{1,4}-\d[\dA-Z-]*)$/i;
+		const skuCell = Array.from(block.querySelectorAll("td")).find((td) => {
+			const first = getTextLines(td)[0] ?? "";
+			return SKU_RE.test(first);
+		});
+		const itemNumber = skuCell ? (getTextLines(skuCell)[0] ?? "") : "";
 		if (!itemNumber) continue;
 
-		// Price block: first $ amount is the paid line total; a higher trailing
-		// amount is the struck original (sale).
+		// Quantity (VS uses a "Qty" attribute row). Captured discreetly for the card.
+		const qtyRaw = getAttributeByLabel(block, "qty");
+		const qty = qtyRaw ? parseInt(qtyRaw, 10) : 1;
+
+		// Price block: first $ amount is the paid line total; the highest trailing
+		// amount is the struck original (sale). A middle "-$X (Offers & Discounts)"
+		// line is the discount and is ignored for the original.
 		const prices = extractPrices(getCellText(block));
 		const price = prices[0] ?? "";
 		const amounts = prices.map((p) => parseFloat(p.replace("$", "")));
-		const onSale = amounts.length > 1 && Math.max(...amounts) > amounts[0];
+		const maxAmount = amounts.length > 0 ? Math.max(...amounts) : 0;
+		const onSale = amounts.length > 1 && maxAmount > amounts[0];
+		const originalPrice = onSale ? `$${maxAmount.toFixed(2)}` : "";
 
 		const product: ExtractedProduct = {
 			imageUrl: "",
 			name,
 			brand: "",
 			price,
+			...(originalPrice ? { originalPrice } : {}),
 			color,
 			size,
 			itemNumber,
 			material: "",
 			onSale,
+			...(qty > 1 ? { qty } : {}),
 		};
 
 		if (!bySku.has(itemNumber)) order.push(itemNumber);
@@ -2378,8 +3507,20 @@ function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	if (!html.trim()) return [];
 
+	// Parse order-level discount from raw HTML BEFORE DOMParser and pruning —
+	// removePostTotalContent strips the Subtotal sibling td and Promotions rows.
+	const brDiscountFraction = parseBRDiscountFraction(html);
+	const orderDiscountFraction = parseOrderDiscountFraction(html);
+
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
+
+	// Banana Republic / Gap Inc. order emails place an "Order total:" summary box
+	// ABOVE the itemized "YOUR ORDER" section, so removePostTotalContent would
+	// strip the products. This strategy has a strong signal (YOUR ORDER bold +
+	// Color/Size/Price labels), so run it on the un-pruned DOM first.
+	const brItems = extractFromBananaRepublic2020Layout(doc, brDiscountFraction);
+	if (brItems.length > 0) return brItems.map(enrichProduct);
 
 	// Pre-process: strip content after order total markers so suggested/
 	// recommended product sections don't produce false positive detections.
@@ -2393,7 +3534,8 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	//  4. Amazon MJML columns — img.productImage + mj-column divs
 	//  5. SHEIN side-by-side tables — ltwebstatic.com CDN + grey span name
 	//  6. H&M nested attribute table — two-cell rows with Color+Size table
-	//  7. Bold-paragraph single-column (Gap/Banana Republic Factory)
+	//  7. Banana Republic 2020 labeled-attribute layout with order-level promotion discount
+	//  7b. Bold-paragraph single-column (Gap/Banana Republic Factory)
 	//  8. Paragraph-based two-cell rows (Princess Polly) — <p> elements
 	//  9. Poshmark 3-cell rows — td.item image + nested name table + td.price
 	// 10. Anthropologie item-detail-row — labeled product-name/color/size cells
@@ -2417,19 +3559,38 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromPoshmarkLayout, // Poshmark td.price 3-cell rows
 		extractFromAnthropologieLayout, // Anthropologie item-detail-row labeled tables
 		extractFromVictoriasSecretLayout, // VS bold name + Color/Size/Qty attribute table
+		extractFromGapIncLabeledLayout, // Banana Republic / Athleta bold name + Color:/Size:/Price: labels
 		extractFromTargetLayout, // Target product-block 2-column layout
+		extractFromShopbopLayout, // Shopbop/East Dane: Description cell = nested image+name, struck original price
+		(doc: Document) => extractFromBrooksBrothersLayout(doc, orderDiscountFraction), // Brooks Brothers: scene7 image + Color:/Size:/Item#: labeled detail cell + order-level discount
+		extractFromSwimOutletLayout, // SwimOutlet: productdetails link + SKU/COLOR/SIZE label row
+		extractFromLulusLayout, // Lulus: product-CDN image + <br>-delimited name/brand/color/size/price
+		extractFromNikeLayout, // Nike/Jordan: x_dynamicProductContainer__name/__price/Size: divs
+		extractFromBlushMarkLayout, // Blush Mark: /products/ anchor + Dress Color:/Size:/Qty: labels
+		extractFromNordstromLayout, // Nordstrom: nordstrommedia image + name link + Size/Price detail
+		extractFromWalmartLayout, // Walmart: items table only (excludes decorative imagery + "Explore more savings")
 		extractFromTableRows,
 		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,
+		extractFromZaraMjmlLayout, // Zara MJML single-column rows (product-img/size/price classes)
 		extractFromDivLayout,
+		extractFromColumnHeaderTable, // Generic header-mapped order tables (American Apparel, older Zara)
 		extractFromTextOnlyRows,
 		extractFromReceiptText, // Old Navy / Gap Inc. monospace POS receipt
 		extractFromImages,
 	];
 
+	// Savage X Fenty spreads an order-level discount across multiple promo lines
+	// ("2 for $29 Bras", "70% Off"). Computed from raw HTML and applied evenly to
+	// the detected items (guarded by the SxF signal so no other email is affected).
+	const sxfDiscountFraction = parseSavageXDiscountFraction(html);
+
 	for (const strategy of strategies) {
 		const raw = strategy(doc);
-		if (raw.length > 0) return raw.map(enrichProduct);
+		if (raw.length > 0) {
+			const enriched = raw.map(enrichProduct);
+			return sxfDiscountFraction > 0 ? enriched.map((p) => applyDiscountFraction(p, sxfDiscountFraction)) : enriched;
+		}
 	}
 
 	return [];
