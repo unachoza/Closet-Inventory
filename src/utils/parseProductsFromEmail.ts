@@ -217,6 +217,88 @@ function parseNameCell(td: Element): ParsedNameCell {
 }
 
 /**
+ * Strategy: Walmart order emails (delivered / shipped / processing).
+ *
+ * Walmart wraps the real line items in an items table but surrounds them with
+ * decorative imagery (logo, banner, "How was your experience?" feedback, social
+ * icons, order barcode) and an "Explore more savings" cross-sell grid. The
+ * generic image fallback turned all of that alt-text into bogus products
+ * ("Walmart Homepage", "Part Of Your Order Has Shipped", "Twitter", …) while
+ * missing the actual purchase. This strategy targets only the purchased line
+ * items, keyed on three Walmart shapes seen across template years:
+ *   A. <span class="itemName-…">  with a sibling $price + "Qty: N"   (delivered)
+ *   B. <a href="…/ip/…">  bold name inside an Item | Qty | Total table (processing)
+ *   C. a product link followed by a "Qty: N" line — the "Items" table and the
+ *      "Other items in your order" rows                              (shipped)
+ * Recommendation tiles carry no "Qty:" and link to tracker URLs (not /ip/), so
+ * they're excluded naturally; removePostTotalContent also strips everything
+ * after "Order total". Guard: only fires on Walmart signals.
+ */
+function extractFromWalmartLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/walmartimages\.com|rptrcks\.walmart|w-mt\.co/i.test(html)) return [];
+
+	const PRICE = /\$\d{1,5}\.\d{2}/;
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	const add = (rawName: string, scope: Element | null): void => {
+		const name = (rawName ?? "").replace(/\s+/g, " ").trim();
+		if (name.length < 4) return;
+		const key = name.toLowerCase();
+		if (seen.has(key)) return;
+
+		const scopeText = scope?.textContent ?? "";
+		const priceMatch = scopeText.match(PRICE);
+		// Look one cell to the right for the price (Item | Qty | Total layout).
+		const rightText = scope?.closest("tr")?.textContent ?? scopeText;
+		const price = priceMatch ? priceMatch[0] : (rightText.match(PRICE)?.[0] ?? "");
+		if (!price) return;
+
+		const qtyMatch = scopeText.match(/Qty:\s*(\d{1,3})/i);
+		const qty = qtyMatch ? Math.max(1, parseInt(qtyMatch[1], 10)) : 1;
+
+		seen.add(key);
+		products.push({
+			imageUrl: "",
+			name,
+			brand: "",
+			price,
+			...(qty > 1 ? { qty } : {}),
+			color: "",
+			size: "",
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	};
+
+	// Pattern A — itemName-* spans: climb to the ancestor that also holds the price.
+	for (const span of Array.from(doc.querySelectorAll('span[class*="itemName-"]'))) {
+		let scope: Element | null = span;
+		for (let i = 0; i < 6 && scope && !PRICE.test(scope.textContent ?? ""); i++) {
+			scope = scope.parentElement;
+		}
+		add(span.textContent ?? "", scope ?? span.parentElement);
+	}
+
+	// Pattern B — product link to a Walmart product page (/ip/<id>) in a Qty/Total row.
+	for (const a of Array.from(doc.querySelectorAll('a[href*="/ip/"]'))) {
+		add(a.textContent ?? "", a.closest("tr") ?? a.parentElement);
+	}
+
+	// Pattern C — a "Qty: N" line marks a real line item; the name is the first
+	// product link in that cell (covers "Items" + "Other items in your order").
+	for (const td of Array.from(doc.querySelectorAll("td"))) {
+		if (!/Qty:\s*\d/i.test(td.textContent ?? "")) continue;
+		const link = td.querySelector("a");
+		if (link) add(link.textContent ?? "", td);
+	}
+
+	return products;
+}
+
+/**
  * Strategy 2: Find <tr> rows with 4+ cells that contain a product image,
  * then read sibling <td> cells for size, color, price, etc.
  * Common for Aritzia, Nordstrom, and other traditional retailers.
@@ -2392,16 +2474,24 @@ function extractFromReceiptText(doc: Document): ExtractedProduct[] {
 		if (seen.has(itemNumber)) continue;
 		seen.add(itemNumber);
 
+		// "Low-Cut Socks 4-Pack" → a pack of 4 units. Surface that count as qty;
+		// otherwise fall back to the receipt's purchased quantity ("1 @ 9.99").
+		const packMatch = name.match(/(\d{1,3})\s*-?\s*pack/i);
+		const qty = packMatch ? parseInt(packMatch[1], 10) : parseInt(skuMatch[2], 10);
+
+		const onSale = original > paid;
 		products.push({
 			imageUrl: "",
 			name,
 			brand: "",
 			price: `$${paid.toFixed(2)}`,
+			...(onSale ? { originalPrice: `$${original.toFixed(2)}` } : {}),
+			...(qty > 1 ? { qty } : {}),
 			color: "",
 			size: "",
 			itemNumber,
 			material: "",
-			onSale: original > paid,
+			onSale,
 		});
 	}
 
@@ -3478,6 +3568,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromNikeLayout, // Nike/Jordan: x_dynamicProductContainer__name/__price/Size: divs
 		extractFromBlushMarkLayout, // Blush Mark: /products/ anchor + Dress Color:/Size:/Qty: labels
 		extractFromNordstromLayout, // Nordstrom: nordstrommedia image + name link + Size/Price detail
+		extractFromWalmartLayout, // Walmart: items table only (excludes decorative imagery + "Explore more savings")
 		extractFromTableRows,
 		extractFromShopifyLayout, // Shopify order template (SKIMS, etc.)
 		extractFromOrderContainerRows,

@@ -693,9 +693,65 @@ describe("real emails > Old Navy (POS receipt)", () => {
 		expect(products.every((p) => p.onSale)).toBe(true);
 	});
 
+	it("captures the original (pre-discount) unit price from the '1 @ X' line", () => {
+		expect(products.map((p) => p.originalPrice)).toEqual(["$5.00", "$5.00", "$9.99", "$9.99"]);
+	});
+
+	it("derives quantity from the 'N-Pack' name (single socks have no qty)", () => {
+		expect(products.map((p) => p.qty)).toEqual([undefined, undefined, 4, 4]);
+	});
+
 	it("does not pick up the barcode image or summary lines as products", () => {
 		for (const p of products) expect(p.imageUrl).toBe("");
 		expect(products.map((p) => p.name)).not.toContain("Bag fee");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Walmart — items table only; excludes decorative imagery + "Explore more savings"
+// ---------------------------------------------------------------------------
+
+describe("real emails > Walmart 2022 delivered (itemName span)", () => {
+	const products = parseProductsFromEmail(loadFixture("walmart-2022-delivered.html"));
+
+	it("extracts the single line item, not the header/feedback images", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0].name).toBe("Hanger Central Velvet Heavy Weight Clothing Hanger, 100 Pack, Black");
+		expect(products[0].price).toBe("$37.98");
+	});
+
+	it("does not import decorative imagery or the cross-sell tile", () => {
+		const names = products.map((p) => p.name);
+		expect(names).not.toContain("Walmart Home Page");
+		expect(names).not.toContain("Feedback Image");
+		expect(names).not.toContain("Wonder Hanger Max, Steel Grey, 10 Pack");
+	});
+});
+
+describe("real emails > Walmart 2018 processing (Item | Qty | Total table)", () => {
+	const products = parseProductsFromEmail(loadFixture("walmart-2018-processing.html"));
+
+	it("reads the bold /ip/ product-link name, not the banner alt", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0].name).toBe('Mainstays 9" High Velocity 3-Speed Fan, Model #MF-9, Black');
+		expect(products[0].price).toBe("$14.24");
+	});
+});
+
+describe("real emails > Walmart 2021 shipped (Items + Other items)", () => {
+	const products = parseProductsFromEmail(loadFixture("walmart-2021-shipped.html"));
+
+	it("captures both the primary item and the 'Other items' row", () => {
+		expect(products.map((p) => p.name)).toEqual([
+			// "for Women" is stripped as gender junk by cleanProductName.
+			"Gilbin Ultra Soft High Waist Yoga Stretch Mini-Bike Shorts -Many Colors-One Size & Plus Size (Black S-L)",
+			"High Weight Capacity Non-slip Velvet Clothes Hangers, Pack of 100, Black",
+		]);
+		expect(products.map((p) => p.price)).toEqual(["$11.95", "$33.99"]);
+	});
+
+	it("excludes the 'Explore more savings' recommendation tile (no Qty line)", () => {
+		expect(products.map((p) => p.name)).not.toContain('Mainstays Flexible Black Laundry Hamper, 20"');
 	});
 });
 
