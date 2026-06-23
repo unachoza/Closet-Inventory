@@ -21,9 +21,10 @@ const makeEl = (tag: string) =>
 				layoutId: _layoutId,
 				drag: _drag,
 				dragConstraints: _dragConstraints,
+				custom: _custom,
 				...rest
-			}: any,
-			ref: any,
+			}: Record<string, unknown> & { children?: React.ReactNode },
+			ref: React.Ref<HTMLElement>,
 		) => React.createElement(tag, { ...rest, ref }, children),
 	);
 

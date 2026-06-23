@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { ChangeEventHandler } from "react";
 import EditItemView from "./EditItemView";
 
 vi.mock("framer-motion");
@@ -12,7 +13,17 @@ const mockShowToast = vi.fn();
 const mockSetView = vi.fn();
 
 vi.mock("../TextInput/TextInput", () => ({
-	default: ({ name, label, value, handleFormUpdate }: any) => (
+	default: ({
+		name,
+		label,
+		value,
+		handleFormUpdate,
+	}: {
+		name: string;
+		label: string;
+		value?: string;
+		handleFormUpdate: ChangeEventHandler<HTMLInputElement>;
+	}) => (
 		<label>
 			{label}
 			<input aria-label={label} name={name} value={value ?? ""} onChange={handleFormUpdate} />
