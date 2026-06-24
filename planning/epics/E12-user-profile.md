@@ -21,6 +21,18 @@ _As a user, I want my profile to separate "what improves my closet" from "what m
 - `E12-1.2` Profile edit UI (two clearly-labeled sections) — _1.5d_
 - `E12-1.3` Laundry machine + lifestyle config (consumed by E11 US-11.4) — _1d_
 
+## US-12.4 — My measurements → "what fits me right now"
+_As Maya whose body has changed, I want my measurements on my profile so that I can filter to what actually fits me now — and keep pieces that don't fit yet for later._
+- [ ] Body measurements on profile (waist/chest/hips/etc.), same unit model as item `measurements` (in↔cm)
+- [ ] **"Fits me now"** filter: match profile measurements vs. `items.measurements` within a tolerance band
+- [ ] Items that don't fit now stay in the closet, just filtered out of "wearable now"
+- [ ] Personas: lifestyle change, pre-baby wardrobe, weight change (the Diana "body gap")
+
+**Tickets**
+- `E12-4.1` Profile body-measurements (reuse measurement model) — _0.5d_
+- `E12-4.2` "Fits me now" filter w/ tolerance per category (waist for bottoms, chest for tops) — _1d_
+> Tolerance algorithm: see [DATA_MODEL](../backend/DATA_MODEL_2026-06-24.md) open Q6. Item measurements come from E2 US-2.8 + web enrichment (E3 US-3.2).
+
 ## US-12.2 — Whose closet is this? (multi-closet ownership) 🔭 (down the line — light)
 _As the mom-executive shopping for the whole family, I want items to belong to the right person's closet so that my husband's and kids' purchases don't clutter mine._
 - [ ] Closets can represent different people (mine / kid's / partner's)

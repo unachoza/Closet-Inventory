@@ -6,23 +6,21 @@
 
 ---
 
-## 🔢 Priority order (set by user, 2026-06-24)
+## 🔢 Priority order (set by user, updated 2026-06-24 — 8-item)
 
-This supersedes the earlier *E2-before-E1* plan. Canonical sequence:
+Canonical sequence. Supersedes both the earlier *E2-before-E1* plan **and** the interim 6-item order. **E2 Inventory Truth is back in, at #4.**
 
 1. **Hotfixes** — Sprint 3.5 (E0/E3/E5 user-feedback bugs + polish)
-2. **Database / full-stack** — E1 (Supabase + RLS + service-layer port)
+2. **Database / full-stack** — E1 (Supabase + RLS + service-layer port). **Run the E3 US-3.2 web-enrichment feasibility spike *inside* this sprint** (server-side anyway) — if Cloudflare is beatable, full web-enrichment slots at #2.5/#3; if it 403-stalls, it waits and mobile keeps #3.
 3. **Mobile PWA** — E5 (installable, touch, bottom nav, offline shell)
-4. **Laundry forecast** — E11 (wear tracking + forecast + weight/volume; needs E12 profile bits)
-5. **Garment care / stain removal + education UI/UX overhaul** — E8
-6. **Sharing / lending / social** — E4 (needs E1 RLS + privacy model)
+4. **Inventory Truth** — E2 (location, status, availability, taxonomy season/occasion/vibe, photos, provenance, fit/measurements)
+5. **User Profile** — E12 (functional vs. social split; machine/lifestyle; body measurements → "fits me")
+6. **Laundry** — E11 (wear tracking + forecast + weight/volume; consumes E12 machine/lifestyle)
+7. **Sharing / lending / social** — E4 (needs E1 RLS + E12 profile + privacy model)
+8. **Care & Knowledge** — E8 (deeper stain/care content + education UI/UX overhaul)
 
-> ### ⚠️ E2 Inventory Truth is now UNSCHEDULED — confirm
-> The previous plan made **E2 the flagship, scheduled first**. The new 6-priority order does **not** include it.
-> The bits laundry needs (`status` clean/dirty, `wornCount`, `lastWornAt`, "Log a Wear") **moved to E11**;
-> the rest of E2 (location, extended statuses, availability, lending) is **parked**. E4 social still wants
-> per-item privacy + (eventually) lending — some E2 location/loan work may get pulled back when E4 lands.
-> **This is the judgment call worth your veto:** confirm E2 stays parked, or slot it back in.
+> **E3 Frictionless Fill is ongoing/cross-cutting** (now ⭐ the differentiator) — import fixes ship in Sprint 3.5; web-enrichment spike rides in #2; Microsoft Graph + Chrome extension layer on after E1.
+> **Note the dependency:** E11 (#6) consumes E12 (#5) machine/lifestyle, and its clean/dirty `status` + `wornCount` are shared with E2 (#4) — build E2's status field as E11's enum, one canonical definition.
 
 ---
 
@@ -33,14 +31,15 @@ This supersedes the earlier *E2-before-E1* plan. Canonical sequence:
 | ✅ done | **E0 · Trustworthy Core** | green suite, core bugs fixed, types tightened |
 | ✅ done | **Security + Backend Foundation** | localStorage purge (#76/#78), Phase 0 scaffold, Supabase + Azure setup |
 | **1 · current** | **Sprint 3.5 · Hotfixes** | re-auth bug, import/form UX, mobile + branding polish |
-| 2 | **E1 · Cloud Backend** | Supabase + RLS + service-layer port + image storage |
+| 2 | **E1 · Cloud Backend** (+ E3 web-enrich spike) | Supabase + RLS + service-layer port + image storage; Cloudflare spike |
 | 3 | **E5 · Mobile & PWA** | installable, touch-friendly, bottom nav, offline |
-| 4 | **E11 · Laundry Forecasting & Wear** ⭐ | "I wore this" + forecast + machine/lifestyle + weight/volume |
-| 4′ | **E12 · User Profile** | functional vs. social profile; feeds E11 + E4 (build alongside E11) |
-| 5 | **E8 · Care & Knowledge** | deeper stain/care content + education UI/UX overhaul |
-| 6 | **E4 · Shared & Social** ⭐ | sharing + privacy (intimates private) + borrowing (needs E1 RLS) |
-| 🟡 parked | **E2 · Inventory Truth** | location, extended statuses, availability, lending — confirm before scheduling |
-| later | E3 (ongoing) / E6 / E7 / E9 / E10 | expand when scheduled |
+| 4 | **E2 · Inventory Truth** ⭐ | location, status, availability, taxonomy, photos, provenance, fit |
+| 5 | **E12 · User Profile** | functional vs. social; machine/lifestyle; body measurements |
+| 6 | **E11 · Laundry & Wear** ⭐ | "I wore this" + forecast + weight/volume (consumes E12) |
+| 7 | **E4 · Shared & Social** ⭐ | sharing + privacy (intimates private) + borrowing (needs E1 RLS + E12) |
+| 8 | **E8 · Care & Knowledge** | deeper stain/care content + education UI/UX overhaul |
+| ongoing | **E3 · Frictionless Fill** ⭐ | email import, web-enrich, pill-tags, Chrome ext — the moat |
+| later | E6 / E7 / E9 / E10 | expand when scheduled |
 
 ---
 
@@ -94,8 +93,8 @@ Completed between Block A and B:
 - `E8-3.1` **Stain guide** — add nail polish + turmeric; expand stain coverage.
 
 > **Larger feature work (own sprints, not 3.5):**
-> - `E2-8.x` **Fit + measurements** (`fit` field; `measurements{ waist, chest, hips, length }` optional numbers, in↔cm) → rides with **parked E2** (or pull alongside E11, since it pairs with the weight/volume model).
-> - `E4-4.x` **Privacy: visibility vs. lendability** (intimates private by default; `isPrivate` + `isLendable`) → **Block F (E4)**, needs E1 RLS.
+> - `E2-8.x` **Fit + measurements** (`fit` field; `measurements{ waist, chest, hips, length }` optional numbers, in↔cm) → **Block D (E2 #4)**, pairs with the E11 weight/volume model.
+> - `E4-4.x` **Privacy: visibility vs. lendability** (intimates private by default; `isPrivate` + `isLendable`) → **Block G (E4 #7)**, needs E1 RLS.
 
 ---
 
@@ -112,38 +111,45 @@ Completed between Block A and B:
 - **iOS + offline:** `E5-2.3` iOS full-screen · `E5-3.1` offline closet view
 > _DoD:_ installable PWA, full-screen iOS, touch-friendly, bottom nav, offline closet.
 
-### Block D — E11 Laundry & Wear ⭐ + E12 Profile · Priority 4
-> E11 needs E12's machine/lifestyle config — build E12 US-12.1 alongside.
-- **Wear loop:** `E11-1.1` canonical `status`/`wornCount`/`lastWornAt` fields · `E11-1.2` one-tap "I wore this" (mobile) + undo
-- **Forecast:** `E11-2.1` `laundryForecast` + tests · `E11-2.2` nudge strip · `E11-2.3` laundry-status view
-- **Physical model:** `E11-3.1` `itemPhysical.ts` weight/volume · `E11-3.2` tests · `E11-3.3` load-fullness wiring
-- **Profile-tuned:** `E12-1.1`/`E12-1.3` profile (functional vs. social) + machine/lifestyle config · `E11-4.1`/`E11-4.2` machine + lifestyle nudges
-> _DoD:_ one-tap wear logging; per-category forecast + nudge; items carry weight/volume; forecast respects machine + lifestyle.
-> 🔭 Calendar planning (`E11-5.x`) + multi-closet/multi-home (`E12-2/3`) stay LIGHT — far horizon.
+### Block D — E2 Inventory Truth ⭐ · Priority 4
+> Back in the plan. Builds everything except the clean/dirty wear bits (those are E11). `status` here = E11's enum extended, one field.
+- **Location:** `E2-2.x` location field + groups + tag + "where is everything"
+- **Extended statuses + filters:** `E2-1.2`/`E2-1.3`/`E2-1.4` (`at_cleaner`/`on_loan`/`in_repair`) · `E2-3.x` status/location filters + quick views
+- **Availability + lending:** `E2-6.1` `isAvailable` · `E2-5.x` lend modal + "Lent out" view
+- **Second-wave (this is where the differentiator data lands):** `E2-10.x` taxonomy (season/occasion/vibe tags) · `E2-11.x` provenance/origin/sentiment · `E2-12.x` multi-photo + view modes · `E2-8.x` fit + measurements · `E2-9.1` swim (swim can ship early in 3.5)
+> _DoD:_ location + status + availability live; taxonomy tags, photos, provenance, fit/measurements modeled.
 
-### Block E — E8 Care & Knowledge · Priority 5
+### Block E — E12 User Profile · Priority 5
+- `E12-1.x` profile (functional vs. social split) + machine/lifestyle config
+- `E12-4.x` body measurements → "fits me now" filter (uses E2 item measurements)
+> 🔭 Multi-closet/multi-home routing (`E12-2/3`) stays LIGHT — far horizon.
+> _DoD:_ profile split shipped; machine/lifestyle ready for E11; "fits me" filter works.
+
+### Block F — E11 Laundry & Wear ⭐ · Priority 6
+> Consumes E12 machine/lifestyle. Wear `status`/`wornCount` fields likely already added in E2 (#4) — reuse, don't redefine.
+- **Wear loop:** `E11-1.x` canonical wear fields (if not from E2) + one-tap "I wore this" (mobile) + undo · `E11-6.x` `wear_events` history + timeline
+- **Forecast:** `E11-2.x` `laundryForecast` + nudge + laundry-status view
+- **Physical model:** `E11-3.x` `itemPhysical.ts` weight/volume + load-fullness
+- **Profile-tuned:** `E11-4.x` machine + lifestyle nudges (from E12)
+> 🔭 Calendar planning (`E11-5.x`) stays LIGHT — far horizon.
+> _DoD:_ one-tap wear logging + history; forecast respects machine + lifestyle; items carry weight/volume.
+
+### Block G — E4 Shared & Social ⭐ · Priority 7
+Needs E1 (RLS) + E12 (shareable profile) + E2 (loan/availability). Spec cold-start + trust first.
+- connections/shares model + RLS + invite/accept (`E4-1.1`, `E4-1.2`)
+- **privacy: `isPrivate` + `isLendable`, intimates private by default** (`E4-4.x`) + per-item privacy + friends' closets (`E4-1.3`, `E4-1.4`)
+- borrow request→approve→return (`E4-2.x`) · **care-agreement on borrow** (`E4-5.1`) · lending-buddy trust (`E4-6.x`) · borrowed/lent views + reminders + revoke
+> Consider a **"shared closet of two"** MVP (you + one invitee) before broad social, to beat the empty-network problem.
+
+### Block H — E8 Care & Knowledge · Priority 8
 - `E8-3.1` stain guide: nail polish + turmeric + expanded coverage
 - `E8-4.x` education UI/UX overhaul (fabric guide, fiber journey, stain views) + deeper care content
 > _DoD:_ richer stain/care content; the education surfaces feel premium and mobile-friendly.
-
-### Block F — E4 Shared & Social ⭐ · Priority 6
-Needs E1 (RLS) + E12 (shareable profile). Some E2 location/loan work may get pulled back here. Spec cold-start + trust first.
-- connections/shares model + RLS + invite/accept (`E4-1.1`, `E4-1.2`)
-- **privacy: `isPrivate` + `isLendable`, intimates private by default** (`E4-4.x`) + per-item privacy + friends' closets (`E4-1.3`, `E4-1.4`)
-- borrow request→approve→return (`E4-2.x`) · borrowed/lent views + reminders + revoke (`E4-2.3`, `E4-3.1`)
-> Consider a **"shared closet of two"** MVP (you + one invitee) before broad social, to beat the empty-network problem.
-
-### 🟡 Parked — E2 Inventory Truth (confirm before scheduling)
-- Location: `E2-2.x` location field + groups + tag + "where is everything"
-- Extended statuses + filters: `E2-1.2`/`E2-1.3`/`E2-1.4` (`at_cleaner`/`on_loan`/`in_repair`) · `E2-3.x` status/location filters + quick views
-- Availability + lending: `E2-6.1` `isAvailable` · `E2-5.x` lend modal + "Lent out" view
-- `E2-8.x` fit + measurements · `E2-9.1` swim category (swim can ship early in 3.5)
-> Clean/dirty `status` + `wornCount` + "Log a Wear" already moved to **E11**.
 
 ---
 
 ## Cadence notes
 - **Palate-cleanser quick wins** (sort by `purchaseDate`, stats strip, branch prune) can slot between blocks without derailing sequence.
 - **Re-estimate after E1 (Block B)** — velocity there tells you whether the block sizes are realistic; adjust accordingly.
-- **E3 v2.2 web-enrichment** stays parked behind its feasibility spike (Cloudflare) regardless of where it lands in sequence.
+- **E3 web-enrichment** — run the Cloudflare feasibility spike *inside* the #2 database sprint (server-side anyway); if beatable, full enrichment slots at ~#2.5/#3; if it 403-stalls, it waits and mobile keeps #3.
 - **E3 ongoing** — import fixes (Sprint 3.5) ship continuously; the email-provider expansion (Microsoft Graph) rides on top of E1.

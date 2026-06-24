@@ -96,18 +96,33 @@ size            text
 purchase_price  numeric
 purchase_date   date
 retailer        text
-source          text                            -- 'manual' | 'gmail_import' | 'camera'
+source          text                            -- HOW it entered the app: 'manual'|'gmail_import'|'camera'|'chrome_ext'
 condition       text
 on_sale         boolean default false
-image_url       text                            -- → Storage, not base64 (E1-2.x)
 notes           text
 created_at      timestamptz default now()
 updated_at      timestamptz default now()
+-- photos: NOT a single image_url — see item_photos (1:* below). Keep an optional
+--         primary_photo_url denormalized cache for fast grid render.
+primary_photo_url text                          -- cache of the default item_photos row
 -- feature columns added by migration in later waves (all nullable):
--- E4(#4 Inventory): status, fit, measurements
--- E11(#6 Laundry):  worn_count, last_worn_at, weight, volume
--- E4(#7 Sharing):   is_private, is_lendable
+-- E2 (#4 Inventory): status, fit, measurements, season, country_of_origin,
+--                    acquisition_type, is_sentimental, is_high_value
+-- E11(#6 Laundry):   worn_count, last_worn_at (cached from wear_events), weight, volume
+-- E4 (#7 Sharing):   is_private, is_lendable
 ```
+> **season/occasion/vibe are tags, not columns** — see `item_tags` + vocab tables below. **acquisition/origin/sentiment** are cheap nullable columns. `is_sentimental`/heirloom should **default `is_private` + `is_lendable=false`**.
+
+### `item_photos` (item 1:* — **v1, replaces `image_url`**)
+```
+id              uuid PK
+item_id         uuid → items.id
+url             text not null                   -- → Storage, not base64 (E1-2.x)
+kind            text                            -- 'retailer' | 'worn' | 'detail'
+is_default      boolean default false           -- the grid/catalog image
+created_at      timestamptz default now()
+```
+> An item has a default photo (retailer image, or a worn shot if camera-imported) **plus** worn-on-you photos. Powers the two **closet view modes** (retailer images vs. worn-on-you) and stylist shoot documentation. Decided now because it changes the `items` shape — building a single `image_url` then migrating to a photos table after launch is the expensive path.
 
 ### `item_materials` (item 1:* — **normalized on purpose**)
 ```
@@ -156,9 +171,66 @@ message text, requested_at, responded_at, returned_at, due_back
 
 ---
 
+---
+
+## Addendum — second feature wave (2026-06-24)
+
+### Taxonomy split: season · occasion · vibe (tags, many-to-many)
+Today `occasion` conflates two different axes — "workout" (an occasion) vs "casual" (a vibe). Split into three controlled vocabularies, each many-to-many with items so an item can carry several:
+- **season** — summer · winter · spring · fall (also drives storage: stored vs. primary closet)
+- **occasion** — cocktail · work · workout · …
+- **vibe** — elevated · fancy · sexy · casual · …
+
+```
+tag_vocab        id, kind ('season'|'occasion'|'vibe'), label   -- controlled list (editable, not code)
+item_tags        item_id → items.id, tag_id → tag_vocab.id, PRIMARY KEY(item_id, tag_id)
+```
+> Normalized so the **wardrobe-gap analytics** (E7) can query "elevated + shorts = 1" and the **pill-tag UI** (E3) can list the vocab. season also feeds **storage** state (urban "under-bed / winter stored" — pairs with `location` kind + `status`).
+
+### Wear history (not just a counter)
+Sloan needs "when did I last wear this, at what occasion" (don't repeat outfits at the same event); the stylist needs shoot documentation. A counter can't answer that — model an event log:
+```
+wear_events      id, item_id → items.id, worn_at date, occasion_tag_id → tag_vocab.id (nullable),
+                 photo_id → item_photos.id (nullable), note text, created_at
+```
+> `items.worn_count` + `last_worn_at` become a **cached rollup** of `wear_events`, not the source of truth. "I wore this" (E11) inserts a `wear_events` row.
+
+### Provenance, origin & sentiment (mostly cheap item columns)
+```
+acquisition_type  text   -- 'bought'|'gifted'|'inherited'|'hand_me_down'|'thrifted'|'resale'|'borrowed'
+country_of_origin text   -- "Vietnam" / "China" / "Sri Lanka" — web-enriched; feeds an origin map viz (E7)
+is_sentimental    bool   -- heirloom / inherited → default is_private + not lendable
+is_high_value     bool   -- gates the borrow care-agreement (below)
+```
+
+### Profile measurements → "what fits me right now"
+`profiles.settings` (or a `profile_measurements` block) holds the user's body measurements; match against `items.measurements` to power a **"fits me now"** filter. Persona: lifestyle change / pre-baby wardrobe / weight change (the Diana "body gap") — items that don't fit now but might later stay in the closet, filtered out of "wearable now."
+
+### Borrow care-agreement (on the deferred `borrow_requests`)
+```
+borrow_requests  + care_agreement text   -- "dry clean before return", "handwash, cold, hang dry"
+                 + care_ack boolean       -- borrower acknowledged
+```
+> On approval (esp. `is_high_value`), owner attaches care requirements the borrower must accept. Directly proves the thesis: stops borrowers from shrinking / over-drying lent pieces.
+
+### Web-enrichment-derived fields (E3 web-engage — bumped up the priority list)
+Server-side PDP fetch (past Cloudflare) fills, per retailer sizing chart: precise **measurements** (size M = 28" vs 30" waist), **material breakdown** (→ `item_materials`), **country_of_origin**, richer style descriptors (→ tags). These feed **travel weight/volume** (E11/E9) far better than email data alone.
+
+---
+
+## Revised v1 vs. later (after this wave)
+
+- **v1 (#2 sprint) now also includes `item_photos`** (replaces `image_url`) — it changes the core shape.
+- **Add by migration:** `tag_vocab` + `item_tags`, `wear_events`, and the nullable item columns above, as their features land (taxonomy/provenance at #4, wear history at #6, care-agreement at #7).
+- **Reference/vocab tables** (`tag_vocab`, `categories`) are content, not user data — seed + extend freely.
+
+---
+
 ## Open questions (don't block v1 — resolve before #7 Sharing)
 
 1. **Share grain confirm.** Proposed: share a *whole closet* (read), refined by per-item `is_private` + category defaults. Alternative: per-item or per-category shares. Closet-level is simpler and matches "Our Closet." Confirm?
 2. **Location scope under stylists.** `locations.owner_user_id` assumes a household/account. A stylist managing many clients' closets complicates "whose locations." Acceptable to scope locations to the closet's creating user for v1 and revisit for pro/stylist tier?
 3. **Measurements storage.** Proposed: `measurements jsonb` = `{ waist, chest, hips, length }` as numbers in a canonical unit (cm), display-converted to in/cm. Sparse + non-relational → JSONB fits. Alternative: discrete nullable columns. JSONB unless you'll query/sort by a measurement.
-4. **Category as enum vs. reference table.** Adding `swim` was a hardcoded-list chore. A `categories` reference table makes future additions data, not code. Worth it?
+4. **Category as enum vs. reference table.** Adding `swim` was a hardcoded-list chore. A `categories` reference table makes future additions data, not code. Worth it? (Same pattern as `tag_vocab` — lean toward a table.)
+5. **Lending-buddy permissions.** If the analytics surface that you + a friend are the same size and lend often, should that promote them to a higher-trust permission tier automatically, or only suggest it? (Affects whether trust level lives on `connections` or is derived.)
+6. **"Fits me" matching tolerance.** Exact measurement match is brittle. Need a tolerance band (± inches) and a rule for which measurements gate "fits" per category (waist for bottoms, chest for tops). Defer the algorithm; reserve the fields.

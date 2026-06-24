@@ -1,8 +1,16 @@
-# E3 · Frictionless Fill 🔅
+# E3 · Frictionless Fill ⭐ (THE differentiator)
 
-> **Date:** 2026-06-20 · **Pillar:** Frictionless Fill · **Detail:** light (expand when scheduled) · **README:** v2.2 / v2.3 / v3.1
-> **Goal:** Make filling the closet effortless — more email providers, richer web-sourced detail, and
-> camera import — because the category dies at onboarding. Builds on the shipped Gmail + inference pipeline.
+> **Date:** 2026-06-20 · **Updated:** 2026-06-24 · **Pillar:** Frictionless Fill · **Detail:** full · **README:** v2.2 / v2.3 / v3.1
+> **Goal:** Make filling the closet effortless — because the category dies at onboarding.
+>
+> ### 🏁 Strategic framing (2026-06-24): frictionless upload is the moat
+> Everyone already has a closet **in their inbox** — years of online-shopping receipts, not just new purchases.
+> NTW's edge is turning that into an online closet with the least possible typing. The wedge has four prongs:
+> 1. **Email import** — parse the existing inbox (the back-catalog, not just current orders)
+> 2. **Web enrichment** — server-side PDP fetch for material breakdown + true sizing measurements (bump this up — see US-3.2)
+> 3. **Manual quick-pills** — tap-to-tag, never type (extend to email-import editing — US-3.8)
+> 4. **Chrome extension** — capture at point-of-purchase, like Alta (US-3.9)
+> Inference (care-from-material, style-from-name) rides on all four. **This epic outranks its old "light" status.**
 
 ---
 
@@ -21,12 +29,14 @@ _As a user on Hotmail/Outlook/Yahoo, I want to import purchases from my provider
 
 **Ticket stubs:** Microsoft Graph OAuth + parser wiring · server-side IMAP service · provider-picker UI.
 
-## US-3.2 — Richer details from the web (v2.2)
-_As a user, I want imported items enriched with full description/material/style so that thin email data gets deep._
+## US-3.2 — Richer details from the web ⬆️ PRIORITY-BUMPED
+_As a user, I want imported items enriched with full description/material/style/**sizing measurements** so that thin email data gets deep enough for travel weight/volume + fit matching._
+- [ ] ⬆️ **Bumped: build right after the database/full-stack (#2), before or alongside mobile.** Reason: server-side PDP queries unlock material breakdown + **true sizing** (retailer size charts: "M = 28\" waist" vs "M = 30\" waist"), which feed `item_materials`, `measurements`, weight/volume (E11/E9), and "fits me" (E12).
 - [ ] Server fetch layer past Cloudflare; URL resolver; feed existing `infer*` pipeline
-- [ ] Full spec: [EngagingWebForProductDetails.md](../EngagingWebForProductDetails.md) (do the feasibility spike first)
+- [ ] Extract: material breakdown, size-chart measurements, country of origin, richer style descriptors → tags
+- [ ] Full spec: [EngagingWebForProductDetails.md](../EngagingWebForProductDetails.md) (do the feasibility spike first — Cloudflare 403 verified 2026-06-20)
 
-**Ticket stubs:** see the v2.2 doc's phased plan.
+**Ticket stubs:** see the v2.2 doc's phased plan · size-chart parser → `measurements` · origin extractor → `country_of_origin`.
 
 ## US-3.3 — Snap an item (v3.1)
 _As Maya, I want to photograph an item so that logging an in-store / second-hand buy is as fast as online._
@@ -68,6 +78,22 @@ _As Maya, I want editing a material blend to be intuitive so that I can correct 
 - [ ] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
 
 **Ticket:** `E3-7.1` Redesign the material-blend editor interaction in `EditItemView` — _1d_
+
+## US-3.8 — Tap-to-tag on email import (mobile friction killer)
+_As Maya importing on my phone, I want to tap pills for occasion / vibe / care / season instead of typing so that ingestion isn't clunky on mobile._
+- [ ] Email-import `EditItemView` uses the same **pill-tag inputs** that manual add already has for material/brand/care
+- [ ] Dropdown-style fields become tappable tags: care (machine wash · cold · hang dry), occasion, vibe, season
+- [ ] No free-typing required for controlled-vocab fields (`tag_vocab`)
+
+**Ticket:** `E3-8.1` Port the manual pill-tag inputs into the email-import edit flow (care/occasion/vibe/season) — _1d_
+
+## US-3.9 — Chrome extension capture (point-of-purchase)
+_As a shopper, I want to add an item to my closet straight from a retailer's product page so that current purchases are captured with full detail, no email round-trip (the Alta move)._
+- [ ] Browser extension grabs PDP details (name, price, image, material, size chart) on the product page
+- [ ] Pushes through the same service layer / inference pipeline as email + manual
+- [ ] Reuses US-3.2 web-extraction logic client-side at the source
+
+**Ticket stubs:** extension scaffold · PDP scraper · auth handshake to the app · dedupe against email import.
 
 ---
 

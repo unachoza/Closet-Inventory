@@ -23,6 +23,17 @@ _As Maya on her phone, I want to tap "I wore this" so that logging a wear is a o
 - `E11-1.2` "I wore this" one-tap action (card + detail, mobile-reachable) + undo — _1d_
 - `E11-1.3` Wear/clean state regression tests — _bundled_
 
+## US-11.6 — Wear history (when + where + what)
+_As Sloan, I want to see when I last wore something and at what occasion so that I don't repeat outfits in front of the same crowd — and as a stylist, so that I have shoot documentation._
+- [ ] `wear_events` log: `item_id`, `worn_at`, `occasion` tag, optional worn `photo_id`, note
+- [ ] "I wore this" (US-11.1) **inserts a `wear_events` row**; `wornCount` + `lastWornAt` become a cached rollup, not the source of truth
+- [ ] Per-item wear timeline; "last worn / where" surfaced on the card
+- [ ] Feeds analytics (E7) — frequency, cost-per-wear, repeat-outfit avoidance
+
+**Tickets**
+- `E11-6.1` `wear_events` model + insert-on-wear + rollup to `wornCount`/`lastWornAt` — _1d_
+- `E11-6.2` Per-item wear timeline + "last worn" on card — _1d_
+
 ## US-11.2 — Laundry status & forecast
 _As Maya, I want a per-category clean-vs-dirty view and a nudge when I'm about to run out so that I do laundry before I'm stuck._
 - [ ] `laundryForecast()` computes clean/dirty ratio per category

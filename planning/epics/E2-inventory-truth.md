@@ -5,19 +5,19 @@
 > The flagship, uncompeted feature. Full spec: [WardrobeStatusAndLocation.md](../WardrobeStatusAndLocation.md).
 > Buildable localStorage-first; sync rides along when E1 lands.
 >
-> ### 🟡 PARKED under the 2026-06-24 reprioritization
-> The new priority order (hotfixes → E1 → E5 → **E11 laundry** → E8 → E4) **does not schedule E2**.
-> The clean/dirty bits this flagship needed for laundry — `status` clean/dirty, `wornCount`, `lastWornAt`,
-> "Log a Wear" — **moved to [E11 · Laundry & Wear](./E11-laundry-wear.md)** (now owns those canonical fields).
-> What remains here (location, `at_cleaner`/`on_loan`/`in_repair` statuses, availability, lending) is **parked /
-> unscheduled** — confirm before pulling it back in. When E2 status ships, it **extends E11's `status` enum**,
-> not a second field. See SPRINTS "⚠️ E2 now unscheduled" marker.
+> ### 🟢 SCHEDULED at #4 (8-item order, 2026-06-24)
+> E2 is back in the plan at **priority #4** (hotfixes → E1 → E5 → **E2** → E12 → E11 → E4 → E8).
+> The clean/dirty bits — `status` clean/dirty, `wornCount`, `lastWornAt`, "Log a Wear" — are **owned by
+> [E11](./E11-laundry-forecasting.md)** (one canonical definition). E2 builds the rest: **location, extended
+> statuses** (`at_cleaner`/`on_loan`/`in_repair`, extending E11's enum — not a second field), **availability,
+> lending**, plus the second-wave additions: **taxonomy** (US-2.10 season/occasion/vibe), **provenance**
+> (US-2.11), **photos** (US-2.12), **fit/measurements** (US-2.8), **swim** (US-2.9).
 
 ---
 
 ## US-2.1 — Mark what state a piece is in → **partly moved to E11**
 _As Maya, I want to mark an item clean/dirty/at-the-cleaner/needs-repair/traveling/on-loan so that I know its real status._
-- → **clean/dirty + wornCount + Log a Wear moved to [E11](./E11-laundry-wear.md) (US-11.1).** `status`/`wornCount`/`lastWornAt` are **owned by E11**.
+- → **clean/dirty + wornCount + Log a Wear moved to [E11](./E11-laundry-forecasting.md) (US-11.1).** `status`/`wornCount`/`lastWornAt` are **owned by E11**.
 - [ ] (parked) Extended statuses: `at_cleaner`, `in_repair`, `traveling`, `on_loan` — extend E11's enum
 - [ ] (parked) Status chip on the card (token-colored)
 - [ ] (parked) Quick-action menu sets status (context-aware per transition table)
@@ -53,7 +53,7 @@ _As Maya, I want to filter by status and location so that I can see "everything 
 
 ## US-2.4 — Tell me when to do laundry → **moved to E11**
 _As Maya, I want a nudge when I'm low on clean items in a category so that I do laundry before I run out._
-- → **Entire story moved to [E11 · Laundry & Wear](./E11-laundry-wear.md) (US-11.2).** `E2-4.1`/`E2-4.2` are now `E11-2.1`/`E11-2.2`. E11 expands it with machine size, lifestyle, and item weight/volume.
+- → **Entire story moved to [E11 · Laundry & Wear](./E11-laundry-forecasting.md) (US-11.2).** `E2-4.1`/`E2-4.2` are now `E11-2.1`/`E11-2.2`. E11 expands it with machine size, lifestyle, and item weight/volume.
 
 ## US-2.5 — Lend something and track it
 _As the "Our Closet" user, I want to mark an item lent out (to whom, due when) so that I know who has my stuff._
@@ -75,6 +75,40 @@ _As Maya, I want availability derived so that outfit suggestions and borrowing n
 - `E2-6.1` `utils/availability.ts` + tests — _0.5d_
 
 ---
+
+## US-2.10 — Season · occasion · vibe (split the taxonomy)
+_As Maya, I want season, occasion, and vibe as separate tags so that "workout" (occasion) and "casual" (vibe) stop being the same field — and so the dashboard can find real gaps._
+- [ ] **season** tags: summer / winter / spring / fall (also feeds storage — stored vs. primary)
+- [ ] **occasion** tags: cocktail / work / workout / … (the event/context)
+- [ ] **vibe** tags: elevated / fancy / sexy / casual / … (the aesthetic)
+- [ ] Each is many-to-many (an item can be multiple); controlled vocab via `tag_vocab` + `item_tags` (see [DATA_MODEL](../backend/DATA_MODEL_2026-06-24.md))
+- [ ] Migrate existing `occasion` values; un-conflate casual/workout
+
+**Tickets**
+- `E2-10.1` `tag_vocab` (season/occasion/vibe) + `item_tags` model — _1d_
+- `E2-10.2` Pill-tag inputs for season/occasion/vibe (manual + email import — see `E3-8.1`) — _1d_
+- `E2-10.3` Migrate/split legacy `occasion` field — _0.5d_
+
+## US-2.11 — Provenance, origin & sentiment
+_As Maya, I want to record how I got an item and whether it's meaningful so that heirlooms stay private and I can see where my clothes come from._
+- [ ] `acquisition_type`: bought / gifted / inherited / hand-me-down / thrifted / resale / borrowed
+- [ ] `country_of_origin` (web-enriched; feeds the E7 origin-map viz)
+- [ ] `is_sentimental` (heirloom/inherited) → **defaults item to private + not lendable**
+- [ ] `is_high_value` → gates the borrow care-agreement (E4)
+
+**Tickets**
+- `E2-11.1` Add provenance/origin/sentiment/high-value columns + edit UI — _1d_
+- `E2-11.2` Sentimental → auto-private/not-lendable default wiring (with E4) — _0.5d_
+
+## US-2.12 — Multiple photos + view modes
+_As Maya, I want several photos per item — the retailer image and shots of me wearing it — so that I can browse my closet as catalog images or as worn-on-me looks._
+- [ ] `item_photos` (1:*): default photo (retailer image, or worn shot if camera-imported) + worn-on-you photos
+- [ ] Two closet **view modes**: retailer images vs. worn-on-you
+- [ ] Worn photos link to wear logging (E11 `wear_events`) — supports Sloan "what did I wear, when" + stylist shoot docs
+
+**Tickets**
+- `E2-12.1` `item_photos` table + upload (camera + retailer) + set-default — _1.5d_
+- `E2-12.2` Closet view-mode toggle (catalog vs. worn) — _1d_
 
 ## US-2.8 — Does it actually fit?
 _As Maya, I want to mark whether an item currently fits and record its measurements so that I stop holding onto things that don't fit and can compare sizing across brands._
@@ -122,4 +156,4 @@ When a user filters by a material (e.g. Cotton), results should sort by that mat
 - Hardcoded-list gotcha: new filter dimensions need manual `DIMENSIONS`/sort-array edits `tsc` won't catch.
 
 ## Definition of done (epic) — _scoped down; laundry + wornCount now in E11_
-Items carry status (extending E11's enum) + location; cards show/set them; filters + "where is everything" work; lending is tracked; `isAvailable` is the shared gate. _(Laundry nudge + `wornCount` + "Log a Wear" shipped under [E11](./E11-laundry-wear.md).)_
+Items carry status (extending E11's enum) + location; cards show/set them; filters + "where is everything" work; lending is tracked; `isAvailable` is the shared gate. _(Laundry nudge + `wornCount` + "Log a Wear" shipped under [E11](./E11-laundry-forecasting.md).)_

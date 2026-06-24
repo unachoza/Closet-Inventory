@@ -41,7 +41,7 @@ _As a user sharing my closet, I want fine-grained control over what others can s
 
 ## US-4.2 — Borrow something from a friend
 _As the "Our Closet" user, I want to request to borrow a friend's item so that sharing is tracked, not chaotic._
-- [ ] "Request to borrow" on a visible friend's item
+- [ ] "Request to borrow" on a visible friend's item (borrower **must be an app user** — locked decision)
 - [ ] Owner approves/declines; on approve → item `on_loan` to me (reuses E2 `loan`)
 - [ ] Both see status; due-back reminders
 - [ ] "Borrowed from me / by me" views; overdue flags
@@ -50,6 +50,23 @@ _As the "Our Closet" user, I want to request to borrow a friend's item so that s
 - `E4-2.1` Borrow-request model + state machine (request→approve/decline→return) — _2d_
 - `E4-2.2` Wire approved borrow into E2 `loan`/`on_loan` with real `borrowerId` — _1d_
 - `E4-2.3` Borrowed-by-me / lent-by-me views + reminders — _1.5d_
+
+## US-4.5 — Care-agreement on borrow (the thesis-prover)
+_As an owner lending a high-value piece, I want my care requirements attached to the approval so that the borrower can't ruin it by washing it wrong._
+- [ ] On approve (esp. `is_high_value`), owner attaches `care_agreement` ("dry clean before return", "handwash · cold · hang dry")
+- [ ] Borrower must **acknowledge** (`care_ack`) before the loan activates
+- [ ] Care terms visible to both for the loan's duration
+- [ ] (Directly addresses the real pain: shrinking / over-drying lent clothes)
+
+**Ticket:** `E4-5.1` `care_agreement` + `care_ack` on `borrow_requests`; approval UI surfaces care; pre-fill from item care — _1d_
+
+## US-4.6 — Lending-buddy trust (analytics-driven)
+_As a user, I want frequent, same-size lending partners recognized so that trusted friends get smoother access._
+- [ ] Surface "you + X are the same size and lend often" (from E7 analytics)
+- [ ] Optionally promote a buddy to a higher-trust permission tier (suggest, don't auto-apply — see DATA_MODEL open Q5)
+- [ ] Sentimental/heirloom + `is_high_value` items stay excludable regardless
+
+**Ticket stubs:** buddy detection (size match + loan frequency) · trust-tier on `connections` · per-buddy permission UI.
 
 ## US-4.3 — Trust & safety basics
 _As a user, I want control and clarity so that sharing feels safe._

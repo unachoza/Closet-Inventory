@@ -32,11 +32,11 @@ _As Maya, I want the fabric/fiber/care/stain education to look and feel polished
 ## US-8.2 — Track an item's life
 _As Maya, I want to log repairs and see estimated lifespan so that I care for pieces long-term._
 - [ ] Repair/alteration log (date, description, cost) — ties to E2 `needs_repair` status
-- [ ] Clothing lifespan tracker ("estimated wears remaining", needs `wornCount` from [E11](./E11-laundry-wear.md))
+- [ ] Clothing lifespan tracker ("estimated wears remaining", needs `wornCount` from [E11](./E11-laundry-forecasting.md))
 
 **Ticket stubs:** repair-log model + UI · lifespan estimate from `wornCount` + category baseline.
 
 ---
 
 ## Dependencies
-- Repair log pairs with **E2 `needs_repair`** (parked); lifespan needs **`wornCount`** (owned by [E11](./E11-laundry-wear.md)). **Expand when scheduled.**
+- Repair log pairs with **E2 `needs_repair`** (parked); lifespan needs **`wornCount`** (owned by [E11](./E11-laundry-forecasting.md)). **Expand when scheduled.**
