@@ -240,7 +240,6 @@
   .card {
       width: 47vw;
       height: 13.5rem;
-
   }
 
   .card-image img {
@@ -250,10 +249,11 @@
   .card-title {
     font-size: 0.9rem;
     font-weight: 700;
-        /* overflow: auto; */
   }
+
   .card-details {
     font-size: 0.85rem;
+    margin-top: 3vh;
   }
 
   .card-front {
