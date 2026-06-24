@@ -75,10 +75,10 @@ describe("OnboardingExpanded", () => {
 	it("walks through all step titles in order", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		const titles = [
-			"Closet Inventory",
+			"Nothing To Wear",
 			"Connect your Gmail",
-			"Narrow your search",
 			"We find your purchases",
+			"Narrow your search",
 			"Pick items to import",
 			"Review the parsed details",
 			"Add items manually too",
@@ -86,7 +86,13 @@ describe("OnboardingExpanded", () => {
 			"Know how to care for it",
 		];
 		titles.forEach((title, i) => {
-			expect(screen.getByText(title)).toBeInTheDocument();
+			// "Nothing To Wear" appears in both the h2 and a decorative div — scope
+			// the query to the heading role so the duplicate doesn't cause a conflict.
+			if (title === "Nothing To Wear") {
+				expect(screen.getByRole("heading", { level: 2, name: title })).toBeInTheDocument();
+			} else {
+				expect(screen.getByText(title)).toBeInTheDocument();
+			}
 			if (i < titles.length - 1) next();
 		});
 	});
@@ -217,11 +223,12 @@ describe("Step 2 — Connect your Gmail (nav drawer demo)", () => {
 	});
 });
 
-describe("Step 3 — Narrow your search (advanced search demo)", () => {
+describe("Step 4 — Narrow your search (advanced search demo)", () => {
 	it("renders the advanced-search filter nav", () => {
 		render(<OnboardingExpanded onComplete={vi.fn()} />);
 		next();
-		next(); // reach step 3
+		next();
+		next(); // reach step 4
 		expect(screen.getByText("Advanced Email Search")).toBeInTheDocument();
 		["Sender", "Dates", "Keywords", "Exclude"].forEach((label) => {
 			expect(screen.getByText(label)).toBeInTheDocument();
@@ -233,7 +240,8 @@ describe("Step 3 — Narrow your search (advanced search demo)", () => {
 		try {
 			const { container } = render(<OnboardingExpanded onComplete={vi.fn()} />);
 			next();
-			next(); // reach step 3
+			next();
+			next(); // reach step 4
 
 			// Exclude is the 4th (last) nav dot; the primary button is the search CTA.
 			const excludeDot = () => container.querySelectorAll(".ob-adv-nav-dot")[3];
