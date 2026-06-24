@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { ClothingItem } from "../../utils/types";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { useClosetFilters } from "../../hooks/useClosetFilters";
@@ -12,8 +12,19 @@ interface EntireClosetViewProps {
 	onEditItem?: (item: ClothingItem) => void;
 }
 
+const DENSITY_KEY = "closet_density";
+
 const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 	const { closet, removeItem } = useLocalStorageCloset();
+
+	const [compact, setCompact] = useState(() => localStorage.getItem(DENSITY_KEY) === "compact");
+	const toggleDensity = useCallback(() => {
+		setCompact((prev) => {
+			const next = !prev;
+			localStorage.setItem(DENSITY_KEY, next ? "compact" : "comfortable");
+			return next;
+		});
+	}, []);
 
 	// 1. Filter by dimension checkboxes
 	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } = useClosetFilters(closet);
@@ -57,6 +68,8 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				matchKeysById={matchKeysById}
 				totalCount={closet.length}
 				gridKey={gridKey}
+				compact={compact}
+				onToggleDensity={toggleDensity}
 				onEditItem={onEditItem}
 				onRemoveItem={removeItem}
 			/>

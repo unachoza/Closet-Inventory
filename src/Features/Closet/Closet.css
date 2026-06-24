@@ -13,6 +13,34 @@
       padding: 1rem;
 }
 
+/* === Density toggle === */
+.density-toggle-row {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      max-width: 80rem;
+      padding: 0 2rem;
+}
+
+.density-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--text-primary);
+      border-radius: var(--border-radius-ty, 4px);
+      background: var(--bg-surface-primary);
+      color: var(--text-primary);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: filter 0.15s ease;
+}
+
+.density-toggle:hover {
+      filter: brightness(0.85);
+}
+
 /* === Grid === */
 .items-grid {
       display: flex;
@@ -20,6 +48,19 @@
       flex-wrap: wrap;
       gap: 10px;
       padding: .5rem 2rem;
+}
+
+/* Compact view: smaller cards so more fit per row. Overriding the --Card-width
+   custom property cascades to every .card inside; the explicit .card rule wins
+   over the mobile `.card { width: 47vw }` so compact also densifies on phones. */
+.items-grid--compact {
+      --Card-width: 12.5rem;
+      --Card-height: 14rem;
+}
+
+.items-grid--compact .card {
+      width: var(--Card-width);
+      height: var(--Card-height);
 }
 
 p.no-results {
@@ -54,5 +95,15 @@ p.no-results {
   .items-grid {
     padding: 0 0.25rem;
     gap: 0.5rem;
+  }
+
+  .density-toggle-row {
+    padding: 0 0.5rem 0.5rem;
+  }
+
+  /* ~3 cards per row on phones in compact mode (vs. the default 2 at 47vw). */
+  .items-grid--compact {
+    --Card-width: 30vw;
+    --Card-height: 11rem;
   }
 }

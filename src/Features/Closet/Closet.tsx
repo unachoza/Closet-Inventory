@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, Variants } from "framer-motion";
+import { LayoutGrid, Grid3x3 } from "lucide-react";
 import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
@@ -38,10 +39,36 @@ const cardVariants: Variants = {
 	},
 };
 
+// Comfortable view shows larger cards; compact fits more per page with smaller cards.
 const ITEMS_PER_PAGE = 6;
+const COMPACT_ITEMS_PER_PAGE = 12;
+const DENSITY_KEY = "closet_density";
 
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	const { closet, removeItem } = useLocalStorageCloset();
+
+	// Persisted so the user's density preference sticks across sessions.
+	const [compact, setCompact] = useState(() => {
+		try {
+			return localStorage.getItem(DENSITY_KEY) === "compact";
+		} catch {
+			return false;
+		}
+	});
+
+	const toggleDensity = () => {
+		setCompact((prev) => {
+			const next = !prev;
+			try {
+				localStorage.setItem(DENSITY_KEY, next ? "compact" : "comfortable");
+			} catch {
+				/* ignore storage errors — density is a non-critical preference */
+			}
+			return next;
+		});
+	};
+
+	const itemsPerPage = compact ? COMPACT_ITEMS_PER_PAGE : ITEMS_PER_PAGE;
 
 	const normalizedCategory = selectedCategory?.trim().toLowerCase() || "";
 
@@ -69,11 +96,11 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 		handlePrevPage,
 		totalPages,
 		goToPage,
-	} = usePagination(filteredItems, ITEMS_PER_PAGE);
+	} = usePagination(filteredItems, itemsPerPage);
 
 	useEffect(() => {
 		goToPage(1);
-	}, [selectedCategory]);
+	}, [selectedCategory, compact]);
 
 	const hasItems = paginatedItems.length > 0;
 	const emptyLabel = selectedCategory?.trim() ? selectedCategory : "your closet";
@@ -81,6 +108,19 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	return (
 		<>
 			<div className="items-overview">
+				{hasItems && (
+					<div className="density-toggle-row">
+						<button
+							className="density-toggle"
+							onClick={toggleDensity}
+							aria-pressed={compact}
+							title={compact ? "Switch to larger cards" : "Show more items (smaller cards)"}
+						>
+							{compact ? <LayoutGrid size={16} /> : <Grid3x3 size={16} />}
+							{compact ? "Larger cards" : "Show more"}
+						</button>
+					</div>
+				)}
 				{hasItems ? (
 					<motion.div
 						// Remount on category OR page change so the stagger replays. The
@@ -91,7 +131,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 						// `mode="wait"` AnimatePresence here, so remounting is safe and can
 						// never strand the grid waiting on an exit (the blank-screen bug).
 						key={`${normalizedCategory || "all"}-${currentPage}`}
-						className="items-grid"
+						className={`items-grid${compact ? " items-grid--compact" : ""}`}
 						variants={containerVariants}
 						initial="hidden"
 						animate="show"

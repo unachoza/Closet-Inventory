@@ -86,4 +86,54 @@ test.describe("Card detail modal — mobile", () => {
 		// Apple/Material guidance is ~44px; allow a small tolerance.
 		expect(box!.height, "tap target is shorter than ~44px").toBeGreaterThanOrEqual(40);
 	});
+
+	// ── Regression: E5-bug.1 — card top clipped + "See all details" clipped ──
+
+	test("first card top edge is not hidden above the viewport (regression: margin-top clipping)", async ({ page }) => {
+		const card = page.getByTestId("clothes-card").first();
+		const cardBox = await card.boundingBox();
+		expect(cardBox).not.toBeNull();
+
+		// Card top must be visible — not scrolled/pushed above y=0.
+		// Allow a 1px tolerance for subpixel rendering.
+		expect(cardBox!.y, "first card is clipped above the visible viewport").toBeGreaterThanOrEqual(-1);
+	});
+
+	test("'See all details' button is fully within the card's vertical bounds (regression: footer clipped)", async ({ page }) => {
+		const card = page.getByTestId("clothes-card").first();
+		await card.tap();
+		await expect(card).toHaveClass(/flipped/);
+		await page.waitForTimeout(900);
+
+		const cardBox = await card.boundingBox();
+		const btnBox = await card.getByRole("button", { name: /see all details/i }).boundingBox();
+
+		expect(cardBox).not.toBeNull();
+		expect(btnBox).not.toBeNull();
+
+		const cardBottom = cardBox!.y + cardBox!.height;
+		const btnBottom = btnBox!.y + btnBox!.height;
+
+		// The "See all details" button's bottom edge must sit within the card.
+		// 2px tolerance for border/subpixel rendering.
+		expect(
+			btnBottom,
+			`"See all details" bottom (${btnBottom.toFixed(1)}) overflows card bottom (${cardBottom.toFixed(1)})`,
+		).toBeLessThanOrEqual(cardBottom + 2);
+
+		// And the button must also be in the visible viewport.
+		const viewportHeight = page.viewportSize()!.height;
+		expect(btnBottom, '"See all details" is below the visible viewport').toBeLessThanOrEqual(viewportHeight);
+	});
+
+	test("all cards on first page have tops within viewport (no card hidden under nav)", async ({ page }) => {
+		const cards = page.getByTestId("clothes-card");
+		const count = await cards.count();
+
+		for (let i = 0; i < count; i++) {
+			const box = await cards.nth(i).boundingBox();
+			expect(box, `card ${i} has no bounding box`).not.toBeNull();
+			expect(box!.y, `card ${i} top is above the viewport`).toBeGreaterThanOrEqual(-1);
+		}
+	});
 });

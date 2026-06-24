@@ -36,7 +36,7 @@ function WelcomeStepDemo() {
 			<div className="ob-welcome-logo-wrap">
 				<img src={logo} alt="Closet Inventory logo" className="ob-welcome-logo" />
 			</div>
-			<div className="ob-welcome-appname">My Closet Inventory</div>
+			<div className="ob-welcome-appname">Nothing To Wear</div>
 			<div className="ob-welcome-tagline">A personal wardrobe management app</div>
 			<div className="ob-welcome-feats">
 				{welcomeFeatures.map((f) => (
@@ -84,7 +84,7 @@ function Step1Demo() {
 					<Menu size={18} />
 					{pressing && <span className="ob-nav-tap" aria-hidden="true" />}
 				</div>
-				<span className="ob-nav-title">My Closet Inventory</span>
+				<span className="ob-nav-title">Nothing To Wear</span>
 			</div>
 			<div className="ob-nav-home">
 				<div className="ob-nav-ghost-row">
@@ -956,8 +956,8 @@ const STEPS: StepDef[] = [
 	{
 		group: "Welcome",
 		groupStyle: { background: "var(--coral-faint)", color: "var(--coral)", border: "1px solid var(--coral-border)" },
-		title: "Closet Inventory",
-		description: "A personal wardrobe management app. Upload your closet, learn fabric care, and more!",
+		title: "Nothing To Wear",
+		description: "Wardrobe inventory and logistics management. Upload your closet, learn fabric care, and more!",
 		demo: <WelcomeStepDemo />,
 	},
 	{
@@ -970,18 +970,18 @@ const STEPS: StepDef[] = [
 	{
 		group: "Email Import",
 		groupStyle: EMAIL_IMPORT_STYLE,
-		title: "Narrow your search",
-		description:
-			"Use Advanced Search to filter by sender, date range, subject patterns, or body keywords — then choose 'New Search' to fetch fresh results or 'Filter Existing' to slice what's already cached.",
-		demo: <StepAdvancedSearchDemo />,
-	},
-	{
-		group: "Email Import",
-		groupStyle: EMAIL_IMPORT_STYLE,
 		title: "We find your purchases",
 		description:
 			"The app scans your inbox and surfaces order confirmations. Found 100 emails? You'll see them all listed here ready to select.",
 		demo: <Step2Demo />,
+	},
+	{
+		group: "Email Import",
+		groupStyle: EMAIL_IMPORT_STYLE,
+		title: "Narrow your search",
+		description:
+			"Use Advanced Search to filter by sender, date range, subject patterns, or body keywords — then choose 'New Search' to fetch fresh results or 'Filter Existing' to slice what's already cached.",
+		demo: <StepAdvancedSearchDemo />,
 	},
 	{
 		group: "Email Import",

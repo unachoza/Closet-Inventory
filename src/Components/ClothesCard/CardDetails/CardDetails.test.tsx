@@ -141,6 +141,72 @@ describe("CardDetails", () => {
 		expect(screen.queryByText("Features")).not.toBeInTheDocument();
 	});
 
+	// ── Layout structure regressions (E5-bug.1 + "See all details" clipping) ────
+	//
+	// NOTE: The visual overflow/clipping regression (overflow:scroll on .card-details
+	// + margin-top:3vh pushing the footer below card-back's overflow:hidden bounds)
+	// cannot be caught here — jsdom does not compute CSS layout.
+	// The authoritative guards for that are in e2e/card-detail-modal.mobile.spec.ts:
+	//   - "See all details button is fully within the card's vertical bounds"
+	//   - "all cards on first page have tops within viewport"
+	// These tests guard a different failure mode: wrong DOM nesting.
+
+	it("compact variant: footer is a direct child of .card-details, not nested inside .card-details__scrollable (regression: See-all-details clipped)", () => {
+		render(<CardDetails item={item} variant="compact" onExpand={() => {}} />);
+
+		const footer = document.querySelector(".card-details__footer");
+		const scrollable = document.querySelector(".card-details__scrollable");
+		const container = document.querySelector(".card-details");
+
+		expect(footer, "footer must exist in compact variant").toBeInTheDocument();
+		expect(scrollable, "scrollable must exist").toBeInTheDocument();
+		expect(container, "card-details container must exist").toBeInTheDocument();
+
+		// Footer must be a direct child of the flex container, NOT inside the
+		// scrollable. If it's inside scrollable it can scroll out of view and
+		// appear clipped on short cards.
+		expect(footer!.parentElement).toBe(container);
+		expect(scrollable!.contains(footer)).toBe(false);
+	});
+
+	it("compact variant: 'See all details' button is not disabled or hidden", () => {
+		render(<CardDetails item={item} variant="compact" onExpand={() => {}} />);
+
+		const btn = screen.getByRole("button", { name: /see all details/i });
+		expect(btn).toBeEnabled();
+		expect(btn).not.toHaveAttribute("hidden");
+		// No inline display:none override — style may be null (no inline style) or a string.
+		const inlineStyle = btn.getAttribute("style") ?? "";
+		expect(inlineStyle).not.toMatch(/display\s*:\s*none/);
+	});
+
+	it("full variant: no footer element is rendered (regression: phantom footer in modal)", () => {
+		render(<CardDetails item={item} variant="full" onEdit={() => {}} onRemove={() => {}} />);
+
+		expect(document.querySelector(".card-details__footer")).not.toBeInTheDocument();
+	});
+
+	it("compact variant: footer not rendered when item has no expandable content (no ghost button)", () => {
+		// Item with only required fields — no style/care/occasion/notes/price/condition.
+		const bare: ClothingItem = {
+			id: "bare",
+			name: "Plain Shirt",
+			brand: "",
+			category: "tops",
+			color: "white",
+			size: "S",
+			material: [],
+			occasion: "",
+			age: "",
+			care: "",
+			imageURL: "",
+		};
+		render(<CardDetails item={bare} variant="compact" onExpand={() => {}} />);
+
+		// No expandable content → no footer → no "See all details" button
+		expect(screen.queryByRole("button", { name: /see all details/i })).not.toBeInTheDocument();
+	});
+
 	it("hides the Style section when only season/pattern are set (regression: ghost Style header)", () => {
 		// season renders in Identity, pattern renders nowhere — neither should
 		// make the Style section appear with no content beneath it.

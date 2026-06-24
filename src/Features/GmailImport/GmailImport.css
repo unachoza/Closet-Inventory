@@ -154,6 +154,9 @@
 	padding: var(--spacing-400);
 	color: rgba(255, 255, 255, 0.55);
 	text-align: center;
+	display: inline-block; /* Required for transform scale to work properly */
+	animation: pulse-scale 2s ease-in-out infinite;
+
 }
 
 /* Results layout */
@@ -642,6 +645,17 @@
 @keyframes gmail-shimmer {
 	0% { background-position: 200% 0; }
 	100% { background-position: -200% 0; }
+}
+
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow: 0 0 0px rgba(0, 118, 255, 0);
+  }
+  50% {
+    transform: scale(1.08); /* Grows 8% larger */
+    text-shadow: 0 0 8px var(--primitive-brand-deep-umber) /* Adds a soft glow */
+  }
 }
 
 @media (max-width: 480px) {

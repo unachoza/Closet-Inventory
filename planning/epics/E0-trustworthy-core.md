@@ -72,6 +72,19 @@ _As the developer, I want `ClothingItem` typed tightly so that flat-vs-nested mi
 
 ---
 
+---
+
+## Post-completion polish backlog
+
+Small UX wins that don't warrant a new epic — slot between sprints as palate cleansers.
+
+- `E0-7.1` **Onboarding app name + step demo order** — updated branding to "MyCloset"; reordered onboarding demo steps for clarity — _✅ PR #80_
+- `E0-7.3` **Clear Closet button + density toggle** — "Clear Closet" nav action with confirm modal deletes all items (incl. sample data); compact/comfortable grid toggle persisted to localStorage, shared between Closet + EntireCloset views — _✅ PR #80_
+- `E0-7.2` **Floppy search pills** (filter pills wrap awkwardly on narrow viewports) — _pending_
+- `E0-2.3` **Material filter: sort options by blend %** (e.g. "80% cotton" before "20% polyester") — _pending_
+
+---
+
 ## Dependencies
 None — this is the base. Do it first.
 

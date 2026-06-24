@@ -46,7 +46,7 @@ const ONBOARDING_KEY = "closetly-onboarding-complete";
 
 function AppShell() {
 	const { view, setView } = useView();
-	const { closet, getCloset, importItems } = useLocalStorageCloset();
+	const { closet, getCloset, importItems, clearCloset } = useLocalStorageCloset();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -165,6 +165,7 @@ function AppShell() {
 				onAddItem={handleAddItem}
 				onExportCloset={handleExportCloset}
 				onImportCloset={importItems}
+				onClearCloset={clearCloset}
 				closetItemCount={closet.length}
 			/>
 			<EditProvider>

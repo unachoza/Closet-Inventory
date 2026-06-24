@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Menu, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route } from "lucide-react";
+import { Menu, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route, Trash2 } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { ClothingItem, ViewType } from "../../utils/types";
 import ExportClosetModal from "./ExportModal/ExportClosetModal";
@@ -7,6 +7,7 @@ import type { ExportFormat } from "../../utils/exportCloset";
 import "./NavBar.css";
 import { importClosetFromFile } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
+import ClearClosetModal from "./ClearModal/ClearClosetModal";
 
 interface NavBarProps {
 	/**
@@ -19,14 +20,17 @@ interface NavBarProps {
 	onExportCloset?: (format: ExportFormat) => void;
 	/** Persist imported items into the closet (replace or merge). Passing this prop enables the Upload Closet button. */
 	onImportCloset?: (items: ClothingItem[], mode: "replace" | "merge") => void;
+	/** Delete every item in the closet. Passing this prop enables the Clear Closet button (guarded by a confirm modal). */
+	onClearCloset?: () => void;
 	/** Number of closet items — shown in the export/import confirmation modals. */
 	closetItemCount?: number;
 }
 
-const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0 }: NavBarProps) => {
+const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, closetItemCount = 0 }: NavBarProps) => {
 	const { view, setView } = useView();
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [exportModalOpen, setExportModalOpen] = useState(false);
+	const [clearModalOpen, setClearModalOpen] = useState(false);
 
 	const [importModalOpen, setImportModalOpen] = useState(false);
 	const [pendingImportItems, setPendingImportItems] = useState<ClothingItem[]>([]);
@@ -103,6 +107,20 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 		setImportModalOpen(false);
 	};
 
+	const handleClearClick = () => {
+		closeDrawer();
+		setClearModalOpen(true);
+	};
+
+	const handleClearConfirm = () => {
+		setClearModalOpen(false);
+		onClearCloset?.();
+	};
+
+	const handleClearCancel = () => {
+		setClearModalOpen(false);
+	};
+
 	const navActions = (
 		<>
 			<button className="action-btn secondary" onClick={() => goTo("entireCloset")}>
@@ -123,6 +141,15 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 				<button className="action-btn secondary" onClick={handleUploadClick} title="Upload a closet backup (.csv or .json)">
 					<FileUp size={16} /> Upload Closet
 					<input ref={fileInputRef} type="file" accept=".csv,.json" onChange={handleUploadCloset} style={{ display: "none" }} />
+				</button>
+			)}
+			{onClearCloset && (
+				<button
+					className="action-btn secondary"
+					onClick={handleClearClick}
+					title="Delete every item in your closet"
+				>
+					<Trash2 size={16} /> Clear Closet
 				</button>
 			)}
 
@@ -191,6 +218,14 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, closetItemCount = 0
 					onModeChange={setImportMode}
 					onConfirm={handleImportConfirm}
 					onCancel={handleImportCancel}
+				/>
+			)}
+			{onClearCloset && (
+				<ClearClosetModal
+					isOpen={clearModalOpen}
+					itemCount={closetItemCount}
+					onConfirm={handleClearConfirm}
+					onCancel={handleClearCancel}
 				/>
 			)}
 		</header>
