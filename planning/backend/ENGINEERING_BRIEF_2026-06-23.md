@@ -4,11 +4,24 @@ _For Claude Code context. Last updated 2026-06-23._
 
 ---
 
+> ## 🔴 RECONCILED 2026-06-23 — Supabase is committed; Firebase is OFF the table.
+>
+> An earlier draft of this brief recommended "Firebase now, Supabase maybe never, don't migrate."
+> **That is superseded.** The founder's decision (2026-06-23) and the source-of-truth docs win:
+> - **Backend = Supabase Postgres**, committed. See [BACKEND_DATABASE_DECISION.md](./BACKEND_DATABASE_DECISION.md).
+> - **Architecture = RLS-preserving GraphQL BFF (or pg_graphql-native if no AI).** See [E1-cloud-backend_ARCHITECTURE.md](./E1-cloud-backend_ARCHITECTURE.md).
+> - **PR #44 (Firestore) is CLOSED.** It is reference material, not the path.
+> - **Why now:** `main` is still localStorage-only, so there is no live cloud data to migrate — this is the cheapest possible moment to land Postgres. The only migration is a one-time **seed-on-first-sign-in** of each user's localStorage closet.
+>
+> Where the sections below still say "Firebase / Firestore / Cloud Functions," read **Supabase / Postgres+RLS / Edge Functions**. The genuinely reusable parts of this brief — the priority order, the viral-loop reasoning, the type contract, and the relational data model — remain valid and have been updated in place.
+
+---
+
 ## Current Stack (do not change)
 
 - React 19 + TypeScript + Vite 6
 - localStorage (current main storage — working, shipped)
-- Firebase Firestore — PR #44 exists, not yet merged
+- ~~Firebase Firestore — PR #44~~ → **Supabase Postgres (committed; PR #44 closed).** Not yet stood up.
 - Gmail OAuth + 10+ retailer receipt parsers (shipped)
 - Fuse.js fuzzy search (shipped)
 - Framer Motion + Radix UI (web-only, stays web-only)
@@ -44,32 +57,35 @@ const item = await itemsApi.getItem(itemId)
 
 The service layer (`/src/services/`) is what changes if we ever swap databases. The components never know what's underneath.
 
-### 3. Firebase now. Postgres (Supabase) when social/sharing ships — maybe never.
+### 3. ~~Firebase now. Postgres maybe never.~~ → Supabase Postgres, committed. (SUPERSEDED)
 
-- Merge PR #44 this week. Firebase Firestore is correct for v1 closet + ingestion.
-- Firebase can handle the social/sharing graph too. See data model below.
-- Do NOT migrate existing users from Firestore to Postgres — too much risk, no benefit yet.
-- Only migrate if the social graph becomes complex enough to warrant it (v8+, real scale).
+> Reconciled 2026-06-23. The original "Firebase now / Supabase maybe never / don't migrate" call is **reversed.** Rationale in [BACKEND_DATABASE_DECISION.md](./BACKEND_DATABASE_DECISION.md): the uncompeted core (status/location/availability + the v8 borrow/share graph) is inherently relational and access-controlled, and **Row-Level Security is the load-bearing reason for the choice.**
+
+- **Stand up Supabase Postgres** — schema-as-migrations from day one, RLS on every table before real data lands.
+- **No live-user migration exists** — `main` is localStorage-only. The only data move is a one-time **seed-on-first-sign-in** of each user's local closet into their account (real work; don't skip it or data silently vanishes).
+- **Firebase / Firestore / PR #44 are off the table.**
 
 ### 4. Monorepo structure — set it up before the backend grows.
 
 ```
 ntw/
 ├── packages/
-│   └── types/               ← shared TypeScript types — Item, User, BorrowRequest, etc.
-│                               both frontend and backend import from here
-│                               npm package: @ntw/types
+│   └── types/               ← shared TypeScript types (@ntw/types) — the backend contract:
+│                               Item, User, BorrowRequest, Connection, enums.
+│                               consumed by the service layer + future backend.
 ├── apps/
-│   └── web/                 ← existing React app moves here (or stays, monorepo wraps it)
-└── backend/
-    └── functions/           ← Firebase Functions (the API layer)
-        ├── items/
-        ├── users/
-        ├── sharing/         ← borrow/lend endpoints go here
-        └── gmail/           ← Gmail OAuth parsing (keeps API keys server-side)
+│   └── web/                 ← existing React app (moves here LATER; today it stays at root
+│                               and the workspace wraps it — moving 800+ tests is a separate step)
+├── services/
+│   └── bff/                 ← Node + Fastify + GraphQL Yoga BFF (forwards user JWT → RLS).
+│                               Also the home for the IMAP worker at v2.3 (Yahoo/iCloud/AOL).
+│                               DEFERRABLE — not needed for Gmail/Graph (both OAuth-HTTP).
+└── supabase/
+    ├── migrations/          ← versioned SQL schema + RLS policies (source of truth)
+    └── functions/           ← Edge Functions: OAuth token refresh, Stripe webhook, v2.2 scraper
 ```
 
-Use **pnpm workspaces**. Turborepo is optional but helpful for large builds.
+Workspaces via **npm** (the repo is npm today — `package-lock.json`). pnpm/Turborepo can come later; switching package managers now is needless churn. **Privileged server work (token refresh, Stripe, scraper) lives in Supabase Edge Functions — the long-running Node host is only required at IMAP (v2.3).**
 
 The shared `types` package is the highest-value move. Define `Item`, `User`, `BorrowRequest`, `ItemStatus`, `ItemLocation` once. Both Firebase Functions and React frontend import from `@ntw/types`. TypeScript catches mismatches at compile time.
 
@@ -89,9 +105,14 @@ One transaction = one new user. This is the growth mechanic. Build it before any
 
 ---
 
-## Firebase Data Model for Sharing (use this, don't design from scratch)
+## Data Model for Sharing — relational (Postgres + RLS)
 
-Firestore can handle the borrow/lend social graph. No Postgres migration needed for v1 sharing.
+> Reconciled 2026-06-23. The document shapes below were originally written as Firestore collections.
+> They map cleanly onto **Postgres tables**: each `/collection/{id}` becomes a table with a `uuid` PK,
+> `*Id` fields become **foreign keys**, and the security-rule notes below become **RLS policies**.
+> The canonical schema lives in `supabase/migrations/` once stood up — treat the shapes here as the
+> conceptual model, not the DDL. `trustedCircle`/`connections` is the relational join the SoT doc calls
+> out as the reason Supabase was chosen over Firestore fan-out writes.
 
 ```
 /users/{userId}
@@ -139,33 +160,31 @@ Firestore can handle the borrow/lend social graph. No Postgres migration needed 
   - createdAt: timestamp
 ```
 
-Firestore security rules:
+RLS policies (the Postgres equivalent of the original Firestore rules):
 
-- Users can only read items where `ownerId == request.auth.uid` OR `isShareable == true && request.auth.uid in resource.data.ownerId.trustedCircle`
-- Borrow requests: readable by fromUserId or toUserId only
+- `items` SELECT: `owner_id = auth.uid()` OR (`is_shareable` AND `auth.uid()` is in the owner's connected circle via the `connections` table)
+- `borrow_requests` SELECT/UPDATE: `from_user_id = auth.uid()` OR `to_user_id = auth.uid()`
+- Every table: `ENABLE ROW LEVEL SECURITY` + explicit policies — a table with RLS off is wide open under the publishable key (the Tea-App-class mistake).
 
 ---
 
 ## What to Build This Week (V1 Deploy)
 
-**Goal: ship closet + Gmail ingestion to production by end of week.**
+**Goal: stand up Supabase + land Gmail/Hotmail ingestion behind the service layer.**
 
-1. **Merge PR #44** — Firebase Firestore replaces localStorage as primary storage
-2. **Set up Firebase project for production** (separate from dev)
-      - Enable Firestore, Auth (Google + email), Storage
-      - Set Firestore security rules (users can only read/write their own items)
-3. **Wrap all Firestore calls in a service layer** before merging
-      - Create `/src/services/itemsService.ts` — all CRUD for items goes here
-      - Create `/src/services/authService.ts` — auth state management
-      - Components import from services, never from firebase directly
-4. **Update Gmail OAuth consent screen** for production domain
-      - Add production domain to authorized origins in Google Cloud Console
-      - Gmail OAuth scope: `https://www.googleapis.com/auth/gmail.readonly`
-      - This is the step most likely to add days — do it first
-5. **Deploy to Vercel or Netlify**
-      - Add all Firebase + Gmail env vars to deployment config
-      - Set up custom domain if you have one
-6. **PWA manifest + service worker** — installable on home screen
+> Reconciled 2026-06-23 — Supabase build order. Full detail in [E1-cloud-backend_ARCHITECTURE.md](./E1-cloud-backend_ARCHITECTURE.md) §"Build order."
+
+1. **Service layer first (on `main`, no cloud spend)** — `/src/services/` so components never import the DB client directly. Repository interface + a localStorage-backed impl today; a Supabase impl slots in later. _(scaffolded 2026-06-23)_
+2. **Create the Supabase project** (Pro, region near users). Schema as **migrations from day one** — never click tables into the dashboard.
+3. **Core tables + RLS** — `profiles` (mirrors `auth.users` via trigger) + `items`. `ENABLE ROW LEVEL SECURITY` and verify policies with a JWT-scoped client before any real data.
+4. **Enable Google + Microsoft auth providers.**
+5. **Provider OAuth setup (start early — these have lead time):**
+      - **Gmail** scope `https://www.googleapis.com/auth/gmail.readonly` is a Google **restricted scope** → needs OAuth verification + annual **CASA** assessment before public launch. Begin the consent-screen/verification process early.
+      - **Microsoft (Hotmail/Outlook)** — Azure app registration **inside a directory/tenant** (free; create a tenant, no Enterprise needed), supported account types = "any org directory **+ personal Microsoft accounts**", Graph delegated `Mail.Read` + `offline_access`. Lighter than Gmail — no CASA equivalent for consumer mail.
+6. **Spike the Gmail provider-token flow under Supabase Auth** — the one thing that can invalidate the plan. Prove Supabase Google OAuth yields a usable `provider_refresh_token` you can store + refresh server-side (Supabase does **not** auto-refresh it). If not, keep a separate Google OAuth client for Gmail.
+7. **Storage migration** — base64 → private bucket + URL column (kills the ~5 MB Safari ceiling; unblocks camera import).
+8. **Port the service layer** to Supabase; keep localStorage as offline cache. Build the **seed-on-first-sign-in** path.
+9. **Deploy** — PWA static host (Vercel/Netlify/Cloudflare Pages); Edge Functions for token refresh/Stripe/scraper.
 
 ---
 
@@ -280,4 +299,4 @@ export interface Connection {
 - Free tier limit: 30 items or raise to 50 for beta?
 - Auth methods: Google OAuth only, or also email/password?
 - Will borrowers need a full NTW account to respond to a request, or just a link-based response? (Full account = more installs but more friction)
-- Gmail import: run server-side in Firebase Functions (more secure, API keys hidden) or client-side (current approach)? Recommend moving to server-side before production.
+- Gmail import: keep client-side (current approach) or move token handling **server-side into a Supabase Edge Function** (API keys hidden, refresh server-side)? Recommend server-side before production — and it's required to store the `provider_refresh_token` securely anyway.
