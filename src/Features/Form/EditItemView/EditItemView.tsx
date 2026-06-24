@@ -322,7 +322,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							Skip This Item
 						</button>
 					)}
-					<button type="submit" className="submit">
+					<button type="submit" className="submit ingestion-edit-form">
 						{isCreateMode ? "Add to Closet" : "Save Changes"}
 					</button>
 				</div>

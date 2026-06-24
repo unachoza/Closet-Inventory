@@ -209,6 +209,10 @@ label.animated-checkbox button.checkbox-root {
       border-color: var(--status-error);
 }
 
+button.submit.ingestion-edit-form {
+      position: initial;
+}
+
 .close-icon {
       position: relative;
       top: 15px;
