@@ -65,6 +65,9 @@ _As Maya, I want obvious non-purchases filtered out and a way to recover anythin
 
 ## Known bugs
 - `E3-bug.1` **Email preview horizontal scroll** — some Gmail previews don't format nicely and create an awkward horizontal scroll. Attempted `.gmail-container:has(.display-email-preview-panel){max-width:1175px}` but it didn't hold across the board. Needs a robust preview-width / overflow fix in `EmailPreview`.
+- `E3-bug.2` ⚠️ **Back to email forces full re-auth** — `useGmailAuth` token is lost when the Gmail view unmounts; returning from item edit triggers a full OAuth flow. Fix: lift the token into an AppShell-level ref or context so it survives unmount. — _P0 · pending_
+- `E3-bug.3` **Skip item button hidden under Add to Closet** — on the multi-item edit view from email ingestion, the Skip button was positioned under the submit button. Fixed with `position: initial` — _✅ PR #80_
+- `E3-bug.4` **Inbox loading text — pulse scale animation** — added pulse-scale keyframe to the loading indicator text in the inbox view for better perceived feedback — _✅ PR #80_
 
 ---
 

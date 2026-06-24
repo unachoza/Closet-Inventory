@@ -38,6 +38,11 @@ _As Maya on the subway, I want to view my closet offline so that the app is reli
 
 ---
 
+## Known bugs
+- `E5-bug.1` **Mobile card margin-top clipping** — card top was hidden under the sticky nav on mobile. Fixed margin-top; also updated toast background color for better contrast — _✅ PR #80_
+
+---
+
 ## Dependencies
 - Independent of E1 for layout/PWA shell; **offline writes** integrate with E1's offline-first sync.
 - PWA install path is **load-bearing for E10 monetization** ("no App Store cut").

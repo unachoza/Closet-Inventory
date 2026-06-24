@@ -34,7 +34,7 @@ function centeredGeometry(): Geometry {
 	return {
 		width,
 		// top: 50vh — CSS translateY(-50%) on the --centered class handles true vertical centering.
-		top: window.innerHeight * 0.5,
+		top: window.innerHeight * 0.55,
 		left: (window.innerWidth - width) / 2,
 	};
 }
@@ -134,9 +134,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 				<div className="card-inner">
 					{/* Front */}
 					<div className="card-front">
-						<div className="card-image">
-							{item.imageURL ? <img src={item.imageURL} alt={item?.name} /> : null}
-						</div>
+						<div className="card-image">{item.imageURL ? <img src={item.imageURL} alt={item?.name} /> : null}</div>
 						<div className="card-name-overlay">
 							<span className="card-name-label">{item.name || item.brand || item.category}</span>
 						</div>
@@ -154,7 +152,12 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 				<div className={`card-modal-overlay ${closing ? "card-modal-overlay--closing" : ""}`} onClick={handleClose}>
 					<div
 						className={`card-grow-modal${!closing ? " card-grow-modal--centered" : ""}`}
-						style={{ top: geometry.top, left: geometry.left, width: geometry.width, ...(geometry.height !== undefined && { height: geometry.height }) }}
+						style={{
+							top: geometry.top,
+							left: geometry.left,
+							width: geometry.width,
+							...(geometry.height !== undefined && { height: geometry.height }),
+						}}
 						onClick={(e) => e.stopPropagation()}
 						onTransitionEnd={handleModalTransitionEnd}
 					>

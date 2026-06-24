@@ -69,7 +69,7 @@
 }
 
 .card-details {
-      overflow: scroll;
+      /* overflow: scroll; */
 }
 
 .controls-container {
@@ -202,7 +202,7 @@
 
 /* When resting at center, offset upward by half own height for true vertical center. */
 .card-grow-modal--centered {
-	transform: translateY(-50%);
+	transform: translateY(-52%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -253,7 +253,6 @@
 
   .card-details {
     font-size: 0.85rem;
-    margin-top: 3vh;
   }
 
   .card-front {
