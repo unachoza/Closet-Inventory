@@ -125,6 +125,10 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --Brand-hover-highlight: #b2867552;
   --Light-hover-highlight: #f3eee7;
 
+  /* Danger / Destructive */
+  --primitive-status-danger: #b3261e;
+  --color-danger: var(--primitive-status-danger);
+
 
   /* Typography Attributes */
   --primitive-font-family-serif: "Lora", serif;
@@ -283,6 +287,8 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   /* Stronger borders for inputs / focus (semantic, used by form controls). */
   --border-strong: var(--primitive-neutral-dark-walnut);
   --border-brand: var(--primitive-brand-muted-clay);
+  /* Subtle white border for use on dark/modal surfaces */
+  --border-on-dark: rgba(255, 255, 255, 0.2);
 }
 
 @media (prefers-color-scheme: dark) {

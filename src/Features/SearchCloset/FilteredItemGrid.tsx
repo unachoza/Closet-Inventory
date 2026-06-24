@@ -2,6 +2,7 @@ import { ClothingItem } from "../../utils/types";
 import FilteredCard from "./FilteredCard";
 import "./EntireCloset.css";
 import { AnimatePresence, motion, Variants } from "framer-motion";
+import { LayoutGrid, Grid3x3 } from "lucide-react";
 
 interface FilteredItemGridProps {
 	items: ClothingItem[];
@@ -12,6 +13,8 @@ interface FilteredItemGridProps {
 	 *  item count, so removing an item animates in place (popLayout) instead of
 	 *  blanking and re-staggering the whole grid. */
 	gridKey: string;
+	compact?: boolean;
+	onToggleDensity?: () => void;
 	onEditItem?: (item: ClothingItem) => void;
 	onRemoveItem?: (id: string) => void;
 }
@@ -40,19 +43,27 @@ const cardVariants: Variants = {
 	exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
 };
 
-const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, onEditItem, onRemoveItem }: FilteredItemGridProps) => {
+const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, compact, onToggleDensity, onEditItem, onRemoveItem }: FilteredItemGridProps) => {
 	return (
 		<>
-			<p className="entire-closet__meta">
-				Showing <strong>{items.length}</strong> of {totalCount} items
-			</p>
+			<div className="entire-closet__meta-row">
+				<p className="entire-closet__meta">
+					Showing <strong>{items.length}</strong> of {totalCount} items
+				</p>
+				{onToggleDensity && (
+					<button className="density-toggle" onClick={onToggleDensity} aria-label="Toggle density">
+						{compact ? <LayoutGrid size={15} /> : <Grid3x3 size={15} />}
+						{compact ? "Comfortable" : "Compact"}
+					</button>
+				)}
+			</div>
 			<div className="filtered-items-parent" role="list">
 				{/* Container is keyed by the filter/search/sort signature (gridKey, which
 				    excludes item count). Changing the query remounts it, so every card
 				    mounts fresh and replays the staggered entrance. The inner
 				    AnimatePresence owns removal: a single delete animates out (exit) and
 				    the rest reflow (popLayout + layout) without re-staggering the grid. */}
-				<motion.div key={gridKey} className="items-grid" layout>
+				<motion.div key={gridKey} className={`items-grid${compact ? " items-grid--compact" : ""}`} layout>
 					<AnimatePresence mode="popLayout">
 						{items.map((item, i) => (
 							<motion.div
