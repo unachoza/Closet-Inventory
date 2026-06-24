@@ -215,7 +215,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ---
 
-### ⭐ v1.5 — Wardrobe Status, Location & Availability _(the "Nothing To Wear" core — uncompeted)_
+### ⭐ v1.3 — Wardrobe Status, Location & Availability _(the "Nothing To Wear" core — uncompeted)_
 
 > The flagship differentiator and the founding idea: knowing not just _what_ you own but _what state
 > it's in_ and _where it is_. No competitor tracks this (verified 2026-06-20). It's the spine that
@@ -251,7 +251,6 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 - ✅ Attribute inference from product name — material blend, fabric care, condition (from order age), and style/occasion tags
 - ✅ Multi-material inference with blend percentages and polyamide keyword support
-- ✅ Title-case display transform for product names (display-only, non-mutating)
 - ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
 - ✅ Purchase date gleaned from confirmation email for age calculation (condition editable during import review; date shown read-only, with manual entry fallback when the email has no date)
 - ✅ Parsing strategies for additional retailers (Gap, Victoria's Secret, Old Navy, Target, Walmart, Levi's)
@@ -280,6 +279,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - 🔲 "Find full details ✨" button on the import-review card (user-triggered, reviewable, cached)
 - 🔲 Search for item material breakdown + descriptions from retailer PDPs
 - 🔲 "Find image" flow for items imported without photos
+- 🔲 Search reseller websites for older items descriptions and details
 - 🔲 Engaging Internet Archive for older / discontinued items
 
 ---
@@ -291,7 +291,6 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - 🔲 Yahoo Mail - server-side IMAP client — a backend required,
 - 🔲 iCloud Mail -IMAP, which browsers cannot speak (it's raw TCP, not HTTP)
 - 🔲 AOL Mail - IMAP, which browsers cannot speak (it's raw TCP, not HTTP)
-- 🔲 Proton Mail - end-to-end encrypted with no usable IMAP
 
 ---
 
@@ -354,12 +353,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 ### v5.1 — Backend & Database
 
-> ⚠️ **OPEN DECISION before this ships: [Firestore vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md).**
-> The cloud layer below (Firestore + Firebase Auth + sync/seed) is implemented in **PR #44 `firebaseAuth`** and is **not yet merged to `main`**. On `main` today the closet is **localStorage-only** (`useLocalCloset`). Treat these 🚧 as "built on the Firestore path, pending the DB decision + merge." If Supabase wins (better fit for v5 SQL analytics + v8 relational social/RLS + image storage + the v2.2 scraper backend), #44 is replaced rather than merged — decide _before_ it ships.
-
-- 🚧 Firestore NoSQL database with per-user closet collection
-- 🚧 Offline-first: localStorage as cache, Firestore sync on sign-in
-- 🚧 First-sign-in seed: uploads local closet to Firestore on first login
+- 🚧 Offline-first: localStorage as cache
+- 🚧 First-sign-in seed: uploads closet to localStorage
 - 🔲 Conflict resolution (last-write-wins with `updatedAt` timestamps)
 - 🔲 Multi-device real-time sync (WebSocket or polling)
 - 🔲 "Sync" status indicator in nav
