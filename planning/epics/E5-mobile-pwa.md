@@ -39,7 +39,7 @@ _As Maya on the subway, I want to view my closet offline so that the app is reli
 ---
 
 ## Known bugs
-- `E5-bug.1` **Mobile card margin-top clipping** — card top was hidden under the sticky nav on mobile. Fixed margin-top; also updated toast background color for better contrast — _✅ PR #80_
+- `E5-bug.1` **Item detail header overlaps sticky nav on mobile** — When viewing an item's details and expanding the top of the card, a full-height card's heading can slide underneath the sticky nav bar. Add `margin-top` (or `scroll-margin-top`) to the detail heading / card so it always clears the sticky nav. Mobile breakpoint only.
 
 ---
 

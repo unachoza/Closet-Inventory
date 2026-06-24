@@ -1,8 +1,16 @@
-# E3 · Frictionless Fill 🔅
+# E3 · Frictionless Fill ⭐ (THE differentiator)
 
-> **Date:** 2026-06-20 · **Pillar:** Frictionless Fill · **Detail:** light (expand when scheduled) · **README:** v2.2 / v2.3 / v3.1
-> **Goal:** Make filling the closet effortless — more email providers, richer web-sourced detail, and
-> camera import — because the category dies at onboarding. Builds on the shipped Gmail + inference pipeline.
+> **Date:** 2026-06-20 · **Updated:** 2026-06-24 · **Pillar:** Frictionless Fill · **Detail:** full · **README:** v2.2 / v2.3 / v3.1
+> **Goal:** Make filling the closet effortless — because the category dies at onboarding.
+>
+> ### 🏁 Strategic framing (2026-06-24): frictionless upload is the moat
+> Everyone already has a closet **in their inbox** — years of online-shopping receipts, not just new purchases.
+> NTW's edge is turning that into an online closet with the least possible typing. The wedge has four prongs:
+> 1. **Email import** — parse the existing inbox (the back-catalog, not just current orders)
+> 2. **Web enrichment** — server-side PDP fetch for material breakdown + true sizing measurements (bump this up — see US-3.2)
+> 3. **Manual quick-pills** — tap-to-tag, never type (extend to email-import editing — US-3.8)
+> 4. **Chrome extension** — capture at point-of-purchase, like Alta (US-3.9)
+> Inference (care-from-material, style-from-name) rides on all four. **This epic outranks its old "light" status.**
 
 ---
 
@@ -21,12 +29,14 @@ _As a user on Hotmail/Outlook/Yahoo, I want to import purchases from my provider
 
 **Ticket stubs:** Microsoft Graph OAuth + parser wiring · server-side IMAP service · provider-picker UI.
 
-## US-3.2 — Richer details from the web (v2.2)
-_As a user, I want imported items enriched with full description/material/style so that thin email data gets deep._
+## US-3.2 — Richer details from the web ⬆️ PRIORITY-BUMPED
+_As a user, I want imported items enriched with full description/material/style/**sizing measurements** so that thin email data gets deep enough for travel weight/volume + fit matching._
+- [ ] ⬆️ **Bumped: build right after the database/full-stack (#2), before or alongside mobile.** Reason: server-side PDP queries unlock material breakdown + **true sizing** (retailer size charts: "M = 28\" waist" vs "M = 30\" waist"), which feed `item_materials`, `measurements`, weight/volume (E11/E9), and "fits me" (E12).
 - [ ] Server fetch layer past Cloudflare; URL resolver; feed existing `infer*` pipeline
-- [ ] Full spec: [EngagingWebForProductDetails.md](../EngagingWebForProductDetails.md) (do the feasibility spike first)
+- [ ] Extract: material breakdown, size-chart measurements, country of origin, richer style descriptors → tags
+- [ ] Full spec: [EngagingWebForProductDetails.md](../EngagingWebForProductDetails.md) (do the feasibility spike first — Cloudflare 403 verified 2026-06-20)
 
-**Ticket stubs:** see the v2.2 doc's phased plan.
+**Ticket stubs:** see the v2.2 doc's phased plan · size-chart parser → `measurements` · origin extractor → `country_of_origin`.
 
 ## US-3.3 — Snap an item (v3.1)
 _As Maya, I want to photograph an item so that logging an in-store / second-hand buy is as fast as online._
@@ -37,18 +47,11 @@ _As Maya, I want to photograph an item so that logging an in-store / second-hand
 
 ## US-3.4 — Efficient, transparent Gmail API usage
 _As a user, I want imports to reuse cached emails and clearly tell me what they're doing so that I'm not waiting on (or paying for) redundant Gmail API calls._
-- [ ] Cache all fetched emails (metadata + bodies) and clear the cache deliberately — never leave a stale or oversized cache around
-- [ ] Make a brand-new fetch visibly distinct from a filter over cached results; prefer the cache and minimize live API calls wherever possible
-- [ ] More descriptive UI about what was fetched — date range of emails, cached vs. fresh count, last-fetched indicator
+- [ ] Cache all fetched emails (metadata + bodies); deliberate, careful cache invalidation (don't clear on every visit) — never leave a stale or oversized cache around
+- [ ] Distinguish an entirely-new fetch from a filter over cached results; default to cache, only hit the API when the query shape actually changed
+- [ ] **Email-list header shows count + date range, not just count.** Today it reads "Found 100 emails." It should read e.g. **"Found 20 emails · May 2018 – Dec 2018"** so it's obvious which tranche the user is viewing. Also surface cached vs. fresh count + last-fetched indicator.
 
-**Ticket stubs:** cache lifecycle + invalidation/TTL audit · fetch-vs-cache mode indicator + cache-first routing · date-range / cached-count status UI in the search bar.
-## US-3.4 — Fewer, smarter Gmail calls
-_As a user, I want the importer to reuse cached emails and be clear about what it's fetching so that I'm not burning API quota or waiting on redundant calls._
-- [ ] Cache all fetched emails + bodies; deliberate, careful cache invalidation (don't clear on every visit)
-- [ ] Distinguish an entirely-new query from a cache-reusable one; default to cache, only hit the API when the query shape actually changed
-- [ ] Surface what's cached vs fetched, and the date range covered, in the UI (e.g. "showing N of M cached · fetched Jun 1–21")
-
-**Ticket stubs:** cache-key by query signature · new-vs-cached resolver · "fetched range" indicator in the search header.
+**Ticket stubs:** cache lifecycle + invalidation/TTL audit · cache-key by query signature · new-vs-cached resolver · `E3-4.1` count + date-range + cached/fresh indicator in the email-list header.
 
 ## US-3.5 — Cleaner import results
 _As Maya, I want obvious non-purchases filtered out and a way to recover anything wrongly skipped so that the import list is trustworthy and reversible._
@@ -60,10 +63,52 @@ _As Maya, I want obvious non-purchases filtered out and a way to recover anythin
 
 ---
 
+## US-3.6 — Correct import form validation
+_As Maya, I want the Edit Item form to only require fields that matter at import time so that I can save an item without being forced to fill in price, occasion, or care._
+- [ ] Optional in email-import flow: `price`, `occasion`, `care`
+- [ ] Mandatory: `name`, `category`, `color`, `size`, `brand`
+- [ ] Both single-item and batch-import flows use the relaxed ruleset
+
+**Ticket:** `E3-6.1` Relax `EditItemView` validation when `mode === "create"` from email import; add regression test — _0.5d_
+
+## US-3.7 — Easier material-blend editing
+_As Maya, I want editing a material blend to be intuitive so that I can correct fabric percentages without fighting the control._
+- [ ] The blend editor is hard to use: the percentage control is disabled at 100% and it's awkward to dial back down to 100% from a multi-fiber blend
+- [ ] Rework so adding/removing fibers and redistributing percentages is smooth; 100% single-fiber and multi-fiber states both editable
+- [ ] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
+
+**Ticket:** `E3-7.1` Redesign the material-blend editor interaction in `EditItemView` — _1d_
+
+## US-3.8 — Tap-to-tag on email import (mobile friction killer)
+_As Maya importing on my phone, I want to tap pills for occasion / vibe / care / season instead of typing so that ingestion isn't clunky on mobile._
+- [ ] Email-import `EditItemView` uses the same **pill-tag inputs** that manual add already has for material/brand/care
+- [ ] Dropdown-style fields become tappable tags: care (machine wash · cold · hang dry), occasion, vibe, season
+- [ ] No free-typing required for controlled-vocab fields (`tag_vocab`)
+
+**Ticket:** `E3-8.1` Port the manual pill-tag inputs into the email-import edit flow (care/occasion/vibe/season) — _1d_
+
+## US-3.9 — Chrome extension capture (point-of-purchase)
+_As a shopper, I want to add an item to my closet straight from a retailer's product page so that current purchases are captured with full detail, no email round-trip (the Alta move)._
+- [ ] Browser extension grabs PDP details (name, price, image, material, size chart) on the product page
+- [ ] Pushes through the same service layer / inference pipeline as email + manual
+- [ ] Reuses US-3.2 web-extraction logic client-side at the source
+
+**Ticket stubs:** extension scaffold · PDP scraper · auth handshake to the app · dedupe against email import.
+
+---
+
 ## Shipped
 - ✅ **Skip non-clothing / uncategorizable imports** (esp. Amazon) with a reviewable "Include" recovery list, excluded noise senders, and category-keyword cleanup — shipped in **PR #72** (tracked under **E0 US-0.5**).
+- ✅ **localStorage security purge** — legacy `gmail_auth_token`, `gmail_email_bodies_cache`, `gmail_emails_cache` keys purged from localStorage on app mount so no sensitive data persists across sessions. PR #76 (XSS hardening) + PR #78 (clean cherry-pick purge on every mount, not just Gmail view). On `main` as of 2026-06-24.
 
 ## Known bugs
+
+- `E3-bug.2` **🔴 CRITICAL — "Back to email" forces full re-auth** — After `GmailImport → EmailPreview → Import → EditItemView → "Back to email"`, the user lands on the Gmail connect screen and must redo the entire OAuth flow. Root cause: `gmail_auth_token` moved to memory-only state inside `useGmailAuth` (PR #76 security fix). Token is lost when the Gmail view unmounts; on remount `useGmailAuth` initialises with no token and shows the connect screen. Fix: hold the token in a stable ref or React context at the `AppShell` level so it survives Gmail ↔ Edit navigation without touching localStorage.
+
+- `E3-bug.3` **Bulk import regression — "Skip item" hidden under "Add to Closet"** — In the multi-item import queue, the Skip button is obscured by the Add to Closet button. Layout regression in `EditItemView` batch controls. Needs z-index / stacking / ordering fix.
+
+- `E3-bug.4` **Email fetch loading state not visible** — The "fetching from email" pulse indicator is no longer obvious. Users can't tell if a live Gmail API call is in progress. Restore or improve the loading pulse in `GmailImport` (tracked in US-3.4 cache/fetch UX work).
+
 - `E3-bug.1` **Email preview horizontal scroll** — some Gmail previews don't format nicely and create an awkward horizontal scroll. Attempted `.gmail-container:has(.display-email-preview-panel){max-width:1175px}` but it didn't hold across the board. Needs a robust preview-width / overflow fix in `EmailPreview`.
 - `E3-bug.2` ⚠️ **Back to email forces full re-auth** — `useGmailAuth` token is lost when the Gmail view unmounts; returning from item edit triggers a full OAuth flow. Fix: lift the token into an AppShell-level ref or context so it survives unmount. — _P0 · pending_
 - `E3-bug.3` **Skip item button hidden under Add to Closet** — on the multi-item edit view from email ingestion, the Skip button was positioned under the submit button. Fixed with `position: initial` — _✅ PR #80_
