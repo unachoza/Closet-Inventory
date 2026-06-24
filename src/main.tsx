@@ -6,13 +6,15 @@ import "./styles/primitives.css"; // canonical component primitives (.btn/.panel
 import "./index.css";
 import "./styles/typography.css"; // editorial type adoption — loads AFTER index.css to win the cascade
 import App from "./App.tsx";
+import { GmailSpike } from "./GmailSpike.tsx";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
+const isSpike = new URLSearchParams(window.location.search).has("spike");
 
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<GoogleOAuthProvider clientId={clientId}>
-			<App />
+			{isSpike ? <GmailSpike /> : <App />}
 		</GoogleOAuthProvider>
 	</StrictMode>,
 );
