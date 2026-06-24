@@ -59,8 +59,18 @@ function AppShell() {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		const hasCompletedOnboarding = localStorage.getItem(ONBOARDING_KEY);
+		// Purge any sensitive data left over by pre-PR#76 builds on first load,
+		// regardless of which view the user lands on.
+		const LEGACY_KEYS = [
+			"gmail_auth_token",
+			"gmail_auth_loading",
+			"gmail_auth_error",
+			"gmail_email_bodies_cache",
+			"gmail_emails_cache",
+		];
+		LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
 
+		const hasCompletedOnboarding = localStorage.getItem(ONBOARDING_KEY);
 		setShowOnboarding(!hasCompletedOnboarding);
 		setIsLoading(false);
 	}, []);
