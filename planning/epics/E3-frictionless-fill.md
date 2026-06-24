@@ -37,18 +37,11 @@ _As Maya, I want to photograph an item so that logging an in-store / second-hand
 
 ## US-3.4 — Efficient, transparent Gmail API usage
 _As a user, I want imports to reuse cached emails and clearly tell me what they're doing so that I'm not waiting on (or paying for) redundant Gmail API calls._
-- [ ] Cache all fetched emails (metadata + bodies) and clear the cache deliberately — never leave a stale or oversized cache around
-- [ ] Make a brand-new fetch visibly distinct from a filter over cached results; prefer the cache and minimize live API calls wherever possible
-- [ ] More descriptive UI about what was fetched — date range of emails, cached vs. fresh count, last-fetched indicator
+- [ ] Cache all fetched emails (metadata + bodies); deliberate, careful cache invalidation (don't clear on every visit) — never leave a stale or oversized cache around
+- [ ] Distinguish an entirely-new fetch from a filter over cached results; default to cache, only hit the API when the query shape actually changed
+- [ ] **Email-list header shows count + date range, not just count.** Today it reads "Found 100 emails." It should read e.g. **"Found 20 emails · May 2018 – Dec 2018"** so it's obvious which tranche the user is viewing. Also surface cached vs. fresh count + last-fetched indicator.
 
-**Ticket stubs:** cache lifecycle + invalidation/TTL audit · fetch-vs-cache mode indicator + cache-first routing · date-range / cached-count status UI in the search bar.
-## US-3.4 — Fewer, smarter Gmail calls
-_As a user, I want the importer to reuse cached emails and be clear about what it's fetching so that I'm not burning API quota or waiting on redundant calls._
-- [ ] Cache all fetched emails + bodies; deliberate, careful cache invalidation (don't clear on every visit)
-- [ ] Distinguish an entirely-new query from a cache-reusable one; default to cache, only hit the API when the query shape actually changed
-- [ ] Surface what's cached vs fetched, and the date range covered, in the UI (e.g. "showing N of M cached · fetched Jun 1–21")
-
-**Ticket stubs:** cache-key by query signature · new-vs-cached resolver · "fetched range" indicator in the search header.
+**Ticket stubs:** cache lifecycle + invalidation/TTL audit · cache-key by query signature · new-vs-cached resolver · `E3-4.1` count + date-range + cached/fresh indicator in the email-list header.
 
 ## US-3.5 — Cleaner import results
 _As Maya, I want obvious non-purchases filtered out and a way to recover anything wrongly skipped so that the import list is trustworthy and reversible._
@@ -60,10 +53,36 @@ _As Maya, I want obvious non-purchases filtered out and a way to recover anythin
 
 ---
 
+## US-3.6 — Correct import form validation
+_As Maya, I want the Edit Item form to only require fields that matter at import time so that I can save an item without being forced to fill in price, occasion, or care._
+- [ ] Optional in email-import flow: `price`, `occasion`, `care`
+- [ ] Mandatory: `name`, `category`, `color`, `size`, `brand`
+- [ ] Both single-item and batch-import flows use the relaxed ruleset
+
+**Ticket:** `E3-6.1` Relax `EditItemView` validation when `mode === "create"` from email import; add regression test — _0.5d_
+
+## US-3.7 — Easier material-blend editing
+_As Maya, I want editing a material blend to be intuitive so that I can correct fabric percentages without fighting the control._
+- [ ] The blend editor is hard to use: the percentage control is disabled at 100% and it's awkward to dial back down to 100% from a multi-fiber blend
+- [ ] Rework so adding/removing fibers and redistributing percentages is smooth; 100% single-fiber and multi-fiber states both editable
+- [ ] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
+
+**Ticket:** `E3-7.1` Redesign the material-blend editor interaction in `EditItemView` — _1d_
+
+---
+
 ## Shipped
 - ✅ **Skip non-clothing / uncategorizable imports** (esp. Amazon) with a reviewable "Include" recovery list, excluded noise senders, and category-keyword cleanup — shipped in **PR #72** (tracked under **E0 US-0.5**).
+- ✅ **localStorage security purge** — legacy `gmail_auth_token`, `gmail_email_bodies_cache`, `gmail_emails_cache` keys purged from localStorage on app mount so no sensitive data persists across sessions. PR #76 (XSS hardening) + PR #78 (clean cherry-pick purge on every mount, not just Gmail view). On `main` as of 2026-06-24.
 
 ## Known bugs
+
+- `E3-bug.2` **🔴 CRITICAL — "Back to email" forces full re-auth** — After `GmailImport → EmailPreview → Import → EditItemView → "Back to email"`, the user lands on the Gmail connect screen and must redo the entire OAuth flow. Root cause: `gmail_auth_token` moved to memory-only state inside `useGmailAuth` (PR #76 security fix). Token is lost when the Gmail view unmounts; on remount `useGmailAuth` initialises with no token and shows the connect screen. Fix: hold the token in a stable ref or React context at the `AppShell` level so it survives Gmail ↔ Edit navigation without touching localStorage.
+
+- `E3-bug.3` **Bulk import regression — "Skip item" hidden under "Add to Closet"** — In the multi-item import queue, the Skip button is obscured by the Add to Closet button. Layout regression in `EditItemView` batch controls. Needs z-index / stacking / ordering fix.
+
+- `E3-bug.4` **Email fetch loading state not visible** — The "fetching from email" pulse indicator is no longer obvious. Users can't tell if a live Gmail API call is in progress. Restore or improve the loading pulse in `GmailImport` (tracked in US-3.4 cache/fetch UX work).
+
 - `E3-bug.1` **Email preview horizontal scroll** — some Gmail previews don't format nicely and create an awkward horizontal scroll. Attempted `.gmail-container:has(.display-email-preview-panel){max-width:1175px}` but it didn't hold across the board. Needs a robust preview-width / overflow fix in `EmailPreview`.
 
 ---

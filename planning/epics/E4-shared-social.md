@@ -20,6 +20,25 @@ _As the "Our Closet" user, I want to share my closet (or parts of it) with a fri
 - `E4-1.3` Per-item/category privacy controls (`visible_to`) — _1.5–2d_
 - `E4-1.4` "Friends' closets" browse view — _1.5d_
 
+## US-4.4 — Privacy: visibility vs. lendability are separate
+_As a user sharing my closet, I want fine-grained control over what others can see and what they can borrow — two independent axes — so that I share comfortably and intimates never leak by accident._
+
+**Two independent flags per item:**
+- `isPrivate` — hidden from all shared views (not visible to anyone but me)
+- `isLendable` — visible to connections but **not** borrowable (the "you can see it, you can't borrow it" case)
+
+**Default behavior:**
+- [ ] **Intimates + underwear categories are `isPrivate` by default** — never shown in a shared closet link unless the owner explicitly opts them in
+- [ ] Any item can be marked private regardless of category
+- [ ] Any visible item can be marked not-for-loan (visible but `isLendable: false`)
+- [ ] Borrow flow (US-4.2) must respect `isLendable` — non-lendable items show no "Request to borrow" action
+- [ ] RLS enforces `isPrivate` server-side; UI enforces `isLendable` on the borrow action
+
+**Tickets**
+- `E4-4.1` Add `isPrivate` + `isLendable` to `ClothingItem` / `@ntw/types` `Item`; default intimates+underwear to private — _0.5d_
+- `E4-4.2` Privacy controls UI (per-item toggles + category defaults) — _1.5d_
+- `E4-4.3` RLS policy for `isPrivate`; gate borrow action on `isLendable` — _1d_
+
 ## US-4.2 — Borrow something from a friend
 _As the "Our Closet" user, I want to request to borrow a friend's item so that sharing is tracked, not chaotic._
 - [ ] "Request to borrow" on a visible friend's item

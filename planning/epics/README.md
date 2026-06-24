@@ -21,7 +21,13 @@
 | [E8 · Care & Knowledge](./E8-care-knowledge.md) | Knowledge | 🔅 light | v9 | ~tbd |
 | [E9 · Travel](./E9-travel.md) | Supporting | 🔅 light | v6 | ~tbd |
 | [E10 · Monetization](./E10-monetization.md) | Business | 🔅 light | v1.0 (Stripe) | ~tbd |
+| [E11 · Laundry & Wear](./E11-laundry-wear.md) ⭐ | Inventory | ✅ full | v1.5/v5 (split from E2) | ~7–10 |
+| [E12 · User Profile & Identity](./E12-user-profile.md) | Foundation | 🔅 light–med | — | ~tbd |
 
 ⭐ = uncompeted differentiator (protect from de-prioritization).
+
+### 🔢 Current priority order (2026-06-24)
+1. **Hotfixes** (Sprint 3.5) → 2. **E1** database/full-stack → 3. **E5** mobile PWA → 4. **E11** laundry (+ **E12** profile) → 5. **E8** care/stain + education overhaul → 6. **E4** sharing/social.
+🟡 **E2 Inventory Truth is parked** under this order (its clean/dirty + `wornCount` bits moved to E11) — confirm before scheduling. Sequencing detail: [SPRINTS.md](./SPRINTS.md).
 
 **Ticket IDs:** `E{n}-{story}.{ticket}` — e.g. `E2-1.3` = Epic 2, Story 1, Ticket 3.

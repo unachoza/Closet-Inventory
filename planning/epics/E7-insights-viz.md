@@ -10,7 +10,7 @@
 _As Maya, I want stats so that I understand my spending and usage._
 - [ ] Stats strip: total items / total spend / avg price
 - [ ] Category breakdown, brand frequency, price distribution
-- [ ] Cost-per-wear (needs `wornCount` from E2)
+- [ ] Cost-per-wear (needs `wornCount` from [E11](./E11-laundry-wear.md))
 
 **Ticket stubs:** `useClosetStats` (in-memory) · stats strip · charts (recharts) · cost-per-wear chip.
 
@@ -24,4 +24,4 @@ _As Maya, I want guilt/sustainability signals so that I wear more and shop smart
 ---
 
 ## Dependencies
-- **`wornCount` (E2)** is the prerequisite for cost-per-wear, guilt, and sustainability. **Expand when scheduled.**
+- **`wornCount` (owned by [E11](./E11-laundry-wear.md), formerly E2)** is the prerequisite for cost-per-wear, guilt, and sustainability. **Expand when scheduled.**
