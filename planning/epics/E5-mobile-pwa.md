@@ -38,6 +38,11 @@ _As Maya on the subway, I want to view my closet offline so that the app is reli
 
 ---
 
+## Known bugs
+- `E5-bug.1` **Item detail header overlaps sticky nav on mobile** — When viewing an item's details and expanding the top of the card, a full-height card's heading can slide underneath the sticky nav bar. Add `margin-top` (or `scroll-margin-top`) to the detail heading / card so it always clears the sticky nav. Mobile breakpoint only.
+
+---
+
 ## Dependencies
 - Independent of E1 for layout/PWA shell; **offline writes** integrate with E1's offline-first sync.
 - PWA install path is **load-bearing for E10 monetization** ("no App Store cut").

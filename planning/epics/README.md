@@ -13,7 +13,7 @@
 | [E0 · Trustworthy Core](./E0-trustworthy-core.md) | Foundation | ✅ full | Priority 1 | ~5.5–6 |
 | [E1 · Cloud Backend & Data](./E1-cloud-backend.md) | Foundation | ✅ full | v5.1 (Supabase) | ~7–11 |
 | [E2 · Inventory Truth](./E2-inventory-truth.md) ⭐ | Inventory | ✅ full | v1.5 | ~8.5–11.5 |
-| [E3 · Frictionless Fill](./E3-frictionless-fill.md) | Fill | 🔅 light | v2.2 / v2.3 / v3.1 | ~tbd |
+| [E3 · Frictionless Fill](./E3-frictionless-fill.md) ⭐ | Fill (the moat) | ✅ full | v2.2 / v2.3 / v3.1 | ~tbd |
 | [E4 · Shared & Social](./E4-shared-social.md) ⭐ | Social | ✅ full | v8.1 | ~9–13 |
 | [E5 · Mobile & PWA](./E5-mobile-pwa.md) | Supporting | ✅ full | v3.0 | ~7.5–9.5 |
 | [E6 · Outfit Builder](./E6-outfit-builder.md) | Supporting | 🔅 light | v7.0 | ~6.5–9.5 |
@@ -21,7 +21,13 @@
 | [E8 · Care & Knowledge](./E8-care-knowledge.md) | Knowledge | 🔅 light | v9 | ~tbd |
 | [E9 · Travel](./E9-travel.md) | Supporting | 🔅 light | v6 | ~tbd |
 | [E10 · Monetization](./E10-monetization.md) | Business | 🔅 light | v1.0 (Stripe) | ~tbd |
+| [E11 · Laundry & Wear](./E11-laundry-forecasting.md) ⭐ | Inventory | ✅ full | v1.5/v5 (split from E2) | ~7–10 |
+| [E12 · User Profile & Identity](./E12-user-profile.md) | Foundation | 🔅 light–med | — | ~tbd |
 
 ⭐ = uncompeted differentiator (protect from de-prioritization).
+
+### 🔢 Current priority order (8-item, 2026-06-24)
+1. **Hotfixes** (Sprint 3.5) → 2. **E1** database/full-stack (+ E3 web-enrich spike) → 3. **E5** mobile PWA → 4. **E2** Inventory Truth → 5. **E12** User Profile → 6. **E11** Laundry → 7. **E4** Sharing/social → 8. **E8** Care & Knowledge.
+**E3 Frictionless Fill** ⭐ is ongoing/cross-cutting (the moat). `wornCount`/clean-dirty `status` are owned by E11 but shared with E2 — one canonical field. Sequencing detail: [SPRINTS.md](./SPRINTS.md).
 
 **Ticket IDs:** `E{n}-{story}.{ticket}` — e.g. `E2-1.3` = Epic 2, Story 1, Ticket 3.
