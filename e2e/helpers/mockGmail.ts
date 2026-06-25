@@ -13,7 +13,6 @@ import type { Page } from "@playwright/test";
  */
 
 const GMAIL_API = "https://www.googleapis.com/gmail/v1/users/me";
-const AUTH_STORAGE_KEY = "gmail_auth_token";
 
 export interface MockEmail {
 	id: string;
@@ -76,12 +75,40 @@ export const DEFAULT_MOCK_EMAILS: MockEmail[] = [
 
 /** Apply all Gmail mocks to a page. Call before page.goto(). */
 export async function mockGmail(page: Page, emails: MockEmail[] = DEFAULT_MOCK_EMAILS): Promise<void> {
-	// 1) Seed auth token (before any app script runs).
-	await page.addInitScript((key) => {
-		localStorage.setItem(key, JSON.stringify({ accessToken: "e2e-fake-token", expiresAt: Date.now() + 3_600_000 }));
-	}, AUTH_STORAGE_KEY);
+	// 1) Fake the Google Identity Services client so the app authenticates through
+	//    its REAL path (useGoogleLogin → onSuccess → in-memory token). The token is
+	//    memory-only now, so the old "seed localStorage" trick no longer works —
+	//    the app purges that key on mount. Instead we stub window.google.accounts:
+	//    initTokenClient auto-fires its callback on mount, which drives onSuccess
+	//    exactly like a real popup grant, with no network and no popup.
+	await page.addInitScript(() => {
+		const token = { access_token: "e2e-fake-token", expires_in: 3600 };
+		// Minimal surface the @react-oauth/google provider + useGoogleLogin touch.
+		(window as unknown as { google: unknown }).google = {
+			accounts: {
+				id: {
+					initialize: () => {},
+					prompt: () => {},
+					renderButton: () => {},
+					cancel: () => {},
+					disableAutoSelect: () => {},
+				},
+				oauth2: {
+					initTokenClient: (config: { callback: (t: typeof token) => void }) => {
+						// Auto-grant shortly after the client is created (mount), so specs
+						// land already authenticated — matching the prior behaviour.
+						setTimeout(() => config.callback(token), 0);
+						// Also honour an explicit login() click (Connect button).
+						return { requestAccessToken: () => config.callback(token) };
+					},
+				},
+			},
+		};
+	});
 
-	// 2) Neutralize Google's auth scripts so the OAuth provider doesn't hang.
+	// 2) Neutralize Google's auth scripts so the OAuth provider doesn't hang (the
+	//    empty body still fires the script's onload → "GSI loaded" — our injected
+	//    window.google survives because the empty script defines nothing).
 	await page.route(/accounts\.google\.com\/.*/, (route) => route.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
 	await page.route(/googleapis\.com\/oauth2\/.*/, (route) => route.fulfill({ status: 200, contentType: "application/json", body: "{}" }));
 
