@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useGmailAuth } from "../../hooks/useGmailAuth";
+import { useGmailAuthContext } from "../../context/GmailAuthContext";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
@@ -27,7 +27,7 @@ interface GmailImportProps {
 }
 
 export default function GmailImport({ onImport, onImportAll, initialSelectedEmailId, onSourceEmailChange }: GmailImportProps) {
-	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
+	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
 
 	const {
 		emails,

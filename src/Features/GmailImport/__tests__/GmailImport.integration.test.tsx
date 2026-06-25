@@ -19,6 +19,7 @@ import EditItemView from "../../Form/EditItemView/EditItemView";
 // Uses the shared manual mock at __mocks__/framer-motion.tsx (declared above).
 import { EditProvider } from "../../Form/EditContext";
 import { ToastProvider } from "../../../Components/Toast/Toast";
+import { GmailAuthProvider } from "../../../context/GmailAuthContext";
 import type { ClothingItem, ViewType } from "../../../utils/types";
 import { ZARA_EMAIL_BODY } from "./__mocks__/emailDataMocks";
 
@@ -164,31 +165,33 @@ function TestHarness() {
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
-		<EditProvider>
-			<ToastProvider>
-				{view === "gmail" && (
-					<GmailImport
-						onImport={handleGmailImport}
-						onImportAll={handleGmailImportAll}
-						initialSelectedEmailId={gmailSourceEmailId}
-						onSourceEmailChange={setGmailSourceEmailId}
-					/>
-				)}
-				{view === "edit" && editItem && (
-					<EditItemView
-						key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
-						item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
-						mode="create"
-						setView={setView}
-						onReturnToEmail={handleReturnToEmail}
-						onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
-						onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
-						queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
-						queueTotal={isInBatchMode ? importQueue.length : undefined}
-					/>
-				)}
-			</ToastProvider>
-		</EditProvider>
+		<GmailAuthProvider>
+			<EditProvider>
+				<ToastProvider>
+					{view === "gmail" && (
+						<GmailImport
+							onImport={handleGmailImport}
+							onImportAll={handleGmailImportAll}
+							initialSelectedEmailId={gmailSourceEmailId}
+							onSourceEmailChange={setGmailSourceEmailId}
+						/>
+					)}
+					{view === "edit" && editItem && (
+						<EditItemView
+							key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
+							item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
+							mode="create"
+							setView={setView}
+							onReturnToEmail={handleReturnToEmail}
+							onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
+							onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+							queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
+							queueTotal={isInBatchMode ? importQueue.length : undefined}
+						/>
+					)}
+				</ToastProvider>
+			</EditProvider>
+		</GmailAuthProvider>
 	);
 }
 
