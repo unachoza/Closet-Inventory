@@ -115,6 +115,7 @@ _As a shopper, I want to add an item to my closet straight from a retailer's pro
 - `E3-bug.6` **"Include" skipped-item identity by name** — when an email skipped multiple items sharing a name (e.g. four "The Highwaist"), clicking one Include dropped all same-named items from the drawer but moved only one into the detected list; the leftovers leaked into the next email's detected list (unskip state never reset on email change). Fixed in `EmailPreview`: identity is now the per-email skipped index (not name), and unskip selections reset on `email.id` change. Added a batch **"Include all N items"** button (parallels Import All). — _✅ FIXED_
 - `E3-bug.3` **Skip item button hidden under Add to Closet** — on the multi-item edit view from email ingestion, the Skip button was positioned under the submit button. Fixed with `position: initial` — _✅ PR #80_
 - `E3-bug.4` **Inbox loading text — pulse scale animation** — added pulse-scale keyframe to the loading indicator text in the inbox view for better perceived feedback — _✅ PR #80_
+- `E3-bug.7` **Fixed-layout retailer emails (Banana Republic, etc.)** — deeply-nested `<table>` structures (640px outer, 606/545/282px inner) with 1px spacer-GIF padding cells distort in preview (gray stripes, squeezed text). Requires iframe-isolation architecture, not CSS tweaks. Scoped as separate ticket. — _BACKLOG_
 
 ---
 

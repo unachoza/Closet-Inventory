@@ -14,7 +14,7 @@ vi.mock("framer-motion");
 
 // ── Module mocks ───────────────────────────────────────────────────────────
 // Control which products the parser returns so tests are deterministic.
-const mockParseProducts = vi.fn<() => ExtractedProduct[]>();
+const mockParseProducts = vi.fn<(body: string) => ExtractedProduct[]>();
 vi.mock("../../../../utils/parseProductsFromEmail", () => ({
 	parseProductsFromEmail: (...args: unknown[]) => mockParseProducts(...(args as [])),
 	detectImageBasedRetailer: () => null,
