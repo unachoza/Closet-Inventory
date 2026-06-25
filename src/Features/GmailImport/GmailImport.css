@@ -533,6 +533,27 @@
 	border-color: var(--bg-surface-brand, #b28675);
 }
 
+/* Batch "Include all" row — sits below the individual items, spans full width
+   and reads as the primary action of the drawer. */
+.gmail-skipped-item--all {
+	justify-content: flex-end;
+	padding-top: var(--spacing-100);
+	margin-top: var(--spacing-50);
+	border-top: 1px solid var(--border-hairline, rgba(132, 112, 87, 0.2));
+}
+
+.gmail-skipped-include-btn--all {
+	background: var(--bg-surface-brand, #b28675);
+	color: #fff;
+	border-color: var(--bg-surface-brand, #b28675);
+	font-weight: 600;
+}
+
+.gmail-skipped-include-btn--all:hover {
+	background: var(--Primary-Pink-Darker, #8f6256);
+	border-color: var(--Primary-Pink-Darker, #8f6256);
+}
+
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;

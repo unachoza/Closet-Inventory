@@ -82,15 +82,38 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 	}, [imageBasedRetailer, parsedProducts]);
 
 	// User can "unskip" individual items — move them into the importable list.
-	const [unskipped, setUnskipped] = useState<ExtractedProduct[]>([]);
-	const effectiveProducts = useMemo(() => [...initialClothing, ...unskipped], [initialClothing, unskipped]);
-	const skippedProducts = useMemo(
-		() => initialSkipped.filter((p) => !unskipped.some((u) => u.name === p.name)),
-		[initialSkipped, unskipped],
-	);
+	// Identity is the item's INDEX within this email's skipped list, not its name:
+	// a single email can skip several items with the same name (e.g. four "The
+	// Highwaist"), so matching by name would unskip them all at once and drop
+	// duplicates. The index is unique and stable within one email's parse.
+	const [unskippedIdx, setUnskippedIdx] = useState<Set<number>>(new Set());
 
-	const handleUnskip = (product: ExtractedProduct) => {
-		setUnskipped((prev) => [...prev, product]);
+	// Reset selections when the email changes — otherwise items unskipped on one
+	// email leak into the next email's detected list.
+	useEffect(() => {
+		setUnskippedIdx(new Set());
+	}, [email.id]);
+
+	const unskippedProducts = useMemo(
+		() => initialSkipped.filter((_, i) => unskippedIdx.has(i)),
+		[initialSkipped, unskippedIdx],
+	);
+	const skippedProducts = useMemo(
+		() => initialSkipped.filter((_, i) => !unskippedIdx.has(i)),
+		[initialSkipped, unskippedIdx],
+	);
+	const effectiveProducts = useMemo(() => [...initialClothing, ...unskippedProducts], [initialClothing, unskippedProducts]);
+
+	const handleUnskip = (index: number) => {
+		setUnskippedIdx((prev) => {
+			const next = new Set(prev);
+			next.add(index);
+			return next;
+		});
+	};
+
+	const handleUnskipAll = () => {
+		setUnskippedIdx(new Set(initialSkipped.map((_, i) => i)));
 	};
 
 	const [showSkipped, setShowSkipped] = useState(false);
@@ -155,18 +178,37 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 					</div>
 					{showSkipped && (
 						<ul className="gmail-skipped-list">
-							{skippedProducts.map((product) => (
-								<li key={product.name} className="gmail-skipped-item">
-									<span className="gmail-skipped-item-name">{product.name}</span>
+							{initialSkipped.map((product, index) =>
+								unskippedIdx.has(index) ? null : (
+									<li key={`${index}-${product.name}`} className="gmail-skipped-item">
+										<span className="gmail-skipped-item-name">{product.name}</span>
+										<button
+											className="gmail-skipped-include-btn"
+											type="button"
+											onClick={(e) => {
+												e.stopPropagation();
+												handleUnskip(index);
+											}}
+										>
+											Include
+										</button>
+									</li>
+								),
+							)}
+							{skippedProducts.length > 1 && (
+								<li className="gmail-skipped-item gmail-skipped-item--all">
 									<button
-										className="gmail-skipped-include-btn"
+										className="gmail-skipped-include-btn gmail-skipped-include-btn--all"
 										type="button"
-										onClick={(e) => { e.stopPropagation(); handleUnskip(product); }}
+										onClick={(e) => {
+											e.stopPropagation();
+											handleUnskipAll();
+										}}
 									>
-										Include
+										Include all {skippedProducts.length} items
 									</button>
 								</li>
-							))}
+							)}
 						</ul>
 					)}
 				</div>

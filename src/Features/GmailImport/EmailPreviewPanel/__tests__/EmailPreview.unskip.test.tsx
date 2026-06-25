@@ -82,6 +82,25 @@ function getIncludeButtons() {
 	return Array.from(list.querySelectorAll(".gmail-skipped-include-btn"));
 }
 
+/** Per-item Include buttons only (excludes the batch "Include all"). */
+function getItemIncludeButtons() {
+	const list = document.querySelector(".gmail-skipped-list");
+	if (!list) return [];
+	return Array.from(list.querySelectorAll(".gmail-skipped-include-btn:not(.gmail-skipped-include-btn--all)"));
+}
+
+function getSkippedItemNames() {
+	return Array.from(document.querySelectorAll(".gmail-skipped-item-name")).map((el) => el.textContent);
+}
+
+/** The batch "Include all" button (scoped by class to avoid matching the
+ *  drawer wrapper, whose accessible name now contains the same text). */
+function getIncludeAllButton(): HTMLElement {
+	const btn = document.querySelector(".gmail-skipped-include-btn--all");
+	if (!btn) throw new Error("Include-all button not found");
+	return btn as HTMLElement;
+}
+
 // ── Tests ──────────────────────────────────────────────────────────────────
 describe("EmailPreview — skipped items drawer", () => {
 	beforeEach(() => {
@@ -205,5 +224,95 @@ describe("EmailPreview — unskip (Include button)", () => {
 		const imported: ExtractedProduct[] = onImportAllProducts.mock.calls[0][0];
 		expect(imported.some((p) => p.name === ACCESSORY.name)).toBe(true);
 		expect(imported.some((p) => p.name === SHIRT.name)).toBe(true);
+	});
+});
+
+// ── Regression: duplicate-named skipped items must be unskipped independently ──
+// A single email can skip several items sharing a name (e.g. four "The
+// Highwaist"). Identity was by name, so including one dropped ALL same-named
+// items from the drawer while only one reached the importable list; the rest
+// leaked into the next email. Identity is now the per-email index.
+describe("EmailPreview — duplicate-named skipped items", () => {
+	// Three skipped accessories sharing the SAME name.
+	const DUP = (i: number): ExtractedProduct => ({
+		name: "Highwaist Accessory",
+		price: 10 + i,
+		color: "",
+		size: "",
+		brand: "CUUP",
+		imageUrl: "",
+		onSale: false,
+		material: "",
+		itemNumber: `${i}`,
+	});
+
+	beforeEach(() => {
+		mockParseProducts.mockReturnValue([SHIRT, DUP(0), DUP(1), DUP(2)]);
+	});
+
+	it("including ONE duplicate leaves the other duplicates in the drawer", async () => {
+		renderPreview();
+		openSkippedDrawer();
+
+		expect(getSkippedItemNames()).toHaveLength(3);
+
+		fireEvent.click(getItemIncludeButtons()[0]);
+
+		// The bug dropped all three to zero; exactly two must remain.
+		await waitFor(() => {
+			expect(getSkippedItemNames()).toHaveLength(2);
+		});
+	});
+
+	it("'Include all' moves every duplicate and closes the drawer", async () => {
+		const onImportAllProducts = vi.fn();
+		renderPreview(vi.fn(), onImportAllProducts);
+		openSkippedDrawer();
+
+		fireEvent.click(getIncludeAllButton());
+
+		await waitFor(() => {
+			expect(screen.queryByRole("button", { name: /skipped/i })).not.toBeInTheDocument();
+		});
+
+		// All three duplicates + the shirt flow into Import All.
+		fireEvent.click(screen.getByRole("button", { name: /import all/i }));
+		const imported: ExtractedProduct[] = onImportAllProducts.mock.calls[0][0];
+		expect(imported.filter((p) => p.name === "Highwaist Accessory")).toHaveLength(3);
+		expect(imported.some((p) => p.name === SHIRT.name)).toBe(true);
+	});
+
+	it("shows the batch 'Include all' button only when more than one item is skipped", () => {
+		mockParseProducts.mockReturnValue([SHIRT, ACCESSORY]); // 1 skipped
+		renderPreview();
+		openSkippedDrawer();
+		expect(screen.queryByRole("button", { name: /include all/i })).not.toBeInTheDocument();
+	});
+});
+
+// ── Regression: unskip selections must not leak across emails ──────────────────
+describe("EmailPreview — selections reset when the email changes", () => {
+	it("does not carry an unskipped item into the next email's detected list", async () => {
+		// Parser returns the accessory only for the first email's body.
+		mockParseProducts.mockImplementation((body: string) =>
+			body === "BODY2" ? [SHIRT] : [SHIRT, ACCESSORY],
+		);
+
+		const { rerender } = render(
+			<EmailPreview email={{ ...MOCK_EMAIL, id: "e1", body: "BODY1" }} onImportProduct={vi.fn()} onImportAllProducts={vi.fn()} />,
+		);
+		openSkippedDrawer();
+		fireEvent.click(getItemIncludeButtons()[0]);
+		await waitFor(() => expect(screen.getByText(`Import ${ACCESSORY.name}`)).toBeInTheDocument());
+
+		// Switch to a different email — the previously unskipped accessory must NOT
+		// appear among the new email's detected items.
+		rerender(
+			<EmailPreview email={{ ...MOCK_EMAIL, id: "e2", body: "BODY2" }} onImportProduct={vi.fn()} onImportAllProducts={vi.fn()} />,
+		);
+
+		await waitFor(() => {
+			expect(screen.queryByText(`Import ${ACCESSORY.name}`)).not.toBeInTheDocument();
+		});
 	});
 });
