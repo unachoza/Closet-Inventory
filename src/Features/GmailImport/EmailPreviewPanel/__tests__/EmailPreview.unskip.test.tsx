@@ -16,7 +16,7 @@ vi.mock("framer-motion");
 // Control which products the parser returns so tests are deterministic.
 const mockParseProducts = vi.fn<(body: string) => ExtractedProduct[]>();
 vi.mock("../../../../utils/parseProductsFromEmail", () => ({
-	parseProductsFromEmail: (...args: unknown[]) => mockParseProducts(...(args as [])),
+	parseProductsFromEmail: (...args: unknown[]) => mockParseProducts(...(args as [string])),
 	detectImageBasedRetailer: () => null,
 }));
 
@@ -50,23 +50,51 @@ vi.mock("../../ProductCard/ProductCard", () => ({
 import EmailPreview from "../EmailPreview";
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-const SHIRT: ExtractedProduct = { name: "Blue Shirt", price: 30, color: "Blue", size: "M", brand: "Gap", imageUrl: "", onSale: false, material: "", itemNumber: "" };
-const ACCESSORY: ExtractedProduct = { name: "Leather Accessory", price: 15, color: "", size: "", brand: "Gap", imageUrl: "", onSale: false, material: "", itemNumber: "" };
-const BELT: ExtractedProduct = { name: "Canvas Accessory Belt", price: 20, color: "Tan", size: "S", brand: "Gap", imageUrl: "", onSale: false, material: "", itemNumber: "" };
+const SHIRT: ExtractedProduct = {
+	name: "Blue Shirt",
+	price: 30,
+	color: "Blue",
+	size: "M",
+	brand: "Gap",
+	imageUrl: "",
+	onSale: false,
+	material: "",
+	itemNumber: "",
+};
+const ACCESSORY: ExtractedProduct = {
+	name: "Leather Accessory",
+	price: 15,
+	color: "",
+	size: "",
+	brand: "Gap",
+	imageUrl: "",
+	onSale: false,
+	material: "",
+	itemNumber: "",
+};
+const BELT: ExtractedProduct = {
+	name: "Canvas Accessory Belt",
+	price: 20,
+	color: "Tan",
+	size: "S",
+	brand: "Gap",
+	imageUrl: "",
+	onSale: false,
+	material: "",
+	itemNumber: "",
+};
 
 const MOCK_EMAIL = {
-	id: "e1", threadId: "t1",
-	subject: "Your order", from: "gap@gap.com", date: "2024-01-01", body: "<html></html>",
+	id: "e1",
+	threadId: "t1",
+	subject: "Your order",
+	from: "gap@gap.com",
+	date: "2024-01-01",
+	body: "<html></html>",
 };
 
 function renderPreview(onImportProduct = vi.fn(), onImportAllProducts = vi.fn()) {
-	return render(
-		<EmailPreview
-			email={MOCK_EMAIL}
-			onImportProduct={onImportProduct}
-			onImportAllProducts={onImportAllProducts}
-		/>,
-	);
+	return render(<EmailPreview email={MOCK_EMAIL} onImportProduct={onImportProduct} onImportAllProducts={onImportAllProducts} />);
 }
 
 function openSkippedDrawer() {
@@ -294,9 +322,7 @@ describe("EmailPreview — duplicate-named skipped items", () => {
 describe("EmailPreview — selections reset when the email changes", () => {
 	it("does not carry an unskipped item into the next email's detected list", async () => {
 		// Parser returns the accessory only for the first email's body.
-		mockParseProducts.mockImplementation((body: string) =>
-			body === "BODY2" ? [SHIRT] : [SHIRT, ACCESSORY],
-		);
+		mockParseProducts.mockImplementation((body: string) => (body === "BODY2" ? [SHIRT] : [SHIRT, ACCESSORY]));
 
 		const { rerender } = render(
 			<EmailPreview email={{ ...MOCK_EMAIL, id: "e1", body: "BODY1" }} onImportProduct={vi.fn()} onImportAllProducts={vi.fn()} />,
@@ -307,9 +333,7 @@ describe("EmailPreview — selections reset when the email changes", () => {
 
 		// Switch to a different email — the previously unskipped accessory must NOT
 		// appear among the new email's detected items.
-		rerender(
-			<EmailPreview email={{ ...MOCK_EMAIL, id: "e2", body: "BODY2" }} onImportProduct={vi.fn()} onImportAllProducts={vi.fn()} />,
-		);
+		rerender(<EmailPreview email={{ ...MOCK_EMAIL, id: "e2", body: "BODY2" }} onImportProduct={vi.fn()} onImportAllProducts={vi.fn()} />);
 
 		await waitFor(() => {
 			expect(screen.queryByText(`Import ${ACCESSORY.name}`)).not.toBeInTheDocument();
