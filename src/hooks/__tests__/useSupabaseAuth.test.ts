@@ -32,7 +32,7 @@ const {
 });
 
 vi.mock("../../lib/supabaseClient", () => ({
-  supabase: {
+  getSupabase: () => ({
     auth: {
       getSession: mockGetSession,
       signInWithOAuth: mockSignInWithOAuth,
@@ -42,7 +42,7 @@ vi.mock("../../lib/supabaseClient", () => ({
         return { data: { subscription: { unsubscribe: mockUnsubscribe } } };
       },
     },
-  },
+  }),
 }));
 
 import { useSupabaseAuth } from "../useSupabaseAuth";

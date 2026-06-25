@@ -15,21 +15,21 @@ import { createClient } from "@supabase/supabase-js";
  * If NO → fallback to separate Google OAuth client (still viable) ⚠️
  */
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-	throw new Error("Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env");
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Lazy — only throws when the component is actually rendered, not at import time.
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
+	? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+	: null;
 
 export function GmailSpike() {
 	const [user, setUser] = useState<string | null>(null);
 	const [loading, setLoading] = useState(false);
 
-	// Check if already signed in
+	// Hooks must run unconditionally — guard against missing config in the JSX below.
 	useEffect(() => {
+		if (!supabase) return;
 		supabase.auth.getSession().then(({ data: { session } }) => {
 			if (session?.user) {
 				setUser(session.user.email || "Unknown");
@@ -37,7 +37,6 @@ export function GmailSpike() {
 			}
 		});
 
-		// Listen for auth changes
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {
@@ -52,20 +51,31 @@ export function GmailSpike() {
 
 	const signInWithGoogle = async () => {
 		setLoading(true);
-		const { error } = await supabase.auth.signInWithOAuth({
+		const result = await supabase?.auth.signInWithOAuth({
 			provider: "google",
 			options: {
 				redirectTo: `${window.location.origin}`,
 			},
 		});
-		if (error) console.error("OAuth error:", error);
+		if (result?.error) console.error("OAuth error:", result.error);
 		setLoading(false);
 	};
 
 	const signOut = async () => {
-		await supabase.auth.signOut();
+		await supabase?.auth.signOut();
 		setUser(null);
 	};
+
+	if (!supabase) {
+		return (
+			<div style={{ padding: "2rem", fontFamily: "system-ui" }}>
+				<h1>Gmail Spike Test</h1>
+				<p style={{ color: "red" }}>
+					Missing <code>VITE_SUPABASE_URL</code> or <code>VITE_SUPABASE_ANON_KEY</code> in .env
+				</p>
+			</div>
+		);
+	}
 
 	return (
 		<div style={{ padding: "2rem", fontFamily: "system-ui" }}>
