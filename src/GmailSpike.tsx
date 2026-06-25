@@ -100,7 +100,7 @@ export function GmailSpike() {
 	);
 }
 
-function logResults(session: any) {
+function logResults(session: import("@supabase/supabase-js").Session) {
 	console.log("=== Gmail spike result ===");
 	console.log("Full session:", session);
 	console.log("User metadata:", session.user?.user_metadata);
