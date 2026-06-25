@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabaseClient";
+import { getSupabase } from "../lib/supabaseClient";
 
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 
@@ -21,6 +21,7 @@ export function useSupabaseAuth(): SupabaseAuthState {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const supabase = getSupabase();
     supabase.auth.getSession().then(({ data, error: err }) => {
       if (err) setError(err.message);
       setSession(data.session);
@@ -36,7 +37,7 @@ export function useSupabaseAuth(): SupabaseAuthState {
 
   const signIn = async () => {
     setError(null);
-    const { error: err } = await supabase.auth.signInWithOAuth({
+    const { error: err } = await getSupabase().auth.signInWithOAuth({
       provider: "google",
       options: {
         scopes: GMAIL_SCOPE,
@@ -48,7 +49,7 @@ export function useSupabaseAuth(): SupabaseAuthState {
 
   const signOut = async () => {
     setError(null);
-    const { error: err } = await supabase.auth.signOut();
+    const { error: err } = await getSupabase().auth.signOut();
     if (err) setError(err.message);
   };
 
