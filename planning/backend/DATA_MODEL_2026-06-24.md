@@ -99,7 +99,7 @@ retailer        text
 source          text                            -- HOW it entered the app: 'manual'|'gmail_import'|'camera'|'chrome_ext'
 condition       text
 on_sale         boolean default false
-notes           text
+notes           text[]  default '{}'    -- bulleted list; typed as string[] in @ntw/types (not text)
 created_at      timestamptz default now()
 updated_at      timestamptz default now()
 -- photos: NOT a single image_url — see item_photos (1:* below). Keep an optional
