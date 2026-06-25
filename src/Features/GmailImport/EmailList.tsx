@@ -1,10 +1,14 @@
-import { memo, useCallback } from "react";
+import { memo } from "react";
+import type { Ref } from "react";
 import type { GmailEmailMeta } from "../../hooks/useAdvancedSearch";
 
 interface EmailListProps {
 	emails: GmailEmailMeta[];
 	selectedEmailId: string | null;
 	onToggleSelect: (emailId: string) => void;
+	// The parent (GmailImport) scrolls the selected row into view AFTER the email
+	// body loads and the preview-split layout settles — see the comment there.
+	listRef?: Ref<HTMLUListElement>;
 }
 
 function formatDate(dateString: string): string {
@@ -31,14 +35,9 @@ interface EmailListItemProps {
 	onToggleSelect: (emailId: string) => void;
 }
 
-const EmailListItem = memo(function EmailListItem({
-	email,
-	isSelected,
-	onToggleSelect,
-	scrollRef,
-}: EmailListItemProps & { scrollRef?: (node: HTMLLIElement | null) => void }) {
+const EmailListItem = memo(function EmailListItem({ email, isSelected, onToggleSelect }: EmailListItemProps) {
 	return (
-		<li className="gmail-email-item" ref={scrollRef}>
+		<li className="gmail-email-item">
 			<label className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}>
 				<input
 					type="checkbox"
@@ -60,16 +59,7 @@ const EmailListItem = memo(function EmailListItem({
 	);
 });
 
-export default function EmailList({ emails, selectedEmailId, onToggleSelect }: EmailListProps) {
-	// Ref callback fires every time the selected <li> mounts — including when
-	// EmailList itself remounts on "Back to email" with an already-set selectedEmailId
-	// (a useEffect with [selectedEmailId] wouldn't fire because the value didn't change).
-	const scrollRef = useCallback((node: HTMLLIElement | null) => {
-		if (node && typeof node.scrollIntoView === "function") {
-			node.scrollIntoView({ behavior: "smooth", block: "start" });
-		}
-	}, []);
-
+export default function EmailList({ emails, selectedEmailId, onToggleSelect, listRef }: EmailListProps) {
 	if (emails.length === 0) {
 		return (
 			<div className="gmail-empty">
@@ -80,19 +70,15 @@ export default function EmailList({ emails, selectedEmailId, onToggleSelect }: E
 	}
 
 	return (
-		<ul className="gmail-email-list" role="list">
-			{emails.map((email) => {
-				const isSelected = email.id === selectedEmailId;
-				return (
-					<EmailListItem
-						key={email.id}
-						scrollRef={isSelected ? scrollRef : undefined}
-						email={email}
-						isSelected={isSelected}
-						onToggleSelect={onToggleSelect}
-					/>
-				);
-			})}
+		<ul className="gmail-email-list" role="list" ref={listRef}>
+			{emails.map((email) => (
+				<EmailListItem
+					key={email.id}
+					email={email}
+					isSelected={email.id === selectedEmailId}
+					onToggleSelect={onToggleSelect}
+				/>
+			))}
 		</ul>
 	);
 }
