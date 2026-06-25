@@ -29,7 +29,7 @@ describe("EmailList — selected row scroll sync", () => {
 	it("scrolls the selected row into view when a selection is present", () => {
 		render(<EmailList emails={makeEmails(10)} selectedEmailId="e7" onToggleSelect={vi.fn()} />);
 
-		expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ block: "nearest" });
+		expect(Element.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
 	});
 
 	it("does not scroll when nothing is selected", () => {
