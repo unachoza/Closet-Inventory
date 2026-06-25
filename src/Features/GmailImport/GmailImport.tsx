@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { useGmailAuth } from "../../hooks/useGmailAuth";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useGmailAuthContext } from "../../context/GmailAuthContext";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
@@ -27,7 +27,7 @@ interface GmailImportProps {
 }
 
 export default function GmailImport({ onImport, onImportAll, initialSelectedEmailId, onSourceEmailChange }: GmailImportProps) {
-	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuth();
+	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
 
 	const {
 		emails,
@@ -48,6 +48,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 	// Find the selected email and ensure it has a body (fetch if needed)
 	const [selectedEmail, setSelectedEmail] = useState<GmailEmail | undefined>(undefined);
+
+	const listRef = useRef<HTMLUListElement>(null);
 
 	// Clear the in-memory + sessionStorage Gmail caches (metadata + bodies).
 	const handleClearCache = useCallback(() => {
@@ -86,6 +88,26 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedEmailId, emails, accessToken]);
+
+	// Scroll the selected row into view so the left list matches the right preview
+	// (esp. on "Back to email"). This MUST run after `selectedEmail` is set: that's
+	// what flips the layout to the 40%-width preview split, which re-wraps the rows
+	// to new heights. Scrolling any earlier (e.g. on row mount, while the list is
+	// still full-width and the body hasn't loaded) lands on a stale offset and the
+	// re-wrap drops you back at the top. requestAnimationFrame waits for that final
+	// layout to paint before measuring.
+	useEffect(() => {
+		if (!selectedEmail) return;
+		const row = listRef.current?.querySelector<HTMLElement>(".gmail-email-label--selected");
+		if (!row || typeof row.scrollIntoView !== "function") return;
+		const raf = requestAnimationFrame(() => {
+			// Instant, not smooth: a follow-up re-render (async color enrichment,
+			// preview mount) would interrupt a smooth animation and strand the list
+			// partway. Setting the offset in one go survives those re-renders.
+			row.scrollIntoView({ behavior: "auto", block: "start" });
+		});
+		return () => cancelAnimationFrame(raf);
+	}, [selectedEmail, selectedEmailId]);
 
 	// Auto-search with defaults on first login
 	useEffect(() => {
@@ -271,7 +293,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 								<span className="gmail-cache-hint"> (of {cachedCount} cached)</span>
 							)}
 						</h3>
-						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} />
+						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} listRef={listRef} />
 						{isFetchingMore && (
 							<>
 								<div className="gmail-skeleton-row" aria-hidden="true" />

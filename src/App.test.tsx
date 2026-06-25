@@ -39,6 +39,20 @@ vi.mock("firebase/firestore", () => ({
 	writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn() })),
 }));
 
+// GmailAuthProvider (mounted in App) calls useGmailAuth → useGoogleLogin, which
+// requires GoogleOAuthProvider. These navigation tests deliberately avoid real
+// auth, so mock the hook — the provider then mounts harmlessly.
+vi.mock("./hooks/useGmailAuth", () => ({
+	useGmailAuth: () => ({
+		accessToken: null,
+		isAuthenticated: false,
+		error: null,
+		isLoading: false,
+		login: vi.fn(),
+		logout: vi.fn(),
+	}),
+}));
+
 // ── Stub all view components ──────────────────────────────────────────────────
 vi.mock("./Features/Carousel/Carousel", () => ({
 	default: () => <div data-testid="view-carousel">Carousel</div>,

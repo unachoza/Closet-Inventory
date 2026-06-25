@@ -46,7 +46,7 @@ actually tells you the truth about itself.
 | We ARE | We are NOT |
 |---|---|
 | An inventory & logistics system for your wardrobe | Just another outfit planner |
-| The source of truth for *status, location, availability* | A styling-AI-first app |
+| The source of truth for *status, location, availability, care* | A styling-AI-first app |
 | Low-friction to fill (inbox + camera) | A manual-photography chore |
 | Social/borrow at the core | Social as an afterthought |
 | A knowledge layer (fabric/care) | A resale marketplace |
@@ -73,7 +73,7 @@ Big closet, decision fatigue, re-buys duplicates, over-packs, has guilt items. O
 → Served by inventory truth + frictionless fill + outfit help.
 
 ### "Our Closet" pair — sharers & travelers *(the founder persona)*
-Cousins/roommates/partners who share and travel; people with multiple homes or storage. Need to know
+Cousins/roommates/power couple  who share and travel; people with multiple homes or storage. Need to know
 *where* a piece is and *who has it*. → Served by status/location + borrow/lend. **This persona is the
 one no competitor serves**, and it's the most defensible.
 

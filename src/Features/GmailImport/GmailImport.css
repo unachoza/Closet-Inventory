@@ -363,12 +363,20 @@
 	background: rgba(255, 255, 255, 0.03);
 	/* max-height: 350px; */
 	overflow-y: auto;
+	/* Retailer order emails are built as fixed-width (600–720px) tables. Let a
+	   genuinely-wide one scroll horizontally INSIDE this box (like Gmail's own
+	   preview) instead of forcing the layout wider. The scroll is confined here;
+	   the panel/page never scroll (E3-bug.1). */
+	overflow-x: auto;
 }
 
 .gmail-preview-html {
 	font-size: 0.85rem;
 	line-height: 1.5;
-	word-break: break-word;
+	/* NO word-break here: `break-word` let the browser break text mid-word, which
+	   collapsed those fixed-width email tables to ~1 character per column on
+	   narrow viewports (the "one letter per line" mangling). Without it the email
+	   keeps its natural column widths and simply scrolls when wider than the box. */
 }
 
 .gmail-preview-html img {
@@ -531,6 +539,27 @@
 	background: var(--bg-surface-brand, #b28675);
 	color: #fff;
 	border-color: var(--bg-surface-brand, #b28675);
+}
+
+/* Batch "Include all" row — sits below the individual items, spans full width
+   and reads as the primary action of the drawer. */
+.gmail-skipped-item--all {
+	justify-content: flex-end;
+	padding-top: var(--spacing-100);
+	margin-top: var(--spacing-50);
+	border-top: 1px solid var(--border-hairline, rgba(132, 112, 87, 0.2));
+}
+
+.gmail-skipped-include-btn--all {
+	background: var(--bg-surface-brand, #b28675);
+	color: #fff;
+	border-color: var(--bg-surface-brand, #b28675);
+	font-weight: 600;
+}
+
+.gmail-skipped-include-btn--all:hover {
+	background: var(--Primary-Pink-Darker, #8f6256);
+	border-color: var(--Primary-Pink-Darker, #8f6256);
 }
 
 .gmail-preview-panel{

@@ -1,10 +1,14 @@
 import { memo } from "react";
+import type { Ref } from "react";
 import type { GmailEmailMeta } from "../../hooks/useAdvancedSearch";
 
 interface EmailListProps {
 	emails: GmailEmailMeta[];
 	selectedEmailId: string | null;
 	onToggleSelect: (emailId: string) => void;
+	// The parent (GmailImport) scrolls the selected row into view AFTER the email
+	// body loads and the preview-split layout settles — see the comment there.
+	listRef?: Ref<HTMLUListElement>;
 }
 
 function formatDate(dateString: string): string {
@@ -31,16 +35,10 @@ interface EmailListItemProps {
 	onToggleSelect: (emailId: string) => void;
 }
 
-const EmailListItem = memo(function EmailListItem({
-	email,
-	isSelected,
-	onToggleSelect,
-}: EmailListItemProps) {
+const EmailListItem = memo(function EmailListItem({ email, isSelected, onToggleSelect }: EmailListItemProps) {
 	return (
 		<li className="gmail-email-item">
-			<label
-				className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}
-			>
+			<label className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}>
 				<input
 					type="checkbox"
 					checked={isSelected}
@@ -50,12 +48,8 @@ const EmailListItem = memo(function EmailListItem({
 				/>
 				<div className="gmail-email-content">
 					<div className="gmail-email-header">
-						<span className="gmail-email-sender">
-							{extractSenderName(email.from)}
-						</span>
-						<span className="gmail-email-date">
-							{formatDate(email.date)}
-						</span>
+						<span className="gmail-email-sender">{extractSenderName(email.from)}</span>
+						<span className="gmail-email-date">{formatDate(email.date)}</span>
 					</div>
 					<div className="gmail-email-subject">{email.subject}</div>
 					<div className="gmail-email-snippet">{email.snippet}</div>
@@ -65,25 +59,18 @@ const EmailListItem = memo(function EmailListItem({
 	);
 });
 
-export default function EmailList({
-	emails,
-	selectedEmailId,
-	onToggleSelect,
-}: EmailListProps) {
+export default function EmailList({ emails, selectedEmailId, onToggleSelect, listRef }: EmailListProps) {
 	if (emails.length === 0) {
 		return (
 			<div className="gmail-empty">
 				<p>No order confirmation emails found.</p>
-				<p className="gmail-empty-hint">
-					Try checking if your purchase confirmations use different subject
-					lines.
-				</p>
+				<p className="gmail-empty-hint">Try checking if your purchase confirmations use different subject lines.</p>
 			</div>
 		);
 	}
 
 	return (
-		<ul className="gmail-email-list" role="list">
+		<ul className="gmail-email-list" role="list" ref={listRef}>
 			{emails.map((email) => (
 				<EmailListItem
 					key={email.id}

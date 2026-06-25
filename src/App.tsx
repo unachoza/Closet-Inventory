@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { EditProvider } from "./Features/Form/EditContext";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
+import { GmailAuthProvider } from "./context/GmailAuthContext";
 import NavBar from "./Components/NavBar/NavBar";
 import { useLocalStorageCloset } from "./hooks/useLocalCloset";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
@@ -222,7 +223,11 @@ function App() {
 	return (
 		<ViewProvider initialView="carousel">
 			<SearchProvider>
-				<AppShell />
+				{/* Session-scoped Gmail auth — mounted above the view switch so the
+				    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
+				<GmailAuthProvider>
+					<AppShell />
+				</GmailAuthProvider>
 			</SearchProvider>
 		</ViewProvider>
 	);

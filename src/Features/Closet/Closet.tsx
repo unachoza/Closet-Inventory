@@ -41,7 +41,7 @@ const cardVariants: Variants = {
 
 // Comfortable view shows larger cards; compact fits more per page with smaller cards.
 const ITEMS_PER_PAGE = 6;
-const COMPACT_ITEMS_PER_PAGE = 12;
+const COMPACT_ITEMS_PER_PAGE = 15;
 const DENSITY_KEY = "closet_density";
 
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
