@@ -2,12 +2,11 @@
  * App-level integration tests.
  *
  * These tests verify cross-view flows that unit tests can't catch.
- * Firebase and auth are mocked (user = signed out → local storage only).
+ * The closet runs on localStorage (the active store).
  * Form, Closet, and filter components render for real.
  *
  * Already covered elsewhere (not duplicated here):
  *   - Batch import queue  → GmailImport.integration.test.tsx
- *   - Firestore sync      → useCloudCloset.test.ts
  *   - Gmail import→save   → GmailImport.integration.test.tsx
  */
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
@@ -20,21 +19,6 @@ import Closet from "./Features/Closet/Closet";
 import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
 import type { ClothingItem, ViewType } from "./utils/types";
 import { useState } from "react";
-
-// ── Prevent Firebase / auth side effects ──────────────────────────────────────
-vi.mock("./firebase", () => ({ auth: {}, db: {} }));
-vi.mock("./context/AuthContext", () => ({
-	AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	useAuth: () => ({ user: null, loading: false }),
-}));
-vi.mock("firebase/firestore", () => ({
-	collection: vi.fn(),
-	doc: vi.fn(),
-	getDocs: vi.fn().mockResolvedValue({ empty: true, docs: [] }),
-	setDoc: vi.fn(),
-	deleteDoc: vi.fn(),
-	writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn() })),
-}));
 
 // Stub heavy sub-components that aren't under test
 vi.mock("./Features/Carousel/Carousel", () => ({

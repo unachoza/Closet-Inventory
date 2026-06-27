@@ -21,7 +21,17 @@ export function useSupabaseAuth(): SupabaseAuthState {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const supabase = getSupabase();
+    let supabase: ReturnType<typeof getSupabase>;
+    try {
+      supabase = getSupabase();
+    } catch (e) {
+      // No Supabase env configured (CI / preview / unconfigured local). Surface
+      // it as auth state instead of crashing the tree that mounts this provider.
+      setError(e instanceof Error ? e.message : "Supabase is not configured");
+      setIsLoading(false);
+      return;
+    }
+
     supabase.auth.getSession().then(({ data, error: err }) => {
       if (err) setError(err.message);
       setSession(data.session);
