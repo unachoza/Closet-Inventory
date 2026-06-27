@@ -1,43 +1,12 @@
 /**
  * App-level tests.
  *
- * All view components are stubbed so navigation tests don't pull in
- * Firebase / auth / Firestore. We test that:
+ * All view components are stubbed so navigation tests stay isolated. We test that:
  *   - The correct view stub is visible after each navigation action.
  *   - NavBar actions trigger the right view transitions.
  */
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
-// ── Prevent Firebase / auth side effects ──────────────────────────────────────
-vi.mock("./firebase", () => ({ auth: {}, db: {} }));
-
-vi.mock("./context/AuthContext", () => ({
-	AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	useAuth: () => ({ user: null, loading: false }),
-}));
-
-vi.mock("./hooks/useCloudCloset", () => ({
-	useCloudCloset: () => ({
-		closet: [],
-		addItem: vi.fn(),
-		addFullItem: vi.fn(),
-		removeItem: vi.fn(),
-		updateItem: vi.fn(),
-		clearCloset: vi.fn(),
-		getCloset: vi.fn(() => []),
-		syncing: false,
-	}),
-}));
-
-vi.mock("firebase/firestore", () => ({
-	collection: vi.fn(),
-	doc: vi.fn(),
-	getDocs: vi.fn().mockResolvedValue({ empty: true, docs: [] }),
-	setDoc: vi.fn(),
-	deleteDoc: vi.fn(),
-	writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn() })),
-}));
 
 // GmailAuthProvider (mounted in App) calls useGmailAuth → useGoogleLogin, which
 // requires GoogleOAuthProvider. These navigation tests deliberately avoid real

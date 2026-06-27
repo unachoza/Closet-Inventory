@@ -15,7 +15,7 @@ Built around low-friction ingestion (email + camera), a fabric-care knowledge la
 - 🧠 **Smart Date Handling** — Intelligent age calculation (months vs. years)
 - 🔍 **Search, Filter & Sort** — Fuzzy search, multi-dimension filters, sort by price/age/name
 - 📧 **Gmail Import** — OAuth-authenticated email parsing to auto-populate closet items
-- ☁️ **Firestore Sync** — Cloud persistence per user with localStorage as offline cache
+- ☁️ **Cloud-Ready Service Layer** — storage-agnostic repository seam; Supabase auth wired, data sync in progress (localStorage is the active store today)
 - 🧵 **Fabric Care Guide** — Interactive textile guide with material-to-care mapping
 - 🎨 **Responsive Design** — Grid layout that works on any device
 
@@ -66,30 +66,38 @@ src/
 │   ├── GmailImport/              # Gmail OAuth + email parsing
 │   └── SearchCloset/             # Full closet search, filter, sort
 ├── context/
-│   ├── AuthContext.tsx           # Firebase auth state
-│   ├── ClosetContext.tsx         # Shared closet instance (cloud + local)
+│   ├── SupabaseAuthContext.tsx   # Supabase auth session state
+│   ├── GmailAuthContext.tsx      # Gmail OAuth token (survives view switches)
 │   ├── SearchContext.tsx         # Shared search state
 │   └── ViewContext.tsx           # App view/navigation state
 ├── hooks/
-│   ├── useCloudCloset.ts         # Firestore sync + localStorage fallback
-│   ├── useLocalCloset.tsx        # localStorage-only closet operations
+│   ├── useLocalCloset.tsx        # localStorage closet operations (active store)
+│   ├── useSupabaseAuth.ts        # Supabase auth session
 │   ├── useClosetFilters.ts       # Multi-dimension filter logic
 │   ├── useClosetSort.ts          # Sort by price, age, name
 │   ├── useFuzzySearch.ts         # Fuse.js fuzzy search
+│   ├── useAdvancedSearch.tsx     # Subject/body + date-range Gmail query builder
 │   ├── useGmailAuth.tsx          # Gmail OAuth flow
 │   ├── useGmailSearch.tsx        # Gmail API search
-│   ├── usePagination.tsx         # Pagination logic
-│   └── useStockPhoto.tsx         # Fallback stock image by category
+│   └── usePagination.tsx         # Pagination logic
 ├── utils/
-│   ├── types.ts                  # TypeScript interfaces
 │   ├── constants.ts              # App-wide constants
 │   ├── materialUtils.ts          # Material normalization
+│   ├── inferProductAttributes.ts # Name → material / care / style inference
 │   ├── parseProductsFromEmail.ts # Email → ClothingItem parser
 │   └── parseEmailToFormData.ts
-├── firebase.ts                   # Firebase app init (auth + Firestore)
+├── services/                     # Storage seam (repository pattern)
+│   ├── closetRepository.ts       # ClosetRepository interface
+│   ├── localClosetRepository.ts  # localStorage implementation (active)
+│   └── index.ts                  # exports the active repo — swap here for Supabase
+├── lib/
+│   └── supabaseClient.ts         # Lazy Supabase client singleton
 ├── App.tsx                       # Root component + view routing
 └── main.tsx                      # Entry point
 ```
+
+> Shared backend/domain types live in the `@ntw/types` workspace package
+> ([packages/types](./packages/types)) — the forward-looking contract for the Supabase port.
 
 ---
 
@@ -103,8 +111,8 @@ src/
 | **Animations**    | Framer Motion                                                   | Declarative animations                         |
 | **UI Primitives** | Radix UI                                                        | Accessible, unstyled components                |
 | **State**         | React Hooks + Context                                           | Local and global state                         |
-| **Database**      | Firebase Firestore                                              | Cloud persistence per user                     |
-| **Auth**          | Firebase Auth + Google OAuth                                    | User sign-in and Gmail access                  |
+| **Database**      | Supabase (Postgres) — _port in progress; localStorage is the active store_ | Cloud persistence per user (planned)           |
+| **Auth**          | Supabase Auth + Google OAuth                                    | User sign-in and Gmail access                  |
 | **Search**        | Fuse.js                                                         | Fuzzy client-side search                       |
 | **Testing**       | Vitest + React Testing Library                                  | Unit and integration tests                     |
 | **E2E**           | Playwright (installed — 2 mobile projects: iPhone 13 + Pixel 7) | End-to-end critical flows (`npm run test:e2e`) |
@@ -117,13 +125,15 @@ src/
 **Data flow:**
 
 ```
-User Input → Form State → Validation → useCloudCloset → Firestore + localStorage → UI
+User Input → Form State → Validation → closetRepository → localStorage → UI
 ```
+
+> **Cloud sync is mid-port.** `SupabaseAuthProvider` is mounted and the closet's **write** path now flows through the `closetRepository` seam — so swapping in a `SupabaseClosetRepository` (one line in `services/index.ts`) redirects all persistence. **Reads** still seed synchronously from localStorage; porting that to async `repository.getAll()` (with loading state + cross-instance sync) is the remaining step — see [E1 · Cloud Backend](./planning/epics/E1-cloud-backend.md).
 
 **Key patterns:**
 
-- `useCloudCloset` — writes to Firestore when signed in, falls back to localStorage when offline/signed out. On first sign-in with no cloud data, seeds Firestore from localStorage.
-- `ClosetContext` — single shared instance of `useCloudCloset` across the app; prevents duplicate Firestore connections.
+- `services/closetRepository` — the single storage seam. The closet hook delegates every mutation to `closetRepository`, never writing localStorage or a DB client directly. The active implementation is `LocalClosetRepository`; a `SupabaseClosetRepository` drops in behind the same interface.
+- `GmailAuthContext` — holds the Gmail OAuth token above the view switch, so Gmail ↔ Edit navigation doesn't drop it.
 - `ToastProvider` — global, decoupled notification system.
 - `ErrorBoundary` — keyed by view; a crash in one screen resets on navigation.
 
@@ -173,14 +183,14 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 > Re-sequenced 2026-06-20. Full reasoning + dev-day estimates in
 > [planning/STRATEGY_REVIEW_2026-06-20.md](./planning/STRATEGY_REVIEW_2026-06-20.md).
 
-1. **Stand up the cloud layer** — ⚠️ **gated by an open decision:** [Firestore (merge PR #44) vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md). Resolve that first; "merge #44" is only the answer if Firestore wins. Pair with the **base64 → object-storage** image fix. (~2.5–10.5 dev-days, path-dependent)
+1. **Stand up the cloud layer (Supabase)** — ✅ **DB decision resolved: Supabase** ([rationale](./planning/BACKEND_DATABASE_DECISION.md)). Auth + client are wired; **next is the data port** — write `SupabaseClosetRepository`, the Postgres schema/migration, and owner-only RLS, then flip the one line in `services/index.ts`. Pair with the **base64 → object-storage** image fix. (~7–11 dev-days)
 2. **Mobile UI polish + PWA** — touch-target audit (44×44px), bottom nav / "Add Item" FAB (primary action out of the hamburger), and PWA scaffolding (`vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons). **Load-bearing** for monetization ("no App Store / no 30% cut"), offline-first, and add-to-home-screen. (~7.5–9.5 dev-days)
 3. **v2.2 web-engagement** — scrape richer product details from retailer PDPs to feed the existing inference pipeline. ⚠️ Do the [feasibility spike first](./planning/EngagingWebForProductDetails.md) — verified 2026-06-20 that Cloudflare bot-blocking returns `403` to plain fetches of major retailers. (~10–14.5 dev-days)
 
 **Cross-version dependencies:**
 
 - `wornCount` (in v5) is required by the **v9.0** lifespan tracker and **v10.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
-- The **cloud backend** (v5.1) gates **v8.1** social and **v1.0 monetization** (`isPremium` read). Resolve the [DB decision](./planning/BACKEND_DATABASE_DECISION.md) before building on it — if Supabase wins, migrate _before_ #44 ships, never after.
+- The **cloud backend** (Supabase, v5.1) gates **v8.1** social and **v11 monetization** (`isPremium` read). The [DB decision](./planning/BACKEND_DATABASE_DECISION.md) is settled — build the data port (repository + schema + RLS) on it before any premium gating.
 - **Monetization** also depends on the **PWA** install path (priority 3).
 - **Camera-roll import** (v3.1) is the fastest logging path for the mobile persona and the only path for in-store / second-hand items — slot it after the image-storage fix (it multiplies the base64 ceiling).
 
@@ -368,7 +378,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - 🔲 see closet and select items
 - 🔲 calculate suggestions based on how many days
 - 🔲 `usePackingList` hook
-- 🔲 Packing lists saved to Firestore
+- 🔲 Packing lists saved to Supabase
 
 ---
 
@@ -440,7 +450,7 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 - Unlimited items
 - Enriched Product Details surfaced from deep internet research
 - Gmail import
-- Firestore cloud sync + multi-device access
+- Supabase cloud sync + multi-device access
 - AI camera roll import (v2.1)
 - Future: outfit builder, packing lists, analytics
 
@@ -448,8 +458,8 @@ User Input → Form State → Validation → useCloudCloset → Firestore + loca
 
 - 🔲 Stripe Checkout — hosted payment page, no custom payment UI needed
 - 🔲 Stripe Customer Portal — handles upgrades, cancellations, billing history automatically
-- 🔲 Stripe webhook → Firestore `users/{uid}` document `{ isPremium: true }`
-- 🔲 Feature gates in app read `isPremium` from Firestore before unlocking Gmail import / sync
-- 🔲 Free item limit enforced in `useCloudCloset` / `useLocalCloset`
+- 🔲 Stripe webhook → Supabase `users` row `{ is_premium: true }`
+- 🔲 Feature gates in app read `is_premium` from Supabase before unlocking Gmail import / sync
+- 🔲 Free item limit enforced in the closet repository (`LocalClosetRepository` / `SupabaseClosetRepository`)
 
 ---
