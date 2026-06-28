@@ -87,7 +87,7 @@ describe("CardDetails", () => {
 
 	it("full variant renders inferred Style attributes", () => {
 		render(<CardDetails item={styledItem} variant="full" />);
-		expect(screen.getByText("Style & Construction")).toBeInTheDocument();
+		expect(screen.getByText("Neckline & Sleeves")).toBeInTheDocument();
 		expect(screen.getByText(/crew neck/i)).toBeInTheDocument();
 		expect(screen.getByText(/long sleeve/i)).toBeInTheDocument();
 		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
@@ -223,7 +223,7 @@ describe("CardDetails", () => {
 		const withFit: ClothingItem = { ...item, style: { fit: "relaxed", season: "fall" } };
 		render(<CardDetails item={withFit} variant="full" />);
 
-		expect(screen.getByText("Style & Construction")).toBeInTheDocument();
+		expect(screen.getByText("Silhouette & Shape")).toBeInTheDocument();
 		expect(screen.getByText(/relaxed/i)).toBeInTheDocument();
 	});
 });

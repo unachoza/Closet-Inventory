@@ -13,6 +13,8 @@ import { inferProductAttributes } from "../Features/FashionParser";
  * of a product image, then reads sibling <td> cells for structured details.
  */
 
+
+//TODO update with fashion parser augments
 export interface ExtractedProduct {
 	readonly imageUrl: string;
 	readonly name: string;
