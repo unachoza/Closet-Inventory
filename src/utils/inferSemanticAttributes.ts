@@ -1,18 +1,9 @@
 import type { ClothingItem } from "./types";
+import { inferOccasion } from "../Features/FashionParser";
 
 export function inferSemanticAttributes(text: string): Partial<ClothingItem> {
-	const lower = text.toLowerCase();
-	const result: Partial<ClothingItem> = {};
-
-	// blazer → care override
-	if (/\bblazer\b/i.test(lower)) {
-		result.care = "dry clean only";
-	}
-
-	// contour → bodycon fit, going-out occasion
-	if (/\bcontour\b/i.test(lower)) {
-		result.occasion = "going-out";
-	}
-
-	return result;
+  const result: Partial<ClothingItem> = {};
+  const occasions = inferOccasion(text);
+  if (occasions.length > 0) result.occasion = occasions[0];
+  return result;
 }
