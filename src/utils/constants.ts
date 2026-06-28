@@ -111,6 +111,7 @@ export const categoryOptions: Option[] = [
 	{ value: "intimates", label: "Intimates" },
 	{ value: "socks", label: "Socks" },
 	{ value: "underwear", label: "Underwear" },
+	{ value: "shoes", label: "Shoes" },
 ];
 
 export const ClothingItemPossibilities = {

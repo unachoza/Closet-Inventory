@@ -113,6 +113,7 @@ export const ACCENTS_MAP: [RegExp, string][] = [
 	[/\bfrayed[- ]?edges?\b/i, "frayed edges"],
 	[/\bfringe\b/i, "fringe"],
 	[/\bglitter\b/i, "glitter"],
+	[/\bhood(ie)?\b/i, "hood"],
 	[/\blace[- ]?up\b/i, "lace-up"],
 	[/\bpeplum\b/i, "peplum"],
 	[/\bripped\b/i, "ripped"],
@@ -121,9 +122,10 @@ export const ACCENTS_MAP: [RegExp, string][] = [
 	[/\bpleated?\b/i, "pleated"],
 	[/\bsequins?\b/i, "sequins"],
 	[/\brhinestones?\b/i, "rhinestones"],
+	[/\bslip[- ]?on\b/i, "slip-on"],
 	[/\bstudded\b/i, "studded"],
 	[/\bvelvet\b/i, "velvet"],
-	[/\bzipper\b/i, "zipper"],
+	[/\bzip(per)?\b/i, "zipper"],
 ];
 
 export const PATTERN_MAP: [RegExp, string][] = [

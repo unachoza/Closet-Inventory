@@ -5,7 +5,7 @@ import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
-import { parseEmailToFormData } from "../../utils/parseEmailToFormData";
+import { parseEmailToFormData, extractForwardedSender } from "../../utils/parseEmailToFormData";
 import { inferCare } from "../../utils/inferCare";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
@@ -148,7 +148,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 
 	const handleImportProduct = useCallback(
 		(product: ExtractedProduct) => {
-			const emailFrom = selectedEmail?.from ?? "";
+			// For forwarded emails the outer sender is the forwarder's own address;
+			// recover the real retailer from the forwarded header in the full body.
+			const emailFrom = extractForwardedSender(selectedEmail?.body ?? "") || selectedEmail?.from || "";
 			const emailSubject = selectedEmail?.subject ?? "";
 			const emailDate = selectedEmail?.date;
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
@@ -185,7 +187,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 	const handleImportAllProducts = useCallback(
 		(products: ExtractedProduct[]) => {
 			if (!onImportAll) return;
-			const emailFrom = selectedEmail?.from ?? "";
+			const emailFrom = extractForwardedSender(selectedEmail?.body ?? "") || selectedEmail?.from || "";
 			const emailSubject = selectedEmail?.subject ?? "";
 			const emailDate = selectedEmail?.date;
 
