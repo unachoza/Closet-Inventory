@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseEmailToFormData } from "../parseEmailToFormData";
+import { parseEmailToFormData, extractForwardedSender } from "../parseEmailToFormData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const parse = (subject: string, body = "", from = "") => parseEmailToFormData(subject, body, from);
@@ -327,6 +327,56 @@ describe("parseEmailToFormData — material inference", () => {
 			{ material: "cotton", percentage: 50 },
 			{ material: "modal", percentage: 50 },
 		]);
+	});
+});
+
+describe("parseEmailToFormData — forwarded email brand detection", () => {
+	it("extracts Nordstrom brand from a Gmail-forwarded email (Begin forwarded message format)", () => {
+		const body = `
+---------- Forwarded message ---------
+From: NORDSTROM <nordstrom@eml.nordstrom.com>
+Reply-To: Nordstrom <reply@eml.nordstrom.com>
+
+Your Nordstrom order has shipped.
+		`.trim();
+		// outer from is the user's gmail — should NOT be the brand
+		const result = parse("Fwd: Your Nordstrom order", body, "me@gmail.com");
+		expect(result.brand).toBe("nordstrom");
+	});
+
+	it("extracts icebreaker brand from a forwarded email via customer-care domain fallback", () => {
+		const body = `
+Begin forwarded message:
+
+From: icebreaker <noreply@orders.icebreaker.com>
+
+Order I538721
+If you have any questions, contact us at us_customer_care@icebreaker.com
+		`.trim();
+		const result = parse("Fwd: Your icebreaker order", body, "me@gmail.com");
+		expect(result.brand).toBe("icebreaker");
+	});
+});
+
+describe("extractForwardedSender — recovers retailer from forwarded HTML body", () => {
+	it("pulls the icebreaker sender from a Gmail-forwarded HTML body", () => {
+		const html = `<div dir="ltr">---------- Forwarded message ---------<br>From: <strong>icebreaker</strong> <span>&lt;noreply@orders.icebreaker.com&gt;</span><br>Date: Sun, Jan 25, 2026<br>Subject: Order I538735 confirmed</div>`;
+		const sender = extractForwardedSender(html);
+		// The display name "icebreaker" is recoverable from the inner From: line.
+		expect(sender.toLowerCase()).toContain("icebreaker");
+		// And it resolves to the icebreaker brand when fed through the parser.
+		expect(parse("Fwd: Order confirmed", "Merino Zip Jacket", sender).brand).toBe("icebreaker");
+	});
+
+	it("pulls the Nordstrom sender from a Begin-forwarded HTML body", () => {
+		const html = `<div dir="ltr"><br>Begin forwarded message:<br></div><blockquote><div dir="ltr"><b>From:</b> NORDSTROM &lt;nordstrom@eml.nordstrom.com&gt;<br><b>Date:</b> June 5, 2026<br></div></blockquote>`;
+		const sender = extractForwardedSender(html);
+		expect(sender.toLowerCase()).toContain("nordstrom");
+		expect(parse("Fwd: Your package has arrived", "Cotton On Graphic T-Shirt", sender).brand).toBe("nordstrom");
+	});
+
+	it("returns empty string for a non-forwarded body", () => {
+		expect(extractForwardedSender("<p>Thanks for your order!</p>")).toBe("");
 	});
 });
 

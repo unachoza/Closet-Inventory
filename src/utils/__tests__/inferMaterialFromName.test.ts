@@ -88,4 +88,10 @@ describe("inferMaterialFromName — multi-material keyword inference (from item 
 	it("keeps a single inferred material at 100%", () => {
 		expect(inferMaterialFromName("Leather Heeled Sandals")).toEqual([{ material: "leather", percentage: 100 }]);
 	});
+
+	it('"merino" alone (without "wool") infers wool (icebreaker product names)', () => {
+		expect(inferMaterialFromName("Merino 260 Quantum Long Sleeve Zip Jacket")).toEqual([
+			{ material: "wool", percentage: 100 },
+		]);
+	});
 });

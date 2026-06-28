@@ -6,6 +6,7 @@ import type { MaterialBlend } from "./types";
 const MATERIAL_KEYWORDS: [RegExp, string][] = [
 	[/\bcashmere\b/i, "cashmere"],
 	[/\bmerino\s+wool\b/i, "wool"],
+	[/\bmerino\b/i, "wool"],
 	[/\borganic\s+cotton\b/i, "cotton"],
 	[/\b(lyocell|tencel)\b/i, "lyocell"],
 	[/\b(viscose|rayon)\b/i, "rayon"],

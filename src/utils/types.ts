@@ -71,6 +71,8 @@ export interface InputProps {
 	value: string | number;
 	errorMessage?: string;
 	placeholder: string;
+	/** Whether the field is required for form submission. Defaults to true. */
+	required?: boolean;
 	onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
 	handleFormUpdate: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string, label?: string) => void;
 	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;

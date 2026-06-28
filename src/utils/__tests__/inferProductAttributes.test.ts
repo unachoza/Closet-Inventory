@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { inferProductAttributes } from "../inferProductAttributes";
+import { inferProductAttributes, matchAll, PATTERN_MAP } from "../inferProductAttributes";
 
 describe("inferProductAttributes — sleeve length", () => {
 	it.each([
@@ -111,5 +111,27 @@ describe("inferProductAttributes — multiple attributes from one name", () => {
 		const result = inferProductAttributes("High Waist Straight Leg Trousers");
 		expect(result.rise).toBe("high waist");
 		expect(result.fit).toBe("straight leg");
+	});
+});
+
+describe("inferProductAttributes — new accent inferences", () => {
+	it('"zip" alone → zipper accent (Merino 260 Quantum Long Sleeve Zip Hoodie)', () => {
+		const result = inferProductAttributes("Merino 260 Quantum Long Sleeve Zip Hoodie");
+		expect(result.accents).toContain("zipper");
+	});
+
+	it('"hoodie" → hood accent', () => {
+		const result = inferProductAttributes("Merino 260 Quantum Long Sleeve Zip Hoodie");
+		expect(result.accents).toContain("hood");
+	});
+
+	it('"slip-on" → slip-on accent (shoe style feature)', () => {
+		const result = inferProductAttributes("Ilse Jacobsen Tulipu Perforated Slip-On Sneaker");
+		expect(result.accents).toContain("slip-on");
+	});
+
+	it('"graphic" → captured as pattern (Cotton On Everyday Fit Graphic T-Shirt)', () => {
+		const name = "Cotton On Everyday Fit Graphic T-Shirt";
+		expect(matchAll(name, PATTERN_MAP)).toContain("graphic");
 	});
 });
