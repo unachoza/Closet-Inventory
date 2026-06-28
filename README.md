@@ -59,28 +59,11 @@ src/
 │   ├── Carousel/                 # Category carousel navigation
 │   ├── Closet/                   # Grid view of closet items
 │   ├── FabricCare/               # Interactive fabric care guide
-│   ├── FashionParser/            # Garment attribute inference engine (the knowledge layer)
-│   │   ├── maps/                 # 17 regex → canonical-value lookup tables
-│   │   │   ├── silhouette.ts     # a-line, sheath, bodycon, mermaid, fit & flare, …
-│   │   │   ├── fit.ts            # oversized, relaxed, slim, tailored, boyfriend, …
-│   │   │   ├── shaping.ts        # princess seams, darts, smocked, boned, gathered, …
-│   │   │   ├── neckline.ts       # 33 neckline/collar entries
-│   │   │   ├── sleeve.ts         # sleeve length + sleeve style (puff, bishop, lantern, …)
-│   │   │   ├── closure.ts        # button front, hidden zipper, lace-up, drawstring, …
-│   │   │   ├── construction.ts   # side slit, raw hem, distressed, scalloped, …
-│   │   │   ├── accents.ts        # ruffles, sequins, beaded, embroidered, feathers, …
-│   │   │   └── leg.ts, rise.ts, waist.ts, hem.ts, pattern.ts, season.ts, color.ts, material.ts
-│   │   ├── normalizers/          # Canonical-value normalizers
-│   │   │   ├── normalizeColor.ts        # "dusty rose" → "Pink"; normalizeColorGroups
-│   │   │   ├── normalizeCategory.ts     # "dress"/"dresses" → "dresses"; jeans → "bottoms"
-│   │   │   └── normalizeMaterial.ts     # "95% Cotton, 5% Spandex" → MaterialBlend[]
-│   │   ├── inference/            # Higher-order attribute inference
-│   │   │   ├── inferCare.ts      # Care instructions from material + name + color
-│   │   │   ├── inferOccasion.ts  # Occasion tags from name keywords + category
-│   │   │   ├── inferCategory.ts  # Garment category from product name keywords
+│   │   ├── maps/                 # 17 regex → canonical-value lookup tables - silhouette, fit, shapping, neckline, sleeve, closure, construction, accents, season, material, hem, pattern, leg, rise, waist
+│   │   ├── normalizers/          # Canonical-value normalizers - Clor, Category, Material blend
+│   │   ├── inference/            # Higher-order attribute inference - Care, Occasion, Category
 │   │   │   ├── inferSeason.ts    # Season from explicit keywords + material signals
 │   │   │   ├── inferStyle.ts     # Style family scoring (romantic/classic/edgy/minimal/…)
-│   │   │   └── inferMaterial.ts  # MaterialBlend from product name + % blend extraction
 │   │   ├── inferProductAttributes.ts  # Main parser — assembles all maps into one call
 │   │   ├── types.ts              # ProductAttributes, MaterialBlend, RegexMap
 │   │   ├── utils.ts              # matchFirst(), matchAll()
