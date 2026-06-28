@@ -3,8 +3,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseProductsFromEmail } from "../parseProductsFromEmail";
 import { categoryFromName } from "../parseEmailToFormData";
-import { inferStyleTagsFromName } from "../inferStyleTagsFromName";
-import normalizeCategory from "../normalizeCategories";
+import { inferOccasion } from "../../Features/FashionParser/inference/inferOccasion";
+import normalizeCategory from "../../Features/FashionParser/normalizers/normalizeCategory";
 import { categoryOptions } from "../constants";
 
 const loadFixture = (name: string): string => readFileSync(join(__dirname, "__fixtures__", name), "utf-8");
@@ -66,7 +66,7 @@ describe("icebreaker (classless Shopify) — items detected", () => {
 
 describe("inference — soccer jersey", () => {
 	it("infers a sports/athleisure occasion", () => {
-		expect(inferStyleTagsFromName("Cotton On Men's Soccer Jersey", "tops")).toContain("athleisure");
+		expect(inferOccasion("Cotton On Men's Soccer Jersey", "tops")).toContain("athleisure");
 	});
 
 	it("resolves to the tops category", () => {

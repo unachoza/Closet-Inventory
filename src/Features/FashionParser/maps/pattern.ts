@@ -1,0 +1,27 @@
+import type { RegexMap } from "../types";
+
+export const PATTERN_MAP: RegexMap = [
+  [/\banimal[- ]?print\b/i, "animal print"],
+  [/\bargyle\b/i, "argyle"],
+  [/\bcamo\b/i, "camo"],
+  [/\bcheckered\b/i, "checkered"],
+  [/\bgingham\b/i, "gingham"],
+  [/\bchevron\b/i, "chevron"],
+  [/\bherringbone\b/i, "herringbone"],
+  [/\bcolor[- ]?block(ed)?\b/i, "color block"],
+  [/\bfloral\b/i, "floral"],
+  [/\bgraphic\b/i, "graphic"],
+  [/\bhearts?\b/i, "hearts"],
+  [/\bhoundstooth\b/i, "houndstooth"],
+  [/\bmetallic\b/i, "metallic"],
+  [/\bpaisley\b/i, "paisley"],
+  [/\bplaid\b/i, "plaid"],
+  [/\bpolka[- ]?dots?\b/i, "polka dots"],
+  [/\bprint(ed)?\b/i, "print"],
+  [/\bsolid\b/i, "solid"],
+  [/\bstars?\b/i, "stars"],
+  [/\bstripes?\b/i, "stripes"],
+  [/\btie[- ]?dye\b/i, "tie-dye"],
+  [/\btropical\b/i, "tropical"],
+  [/\btweed\b/i, "tweed"],
+];

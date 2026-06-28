@@ -6,14 +6,12 @@ import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
 import { parseEmailToFormData, extractForwardedSender } from "../../utils/parseEmailToFormData";
-import { inferCare } from "../../utils/inferCare";
+import { inferCare, inferProductAttributes, normalizeColor } from "../FashionParser";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
-import normalizeColor from "../../utils/normalizeColors";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import "./GmailImport.css";
-import { inferProductAttributes } from "../../utils/inferProductAttributes";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
 
