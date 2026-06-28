@@ -15,6 +15,9 @@ import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
 import close from "../../../assets/close.svg";
+import { enrichFromRetailer } from "../../../utils/enrichFromRetailer";
+import { inferMaterialFromName } from "../../../utils/inferMaterialFromName";
+import { inferProductAttributes } from "../../../utils/inferProductAttributes";
 
 /** Fields the user may leave blank when adding/editing an item **/
 const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
@@ -149,6 +152,70 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		}
 	};
 
+	const [enrichmentState, setEnrichmentState] = useState<"idle" | "loading" | "done" | "error">("idle");
+	const [enrichmentSource, setEnrichmentSource] = useState<string | null>(null);
+
+	const handleEnrich = useCallback(async () => {
+		const brand = String(formData.brand ?? item.brand ?? "");
+		const name = String(formData.name ?? item.name ?? "");
+		if (!brand && !name) return;
+
+		setEnrichmentState("loading");
+		try {
+			const result = await enrichFromRetailer(
+				brand,
+				name,
+				typeof (item as Record<string, unknown>).itemNumber === "string"
+					? (item as Record<string, unknown>).itemNumber as string
+					: undefined,
+				brand,
+			);
+
+			setFormData((prev) => {
+				const updates: Partial<ClothingItem> = {};
+
+				if (result.materialsRaw && (!prev.material || (Array.isArray(prev.material) && prev.material.length === 0))) {
+					updates.material = inferMaterialFromName(result.materialsRaw);
+				}
+
+				if (result.careRaw) {
+					updates.care = result.careRaw;
+				}
+
+				const currentStyle = prev.style ?? {};
+				const styleUpdates: Partial<typeof currentStyle> = {};
+
+				if (result.description) {
+					const attrs = inferProductAttributes(result.description);
+					if (attrs.hemLength && !currentStyle.hemLength) styleUpdates.hemLength = attrs.hemLength;
+					if (attrs.neckline && !currentStyle.neckline) styleUpdates.neckline = attrs.neckline;
+					if (attrs.sleeveLength && !currentStyle.sleeveLength) styleUpdates.sleeveLength = attrs.sleeveLength;
+					if (attrs.fit && !currentStyle.fit) styleUpdates.fit = attrs.fit;
+				}
+
+				if (result.fitInfo) {
+					const fitMatch = result.fitInfo.match(/Fit:\s*(\w+)/i);
+					if (fitMatch && !currentStyle.fit) styleUpdates.fit = fitMatch[1];
+					const lengthMatch = result.fitInfo.match(/Length:\s*(\w+)/i);
+					if (lengthMatch && !currentStyle.hemLength) styleUpdates.hemLength = lengthMatch[1];
+				}
+
+				if (Object.keys(styleUpdates).length > 0) {
+					updates.style = { ...currentStyle, ...styleUpdates };
+				}
+
+				return { ...prev, ...updates };
+			});
+
+			setEnrichmentSource(result.pdpUrl ?? result.source);
+			setEnrichmentState("done");
+			showToast("Product details found!");
+		} catch {
+			setEnrichmentState("error");
+			showToast("Couldn't find product details");
+		}
+	}, [formData.brand, formData.name, item, showToast]);
+
 	const separateFeilds = () => {
 		return Object.entries(inputsToSeperate).map(([key, value]) => {
 			if (key === "imageURL") {
@@ -232,6 +299,25 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					<div className="edit-form-image-preview">
 						<img src={formData.imageURL} alt={formData.name ?? "Product"} className="edit-form-preview-img" />
 					</div>
+				)}
+
+				{isCreateMode && formData.brand && (
+					<button
+						type="button"
+						className="edit-form-enrich-btn"
+						onClick={handleEnrich}
+						disabled={enrichmentState === "loading"}
+					>
+						{enrichmentState === "loading" && "Finding details..."}
+						{enrichmentState === "idle" && "Find Full Details"}
+						{enrichmentState === "done" && "Details found"}
+						{enrichmentState === "error" && "Retry"}
+					</button>
+				)}
+				{enrichmentSource && enrichmentState === "done" && (
+					<span className="edit-form-enrich-source">
+						from {(() => { try { return new URL(enrichmentSource).hostname; } catch { return enrichmentSource; } })()}
+					</span>
 				)}
 
 				<div className="form-fields">

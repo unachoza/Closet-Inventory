@@ -3384,6 +3384,7 @@ function extractFromZaraMjmlLayout(doc: Document): ExtractedProduct[] {
 		let price = "";
 		let name = "";
 		let color = "";
+		let itemNumber = "";
 
 		// Walk following sibling rows until the next product image.
 		for (let row = imgRow.nextElementSibling; row; row = row.nextElementSibling) {
@@ -3408,6 +3409,8 @@ function extractFromZaraMjmlLayout(doc: Document): ExtractedProduct[] {
 				// Color line carries a Zara SKU ("Black 0/7901/290/800/02").
 				if (/\d\/\d{3,4}\//.test(text)) {
 					if (!color) color = parseColorFromSkuLine(text);
+					const skuMatch = text.match(/(\d\/\d{3,4}\/\d{3}(?:\/\d+)*)/);
+					if (skuMatch && !itemNumber) itemNumber = skuMatch[1];
 				} else if (!name) {
 					name = text;
 				}
@@ -3427,7 +3430,7 @@ function extractFromZaraMjmlLayout(doc: Document): ExtractedProduct[] {
 			price,
 			color,
 			size,
-			itemNumber: "",
+			itemNumber,
 			material: "",
 			onSale: false,
 		});

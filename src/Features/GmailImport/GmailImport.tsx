@@ -173,13 +173,11 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				size: product.size,
 				material,
 				onSale: product.onSale,
-				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
 				condition: emailData.condition,
-				// Recompute care from the RESOLVED color/material — the card's color
-				// (e.g. "Color: White") isn't visible to parseEmailToFormData.
 				care: inferCare(product.name, color, material),
 				style,
-			});
+				itemNumber: product.itemNumber,
+			} as ClothingItem & { itemNumber?: string });
 		},
 		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
 	);
@@ -216,7 +214,8 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					// visible to parseEmailToFormData).
 					care: inferCare(product.name, color, material),
 					style,
-				} as Partial<ClothingItem>;
+					itemNumber: product.itemNumber,
+				} as Partial<ClothingItem> & { itemNumber?: string };
 			});
 			onImportAll(items);
 		},
