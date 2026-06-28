@@ -117,8 +117,10 @@ describe("parseEmailToFormData — category inference", () => {
 		expect(parse("Double Breasted Blazer").category).toBe("coats");
 	});
 
-	it('infers "active" from "legging"', () => {
-		expect(parse("High Waist Leggings").category).toBe("active");
+	it('infers "athleisure" from "legging"', () => {
+		// "active" was a legacy orphan label (never a valid CategoryType); it now
+		// folds into the canonical "athleisure" bucket.
+		expect(parse("High Waist Leggings").category).toBe("athleisure");
 	});
 
 	it('infers "body" from "jumpsuit"', () => {

@@ -12,7 +12,9 @@ const CATEGORY_GROUPS: Record<string, string> = {
 	sweater: "sweaters",
 	sweaters: "sweaters",
 	intimates: "intimates",
-	active: "active",
+	// "active" is the legacy label for athleisure — fold it into the canonical bucket.
+	active: "athleisure",
+	athleisure: "athleisure",
 	sock: "socks",
 	socks: "socks",
 	underwear: "underwear",

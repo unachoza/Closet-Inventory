@@ -104,9 +104,12 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	sock: "socks",
 	tights: "socks",
 	underwear: "intimates",
-	legging: "active",
-	sports: "active",
-	jersey: "active",
+	legging: "athleisure",
+	sports: "athleisure",
+	// A jersey is a top (soccer/football/sports shirt). More specific garment
+	// words (dress, skirt, …) are matched earlier, so "jersey knit dress" still
+	// resolves to dresses; a bare "jersey" lands in tops.
+	jersey: "tops",
 	swimsuit: "intimates",
 	bodysuit: "body",
 	jumpsuit: "body",
