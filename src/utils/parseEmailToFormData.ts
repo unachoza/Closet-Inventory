@@ -1,14 +1,13 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
 import { parseInlineColorSize, stripBrandFromName, extractColorFromName } from "./parseNameHelpers";
-import normalizeColor from "./normalizeColors";
+import normalizeColor from "../Features/FashionParser/normalizers/normalizeColor";
 import { extractBrandFromSender } from "./parseProductsFromEmail";
-import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
+import { inferOccasion } from "../Features/FashionParser/inference/inferOccasion";
 import { cleanProductName } from "./cleanProductName";
-import { inferProductAttributes } from "./inferProductAttributes";
-import { inferMaterialFromName } from "./inferMaterialFromName";
-import { inferCare } from "./inferCare";
-import { inferSemanticAttributes } from "./inferSemanticAttributes";
+import { inferProductAttributes } from "../Features/FashionParser";
+import { inferMaterialFromName } from "../Features/FashionParser/inference/inferMaterial";
+import { inferCare } from "../Features/FashionParser/inference/inferCare";
 import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
@@ -242,7 +241,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	const effectiveFrom = forwardedFrom || from;
 	const brand = extractBrand(combinedText, effectiveFrom) || extractBrandFromSender(effectiveFrom);
 	const category = extractCategory(combinedText);
-	const styleTags = inferStyleTagsFromName(combinedText, category);
+	const styleTags = inferOccasion(combinedText, category);
 
 	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
 	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
@@ -258,8 +257,6 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// product name arrives as `body` (subject is the retailer's generic
 	// "Your order has been received"), so subject-only inference drops it.
 	const attrs = inferProductAttributes(combinedText);
-
-	const semantic = inferSemanticAttributes(combinedText);
 
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	// Care from material (fiber wash/dry) + name/color attributes (jeans → wash
@@ -299,7 +296,6 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		...(condition && { condition }),
 		...(purchaseDate ? { purchaseDate } : {}),
 		...attrs,
-		...semantic,
 	};
 
 	return result;

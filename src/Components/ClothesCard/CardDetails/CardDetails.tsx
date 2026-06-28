@@ -115,14 +115,51 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<div className="card-details__expanded">
 						{hasStyle && (
 							<div className="card-details__expanded-subsection">
-								<SectionTitle label="Style & Construction" />
+								<SectionTitle label="Silhouette & Shape" />
+								{style?.silhouette && <p className="card-details__identity-text">Silhouette: {style.silhouette}</p>}
 								{style?.fit && <p className="card-details__identity-text">Fit: {style.fit}</p>}
+								{style?.legShape && <p className="card-details__identity-text">Leg Shape: {style.legShape}</p>}
+								{style?.waistStyle && <p className="card-details__identity-text">Waist: {style.waistStyle}</p>}
+								{style?.hemLength && <p className="card-details__identity-text">Length: {style.hemLength}</p>}
+								{style?.rise && <p className="card-details__identity-text">Rise: {style.rise}</p>}
+							</div>
+						)}
+						{hasStyle && (style?.neckline || style?.sleeveLength || style?.sleeveStyle) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Neckline & Sleeves" />
+								{style?.neckline && <p className="card-details__identity-text">Neckline: {style.neckline}</p>}
+								{style?.sleeveLength && <p className="card-details__identity-text">Sleeve Length: {style.sleeveLength}</p>}
+								{style?.sleeveStyle && <p className="card-details__identity-text">Sleeve Style: {style.sleeveStyle}</p>}
+							</div>
+						)}
+						{hasStyle && (style?.shaping?.length || style?.construction?.length) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Construction Details" />
+								{style?.shaping && style.shaping.length > 0 && (
+									<p className="card-details__identity-text">Shaping: {style.shaping.join(", ")}</p>
+								)}
+								{style?.construction && style.construction.length > 0 && (
+									<p className="card-details__identity-text">Details: {style.construction.join(", ")}</p>
+								)}
+							</div>
+						)}
+						{hasStyle && (style?.accents?.length || style?.pattern) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Embellishments & Pattern" />
 								{style?.pattern && <p className="card-details__identity-text">Pattern: {style.pattern}</p>}
-								{style?.neckline && <p className="card-details__identity-text">Neckline: {style?.neckline}</p>}
-								{style?.topLength && <p className="card-details__identity-text">Length: {style?.topLength}</p>}
-								{style?.sleeveLength && <p className="card-details__identity-text">Sleeve: {style?.sleeveLength}</p>}
-								{style?.hemLength && <p className="card-details__identity-text">Hem Length: {style?.hemLength}</p>}
-								{style?.rise && <p className="card-details__identity-text">Rise: {style?.rise}</p>}
+								{style?.accents && style.accents.length > 0 && (
+									<p className="card-details__identity-text">Accents: {style.accents.join(", ")}</p>
+								)}
+							</div>
+						)}
+						{hasStyle && style?.closure?.length && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Closure & Features" />
+								{style?.closure && style.closure.length > 0 && (
+									<p className="card-details__identity-text">Closure: {style.closure.join(", ")}</p>
+								)}
+								{style?.hasStretch && <p className="card-details__identity-text">✓ Stretch</p>}
+								{style?.hasPockets && <p className="card-details__identity-text">✓ Pockets</p>}
 							</div>
 						)}
 						{featureTags.length > 0 && (

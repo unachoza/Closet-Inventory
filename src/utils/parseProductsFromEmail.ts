@@ -1,6 +1,6 @@
 import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize, extractColorFromName } from "./parseNameHelpers";
 import { cleanProductName } from "./cleanProductName";
-import { inferProductAttributes } from "./inferProductAttributes";
+import { inferProductAttributes } from "../Features/FashionParser";
 
 /**
  * Extracts product details from order confirmation email HTML.

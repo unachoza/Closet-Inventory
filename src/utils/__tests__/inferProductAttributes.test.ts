@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { inferProductAttributes, matchAll, PATTERN_MAP } from "../inferProductAttributes";
+import { inferProductAttributes } from "../../Features/FashionParser";
+import { matchAll } from "../../Features/FashionParser/utils";
+import { PATTERN_MAP } from "../../Features/FashionParser/maps/pattern";
 
 describe("inferProductAttributes — sleeve length", () => {
 	it.each([
