@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { ClothingItem, MaterialBlend } from "../utils/types";
-import normalizeColor, { normalizeColorGroups } from "../utils/normalizeColors";
-import normalizeCategory from "../utils/normalizeCategories";
+import normalizeColor, { normalizeColorGroups } from "../Features/FashionParser/normalizers/normalizeColor";
+import normalizeCategory from "../Features/FashionParser/normalizers/normalizeCategory";
 import { parseCareLabels } from "../utils/careUtils";
 
 const MATERIAL_MIN_PCT = 6;

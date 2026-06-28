@@ -157,24 +157,6 @@ src/Features/FashionParser/
     └── silhouette.test.ts
 ```
 
-### Backward compatibility
-
-All pre-existing `src/utils/` imports continue to work unchanged. The following utils files are now thin re-export stubs pointing at FashionParser:
-
-| utils stub | → FashionParser source |
-|---|---|
-| `inferProductAttributes.ts` | `inferProductAttributes` + all maps |
-| `inferCare.ts` | `inference/inferCare.ts` |
-| `inferCareFromAttributes.ts` | `inference/inferCare.ts` |
-| `inferCareFromMaterial.ts` | `inference/inferCare.ts` |
-| `inferStyleTagsFromName.ts` | `inference/inferOccasion.ts` |
-| `inferMaterialFromName.ts` | `inference/inferMaterial.ts` |
-| `inferSemanticAttributes.ts` | `inference/inferOccasion.ts` |
-| `normalizeColors.ts` | `normalizers/normalizeColor.ts` |
-| `normalizeCategories.ts` | `normalizers/normalizeCategory.ts` |
-
-`materialUtils.ts` intentionally stays in `utils/` — it contains UI display helpers (`getMaterialColor`, `blendToDisplayString`, `MATERIAL_COLORS`) that belong to the presentation layer, not the parsing domain. `normalizeMaterial` is now canonical in FashionParser and re-exported from `materialUtils` for backward compat.
-
 ---
 
 ## Roadmap
@@ -184,7 +166,7 @@ All pre-existing `src/utils/` imports continue to work unchanged. The following 
 - [x] `matchFirst` (single-value) and `matchAll` (multi-value) utilities
 - [x] Silhouette / fit / leg shape properly separated
 - [x] Color and material maps
-- [x] Backward-compatible stubs in `src/utils/`
+- [x] All consumers migrated to direct FashionParser imports; legacy `src/utils/` stubs removed
 
 ### Phase 2 — Normalizers ✅
 - [x] `normalizeColor` — maps retailer color names to canonical palette

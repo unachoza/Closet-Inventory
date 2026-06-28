@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
-import { ProductAttributes } from "../utils/inferProductAttributes";
+import { ProductAttributes } from "../Features/FashionParser/types"
 
 export interface MaterialBlend {
 	material: string;
