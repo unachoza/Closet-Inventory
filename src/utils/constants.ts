@@ -129,7 +129,7 @@ export const ClothingItemPossibilities = {
 	condition: ["new", "like new", "good", "poor", "needs repair"],
 	age: clothesAgesOptions,
 	care: careExamples,
-	notes: "",
+	notes: [],
 };
 
 export const categoryDecisionTree = {

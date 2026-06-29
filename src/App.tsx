@@ -3,6 +3,7 @@ import { EditProvider } from "./Features/Form/EditContext";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
+import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import NavBar from "./Components/NavBar/NavBar";
 import { useLocalStorageCloset } from "./hooks/useLocalCloset";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
@@ -35,7 +36,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		condition: "new",
 		care: "",
 		onSale: false,
-		notes: "",
+		notes: [],
 		// Spread carries all prefilled fields including `style` and any future
 		// ClothingItem properties — nothing is silently dropped by enumeration.
 		...prefilled,
@@ -215,15 +216,17 @@ function AppShell() {
 
 function App() {
 	return (
-		<ViewProvider initialView="carousel">
-			<SearchProvider>
-				{/* Session-scoped Gmail auth — mounted above the view switch so the
-				    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
-				<GmailAuthProvider>
-					<AppShell />
-				</GmailAuthProvider>
-			</SearchProvider>
-		</ViewProvider>
+		<SupabaseAuthProvider>
+			<ViewProvider initialView="carousel">
+				<SearchProvider>
+					{/* Session-scoped Gmail auth — mounted above the view switch so the
+					    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
+					<GmailAuthProvider>
+						<AppShell />
+					</GmailAuthProvider>
+				</SearchProvider>
+			</ViewProvider>
+		</SupabaseAuthProvider>
 	);
 }
 

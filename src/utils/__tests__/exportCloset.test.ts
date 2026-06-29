@@ -19,7 +19,7 @@ const baseItem: ClothingItem = {
 	purchaseDate: "2024-03-15T00:00:00.000Z",
 	care: ["hand wash", "lay flat"],
 	onSale: false,
-	notes: "",
+	notes: [],
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -138,12 +138,12 @@ describe("exportClosetToCSV", () => {
 		});
 
 		it("escapes double-quotes inside cell values by doubling them", () => {
-			const csv = captureCSV({ ...baseItem, notes: 'Fits "true to size"' });
+			const csv = captureCSV({ ...baseItem, notes: ['Fits "true to size"'] });
 			expect(csv).toContain('"Fits ""true to size"""');
 		});
 
 		it("wraps cells containing newlines in double-quotes", () => {
-			const csv = captureCSV({ ...baseItem, notes: "Line one\nLine two" });
+			const csv = captureCSV({ ...baseItem, notes: ["Line one\nLine two"] });
 			expect(csv).toContain('"Line one\nLine two"');
 		});
 

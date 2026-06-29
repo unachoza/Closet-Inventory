@@ -116,7 +116,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		purchaseDate: prefilled.purchaseDate,
 		care: prefilled.care ?? "",
 		onSale: prefilled.onSale ?? false,
-		notes: prefilled.notes ?? "",
+		notes: prefilled.notes ?? [],
 	};
 }
 

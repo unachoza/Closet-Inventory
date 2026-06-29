@@ -41,7 +41,7 @@ const makeItem = (overrides: Partial<ClothingItem> = {}): ClothingItem => ({
 	care: "machine wash",
 	price: "$30",
 	onSale: false,
-	notes: "",
+	notes: [],
 	...overrides,
 });
 

@@ -11,6 +11,8 @@ import type { ClosetRepository } from "./closetRepository";
 
 export type { ClosetRepository, ImportMode } from "./closetRepository";
 export { LocalClosetRepository } from "./localClosetRepository";
+export { SupabaseClosetRepository } from "./supabaseClosetRepository";
+export { SyncedClosetRepository } from "./syncedClosetRepository";
 
 /** The active repository. Swap during the cloud port. */
 export const closetRepository: ClosetRepository = new LocalClosetRepository();

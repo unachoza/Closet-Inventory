@@ -17,33 +17,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-// ── Prevent Firebase / auth / cloud side effects (mirrors App.test.tsx) ───────
-vi.mock("./firebase", () => ({ auth: {}, db: {} }));
-vi.mock("./context/AuthContext", () => ({
-	AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	useAuth: () => ({ user: null, loading: false }),
-}));
-vi.mock("./hooks/useCloudCloset", () => ({
-	useCloudCloset: () => ({
-		closet: [],
-		addItem: vi.fn(),
-		addFullItem: vi.fn(),
-		removeItem: vi.fn(),
-		updateItem: vi.fn(),
-		clearCloset: vi.fn(),
-		getCloset: vi.fn(() => []),
-		syncing: false,
-	}),
-}));
-vi.mock("firebase/firestore", () => ({
-	collection: vi.fn(),
-	doc: vi.fn(),
-	getDocs: vi.fn().mockResolvedValue({ empty: true, docs: [] }),
-	setDoc: vi.fn(),
-	deleteDoc: vi.fn(),
-	writeBatch: vi.fn(() => ({ set: vi.fn(), commit: vi.fn() })),
-}));
-
 // ── Google SDK: capture onSuccess so we can drive the REAL useGmailAuth ────────
 let capturedOnSuccess: ((resp: { access_token: string; expires_in: number }) => void) | undefined;
 vi.mock("@react-oauth/google", () => ({

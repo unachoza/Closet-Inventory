@@ -15,6 +15,7 @@ Built around low-friction ingestion (email + camera), a fabric-care knowledge la
 - 🧠 **Smart Date Handling** — Intelligent age calculation (months vs. years)
 - 🔍 **Search, Filter & Sort** — Fuzzy search, multi-dimension filters, sort by price/age/name
 - 📧 **Gmail Import** — OAuth-authenticated email parsing to auto-populate closet items
+- ☁️ **Cloud-Ready Service Layer** — storage-agnostic repository seam; Supabase auth wired, data sync in progress (localStorage is the active store today)
 - ☁️ **Supabase Sync** — Cloud persistence per user with localStorage as offline cache
 - 🧬 **FashionParser** — Domain inference engine: 17 attribute maps, 6 normalizers, style/occasion/care/season inference
 - 🧵 **Fabric Care Guide** — Interactive textile guide with material-to-care mapping
@@ -77,6 +78,17 @@ src/
 │   ├── GmailImport/              # Gmail OAuth + email parsing
 │   └── SearchCloset/             # Full closet search, filter, sort
 ├── context/
+│   ├── SupabaseAuthContext.tsx   # Supabase auth session state
+│   ├── GmailAuthContext.tsx      # Gmail OAuth token (survives view switches)
+│   ├── SearchContext.tsx         # Shared search state
+│   └── ViewContext.tsx           # App view/navigation state
+├── hooks/
+│   ├── useLocalCloset.tsx        # localStorage closet operations (active store)
+│   ├── useSupabaseAuth.ts        # Supabase auth session
+│   ├── useClosetFilters.ts       # Multi-dimension filter logic
+│   ├── useClosetSort.ts          # Sort by price, age, name
+│   ├── useFuzzySearch.ts         # Fuse.js fuzzy search
+│   ├── useAdvancedSearch.tsx     # Subject/body + date-range Gmail query builder
 │   ├── AuthContext.tsx           # Supabase auth state
 │   ├── ClosetContext.tsx         # Shared closet instance (cloud + local)
 │   ├── SearchContext.tsx         # Shared search state
@@ -89,9 +101,19 @@ src/
 │   ├── useFuzzySearch.ts         # Fuse.js fuzzy search (imports from FashionParser)
 │   ├── useGmailAuth.tsx          # Gmail OAuth flow
 │   ├── useGmailSearch.tsx        # Gmail API search
-│   ├── usePagination.tsx         # Pagination logic
-│   └── useStockPhoto.tsx         # Fallback stock image by category
+│   └── usePagination.tsx         # Pagination logic
 ├── utils/
+│   ├── constants.ts              # App-wide constants
+│   ├── materialUtils.ts          # Material normalization
+│   ├── inferProductAttributes.ts # Name → material / care / style inference
+│   ├── parseProductsFromEmail.ts # Email → ClothingItem parser
+│   └── parseEmailToFormData.ts
+├── services/                     # Storage seam (repository pattern)
+│   ├── closetRepository.ts       # ClosetRepository interface
+│   ├── localClosetRepository.ts  # localStorage implementation (active)
+│   └── index.ts                  # exports the active repo — swap here for Supabase
+├── lib/
+│   └── supabaseClient.ts         # Lazy Supabase client singleton
 │   ├── types.ts                  # TypeScript interfaces (ProductAttributes via FashionParser)
 │   ├── constants.ts              # App-wide constants
 │   ├── materialUtils.ts          # UI-layer material helpers (display colors, blend display string)
@@ -100,6 +122,9 @@ src/
 ├── App.tsx                       # Root component + view routing
 └── main.tsx                      # Entry point
 ```
+
+> Shared backend/domain types live in the `@ntw/types` workspace package
+> ([packages/types](./packages/types)) — the forward-looking contract for the Supabase port.
 
 ---
 
@@ -132,8 +157,12 @@ User Input → Form State → Validation → useCloudCloset → Supabase + local
 Email HTML → multi-retailer parsers → FashionParser inference → ClothingItem → closet
 ```
 
+> **Cloud sync is mid-port.** `SupabaseAuthProvider` is mounted and the closet's **write** path now flows through the `closetRepository` seam — so swapping in a `SupabaseClosetRepository` (one line in `services/index.ts`) redirects all persistence. **Reads** still seed synchronously from localStorage; porting that to async `repository.getAll()` (with loading state + cross-instance sync) is the remaining step — see [E1 · Cloud Backend](./planning/epics/E1-cloud-backend.md).
+
 **Key patterns:**
 
+- `services/closetRepository` — the single storage seam. The closet hook delegates every mutation to `closetRepository`, never writing localStorage or a DB client directly. The active implementation is `LocalClosetRepository`; a `SupabaseClosetRepository` drops in behind the same interface.
+- `GmailAuthContext` — holds the Gmail OAuth token above the view switch, so Gmail ↔ Edit navigation doesn't drop it.
 - `useCloudCloset` — writes to Supabase when signed in, falls back to localStorage when offline/signed out. On first sign-in with no cloud data, seeds Supabase from localStorage.
 - `ClosetContext` — single shared instance of `useCloudCloset` across the app; prevents duplicate DB connections.
 - `FashionParser` — domain module at `src/Features/FashionParser/`. All garment-attribute parsing, normalization, and inference is isolated here. Consumers (`GmailImport`, `useClosetFilters`, `useFuzzySearch`) import directly from it; no scattered utils stubs.
@@ -186,14 +215,14 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 > Re-sequenced 2026-06-20. Full reasoning + dev-day estimates in
 > [planning/STRATEGY_REVIEW_2026-06-20.md](./planning/STRATEGY_REVIEW_2026-06-20.md).
 
-1. **Stand up the cloud layer** — ⚠️ **gated by an open decision:** [Firestore (merge PR #44) vs. Supabase](./planning/BACKEND_DATABASE_DECISION.md). Resolve that first; "merge #44" is only the answer if Firestore wins. Pair with the **base64 → object-storage** image fix. (~2.5–10.5 dev-days, path-dependent)
+1. **Stand up the cloud layer (Supabase)** — ✅ **DB decision resolved: Supabase** ([rationale](./planning/BACKEND_DATABASE_DECISION.md)). Auth + client are wired; **next is the data port** — write `SupabaseClosetRepository`, the Postgres schema/migration, and owner-only RLS, then flip the one line in `services/index.ts`. Pair with the **base64 → object-storage** image fix. (~7–11 dev-days)
 2. **Mobile UI polish + PWA** — touch-target audit (44×44px), bottom nav / "Add Item" FAB (primary action out of the hamburger), and PWA scaffolding (`vite-plugin-pwa`, `manifest.json`, service worker, iOS meta, icons). **Load-bearing** for monetization ("no App Store / no 30% cut"), offline-first, and add-to-home-screen. (~7.5–9.5 dev-days)
 3. **v2.2 web-engagement** — scrape richer product details from retailer PDPs to feed the existing inference pipeline. ⚠️ Do the [feasibility spike first](./planning/EngagingWebForProductDetails.md) — verified 2026-06-20 that Cloudflare bot-blocking returns `403` to plain fetches of major retailers. (~10–14.5 dev-days)
 
 **Cross-version dependencies:**
 
 - `wornCount` (in v5) is required by the **v9.0** lifespan tracker and **v10.0** sustainability. Add the field + "Log a Wear" button early, decoupled from the full analytics dashboard.
-- The **cloud backend** (v5.1) gates **v8.1** social and **v1.0 monetization** (`isPremium` read). Resolve the [DB decision](./planning/BACKEND_DATABASE_DECISION.md) before building on it — if Supabase wins, migrate _before_ #44 ships, never after.
+- The **cloud backend** (Supabase, v5.1) gates **v8.1** social and **v11 monetization** (`isPremium` read). The [DB decision](./planning/BACKEND_DATABASE_DECISION.md) is settled — build the data port (repository + schema + RLS) on it before any premium gating.
 - **Monetization** also depends on the **PWA** install path (priority 3).
 - **Camera-roll import** (v3.1) is the fastest logging path for the mobile persona and the only path for in-store / second-hand items — slot it after the image-storage fix (it multiplies the base64 ceiling).
 
@@ -390,7 +419,7 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 - 🔲 see closet and select items
 - 🔲 calculate suggestions based on how many days
 - 🔲 `usePackingList` hook
-- 🔲 Packing lists saved to Firestore
+- 🔲 Packing lists saved to Supabase
 
 ---
 
@@ -462,7 +491,7 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 - Unlimited items
 - Enriched Product Details surfaced from deep internet research
 - Gmail import
-- Firestore cloud sync + multi-device access
+- Supabase cloud sync + multi-device access
 - AI camera roll import (v2.1)
 - Future: outfit builder, packing lists, analytics
 
@@ -470,8 +499,8 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 
 - 🔲 Stripe Checkout — hosted payment page, no custom payment UI needed
 - 🔲 Stripe Customer Portal — handles upgrades, cancellations, billing history automatically
-- 🔲 Stripe webhook → Firestore `users/{uid}` document `{ isPremium: true }`
-- 🔲 Feature gates in app read `isPremium` from Firestore before unlocking Gmail import / sync
-- 🔲 Free item limit enforced in `useCloudCloset` / `useLocalCloset`
+- 🔲 Stripe webhook → Supabase `users` row `{ is_premium: true }`
+- 🔲 Feature gates in app read `is_premium` from Supabase before unlocking Gmail import / sync
+- 🔲 Free item limit enforced in the closet repository (`LocalClosetRepository` / `SupabaseClosetRepository`)
 
 ---
