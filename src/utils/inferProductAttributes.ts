@@ -1,15 +1,36 @@
 export interface ProductAttributes {
-	neckline?: string;
-	topLength?: string;
-	sleeveLength?: string;
-	hemLength?: string;
+	// silhouette & shape
+	silhouette?: string;
 	fit?: string;
+	shaping?: string[];
+
+	// neckline & sleeves
+	neckline?: string;
+	sleeveLength?: string;
+	sleeveStyle?: string;
+
+	// length & leg
+	hemLength?: string;
+	/** @deprecated use hemLength — kept for back-compat with parsed email data */
+	topLength?: string;
+	legShape?: string;
+
+	// waist & rise
 	rise?: string;
-	season?: string;
+	waistStyle?: string;
+
+	// construction details
+	closure?: string[];
+	accents?: string[];
+	construction?: string[];
+	pattern?: string;
+
+	// fit & function
 	hasStretch?: boolean;
 	hasPockets?: boolean;
-	pattern?: string;
-	accents?: string | string[];
+
+	// context
+	season?: string;
 }
 
 // Each entry: [pattern, canonical value].
