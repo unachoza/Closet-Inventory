@@ -39,7 +39,7 @@ export class LocalClosetRepository implements ClosetRepository {
 	}
 
 	async add(item: ClothingItem): Promise<ClothingItem> {
-		const normalized = { ...item, material: normalizeMaterial(item.material) };
+		const normalized = { ...item, material: normalizeMaterial(item.material), updatedAt: item.updatedAt ?? new Date().toISOString() };
 		write([...read(), normalized]);
 		return normalized;
 	}
@@ -47,9 +47,10 @@ export class LocalClosetRepository implements ClosetRepository {
 	async update(id: string, patch: Partial<ClothingItem>): Promise<ClothingItem | null> {
 		const items = read();
 		let updated: ClothingItem | null = null;
+		const stamped = { ...patch, updatedAt: new Date().toISOString() };
 		const next = items.map((item) => {
 			if (item.id !== id) return item;
-			updated = { ...item, ...patch };
+			updated = { ...item, ...stamped };
 			return updated;
 		});
 		if (updated) write(next);

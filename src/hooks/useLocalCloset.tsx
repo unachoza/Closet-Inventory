@@ -28,7 +28,8 @@ function seed(): ClothingItem[] {
 	}
 }
 
-export function useLocalStorageCloset() {
+/** @internal Pure-local hook (no Supabase sync). Use `useLocalStorageCloset` in production code. */
+export function useLocalOnlyCloset() {
 	const [closet, setCloset] = useState<ClothingItem[]>(seed);
 
 	// Transparently migrate legacy string material fields to MaterialBlend[]
@@ -88,3 +89,10 @@ export function useLocalStorageCloset() {
 
 	return { closet: normalizedCloset, addItem, addFullItem, importItems, removeItem, updateItem, getCloset, clearCloset };
 }
+
+/**
+ * Public alias — backed by `useCloudCloset` (Supabase sync when signed in,
+ * offline-local when signed out). Kept under this name so all existing
+ * component imports and test mocks require no path changes.
+ */
+export { useCloudCloset as useLocalStorageCloset } from "./useCloudCloset";

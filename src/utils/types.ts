@@ -105,6 +105,9 @@ export type ClothingItem = {
 	// ── E11 cached rollup (E11 owns the write path) ───────────────────────────
 	wornCount?: number;
 	lastWornAt?: string;   // ISO date
+
+	// ── sync metadata (set by SyncedClosetRepository; used for last-write-wins) ─
+	updatedAt?: string;    // ISO datetime
 };
 
 export interface ItemFormData {
