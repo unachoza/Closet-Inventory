@@ -101,7 +101,7 @@ Suite green · no debug logs / console warnings · the confidence-eroding bugs f
 ## Post-completion polish backlog
 _Epic DoD is met ✅; these are small correctness/branding nits surfaced from user feedback, scheduled in **Sprint 3.5**. They do not reopen the epic._
 
-- `E0-7.1` **Onboarding still says "MyCloset"** — the onboarding flow shows the old "MyCloset" name; update all copy to **"Nothing To Wear"**. Audit `src/Features/Onboarding/` (and anywhere else) for stale branding. — _0.25d_
+- ✅`E0-7.1` **Onboarding still says "MyCloset"** — the onboarding flow shows the old "MyCloset" name; update all copy to **"Nothing To Wear"**. Audit `src/Features/Onboarding/` (and anywhere else) for stale branding. — _0.25d_
 - `E0-7.2` **Search-result pills look "floppy"** — when a search query is active, the match pills render at the bottom of the clothing cards but read as a separate, detached layer (especially on hover, where they separate from the card). Pull the pills **inside** the card on their own layer so they feel attached, not floating. Card / search-pill styling fix. — _0.5d_
 - `E0-2.3` **Material filter sort by blend %** — when filtering by a material, sort results descending by that material's `MaterialBlend.percentage` (100% cotton first); regression test. — _0.5d_
 
