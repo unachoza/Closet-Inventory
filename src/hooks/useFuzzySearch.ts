@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 import { ClothingItem } from "../utils/types";
-import { normalizeColorGroups } from "../utils/normalizeColors";
-import normalizeCategory from "../utils/normalizeCategories";
+import { normalizeColorGroups } from "../Features/FashionParser/normalizers/normalizeColor";
+import normalizeCategory from "../Features/FashionParser/normalizers/normalizeCategory";
 
 const DEBOUNCE_MS = 300;
 

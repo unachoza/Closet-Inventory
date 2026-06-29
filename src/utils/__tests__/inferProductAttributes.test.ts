@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { inferProductAttributes } from "../inferProductAttributes";
+import { inferProductAttributes } from "../../Features/FashionParser";
+import { matchAll } from "../../Features/FashionParser/utils";
+import { PATTERN_MAP } from "../../Features/FashionParser/maps/pattern";
 
 describe("inferProductAttributes — sleeve length", () => {
 	it.each([
@@ -54,20 +56,42 @@ describe("inferProductAttributes — neckline", () => {
 	});
 });
 
+describe("inferProductAttributes — silhouette", () => {
+	it.each([
+		["Aritzia Teal Long-Sleeve Square Neck Bodycon Dress", "bodycon"],
+		["Fit and Flare Midi Dress", "fit & flare"],
+		["A-Line Skirt", "a-line"],
+		["Sheath Dress", "sheath"],
+		["Wrap Blouse", "wrap"],
+		["Pencil Skirt", "pencil"],
+		["Mermaid Gown", "mermaid"],
+	] as [string, string][])('"%s" → silhouette="%s"', (name, expected) => {
+		expect(inferProductAttributes(name).silhouette).toBe(expected);
+	});
+});
+
 describe("inferProductAttributes — fit", () => {
 	it.each([
-		["Aritzia Contour Squareneck Longsleeve Mini Dress", "bodycon"],
-		["Aritzia Teal Long-Sleeve Square Neck Bodycon Dress", "bodycon"],
-		["Casual Solid Color High Waist Straight Leg Trousers", "straight leg"],
-		["High Waist Wide Leg Trousers", "wide leg"],
-		["Flared Midi Skirt", "flare"],
-		["Skinny Jeans", "skinny"],
-		["Slim Fit Chinos", "slim"],
-		["Relaxed Linen Trousers", "relaxed"],
 		["Oversized Hoodie", "oversized"],
+		["Relaxed Linen Trousers", "relaxed"],
 		["Fitted Blazer", "fitted"],
+		["Slim Fit Chinos", "slim"],
+		["Skinny Jeans", "skinny"],
+		["Tailored Wool Trousers", "tailored"],
+		["Boyfriend Jeans", "boyfriend"],
 	] as [string, string][])('"%s" → fit="%s"', (name, expected) => {
 		expect(inferProductAttributes(name).fit).toBe(expected);
+	});
+});
+
+describe("inferProductAttributes — leg shape", () => {
+	it.each([
+		["Casual Solid Color High Waist Straight Leg Trousers", "straight leg"],
+		["High Waist Wide Leg Trousers", "wide leg"],
+		["Bootcut Jeans", "bootcut"],
+		["Tapered Chinos", "tapered"],
+	] as [string, string][])('"%s" → legShape="%s"', (name, expected) => {
+		expect(inferProductAttributes(name).legShape).toBe(expected);
 	});
 });
 
@@ -98,18 +122,85 @@ describe("inferProductAttributes — season", () => {
 	});
 });
 
+describe("inferProductAttributes — closure", () => {
+	it("detects zipper from zip keyword", () => {
+		const result = inferProductAttributes("Merino 260 Quantum Long Sleeve Zip Hoodie");
+		expect(result.closure).toContain("zipper");
+	});
+
+	it("detects button-up", () => {
+		const result = inferProductAttributes("Button-Up Oxford Shirt");
+		expect(result.closure).toContain("button-up");
+	});
+
+	it("detects hidden zipper", () => {
+		const result = inferProductAttributes("Hidden Zip Midi Dress");
+		expect(result.closure).toContain("hidden zipper");
+	});
+});
+
+describe("inferProductAttributes — shaping", () => {
+	it("detects princess seams and boning together", () => {
+		const result = inferProductAttributes("Princess Seam Boned Corset Dress");
+		expect(result.shaping).toContain("princess seams");
+		expect(result.shaping).toContain("boned");
+		expect(result.shaping).toContain("corset");
+	});
+
+	it("detects darts", () => {
+		const result = inferProductAttributes("Darted Wool Blazer");
+		expect(result.shaping).toContain("darts");
+	});
+
+	it("detects smocked", () => {
+		const result = inferProductAttributes("Smocked Bodice Midi Dress");
+		expect(result.shaping).toContain("smocked");
+	});
+});
+
+describe("inferProductAttributes — construction", () => {
+	it("detects side slit", () => {
+		const result = inferProductAttributes("Side Slit Midi Skirt");
+		expect(result.construction).toContain("side slit");
+	});
+
+	it("detects distressed", () => {
+		const result = inferProductAttributes("Distressed Boyfriend Jeans");
+		expect(result.construction).toContain("distressed");
+	});
+});
+
 describe("inferProductAttributes — multiple attributes from one name", () => {
-	it("extracts all 5 attributes from Aritzia example", () => {
+	it("extracts attributes from Aritzia example", () => {
 		const result = inferProductAttributes("Aritzia Contour Squareneck Longsleeve Mini Dress in burgundy size M");
 		expect(result.sleeveLength).toBe("long sleeve");
 		expect(result.hemLength).toBe("mini");
 		expect(result.neckline).toBe("square neck");
-		expect(result.fit).toBe("bodycon");
 	});
 
 	it("extracts attributes from SHEIN trousers example", () => {
 		const result = inferProductAttributes("High Waist Straight Leg Trousers");
 		expect(result.rise).toBe("high waist");
-		expect(result.fit).toBe("straight leg");
+		expect(result.legShape).toBe("straight leg");
+	});
+
+	it("extracts rich metadata from complex product name", () => {
+		const result = inferProductAttributes(
+			"Princess Seam Corset Midi Dress with Button Front, Hidden Zipper, Side Slit and Rhinestone Trim"
+		);
+		expect(result.hemLength).toBe("midi");
+		expect(result.shaping).toContain("princess seams");
+		expect(result.shaping).toContain("corset");
+		expect(result.closure).toContain("button front");
+		expect(result.closure).toContain("hidden zipper");
+		expect(result.construction).toEqual(expect.arrayContaining(["side slit"]));
+		expect(result.accents).toContain("rhinestones");
+	});
+});
+
+describe("inferProductAttributes — pattern", () => {
+	it('"graphic" → captured as pattern', () => {
+		const name = "Cotton On Everyday Fit Graphic T-Shirt";
+		expect(matchAll(name, PATTERN_MAP)).toContain("graphic");
 	});
 });

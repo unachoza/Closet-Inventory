@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
-import { normalizeToString } from "../../../utils/normalizeToString";
 import { parseCareItems } from "../../../utils/careUtils";
 import { toAbsoluteDate } from "../../../utils/dateUtils";
 import "./CardDetails.css";
@@ -39,7 +38,8 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const blend = normalizeMaterial(item.material);
 	const careItems = parseCareItems(item.care);
 	const occasions = Array.isArray(item.occasion) ? item.occasion : item.occasion ? [item.occasion] : [];
-	const notes = normalizeToString(item.notes);
+	const normalizedNotesItems = item.notes === undefined ? [] : Array.isArray(item.notes) ? item.notes : [item.notes];
+	// const notesItems: string[] = Array.isArray(notes) ? notes : [notes]
 
 	// Inferred style attributes live on the nested `style` object (from
 	// inferProductAttributes — populated during email import), NOT as flat
@@ -59,7 +59,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	const identityParts = [style?.season, item.condition, item.price].filter((p): p is string => !!p);
 	const hasIdentity = !!purchasedLabel || identityParts.length > 0 || !!item.age;
 
-	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!notes;
+	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!item.notes;
 
 	return (
 		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
@@ -115,14 +115,55 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<div className="card-details__expanded">
 						{hasStyle && (
 							<div className="card-details__expanded-subsection">
-								<SectionTitle label="Style & Construction" />
+								<SectionTitle label="Silhouette & Shape" />
+								{style?.silhouette && <p className="card-details__identity-text">Silhouette: {style.silhouette}</p>}
 								{style?.fit && <p className="card-details__identity-text">Fit: {style.fit}</p>}
+								{style?.legShape && <p className="card-details__identity-text">Leg Shape: {style.legShape}</p>}
+								{style?.waistStyle && <p className="card-details__identity-text">Waist: {style.waistStyle}</p>}
+								{style?.hemLength && <p className="card-details__identity-text">Length: {style.hemLength}</p>}
+								{style?.rise && <p className="card-details__identity-text">Rise: {style.rise}</p>}
+							</div>
+						)}
+						{hasStyle && (style?.neckline || style?.sleeveLength || style?.sleeveStyle) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Neckline & Sleeves" />
+								{style?.neckline && <p className="card-details__identity-text">Neckline: {style.neckline}</p>}
+								{style?.sleeveLength && (
+									<p className="card-details__identity-text">Sleeve Length: {style.sleeveLength}</p>
+								)}
+								{style?.sleeveStyle && (
+									<p className="card-details__identity-text">Sleeve Style: {style.sleeveStyle}</p>
+								)}
+							</div>
+						)}
+						{hasStyle && (style?.shaping?.length || style?.construction?.length) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Construction Details" />
+								{style?.shaping && style.shaping.length > 0 && (
+									<p className="card-details__identity-text">Shaping: {style.shaping.join(", ")}</p>
+								)}
+								{style?.construction && style.construction.length > 0 && (
+									<p className="card-details__identity-text">Details: {style.construction.join(", ")}</p>
+								)}
+							</div>
+						)}
+						{hasStyle && (style?.accents?.length || style?.pattern) && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Embellishments & Pattern" />
 								{style?.pattern && <p className="card-details__identity-text">Pattern: {style.pattern}</p>}
-								{style?.neckline && <p className="card-details__identity-text">Neckline: {style?.neckline}</p>}
-								{style?.topLength && <p className="card-details__identity-text">Length: {style?.topLength}</p>}
-								{style?.sleeveLength && <p className="card-details__identity-text">Sleeve: {style?.sleeveLength}</p>}
-								{style?.hemLength && <p className="card-details__identity-text">Hem Length: {style?.hemLength}</p>}
-								{style?.rise && <p className="card-details__identity-text">Rise: {style?.rise}</p>}
+								{style?.accents && style.accents.length > 0 && (
+									<p className="card-details__identity-text">Accents: {style.accents.join(", ")}</p>
+								)}
+							</div>
+						)}
+						{hasStyle && style?.closure?.length && (
+							<div className="card-details__expanded-subsection">
+								<SectionTitle label="Closure & Features" />
+								{style?.closure && style.closure.length > 0 && (
+									<p className="card-details__identity-text">Closure: {style.closure.join(", ")}</p>
+								)}
+								{style?.hasStretch && <p className="card-details__identity-text">✓ Stretch</p>}
+								{style?.hasPockets && <p className="card-details__identity-text">✓ Pockets</p>}
 							</div>
 						)}
 						{featureTags.length > 0 && (
@@ -167,10 +208,14 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 								</div>
 							</div>
 						)}
-						{notes && (
+						{item.notes && (
 							<div className="card-details__expanded-subsection">
 								<SectionTitle label="Notes" />
-								<p className="card-details__notes-text">"{notes}"</p>
+								{normalizedNotesItems.map((note: string, i: number) => (
+									<p key={i} className="card-details__notes-text">
+										- {note.charAt(0).toUpperCase() + note.slice(1)}
+									</p>
+								))}
 							</div>
 						)}
 						{/* Action buttons */}

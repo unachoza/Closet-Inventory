@@ -20,7 +20,7 @@ describe("parseEmailToFormData — style attributes reach the item", () => {
 	it("infers fit + rise from a bottoms product name", () => {
 		const result = parseEmailToFormData(subject, "High Waist Wide Leg Trousers", "no-reply@zara.com");
 		expect(result).toMatchObject({
-			fit: "wide leg",
+			legShape: "wide leg",
 			rise: "high waist",
 		});
 	});

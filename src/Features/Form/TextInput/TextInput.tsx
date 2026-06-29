@@ -2,7 +2,7 @@ import { memo } from "react";
 import { InputProps } from "../../../utils/types";
 import "./TextInput.css";
 
-const Input = ({ id, label, name, className, value, errorMessage, placeholder, handleFormUpdate, onKeyDown }: InputProps) => {
+const Input = ({ id, label, name, className, value, errorMessage, placeholder, handleFormUpdate, onKeyDown, required = true }: InputProps) => {
 	return (
 		<label>
 			{label && <span className="label-text">{label}</span>}
@@ -15,7 +15,7 @@ const Input = ({ id, label, name, className, value, errorMessage, placeholder, h
 				placeholder={placeholder}
 				onChange={(e) => handleFormUpdate(e, label)}
 				onKeyDown={onKeyDown}
-				required
+				required={required}
 			/>
 			{errorMessage && (
 				<div className="error-message" role="alert" id={`${name}-error`}>

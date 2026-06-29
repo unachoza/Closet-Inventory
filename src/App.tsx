@@ -9,7 +9,7 @@ import { useLocalStorageCloset } from "./hooks/useLocalCloset";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
-import EditItemView from "./Features/Form/EditItemView/EditItemView";
+import EditItemView from "./Features/Form/EditItemView/EditItemViewGeminiV2";
 import MultiStepForm from "./Features/Form/Form";
 import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
@@ -63,13 +63,7 @@ function AppShell() {
 	useEffect(() => {
 		// Purge any sensitive data left over by pre-PR#76 builds on first load,
 		// regardless of which view the user lands on.
-		const LEGACY_KEYS = [
-			"gmail_auth_token",
-			"gmail_auth_loading",
-			"gmail_auth_error",
-			"gmail_email_bodies_cache",
-			"gmail_emails_cache",
-		];
+		const LEGACY_KEYS = ["gmail_auth_token", "gmail_auth_loading", "gmail_auth_error", "gmail_email_bodies_cache", "gmail_emails_cache"];
 		LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
 
 		const hasCompletedOnboarding = localStorage.getItem(ONBOARDING_KEY);

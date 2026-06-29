@@ -16,6 +16,8 @@ Built around low-friction ingestion (email + camera), a fabric-care knowledge la
 - 🔍 **Search, Filter & Sort** — Fuzzy search, multi-dimension filters, sort by price/age/name
 - 📧 **Gmail Import** — OAuth-authenticated email parsing to auto-populate closet items
 - ☁️ **Cloud-Ready Service Layer** — storage-agnostic repository seam; Supabase auth wired, data sync in progress (localStorage is the active store today)
+- ☁️ **Supabase Sync** — Cloud persistence per user with localStorage as offline cache
+- 🧬 **FashionParser** — Domain inference engine: 17 attribute maps, 6 normalizers, style/occasion/care/season inference
 - 🧵 **Fabric Care Guide** — Interactive textile guide with material-to-care mapping
 - 🎨 **Responsive Design** — Grid layout that works on any device
 
@@ -58,6 +60,16 @@ src/
 │   ├── Carousel/                 # Category carousel navigation
 │   ├── Closet/                   # Grid view of closet items
 │   ├── FabricCare/               # Interactive fabric care guide
+│   │   ├── maps/                 # 17 regex → canonical-value lookup tables - silhouette, fit, shapping, neckline, sleeve, closure, construction, accents, season, material, hem, pattern, leg, rise, waist
+│   │   ├── normalizers/          # Canonical-value normalizers - Clor, Category, Material blend
+│   │   ├── inference/            # Higher-order attribute inference - Care, Occasion, Category
+│   │   │   ├── inferSeason.ts    # Season from explicit keywords + material signals
+│   │   │   ├── inferStyle.ts     # Style family scoring (romantic/classic/edgy/minimal/…)
+│   │   ├── inferProductAttributes.ts  # Main parser — assembles all maps into one call
+│   │   ├── types.ts              # ProductAttributes, MaterialBlend, RegexMap
+│   │   ├── utils.ts              # matchFirst(), matchAll()
+│   │   ├── index.ts              # Public API barrel
+│   │   └── __tests__/
 │   ├── Form/                     # 9-step item creation/edit form
 │   │   ├── EditItemView/         # Full item detail/edit view
 │   │   ├── DatePicker/
@@ -77,6 +89,16 @@ src/
 │   ├── useClosetSort.ts          # Sort by price, age, name
 │   ├── useFuzzySearch.ts         # Fuse.js fuzzy search
 │   ├── useAdvancedSearch.tsx     # Subject/body + date-range Gmail query builder
+│   ├── AuthContext.tsx           # Supabase auth state
+│   ├── ClosetContext.tsx         # Shared closet instance (cloud + local)
+│   ├── SearchContext.tsx         # Shared search state
+│   └── ViewContext.tsx           # App view/navigation state
+├── hooks/
+│   ├── useCloudCloset.ts         # Supabase sync + localStorage fallback
+│   ├── useLocalCloset.tsx        # localStorage-only closet operations
+│   ├── useClosetFilters.ts       # Multi-dimension filter logic (imports from FashionParser)
+│   ├── useClosetSort.ts          # Sort by price, age, name
+│   ├── useFuzzySearch.ts         # Fuse.js fuzzy search (imports from FashionParser)
 │   ├── useGmailAuth.tsx          # Gmail OAuth flow
 │   ├── useGmailSearch.tsx        # Gmail API search
 │   └── usePagination.tsx         # Pagination logic
@@ -92,6 +114,11 @@ src/
 │   └── index.ts                  # exports the active repo — swap here for Supabase
 ├── lib/
 │   └── supabaseClient.ts         # Lazy Supabase client singleton
+│   ├── types.ts                  # TypeScript interfaces (ProductAttributes via FashionParser)
+│   ├── constants.ts              # App-wide constants
+│   ├── materialUtils.ts          # UI-layer material helpers (display colors, blend display string)
+│   ├── parseProductsFromEmail.ts # Email → ClothingItem parser
+│   └── parseEmailToFormData.ts
 ├── App.tsx                       # Root component + view routing
 └── main.tsx                      # Entry point
 ```
@@ -111,7 +138,7 @@ src/
 | **Animations**    | Framer Motion                                                   | Declarative animations                         |
 | **UI Primitives** | Radix UI                                                        | Accessible, unstyled components                |
 | **State**         | React Hooks + Context                                           | Local and global state                         |
-| **Database**      | Supabase (Postgres) — _port in progress; localStorage is the active store_ | Cloud persistence per user (planned)           |
+| **Database**      | Supabase (Postgres + Row-Level Security)                        | Cloud persistence per user                     |
 | **Auth**          | Supabase Auth + Google OAuth                                    | User sign-in and Gmail access                  |
 | **Search**        | Fuse.js                                                         | Fuzzy client-side search                       |
 | **Testing**       | Vitest + React Testing Library                                  | Unit and integration tests                     |
@@ -125,7 +152,9 @@ src/
 **Data flow:**
 
 ```
-User Input → Form State → Validation → closetRepository → localStorage → UI
+User Input → Form State → Validation → useCloudCloset → Supabase + localStorage → UI
+
+Email HTML → multi-retailer parsers → FashionParser inference → ClothingItem → closet
 ```
 
 > **Cloud sync is mid-port.** `SupabaseAuthProvider` is mounted and the closet's **write** path now flows through the `closetRepository` seam — so swapping in a `SupabaseClosetRepository` (one line in `services/index.ts`) redirects all persistence. **Reads** still seed synchronously from localStorage; porting that to async `repository.getAll()` (with loading state + cross-instance sync) is the remaining step — see [E1 · Cloud Backend](./planning/epics/E1-cloud-backend.md).
@@ -134,6 +163,9 @@ User Input → Form State → Validation → closetRepository → localStorage �
 
 - `services/closetRepository` — the single storage seam. The closet hook delegates every mutation to `closetRepository`, never writing localStorage or a DB client directly. The active implementation is `LocalClosetRepository`; a `SupabaseClosetRepository` drops in behind the same interface.
 - `GmailAuthContext` — holds the Gmail OAuth token above the view switch, so Gmail ↔ Edit navigation doesn't drop it.
+- `useCloudCloset` — writes to Supabase when signed in, falls back to localStorage when offline/signed out. On first sign-in with no cloud data, seeds Supabase from localStorage.
+- `ClosetContext` — single shared instance of `useCloudCloset` across the app; prevents duplicate DB connections.
+- `FashionParser` — domain module at `src/Features/FashionParser/`. All garment-attribute parsing, normalization, and inference is isolated here. Consumers (`GmailImport`, `useClosetFilters`, `useFuzzySearch`) import directly from it; no scattered utils stubs.
 - `ToastProvider` — global, decoupled notification system.
 - `ErrorBoundary` — keyed by view; a crash in one screen resets on navigation.
 
@@ -257,8 +289,14 @@ User Input → Form State → Validation → closetRepository → localStorage �
 
 ---
 
-### v2.1 — Intense Email Parsing
+### v2.1 — Intense Email Parsing + FashionParser Inference Engine
 
+> The `infer*` utils that started as scattered helpers have been consolidated into a proper domain module: `src/Features/FashionParser/`. Full taxonomy, maps, normalizers, and inference — see [src/Features/FashionParser/README.md](./src/Features/FashionParser/README.md).
+
+- ✅ **FashionParser** — 17 attribute-map files (silhouette, fit, shaping, neckline, sleeve, closure, construction, accents, leg shape, rise, waist, hem, pattern, season, color, material, stretch/pockets)
+- ✅ **Attribute taxonomy** — silhouette (overall shape) vs fit (body proximity) vs leg shape (pants silhouette) vs shaping (construction technique) are properly separated, not conflated
+- ✅ **Normalizers** — `normalizeColor`, `normalizeCategory`, `normalizeMaterial` canonical-value normalizers
+- ✅ **Inference engine** — `inferCare`, `inferOccasion`, `inferCategory`, `inferSeason`, `inferStyle` (6-family weighted scoring), `inferMaterial` (% blend extraction + keyword fallback)
 - ✅ Attribute inference from product name — material blend, fabric care, condition (from order age), and style/occasion tags
 - ✅ Multi-material inference with blend percentages and polyamide keyword support
 - ✅ Material-based care instruction inference (Washing/Drying auto-population during import)
@@ -363,10 +401,13 @@ User Input → Form State → Validation → closetRepository → localStorage �
 
 ### v5.1 — Backend & Database
 
-- 🚧 Offline-first: localStorage as cache
-- 🚧 First-sign-in seed: uploads closet to localStorage
+> DB decision made: **Supabase** (Postgres + Row-Level Security). Firebase/Firestore removed.
+
+- ✅ Supabase selected as cloud backend
+- 🚧 Offline-first: localStorage as cache via `closetRepository`
+- 🚧 First-sign-in seed: uploads localStorage closet to Supabase on initial sign-in
 - 🔲 Conflict resolution (last-write-wins with `updatedAt` timestamps)
-- 🔲 Multi-device real-time sync (WebSocket or polling)
+- 🔲 Multi-device real-time sync (Supabase Realtime)
 - 🔲 "Sync" status indicator in nav
 
 ---

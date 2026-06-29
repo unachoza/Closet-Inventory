@@ -1,14 +1,13 @@
 import type { ItemFormData } from "./types";
 import { formItem } from "./constants";
 import { parseInlineColorSize, stripBrandFromName, extractColorFromName } from "./parseNameHelpers";
-import normalizeColor from "./normalizeColors";
+import normalizeColor from "../Features/FashionParser/normalizers/normalizeColor";
 import { extractBrandFromSender } from "./parseProductsFromEmail";
-import { inferStyleTagsFromName } from "./inferStyleTagsFromName";
+import { inferOccasion } from "../Features/FashionParser/inference/inferOccasion";
 import { cleanProductName } from "./cleanProductName";
-import { inferProductAttributes } from "./inferProductAttributes";
-import { inferMaterialFromName } from "./inferMaterialFromName";
-import { inferCare } from "./inferCare";
-import { inferSemanticAttributes } from "./inferSemanticAttributes";
+import { inferProductAttributes } from "../Features/FashionParser";
+import { inferMaterialFromName } from "../Features/FashionParser/inference/inferMaterial";
+import { inferCare } from "../Features/FashionParser/inference/inferCare";
 import { defaultConditionForPurchaseDate } from "./condition";
 
 const BRAND_PATTERNS: Record<string, string> = {
@@ -104,9 +103,12 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	sock: "socks",
 	tights: "socks",
 	underwear: "intimates",
-	legging: "active",
-	sports: "active",
-	jersey: "active",
+	legging: "athleisure",
+	sports: "athleisure",
+	// A jersey is a top (soccer/football/sports shirt). More specific garment
+	// words (dress, skirt, …) are matched earlier, so "jersey knit dress" still
+	// resolves to dresses; a bare "jersey" lands in tops.
+	jersey: "tops",
 	swimsuit: "intimates",
 	bodysuit: "body",
 	jumpsuit: "body",
@@ -164,10 +166,56 @@ export function categoryFromName(name: string): string {
 	return extractCategory(name);
 }
 
+/**
+ * When the user forwards a retailer email, the outer "from" is their own Gmail
+ * address (not useful). The real retailer sender is embedded in the forwarded
+ * header block. This function finds that block and returns the inner From: value
+ * so it can be fed through extractBrandFromSender as usual.
+ *
+ * Recognizes two common formats:
+ *   "Begin forwarded message:\n\nFrom: BRAND <brand@eml.brand.com>"
+ *   "---------- Forwarded message ---------\nFrom: brand <noreply@brand.com>"
+ *
+ * Also falls back to the first @brand.com address in a customer-care line
+ * ("contact us at us_customer_care@icebreaker.com").
+ */
+export function extractForwardedFrom(plainText: string): string {
+	const forwardedHeaderRe = /(?:begin\s+forwarded\s+message|[-]{5,}\s*forwarded\s+message\s*[-]{5,})/i;
+	const match = forwardedHeaderRe.exec(plainText);
+	if (match) {
+		// Not line-anchored: stripped HTML collapses <br> tags so the "From:" can
+		// sit mid-line right after "Begin forwarded message:". `.` stops at any
+		// real newline, so plain-text forwards still capture just the From line.
+		const after = plainText.slice(match.index + match[0].length);
+		const fromLine = after.match(/From:\s*(.+)/i);
+		if (fromLine) return fromLine[1].trim();
+	}
+
+	// Fallback: customer-care email domain (e.g. us_customer_care@icebreaker.com)
+	const careMatch = plainText.match(/(?:contact|care|support)[^\n]*?[\w.+-]+@([\w-]+)\.\w+/i);
+	if (careMatch) return `@${careMatch[1]}`;
+
+	return "";
+}
+
 function stripHtml(html: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
 	return doc.body.textContent ?? "";
+}
+
+/**
+ * Resolve the true retailer sender from a forwarded email's HTML body.
+ *
+ * On the per-product import path the body passed to parseEmailToFormData is just
+ * the product name, so the forwarded header (which lives in the full email body)
+ * is never seen. Callers with the full HTML body use this to recover the real
+ * sender (e.g. "icebreaker <noreply@orders.icebreaker.com>") and pass it as the
+ * `from` argument. Returns "" when no forwarded sender is found.
+ */
+export function extractForwardedSender(htmlBody: string): string {
+	if (!htmlBody) return "";
+	return extractForwardedFrom(stripHtml(htmlBody));
 }
 
 function isFromReseller(from: string): boolean {
@@ -187,9 +235,13 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// to the email sender (e.g. an Old Navy receipt has no brand text — the
 	// "Old Navy" sender becomes the brand).
 
-	const brand = extractBrand(combinedText, from) || extractBrandFromSender(from);
+	// For forwarded emails the outer `from` is the user's own address (not useful).
+	// Try the inner sender first, then fall back to the outer one.
+	const forwardedFrom = extractForwardedFrom(plainBody);
+	const effectiveFrom = forwardedFrom || from;
+	const brand = extractBrand(combinedText, effectiveFrom) || extractBrandFromSender(effectiveFrom);
 	const category = extractCategory(combinedText);
-	const styleTags = inferStyleTagsFromName(combinedText, category);
+	const styleTags = inferOccasion(combinedText, category);
 
 	// Inline color/size extraction (e.g. Poshmark: "...in burgundy size M")
 	const { color: inlineColor, size: inlineSize } = parseInlineColorSize(subject);
@@ -205,8 +257,6 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// product name arrives as `body` (subject is the retailer's generic
 	// "Your order has been received"), so subject-only inference drops it.
 	const attrs = inferProductAttributes(combinedText);
-
-	const semantic = inferSemanticAttributes(combinedText);
 
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	// Care from material (fiber wash/dry) + name/color attributes (jeans → wash
@@ -246,7 +296,6 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 		...(condition && { condition }),
 		...(purchaseDate ? { purchaseDate } : {}),
 		...attrs,
-		...semantic,
 	};
 
 	return result;

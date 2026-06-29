@@ -62,7 +62,9 @@ actually tells you the truth about itself.
 2. **Frictionless fill** — email import + inference + (v2.2) web enrichment + (v3.1) camera. The category dies at onboarding; we attack that.
 3. **Shared & social** — borrow/lend with trusted people, the only feature with a built-in growth loop. Grew straight out of "Our Closet."
 
-Plus a **knowledge layer** (fabric/fiber/care) and **delightful data viz** — the viz is admittedly *for me*; competitors do it well, but I enjoy it and it reinforces the "see your closet" promise.
+Plus a **knowledge layer** (fabric/fiber/care — now formalized as `FashionParser`, a domain inference engine at `src/Features/FashionParser/`) and **delightful data viz** — the viz is admittedly *for me*; competitors do it well, but I enjoy it and it reinforces the "see your closet" promise.
+
+> **FashionParser update (2026-06-28):** The scattered `infer*` and `normalize*` utils have been consolidated into a proper domain module. It owns 17 attribute-map files, 3 normalizers, and 6 inference functions. All consumers import directly from it. The knowledge layer now has a home. See `src/Features/FashionParser/README.md`.
 
 ---
 

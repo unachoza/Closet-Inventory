@@ -80,7 +80,7 @@ Small UX wins that don't warrant a new epic — slot between sprints as palate c
 
 - `E0-7.1` **Onboarding app name + step demo order** — updated branding to "MyCloset"; reordered onboarding demo steps for clarity — _✅ PR #80_
 - `E0-7.3` **Clear Closet button + density toggle** — "Clear Closet" nav action with confirm modal deletes all items (incl. sample data); compact/comfortable grid toggle persisted to localStorage, shared between Closet + EntireCloset views — _✅ PR #80_
-- `E0-7.2` **Floppy search pills** (filter pills wrap awkwardly on narrow viewports) — _pending_
+- `E0-7.2` **Sloppy search pills** (filter pills wrap awkwardly on narrow viewports) — _✅ PR #86_
 - `E0-2.3` **Material filter: sort options by blend %** (e.g. "80% cotton" before "20% polyester") — _pending_
 
 ---
@@ -101,8 +101,8 @@ Suite green · no debug logs / console warnings · the confidence-eroding bugs f
 ## Post-completion polish backlog
 _Epic DoD is met ✅; these are small correctness/branding nits surfaced from user feedback, scheduled in **Sprint 3.5**. They do not reopen the epic._
 
-- `E0-7.1` **Onboarding still says "MyCloset"** — the onboarding flow shows the old "MyCloset" name; update all copy to **"Nothing To Wear"**. Audit `src/Features/Onboarding/` (and anywhere else) for stale branding. — _0.25d_
-- `E0-7.2` **Search-result pills look "floppy"** — when a search query is active, the match pills render at the bottom of the clothing cards but read as a separate, detached layer (especially on hover, where they separate from the card). Pull the pills **inside** the card on their own layer so they feel attached, not floating. Card / search-pill styling fix. — _0.5d_
+- ✅`E0-7.1` **Onboarding still says "MyCloset"** — the onboarding flow shows the old "MyCloset" name; update all copy to **"Nothing To Wear"**. Audit `src/Features/Onboarding/` (and anywhere else) for stale branding. — _0.25d_
+- ✅`E0-7.2` **Search-result pills look "floppy"** — when a search query is active, the match pills render at the bottom of the clothing cards but read as a separate, detached layer (especially on hover, where they separate from the card). Pull the pills **inside** the card on their own layer so they feel attached, not floating. Card / search-pill styling fix. — _0.5d_
 - `E0-2.3` **Material filter sort by blend %** — when filtering by a material, sort results descending by that material's `MaterialBlend.percentage` (100% cotton first); regression test. — _0.5d_
 
 _(US-0.5 "Don't import junk" shipped in PR #72: skip-on-no-category guard + "Include" recovery UI + excluded senders + category-keyword cleanup.)_

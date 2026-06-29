@@ -10,16 +10,16 @@
 
 ## Snapshot (as of 2026-06-20)
 
-- `main` is **localStorage-only**; the entire cloud layer is in open [PR #44](https://github.com/unachoza/Closet-Inventory/pull/44).
-- 74 test files; design-token system (`tokens.css`) layered over legacy `index.css`.
-- Recently merged: unified search/filter (#69), filter-drawer fixes (#70), design-principles pass (#64). Filter drawer now slides from the right (this session).
-- Rich client-side email-import + inference pipeline (multi-retailer parsers + ~8 `infer*` utils).
+- `main` is **localStorage-only** via `closetRepository`; Supabase chosen as cloud backend (PR #44 closed, Firebase removed).
+- 74 test files (1165 passing as of 2026-06-28); design-token system (`tokens.css`) layered over legacy `index.css`.
+- Recently merged: unified search/filter (#69), filter-drawer fixes (#70), design-principles pass (#64), Nordstrom multi-size + inference improvements (#84).
+- **FashionParser refactor (2026-06-28):** the ~8 scattered `infer*` / `normalize*` utils are now a proper domain module at `src/Features/FashionParser/`. 17 attribute maps, 6 normalizers, 6 inference functions, all consumers importing directly, legacy stubs deleted.
 
 ---
 
 ## Strengths (what's genuinely good)
 
-1. **The inference pipeline is the crown jewel.** `inferProductAttributes`, `inferMaterialFromName`, `resolveMaterials`, the care-inference chain — turning a thin product name into structured attributes + material blends is real, differentiated product value. It's also the leverage point for v2.2 (feed it richer text → better output, no new inference code).
+1. **The inference pipeline is the crown jewel — and now properly organized.** `FashionParser` (`src/Features/FashionParser/`) consolidates 17 attribute maps, 3 normalizers, and 6 inference functions (`inferCare`, `inferOccasion`, `inferCategory`, `inferSeason`, `inferStyle`, `inferMaterial`) into a single domain module. Turning a thin product name into structured garment attributes + material blends is real, differentiated product value. It's also the leverage point for v2.2 (feed it richer text → better output, no new inference code).
 2. **Clean separation of concerns.** `utils/` (pure, testable predicates) vs `hooks/` (stateful React) vs `Features/` (composition) is disciplined. Pure functions like `hasRequiredItemInfo` make the write path defensible and unit-testable.
 3. **Design-token foundation exists.** `tokens.css` (primitive→semantic, light/dark) is the right architecture, even mid-migration off `index.css`.
 4. **Planning hygiene is unusually strong.** Dated, cross-linked planning docs that *reconcile roadmap vs. reality* (FORWARD_PLAN explicitly calls out "done in docs ≠ done on main"). This is rare and worth keeping.
@@ -109,4 +109,4 @@ From [archive/QUICK_WINS.md](./archive/QUICK_WINS.md) / [archive/FORWARD_PLAN.md
 
 ## One-paragraph "what should I actually do Monday"
 
-Decide the [database question](./BACKEND_DATABASE_DECISION.md) on paper (it gates priorities 2 and 4 and shouldn't wait). Then spend the first focused block on **Priority 1** — strip logs, green the suite, and land the four known-bug fixes *with regression tests*, because they're cheap and they make the core loop trustworthy. Tighten `ClothingItem`'s typing while you're in there. Only then move to the cloud layer per your DB call. Keep v2.2 parked until after a 1-day feasibility spike proves the scraping path actually returns data past Cloudflare — don't let the most interesting feature jump its priority.
+~~Decide the DB question~~ — **done: Supabase.** FashionParser is also done and cleaned up. The priority stack has shifted: stand up the Supabase cloud layer (schema + RLS + `useCloudCloset` port + image storage) while it's top of mind. Then spend a focused block on **Priority 1** bugs — material filter, grid remove re-render, `ClothingItem` typing. Keep v2.2 parked until after a 1-day feasibility spike; don't let the most interesting feature jump its priority. The 4 deferred email-parser tests (taxonomy: `fit` → `silhouette`/`legShape`) are small and a good warm-up before the bigger cloud work.

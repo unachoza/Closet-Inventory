@@ -12,6 +12,8 @@ const stockPhotoMap: StockPhotoMapType = {
 	intimates: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332283/Screenshot_2025-10-24_at_11.56.38_AM_qynpnn.png",
 	socks: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.53.37_AM_apfogb.png",
 	underwear: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332283/Screenshot_2025-10-24_at_11.55.50_AM_mx8dri.png",
+	// TODO: dedicated shoes stock photo; empty falls back to no image for now.
+	shoes: "",
 	// swim: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.54.40_AM_ml9yqu.png",
 };
 

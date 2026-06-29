@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
-import { ProductAttributes } from "../utils/inferProductAttributes";
+import { ProductAttributes } from "../Features/FashionParser/types"
 
 export interface MaterialBlend {
 	material: string;
@@ -126,7 +126,7 @@ export interface ItemFormData {
 	image?: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "underwear" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "underwear" | "shoes" | null;
 
 export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "journey" | "entireCloset";
 
@@ -150,6 +150,8 @@ export interface InputProps {
 	value: string | number;
 	errorMessage?: string;
 	placeholder: string;
+	/** Whether the field is required for form submission. Defaults to true. */
+	required?: boolean;
 	onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
 	handleFormUpdate: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string, label?: string) => void;
 	onKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;

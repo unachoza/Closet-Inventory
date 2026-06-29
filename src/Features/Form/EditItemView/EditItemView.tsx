@@ -16,6 +16,9 @@ import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
 import close from "../../../assets/close.svg";
 
+/** Fields the user may leave blank when adding/editing an item **/
+const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
+
 /** Extract form-editable fields from a ClothingItem. Used for both
  *  initial state and when the item prop changes (batch import queue). */
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
@@ -240,6 +243,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							value={normalizeToString(formData[key as keyof ClothingItem] ?? value)}
 							placeholder={!value ? `Enter ${key}` : ""}
 							handleFormUpdate={handleChange}
+							required={!OPTIONAL_FIELDS.has(key)}
 						/>
 					))}
 					{onSale && (

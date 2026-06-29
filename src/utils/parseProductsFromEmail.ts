@@ -1,6 +1,6 @@
 import { parseSHEINSizeField, stripBrandFromName, parseInlineColorSize, extractColorFromName } from "./parseNameHelpers";
 import { cleanProductName } from "./cleanProductName";
-import { inferProductAttributes } from "./inferProductAttributes";
+import { inferProductAttributes } from "../Features/FashionParser";
 
 /**
  * Extracts product details from order confirmation email HTML.
@@ -13,6 +13,8 @@ import { inferProductAttributes } from "./inferProductAttributes";
  * of a product image, then reads sibling <td> cells for structured details.
  */
 
+
+//TODO update with fashion parser augments
 export interface ExtractedProduct {
 	readonly imageUrl: string;
 	readonly name: string;
@@ -1867,7 +1869,20 @@ function extractFromAmazonLayout(doc: Document): ExtractedProduct[] {
  * since color is captured separately from the variant span.
  */
 function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
-	const titleSpans = doc.querySelectorAll("span.order-list__item-title");
+	// Newer Shopify order emails (e.g. icebreaker) drop the CSS classes and use
+	// inline styles only: the product name is a bold <span> whose text ends in
+	// "× N", the variant is a sibling grey <span> ("COLOR / SIZE"), and the price
+	// sits in an adjacent cell. Fall back to detecting those when the classed
+	// template (SKIMS) isn't present.
+	const classedTitles = Array.from(doc.querySelectorAll("span.order-list__item-title"));
+	const classed = classedTitles.length > 0;
+	const titleSpans: Element[] = classed
+		? classedTitles
+		: Array.from(doc.querySelectorAll("span")).filter((s) => {
+				const txt = (s.textContent ?? "").replace(/&nbsp;| /g, " ").trim();
+				const bold = /font-weight:\s*(?:600|700|bold)/i.test(s.getAttribute("style") ?? "");
+				return bold && /[×x]\s*\d+\s*$/.test(txt) && txt.length > 4;
+			});
 	if (titleSpans.length === 0) return [];
 
 	const products: ExtractedProduct[] = [];
@@ -1897,8 +1912,17 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 
 		if (!name || name.length < 3) continue;
 
-		// Variant: "ONYX / S" → color = "onyx", size = "S"
-		const variantSpan = row.querySelector("span.order-list__item-variant");
+		// Variant: "ONYX / S" → color = "onyx", size = "S". Classed template uses a
+		// dedicated span; the inline template uses a grey sibling span in the same
+		// cell (the one that isn't the bold "× N" title).
+		let variantSpan = row.querySelector("span.order-list__item-variant");
+		if (!variantSpan) {
+			const cell = titleSpan.closest("td");
+			variantSpan =
+				Array.from(cell?.querySelectorAll("span") ?? []).find(
+					(s) => s !== titleSpan && (s.textContent ?? "").trim() && !/[×x]\s*\d+\s*$/.test((s.textContent ?? "").trim()),
+				) ?? null;
+		}
 		const variantText = variantSpan ? (variantSpan.textContent ?? "").trim().replace(/\s+/g, " ") : "";
 
 		let color = "";
@@ -1922,8 +1946,10 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 		}
 
 		// Price: read directly from the dedicated price element, divide by qty for per-unit
+		// Classed template has a dedicated price element; the inline template puts
+		// the line total in an adjacent cell — scan the row text for the first "$".
 		const priceEl = row.querySelector("p.order-list__item-price");
-		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : "";
+		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : getCellText(row);
 		const prices = extractPrices(priceText);
 		const totalPrice = prices[0] ?? "";
 		const price = totalPrice && qty > 1 ? `$${(parseFloat(totalPrice.replace("$", "")) / qty).toFixed(2)}` : totalPrice;
@@ -3067,24 +3093,40 @@ function extractFromNordstromLayout(doc: Document): ExtractedProduct[] {
 		const detailCell = Array.from(row.querySelectorAll("td")).find((td) => td.querySelector("a") && /price:/i.test(getCellText(td)));
 		if (!detailCell) continue;
 
-		const nameLink = detailCell.querySelector("a");
-		const name = (nameLink?.textContent ?? "").trim().replace(/\s+/g, " ");
-		if (!name || seen.has(name.toLowerCase())) continue;
+		// Product name: the bold product link — NOT in-page anchors like the
+		// "Arrives <date>" delivery link or the "Item: #…" anchor (both href="#…"),
+		// and NOT the truncated mobile label. Keep only real (http) product links
+		// and take the LONGEST text so the full desktop name wins over the
+		// "…Sli…" mobile-truncated copy.
+		const name =
+			Array.from(detailCell.querySelectorAll("a"))
+				.filter((a) => /^https?:/i.test(a.getAttribute("href") ?? ""))
+				.map((a) => (a.textContent ?? "").trim().replace(/\s+/g, " "))
+				.filter((t) => t.length > 0)
+				.sort((a, b) => b.length - a.length)[0] ?? "";
+		if (!name) continue;
 
 		const text = getCellText(detailCell);
-		const sizeMatch = text.match(/\bSize\s+([A-Za-z0-9-]+)/i);
+		// Tolerate both "Size Medium" (Nordstrom) and "Size: 40" (Nordstrom Rack).
+		const sizeMatch = text.match(/\bSize:?\s*([A-Za-z0-9-]+)/i);
 		const priceMatch = text.match(/Price:\s*(\$[\d.,]+)/i);
 		const size = sizeMatch ? sizeMatch[1].trim() : "";
 		const price = priceMatch ? priceMatch[1] : "";
 
-		// Color: the UPPERCASE span text before the style code; fall back to a known color word.
+		// Color: the UPPERCASE span text before the style code (Nordstrom), or a
+		// "Color: <x>" label line (Nordstrom Rack); fall back to a known color word.
 		const colorSpan = Array.from(detailCell.querySelectorAll("span")).find((s) =>
 			/text-transform:\s*uppercase/i.test(s.getAttribute("style") ?? ""),
 		);
-		const colorRaw = colorSpan ? getCellText(colorSpan).replace(/,.*$/, "").trim() : "";
+		const colorLabel = text.match(/Color:?\s*([A-Za-z ]+?)\s*(?:Item|Qty|Price|$)/i);
+		const colorRaw = colorSpan ? getCellText(colorSpan).replace(/,.*$/, "").trim() : (colorLabel?.[1].trim() ?? "");
 		const color = extractColorFromName(colorRaw) || colorRaw.toLowerCase();
 
-		seen.add(name.toLowerCase());
+		// Dedupe on name + color + size so different sizes of the same style stay
+		// separate (was name-only → collapsed Medium/Large/X-Large into one).
+		const dedupeKey = `${name.toLowerCase()}|${color}|${size.toLowerCase()}`;
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
 		products.push({
 			imageUrl: img.getAttribute("src") ?? "",
 			name,
