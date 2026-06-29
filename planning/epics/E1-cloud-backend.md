@@ -7,7 +7,7 @@
 
 ---
 
-## US-1.1 — Sign in and keep my closet in the cloud
+## US-1.1 — Sign in and keep my closet in the cloud ✅
 _As Maya, I want my closet synced to my account so that I see the same wardrobe on phone and laptop._
 - [ ] Supabase Auth sign-in (Google)
 - [ ] Per-user `items` table; RLS so a user reads/writes only their own rows
