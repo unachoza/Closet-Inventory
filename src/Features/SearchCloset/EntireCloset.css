@@ -601,6 +601,11 @@ button.filter-accordion__header:focus{
 	gap: var(--spacing-50);
 }
 
+.filtered-card:hover {
+	box-shadow: none;
+      transform: none;
+}
+
 /* ── Match pills on cards ── */
 .filter-match-pills {
 	z-index: 10;
@@ -612,6 +617,9 @@ button.filter-accordion__header:focus{
 	gap: 3px;
 	gap: 3px;
 	margin-top: -15px;
+	background: color-mix(in srgb, var(--bg-surface-secondary), transparent 30%);
+   	-webkit-backdrop-filter: var(--effect-blur-glass);
+   	backdrop-filter: var(--effect-blur-glass);
 }
 
 .filter-match-pill {
