@@ -134,9 +134,9 @@ _As Maya, I want a Swim category so that swimsuits classify correctly instead of
 
 ## US-2.7 — Notes field supports bulleted lists
 _As Maya, I want to write structured notes on an item so that care tips and style reminders stay readable instead of a wall of text._
-- [ ] Notes textarea: auto-prefix `•` on new line in edit mode, or accept `- ` markdown prefix
+- [x] Notes textarea: auto-prefix `•` on new line in edit mode, or accept `- ` markdown prefix
 - [ ] Read mode renders as a `<ul>` when content looks bullet-like
-- [ ] Existing plain-text notes remain intact (no migration)
+- [x] Existing plain-text notes remain intact (no migration)
 
 **Ticket:** `E2-7.1` Update `EditItemView` notes textarea to encourage / render bullets — _0.5d_
 

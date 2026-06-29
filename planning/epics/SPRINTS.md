@@ -72,16 +72,16 @@ Completed between Block A and B:
 > User-feedback grab-bag. The CRITICAL re-auth bug blocks user testing of the import flow — do it first. This is bigger than 2 days; split into 3.5a (bugs) and 3.5b (polish/features) if needed.
 
 **P0 — Critical**
-- `E3-bug.2` **🔴 Back to email re-auth** — `useGmailAuth` token lost on Gmail view unmount. Fix: lift token into `AppShell`-level ref/context so Gmail ↔ Edit navigation preserves it. Regression test required.
+- ✅ `E3-bug.2` **🔴 Back to email re-auth** — `useGmailAuth` token lost on Gmail view unmount. Fix: lift token into `AppShell`-level ref/context so Gmail ↔ Edit navigation preserves it. Regression test required.
 
 **P1 — Bugs / regressions**
-- `E3-bug.3` **Skip item hidden under Add to Closet** — layout regression in `EditItemView` batch controls; z-index / order fix.
+- ✅ `E3-bug.3` **Skip item hidden under Add to Closet** — layout regression in `EditItemView` batch controls; z-index / order fix.
 - `E5-bug.1` **Mobile: item detail header under sticky nav** — full-height card heading slides under the sticky nav; add `margin-top`/`scroll-margin-top`.
-- `E3-bug.4` **Email fetch loading pulse** — restore visible pulse/spinner in `GmailImport` during live Gmail API calls.
-- `E0-7.1` **Onboarding says "MyCloset"** — update branding to "Nothing To Wear".
+- ✅ `E3-bug.4` **Email fetch loading pulse** — restore visible pulse/spinner in `GmailImport` during live Gmail API calls.
+- ✅ `E0-7.1` **Onboarding says "MyCloset"** — update branding to "Nothing To Wear".
 
 **P2 — Import & form UX**
-- `E3-6.1` **EditItemView optional fields** — relax validation for `mode === "create"`: `price`/`occasion`/`care` optional; `name`/`category`/`color`/`size`/`brand` mandatory.
+- ✅ `E3-6.1` **EditItemView optional fields** — relax validation for `mode === "create"`: `price`/`occasion`/`care` optional; `name`/`category`/`color`/`size`/`brand` mandatory.
 - `E3-4.1` **Email-list header: count + date range** — "Found 20 emails · May 2018 – Dec 2018" instead of just "Found 100 emails".
 - `E3-7.1` **Material-blend editor rework** — fix the disabled-at-100% / hard-to-reach-100% interaction.
 - `E0-2.3` **Material filter sort by blend %** — sort filtered results descending by matched fiber's `MaterialBlend.percentage`; regression test.
@@ -89,7 +89,7 @@ Completed between Block A and B:
 **P3 — Polish / small features**
 - `E0-7.2` **Search-result pills "floppy"** — pull match pills inside the card on their own layer so they don't detach on hover.
 - `E2-9.1` **Swim category** — add `swim` to `CategoryType` + Form list + Carousel; map bikini/one-piece/swimsuit/tankini/two-piece. ⚠️ hardcoded-list audit.
-- `E2-7.1` **Notes as bulleted list** — auto-bullet textarea + `<ul>` read mode.
+- ✅ `E2-7.1` **Notes as bulleted list** — auto-bullet textarea + `<ul>` read mode.
 - `E8-3.1` **Stain guide** — add nail polish + turmeric; expand stain coverage.
 
 > **Larger feature work (own sprints, not 3.5):**
