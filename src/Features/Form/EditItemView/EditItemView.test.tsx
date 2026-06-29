@@ -68,7 +68,7 @@ const mockItem = {
 	category: "Tops",
 	price: "$20",
 	onSale: true,
-	notes: "This is a test item.",
+	notes: ["This is a test item."],
 };
 
 describe("EditItemView", () => {

@@ -36,7 +36,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		condition: "new",
 		care: "",
 		onSale: false,
-		notes: "",
+		notes: [],
 		// Spread carries all prefilled fields including `style` and any future
 		// ClothingItem properties — nothing is silently dropped by enumeration.
 		...prefilled,

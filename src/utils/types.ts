@@ -73,7 +73,7 @@ export type ClothingItem = {
 	purchaseDate?: string;
 	care: string | string[];
 	onSale?: boolean;
-	notes?: string | string[];
+	notes?: string[];
 	style?: ProductAttributes;
 
 	// ── E1 gap (should have been in v1 spine) ──────────────────────────────
