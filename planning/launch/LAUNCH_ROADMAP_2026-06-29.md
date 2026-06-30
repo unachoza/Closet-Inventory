@@ -54,17 +54,17 @@
 Each item maps to an existing E1-4.x ticket; this is the launch-ordered view.
 
 **Must-have before a single real user (hard gate):**
-- [ ] `G0.2` RLS second-account isolation proven (tables + Storage) — *also Block 0*
+- [x] ✅ `G0.2` RLS second-account isolation proven (tables + Storage) (2026-06-30) — *also Block 0*
 - [ ] **Dev/prod Supabase split** — you're currently running ONE project as both. Real users' data must not mix with dev data. (`E1-4.12`)
-- [ ] **Push** `20260629000001_storage_validation.sql` to prod (`supabase db push`) — server-side size/MIME enforcement is written but not live (`E1-4.11`)
+- [x] ✅ **Storage validation pushed to prod** (2026-06-30) — server-side size/MIME enforcement live via `20260629000001_storage_validation.sql` (`E1-4.11`)
 - [ ] **Account deletion + data export** — legal right-to-erasure/portability; your privacy policy will *promise* this, so it must exist. Delete rows AND Storage objects. (`E1-4.8`)
-- [ ] **Secret hygiene** — confirm `.env` gitignored, scan git history for leaked keys, rotate anything exposed (`E1-4.3`)
+- [x] ✅ **Secret hygiene** (2026-06-30) — `.env` gitignored ✓, full git history clean (zero leaks via gitleaks) ✓, CI secret scanning live and passing ✓ (`E1-4.3`)
 - [ ] **Base64→Storage migration + legacy wipe** for any existing cloud items; no orphaned base64 left behind (`E1-2.2` / `E1-4.5`)
 
 **Strongly recommended before launch:**
 - [ ] CSP (`script-src 'self'`) + HSTS at the Vercel layer — verify it doesn't break Google OAuth SDK first (`E1-4.7`)
 - [ ] Supabase platform hardening: `service_role` key never in browser, audit `SECURITY DEFINER` functions, enable leaked-password protection (`E1-4.10`)
-- [ ] CI dependency + secret scanning (`E1-4.3`)
+- [x] ✅ CI dependency + secret scanning (2026-06-30) — gitleaks + npm audit passing on every PR (`E1-4.3`)
 - [ ] Logging hygiene — never log tokens/OAuth codes/PII (`E1-4.12`)
 
 ---
