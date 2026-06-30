@@ -1,4 +1,3 @@
-//@ts-nocheck
 import "./EditItemView.css";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
@@ -86,14 +85,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// Local state specifically managing the raw text string inside the textarea field
 	const [textAreaNotes, setTextAreaNotes] = useState<string>(() => {
 		const initialNotes = formData.notes ?? notes;
-		if (Array.isArray(initialNotes)) {
-			return initialNotes.length > 0 ? `• ${initialNotes.join("\n• ")}` : "";
-		}
-		if (typeof initialNotes === "string" && initialNotes.trim()) {
-			// Fallback string protection if legacy plain text data lands here
-			return initialNotes.startsWith("•") || initialNotes.startsWith("-") ? initialNotes : `• ${initialNotes}`;
-		}
-		return "";
+		return initialNotes && initialNotes.length > 0 ? `• ${initialNotes.join("\n• ")}` : "";
 	});
 
 	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {

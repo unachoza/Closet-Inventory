@@ -112,10 +112,45 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - `E1-4.6` Swap email sanitizer to DOMPurify; add XSS regression tests (event-handler / `javascript:` / `<svg onload>` payloads) — _0.5d_
 - `E1-4.7` CSP + HSTS + secure-cookie + CORS-allowlist config — _0.5–1d_
 - `E1-4.8` Self-serve account deletion + data export (rows + Storage) — _1–1.5d_
-- `E1-4.9` Google OAuth verification + CASA assessment scoping (start early) — _tbd, long lead_
+- `E1-4.9` Google OAuth verification + CASA assessment (scoping done 2026-06-29 — needed before real-user launch) — _tbd, long lead, budget 1–3mo_
+  - `E1-4.9a` OAuth consent screen: domain verification, privacy policy + ToS URLs, logo, support contact, scope justification — _0.5d_
+  - `E1-4.9b` Record scope-usage demo video; submit for Google verification; respond to review rounds — _tbd, Google's queue, not ours_
+  - `E1-4.9c` Determine CASA tier (likely Tier 2 for `gmail.readonly`-only); engage an approved validator/tool — _tbd_
+  - `E1-4.9d` Remediate any CASA findings (likely overlaps E1-4.6/4.7/4.10) — _tbd_
+  - `E1-4.9e` Submit CASA report to Google; **recurring annually** for as long as `gmail.readonly` is used — _recurring_
+  - `E1-4.9f` Add "Limited Use" data-policy disclosure to privacy policy (no ad use, no resale, no human review w/o consent) — _bundled w/ E1-4.13_
 - `E1-4.10` Supabase platform hardening: leaked-password protection, CAPTCHA, `service_role` audit, `SECURITY DEFINER` review — _0.5d_
 - `E1-4.11` ⚠️ **Mostly done, blocked on push** — Upload validation (type/size) + short-expiry signed URLs — _0.5d_. Client validation + 5-min signed URLs with auto-refresh are live. Server-side bucket `file_size_limit`/`allowed_mime_types` migration (`20260629000001_storage_validation.sql`) is written but **needs `supabase db push`** — remaining work is just running the push, deferred for now. Dimension capping (separate from byte-size) not addressed — compression already caps display dimensions but doesn't reject huge source dimensions before decode.
 - `E1-4.12` Backups/PITR enabled + restore test; dev/prod project split; logging-hygiene pass — _0.5–1d_
+- `E1-4.13` Publish privacy policy (data collected, retention, third parties/Supabase, deletion/export rights, Limited Use disclosure) — _0.5–1d, blocked on E1-4.8 existing first_
+
+## US-1.5 — Import from Hotmail/Outlook and Yahoo, not just Gmail
+_As Maya, I want to connect whichever email I actually use so that order-confirmation import isn't Gmail-only._
+
+> **Scope note (added 2026-06-29):** today's Gmail import rides entirely on Supabase Auth's
+> Google OAuth provider — one `signInWithOAuth({provider:"google"})` call both signs the user
+> in *and* grants the Gmail scope. Outlook/Hotmail (Microsoft) and Yahoo are separate identity
+> providers with their own OAuth implementations; there is no shared "add another provider"
+> toggle. Each is realistically its own spike-first mini-track, mirroring `E1-1.1`'s "prove the
+> token flow before porting" approach — not a quick follow-up to the Gmail work.
+
+- [ ] User can connect a Microsoft/Outlook account and import order-confirmation emails
+- [ ] User can connect a Yahoo Mail account and import order-confirmation emails
+- [ ] Both follow the same RLS/token-handling bar already set for Gmail (no plaintext token persistence, least-privilege scope, revoke-on-logout)
+
+**Tickets — Microsoft (Outlook/Hotmail)**
+- `E1-5.1` ⚠️ **Spike:** Microsoft identity platform OAuth (Azure AD app registration) + Graph API `Mail.Read` token flow under Supabase Auth (Supabase supports Azure as a provider — prove the token shape before porting) — _1–1.5d_
+- `E1-5.2` Azure app registration: multi-tenant config (so any Microsoft/Outlook/Hotmail user can connect, not just one org) — _0.5d_
+- `E1-5.3` Microsoft **Publisher Verification** (Partner Center) — removes the "unverified app" warning; analogous gate to Google's verification — _tbd, separate from Google's process_
+- `E1-5.4` Build parallel auth hook (`useMicrosoftAuth`) + Graph-API email-fetch/parse adapter alongside the existing Gmail one — _2–3d_
+- `E1-5.5` Privacy policy update: add Microsoft scope + data handling — _bundled w/ E1-4.13_
+
+**Tickets — Yahoo**
+- `E1-6.1` ⚠️ **Spike:** Yahoo OAuth2 token flow. Yahoo's modern mail access is OAuth2 + IMAP (`XOAUTH2`), **not** a REST API like Gmail's — confirm whether Supabase Auth's generic OAuth provider support covers it or a custom flow is needed — _1–1.5d_
+- `E1-6.2` Register app in Yahoo Developer Network; request mail-read scope — _0.5d_
+- `E1-6.3` Build IMAP-based email-fetch adapter (can't reuse the Gmail-API-shaped parser as-is) + parse layer — _2–3d_
+- `E1-6.4` Yahoo's production-mode app review for mail-scope apps — _tbd, Yahoo's queue_
+- `E1-6.5` Privacy policy update: add Yahoo scope + data handling — _bundled w/ E1-4.13_
 
 ---
 
