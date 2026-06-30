@@ -1,7 +1,7 @@
 # E1 · Cloud Backend & Data (Supabase)
 
 > **Date:** 2026-06-20 · **Pillar:** Foundation · **Detail:** full · **README:** v5.1 · **Est:** ~7–11 dev-days
-> **Goal:** Stand up the cloud layer on **Supabase** (decided — [BACKEND_DATABASE_DECISION](../BACKEND_DATABASE_DECISION.md)):
+> **Goal:** Stand up the cloud layer on **Supabase** (decided — [BACKEND_DATABASE_DECISION](../../backend/BACKEND_DATABASE_DECISION.md)):
 > per-user closet in Postgres, image storage off base64, offline-first sync. Do NOT merge Firestore PR #44.
 > **Riskiest unknown first:** Gmail access-token flow under Supabase Auth.
 

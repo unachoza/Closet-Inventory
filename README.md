@@ -11,15 +11,16 @@ Built around low-friction ingestion (email + camera), a fabric-care knowledge la
 ## ✨ Key Highlights
 
 - 🪜 **9-Step Guided Form** — Streamlined item creation with visual progress tracking
-- 📸 **Image Management** — Upload, preview, and persist clothing photos
+- 📸 **Image Management** — Upload + preview; signed-in photos go to Supabase Storage (signed-URL display), signed-out fall back to base64 in localStorage
 - 🧠 **Smart Date Handling** — Intelligent age calculation (months vs. years)
 - 🔍 **Search, Filter & Sort** — Fuzzy search, multi-dimension filters, sort by price/age/name
-- 📧 **Gmail Import** — OAuth-authenticated email parsing to auto-populate closet items
-- ☁️ **Cloud-Ready Service Layer** — storage-agnostic repository seam; Supabase auth wired, data sync in progress (localStorage is the active store today)
-- ☁️ **Supabase Sync** — Cloud persistence per user with localStorage as offline cache
+- 📧 **Gmail Import** — OAuth email parsing to auto-populate items _(parser tested on fixtures; live end-to-end round-trip not yet re-verified — see roadmap Block 0)_
+- ☁️ **Supabase Cloud Layer** — per-user Postgres + RLS + storage-agnostic repository seam; offline-first sync with localStorage as cache. _Auth + repository + image pipeline are wired; live multi-device sync + RLS second-account isolation are not yet end-to-end verified._
 - 🧬 **FashionParser** — Domain inference engine: 17 attribute maps, 6 normalizers, style/occasion/care/season inference
 - 🧵 **Fabric Care Guide** — Interactive textile guide with material-to-care mapping
-- 🎨 **Responsive Design** — Grid layout that works on any device
+
+> **Status (2026-06-29):** pre-beta. Built: manual entry, search/filter/sort, FashionParser, fabric guide, image→Storage pipeline.
+> In progress toward launch: the **inventory spine** (status · location · availability · simple lending — modeled but not yet wired in the UI), **security/privacy hardening**, and **mobile + PWA** (no manifest/service worker yet; mobile rendering needs work). See **[planning/launch/](./planning/launch/README.md)** for the full launch package (roadmap, sprints, MVP epics).
 
 ---
 
@@ -157,7 +158,7 @@ User Input → Form State → Validation → useCloudCloset → Supabase + local
 Email HTML → multi-retailer parsers → FashionParser inference → ClothingItem → closet
 ```
 
-> **Cloud sync is mid-port.** `SupabaseAuthProvider` is mounted and the closet's **write** path now flows through the `closetRepository` seam — so swapping in a `SupabaseClosetRepository` (one line in `services/index.ts`) redirects all persistence. **Reads** still seed synchronously from localStorage; porting that to async `repository.getAll()` (with loading state + cross-instance sync) is the remaining step — see [E1 · Cloud Backend](./planning/epics/E1-cloud-backend.md).
+> **Cloud sync is code-complete, not yet live-verified.** `useCloudCloset` + `SyncedClosetRepository` implement offline-first reconcile (last-write-wins via `updatedAt`) and first-sign-in seeding; reads and writes both flow through the `closetRepository` seam. What's unverified: a real multi-device sync round-trip with a live signed-in session, and RLS isolation against a second account — see Block 0 of the [launch roadmap](./planning/launch/LAUNCH_ROADMAP_2026-06-29.md) and [E1 · Cloud Backend](./planning/launch/epics/E1-cloud-backend.md).
 
 **Key patterns:**
 

@@ -1,14 +1,24 @@
 # Sprints — 2-Day Sprint Sequencing
 
-> **Date:** 2026-06-20 · **Audience:** personal build plan. Index of epics: [README.md](./README.md).
+> **Date:** 2026-06-20 · **Audience:** personal build plan. Index of epics: [README.md](../epics/README.md).
 > Each sprint ≈ **2 ideal dev-days**. Calendar time will run longer — treat the sprint _number_ as
 > sequence, not a calendar promise. Tickets reference epic files (e.g. `E2-1.3`).
+> Now part of the launch package — see [planning/launch/README.md](./README.md) for the launch overview.
 
 ---
 
-## 🔢 Priority order (set by user, updated 2026-06-24 — 8-item)
+## 🚀 LAUNCH MODE (2026-06-29) — see [LAUNCH_ROADMAP](./LAUNCH_ROADMAP_2026-06-29.md)
 
-Canonical sequence. Supersedes both the earlier _E2-before-E1_ plan **and** the interim 6-item order. **E2 Inventory Truth is back in, at #4.**
+> **The 8-item order below is the BACKLOG sequence. For the next ~6–8 weeks it is SUPERSEDED by the
+> launch roadmap**, which reorders around shipping a safe beta to the 30-person waitlist:
+> **Block 0 (prove Gmail import + RLS isolation actually work) → A (security/privacy) → B (inventory spine: status·location·availability·simple-lend) → C (mobile + full PWA) → 🚀 launch (Gmail test-user mode).**
+> Lending social loop (E4) and Hotmail/Yahoo import (E1-5/6) are explicitly **post-MVP** — user's stated next priorities, in that order. Resume the backlog order below after launch.
+
+---
+
+## 🔢 Backlog priority order (set by user, updated 2026-06-24 — 8-item)
+
+Canonical *post-launch* sequence. Supersedes both the earlier _E2-before-E1_ plan **and** the interim 6-item order. **E2 Inventory Truth is back in, at #4.**
 
 1. **Hotfixes** — Sprint 3.5 (E0/E3/E5 user-feedback bugs + polish)
 2. **Database / full-stack** — E1 (Supabase + RLS + service-layer port). **Run the E3 US-3.2 web-enrichment feasibility spike _inside_ this sprint** (server-side anyway) — if Cloudflare is beatable, full web-enrichment slots at #2.5/#3; if it 403-stalls, it waits and mobile keeps #3.
