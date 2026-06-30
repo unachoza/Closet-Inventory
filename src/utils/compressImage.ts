@@ -68,15 +68,8 @@ export function scaledSize(width: number, height: number, max: number): { width:
 	return { width: Math.round(width * ratio), height: Math.round(height * ratio) };
 }
 
-export async function compressImage(file: File, options: CompressOptions = {}): Promise<string> {
-	// Non-image files (shouldn't happen via accept="image/*") pass through untouched.
-	if (!file.type.startsWith("image/")) {
-		return fileToDataURL(file);
-	}
-
-	const maxDimension = options.maxDimension ?? DEFAULT_MAX_DIMENSION;
-	const quality = options.quality ?? DEFAULT_QUALITY;
-
+/** Decode + downscale onto a canvas. Returns null on any failure so callers can fall back. */
+async function prepareCanvas(file: File, maxDimension: number): Promise<HTMLCanvasElement | null> {
 	try {
 		const source = await decodeImage(file);
 		const { width, height } = scaledSize(source.width, source.height, maxDimension);
@@ -86,18 +79,70 @@ export async function compressImage(file: File, options: CompressOptions = {}): 
 		canvas.height = height;
 
 		const ctx = canvas.getContext("2d");
-		if (!ctx) return fileToDataURL(file);
+		if (!ctx) return null;
 
 		ctx.drawImage(source, 0, 0, width, height);
 		if (typeof ImageBitmap !== "undefined" && source instanceof ImageBitmap) {
 			source.close();
 		}
-
-		const compressed = canvas.toDataURL("image/jpeg", quality);
-		// Guard against environments where toDataURL is stubbed/empty.
-		return compressed && compressed.startsWith("data:image/jpeg") ? compressed : fileToDataURL(file);
+		return canvas;
 	} catch (error) {
 		console.warn("compressImage: falling back to the original image", error);
+		return null;
+	}
+}
+
+export async function compressImage(file: File, options: CompressOptions = {}): Promise<string> {
+	// Non-image files (shouldn't happen via accept="image/*") pass through untouched.
+	if (!file.type.startsWith("image/")) {
 		return fileToDataURL(file);
 	}
+
+	const maxDimension = options.maxDimension ?? DEFAULT_MAX_DIMENSION;
+	const quality = options.quality ?? DEFAULT_QUALITY;
+
+	const canvas = await prepareCanvas(file, maxDimension);
+	if (!canvas) return fileToDataURL(file);
+
+	const compressed = canvas.toDataURL("image/jpeg", quality);
+	// Guard against environments where toDataURL is stubbed/empty.
+	return compressed && compressed.startsWith("data:image/jpeg") ? compressed : fileToDataURL(file);
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob | null> {
+	return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+}
+
+/** Extension from a filename, or `fallback` if there's no dot (NOT `split(".").pop()` —
+ *  that returns the whole filename, not undefined, when there's no extension). */
+function extOf(filename: string, fallback: string): string {
+	const dotIndex = filename.lastIndexOf(".");
+	return dotIndex === -1 ? fallback : filename.slice(dotIndex + 1);
+}
+
+export interface CompressedPhoto {
+	blob: Blob;
+	ext: string;
+}
+
+/**
+ * Same downscale/recompress pipeline as `compressImage`, but returns a Blob
+ * (for Storage upload) instead of a base64 string. Falls back to the original
+ * file untouched if decoding/canvas/encoding fails at any step.
+ */
+export async function compressImageToBlob(file: File, options: CompressOptions = {}): Promise<CompressedPhoto> {
+	if (!file.type.startsWith("image/")) {
+		return { blob: file, ext: extOf(file.name, "bin") };
+	}
+
+	const maxDimension = options.maxDimension ?? DEFAULT_MAX_DIMENSION;
+	const quality = options.quality ?? DEFAULT_QUALITY;
+
+	const canvas = await prepareCanvas(file, maxDimension);
+	if (canvas) {
+		const blob = await canvasToBlob(canvas, quality);
+		if (blob) return { blob, ext: "jpg" };
+	}
+
+	return { blob: file, ext: extOf(file.name, "jpg") };
 }

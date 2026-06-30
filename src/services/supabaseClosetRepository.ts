@@ -16,6 +16,7 @@ function rowToItem(row: ItemRow): ClothingItem {
 		name: row.name,
 		category: row.category,
 		brand: row.brand ?? "",
+		retailer: row.retailer ?? undefined,
 		color: row.color ?? "",
 		size: row.size ?? "",
 		imageURL: row.primary_photo_url ?? "",
@@ -61,6 +62,7 @@ function itemToInsertRow(item: ClothingItem, closetId: string): TablesInsert<"it
 		name: item.name,
 		category: item.category,
 		brand: item.brand || null,
+		retailer: item.retailer || null,
 		color: item.color || null,
 		size: item.size || null,
 		purchase_price: item.price ? parseFloat(item.price) : null,
@@ -95,6 +97,7 @@ function patchToUpdateRow(patch: Partial<ClothingItem>): TablesUpdate<"items"> {
 	if (patch.name !== undefined) row.name = patch.name;
 	if (patch.category !== undefined) row.category = patch.category;
 	if (patch.brand !== undefined) row.brand = patch.brand || null;
+	if (patch.retailer !== undefined) row.retailer = patch.retailer || null;
 	if (patch.color !== undefined) row.color = patch.color || null;
 	if (patch.size !== undefined) row.size = patch.size || null;
 	if (patch.price !== undefined) row.purchase_price = patch.price ? parseFloat(patch.price) : null;

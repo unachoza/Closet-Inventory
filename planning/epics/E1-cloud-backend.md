@@ -7,11 +7,11 @@
 
 ---
 
-## US-1.1 — Sign in and keep my closet in the cloud
+## US-1.1 — Sign in and keep my closet in the cloud ✅
 _As Maya, I want my closet synced to my account so that I see the same wardrobe on phone and laptop._
-- [ ] Supabase Auth sign-in (Google)
+- [x] Supabase Auth sign-in (Google)
 - [ ] Per-user `items` table; RLS so a user reads/writes only their own rows
-- [ ] localStorage acts as offline cache; reconciles on reconnect
+- [x] localStorage acts as offline cache; reconciles on reconnect
 - [ ] First sign-in seeds the cloud from existing local closet
 
 **Tickets**
@@ -24,13 +24,16 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 
 ## US-1.2 — Images that don't blow the storage budget
 _As Maya, I want my photos stored properly so that big closets and camera imports don't silently fail._
-- [ ] Images upload to Supabase Storage; row stores a URL, not base64
-- [ ] Existing base64 images migrate to Storage
-- [ ] Upload handles failure with a user-facing message
+- [x] Images upload to Supabase Storage; row stores a **path**, not a URL or base64 (signed URLs are resolved at display time, never persisted — see `useSignedImageUrl`)
+- [ ] Existing base64 images migrate to Storage (`E1-2.2`, not started)
+- [x] Upload handles failure with a user-facing message
 
 **Tickets**
-- `E1-2.1` Supabase Storage bucket + upload pipeline (replaces base64 in `ImageUploader`) — _1–1.5d_
-- `E1-2.2` One-time migration: base64 localStorage images → Storage URLs — _1d_
+- `E1-2.1` ✅ **Done** (2026-06-29) — Supabase Storage bucket + upload pipeline (replaces base64 in `ImageUploader` when signed in). `storageService.uploadItemPhoto` uploads to `<userId>/<uuid>.<ext>`; `item-photos` row stores the bare path; `useSignedImageUrl` signs it for display and auto-refreshes before expiry. Offline/signed-out unchanged (base64 → localStorage). — _1–1.5d_
+  - Photos are downscaled/recompressed (≤1200px longest edge, JPEG q0.8 — `compressImageToBlob`) before upload, same pipeline as the offline base64 path. Reduction is proportional to original size, not a fixed target — see `scaledSize` tests.
+  - ⚠️ **Not yet pushed to remote**: migration `20260629000001_storage_validation.sql` (bucket `file_size_limit` + `allowed_mime_types`) is written but `supabase db push` has not been run. Until pushed, server-side upload validation is NOT enforced — only the client-side `validateImageFile` check is live. Push before relying on this as a security boundary.
+  - Verified: `tsc --noEmit` clean, full vitest suite green (1089 tests incl. new compression/validation tests). NOT verified: a live signed-in upload round-trip against Supabase Storage (no authenticated browser session available in-session) — the actual bucket RLS/size/mime enforcement is unverified end-to-end.
+- `E1-2.2` One-time migration: base64 localStorage images → Storage URLs — _1d_ — not started
 
 ## US-1.3 — Know my sync state
 _As Maya, I want a sync indicator so that I know my data is safe / when I'm offline._
@@ -90,8 +93,8 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] Lock CORS to known origins on edge functions (no `*` in production)
 
 **Storage upload safety**
-- [ ] Validate file type + size on upload; reject non-image content; cap dimensions/bytes
-- [ ] Short-expiry signed URLs; no long-lived/public links to user images
+- [x] Validate file type + size on upload; reject non-image content; cap dimensions/bytes — client-side live (`validateImageFile`); server-side bucket constraints written (`20260629000001_storage_validation.sql`) but **not pushed to remote yet** — client check alone is bypassable
+- [x] Short-expiry signed URLs; no long-lived/public links to user images — `signItemPhotoPath` TTL dropped 1hr → 5min; `useSignedImageUrl` auto-refreshes ~30s before expiry while mounted
 
 **Privacy & compliance**
 - [ ] Privacy policy + ToS; explicit consent for the Gmail scope at connect time
@@ -109,10 +112,45 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - `E1-4.6` Swap email sanitizer to DOMPurify; add XSS regression tests (event-handler / `javascript:` / `<svg onload>` payloads) — _0.5d_
 - `E1-4.7` CSP + HSTS + secure-cookie + CORS-allowlist config — _0.5–1d_
 - `E1-4.8` Self-serve account deletion + data export (rows + Storage) — _1–1.5d_
-- `E1-4.9` Google OAuth verification + CASA assessment scoping (start early) — _tbd, long lead_
+- `E1-4.9` Google OAuth verification + CASA assessment (scoping done 2026-06-29 — needed before real-user launch) — _tbd, long lead, budget 1–3mo_
+  - `E1-4.9a` OAuth consent screen: domain verification, privacy policy + ToS URLs, logo, support contact, scope justification — _0.5d_
+  - `E1-4.9b` Record scope-usage demo video; submit for Google verification; respond to review rounds — _tbd, Google's queue, not ours_
+  - `E1-4.9c` Determine CASA tier (likely Tier 2 for `gmail.readonly`-only); engage an approved validator/tool — _tbd_
+  - `E1-4.9d` Remediate any CASA findings (likely overlaps E1-4.6/4.7/4.10) — _tbd_
+  - `E1-4.9e` Submit CASA report to Google; **recurring annually** for as long as `gmail.readonly` is used — _recurring_
+  - `E1-4.9f` Add "Limited Use" data-policy disclosure to privacy policy (no ad use, no resale, no human review w/o consent) — _bundled w/ E1-4.13_
 - `E1-4.10` Supabase platform hardening: leaked-password protection, CAPTCHA, `service_role` audit, `SECURITY DEFINER` review — _0.5d_
-- `E1-4.11` Upload validation (type/size/dimensions) + short-expiry signed URLs — _0.5d_
+- `E1-4.11` ⚠️ **Mostly done, blocked on push** — Upload validation (type/size) + short-expiry signed URLs — _0.5d_. Client validation + 5-min signed URLs with auto-refresh are live. Server-side bucket `file_size_limit`/`allowed_mime_types` migration (`20260629000001_storage_validation.sql`) is written but **needs `supabase db push`** — remaining work is just running the push, deferred for now. Dimension capping (separate from byte-size) not addressed — compression already caps display dimensions but doesn't reject huge source dimensions before decode.
 - `E1-4.12` Backups/PITR enabled + restore test; dev/prod project split; logging-hygiene pass — _0.5–1d_
+- `E1-4.13` Publish privacy policy (data collected, retention, third parties/Supabase, deletion/export rights, Limited Use disclosure) — _0.5–1d, blocked on E1-4.8 existing first_
+
+## US-1.5 — Import from Hotmail/Outlook and Yahoo, not just Gmail
+_As Maya, I want to connect whichever email I actually use so that order-confirmation import isn't Gmail-only._
+
+> **Scope note (added 2026-06-29):** today's Gmail import rides entirely on Supabase Auth's
+> Google OAuth provider — one `signInWithOAuth({provider:"google"})` call both signs the user
+> in *and* grants the Gmail scope. Outlook/Hotmail (Microsoft) and Yahoo are separate identity
+> providers with their own OAuth implementations; there is no shared "add another provider"
+> toggle. Each is realistically its own spike-first mini-track, mirroring `E1-1.1`'s "prove the
+> token flow before porting" approach — not a quick follow-up to the Gmail work.
+
+- [ ] User can connect a Microsoft/Outlook account and import order-confirmation emails
+- [ ] User can connect a Yahoo Mail account and import order-confirmation emails
+- [ ] Both follow the same RLS/token-handling bar already set for Gmail (no plaintext token persistence, least-privilege scope, revoke-on-logout)
+
+**Tickets — Microsoft (Outlook/Hotmail)**
+- `E1-5.1` ⚠️ **Spike:** Microsoft identity platform OAuth (Azure AD app registration) + Graph API `Mail.Read` token flow under Supabase Auth (Supabase supports Azure as a provider — prove the token shape before porting) — _1–1.5d_
+- `E1-5.2` Azure app registration: multi-tenant config (so any Microsoft/Outlook/Hotmail user can connect, not just one org) — _0.5d_
+- `E1-5.3` Microsoft **Publisher Verification** (Partner Center) — removes the "unverified app" warning; analogous gate to Google's verification — _tbd, separate from Google's process_
+- `E1-5.4` Build parallel auth hook (`useMicrosoftAuth`) + Graph-API email-fetch/parse adapter alongside the existing Gmail one — _2–3d_
+- `E1-5.5` Privacy policy update: add Microsoft scope + data handling — _bundled w/ E1-4.13_
+
+**Tickets — Yahoo**
+- `E1-6.1` ⚠️ **Spike:** Yahoo OAuth2 token flow. Yahoo's modern mail access is OAuth2 + IMAP (`XOAUTH2`), **not** a REST API like Gmail's — confirm whether Supabase Auth's generic OAuth provider support covers it or a custom flow is needed — _1–1.5d_
+- `E1-6.2` Register app in Yahoo Developer Network; request mail-read scope — _0.5d_
+- `E1-6.3` Build IMAP-based email-fetch adapter (can't reuse the Gmail-API-shaped parser as-is) + parse layer — _2–3d_
+- `E1-6.4` Yahoo's production-mode app review for mail-scope apps — _tbd, Yahoo's queue_
+- `E1-6.5` Privacy policy update: add Yahoo scope + data handling — _bundled w/ E1-4.13_
 
 ---
 

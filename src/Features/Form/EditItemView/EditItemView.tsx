@@ -1,6 +1,7 @@
 import "./EditItemView.css";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
+import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
 // import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
@@ -84,6 +85,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// component for each new item, reinitializing useState with fresh data.
 	// No useEffect needed — key-based remount is the React-idiomatic approach.
 	const [formData, setFormData] = useState<Partial<ClothingItem>>(() => buildFormDataFromItem(item));
+	const previewSrc = useSignedImageUrl(formData.imageURL);
 
 	// Stable ref — uses functional update so it never needs formData in deps.
 	// TextInput is wrapped in memo(), so a stable handleChange means only the
@@ -228,9 +230,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				)}
 				{/* Image preview for create mode */}
 
-				{isCreateMode && formData.imageURL && (
+				{isCreateMode && previewSrc && (
 					<div className="edit-form-image-preview">
-						<img src={formData.imageURL} alt={formData.name ?? "Product"} className="edit-form-preview-img" />
+						<img src={previewSrc} alt={formData.name ?? "Product"} className="edit-form-preview-img" />
 					</div>
 				)}
 
