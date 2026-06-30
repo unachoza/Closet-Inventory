@@ -1,6 +1,7 @@
 import "./Card.css";
 import { ClothingItem } from "../../../utils/types";
 import { CardDetails } from "../CardDetails/CardDetails";
+import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 interface CardProps {
@@ -44,6 +45,7 @@ function rectToGeometry(rect: DOMRect): Geometry {
 }
 
 const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
+	const imageSrc = useSignedImageUrl(item.imageURL);
 	const [flipped, setFlipped] = useState(false);
 	// After the flip completes, the card grows into a centered modal.
 	const [expanded, setExpanded] = useState(false);
@@ -134,7 +136,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 				<div className="card-inner">
 					{/* Front */}
 					<div className="card-front">
-						<div className="card-image">{item.imageURL ? <img src={item.imageURL} alt={item?.name} /> : null}</div>
+						<div className="card-image">{imageSrc ? <img src={imageSrc} alt={item?.name} /> : null}</div>
 						<div className="card-name-overlay">
 							<span className="card-name-label">{item.name || item.brand || item.category}</span>
 						</div>

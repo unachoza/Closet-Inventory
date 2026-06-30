@@ -105,9 +105,9 @@ Completed between Block A and B:
 
 ### Block B — E1 Cloud Backend (Supabase) · Priority 2
 
-- **Spike + schema:** `E1-1.1` ⚠️ Gmail-token-under-Supabase spike · `E1-1.2` schema (incl. E11 wear/status + E12 profile columns)
-- **RLS + port:** `E1-1.3` RLS owner-only · `E1-1.4` port `useCloudCloset`
-- **Seed + offline:** `E1-1.5` first-sign-in seed · `E1-1.6` offline-first reconcile · `E1-3.1` sync indicator
+- ✅ **Spike + schema:** `E1-1.1` ⚠️ Gmail-token-under-Supabase spike · `E1-1.2` schema (incl. E11 wear/status + E12 profile columns)
+- ✅ **RLS + port:** `E1-1.3` RLS owner-only · `E1-1.4` port `useCloudCloset`
+- ✅ **Seed + offline:** `E1-1.5` first-sign-in seed · `E1-1.6` offline-first reconcile · `E1-3.1` sync indicator
 - **Image storage:** `E1-2.1` Storage upload (off base64) · `E1-2.2` migrate existing base64
      > _DoD:_ private synced offline-capable closet on Supabase; images in Storage; Gmail import works under Supabase Auth.
 
