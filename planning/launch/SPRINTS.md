@@ -1,14 +1,30 @@
 # Sprints — 2-Day Sprint Sequencing
 
-> **Date:** 2026-06-20 · **Audience:** personal build plan. Index of epics: [README.md](./README.md).
+> **Date:** 2026-06-20 · **Audience:** personal build plan. Index of epics: [README.md](../epics/README.md).
 > Each sprint ≈ **2 ideal dev-days**. Calendar time will run longer — treat the sprint _number_ as
 > sequence, not a calendar promise. Tickets reference epic files (e.g. `E2-1.3`).
+> Now part of the launch package — see [planning/launch/README.md](./README.md) for the launch overview.
 
 ---
 
-## 🔢 Priority order (set by user, updated 2026-06-24 — 8-item)
+## 🚀 LAUNCH MODE (2026-06-30) — see [LAUNCH_ROADMAP](./LAUNCH_ROADMAP_2026-06-29.md)
 
-Canonical sequence. Supersedes both the earlier _E2-before-E1_ plan **and** the interim 6-item order. **E2 Inventory Truth is back in, at #4.**
+> ✅ **Block 0 COMPLETE (2026-06-30)** — All three gates verified:
+> - G0.1 Gmail import: live end-to-end (Google OAuth + parsing)
+> - G0.2 RLS isolation: 11/11 checks pass (user B blocked from user A's data)
+> - G0.3 Cloud sync: round-trip verified (item on device A appears on device B)
+> - **Critical fix:** Postgres GRANT bug (zero table privileges) discovered and fixed.
+>
+> **The 8-item order below is the BACKLOG sequence. For the next ~6–8 weeks it is SUPERSEDED by the
+> launch roadmap**, which reorders around shipping a safe beta to the 30-person waitlist:
+> **✅ Block 0 (done) → A (security/privacy) → B (inventory spine: status·location·availability·simple-lend) → C (mobile + full PWA) → 🚀 launch (Gmail test-user mode).**
+> Lending social loop (E4) and Hotmail/Yahoo import (E1-5/6) are explicitly **post-MVP** — user's stated next priorities, in that order. Resume the backlog order below after launch.
+
+---
+
+## 🔢 Backlog priority order (set by user, updated 2026-06-24 — 8-item)
+
+Canonical *post-launch* sequence. Supersedes both the earlier _E2-before-E1_ plan **and** the interim 6-item order. **E2 Inventory Truth is back in, at #4.**
 
 1. **Hotfixes** — Sprint 3.5 (E0/E3/E5 user-feedback bugs + polish)
 2. **Database / full-stack** — E1 (Supabase + RLS + service-layer port). **Run the E3 US-3.2 web-enrichment feasibility spike _inside_ this sprint** (server-side anyway) — if Cloudflare is beatable, full web-enrichment slots at #2.5/#3; if it 403-stalls, it waits and mobile keeps #3.
@@ -62,7 +78,7 @@ Completed between Block A and B:
 - ✅ **Phase 0 monorepo scaffold** — npm workspaces · `@ntw/types` package · `src/services/closetRepository.ts` interface · `src/services/localClosetRepository.ts` impl · 10 unit tests green.
 - ✅ **Supabase project** — `rawuntspvetfdtrqggen.supabase.co` · anon + secret keys in `.env` · Google + Azure OAuth providers enabled.
 - ✅ **Azure App Registration** — Entra ID tenant under `ariannacodes@gmail.com` · `AZURE_TENANT_ID/CLIENT_ID/CLIENT_SECRET` in `.env` · Microsoft Graph `Mail.Read` + `offline_access` permissions · SPA redirect URI registered.
-- ⏸️ **Gmail OAuth spike** (`E1-1.1`) — blocked: `redirect_uri_mismatch` persists after 24h + fresh OAuth app. `src/GmailSpike.tsx` stays in repo; clean up when resolved.
+- ✅ **Gmail OAuth spike** (`E1-1.1`, 2026-06-30) — verified live. Google OAuth sign-in + email import + parsing works end-to-end. Supabase-mediated flow succeeds where standalone spike had issues. `GmailSpike.tsx` can be cleaned up post-launch.
 - ✅ **`ENGINEERING_BRIEF_2026-06-23.md` reconciled** — Firebase → Supabase/Postgres+RLS throughout.
 
 ---
@@ -105,11 +121,12 @@ Completed between Block A and B:
 
 ### Block B — E1 Cloud Backend (Supabase) · Priority 2
 
-- ✅ **Spike + schema:** `E1-1.1` ⚠️ Gmail-token-under-Supabase spike · `E1-1.2` schema (incl. E11 wear/status + E12 profile columns)
-- ✅ **RLS + port:** `E1-1.3` RLS owner-only · `E1-1.4` port `useCloudCloset`
-- ✅ **Seed + offline:** `E1-1.5` first-sign-in seed · `E1-1.6` offline-first reconcile · `E1-3.1` sync indicator
-- **Image storage:** `E1-2.1` Storage upload (off base64) · `E1-2.2` migrate existing base64
-     > _DoD:_ private synced offline-capable closet on Supabase; images in Storage; Gmail import works under Supabase Auth.
+- ✅ **Spike + schema (2026-06-30):** `E1-1.1` Gmail-token-under-Supabase verified ✅ · `E1-1.2` schema (incl. E11 wear/status + E12 profile columns)
+- ✅ **RLS + port (2026-06-30):** `E1-1.3` RLS isolation verified ✅ (G0.2, 11/11) · `E1-1.4` port `useCloudCloset`
+- ✅ **Seed + offline:** `E1-1.5` first-sign-in seed · `E1-1.6` offline-first reconcile · `E1-3.1` sync indicator (next ticket)
+- ✅ **Security hardening (2026-06-30):** `E1-4.1` bucket privacy audit ✅ · `E1-4.2` RLS isolation test ✅ · `E1-4.3` CI security scanning live ✅ · `E1-4.11` upload validation pushed ✅
+- **Image storage:** `E1-2.1` Storage upload (off base64) ✅ · `E1-2.2` migrate existing base64 (not started)
+     > _DoD:_ private synced offline-capable closet on Supabase; images in Storage; Gmail import works under Supabase Auth. Block 0 foundation verified; moving to Block A (dev/prod split, account deletion, privacy policy).
 
 ### Block C — E5 Mobile & PWA · Priority 3
 

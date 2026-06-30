@@ -3,6 +3,10 @@
 > **Date:** 2026-06-20 · **Pillar:** Supporting (load-bearing for the business model) · **Detail:** full · **README:** v3.0 · **Est:** ~7.5–9.5 dev-days
 > **Goal:** Make the mobile experience first-class and installable — touch targets, thumb-reachable
 > primary action, and a PWA so it lives on the home screen with no App Store / no 30% cut.
+>
+> ### 🚀 PROMOTED TO LAUNCH BLOCK C (2026-06-29) — see [LAUNCH_ROADMAP](../LAUNCH_ROADMAP_2026-06-29.md)
+> User wants the **full installable PWA** at launch (manifest + service worker + offline + iOS full-screen), not just responsive fixes. **Reality check:** this is **0% built** — no `manifest.json`, no service worker, no `vite-plugin-pwa`, no bottom nav. Greenfield block.
+> **Lever:** if the 1-month target is hard, cut to the *touch/responsive half* (US-5.1) for launch and ship the PWA shell (US-5.2/5.3) as a fast-follow — waitlisters can use the responsive web app on day one.
 
 ---
 

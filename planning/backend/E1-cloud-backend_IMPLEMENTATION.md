@@ -1,6 +1,6 @@
 # E1 · Cloud Backend — Implementation Plan
 
-> **Date:** 2026-06-22 · **Status:** draft · **Implements:** [E1-cloud-backend.md](./E1-cloud-backend.md) (goals/tickets) ·
+> **Date:** 2026-06-22 · **Status:** draft · **Implements:** [E1-cloud-backend.md](../launch/epics/E1-cloud-backend.md) (goals/tickets) ·
 > **Architecture:** [E1-cloud-backend_ARCHITECTURE.md](./E1-cloud-backend_ARCHITECTURE.md) · **DB decision:** [BACKEND_DATABASE_DECISION.md](../BACKEND_DATABASE_DECISION.md)
 > **Goal:** Per-user closet in Supabase Postgres, images off base64, offline-first sync — RLS as the enforcement layer.
 > **Est:** ~7–11 dev-days · **Spike first:** Gmail access-token under Supabase Auth.

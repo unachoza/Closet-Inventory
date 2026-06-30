@@ -2,13 +2,17 @@
 
 > **Date:** 2026-06-20 · **Updated:** 2026-06-24 · **Pillar:** Inventory (the differentiator) · **Detail:** full · **README:** v1.5
 > **Goal:** Know not just *what* you own but *what state it's in*, *where it is*, and whether it's *available*.
-> The flagship, uncompeted feature. Full spec: [WardrobeStatusAndLocation.md](../WardrobeStatusAndLocation.md).
+> The flagship, uncompeted feature. Full spec: [WardrobeStatusAndLocation.md](../../WardrobeStatusAndLocation.md).
 > Buildable localStorage-first; sync rides along when E1 lands.
 >
-> ### 🟢 SCHEDULED at #4 (8-item order, 2026-06-24)
+> ### 🚀 PROMOTED TO LAUNCH BLOCK B (2026-06-29) — see [LAUNCH_ROADMAP](../LAUNCH_ROADMAP_2026-06-29.md)
+> The **inventory spine** (status · location · availability · **simple** free-text lending) is now core MVP, not #4-backlog.
+> **Reality check:** the data model exists (`ClothingItem.status`/`locationId`/`loan` + DB columns) but the **UI is ~0% built** — no status chip, no quick-action menu, no `statusTransitions.ts`, no location field/tag/grouped view, no lend modal. This is the bulk of remaining MVP work. Launch scope = US-2.2 (location), US-2.3 (filters), US-2.5 (simple lend), US-2.6 (availability) + the status chip/menu from US-2.1. **Second-wave** (taxonomy US-2.10, provenance US-2.11, multi-photo US-2.12, fit/measurements US-2.8) stays post-launch.
+>
+> ### 🟢 (prior) SCHEDULED at #4 (8-item order, 2026-06-24)
 > E2 is back in the plan at **priority #4** (hotfixes → E1 → E5 → **E2** → E12 → E11 → E4 → E8).
 > The clean/dirty bits — `status` clean/dirty, `wornCount`, `lastWornAt`, "Log a Wear" — are **owned by
-> [E11](./E11-laundry-forecasting.md)** (one canonical definition). E2 builds the rest: **location, extended
+> [E11](../../epics/E11-laundry-forecasting.md)** (one canonical definition). E2 builds the rest: **location, extended
 > statuses** (`at_cleaner`/`on_loan`/`in_repair`, extending E11's enum — not a second field), **availability,
 > lending**, plus the second-wave additions: **taxonomy** (US-2.10 season/occasion/vibe), **provenance**
 > (US-2.11), **photos** (US-2.12), **fit/measurements** (US-2.8), **swim** (US-2.9).
@@ -17,7 +21,7 @@
 
 ## US-2.1 — Mark what state a piece is in → **partly moved to E11**
 _As Maya, I want to mark an item clean/dirty/at-the-cleaner/needs-repair/traveling/on-loan so that I know its real status._
-- → **clean/dirty + wornCount + Log a Wear moved to [E11](./E11-laundry-forecasting.md) (US-11.1).** `status`/`wornCount`/`lastWornAt` are **owned by E11**.
+- → **clean/dirty + wornCount + Log a Wear moved to [E11](../../epics/E11-laundry-forecasting.md) (US-11.1).** `status`/`wornCount`/`lastWornAt` are **owned by E11**.
 - [ ] (parked) Extended statuses: `at_cleaner`, `in_repair`, `traveling`, `on_loan` — extend E11's enum
 - [ ] (parked) Status chip on the card (token-colored)
 - [ ] (parked) Quick-action menu sets status (context-aware per transition table)
@@ -53,7 +57,7 @@ _As Maya, I want to filter by status and location so that I can see "everything 
 
 ## US-2.4 — Tell me when to do laundry → **moved to E11**
 _As Maya, I want a nudge when I'm low on clean items in a category so that I do laundry before I run out._
-- → **Entire story moved to [E11 · Laundry & Wear](./E11-laundry-forecasting.md) (US-11.2).** `E2-4.1`/`E2-4.2` are now `E11-2.1`/`E11-2.2`. E11 expands it with machine size, lifestyle, and item weight/volume.
+- → **Entire story moved to [E11 · Laundry & Wear](../../epics/E11-laundry-forecasting.md) (US-11.2).** `E2-4.1`/`E2-4.2` are now `E11-2.1`/`E11-2.2`. E11 expands it with machine size, lifestyle, and item weight/volume.
 
 ## US-2.5 — Lend something and track it
 _As the "Our Closet" user, I want to mark an item lent out (to whom, due when) so that I know who has my stuff._
@@ -81,7 +85,7 @@ _As Maya, I want season, occasion, and vibe as separate tags so that "workout" (
 - [ ] **season** tags: summer / winter / spring / fall (also feeds storage — stored vs. primary)
 - [ ] **occasion** tags: cocktail / work / workout / … (the event/context)
 - [ ] **vibe** tags: elevated / fancy / sexy / casual / … (the aesthetic)
-- [ ] Each is many-to-many (an item can be multiple); controlled vocab via `tag_vocab` + `item_tags` (see [DATA_MODEL](../backend/DATA_MODEL_2026-06-24.md))
+- [ ] Each is many-to-many (an item can be multiple); controlled vocab via `tag_vocab` + `item_tags` (see [DATA_MODEL](../../backend/DATA_MODEL_2026-06-24.md))
 - [ ] Migrate existing `occasion` values; un-conflate casual/workout
 
 **Tickets**
@@ -156,4 +160,4 @@ When a user filters by a material (e.g. Cotton), results should sort by that mat
 - Hardcoded-list gotcha: new filter dimensions need manual `DIMENSIONS`/sort-array edits `tsc` won't catch.
 
 ## Definition of done (epic) — _scoped down; laundry + wornCount now in E11_
-Items carry status (extending E11's enum) + location; cards show/set them; filters + "where is everything" work; lending is tracked; `isAvailable` is the shared gate. _(Laundry nudge + `wornCount` + "Log a Wear" shipped under [E11](./E11-laundry-forecasting.md).)_
+Items carry status (extending E11's enum) + location; cards show/set them; filters + "where is everything" work; lending is tracked; `isAvailable` is the shared gate. _(Laundry nudge + `wornCount` + "Log a Wear" shipped under [E11](../../epics/E11-laundry-forecasting.md).)_
