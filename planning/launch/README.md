@@ -40,13 +40,11 @@ status chip, no location tag, no lend modal, no filters for either). That's not 
 plan, it's a correction to the *feeling* that this is "mostly done, just needs hooking up." It's the
 largest single block of remaining work, sized at 6–9 dev-days in the roadmap.
 
-The second thing: **two of your launch assumptions have never been tested, and one of them is the
-one thing you said has to be pristine.** Gmail import has only ever run against canned email fixtures,
-never a live signed-in account (your own SPRINTS doc contradicts itself on whether the spike even
-passed). And — the important one — **row-level security has never been tested against a second
-account.** You're about to put 30 real people's photos and email contents behind that boundary. The
-roadmap's Block 0 exists specifically so you find out *before* launch, not after, whether either of
-these is real or aspirational.
+The second thing has been resolved: **all three Block 0 assumptions are now verified** (2026-06-30).
+Gmail import works end-to-end against a real Google account (G0.1). RLS isolation holds against a
+second account (G0.2, 11/11 checks pass). Cloud sync round-trips across devices (G0.3). The only
+remaining infrastructure risk that surfaced: zero Postgres table GRANTs meant no signed-in user could
+read/write their data — this was caught and fixed before launch (`20260629000002_grant_table_privileges.sql`).
 
 ## How seriously you're taking security — and why "not yet passed" is the right answer
 
@@ -72,7 +70,7 @@ seriously — more so than a green checkmark would be.
 | Feature | Your words | Build status |
 |---|---|---|
 | **Manual closet upload** | upload your closet manually | ✅ Built — 9-step guided form, image upload (Storage + base64 fallback) |
-| **Gmail auto-import** | scrape auto-import from Gmail | ⚠️ Parser built (fixtures only) — **live end-to-end round-trip unverified**, Block 0 gate |
+| **Gmail auto-import** | scrape auto-import from Gmail | ✅ Live end-to-end verified (2026-06-30) — Google OAuth sign-in, email import, parsing confirmed (G0.1) |
 | **Status** | know the status — dirty, needs repair, too small | 🔴 Modeled (type+DB), **UI ~0% built** — Block B |
 | **Location** | know the location — storage, lent out, dry cleaner, summer house | 🔴 Modeled (type+DB), **UI ~0% built** — Block B |
 | **PWA / mobile** | needs to look better on mobile, browser rendering too buggy | 🔴 0% built — no manifest/service worker yet; full installable PWA chosen — Block C |
