@@ -15,7 +15,7 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 - [ ] First sign-in seeds the cloud from existing local closet
 
 **Tickets**
-- `E1-1.1` ⚠️ **Spike, code shipped but NOT verified** (PR#82 + PR#83 typo fix, 2026-06-25) — `GmailSpike.tsx` + `useSupabaseAuth.ts` implement the token flow, but `useSupabaseAuth.test.ts` is fully mocked (no live OAuth ever exercised) and `GmailSpike.tsx` is still flag-gated in `main.tsx`. The spike's actual question — does a live Gmail access token survive under Supabase Auth — is unconfirmed. **This is Block 0 / G0.1 in the launch roadmap.** Don't check off until a live signed-in round-trip is confirmed. — _1–1.5d_
+- `E1-1.1` ✅ **Done** (2026-06-30) — `GmailSpike.tsx` + `useSupabaseAuth.ts` implement the token flow; live Google OAuth sign-in verified (G0.1). Gmail access token survives under Supabase Auth and email import works end-to-end. — _1–1.5d_
 - `E1-1.2` ✅ **Done** (PR#88, 2026-06-26) — `items` table mirroring `ClothingItem` incl. E2 status/location columns; migrations `20260626000001_v1_spine.sql` + `20260628000004_items_e2_columns.sql`, pushed to remote. — _1d_
 - `E1-1.3` ✅ **Done** (2026-06-30) — owner-only RLS policies (PR#88, `20260626000002_rls.sql`) verified via real two-account isolation test (`scripts/test-rls-isolation.mjs`): 11/11 checks pass — user B cannot read/update/delete user A's items, closet_members, or Storage objects. Required a critical GRANT fix first (`20260629000002_grant_table_privileges.sql`) — see `E1-4.2`. — _0.5d_
 - `E1-1.4` Port `useCloudCloset` to Supabase client; keep `useLocalCloset` as offline cache — _2–3d_

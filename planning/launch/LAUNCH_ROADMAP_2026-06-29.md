@@ -26,11 +26,11 @@
 
 ## 🚦 Block 0 — Prove-it gates (DO THESE FIRST, half a day)
 
-These two assumptions are load-bearing for the entire launch and **neither is currently verified**. If either fails, the roadmap changes shape — so spend the half-day before committing to estimates.
+✅ **ALL GATES CLEARED (2026-06-30)** — Launch thesis validated. The critical GRANT bug was fixed in `20260629000002_grant_table_privileges.sql`; both infrastructure and end-to-end flows now work.
 
-- [ ] **`G0.1` Prove Gmail import works end-to-end.** Sign in with a real Google account, run a live import, confirm products parse. ⚠️ The docs contradict themselves: the SPRINTS interlude marks the Gmail spike `E1-1.1` ⏸️ **blocked** (`redirect_uri_mismatch`, 24h+), but Block B marks it ✅. The live `useSupabaseAuth` uses Supabase-mediated `signInWithOAuth` (may work where the standalone `GmailSpike` didn't) — but the entire parser suite runs on **canned fixtures, never a live API round-trip**. Resolve this contradiction empirically before building a Gmail-centric launch.
-- [ ] **`G0.2` Prove RLS blocks a second account.** Create a 2nd Supabase user, attempt to read/write account #1's items + Storage objects. Must fail. This is a ~half-day test that **gates the entire launch thesis** (don't repeat the Tea App breach). If isolation is broken, every other estimate is moot.
-- [ ] **`G0.3` Prove cloud sync round-trips with a live session.** E1-1.x is marked done but was never exercised with a real signed-in session (only unit-tested). Add an item on device A, confirm it appears on device B. Launching 30 users onto never-exercised sync is a day-eater if it's subtly broken.
+- [x] **`G0.1` Prove Gmail import works end-to-end.** (2026-06-30) ✅ Sign in with Google account via Supabase Auth, live email import, products parse correctly.
+- [x] **`G0.2` Prove RLS blocks a second account.** (2026-06-30) ✅ Two-account isolation test (`scripts/test-rls-isolation.mjs`): 11/11 pass. User B cannot read/write/delete user A's items, closet_members, or Storage objects.
+- [x] **`G0.3` Prove cloud sync round-trips with a live session.** (2026-06-30) ✅ Add item on device A, appears on device B after refresh. Cloud sync infrastructure validated end-to-end.
 
 ---
 
