@@ -10,14 +10,14 @@
 ## US-1.1 — Sign in and keep my closet in the cloud ✅
 _As Maya, I want my closet synced to my account so that I see the same wardrobe on phone and laptop._
 - [x] Supabase Auth sign-in (Google)
-- [ ] Per-user `items` table; RLS so a user reads/writes only their own rows
+- [x] Per-user `items` table; RLS so a user reads/writes only their own rows
 - [x] localStorage acts as offline cache; reconciles on reconnect
 - [ ] First sign-in seeds the cloud from existing local closet
 
 **Tickets**
 - `E1-1.1` ⚠️ **Spike, code shipped but NOT verified** (PR#82 + PR#83 typo fix, 2026-06-25) — `GmailSpike.tsx` + `useSupabaseAuth.ts` implement the token flow, but `useSupabaseAuth.test.ts` is fully mocked (no live OAuth ever exercised) and `GmailSpike.tsx` is still flag-gated in `main.tsx`. The spike's actual question — does a live Gmail access token survive under Supabase Auth — is unconfirmed. **This is Block 0 / G0.1 in the launch roadmap.** Don't check off until a live signed-in round-trip is confirmed. — _1–1.5d_
 - `E1-1.2` ✅ **Done** (PR#88, 2026-06-26) — `items` table mirroring `ClothingItem` incl. E2 status/location columns; migrations `20260626000001_v1_spine.sql` + `20260628000004_items_e2_columns.sql`, pushed to remote. — _1d_
-- `E1-1.3` ⚠️ **Policies written + deployed, isolation NOT proven** (PR#88, `20260626000002_rls.sql`) — owner-only RLS policies exist on every table and are live on remote. But "written" ≠ "verified" — no second account has ever tested whether isolation actually holds. **Don't check off until `E1-4.2` passes (also Block 0 / G0.2).** — _0.5d_
+- `E1-1.3` ✅ **Done** (2026-06-30) — owner-only RLS policies (PR#88, `20260626000002_rls.sql`) verified via real two-account isolation test (`scripts/test-rls-isolation.mjs`): 11/11 checks pass — user B cannot read/update/delete user A's items, closet_members, or Storage objects. Required a critical GRANT fix first (`20260629000002_grant_table_privileges.sql`) — see `E1-4.2`. — _0.5d_
 - `E1-1.4` Port `useCloudCloset` to Supabase client; keep `useLocalCloset` as offline cache — _2–3d_
 - `E1-1.5` First-sign-in seed: upload local closet to Supabase — _1d_
 - `E1-1.6` Offline-first reconcile (last-write-wins via `updatedAt`) — _1–1.5d_
@@ -31,7 +31,7 @@ _As Maya, I want my photos stored properly so that big closets and camera import
 **Tickets**
 - `E1-2.1` ✅ **Done** (2026-06-29) — Supabase Storage bucket + upload pipeline (replaces base64 in `ImageUploader` when signed in). `storageService.uploadItemPhoto` uploads to `<userId>/<uuid>.<ext>`; `item-photos` row stores the bare path; `useSignedImageUrl` signs it for display and auto-refreshes before expiry. Offline/signed-out unchanged (base64 → localStorage). — _1–1.5d_
   - Photos are downscaled/recompressed (≤1200px longest edge, JPEG q0.8 — `compressImageToBlob`) before upload, same pipeline as the offline base64 path. Reduction is proportional to original size, not a fixed target — see `scaledSize` tests.
-  - ⚠️ **Not yet pushed to remote**: migration `20260629000001_storage_validation.sql` (bucket `file_size_limit` + `allowed_mime_types`) is written but `supabase db push` has not been run. Until pushed, server-side upload validation is NOT enforced — only the client-side `validateImageFile` check is live. Push before relying on this as a security boundary.
+  - ✅ Server-side bucket constraints pushed to remote (2026-06-30) — `20260629000001_storage_validation.sql` enforces `file_size_limit` (10MB) + `allowed_mime_types` (jpeg/png/webp/heic) at the bucket level.
   - Verified: `tsc --noEmit` clean, full vitest suite green (1089 tests incl. new compression/validation tests). NOT verified: a live signed-in upload round-trip against Supabase Storage (no authenticated browser session available in-session) — the actual bucket RLS/size/mime enforcement is unverified end-to-end.
 - `E1-2.2` One-time migration: base64 localStorage images → Storage URLs — _1d_ — not started
 
@@ -54,18 +54,18 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 
 **Precautions checklist (each = a Tea App "sin" to avoid)**
 - [ ] **No unsecured buckets** — every Supabase Storage bucket is private by default; access only via authenticated, signed URLs (no public/direct-URL downloads). _(Tea: open Firebase bucket, anyone with the URL)_
-- [ ] **RLS everywhere** — owner-only Row Level Security on every table *and* Storage object; verify a second account cannot read another user's rows/files. _(Tea: no access controls)_
+- [x] ✅ **RLS everywhere** (2026-06-30) — owner-only RLS on every table + Storage; verified via two-account isolation test (11/11 pass, `scripts/test-rls-isolation.mjs`). _(Tea: no access controls)_
 - [ ] **Data minimization** — only collect what's needed; if any verification image/ID is ever introduced, delete immediately after use and prove deletion. _(Tea: promised deletion, kept images for years)_
 - [ ] **No orphaned legacy data** — when migrating off base64 / PR #44 / any old store, securely wipe or migrate-and-delete the old data; never leave legacy copies behind. _(Tea: left data in old unsecured store after migrating)_
 - [ ] **Encryption at rest & in transit** — confirm Supabase encryption at rest is on; all transport over HTTPS/TLS. _(Tea: files + 1M+ DMs stored unencrypted)_
-- [x] ✅ **No hardcoded secrets** (2026-06-29) — `.env` gitignored, never committed (verified via full git history). Source scanned for key-shaped strings: clean. Full git history (552 non-merge commits, every branch + remote ref) scanned with `gitleaks`: zero leaks. Dead unused env vars (`VITE_FIREBASE_*`, `VITE_GITHUB_CLIENT_ID`) identified and removed. ⚠️ Gap: no key-rotation runbook written yet. _(Tea: keys hardcoded in source)_
+- [x] ✅ **No hardcoded secrets** (2026-06-29) — `.env` gitignored, never committed (verified via full git history). Source scanned for key-shaped strings: clean. Full git history (552 non-merge commits, every branch + remote ref) scanned with `gitleaks`: zero leaks. Dead unused env vars (`VITE_FIREBASE_*`, `VITE_GITHUB_CLIENT_ID`) identified and removed. Key-rotation runbook written (`planning/launch/KEY_ROTATION_RUNBOOK.md`). _(Tea: keys hardcoded in source)_
 - [ ] **Routine security audits** — CI secret/dependency scanning configured (2026-06-29, see `E1-4.3`) but **not yet run in CI** (gitleaks ran locally only — first real CI run happens on next push). Periodic access review and anomalous-access monitoring/alerting not started (Supabase-platform concern, `E1-4.10`). _(Tea: no testing or monitoring)_
 - [x] ✅ **Token handling (interim, branch `security-xss`)** — Gmail access token moved out of localStorage to **in-memory only** (`useGmailAuth`); legacy persisted token purged on mount; cleared on sign-out. Server-side token storage + refresh remains the E1 target (`E1-4.4`). Scope is already least-privilege (`gmail.readonly`).
 
 **Tickets**
 - `E1-4.1` Bucket privacy + signed-URL-only access pattern (audit `E1-2.1` storage pipeline) — _0.5d_
-- `E1-4.2` RLS verification tests — second-account read/write attempts must fail (tables + Storage) — _0.5–1d_
-- `E1-4.3` ⚠️ **Mostly done** (2026-06-29) — env-only config ✓, `.env` gitignored ✓, full git-history secret scan (gitleaks, zero leaks) ✓, CI secret+dep scanning configured (`security.yml` + `dependabot.yml`) — written but **not yet exercised in CI** (no push yet). Remaining gap: **key-rotation runbook** not written. — _0.5–1d_
+- `E1-4.2` ✅ **Done** (2026-06-30) — Two-account RLS isolation test (`scripts/test-rls-isolation.mjs`) passes 11/11: trigger-created closets, item CRUD isolation, closet_members isolation, Storage upload/download/signedUrl/delete isolation. **Critical finding:** all tables had zero Postgres GRANTs for `authenticated`/`anon`/`service_role` — fixed by `20260629000002_grant_table_privileges.sql` (also sets `ALTER DEFAULT PRIVILEGES` so future tables inherit). This means no signed-in user could ever read/write their own data prior to this fix — Block 0 / G0.2 + G0.3 unblocked. — _0.5–1d_
+- `E1-4.3` ✅ **Done** (2026-06-29/30) — env-only config ✓, `.env` gitignored ✓, full git-history secret scan (gitleaks, zero leaks) ✓, CI secret+dep scanning configured (`security.yml` + `dependabot.yml`) — CI not yet exercised (first real run on next push to main). Key-rotation runbook written (`planning/launch/KEY_ROTATION_RUNBOOK.md`). — _0.5–1d_
 - `E1-4.4` Gmail token storage & scope review (least-privilege, secure storage, revoke-on-logout) — _0.5–1d_
 - `E1-4.5` Data-minimization + legacy-wipe checklist enforced in the base64→Storage migration (`E1-2.2`) — _bundled_
 
@@ -120,7 +120,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
   - `E1-4.9e` Submit CASA report to Google; **recurring annually** for as long as `gmail.readonly` is used — _recurring_
   - `E1-4.9f` Add "Limited Use" data-policy disclosure to privacy policy (no ad use, no resale, no human review w/o consent) — _bundled w/ E1-4.13_
 - `E1-4.10` Supabase platform hardening: leaked-password protection, CAPTCHA, `service_role` audit, `SECURITY DEFINER` review — _0.5d_
-- `E1-4.11` ⚠️ **Mostly done, blocked on push** — Upload validation (type/size) + short-expiry signed URLs — _0.5d_. Client validation + 5-min signed URLs with auto-refresh are live. Server-side bucket `file_size_limit`/`allowed_mime_types` migration (`20260629000001_storage_validation.sql`) is written but **needs `supabase db push`** — remaining work is just running the push, deferred for now. Dimension capping (separate from byte-size) not addressed — compression already caps display dimensions but doesn't reject huge source dimensions before decode.
+- `E1-4.11` ✅ **Done** (2026-06-30) — Upload validation (type/size) + short-expiry signed URLs. Client validation + 5-min signed URLs with auto-refresh live. Server-side bucket constraints (`file_size_limit` 10MB, `allowed_mime_types` jpeg/png/webp/heic) pushed to remote via `20260629000001_storage_validation.sql`. Dimension capping not addressed (compression already caps display dims). — _0.5d_
 - `E1-4.12` Backups/PITR enabled + restore test; dev/prod project split; logging-hygiene pass — _0.5–1d_
 - `E1-4.13` Publish privacy policy (data collected, retention, third parties/Supabase, deletion/export rights, Limited Use disclosure) — _0.5–1d, blocked on E1-4.8 existing first_
 
