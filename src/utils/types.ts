@@ -59,6 +59,7 @@ export type ClothingItem = {
 	color: string;
 	size: string;
 	brand: string;
+	retailer?: string;
 	price?: string;
 	originalPrice?: string;
 	qty?: number;

@@ -9,9 +9,9 @@
 
 ## US-1.1 — Sign in and keep my closet in the cloud ✅
 _As Maya, I want my closet synced to my account so that I see the same wardrobe on phone and laptop._
-- [ ] Supabase Auth sign-in (Google)
+- [x] Supabase Auth sign-in (Google)
 - [ ] Per-user `items` table; RLS so a user reads/writes only their own rows
-- [ ] localStorage acts as offline cache; reconciles on reconnect
+- [x] localStorage acts as offline cache; reconciles on reconnect
 - [ ] First sign-in seeds the cloud from existing local closet
 
 **Tickets**
