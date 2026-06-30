@@ -24,13 +24,16 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 
 ## US-1.2 — Images that don't blow the storage budget
 _As Maya, I want my photos stored properly so that big closets and camera imports don't silently fail._
-- [ ] Images upload to Supabase Storage; row stores a URL, not base64
-- [ ] Existing base64 images migrate to Storage
-- [ ] Upload handles failure with a user-facing message
+- [x] Images upload to Supabase Storage; row stores a **path**, not a URL or base64 (signed URLs are resolved at display time, never persisted — see `useSignedImageUrl`)
+- [ ] Existing base64 images migrate to Storage (`E1-2.2`, not started)
+- [x] Upload handles failure with a user-facing message
 
 **Tickets**
-- `E1-2.1` Supabase Storage bucket + upload pipeline (replaces base64 in `ImageUploader`) — _1–1.5d_
-- `E1-2.2` One-time migration: base64 localStorage images → Storage URLs — _1d_
+- `E1-2.1` ✅ **Done** (2026-06-29) — Supabase Storage bucket + upload pipeline (replaces base64 in `ImageUploader` when signed in). `storageService.uploadItemPhoto` uploads to `<userId>/<uuid>.<ext>`; `item-photos` row stores the bare path; `useSignedImageUrl` signs it for display and auto-refreshes before expiry. Offline/signed-out unchanged (base64 → localStorage). — _1–1.5d_
+  - Photos are downscaled/recompressed (≤1200px longest edge, JPEG q0.8 — `compressImageToBlob`) before upload, same pipeline as the offline base64 path. Reduction is proportional to original size, not a fixed target — see `scaledSize` tests.
+  - ⚠️ **Not yet pushed to remote**: migration `20260629000001_storage_validation.sql` (bucket `file_size_limit` + `allowed_mime_types`) is written but `supabase db push` has not been run. Until pushed, server-side upload validation is NOT enforced — only the client-side `validateImageFile` check is live. Push before relying on this as a security boundary.
+  - Verified: `tsc --noEmit` clean, full vitest suite green (1089 tests incl. new compression/validation tests). NOT verified: a live signed-in upload round-trip against Supabase Storage (no authenticated browser session available in-session) — the actual bucket RLS/size/mime enforcement is unverified end-to-end.
+- `E1-2.2` One-time migration: base64 localStorage images → Storage URLs — _1d_ — not started
 
 ## US-1.3 — Know my sync state
 _As Maya, I want a sync indicator so that I know my data is safe / when I'm offline._
@@ -90,8 +93,8 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] Lock CORS to known origins on edge functions (no `*` in production)
 
 **Storage upload safety**
-- [ ] Validate file type + size on upload; reject non-image content; cap dimensions/bytes
-- [ ] Short-expiry signed URLs; no long-lived/public links to user images
+- [x] Validate file type + size on upload; reject non-image content; cap dimensions/bytes — client-side live (`validateImageFile`); server-side bucket constraints written (`20260629000001_storage_validation.sql`) but **not pushed to remote yet** — client check alone is bypassable
+- [x] Short-expiry signed URLs; no long-lived/public links to user images — `signItemPhotoPath` TTL dropped 1hr → 5min; `useSignedImageUrl` auto-refreshes ~30s before expiry while mounted
 
 **Privacy & compliance**
 - [ ] Privacy policy + ToS; explicit consent for the Gmail scope at connect time
@@ -111,7 +114,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - `E1-4.8` Self-serve account deletion + data export (rows + Storage) — _1–1.5d_
 - `E1-4.9` Google OAuth verification + CASA assessment scoping (start early) — _tbd, long lead_
 - `E1-4.10` Supabase platform hardening: leaked-password protection, CAPTCHA, `service_role` audit, `SECURITY DEFINER` review — _0.5d_
-- `E1-4.11` Upload validation (type/size/dimensions) + short-expiry signed URLs — _0.5d_
+- `E1-4.11` ⚠️ **Mostly done, blocked on push** — Upload validation (type/size) + short-expiry signed URLs — _0.5d_. Client validation + 5-min signed URLs with auto-refresh are live. Server-side bucket `file_size_limit`/`allowed_mime_types` migration (`20260629000001_storage_validation.sql`) is written but **needs `supabase db push`** — remaining work is just running the push, deferred for now. Dimension capping (separate from byte-size) not addressed — compression already caps display dimensions but doesn't reject huge source dimensions before decode.
 - `E1-4.12` Backups/PITR enabled + restore test; dev/prod project split; logging-hygiene pass — _0.5–1d_
 
 ---

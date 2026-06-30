@@ -113,6 +113,13 @@ function canvasToBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob 
 	return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
 }
 
+/** Extension from a filename, or `fallback` if there's no dot (NOT `split(".").pop()` —
+ *  that returns the whole filename, not undefined, when there's no extension). */
+function extOf(filename: string, fallback: string): string {
+	const dotIndex = filename.lastIndexOf(".");
+	return dotIndex === -1 ? fallback : filename.slice(dotIndex + 1);
+}
+
 export interface CompressedPhoto {
 	blob: Blob;
 	ext: string;
@@ -125,7 +132,7 @@ export interface CompressedPhoto {
  */
 export async function compressImageToBlob(file: File, options: CompressOptions = {}): Promise<CompressedPhoto> {
 	if (!file.type.startsWith("image/")) {
-		return { blob: file, ext: file.name.split(".").pop() ?? "bin" };
+		return { blob: file, ext: extOf(file.name, "bin") };
 	}
 
 	const maxDimension = options.maxDimension ?? DEFAULT_MAX_DIMENSION;
@@ -137,5 +144,5 @@ export async function compressImageToBlob(file: File, options: CompressOptions =
 		if (blob) return { blob, ext: "jpg" };
 	}
 
-	return { blob: file, ext: file.name.split(".").pop() ?? "jpg" };
+	return { blob: file, ext: extOf(file.name, "jpg") };
 }
