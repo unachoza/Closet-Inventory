@@ -15,9 +15,9 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 - [ ] First sign-in seeds the cloud from existing local closet
 
 **Tickets**
-- `E1-1.1` ⚠️ **Spike:** Gmail API access-token flow under Supabase Auth (prove before porting) — _1–1.5d_
-- `E1-1.2` Supabase project + schema: `items` table mirroring `ClothingItem` (incl. E2 status/location columns) — _1d_
-- `E1-1.3` RLS policies: owner-only read/write — _0.5d_
+- `E1-1.1` ⚠️ **Spike, code shipped but NOT verified** (PR#82 + PR#83 typo fix, 2026-06-25) — `GmailSpike.tsx` + `useSupabaseAuth.ts` implement the token flow, but `useSupabaseAuth.test.ts` is fully mocked (no live OAuth ever exercised) and `GmailSpike.tsx` is still flag-gated in `main.tsx`. The spike's actual question — does a live Gmail access token survive under Supabase Auth — is unconfirmed. **This is Block 0 / G0.1 in the launch roadmap.** Don't check off until a live signed-in round-trip is confirmed. — _1–1.5d_
+- `E1-1.2` ✅ **Done** (PR#88, 2026-06-26) — `items` table mirroring `ClothingItem` incl. E2 status/location columns; migrations `20260626000001_v1_spine.sql` + `20260628000004_items_e2_columns.sql`, pushed to remote. — _1d_
+- `E1-1.3` ⚠️ **Policies written + deployed, isolation NOT proven** (PR#88, `20260626000002_rls.sql`) — owner-only RLS policies exist on every table and are live on remote. But "written" ≠ "verified" — no second account has ever tested whether isolation actually holds. **Don't check off until `E1-4.2` passes (also Block 0 / G0.2).** — _0.5d_
 - `E1-1.4` Port `useCloudCloset` to Supabase client; keep `useLocalCloset` as offline cache — _2–3d_
 - `E1-1.5` First-sign-in seed: upload local closet to Supabase — _1d_
 - `E1-1.6` Offline-first reconcile (last-write-wins via `updatedAt`) — _1–1.5d_
@@ -58,14 +58,14 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] **Data minimization** — only collect what's needed; if any verification image/ID is ever introduced, delete immediately after use and prove deletion. _(Tea: promised deletion, kept images for years)_
 - [ ] **No orphaned legacy data** — when migrating off base64 / PR #44 / any old store, securely wipe or migrate-and-delete the old data; never leave legacy copies behind. _(Tea: left data in old unsecured store after migrating)_
 - [ ] **Encryption at rest & in transit** — confirm Supabase encryption at rest is on; all transport over HTTPS/TLS. _(Tea: files + 1M+ DMs stored unencrypted)_
-- [] **No hardcoded secrets** — API keys/client tokens in env vars only, never committed; rotate anything ever exposed; scan source + git history for leaked keys. _(Tea: keys hardcoded in source)_
-- [ ] **Routine security audits** — dependency/secret scanning in CI, periodic access review, and monitoring/alerting for anomalous access or exposure. _(Tea: no testing or monitoring)_
+- [x] ✅ **No hardcoded secrets** (2026-06-29) — `.env` gitignored, never committed (verified via full git history). Source scanned for key-shaped strings: clean. Full git history (552 non-merge commits, every branch + remote ref) scanned with `gitleaks`: zero leaks. Dead unused env vars (`VITE_FIREBASE_*`, `VITE_GITHUB_CLIENT_ID`) identified and removed. ⚠️ Gap: no key-rotation runbook written yet. _(Tea: keys hardcoded in source)_
+- [ ] **Routine security audits** — CI secret/dependency scanning configured (2026-06-29, see `E1-4.3`) but **not yet run in CI** (gitleaks ran locally only — first real CI run happens on next push). Periodic access review and anomalous-access monitoring/alerting not started (Supabase-platform concern, `E1-4.10`). _(Tea: no testing or monitoring)_
 - [x] ✅ **Token handling (interim, branch `security-xss`)** — Gmail access token moved out of localStorage to **in-memory only** (`useGmailAuth`); legacy persisted token purged on mount; cleared on sign-out. Server-side token storage + refresh remains the E1 target (`E1-4.4`). Scope is already least-privilege (`gmail.readonly`).
 
 **Tickets**
 - `E1-4.1` Bucket privacy + signed-URL-only access pattern (audit `E1-2.1` storage pipeline) — _0.5d_
 - `E1-4.2` RLS verification tests — second-account read/write attempts must fail (tables + Storage) — _0.5–1d_
-- `E1-4.3` Secret hygiene: env-only config, `.env` gitignored, git-history secret scan + CI secret/dep scanning, key rotation runbook — _0.5–1d_
+- `E1-4.3` ⚠️ **Mostly done** (2026-06-29) — env-only config ✓, `.env` gitignored ✓, full git-history secret scan (gitleaks, zero leaks) ✓, CI secret+dep scanning configured (`security.yml` + `dependabot.yml`) — written but **not yet exercised in CI** (no push yet). Remaining gap: **key-rotation runbook** not written. — _0.5–1d_
 - `E1-4.4` Gmail token storage & scope review (least-privilege, secure storage, revoke-on-logout) — _0.5–1d_
 - `E1-4.5` Data-minimization + legacy-wipe checklist enforced in the base64→Storage migration (`E1-2.2`) — _bundled_
 
@@ -105,11 +105,11 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] Separate dev / prod Supabase projects; no prod data in dev
 - [ ] Backups + point-in-time recovery enabled and restore-tested
 - [ ] Logging hygiene — never log tokens, OAuth codes, or PII; error messages don't leak internals
-- [ ] Dependency security in CI (`npm audit` / Dependabot, lockfile committed)
+- [x] ✅ Dependency security in CI (2026-06-29) — `npm audit --audit-level=high` step + `dependabot.yml` weekly auto-update PRs configured; lockfile already committed. Current state: 1 critical + 8 high, all in devDependencies (vite/vitest/jsdom/stylelint toolchain — not shipped to the browser bundle, not in `package.json` `dependencies`). `npm audit fix` available, not yet run.
 - [ ] Written incident-response + breach-notification plan before public launch
 
 **Tickets (hardening)**
-- `E1-4.6` Swap email sanitizer to DOMPurify; add XSS regression tests (event-handler / `javascript:` / `<svg onload>` payloads) — _0.5d_
+- `E1-4.6` ✅ **Done** (PR#76, 2026-06-23) — Swap email sanitizer to DOMPurify; XSS regression tests added (`EmailPreview.xss.test.tsx`). — _0.5d_
 - `E1-4.7` CSP + HSTS + secure-cookie + CORS-allowlist config — _0.5–1d_
 - `E1-4.8` Self-serve account deletion + data export (rows + Storage) — _1–1.5d_
 - `E1-4.9` Google OAuth verification + CASA assessment (scoping done 2026-06-29 — needed before real-user launch) — _tbd, long lead, budget 1–3mo_
