@@ -58,7 +58,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] **Data minimization** — only collect what's needed; if any verification image/ID is ever introduced, delete immediately after use and prove deletion. _(Tea: promised deletion, kept images for years)_
 - [ ] **No orphaned legacy data** — when migrating off base64 / PR #44 / any old store, securely wipe or migrate-and-delete the old data; never leave legacy copies behind. _(Tea: left data in old unsecured store after migrating)_
 - [ ] **Encryption at rest & in transit** — confirm Supabase encryption at rest is on; all transport over HTTPS/TLS. _(Tea: files + 1M+ DMs stored unencrypted)_
-- [ ] **No hardcoded secrets** — API keys/client tokens in env vars only, never committed; rotate anything ever exposed; scan source + git history for leaked keys. _(Tea: keys hardcoded in source)_
+- [] **No hardcoded secrets** — API keys/client tokens in env vars only, never committed; rotate anything ever exposed; scan source + git history for leaked keys. _(Tea: keys hardcoded in source)_
 - [ ] **Routine security audits** — dependency/secret scanning in CI, periodic access review, and monitoring/alerting for anomalous access or exposure. _(Tea: no testing or monitoring)_
 - [x] ✅ **Token handling (interim, branch `security-xss`)** — Gmail access token moved out of localStorage to **in-memory only** (`useGmailAuth`); legacy persisted token purged on mount; cleared on sign-out. Server-side token storage + refresh remains the E1 target (`E1-4.4`). Scope is already least-privilege (`gmail.readonly`).
 

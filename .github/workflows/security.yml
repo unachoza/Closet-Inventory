@@ -1,0 +1,50 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly sweep — catches newly-disclosed CVEs in dependencies that were
+    # clean on the day they were added (npm audit only checks at run time).
+    - cron: "0 13 * * 1"
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, not just the latest commit — a secret can be added
+          # and removed in the same PR and still be permanently in history.
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # gitleaks-action is free for public repos with no license key.
+          # If this repo ever goes private, a GITLEAKS_LICENSE secret becomes
+          # required — see https://github.com/gitleaks/gitleaks-action.
+
+  dependency-audit:
+    name: Dependency audit (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit (high+critical only)
+        # Plain `npm audit` fails the build on unfixable low-severity transitive
+        # advisories — noise that trains you to ignore red CI. Gate on high+
+        # so a failure here is always worth looking at.
+        run: npm audit --audit-level=high

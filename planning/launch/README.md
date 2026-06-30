@@ -19,7 +19,7 @@ with [PRODUCT_VISION_2026-06-20.md](../PRODUCT_VISION_2026-06-20.md) — this do
 vision, it scopes the next 6–8 weeks of it.)
 
 The five-pillar spine — **Location · Status · Availability · Care · Share** — is the long-term
-differentiator. The MVP ships the first three plus a simple version of the fifth; Care (E8) and the full
+differentiator. The MVP ships the first three plus a simple version of the fourth and fifth; Care (E8) and the full
 social Share loop (E4) come after.
 
 ## You should feel good about this
