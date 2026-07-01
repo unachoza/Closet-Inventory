@@ -31,6 +31,7 @@
 	border-radius: 0.5rem;
 	/* background: rgb(149 143 143); */
 	gap: 0.5rem;
+	border: none;
 }
 
 /* ── Color swatch ── */
@@ -46,7 +47,9 @@
 input.mbi__material-input {
 	padding: .5rem;
 	border: 1px black solid;
+	height: 100%;
 }
+
 .mbi__material-input {
 	min-width: 0;
 	padding: 0.2rem 0;
