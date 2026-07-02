@@ -456,6 +456,9 @@ const TextileGuildInteractive = () => {
 									))}
 								</ul>
 								<div className="stain-card__table">
+									{/* TODO ADD STAIN TABLE HERE
+									glue, mayonaise, rust, tumeric, ink, chocolate, avocado, sweat, deoderaant, curry, tomato sauce / ketchup, paint, nail polish, mustard, soy sauce, gum, jam, soda, yogurt, gravey, lipstick, cigarette smoke/ fire, basically all foods */}
+									{/* TODO: call cynthia and confirm' */}
 									{entry.stains.map((s) => (
 										<div key={s.type} className="stain-row">
 											<span className="stain-row__type">{s.type}</span>
