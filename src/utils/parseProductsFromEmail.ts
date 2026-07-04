@@ -1659,6 +1659,14 @@ function removePostTotalContent(doc: Document): void {
 	const strongPattern = /\b(grand\s*total|order\s*total)\b/i;
 	const weakPattern = /\bsub\s*total\b/i;
 
+	// A genuine end-of-order total has the purchased items BEFORE it. Some
+	// templates (e.g. REI) print an "Order total" summary block ABOVE the items;
+	// truncating there would delete the products. So when the email has product
+	// images, only treat a total marker as the end-of-order if at least one
+	// product image precedes it. Emails with no product images (text-only line
+	// items) keep the original first-marker behavior.
+	const productImages = Array.from(doc.querySelectorAll("img")).filter((img) => isProductImage(img as HTMLImageElement));
+
 	const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
 
 	while (walker.nextNode()) {
@@ -1681,6 +1689,17 @@ function removePostTotalContent(doc: Document): void {
 		}
 
 		if (!isTotal) continue;
+
+		// Header-summary guard: if the email has product images but none precede
+		// this marker, it's a top-of-email order summary, not the end of the item
+		// list — don't truncate here.
+		if (productImages.length > 0) {
+			const node = walker.currentNode;
+			const hasItemBefore = productImages.some(
+				(img) => (node.compareDocumentPosition(img) & Node.DOCUMENT_POSITION_PRECEDING) !== 0,
+			);
+			if (!hasItemBefore) continue;
+		}
 
 		// Skip <th> / <thead> column headers
 		let inHeader = false;
@@ -3529,6 +3548,113 @@ function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
 
 // Post-processing applied to every extracted product regardless of strategy.
 // Infer-from-raw first, then clean for storage — per advisor guidance.
+/**
+ * Strategy: REI Co-op order confirmations (notices.rei.com / Responsys).
+ *
+ * REI ships two long-lived templates that both broke the generic strategies:
+ *
+ *  - 2022 template: each product's image sits in a 3-<td> row (image | spacer |
+ *    name+color+size+"Item #NNNNNN"), while its Qty and price live in a SEPARATE
+ *    sibling <table> below. No generic strategy models "image row + detached
+ *    price row" (extractFromTableRows needs 4+ cells in one row; the order-
+ *    container 3-col strategy needs the price in-row). It also prints an
+ *    "Order total" summary block ABOVE the items, so removePostTotalContent used
+ *    to delete the products entirely.
+ *  - 2019 template: clean 2-cell rows (image | name + "Item Number: NNNN" +
+ *    "Item Price: $X"), but the generic image fallback also caught decorative
+ *    images (member-bonus e-card, store photos), whose alt-text failed the
+ *    clothing classifier and hid the real base layers.
+ *
+ * Both templates key their product photos on rei.com/skuimage/<sku>, which
+ * decorative imagery never uses — so we anchor on those images. This runs on
+ * the un-pruned DOM (before removePostTotalContent) to survive the top-summary
+ * "Order total" block. Guarded by the REI sender/CDN signal.
+ */
+function extractFromReiLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/notices\.rei\.com|rei\.com\/skuimage/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	// Product photos are the only images served from rei.com/skuimage/<sku>.
+	const skuImages = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/rei\.com\/skuimage/i.test(img.getAttribute("src") ?? ""),
+	);
+
+	for (const img of skuImages) {
+		const imageUrl = img.getAttribute("src") ?? "";
+		const alt = (img.getAttribute("alt") ?? "").trim();
+
+		// Climb to the smallest ancestor that holds BOTH the item number and a
+		// price. In the 2022 template these live in sibling tables, so this lands
+		// on the outer product cell; in 2019 it lands on the item <tr>.
+		let block: Element = img;
+		for (let i = 0; i < 8; i++) {
+			const parent = block.parentElement;
+			if (!parent) break;
+			block = parent;
+			const t = block.textContent ?? "";
+			if (/Item\s*(?:#|Number)/i.test(t) && /\$\d/.test(t)) break;
+		}
+
+		const blockText = block.textContent ?? "";
+
+		// Item number: "Item #199598" (2022) or "Item Number: 1013880032" (2019).
+		const itemMatch = blockText.match(/Item\s*(?:#|Number)\s*:?\s*(\d+)/i);
+		const itemNumber = itemMatch ? itemMatch[1] : "";
+
+		// Name: the image alt is the full product name in both templates; fall
+		// back to the first substantial text line.
+		const lines = getTextLines(block);
+		const rawName = alt || (lines.find((l) => l.length > 3) ?? "");
+		// REI suffixes every name with a gender ("… - Women's"). Drop it (and the
+		// dangling dash) so the cleaned name doesn't end in a stray " -".
+		const name = rawName.replace(/\s*[-–]\s*(?:Women's|Men's|Kids'?|Unisex|Boys'?|Girls'?)\s*$/i, "").trim();
+		if (!name) continue;
+
+		// Color/size (2022 only) sit BETWEEN the name line and the "Item #" line
+		// as bare <div>s ([name, color, size, "Item #NNNNNN"]). Restricting to
+		// that window yields nothing for 2019 (no lines between them), avoiding
+		// mislabeling "Item Price:"/"Qty:" as a color.
+		const itemLineIdx = lines.findIndex((l) => /Item\s*(?:#|Number)/i.test(l));
+		let color = "";
+		let size = "";
+		if (itemLineIdx > 1) {
+			for (const line of lines.slice(1, itemLineIdx)) {
+				if (!size && looksLikeSize(line)) {
+					size = line;
+				} else if (!color && line.length > 1 && !/\$\d/.test(line)) {
+					color = line;
+				}
+			}
+		}
+
+		// Price: prefer the labeled "Item Price:" (2019); otherwise the first $
+		// amount in the block (2022 lists the same paid price twice).
+		const labeled = blockText.match(/Item\s*Price:\s*\$?(\d{1,5}\.\d{2})/i);
+		const price = labeled ? `$${labeled[1]}` : (extractPrices(blockText)[0] ?? "");
+
+		const dedupeKey = (itemNumber || name.toLowerCase()).trim();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 	const rawName = p.name;
 
@@ -3564,6 +3690,12 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// Color/Size/Price labels), so run it on the un-pruned DOM first.
 	const brItems = extractFromBananaRepublic2020Layout(doc, brDiscountFraction);
 	if (brItems.length > 0) return brItems.map(enrichProduct);
+
+	// REI prints an "Order total" summary block ABOVE its items, so run this on
+	// the un-pruned DOM before removePostTotalContent would strip the products.
+	// Strongly guarded by the REI CDN/sender signal.
+	const reiItems = extractFromReiLayout(doc);
+	if (reiItems.length > 0) return reiItems.map(enrichProduct);
 
 	// Pre-process: strip content after order total markers so suggested/
 	// recommended product sections don't produce false positive detections.

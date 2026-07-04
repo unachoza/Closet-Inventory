@@ -837,3 +837,55 @@ describe("banana-republic-2020", () => {
 		expect(jumpsuit!.size).toBe("4");
 	});
 });
+
+// ---------------------------------------------------------------------------
+// REI Co-op — two long-lived Responsys templates. Both previously returned 0
+// real items: the 2022 layout has an "Order total" summary ABOVE the products
+// and a detached price row; the 2019 layout's decorative images crowded out the
+// real base layers. Fixtures are trimmed to the structural essentials.
+// ---------------------------------------------------------------------------
+
+describe("real emails > REI 2022 (order-total on top, detached price row)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2022-detached-price.html"));
+
+	it("detects both Smartwool items (survives top-summary truncation)", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("extracts name, price, color, size, and item number", () => {
+		const quarterZip = byName(products, "Smartwool Intraknit 200 Pattern Quarter-Zip Base Layer Top");
+		expect(quarterZip).toBeDefined();
+		expect(quarterZip!.price).toBe("$88.73");
+		expect(quarterZip!.color).toBe("Deep Navy Polar Arc");
+		expect(quarterZip!.size).toBe("M");
+		expect(quarterZip!.itemNumber).toBe("199598");
+
+		const tunic = byName(products, "Smartwool Shadow Pine Pointelle Stripe Tunic Sweater");
+		expect(tunic).toBeDefined();
+		expect(tunic!.price).toBe("$89.73");
+		expect(tunic!.color).toBe("Blue Spruce Heather");
+		expect(tunic!.size).toBe("S");
+		expect(tunic!.itemNumber).toBe("213109");
+	});
+});
+
+describe("real emails > REI 2019 (BOPUS, decorative images)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2019-bopus.html"));
+
+	it("detects the two base layers and excludes the member-bonus card", () => {
+		expect(products).toHaveLength(2);
+		expect(products.every((p) => !/bonus card/i.test(p.name))).toBe(true);
+	});
+
+	it("extracts name, labeled item price, and item number", () => {
+		const reiTop = byName(products, "REI Co-op Merino Midweight Base Layer Top");
+		expect(reiTop).toBeDefined();
+		expect(reiTop!.price).toBe("$54.93");
+		expect(reiTop!.itemNumber).toBe("1013880032");
+
+		const smartwool = byName(products, "Smartwool Merino 150 Pattern Base Layer Long-Sleeve Top");
+		expect(smartwool).toBeDefined();
+		expect(smartwool!.price).toBe("$80.00");
+		expect(smartwool!.itemNumber).toBe("1116280037");
+	});
+});

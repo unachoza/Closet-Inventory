@@ -344,3 +344,14 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		</div>
 	);
 }
+
+
+
+// TODO: 
+// test for REI 
+// test for EXPRESS
+//make swim category -> if swimsuit might be european size ie 38 - 36-Flamingo 
+//REI Order Confirmation #A307597894
+// shoe sizes have 1/2 sizes
+// add more than one sender, for serch
+// ebay Eddie Bauer Shoes 9 M Mocassins Loafers- Mocassins Loafers
