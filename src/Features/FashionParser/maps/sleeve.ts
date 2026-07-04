@@ -1,7 +1,6 @@
 export const SLEEVE_LENGTH_MAP: [RegExp, string][] = [
 	[/\b(long[- ]?sleeve|longsleeve)\b/i, "long sleeve"],
 	// Outdoor/base-layer shorthand: "L/S" and standalone "LS" mean long sleeve
-	// (e.g. REI "Silk L/S V-Neck", Icebreaker "Sphere LS Low Crewe").
 	[/\bl\/s\b|\bls\b/i, "long sleeve"],
 	[/\b3\/4[- ]?sleeve\b/i, "3/4 sleeve"],
 	[/\bshort[- ]?sleeve\b/i, "short sleeve"],

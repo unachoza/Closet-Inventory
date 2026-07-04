@@ -6,7 +6,6 @@ export const MATERIAL_MAP: RegexMap = [
   [/\bsilk\b/i, "silk"],
   [/\bsatin\b/i, "satin"],
   [/\bchiffon\b/i, "chiffon"],
-  // Smartwool (REI brand) is a merino-wool blend; treat the brand token as wool.
   [/\bsmartwool\b/i, "wool"],
   [/\bwool\b/i, "wool"],
   [/\bcashmere\b/i, "cashmere"],

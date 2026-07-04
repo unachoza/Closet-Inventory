@@ -9,7 +9,6 @@ export const ACCENTS_MAP: RegexMap = [
   [/\bfeathers?\b/i, "feathers"],
   [/\bfringe\b/i, "fringe"],
   [/\bglitter\b/i, "glitter"],
-  // "hoody" (REI/Smartwool spelling) and "hoodie" both carry a hood.
   [/\bhood(ie|y)?\b/i, "hood"],
   [/\bpearls?\b/i, "pearls"],
   [/\bruched\b/i, "ruched"],
