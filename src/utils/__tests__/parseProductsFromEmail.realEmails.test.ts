@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseProductsFromEmail, type ExtractedProduct } from "../parseProductsFromEmail";
-import { parseEmailToFormData } from "../parseEmailToFormData";
+import { parseEmailToFormData, categoryFromName } from "../parseEmailToFormData";
 
 /**
  * Regression tests built from real order-confirmation email HTML captured from
@@ -948,5 +948,39 @@ describe("real emails > REI enrichment (material / season / pattern)", () => {
 		const tunic = byName(products, "Smartwool Shadow Pine Pointelle Stripe Tunic Sweater");
 		expect(tunic!.pattern).toBe("stripes");
 		expect(tunic!.construction).toContain("pointelle");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// eBay — order-status emails bury the ONE real purchase among several
+// sponsored "complement your purchase" listings sharing the same image/
+// title/price markup. Only the block carrying eBay's structured transaction
+// labels together (Order number:/Item ID:/Seller:) is the genuine purchase.
+// ---------------------------------------------------------------------------
+
+describe("real emails > eBay (Eddie Bauer shoes, excludes sponsored items)", () => {
+	const products = parseProductsFromEmail(loadFixture("ebay-eddie-bauer-shoes.html"));
+
+	it("detects exactly the one purchased item, not the 4 sponsored 'complement your purchase' listings", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("extracts brand, size, price, and item ID from the labeled transaction block", () => {
+		const item = products[0];
+		expect(item.brand).toBe("Eddie Bauer");
+		expect(item.size).toBe("9");
+		expect(item.price).toBe("$25.72");
+		expect(item.itemNumber).toBe("195511846811");
+		expect(item.name).toMatch(/shoes/i);
+		expect(item.imageUrl).toContain("i.ebayimg.com");
+	});
+
+	it("classifies as shoes via the retained garment word in the name", () => {
+		expect(categoryFromName(products[0].name)).toBe("shoes");
+	});
+
+	it("does not import the sponsored LL Bean / Eddie Bauer boat shoe listings", () => {
+		expect(byName(products, "LL Bean Slip On Wedge Loafers")).toBeUndefined();
+		expect(products.some((p) => /boat shoes/i.test(p.name))).toBe(false);
 	});
 });

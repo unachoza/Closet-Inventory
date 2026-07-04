@@ -3721,6 +3721,174 @@ function parseReiName(raw: string): { brand: string; name: string; color: string
 	return { brand, name, color, size };
 }
 
+// Garment/shoe words that mark where an eBay title's leading brand ends
+// (e.g. "Eddie Bauer SHOES Womens 9 M Mocassins..." → brand stops at "Shoes").
+const EBAY_GARMENT_WORDS = new Set([
+	"shoe",
+	"shoes",
+	"boot",
+	"boots",
+	"sandal",
+	"sandals",
+	"sneaker",
+	"sneakers",
+	"loafer",
+	"loafers",
+	"moccasin",
+	"moccasins",
+	"mocassin",
+	"mocassins",
+	"flat",
+	"flats",
+	"heel",
+	"heels",
+	"wedge",
+	"wedges",
+	"mule",
+	"mules",
+	"slide",
+	"slides",
+	"slipper",
+	"slippers",
+	"clog",
+	"clogs",
+	"dress",
+	"top",
+	"tops",
+	"shirt",
+	"blouse",
+	"tank",
+	"tee",
+	"sweater",
+	"hoodie",
+	"cardigan",
+	"jacket",
+	"coat",
+	"blazer",
+	"pants",
+	"jeans",
+	"trousers",
+	"shorts",
+	"skirt",
+	"leggings",
+	"jumpsuit",
+	"romper",
+	"bodysuit",
+]);
+
+/**
+ * Split an eBay listing title into a leading brand and the rest of the name.
+ *
+ * eBay titles conventionally lead with the brand, then a garment/shoe word
+ * ("Eddie Bauer Shoes Womens 9 M Mocassins Loafers Comfor..."). Everything
+ * before the first recognized garment word is the brand; the garment word
+ * onward is the name. Titles with no recognized garment word are returned
+ * unsplit (brand "").
+ */
+function splitEbayBrandFromName(rawName: string): { brand: string; name: string } {
+	const words = rawName.split(/\s+/).filter(Boolean);
+	const garmentIdx = words.findIndex((w) => EBAY_GARMENT_WORDS.has(w.toLowerCase().replace(/[^a-z]/gi, "")));
+	if (garmentIdx <= 0) return { brand: "", name: rawName };
+	return { brand: words.slice(0, garmentIdx).join(" "), name: words.slice(garmentIdx).join(" ") };
+}
+
+/**
+ * Extract a shoe/apparel size from an eBay title's "9 M" / "8.5 W" pattern
+ * (number + width letter), returning just the numeric size ("9").
+ */
+function extractEbayShoeSize(rawName: string): string {
+	const match = rawName.match(/\b(\d{1,2}(?:\.\d)?)\s*[MWN]\b/i);
+	return match ? match[1] : "";
+}
+
+/**
+ * Strategy: eBay order emails (shipped/delivered confirmations).
+ *
+ * eBay order-status emails bury the ONE real purchase among several sponsored
+ * "complement your purchase" listings that share the same image/title/price
+ * markup — the generic strategies can't tell them apart, so every card in the
+ * email (real + sponsored) got detected as a product.
+ *
+ * The real purchase is the only block carrying eBay's three structured
+ * transaction labels together: "Order number:", "Item ID:", "Seller:" (plus a
+ * "Total:" price). Sponsored items have none of these — only a name, image,
+ * and price — so anchoring on that label triple excludes them automatically.
+ *
+ * The label block sits in the same outer row as the product photo (an
+ * i.ebayimg.com image — never the p.ebaystatic.com money-back-guarantee icon
+ * or sponsored thumbnails, which live in a separate, more distant section of
+ * the email), so climbing from the "Item ID" text to the smallest ancestor
+ * that also contains an i.ebayimg.com image reliably lands on the real item's
+ * block without reaching into the sponsored strip.
+ */
+function extractFromEbayLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/ebay\.com/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	// eBay renders each label as "<b>Item ID</b>: 195511846811" — the label and
+	// value are separate text nodes (split by the </b> boundary), so a
+	// text-node walker never sees them combined. Match on ELEMENT textContent
+	// instead, then keep only the deepest (leaf-most) matching element per
+	// occurrence — its parent/ancestors also "match" (they contain the same
+	// text), so without this filter every ancestor up to <body> would be
+	// treated as a separate occurrence.
+	const itemIdCandidates = Array.from(doc.querySelectorAll("*")).filter((el) => /Item\s*ID\s*:?\s*\d+/i.test(el.textContent ?? ""));
+	const itemIdEls = itemIdCandidates.filter(
+		(el) => !itemIdCandidates.some((other) => other !== el && el.contains(other)),
+	);
+
+	for (const node of itemIdEls) {
+		const itemMatch = (node.textContent ?? "").match(/Item\s*ID\s*:?\s*(\d+)/i);
+		if (!itemMatch) continue;
+		const itemNumber = itemMatch[1];
+		if (seen.has(itemNumber)) continue;
+
+		// Climb to the smallest ancestor that carries all three "you actually
+		// bought this" markers AND the real product photo.
+		let scope: Element | null = node.parentElement;
+		let productImg: Element | null = null;
+		for (let i = 0; i < 12 && scope; i++) {
+			const text = scope.textContent ?? "";
+			const hasMarkers = /order\s*number\s*:/i.test(text) && /seller\s*:/i.test(text) && /total\s*:/i.test(text);
+			if (hasMarkers) {
+				productImg =
+					Array.from(scope.querySelectorAll("img")).find((im) => /i\.ebayimg\.com/i.test(im.getAttribute("src") ?? "")) ?? null;
+				if (productImg) break;
+			}
+			scope = scope.parentElement;
+		}
+		if (!scope || !productImg) continue;
+
+		const priceMatch = (scope.textContent ?? "").match(/Total\s*:?\s*\$?(\d{1,5}(?:,\d{3})*\.\d{2})/i);
+		const price = priceMatch ? `$${priceMatch[1].replace(/,/g, "")}` : "";
+
+		const rawName = (productImg.getAttribute("alt") ?? "").trim();
+		if (!rawName) continue;
+
+		const size = extractEbayShoeSize(rawName);
+		const nameWithoutSize = size ? rawName.replace(/\b\d{1,2}(?:\.\d)?\s*[MWN]\b/i, "").replace(/\s{2,}/g, " ").trim() : rawName;
+		const { brand, name } = splitEbayBrandFromName(nameWithoutSize);
+
+		seen.add(itemNumber);
+		products.push({
+			imageUrl: productImg.getAttribute("src") ?? "",
+			name: name || nameWithoutSize,
+			brand,
+			price,
+			color: "",
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 	const rawName = p.name;
 
@@ -3794,6 +3962,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// 17. Image fallback
 
 	const strategies = [
+		extractFromEbayLayout, // eBay: only the Order number:/Item ID:/Seller: block, excludes sponsored "complement your purchase" items — guarded by ebay.com, must run before generic table/image strategies which would otherwise match eBay's plain image+link+price rows (real item AND sponsored alike)
 		extractFromNestedTables,
 		extractFromLabeledFieldLayout,
 		extractFromReactEmailLayout,
