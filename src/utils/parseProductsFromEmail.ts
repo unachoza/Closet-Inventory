@@ -13,7 +13,6 @@ import { inferProductAttributes } from "../Features/FashionParser";
  * of a product image, then reads sibling <td> cells for structured details.
  */
 
-
 //TODO update with fashion parser augments
 export interface ExtractedProduct {
 	readonly imageUrl: string;
@@ -27,12 +26,15 @@ export interface ExtractedProduct {
 	readonly itemNumber: string;
 	readonly material: string;
 	readonly onSale: boolean;
-	// Inferred clothing attributes
 	readonly sleeveLength?: string;
 	readonly hemLength?: string;
 	readonly neckline?: string;
 	readonly fit?: string;
 	readonly rise?: string;
+	readonly season?: string;
+	readonly accents?: string | string[];
+	readonly pattern?: string;
+	readonly construction?: string | string[];
 }
 
 const PRICE_REGEX = /\$\d{1,5}(?:\.\d{2})?/g;
@@ -1695,9 +1697,7 @@ function removePostTotalContent(doc: Document): void {
 		// list — don't truncate here.
 		if (productImages.length > 0) {
 			const node = walker.currentNode;
-			const hasItemBefore = productImages.some(
-				(img) => (node.compareDocumentPosition(img) & Node.DOCUMENT_POSITION_PRECEDING) !== 0,
-			);
+			const hasItemBefore = productImages.some((img) => (node.compareDocumentPosition(img) & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
 			if (!hasItemBefore) continue;
 		}
 
@@ -3578,9 +3578,7 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 	const seen = new Set<string>();
 
 	// Product photos are the only images served from rei.com/skuimage/<sku>.
-	const skuImages = Array.from(doc.querySelectorAll("img")).filter((img) =>
-		/rei\.com\/skuimage/i.test(img.getAttribute("src") ?? ""),
-	);
+	const skuImages = Array.from(doc.querySelectorAll("img")).filter((img) => /rei\.com\/skuimage/i.test(img.getAttribute("src") ?? ""));
 
 	for (const img of skuImages) {
 		const imageUrl = img.getAttribute("src") ?? "";
@@ -3836,9 +3834,7 @@ function extractFromEbayLayout(doc: Document): ExtractedProduct[] {
 	// text), so without this filter every ancestor up to <body> would be
 	// treated as a separate occurrence.
 	const itemIdCandidates = Array.from(doc.querySelectorAll("*")).filter((el) => /Item\s*ID\s*:?\s*\d+/i.test(el.textContent ?? ""));
-	const itemIdEls = itemIdCandidates.filter(
-		(el) => !itemIdCandidates.some((other) => other !== el && el.contains(other)),
-	);
+	const itemIdEls = itemIdCandidates.filter((el) => !itemIdCandidates.some((other) => other !== el && el.contains(other)));
 
 	for (const node of itemIdEls) {
 		const itemMatch = (node.textContent ?? "").match(/Item\s*ID\s*:?\s*(\d+)/i);
@@ -3869,7 +3865,12 @@ function extractFromEbayLayout(doc: Document): ExtractedProduct[] {
 		if (!rawName) continue;
 
 		const size = extractEbayShoeSize(rawName);
-		const nameWithoutSize = size ? rawName.replace(/\b\d{1,2}(?:\.\d)?\s*[MWN]\b/i, "").replace(/\s{2,}/g, " ").trim() : rawName;
+		const nameWithoutSize = size
+			? rawName
+					.replace(/\b\d{1,2}(?:\.\d)?\s*[MWN]\b/i, "")
+					.replace(/\s{2,}/g, " ")
+					.trim()
+			: rawName;
 		const { brand, name } = splitEbayBrandFromName(nameWithoutSize);
 
 		seen.add(itemNumber);
