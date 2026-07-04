@@ -139,6 +139,13 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	pump: "shoes",
 	wedge: "shoes",
 	clog: "shoes",
+	// Weak top clues — placed LAST so any more-specific garment (e.g. "crew
+	// socks" → socks, "crewneck sweater" → sweaters) wins first. "crew" catches
+	// the British "crewe" spelling REI uses ("Sphere LS Low Crewe") via substring.
+	crew: "tops",
+	"base layer": "tops",
+	henley: "tops",
+	turtleneck: "tops",
 };
 
 function extractBrand(text: string, from: string): string {

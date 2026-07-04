@@ -889,3 +889,21 @@ describe("real emails > REI 2019 (BOPUS, decorative images)", () => {
 		expect(smartwool!.itemNumber).toBe("1116280037");
 	});
 });
+
+describe("real emails > REI shipped (CSV alt name, no price)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-shipped-csv-name.html"));
+
+	it("detects the item from a 'Just shipped' email that carries no price", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("splits the comma-delimited alt into brand + name and reads color/size", () => {
+		const item = products[0];
+		expect(item.brand).toBe("Icebreaker");
+		expect(item.name).toBe("Sphere LS Low Crewe");
+		expect(item.color).toBe("Suede Heather");
+		expect(item.size).toBe("L");
+		expect(item.itemNumber).toBe("167343");
+		expect(item.price).toBe(""); // shipping confirmations omit price
+	});
+});

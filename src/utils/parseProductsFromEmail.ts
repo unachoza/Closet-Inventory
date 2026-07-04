@@ -3586,42 +3586,40 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 		const imageUrl = img.getAttribute("src") ?? "";
 		const alt = (img.getAttribute("alt") ?? "").trim();
 
-		// Climb to the smallest ancestor that holds BOTH the item number and a
-		// price. In the 2022 template these live in sibling tables, so this lands
-		// on the outer product cell; in 2019 it lands on the item <tr>.
-		let block: Element = img;
-		for (let i = 0; i < 8; i++) {
-			const parent = block.parentElement;
-			if (!parent) break;
-			block = parent;
-			const t = block.textContent ?? "";
-			if (/Item\s*(?:#|Number)/i.test(t) && /\$\d/.test(t)) break;
+		// The product's DETAILS cell is the tight <td> that holds the item number
+		// and the name/color/size <div>s (sibling of the image cell). Anchor on it
+		// so extraction doesn't depend on a price — "Just shipped" emails carry no
+		// $ amount, and a price-based climb would overshoot into unrelated markup.
+		let detailsCell: Element | null = null;
+		let cursor: Element | null = img;
+		for (let i = 0; i < 8 && cursor; i++) {
+			cursor = cursor.parentElement;
+			if (!cursor) break;
+			const cell = Array.from(cursor.querySelectorAll("td, th")).find(
+				(c) => /Item\s*(?:#|Number)/i.test(c.textContent ?? "") && !c.querySelector("img"),
+			);
+			if (cell) {
+				detailsCell = cell;
+				break;
+			}
 		}
+		if (!detailsCell) continue;
 
-		const blockText = block.textContent ?? "";
+		const detailLines = getTextLines(detailsCell);
 
-		// Item number: "Item #199598" (2022) or "Item Number: 1013880032" (2019).
-		const itemMatch = blockText.match(/Item\s*(?:#|Number)\s*:?\s*(\d+)/i);
+		// Item number: "Item #199598" (2022/shipped) or "Item Number: 1013880032" (2019).
+		const itemMatch = (detailsCell.textContent ?? "").match(/Item\s*(?:#|Number)\s*:?\s*(\d+)/i);
 		const itemNumber = itemMatch ? itemMatch[1] : "";
 
-		// Name: the image alt is the full product name in both templates; fall
-		// back to the first substantial text line.
-		const lines = getTextLines(block);
-		const rawName = alt || (lines.find((l) => l.length > 3) ?? "");
-		// REI suffixes every name with a gender ("… - Women's"). Drop it (and the
-		// dangling dash) so the cleaned name doesn't end in a stray " -".
-		const name = rawName.replace(/\s*[-–]\s*(?:Women's|Men's|Kids'?|Unisex|Boys'?|Girls'?)\s*$/i, "").trim();
-		if (!name) continue;
-
-		// Color/size (2022 only) sit BETWEEN the name line and the "Item #" line
-		// as bare <div>s ([name, color, size, "Item #NNNNNN"]). Restricting to
-		// that window yields nothing for 2019 (no lines between them), avoiding
-		// mislabeling "Item Price:"/"Qty:" as a color.
-		const itemLineIdx = lines.findIndex((l) => /Item\s*(?:#|Number)/i.test(l));
+		// Color/size sit BETWEEN the name line and the "Item #" line as bare <div>s
+		// ([name, color, size, ("Qty: N"), "Item #NNNNNN"]). 2019 has nothing
+		// between them, so this yields empty there (its name carries no color/size).
+		const itemLineIdx = detailLines.findIndex((l) => /Item\s*(?:#|Number)/i.test(l));
 		let color = "";
 		let size = "";
 		if (itemLineIdx > 1) {
-			for (const line of lines.slice(1, itemLineIdx)) {
+			for (const line of detailLines.slice(1, itemLineIdx)) {
+				if (/^qty\b/i.test(line)) continue;
 				if (!size && looksLikeSize(line)) {
 					size = line;
 				} else if (!color && line.length > 1 && !/\$\d/.test(line)) {
@@ -3630,10 +3628,35 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 			}
 		}
 
-		// Price: prefer the labeled "Item Price:" (2019); otherwise the first $
-		// amount in the block (2022 lists the same paid price twice).
-		const labeled = blockText.match(/Item\s*Price:\s*\$?(\d{1,5}\.\d{2})/i);
-		const price = labeled ? `$${labeled[1]}` : (extractPrices(blockText)[0] ?? "");
+		// Name: the image alt is the full product name in every template. REI uses
+		// two name shapes:
+		//   plain   — "Smartwool Intraknit 200 … Base Layer Top - Women's"
+		//   CSV     — "Icebreaker, Sphere LS Low Crewe, SUEDE HEATHER, L, Women's"
+		// parseReiName splits the CSV form into brand + name (dropping the
+		// color/size/gender fields) and leaves plain names untouched.
+		const parsed = parseReiName(alt || (detailLines.find((l) => l.length > 3) ?? ""), color, size);
+		const name = parsed.name;
+		if (!name) continue;
+		const brand = parsed.brand;
+
+		// Price. Look in the details cell FIRST — 2019 prints "Item Price: $X"
+		// inside it, and scoping tightly avoids bleeding one item's price onto the
+		// next (all 2019 rows share one <tbody>). 2022 keeps the price in a sibling
+		// table, so if the cell has none, climb to the smallest ancestor that does
+		// (the item's own outer cell). Shipped emails have no price — leave empty.
+		const cellText = detailsCell.textContent ?? "";
+		const labeled = cellText.match(/Item\s*Price:\s*\$?(\d{1,5}\.\d{2})/i);
+		let price = labeled ? `$${labeled[1]}` : (extractPrices(cellText)[0] ?? "");
+		if (!price) {
+			let pc: Element | null = detailsCell;
+			for (let i = 0; i < 6 && pc; i++) {
+				pc = pc.parentElement;
+				if (pc && /\$\d/.test(pc.textContent ?? "")) {
+					price = extractPrices(pc.textContent ?? "")[0] ?? "";
+					break;
+				}
+			}
+		}
 
 		const dedupeKey = (itemNumber || name.toLowerCase()).trim();
 		if (seen.has(dedupeKey)) continue;
@@ -3642,7 +3665,7 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 		products.push({
 			imageUrl,
 			name,
-			brand: "",
+			brand,
 			price,
 			color,
 			size,
@@ -3653,6 +3676,39 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 	}
 
 	return products;
+}
+
+/**
+ * Split an REI product name into brand + clean name.
+ *
+ * REI's shipped-email alt text is comma-delimited: "Brand, Product Name, COLOR,
+ * Size, Gender" (e.g. "Icebreaker, Sphere LS Low Crewe, SUEDE HEATHER, L,
+ * Women's"). We already recover color/size from the detail <div>s, so drop any
+ * comma field that matches them (or a trailing gender), take the first field as
+ * the brand and the rest as the name. Plain names (no commas, as in order
+ * confirmations) are returned as-is with the gender suffix trimmed.
+ */
+function parseReiName(raw: string, color: string, size: string): { brand: string; name: string } {
+	const genderRe = /\s*[,\-–]\s*(?:Women's|Men's|Kids'?|Unisex|Boys'?|Girls'?)\s*$/i;
+	const stripped = raw.replace(genderRe, "").trim();
+
+	if (!stripped.includes(",")) {
+		return { brand: "", name: stripped };
+	}
+
+	const parts = stripped
+		.split(",")
+		.map((p) => p.trim())
+		.filter((p) => p.length > 0);
+
+	// Drop fields that duplicate the color or size we already extracted.
+	const norm = (s: string) => s.toLowerCase().trim();
+	const kept = parts.filter((p) => norm(p) !== norm(color) && norm(p) !== norm(size));
+
+	if (kept.length >= 2) {
+		return { brand: kept[0], name: kept.slice(1).join(", ") };
+	}
+	return { brand: "", name: kept.join(", ") || stripped };
 }
 
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
