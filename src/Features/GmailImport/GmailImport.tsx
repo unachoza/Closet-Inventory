@@ -5,7 +5,7 @@ import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
-import { parseEmailToFormData, extractForwardedSender } from "../../utils/parseEmailToFormData";
+import { parseEmailToFormData, extractForwardedSender, extractForwardedPurchaseDate } from "../../utils/parseEmailToFormData";
 import { inferCare, inferProductAttributes, normalizeColor } from "../FashionParser";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
@@ -150,7 +150,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			// recover the real retailer from the forwarded header in the full body.
 			const emailFrom = extractForwardedSender(selectedEmail?.body ?? "") || selectedEmail?.from || "";
 			const emailSubject = selectedEmail?.subject ?? "";
-			const emailDate = selectedEmail?.date;
+			// For forwarded emails, the purchase date is when the retailer sent the
+			// original email, not when the user forwarded it.
+			const emailDate = extractForwardedPurchaseDate(selectedEmail?.body ?? "") || selectedEmail?.date;
 			const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 			const style = inferProductAttributes(product.name);
 			// Color: prefer the structured value from the email HTML; otherwise
@@ -187,7 +189,9 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			if (!onImportAll) return;
 			const emailFrom = extractForwardedSender(selectedEmail?.body ?? "") || selectedEmail?.from || "";
 			const emailSubject = selectedEmail?.subject ?? "";
-			const emailDate = selectedEmail?.date;
+			// For forwarded emails, the purchase date is when the retailer sent the
+			// original email, not when the user forwarded it.
+			const emailDate = extractForwardedPurchaseDate(selectedEmail?.body ?? "") || selectedEmail?.date;
 
 			onSourceEmailChange?.(selectedEmailId);
 

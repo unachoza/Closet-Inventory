@@ -208,6 +208,29 @@ export function extractForwardedFrom(plainText: string): string {
 	return "";
 }
 
+/**
+ * When an email is forwarded, the outer send date is when the USER forwarded
+ * it — not when the purchase happened. The real date is in the forwarded
+ * header block ("Date: Mon, May 31, 2021 at 7:42 PM"). This extracts just the
+ * "Month Day, Year" portion (dropping weekday/time, which Date() chokes on
+ * with the "at" separator) and returns an ISO string, or "" if none found.
+ */
+export function extractForwardedDate(plainText: string): string {
+	const forwardedHeaderRe = /(?:begin\s+forwarded\s+message|[-]{5,}\s*forwarded\s+message\s*[-]{5,})/i;
+	const match = forwardedHeaderRe.exec(plainText);
+	if (!match) return "";
+
+	const after = plainText.slice(match.index + match[0].length);
+	const dateLine = after.match(/Date:\s*(.+)/i);
+	if (!dateLine) return "";
+
+	const monthDayYear = dateLine[1].match(/([A-Za-z]+\s+\d{1,2},\s*\d{4})/);
+	if (!monthDayYear) return "";
+
+	const parsed = new Date(monthDayYear[1]);
+	return isNaN(parsed.getTime()) ? "" : parsed.toISOString();
+}
+
 function stripHtml(html: string): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
@@ -226,6 +249,21 @@ function stripHtml(html: string): string {
 export function extractForwardedSender(htmlBody: string): string {
 	if (!htmlBody) return "";
 	return extractForwardedFrom(stripHtml(htmlBody));
+}
+
+/**
+ * Resolve the true purchase date from a forwarded email's HTML body.
+ *
+ * On the per-product import path the `body` passed to parseEmailToFormData is
+ * just the product name, so the forwarded header (which lives in the full
+ * email body) is never seen. Callers with the full HTML body use this to
+ * recover the real send date and pass it as the `date` argument, overriding
+ * the outer "when the user forwarded it" date. Returns "" when no forwarded
+ * date is found.
+ */
+export function extractForwardedPurchaseDate(htmlBody: string): string {
+	if (!htmlBody) return "";
+	return extractForwardedDate(stripHtml(htmlBody));
 }
 
 function isFromReseller(from: string): boolean {
@@ -278,9 +316,15 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// (see GmailImport) since the card's color isn't visible to this function.
 	const inferencedCare = inferCare(combinedText, color, inferencedMaterial);
 
-	// Purchase date drives the factual age shown on the card.
-	const parsed = new Date(date ?? "");
-	const purchaseDate = date && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
+	// Purchase date drives the factual age shown on the card. For a forwarded
+	// email, the outer `date` is when the USER forwarded it, not when the
+	// purchase happened — prefer the date in the forwarded header block when
+	// present (works here when the full HTML body is passed; callers on the
+	// per-product import path, where `body` is just the product name, must
+	// resolve this themselves via extractForwardedDate(fullBody) — see GmailImport).
+	const effectiveDate = extractForwardedDate(plainBody) || date;
+	const parsed = new Date(effectiveDate ?? "");
+	const purchaseDate = effectiveDate && !isNaN(parsed.getTime()) ? parsed.toISOString() : undefined;
 
 	// For reseller platforms, default to "good" (unknown secondhand condition);
 	// only upgrade to "new" if the listing explicitly says NWT/new with tags.

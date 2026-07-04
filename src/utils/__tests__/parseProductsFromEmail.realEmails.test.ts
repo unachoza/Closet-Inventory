@@ -905,6 +905,7 @@ describe("real emails > REI shipped (CSV alt name, no price)", () => {
 		expect(item.size).toBe("L");
 		expect(item.itemNumber).toBe("167343");
 		expect(item.price).toBe(""); // shipping confirmations omit price
+		expect(item.neckline).toBe("crew neck"); // "Crewe" (Icebreaker's alt spelling)
 	});
 });
 
@@ -930,6 +931,7 @@ describe("real emails > REI 2018 pickup (CSV names, no item#, no price)", () => 
 		expect(hoody!.color).toBe("CHARCOAL");
 		expect(hoody!.material).toBe("merino wool");
 		expect(hoody!.season).toBe("winter");
+		expect(hoody!.accents).toContain("hood"); // "Hoody" spelling
 	});
 });
 
