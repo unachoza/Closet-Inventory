@@ -4,8 +4,6 @@ export const NECKLINE_MAP: RegexMap = [
 	[/\b(square[- ]?neck|squareneck)\b/i, "square neck"],
 	[/\b(v[- ]?neck|vneck)\b/i, "v-neck"],
 	[/\bcrew[- ]?neck\b/i, "crew neck"],
-	// "Crewe" is an alt/UK spelling some outdoor brands (Icebreaker, REI base
-	// layers) use for "crew neck" (e.g. "Sphere LS Low Crewe").
 	[/\bcrewe\b/i, "crew neck"],
 	[/\b(scoop[- ]?neck|scoopneck|scoop)\b/i, "scoop neck"],
 	[/\b(boat[- ]?neck|boatneck)\b/i, "boat neck"],

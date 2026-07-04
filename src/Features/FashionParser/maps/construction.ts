@@ -13,6 +13,5 @@ export const CONSTRUCTION_MAP: RegexMap = [
   [/\basymmetrical\b/i, "asymmetrical"],
   [/\bscalloped\b/i, "scalloped hem"],
   [/\bripped\b/i, "ripped"],
-  // Pointelle: a delicate open-work knit with tiny decorative holes (base layers).
   [/\bpointelle\b/i, "pointelle"],
 ];
