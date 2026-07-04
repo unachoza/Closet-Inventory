@@ -8,9 +8,9 @@ const MATERIAL_MIN_PCT = 6;
 
 // Exact-key overrides — checked first.
 const MATERIAL_EXACT: Record<string, string> = {
-	"lycra": "Spandex",
-	"elastane": "Spandex",
-	"lyocell": "Tencel",
+	lycra: "Spandex",
+	elastane: "Spandex",
+	lyocell: "Tencel",
 	"cupro rayon": "Cupro",
 };
 
@@ -104,8 +104,7 @@ const canonicalValue = (dim: FilterDimension, value: string): string => normaliz
 // their distinct groups (primary + secondary), e.g. "blue / white" → ["Blue", "White"].
 // Material is handled separately via extractMaterialNames so this path is only hit
 // for non-material dimensions.
-const displayValues = (dim: FilterDimension, raw: string): string[] =>
-	dim === "color" ? normalizeColorGroups(raw) : [normalizeForDim(dim, raw)];
+const displayValues = (dim: FilterDimension, raw: string): string[] => (dim === "color" ? normalizeColorGroups(raw) : [normalizeForDim(dim, raw)]);
 
 export const useClosetFilters = (closet: ClothingItem[]) => {
 	const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
@@ -116,14 +115,14 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 
 		for (const dim of FILTER_DIMENSIONS) {
 			const counts = new Map<string, { value: string; count: number }>();
-
 			for (const item of closet) {
 				// Material and care use their own extractors; all other dims use the generic path.
-				const displayList = dim === "material"
-					? extractMaterialNames(item[dim])
-					: dim === "care"
-						? parseCareLabels(item.care)
-						: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
+				const displayList =
+					dim === "material"
+						? extractMaterialNames(item[dim])
+						: dim === "care"
+							? parseCareLabels(item.care)
+							: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
 
 				for (const display of displayList) {
 					const key = display.toLowerCase();
@@ -138,7 +137,6 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 
 			result[dim] = Array.from(counts.values()).sort((a, b) => a.value.localeCompare(b.value));
 		}
-
 		return result;
 	}, [closet]);
 
@@ -150,13 +148,13 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 				if (selected.length === 0) continue;
 
 				// Material and care use their own extractors; all other dims use the generic path.
-				const itemKeys = dim === "material"
-					? extractMaterialNames(item[dim]).map((n) => n.toLowerCase())
-					: dim === "care"
-						? parseCareLabels(item.care).map((l) => l.toLowerCase())
-						: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+				const itemKeys =
+					dim === "material"
+						? extractMaterialNames(item[dim]).map((n) => n.toLowerCase())
+						: dim === "care"
+							? parseCareLabels(item.care).map((l) => l.toLowerCase())
+							: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
-
 				if (!matches) return false;
 			}
 			return true;
