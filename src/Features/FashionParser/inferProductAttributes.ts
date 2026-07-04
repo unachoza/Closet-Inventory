@@ -14,6 +14,7 @@ import { CONSTRUCTION_MAP } from "./maps/construction";
 import { ACCENTS_MAP } from "./maps/accents";
 import { PATTERN_MAP } from "./maps/pattern";
 import { SEASON_MAP } from "./maps/season";
+import { MATERIAL_MAP } from "./maps/material";
 import { STRETCH_MAP, POCKET_MAP } from "./maps/stretch";
 
 export function inferProductAttributes(name: string): ProductAttributes {
@@ -51,6 +52,9 @@ export function inferProductAttributes(name: string): ProductAttributes {
 
   const season = matchFirst(name, SEASON_MAP);
   if (season) attrs.season = season;
+
+  const material = matchFirst(name, MATERIAL_MAP);
+  if (material) attrs.material = material;
 
   if (matchFirst(name, STRETCH_MAP)) attrs.hasStretch = true;
   if (matchFirst(name, POCKET_MAP)) attrs.hasPockets = true;

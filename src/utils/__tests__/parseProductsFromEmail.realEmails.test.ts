@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseProductsFromEmail, type ExtractedProduct } from "../parseProductsFromEmail";
-import { parseEmailToFormData } from "../parseEmailToFormData";
+import { parseEmailToFormData, categoryFromName } from "../parseEmailToFormData";
 
 /**
  * Regression tests built from real order-confirmation email HTML captured from
@@ -835,5 +835,152 @@ describe("banana-republic-2020", () => {
 		expect(jumpsuit!.onSale).toBe(true);
 		expect(jumpsuit!.color).toBe("black");
 		expect(jumpsuit!.size).toBe("4");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// REI Co-op — two long-lived Responsys templates. Both previously returned 0
+// real items: the 2022 layout has an "Order total" summary ABOVE the products
+// and a detached price row; the 2019 layout's decorative images crowded out the
+// real base layers. Fixtures are trimmed to the structural essentials.
+// ---------------------------------------------------------------------------
+
+describe("real emails > REI 2022 (order-total on top, detached price row)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2022-detached-price.html"));
+
+	it("detects both Smartwool items (survives top-summary truncation)", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("extracts name, price, color, size, and item number", () => {
+		const quarterZip = byName(products, "Smartwool Intraknit 200 Pattern Quarter-Zip Base Layer Top");
+		expect(quarterZip).toBeDefined();
+		expect(quarterZip!.price).toBe("$88.73");
+		expect(quarterZip!.color).toBe("Deep Navy Polar Arc");
+		expect(quarterZip!.size).toBe("M");
+		expect(quarterZip!.itemNumber).toBe("199598");
+
+		const tunic = byName(products, "Smartwool Shadow Pine Pointelle Stripe Tunic Sweater");
+		expect(tunic).toBeDefined();
+		expect(tunic!.price).toBe("$89.73");
+		expect(tunic!.color).toBe("Blue Spruce Heather");
+		expect(tunic!.size).toBe("S");
+		expect(tunic!.itemNumber).toBe("213109");
+	});
+});
+
+describe("real emails > REI 2019 (BOPUS, decorative images)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2019-bopus.html"));
+
+	it("detects the two base layers and excludes the member-bonus card", () => {
+		expect(products).toHaveLength(2);
+		expect(products.every((p) => !/bonus card/i.test(p.name))).toBe(true);
+	});
+
+	it("extracts name, labeled item price, and item number", () => {
+		const reiTop = byName(products, "REI Co-op Merino Midweight Base Layer Top");
+		expect(reiTop).toBeDefined();
+		expect(reiTop!.price).toBe("$54.93");
+		expect(reiTop!.itemNumber).toBe("1013880032");
+
+		const smartwool = byName(products, "Smartwool Merino 150 Pattern Base Layer Long-Sleeve Top");
+		expect(smartwool).toBeDefined();
+		expect(smartwool!.price).toBe("$80.00");
+		expect(smartwool!.itemNumber).toBe("1116280037");
+	});
+});
+
+describe("real emails > REI shipped (CSV alt name, no price)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-shipped-csv-name.html"));
+
+	it("detects the item from a 'Just shipped' email that carries no price", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("splits the comma-delimited alt into brand + name and reads color/size", () => {
+		const item = products[0];
+		expect(item.brand).toBe("Icebreaker");
+		expect(item.name).toBe("Sphere LS Low Crewe");
+		expect(item.color).toBe("Suede Heather");
+		expect(item.size).toBe("L");
+		expect(item.itemNumber).toBe("167343");
+		expect(item.price).toBe(""); // shipping confirmations omit price
+		expect(item.neckline).toBe("crew neck"); // "Crewe" (Icebreaker's alt spelling)
+	});
+});
+
+describe("real emails > REI 2018 pickup (CSV names, no item#, no price)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2018-pickup.html"));
+
+	it("detects both items despite an arrow <img> inside the name link", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("parses brand/name/color/size from the comma-delimited alt", () => {
+		const silk = byName(products, "Silk L/S V-Neck");
+		expect(silk).toBeDefined();
+		expect(silk!.brand).toBe("REI Co-op");
+		expect(silk!.color).toBe("BLACK");
+		expect(silk!.size).toBe("M");
+		expect(silk!.sleeveLength).toBe("long sleeve"); // "L/S" → long sleeve
+		expect(silk!.material).toBe("silk");
+
+		const hoody = byName(products, "Merino 250 1/2 Zip Hoody");
+		expect(hoody).toBeDefined();
+		expect(hoody!.brand).toBe("Smartwool");
+		expect(hoody!.color).toBe("CHARCOAL");
+		expect(hoody!.material).toBe("merino wool");
+		expect(hoody!.season).toBe("winter");
+		expect(hoody!.accents).toContain("hood"); // "Hoody" spelling
+	});
+});
+
+describe("real emails > REI enrichment (material / season / pattern)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2022-detached-price.html"));
+
+	it("infers wool material and winter season from Smartwool", () => {
+		const quarterZip = byName(products, "Smartwool Intraknit 200 Pattern Quarter-Zip Base Layer Top");
+		expect(quarterZip!.material).toBe("wool");
+		expect(quarterZip!.season).toBe("winter");
+	});
+
+	it("captures pointelle construction and stripe pattern together", () => {
+		const tunic = byName(products, "Smartwool Shadow Pine Pointelle Stripe Tunic Sweater");
+		expect(tunic!.pattern).toBe("stripes");
+		expect(tunic!.construction).toContain("pointelle");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// eBay — order-status emails bury the ONE real purchase among several
+// sponsored "complement your purchase" listings sharing the same image/
+// title/price markup. Only the block carrying eBay's structured transaction
+// labels together (Order number:/Item ID:/Seller:) is the genuine purchase.
+// ---------------------------------------------------------------------------
+
+describe("real emails > eBay (Eddie Bauer shoes, excludes sponsored items)", () => {
+	const products = parseProductsFromEmail(loadFixture("ebay-eddie-bauer-shoes.html"));
+
+	it("detects exactly the one purchased item, not the 4 sponsored 'complement your purchase' listings", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("extracts brand, size, price, and item ID from the labeled transaction block", () => {
+		const item = products[0];
+		expect(item.brand).toBe("Eddie Bauer");
+		expect(item.size).toBe("9");
+		expect(item.price).toBe("$25.72");
+		expect(item.itemNumber).toBe("195511846811");
+		expect(item.name).toMatch(/shoes/i);
+		expect(item.imageUrl).toContain("i.ebayimg.com");
+	});
+
+	it("classifies as shoes via the retained garment word in the name", () => {
+		expect(categoryFromName(products[0].name)).toBe("shoes");
+	});
+
+	it("does not import the sponsored LL Bean / Eddie Bauer boat shoe listings", () => {
+		expect(byName(products, "LL Bean Slip On Wedge Loafers")).toBeUndefined();
+		expect(products.some((p) => /boat shoes/i.test(p.name))).toBe(false);
 	});
 });

@@ -6,6 +6,7 @@ describe("FashionParser — neckline", () => {
     ["Square Neck Midi Dress", "square neck"],
     ["V-Neck Wrap Blouse", "v-neck"],
     ["Crew Neck Sweater", "crew neck"],
+    ["Sphere Ls Low Crewe", "crew neck"], // Icebreaker/REI alt spelling
     ["Sweetheart Strapless Gown", "sweetheart"],
     ["Off-the-Shoulder Midi Dress", "off-shoulder"],
     ["Cowl Neck Draped Top", "cowl neck"],

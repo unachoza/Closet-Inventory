@@ -24,6 +24,7 @@ export interface ProductAttributes {
   hasPockets?: boolean;
 
   season?: string;
+  material?: string;
 }
 
 export interface MaterialBlend {

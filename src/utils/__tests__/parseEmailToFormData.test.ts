@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseEmailToFormData, extractForwardedSender } from "../parseEmailToFormData";
+import { parseEmailToFormData, extractForwardedSender, extractForwardedPurchaseDate } from "../parseEmailToFormData";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const parse = (subject: string, body = "", from = "") => parseEmailToFormData(subject, body, from);
@@ -377,6 +377,62 @@ describe("extractForwardedSender — recovers retailer from forwarded HTML body"
 
 	it("returns empty string for a non-forwarded body", () => {
 		expect(extractForwardedSender("<p>Thanks for your order!</p>")).toBe("");
+	});
+});
+
+describe("extractForwardedPurchaseDate — recovers the original send date from a forwarded HTML body", () => {
+	it("pulls the forwarded date, not the date the user forwarded it", () => {
+		const html = `<div dir="ltr">---------- Forwarded message ---------<br>From: REI Co-op &lt;rei@notices.rei.com&gt;<br>Date: Mon, May 31, 2021 at 7:42 PM<br>Subject: Your Shipment Confirmation for Order #A220391194<br>To: &lt;maggieannclark@gmail.com&gt;</div>`;
+		const iso = extractForwardedPurchaseDate(html);
+		expect(iso).toBeTruthy();
+		expect(new Date(iso).getUTCFullYear()).toBe(2021);
+		expect(new Date(iso).getUTCMonth()).toBe(4); // May (0-indexed)
+		expect(new Date(iso).getUTCDate()).toBe(31);
+	});
+
+	it("handles the second REI order confirmation date", () => {
+		const html = `<div dir="ltr">---------- Forwarded message ---------<br>From: REI Co-op &lt;rei@notices.rei.com&gt;<br>Date: Fri, Nov 4, 2022 at 2:22 PM<br>Subject: REI Order Confirmation #A256438779<br>To: &lt;maggieannclark@gmail.com&gt;</div>`;
+		const iso = extractForwardedPurchaseDate(html);
+		expect(new Date(iso).getUTCFullYear()).toBe(2022);
+		expect(new Date(iso).getUTCMonth()).toBe(10); // November
+		expect(new Date(iso).getUTCDate()).toBe(4);
+	});
+
+	it("returns empty string for a non-forwarded body", () => {
+		expect(extractForwardedPurchaseDate("<p>Thanks for your order!</p>")).toBe("");
+	});
+
+	it("returns empty string when the forwarded header has no parseable Date: line", () => {
+		const html = `<div>---------- Forwarded message ---------<br>From: REI Co-op &lt;rei@notices.rei.com&gt;<br>Subject: No date here</div>`;
+		expect(extractForwardedPurchaseDate(html)).toBe("");
+	});
+});
+
+describe("parseEmailToFormData — purchase date from forwarded emails", () => {
+	it("uses the forwarded send date instead of the outer forward date when the full body is passed", () => {
+		const body = `
+---------- Forwarded message ---------
+From: REI Co-op <rei@notices.rei.com>
+Date: Mon, May 31, 2021 at 7:42 PM
+Subject: Your Shipment Confirmation for Order #A220391194
+To: <maggieannclark@gmail.com>
+
+We've shipped your order.
+		`.trim();
+		// Outer date is when Maggie forwarded it (2026); the real purchase date is 2021.
+		const result = parseEmailToFormData(
+			"Fwd: Your Shipment Confirmation for Order #A220391194",
+			body,
+			"maggieannclark@gmail.com",
+			"Thu, 2 Jul 2026 11:29:40 -0700",
+		);
+		expect(result.purchaseDate).toBeDefined();
+		expect(new Date(result.purchaseDate as string).getUTCFullYear()).toBe(2021);
+	});
+
+	it("falls back to the outer date when the body has no forwarded header", () => {
+		const result = parseEmailToFormData("Order Confirmation", "Thanks for your order", "sales@gap.com", "Fri, 15 Mar 2024 10:30:00 -0700");
+		expect(new Date(result.purchaseDate as string).getUTCFullYear()).toBe(2024);
 	});
 });
 

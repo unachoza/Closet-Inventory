@@ -13,7 +13,6 @@ import { inferProductAttributes } from "../Features/FashionParser";
  * of a product image, then reads sibling <td> cells for structured details.
  */
 
-
 //TODO update with fashion parser augments
 export interface ExtractedProduct {
 	readonly imageUrl: string;
@@ -27,12 +26,15 @@ export interface ExtractedProduct {
 	readonly itemNumber: string;
 	readonly material: string;
 	readonly onSale: boolean;
-	// Inferred clothing attributes
 	readonly sleeveLength?: string;
 	readonly hemLength?: string;
 	readonly neckline?: string;
 	readonly fit?: string;
 	readonly rise?: string;
+	readonly season?: string;
+	readonly accents?: string | string[];
+	readonly pattern?: string;
+	readonly construction?: string | string[];
 }
 
 const PRICE_REGEX = /\$\d{1,5}(?:\.\d{2})?/g;
@@ -1659,6 +1661,14 @@ function removePostTotalContent(doc: Document): void {
 	const strongPattern = /\b(grand\s*total|order\s*total)\b/i;
 	const weakPattern = /\bsub\s*total\b/i;
 
+	// A genuine end-of-order total has the purchased items BEFORE it. Some
+	// templates (e.g. REI) print an "Order total" summary block ABOVE the items;
+	// truncating there would delete the products. So when the email has product
+	// images, only treat a total marker as the end-of-order if at least one
+	// product image precedes it. Emails with no product images (text-only line
+	// items) keep the original first-marker behavior.
+	const productImages = Array.from(doc.querySelectorAll("img")).filter((img) => isProductImage(img as HTMLImageElement));
+
 	const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
 
 	while (walker.nextNode()) {
@@ -1681,6 +1691,15 @@ function removePostTotalContent(doc: Document): void {
 		}
 
 		if (!isTotal) continue;
+
+		// Header-summary guard: if the email has product images but none precede
+		// this marker, it's a top-of-email order summary, not the end of the item
+		// list — don't truncate here.
+		if (productImages.length > 0) {
+			const node = walker.currentNode;
+			const hasItemBefore = productImages.some((img) => (node.compareDocumentPosition(img) & Node.DOCUMENT_POSITION_PRECEDING) !== 0);
+			if (!hasItemBefore) continue;
+		}
 
 		// Skip <th> / <thead> column headers
 		let inHeader = false;
@@ -3529,6 +3548,348 @@ function extractFromVictoriasSecretLayout(doc: Document): ExtractedProduct[] {
 
 // Post-processing applied to every extracted product regardless of strategy.
 // Infer-from-raw first, then clean for storage — per advisor guidance.
+/**
+ * Strategy: REI Co-op order confirmations (notices.rei.com / Responsys).
+ *
+ * REI ships two long-lived templates that both broke the generic strategies:
+ *
+ *  - 2022 template: each product's image sits in a 3-<td> row (image | spacer |
+ *    name+color+size+"Item #NNNNNN"), while its Qty and price live in a SEPARATE
+ *    sibling <table> below. No generic strategy models "image row + detached
+ *    price row" (extractFromTableRows needs 4+ cells in one row; the order-
+ *    container 3-col strategy needs the price in-row). It also prints an
+ *    "Order total" summary block ABOVE the items, so removePostTotalContent used
+ *    to delete the products entirely.
+ *  - 2019 template: clean 2-cell rows (image | name + "Item Number: NNNN" +
+ *    "Item Price: $X"), but the generic image fallback also caught decorative
+ *    images (member-bonus e-card, store photos), whose alt-text failed the
+ *    clothing classifier and hid the real base layers.
+ *
+ * Both templates key their product photos on rei.com/skuimage/<sku>, which
+ * decorative imagery never uses — so we anchor on those images. This runs on
+ * the un-pruned DOM (before removePostTotalContent) to survive the top-summary
+ * "Order total" block. Guarded by the REI sender/CDN signal.
+ */
+function extractFromReiLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/notices\.rei\.com|rei\.com\/skuimage/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	// Product photos are the only images served from rei.com/skuimage/<sku>.
+	const skuImages = Array.from(doc.querySelectorAll("img")).filter((img) => /rei\.com\/skuimage/i.test(img.getAttribute("src") ?? ""));
+
+	for (const img of skuImages) {
+		const imageUrl = img.getAttribute("src") ?? "";
+		const alt = (img.getAttribute("alt") ?? "").trim();
+
+		// The product's DETAILS cell is the sibling text cell of the image cell —
+		// it holds the name link and (per template) item number, color/size, qty
+		// and price. Climb to the nearest ancestor that contains such a cell.
+		// We must NOT anchor on "Item #" alone: pickup emails have no item number.
+		// We must NOT reject cells that merely contain an <img>: the name link
+		// wraps a small decorative arrow <img>. So the guard is "doesn't contain
+		// the product photo we're anchored on" (`!c.contains(img)`), and the
+		// marker is an item number OR a "Qty:" line OR simply the most text.
+		let detailsCell: Element | null = null;
+		let cursor: Element | null = img;
+		for (let i = 0; i < 8 && cursor && !detailsCell; i++) {
+			cursor = cursor.parentElement;
+			if (!cursor) break;
+			const cands = Array.from(cursor.querySelectorAll("td, th")).filter((c) => !c.contains(img));
+			detailsCell =
+				cands.find((c) => /Item\s*(?:#|Number)|Qty/i.test(c.textContent ?? "")) ??
+				cands.find((c) => getCellText(c).length > 10) ??
+				null;
+		}
+		if (!detailsCell) continue;
+
+		const detailLines = getTextLines(detailsCell);
+
+		// Item number: "Item #199598" (2022/shipped) or "Item Number: 1013880032"
+		// (2019). Pickup emails omit it entirely.
+		const itemMatch = (detailsCell.textContent ?? "").match(/Item\s*(?:#|Number)\s*:?\s*(\d+)/i);
+		const itemNumber = itemMatch ? itemMatch[1] : "";
+
+		// Name: the image alt is the full product name when present; otherwise the
+		// first substantial detail line (pickup-email photos have no alt). REI uses
+		// two name shapes, both handled by parseReiName:
+		//   plain — "Smartwool Intraknit 200 … Base Layer Top - Women's"
+		//   CSV   — "REI Co-op, Silk L/S V-Neck, BLACK, M, Women's" (brand,name,color,size,gender)
+		const nameSource = alt || (detailLines.find((l) => l.length > 3) ?? "");
+		const parsed = parseReiName(nameSource);
+		const name = parsed.name;
+		if (!name) continue;
+		const brand = parsed.brand;
+
+		// Color/size: start from the CSV fields (pickup/shipped), then let the
+		// detail <div>s override when present (2022/shipped carry nicer-cased
+		// "Suede Heather"/"M" divs between the name and the "Item #"/"Qty" line).
+		let color = parsed.color;
+		let size = parsed.size;
+		const stopIdx = detailLines.findIndex((l) => /Item\s*(?:#|Number)|^qty\b/i.test(l));
+		const windowEnd = stopIdx > 0 ? stopIdx : detailLines.length;
+		for (const line of detailLines.slice(1, windowEnd)) {
+			if (/^qty\b/i.test(line)) continue;
+			if (looksLikeSize(line)) {
+				size = line;
+			} else if (line.length > 1 && !/\$\d/.test(line) && !/,/.test(line)) {
+				color = line;
+			}
+		}
+
+		// Price. Look in the details cell FIRST — 2019 prints "Item Price: $X"
+		// inside it, and scoping tightly avoids bleeding one item's price onto the
+		// next (all 2019 rows share one <tbody>). 2022 keeps the price in a sibling
+		// table, so if the cell has none, climb to the smallest ancestor that does
+		// (the item's own outer cell). Shipped emails have no price — leave empty.
+		const cellText = detailsCell.textContent ?? "";
+		const labeled = cellText.match(/Item\s*Price:\s*\$?(\d{1,5}\.\d{2})/i);
+		let price = labeled ? `$${labeled[1]}` : (extractPrices(cellText)[0] ?? "");
+		if (!price) {
+			let pc: Element | null = detailsCell;
+			for (let i = 0; i < 6 && pc; i++) {
+				pc = pc.parentElement;
+				if (pc && /\$\d/.test(pc.textContent ?? "")) {
+					price = extractPrices(pc.textContent ?? "")[0] ?? "";
+					break;
+				}
+			}
+		}
+
+		const dedupeKey = (itemNumber || name.toLowerCase()).trim();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl,
+			name,
+			brand,
+			price,
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Split an REI product name into brand + clean name (+ color/size when encoded).
+ *
+ * REI's shipped/pickup alt text is comma-delimited: "Brand, Product Name, COLOR,
+ * Size, Gender" (e.g. "REI Co-op, Silk L/S V-Neck, BLACK, M, Women's"). After
+ * dropping the trailing gender we peel a trailing size (looksLikeSize) and then
+ * a trailing color field, leaving [brand, …name]. Plain names (no commas, as in
+ * order confirmations) are returned as-is with the gender suffix trimmed, and no
+ * color/size — those come from the detail <div>s.
+ */
+function parseReiName(raw: string): { brand: string; name: string; color: string; size: string } {
+	const genderRe = /\s*[,\-–]\s*(?:Women's|Men's|Kids'?|Unisex|Boys'?|Girls'?)\s*$/i;
+	const stripped = raw.replace(genderRe, "").trim();
+
+	if (!stripped.includes(",")) {
+		return { brand: "", name: stripped, color: "", size: "" };
+	}
+
+	const parts = stripped
+		.split(",")
+		.map((p) => p.trim())
+		.filter((p) => p.length > 0);
+
+	let size = "";
+	if (parts.length >= 3 && looksLikeSize(parts[parts.length - 1])) {
+		size = parts.pop() as string;
+	}
+	let color = "";
+	if (parts.length >= 3) {
+		color = parts.pop() as string;
+	}
+
+	const brand = parts.shift() ?? "";
+	let name = parts.join(", ");
+	if (!name) {
+		name = brand;
+		return { brand: "", name, color, size };
+	}
+	return { brand, name, color, size };
+}
+
+// Garment/shoe words that mark where an eBay title's leading brand ends
+// (e.g. "Eddie Bauer SHOES Womens 9 M Mocassins..." → brand stops at "Shoes").
+const EBAY_GARMENT_WORDS = new Set([
+	"shoe",
+	"shoes",
+	"boot",
+	"boots",
+	"sandal",
+	"sandals",
+	"sneaker",
+	"sneakers",
+	"loafer",
+	"loafers",
+	"moccasin",
+	"moccasins",
+	"mocassin",
+	"mocassins",
+	"flat",
+	"flats",
+	"heel",
+	"heels",
+	"wedge",
+	"wedges",
+	"mule",
+	"mules",
+	"slide",
+	"slides",
+	"slipper",
+	"slippers",
+	"clog",
+	"clogs",
+	"dress",
+	"top",
+	"tops",
+	"shirt",
+	"blouse",
+	"tank",
+	"tee",
+	"sweater",
+	"hoodie",
+	"cardigan",
+	"jacket",
+	"coat",
+	"blazer",
+	"pants",
+	"jeans",
+	"trousers",
+	"shorts",
+	"skirt",
+	"leggings",
+	"jumpsuit",
+	"romper",
+	"bodysuit",
+]);
+
+/**
+ * Split an eBay listing title into a leading brand and the rest of the name.
+ *
+ * eBay titles conventionally lead with the brand, then a garment/shoe word
+ * ("Eddie Bauer Shoes Womens 9 M Mocassins Loafers Comfor..."). Everything
+ * before the first recognized garment word is the brand; the garment word
+ * onward is the name. Titles with no recognized garment word are returned
+ * unsplit (brand "").
+ */
+function splitEbayBrandFromName(rawName: string): { brand: string; name: string } {
+	const words = rawName.split(/\s+/).filter(Boolean);
+	const garmentIdx = words.findIndex((w) => EBAY_GARMENT_WORDS.has(w.toLowerCase().replace(/[^a-z]/gi, "")));
+	if (garmentIdx <= 0) return { brand: "", name: rawName };
+	return { brand: words.slice(0, garmentIdx).join(" "), name: words.slice(garmentIdx).join(" ") };
+}
+
+/**
+ * Extract a shoe/apparel size from an eBay title's "9 M" / "8.5 W" pattern
+ * (number + width letter), returning just the numeric size ("9").
+ */
+function extractEbayShoeSize(rawName: string): string {
+	const match = rawName.match(/\b(\d{1,2}(?:\.\d)?)\s*[MWN]\b/i);
+	return match ? match[1] : "";
+}
+
+/**
+ * Strategy: eBay order emails (shipped/delivered confirmations).
+ *
+ * eBay order-status emails bury the ONE real purchase among several sponsored
+ * "complement your purchase" listings that share the same image/title/price
+ * markup — the generic strategies can't tell them apart, so every card in the
+ * email (real + sponsored) got detected as a product.
+ *
+ * The real purchase is the only block carrying eBay's three structured
+ * transaction labels together: "Order number:", "Item ID:", "Seller:" (plus a
+ * "Total:" price). Sponsored items have none of these — only a name, image,
+ * and price — so anchoring on that label triple excludes them automatically.
+ *
+ * The label block sits in the same outer row as the product photo (an
+ * i.ebayimg.com image — never the p.ebaystatic.com money-back-guarantee icon
+ * or sponsored thumbnails, which live in a separate, more distant section of
+ * the email), so climbing from the "Item ID" text to the smallest ancestor
+ * that also contains an i.ebayimg.com image reliably lands on the real item's
+ * block without reaching into the sponsored strip.
+ */
+function extractFromEbayLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/ebay\.com/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	// eBay renders each label as "<b>Item ID</b>: 195511846811" — the label and
+	// value are separate text nodes (split by the </b> boundary), so a
+	// text-node walker never sees them combined. Match on ELEMENT textContent
+	// instead, then keep only the deepest (leaf-most) matching element per
+	// occurrence — its parent/ancestors also "match" (they contain the same
+	// text), so without this filter every ancestor up to <body> would be
+	// treated as a separate occurrence.
+	const itemIdCandidates = Array.from(doc.querySelectorAll("*")).filter((el) => /Item\s*ID\s*:?\s*\d+/i.test(el.textContent ?? ""));
+	const itemIdEls = itemIdCandidates.filter((el) => !itemIdCandidates.some((other) => other !== el && el.contains(other)));
+
+	for (const node of itemIdEls) {
+		const itemMatch = (node.textContent ?? "").match(/Item\s*ID\s*:?\s*(\d+)/i);
+		if (!itemMatch) continue;
+		const itemNumber = itemMatch[1];
+		if (seen.has(itemNumber)) continue;
+
+		// Climb to the smallest ancestor that carries all three "you actually
+		// bought this" markers AND the real product photo.
+		let scope: Element | null = node.parentElement;
+		let productImg: Element | null = null;
+		for (let i = 0; i < 12 && scope; i++) {
+			const text = scope.textContent ?? "";
+			const hasMarkers = /order\s*number\s*:/i.test(text) && /seller\s*:/i.test(text) && /total\s*:/i.test(text);
+			if (hasMarkers) {
+				productImg =
+					Array.from(scope.querySelectorAll("img")).find((im) => /i\.ebayimg\.com/i.test(im.getAttribute("src") ?? "")) ?? null;
+				if (productImg) break;
+			}
+			scope = scope.parentElement;
+		}
+		if (!scope || !productImg) continue;
+
+		const priceMatch = (scope.textContent ?? "").match(/Total\s*:?\s*\$?(\d{1,5}(?:,\d{3})*\.\d{2})/i);
+		const price = priceMatch ? `$${priceMatch[1].replace(/,/g, "")}` : "";
+
+		const rawName = (productImg.getAttribute("alt") ?? "").trim();
+		if (!rawName) continue;
+
+		const size = extractEbayShoeSize(rawName);
+		const nameWithoutSize = size
+			? rawName
+					.replace(/\b\d{1,2}(?:\.\d)?\s*[MWN]\b/i, "")
+					.replace(/\s{2,}/g, " ")
+					.trim()
+			: rawName;
+		const { brand, name } = splitEbayBrandFromName(nameWithoutSize);
+
+		seen.add(itemNumber);
+		products.push({
+			imageUrl: productImg.getAttribute("src") ?? "",
+			name: name || nameWithoutSize,
+			brand,
+			price,
+			color: "",
+			size,
+			itemNumber,
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 	const rawName = p.name;
 
@@ -3544,7 +3905,12 @@ function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 	// Infer clothing attributes from raw (un-cleaned) name
 	const attrs = inferProductAttributes(rawName);
 
-	return { ...p, name, color, size, ...attrs };
+	// A material the strategy read from the email wins over the name-inferred one;
+	// otherwise fall back to inference (e.g. "Smartwool"/"Merino" → wool).
+	const { material: inferredMaterial, ...restAttrs } = attrs;
+	const material = p.material || inferredMaterial || "";
+
+	return { ...p, name, color, size, material, ...restAttrs };
 }
 
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
@@ -3564,6 +3930,12 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// Color/Size/Price labels), so run it on the un-pruned DOM first.
 	const brItems = extractFromBananaRepublic2020Layout(doc, brDiscountFraction);
 	if (brItems.length > 0) return brItems.map(enrichProduct);
+
+	// REI prints an "Order total" summary block ABOVE its items, so run this on
+	// the un-pruned DOM before removePostTotalContent would strip the products.
+	// Strongly guarded by the REI CDN/sender signal.
+	const reiItems = extractFromReiLayout(doc);
+	if (reiItems.length > 0) return reiItems.map(enrichProduct);
 
 	// Pre-process: strip content after order total markers so suggested/
 	// recommended product sections don't produce false positive detections.
@@ -3591,6 +3963,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// 17. Image fallback
 
 	const strategies = [
+		extractFromEbayLayout, // eBay: only the Order number:/Item ID:/Seller: block, excludes sponsored "complement your purchase" items — guarded by ebay.com, must run before generic table/image strategies which would otherwise match eBay's plain image+link+price rows (real item AND sponsored alike)
 		extractFromNestedTables,
 		extractFromLabeledFieldLayout,
 		extractFromReactEmailLayout,

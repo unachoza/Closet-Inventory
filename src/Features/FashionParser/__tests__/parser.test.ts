@@ -40,4 +40,24 @@ describe("FashionParser — inferProductAttributes", () => {
     expect(result.closure).toContain("button front");
     expect(result.closure).toContain("hidden zipper");
   });
+
+  it('captures "hoody" (REI/Smartwool spelling) as a hood accent, same as "hoodie"', () => {
+    expect(inferProductAttributes("Merino 250 1/2 Zip Hoody").accents).toContain("hood");
+    expect(inferProductAttributes("Fleece Pullover Hoodie").accents).toContain("hood");
+  });
+
+  it("infers wool material and winter season from Smartwool/Merino branding", () => {
+    const quarterZip = inferProductAttributes("Smartwool Intraknit 200 Pattern Quarter-Zip Base Layer Top");
+    expect(quarterZip.material).toBe("wool");
+    expect(quarterZip.season).toBe("winter");
+
+    const merino = inferProductAttributes("REI Co-op Merino Midweight Base Layer Top");
+    expect(merino.material).toBe("merino wool");
+    expect(merino.season).toBe("winter");
+  });
+
+  it('treats "L/S" and "LS" as long sleeve shorthand', () => {
+    expect(inferProductAttributes("Silk L/S V-Neck").sleeveLength).toBe("long sleeve");
+    expect(inferProductAttributes("Sphere Ls Low Crewe").sleeveLength).toBe("long sleeve");
+  });
 });
