@@ -117,7 +117,6 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 			const counts = new Map<string, { value: string; count: number }>();
 			for (const item of closet) {
 				// Material and care use their own extractors; all other dims use the generic path.
-				console.log("filter dimension", item[dim]);
 				const displayList =
 					dim === "material"
 						? extractMaterialNames(item[dim])
@@ -138,7 +137,6 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 
 			result[dim] = Array.from(counts.values()).sort((a, b) => a.value.localeCompare(b.value));
 		}
-		console.log({ filterOptions: result });
 		return result;
 	}, [closet]);
 
@@ -157,7 +155,6 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 							? parseCareLabels(item.care).map((l) => l.toLowerCase())
 							: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
-				console.log({ dim, selected, itemKeys, matches });
 				if (!matches) return false;
 			}
 			return true;
