@@ -907,3 +907,44 @@ describe("real emails > REI shipped (CSV alt name, no price)", () => {
 		expect(item.price).toBe(""); // shipping confirmations omit price
 	});
 });
+
+describe("real emails > REI 2018 pickup (CSV names, no item#, no price)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2018-pickup.html"));
+
+	it("detects both items despite an arrow <img> inside the name link", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("parses brand/name/color/size from the comma-delimited alt", () => {
+		const silk = byName(products, "Silk L/S V-Neck");
+		expect(silk).toBeDefined();
+		expect(silk!.brand).toBe("REI Co-op");
+		expect(silk!.color).toBe("BLACK");
+		expect(silk!.size).toBe("M");
+		expect(silk!.sleeveLength).toBe("long sleeve"); // "L/S" → long sleeve
+		expect(silk!.material).toBe("silk");
+
+		const hoody = byName(products, "Merino 250 1/2 Zip Hoody");
+		expect(hoody).toBeDefined();
+		expect(hoody!.brand).toBe("Smartwool");
+		expect(hoody!.color).toBe("CHARCOAL");
+		expect(hoody!.material).toBe("merino wool");
+		expect(hoody!.season).toBe("winter");
+	});
+});
+
+describe("real emails > REI enrichment (material / season / pattern)", () => {
+	const products = parseProductsFromEmail(loadFixture("rei-2022-detached-price.html"));
+
+	it("infers wool material and winter season from Smartwool", () => {
+		const quarterZip = byName(products, "Smartwool Intraknit 200 Pattern Quarter-Zip Base Layer Top");
+		expect(quarterZip!.material).toBe("wool");
+		expect(quarterZip!.season).toBe("winter");
+	});
+
+	it("captures pointelle construction and stripe pattern together", () => {
+		const tunic = byName(products, "Smartwool Shadow Pine Pointelle Stripe Tunic Sweater");
+		expect(tunic!.pattern).toBe("stripes");
+		expect(tunic!.construction).toContain("pointelle");
+	});
+});

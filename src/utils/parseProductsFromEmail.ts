@@ -3586,58 +3586,60 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 		const imageUrl = img.getAttribute("src") ?? "";
 		const alt = (img.getAttribute("alt") ?? "").trim();
 
-		// The product's DETAILS cell is the tight <td> that holds the item number
-		// and the name/color/size <div>s (sibling of the image cell). Anchor on it
-		// so extraction doesn't depend on a price — "Just shipped" emails carry no
-		// $ amount, and a price-based climb would overshoot into unrelated markup.
+		// The product's DETAILS cell is the sibling text cell of the image cell —
+		// it holds the name link and (per template) item number, color/size, qty
+		// and price. Climb to the nearest ancestor that contains such a cell.
+		// We must NOT anchor on "Item #" alone: pickup emails have no item number.
+		// We must NOT reject cells that merely contain an <img>: the name link
+		// wraps a small decorative arrow <img>. So the guard is "doesn't contain
+		// the product photo we're anchored on" (`!c.contains(img)`), and the
+		// marker is an item number OR a "Qty:" line OR simply the most text.
 		let detailsCell: Element | null = null;
 		let cursor: Element | null = img;
-		for (let i = 0; i < 8 && cursor; i++) {
+		for (let i = 0; i < 8 && cursor && !detailsCell; i++) {
 			cursor = cursor.parentElement;
 			if (!cursor) break;
-			const cell = Array.from(cursor.querySelectorAll("td, th")).find(
-				(c) => /Item\s*(?:#|Number)/i.test(c.textContent ?? "") && !c.querySelector("img"),
-			);
-			if (cell) {
-				detailsCell = cell;
-				break;
-			}
+			const cands = Array.from(cursor.querySelectorAll("td, th")).filter((c) => !c.contains(img));
+			detailsCell =
+				cands.find((c) => /Item\s*(?:#|Number)|Qty/i.test(c.textContent ?? "")) ??
+				cands.find((c) => getCellText(c).length > 10) ??
+				null;
 		}
 		if (!detailsCell) continue;
 
 		const detailLines = getTextLines(detailsCell);
 
-		// Item number: "Item #199598" (2022/shipped) or "Item Number: 1013880032" (2019).
+		// Item number: "Item #199598" (2022/shipped) or "Item Number: 1013880032"
+		// (2019). Pickup emails omit it entirely.
 		const itemMatch = (detailsCell.textContent ?? "").match(/Item\s*(?:#|Number)\s*:?\s*(\d+)/i);
 		const itemNumber = itemMatch ? itemMatch[1] : "";
 
-		// Color/size sit BETWEEN the name line and the "Item #" line as bare <div>s
-		// ([name, color, size, ("Qty: N"), "Item #NNNNNN"]). 2019 has nothing
-		// between them, so this yields empty there (its name carries no color/size).
-		const itemLineIdx = detailLines.findIndex((l) => /Item\s*(?:#|Number)/i.test(l));
-		let color = "";
-		let size = "";
-		if (itemLineIdx > 1) {
-			for (const line of detailLines.slice(1, itemLineIdx)) {
-				if (/^qty\b/i.test(line)) continue;
-				if (!size && looksLikeSize(line)) {
-					size = line;
-				} else if (!color && line.length > 1 && !/\$\d/.test(line)) {
-					color = line;
-				}
-			}
-		}
-
-		// Name: the image alt is the full product name in every template. REI uses
-		// two name shapes:
-		//   plain   — "Smartwool Intraknit 200 … Base Layer Top - Women's"
-		//   CSV     — "Icebreaker, Sphere LS Low Crewe, SUEDE HEATHER, L, Women's"
-		// parseReiName splits the CSV form into brand + name (dropping the
-		// color/size/gender fields) and leaves plain names untouched.
-		const parsed = parseReiName(alt || (detailLines.find((l) => l.length > 3) ?? ""), color, size);
+		// Name: the image alt is the full product name when present; otherwise the
+		// first substantial detail line (pickup-email photos have no alt). REI uses
+		// two name shapes, both handled by parseReiName:
+		//   plain — "Smartwool Intraknit 200 … Base Layer Top - Women's"
+		//   CSV   — "REI Co-op, Silk L/S V-Neck, BLACK, M, Women's" (brand,name,color,size,gender)
+		const nameSource = alt || (detailLines.find((l) => l.length > 3) ?? "");
+		const parsed = parseReiName(nameSource);
 		const name = parsed.name;
 		if (!name) continue;
 		const brand = parsed.brand;
+
+		// Color/size: start from the CSV fields (pickup/shipped), then let the
+		// detail <div>s override when present (2022/shipped carry nicer-cased
+		// "Suede Heather"/"M" divs between the name and the "Item #"/"Qty" line).
+		let color = parsed.color;
+		let size = parsed.size;
+		const stopIdx = detailLines.findIndex((l) => /Item\s*(?:#|Number)|^qty\b/i.test(l));
+		const windowEnd = stopIdx > 0 ? stopIdx : detailLines.length;
+		for (const line of detailLines.slice(1, windowEnd)) {
+			if (/^qty\b/i.test(line)) continue;
+			if (looksLikeSize(line)) {
+				size = line;
+			} else if (line.length > 1 && !/\$\d/.test(line) && !/,/.test(line)) {
+				color = line;
+			}
+		}
 
 		// Price. Look in the details cell FIRST — 2019 prints "Item Price: $X"
 		// inside it, and scoping tightly avoids bleeding one item's price onto the
@@ -3679,21 +3681,21 @@ function extractFromReiLayout(doc: Document): ExtractedProduct[] {
 }
 
 /**
- * Split an REI product name into brand + clean name.
+ * Split an REI product name into brand + clean name (+ color/size when encoded).
  *
- * REI's shipped-email alt text is comma-delimited: "Brand, Product Name, COLOR,
- * Size, Gender" (e.g. "Icebreaker, Sphere LS Low Crewe, SUEDE HEATHER, L,
- * Women's"). We already recover color/size from the detail <div>s, so drop any
- * comma field that matches them (or a trailing gender), take the first field as
- * the brand and the rest as the name. Plain names (no commas, as in order
- * confirmations) are returned as-is with the gender suffix trimmed.
+ * REI's shipped/pickup alt text is comma-delimited: "Brand, Product Name, COLOR,
+ * Size, Gender" (e.g. "REI Co-op, Silk L/S V-Neck, BLACK, M, Women's"). After
+ * dropping the trailing gender we peel a trailing size (looksLikeSize) and then
+ * a trailing color field, leaving [brand, …name]. Plain names (no commas, as in
+ * order confirmations) are returned as-is with the gender suffix trimmed, and no
+ * color/size — those come from the detail <div>s.
  */
-function parseReiName(raw: string, color: string, size: string): { brand: string; name: string } {
+function parseReiName(raw: string): { brand: string; name: string; color: string; size: string } {
 	const genderRe = /\s*[,\-–]\s*(?:Women's|Men's|Kids'?|Unisex|Boys'?|Girls'?)\s*$/i;
 	const stripped = raw.replace(genderRe, "").trim();
 
 	if (!stripped.includes(",")) {
-		return { brand: "", name: stripped };
+		return { brand: "", name: stripped, color: "", size: "" };
 	}
 
 	const parts = stripped
@@ -3701,14 +3703,22 @@ function parseReiName(raw: string, color: string, size: string): { brand: string
 		.map((p) => p.trim())
 		.filter((p) => p.length > 0);
 
-	// Drop fields that duplicate the color or size we already extracted.
-	const norm = (s: string) => s.toLowerCase().trim();
-	const kept = parts.filter((p) => norm(p) !== norm(color) && norm(p) !== norm(size));
-
-	if (kept.length >= 2) {
-		return { brand: kept[0], name: kept.slice(1).join(", ") };
+	let size = "";
+	if (parts.length >= 3 && looksLikeSize(parts[parts.length - 1])) {
+		size = parts.pop() as string;
 	}
-	return { brand: "", name: kept.join(", ") || stripped };
+	let color = "";
+	if (parts.length >= 3) {
+		color = parts.pop() as string;
+	}
+
+	const brand = parts.shift() ?? "";
+	let name = parts.join(", ");
+	if (!name) {
+		name = brand;
+		return { brand: "", name, color, size };
+	}
+	return { brand, name, color, size };
 }
 
 function enrichProduct(p: ExtractedProduct): ExtractedProduct {
@@ -3726,7 +3736,12 @@ function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 	// Infer clothing attributes from raw (un-cleaned) name
 	const attrs = inferProductAttributes(rawName);
 
-	return { ...p, name, color, size, ...attrs };
+	// A material the strategy read from the email wins over the name-inferred one;
+	// otherwise fall back to inference (e.g. "Smartwool"/"Merino" → wool).
+	const { material: inferredMaterial, ...restAttrs } = attrs;
+	const material = p.material || inferredMaterial || "";
+
+	return { ...p, name, color, size, material, ...restAttrs };
 }
 
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {

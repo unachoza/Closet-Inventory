@@ -80,6 +80,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	tank: "tops",
 	sweater: "sweaters",
 	hoodie: "sweaters",
+	hoody: "sweaters",
 	cardigan: "sweaters",
 	coat: "coats",
 	jacket: "coats",
@@ -146,6 +147,8 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	"base layer": "tops",
 	henley: "tops",
 	turtleneck: "tops",
+	"v-neck": "tops",
+	vneck: "tops",
 };
 
 function extractBrand(text: string, from: string): string {
@@ -263,7 +266,10 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 	// not just the subject: on the per-product import path the style-bearing
 	// product name arrives as `body` (subject is the retailer's generic
 	// "Your order has been received"), so subject-only inference drops it.
-	const attrs = inferProductAttributes(combinedText);
+	// Drop the single-string material from attrs — this path resolves a richer
+	// percentage-based `material` array below (inferMaterialFromName), and the
+	// `...attrs` spread must not clobber it with a bare string.
+	const { material: _inferredMaterialString, ...attrs } = inferProductAttributes(combinedText);
 
 	const inferencedMaterial = inferMaterialFromName(combinedText);
 	// Care from material (fiber wash/dry) + name/color attributes (jeans → wash
