@@ -13,9 +13,9 @@ describe("MaterialBlendInput", () => {
 		expect(screen.getByDisplayValue("80")).toBeInTheDocument();
 	});
 
-	it("shows empty state when no materials", () => {
+	it("renders no rows when there are no materials", () => {
 		render(<MaterialBlendInput value={[]} onChange={onChange} />);
-		expect(screen.getByText(/No materials added yet/i)).toBeInTheDocument();
+		expect(screen.queryAllByLabelText(/percentage/i)).toHaveLength(0);
 	});
 
 	it("clicking Add Material calls onChange with a new empty row", () => {

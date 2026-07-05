@@ -208,7 +208,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		render(<TestHarness />);
 		expect(screen.getByText("Your ZARA order has been received")).toBeInTheDocument();
 		expect(screen.getByText("ZARA")).toBeInTheDocument();
-		expect(screen.getByText(/Found 1 email/)).toBeInTheDocument();
+		expect(screen.getByTestId('email-count')).toHaveTextContent(/found 1 email/i);
 	});
 
 	it("opens the preview panel when a Zara email is clicked", () => {
@@ -494,7 +494,8 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 
 		// Should be back on the gmail view with email list
 		await waitFor(() => {
-			expect(screen.getByText(/Found 1 email/)).toBeInTheDocument();
+			expect(screen.getByTestId('email-count')).toHaveTextContent(/found 1 email/i);
+
 		});
 	});
 

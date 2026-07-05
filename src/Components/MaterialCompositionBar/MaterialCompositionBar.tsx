@@ -13,7 +13,7 @@ interface MaterialCompositionBarProps {
 
 const MaterialCompositionBar = ({ blend, showLegend = true, compact = false }: MaterialCompositionBarProps) => {
 	const safeBlend = Array.isArray(blend) ? blend : [];
-	// if (blend.length === 0) return null;
+	if (safeBlend.length === 0) return null;
 
 	const total = blendTotal(safeBlend);
 	// Normalize widths so they always fill 100% of the bar,

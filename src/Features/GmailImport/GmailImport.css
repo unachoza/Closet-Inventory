@@ -215,6 +215,14 @@
 	color: #fff;
 	font-size: 0.95rem;
 	font-weight: 500;
+	font-family: 'DM Sans';
+}
+
+.gmail-section-title span {
+	color: var(--text-muted);
+	font-weight: 400;
+	margin-left: var(--spacing-50);
+	font-size: 1rem;
 }
 
 /* Email list */
