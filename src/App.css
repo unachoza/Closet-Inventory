@@ -43,7 +43,7 @@
 .app-content{
   flex: 1;
   overflow-y: auto;
-  width: 100vw;
+  width: 100%;
 
 }
 /* Button color tokens now live centrally in index.css (:root).

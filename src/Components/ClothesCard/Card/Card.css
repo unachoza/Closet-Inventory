@@ -190,19 +190,18 @@
 	border-radius: var(--border-radius-md);
 	overflow-y: auto;
 	box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
-	/* Height is content-driven; CSS owns the bounds. */
 	min-height: 300px;
-	max-height: 92dvh;
+	max-height: calc(100dvh - var(--card-modal-top, 68px) - 12px);
 	transition:
 		top 0.55s cubic-bezier(0.32, 0.7, 0, 1),
 		left 0.55s cubic-bezier(0.32, 0.7, 0, 1),
-		width 0.55s cubic-bezier(0.32, 0.7, 0, 1),
-		transform 0.55s cubic-bezier(0.32, 0.7, 0, 1);
+		width 0.55s cubic-bezier(0.32, 0.7, 0, 1);
 }
 
-/* When resting at center, offset upward by half own height for true vertical center. */
+/* Resting state: top is set by JS to clear the sticky nav; no vertical
+   transform needed — the modal grows downward from that safe top edge. */
 .card-grow-modal--centered {
-	transform: translateY(-52%);
+	transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

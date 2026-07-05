@@ -126,6 +126,45 @@ test.describe("Card detail modal — mobile", () => {
 		expect(btnBottom, '"See all details" is below the visible viewport').toBeLessThanOrEqual(viewportHeight);
 	});
 
+	test("expanded modal top edge clears the sticky nav (regression: E5-bug.1 title clipped under nav)", async ({ page }) => {
+		const card = page.getByTestId("clothes-card").first();
+
+		// Flip
+		await card.tap();
+		await expect(card).toHaveClass(/flipped/);
+		await page.waitForTimeout(900);
+
+		// Expand into grow modal
+		await card.getByRole("button", { name: /see all details/i }).tap({ force: true });
+		const modal = page.locator(".card-grow-modal");
+		await expect(modal).toBeVisible();
+		await page.waitForTimeout(450);
+
+		const navBox = await page.locator(".top-nav").boundingBox();
+		const modalBox = await modal.boundingBox();
+		expect(navBox, "sticky nav should have a bounding box").not.toBeNull();
+		expect(modalBox, "modal should have a bounding box").not.toBeNull();
+
+		const navBottom = navBox!.y + navBox!.height;
+		expect(
+			modalBox!.y,
+			`modal top (${modalBox!.y.toFixed(1)}) is behind the nav bottom (${navBottom.toFixed(1)})`,
+		).toBeGreaterThanOrEqual(navBottom - 1);
+
+		// Also: item name inside the modal must be fully visible
+		const nameEl = modal.locator(".card-details__name").first();
+		const nameBox = await nameEl.boundingBox();
+		expect(nameBox, "item name should have a bounding box").not.toBeNull();
+		expect(
+			nameBox!.y,
+			`item name top (${nameBox!.y.toFixed(1)}) is clipped behind the nav`,
+		).toBeGreaterThanOrEqual(navBottom - 1);
+
+		// Cleanup
+		await modal.getByRole("button", { name: "Close" }).dispatchEvent("click");
+		await expect(modal).toBeHidden();
+	});
+
 	test("all cards on first page have tops within viewport (no card hidden under nav)", async ({ page }) => {
 		const cards = page.getByTestId("clothes-card");
 		const count = await cards.count();
