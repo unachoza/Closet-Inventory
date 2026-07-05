@@ -72,7 +72,7 @@ describe("CardDetails", () => {
 	// ── Inferred style attributes (populated during email import) ──
 	const styledItem: ClothingItem = {
 		...item,
-		condition: "like new",
+		condition: "like_new",
 		style: {
 			season: "fall",
 			hasPockets: true,
