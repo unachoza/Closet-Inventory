@@ -1,4 +1,4 @@
-import { Option, Step, MaterialBlend, ItemStatus } from "./types.ts";
+import { Option, Step, MaterialBlend, ItemStatus, WearState } from "./types.ts";
 import TopIcon from "../assets/clothes-icons/blouse.svg";
 import BottomIcon from "../assets/clothes-icons/trousers.svg";
 import SweaterIcon from "../assets/clothes-icons/sweater.svg";
@@ -6,11 +6,11 @@ import CoatIcon from "../assets/clothes-icons/raincoat.svg";
 import DressIcon1 from "../assets/clothes-icons/dress1.svg";
 import GymClothesIcon from "../assets/clothes-icons/gym-clothes.svg";
 import PajamasIcon from "../assets/clothes-icons/pajamas.svg";
-import UnderwearIcon from "../assets/clothes-icons/underwear.svg";
 import HeelIcon from "../assets/clothes-icons/heel.svg";
 import IntimatesIcon from "../assets/clothes-icons/intimates.svg";
 import SocksIcon from "../assets/clothes-icons/socks.svg";
 import JumpsuitIcon from "../assets/clothes-icons/jumpsuit.svg";
+import SwimIcon from "../assets/clothes-icons/leotard.svg";
 
 const b = (material: string, percentage: number): MaterialBlend => ({ material, percentage });
 
@@ -48,8 +48,8 @@ export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
 
 export const clothesAgesOptions = ["new", "3 months", "6 months", "1 year", "18 months", "3 years", "vintage", "unknown"];
 
-// Subjective condition states (replaces the old free-text "age" picker).
-export const conditionOptions = ["new", "like new", "good", "fair", "needs repair"];
+// Subjective wear states (canonical WearState values; humanize for display).
+export const conditionOptions: WearState[] = ["new", "like_new", "good", "fair", "poor", "needs_repair"];
 
 // E2: mutable lifecycle status (distinct from condition). E11 owns clean/dirty.
 export const statusOptions: ItemStatus[] = ["clean", "dirty", "at_cleaner", "in_repair", "traveling", "on_loan"];
@@ -98,7 +98,7 @@ export const carouselCategories = [
 	{ label: "Athleisure", icon: GymClothesIcon },
 	{ label: "Intimates", icon: IntimatesIcon },
 	{ label: "Socks", icon: SocksIcon },
-	{ label: "Underwear", icon: UnderwearIcon },
+	{ label: "Swim", icon: SwimIcon },
 	{ label: "body", icon: JumpsuitIcon },
 	{ label: "Shoes", icon: HeelIcon },
 	{ label: "Sleep", icon: PajamasIcon },
@@ -113,7 +113,7 @@ export const categoryOptions: Option[] = [
 	{ value: "athleisure", label: "Athleisure" },
 	{ value: "intimates", label: "Intimates" },
 	{ value: "socks", label: "Socks" },
-	{ value: "underwear", label: "Underwear" },
+	{ value: "swim", label: "Swim" },
 	{ value: "shoes", label: "Shoes" },
 ];
 
@@ -129,7 +129,7 @@ export const ClothingItemPossibilities = {
 	material: materialExamples,
 	occasion: occasionExamples,
 	season: ["winter", "summer"],
-	condition: ["new", "like new", "good", "poor", "needs repair"],
+	condition: ["new", "like_new", "good", "fair", "poor", "needs_repair"],
 	age: clothesAgesOptions,
 	care: careExamples,
 	notes: [],
@@ -388,7 +388,7 @@ export const MY_CLOSET_DATA = [
 		status: "traveling" as ItemStatus,
 		locationId: "suitcase",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781163001/l_wp_699bd186ff353a34a178dd67_es6xwd.webp",
-		name: "Sherpa Car Coat | Double-breasted blazer with shoulder pads",
+		name: "Serres Sherpa Car Coat",
 		category: "coat",
 		color: "brown",
 		size: "M",
@@ -405,6 +405,7 @@ export const MY_CLOSET_DATA = [
 			"Take a trip of unexpected luxury with this sumptuously soft sherpa coat with meticulous diamond quilted lining to keep you cozy on every adventure. Oversized. Notch collar. Button closure. On-seam pockets. Two interior pockets. WARMER: Lightly lined with quilted lining so you can layer it through the seasons ",
 			"Below-knee length",
 			"SHERPA: Luxuriously soft, this vegan-friendly faux fur fabric looks and feels even better than the real thing. WARMEST: Fully lined and ultra-cozy, this style is designed to keep you warm through the coldest days. Wide notch lapel, Front pockets, Center back vent, Fully lined, Semi-fitted with room through the chest, arms and waist, Long sleeves, Knee length",
+			"Take a trip of unexpected luxury with this sumptuously soft sherpa coat with meticulous diamond quilted lining to keep you cozy on every adventure. Oversized, WARMER: Lightly lined with quilted lining so you can layer it through the seasons., OVERSIZED FIT: Expertly cut for a loose fit. Size down if you prefer more form-fitting., Notch collar. Button closure., On-seam pockets. Two interior pockets., Fully lined., Product #506005"
 		],
 		onSale: true,
 	},
@@ -444,7 +445,7 @@ export const MY_CLOSET_DATA = [
 		// was 44
 		material: [b("cotton", 95), b("spandex", 5)],
 		purchaseDate: "2021-11-10T01:02:37.000Z",
-		condition: "needs repair",
+		condition: "needs_repair",
 		occasion: "casual",
 		care: " wash cold",
 		notes: ["we fight about this", "fits perfect", "small hole"],

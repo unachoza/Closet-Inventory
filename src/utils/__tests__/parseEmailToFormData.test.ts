@@ -135,9 +135,9 @@ describe("parseEmailToFormData — category inference", () => {
 		expect(parse("The Bra").category).toBe("intimates");
 	});
 
-	// known bug: "briefs" maps to "intimates" instead of "underwear" — keyword map needs updating
-	it.fails('infers "underwear" from "briefs"', () => {
-		expect(parse("Cotton Briefs 3-Pack").category).toBe("underwear");
+	// "underwear" was retired as a category; bras/briefs/underwear now fold into intimates.
+	it('infers "intimates" from "briefs"', () => {
+		expect(parse("Cotton Briefs 3-Pack").category).toBe("intimates");
 	});
 
 	it('infers "intimates" from "teddy"', () => {

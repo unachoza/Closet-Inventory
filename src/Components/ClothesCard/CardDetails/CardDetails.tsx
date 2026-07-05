@@ -3,6 +3,7 @@ import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
 import { parseCareItems } from "../../../utils/careUtils";
+import { humanizeCondition } from "../../../utils/condition";
 import { toAbsoluteDate } from "../../../utils/dateUtils";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
@@ -56,7 +57,9 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
-	const identityParts = [style?.season, item.condition, item.price].filter((p): p is string => !!p);
+	const identityParts = [style?.season, item.condition && humanizeCondition(item.condition), item.price].filter(
+		(p): p is string => !!p,
+	);
 	const hasIdentity = !!purchasedLabel || identityParts.length > 0 || !!item.age;
 
 	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!item.notes;
@@ -188,7 +191,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 											{ageLabel ? ` - ${ageLabel} ago` : ""}
 										</p>
 									)}
-									{item.condition && <p className="card-details__identity-text">Condition: {item.condition}</p>}
+									{item.condition && <p className="card-details__identity-text">Condition: {humanizeCondition(item.condition)}</p>}
 									{item.price && <p className="card-details__identity-text">Price: {item.price}</p>}
 								</div>
 							</div>

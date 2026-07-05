@@ -96,8 +96,8 @@ describe("EditItemView", () => {
 		render(<EditItemView item={mockItem} setView={mockSetView} />);
 		const condition = screen.getByLabelText("condition") as HTMLSelectElement;
 		expect(condition.tagName).toBe("SELECT");
-		// All five condition options are offered.
-		expect(condition.querySelectorAll("option")).toHaveLength(5);
+		// All six WearState condition options are offered.
+		expect(condition.querySelectorAll("option")).toHaveLength(6);
 
 		const purchaseDate = screen.getByLabelText("purchase date") as HTMLInputElement;
 		expect(purchaseDate).toBeDisabled();

@@ -9,7 +9,7 @@ import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialB
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem, conditionOptions, statusOptions } from "../../../utils/constants";
 import { LOCATIONS } from "../../../utils/locations";
-import type { ItemStatus } from "../../../utils/types";
+import type { ItemStatus, WearState } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import { formatItemAge } from "../../../utils/itemAge";
 import { matchedCondition } from "../../../utils/condition";
@@ -107,7 +107,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	console.log("formData.material", formData, formData.material);
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-		setFormData((prev) => ({ ...prev, condition: e.target.value }));
+		setFormData((prev) => ({ ...prev, condition: e.target.value as WearState }));
 	}, []);
 
 	const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -328,7 +328,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						>
 							{conditionOptions.map((opt) => (
 								<option key={opt} value={opt}>
-									{opt}
+									{opt.replace(/_/g, " ")}
 								</option>
 							))}
 						</select>

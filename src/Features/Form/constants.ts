@@ -14,7 +14,7 @@ export const options: Option[] = [
 	{ value: "sweaters", label: "Sweaters" },
 	{ value: "intimates", label: "Intimates" },
 	{ value: "socks", label: "Socks" },
-	{ value: "underwear", label: "Underwear" },
+	{ value: "swim", label: "Swim" },
 	{ value: "shoes", label: "Shoes" },
 	{ value: "sleep", label: "Sleep" },
 ];

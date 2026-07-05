@@ -13,7 +13,7 @@ describe("matchedCondition", () => {
 	});
 
 	it("falls back to a legacy age value only when it is a valid condition", () => {
-		expect(matchedCondition(undefined, "like new")).toBe("like new");
+		expect(matchedCondition(undefined, "like_new")).toBe("like_new");
 	});
 
 	it("returns undefined for a legacy free-text age that isn't a condition", () => {
@@ -51,12 +51,12 @@ describe("defaultConditionForPurchaseDate", () => {
 		expect(defaultConditionForPurchaseDate(yearsAgo(0.5))).toBe("new");
 	});
 
-	it('returns "like new" for a purchase 1–3 years old', () => {
-		expect(defaultConditionForPurchaseDate(yearsAgo(2))).toBe("like new");
+	it('returns "like_new" for a purchase 1–3 years old', () => {
+		expect(defaultConditionForPurchaseDate(yearsAgo(2))).toBe("like_new");
 	});
 
-	it('returns "like new" right at the 1-year boundary', () => {
-		expect(defaultConditionForPurchaseDate(yearsAgo(1))).toBe("like new");
+	it('returns "like_new" right at the 1-year boundary', () => {
+		expect(defaultConditionForPurchaseDate(yearsAgo(1))).toBe("like_new");
 	});
 
 	it('returns "good" for a purchase over 3 years old', () => {

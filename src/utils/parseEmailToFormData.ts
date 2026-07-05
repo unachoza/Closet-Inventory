@@ -110,7 +110,9 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	// words (dress, skirt, …) are matched earlier, so "jersey knit dress" still
 	// resolves to dresses; a bare "jersey" lands in tops.
 	jersey: "tops",
-	swimsuit: "intimates",
+	swimsuit: "swim",
+	swimwear: "swim",
+	bikini: "swim",
 	bodysuit: "body",
 	jumpsuit: "body",
 	cheeky: "intimates",
@@ -118,7 +120,6 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	briefs: "intimates",
 	brief: "intimates",
 	panty: "intimates",
-	bikini: "intimates",
 	teddy: "intimates",
 	intimate: "intimates",
 	pajama: "sleep",
