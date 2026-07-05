@@ -16,7 +16,7 @@ import {
 	occasionExamples,
 } from "../../utils/constants";
 import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
-import { useLocalStorage } from "../../hooks/uselocalStorage";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
@@ -134,9 +134,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 						<p className="step-hint">Add each fiber and its percentage. Total must equal 100%.</p>
 						<MaterialBlendInput
 							value={normalizeMaterial(formData.material)}
-							onChange={(blend: MaterialBlend[]) =>
-								setFormData((prev) => ({ ...prev, material: blend }))
-							}
+							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
 						/>
 					</div>
 				)}
