@@ -15,8 +15,8 @@ import {
 	careExamples,
 	occasionExamples,
 } from "../../utils/constants";
-import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
