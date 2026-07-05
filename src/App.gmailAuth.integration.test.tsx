@@ -88,7 +88,7 @@ describe("E3-bug.2 — Gmail auth survives leaving and returning to the Gmail vi
 
 		// Authenticate through the REAL useGmailAuth via the captured Google onSuccess.
 		act(() => capturedOnSuccess?.({ access_token: "tok-xyz", expires_in: 3600 }));
-		expect(screen.getByText(/Found 1 email/i)).toBeInTheDocument();
+		expect(screen.getByTestId("email-count")).toHaveTextContent(/found 1 email/i);
 		expect(screen.queryByRole("button", { name: /connect gmail account/i })).not.toBeInTheDocument();
 
 		// Leave the Gmail view → this UNMOUNTS GmailImport (same as importing an item).
@@ -102,7 +102,8 @@ describe("E3-bug.2 — Gmail auth survives leaving and returning to the Gmail vi
 
 		// THE GUARD: the session-scoped provider kept the token alive, so the user
 		// lands back on their email list — NOT the re-auth screen.
-		expect(screen.getByText(/Found 1 email/i)).toBeInTheDocument();
+		// expect(screen.getByText(/Found 1 email/i)).toBeInTheDocument();
+		expect(screen.getByTestId('email-count')).toHaveTextContent(/found 1 email/i);
 		expect(screen.queryByRole("button", { name: /connect gmail account/i })).not.toBeInTheDocument();
 	});
 });

@@ -311,7 +311,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 			{!isSearching && emails.length > 0 && (
 				<div className={selectedEmail ? "display-email-preview-panel" : "gmail-results"}>
 					<div className="gmail-list-panel">
-						<h3 className="gmail-section-title">
+						<h3 className="gmail-section-title" data-testid="email-count">
 							<span>Found</span> {emails.length} email
 							{emails.length !== 1 ? "s" : ""}
 							{emailDateRange && (
