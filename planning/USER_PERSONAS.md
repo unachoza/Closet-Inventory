@@ -82,18 +82,18 @@ remember what she paid; over-packs when traveling with no system; "guilt items" 
 
 ## 2. The Closet Pair — "Our Closet" (24–34)
 
-**The origin story.** Sofia took the dress to Italy. Not maliciously — it was there, it was perfect for the
-trip. Arianna spent two days thinking she'd lost it before texting Sofia and learning it was in Milan. Not a
+**The origin story.** MJ took the dress to Italy. Not maliciously — it was there, it was perfect for the
+trip. Arianna spent two days thinking she'd lost it before texting MJ and learning it was in Milan. Not a
 technology failure — a *visibility* failure. The dress existed, it was fine, it was just invisible.
 
 | | |
 |---|---|
-| Ages | 24–34 · e.g. cousins Arianna (LA) + Sofia (Milan) |
+| Ages | 30–34 · e.g. cousins Arianna (SD) + MJ (Miami) |
 | Also | Roommates, partners, same-city lending friends, multi-home people |
 | Pattern | 2+ people with shared/overlapping wardrobes; casual trust-based sharing |
 
 **Their "nothing to wear":** *the thing I want is somewhere I can't reach.* The grey blazer is in Arianna's
-apartment; Arianna's in New York; Sofia's in Milan. Or the skirt came back but smells of perfume and needs
+apartment; Arianna's in New York; MJ's in Milan. Or the skirt came back but smells of perfume and needs
 cleaning — technically available, practically not.
 
 **Pain points (ranked):** location blindness · loan decay (borrowed → permanently gone) · availability
@@ -123,10 +123,10 @@ spine.** Strategic note: no competitor serves this pair — they are retention, 
 
 | Label | kind | Notes |
 |---|---|---|
-| Arianna's LA apartment | `home` | Arianna's primary |
-| Sofia's Milan flat | `other` | The other person's home ("with Sofia") |
+| Arianna's San Diego condo | `home` | Arianna's primary |
+| MJ's Miami flat | `other` | The other person's home ("with MJ") |
 | Carry-on | `suitcase` | In transit between cities |
-| Storage (LA) | `storage` | Off-season bins |
+| Storage (SD) | `storage` | Off-season bins |
 | With a friend | `other` | Generic on-loan-to-person |
 
 ---
@@ -142,7 +142,7 @@ clutter her mornings, and finds it offensive that no app built the middle layer 
 
 | | |
 |---|---|
-| Age | Early 30s · SWE + founder · LA · solo, travels frequently |
+| Age | Early 30s · SWE + founder · SD · solo, travels frequently |
 
 **Her "nothing to wear":** a systems failure. The item is at the dry cleaner, in a moving bin, or lent at a
 dinner party eight months ago and never returned — or it's right there but doesn't fit today, and seeing it is
@@ -168,7 +168,7 @@ memory tags — the display case, not the donation bin).
 
 | Label | kind | Notes |
 |---|---|---|
-| LA apartment | `home` | Primary |
+| SD condo | `home` | Primary |
 | Storage unit | `storage` | Moving bins / off-season |
 | At the cleaner | `other` | Out for dry cleaning (pairs with status `at_cleaner`) |
 | With a friend | `other` | Lent out (pairs with status `on_loan`) |
