@@ -33,7 +33,10 @@ function captureCSV(item: ClothingItem | ClothingItem[]): string {
 	let capturedCSV = "";
 
 	const OriginalBlob = globalThis.Blob;
-	vi.spyOn(globalThis, "Blob").mockImplementation((parts, opts) => {
+	// Use a regular function (not an arrow) so it can be invoked with `new`:
+	// production code calls `new Blob(...)`, and vitest 4's spy constructs the
+	// mock implementation directly — arrow functions aren't constructable.
+	vi.spyOn(globalThis, "Blob").mockImplementation(function (parts, opts) {
 		capturedCSV = (parts as string[]).join("");
 		return new OriginalBlob(parts, opts);
 	});

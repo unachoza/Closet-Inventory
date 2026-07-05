@@ -1,4 +1,4 @@
-/* //Colors// */
+/* //Colors//
 
 ├── Brand Terracotta (Focal / 10%)
 │   ├── #b28675 (Rose Terracotta)
@@ -13,9 +13,10 @@
 ├── Light Neutrals (Editorial Canvas / 60%) [Added for completeness]
 │   ├── #faf8f5 (Alabaster Linen)
 │   └── #f3eee7 (Soft Sand)
+*/
 
 
-/* //Semantic Tokens// */
+/* //Semantic Tokens//
 These tokens map the raw colors to their actual utility across your user interface.
 🏛️ Surface Tokens (Backgrounds)
 bg-canvas: #faf8f5 (The main editorial backdrop; clean, high-end, gallery-like)
@@ -35,6 +36,7 @@ text-link: #8f6256 (Sophisticated, non-blue interactive links)
 border-hairline: #847057 with 20% opacity (Fine, sharp lines separating layout grids)
 border-strong: #675647 (Input fields, active UI boundaries)
 border-brand: #ab7a68 (Focus indicators, premium components)
+*/
 
 
 
