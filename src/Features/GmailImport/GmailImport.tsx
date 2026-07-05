@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useGmailAuthContext } from "../../context/GmailAuthContext";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
@@ -41,7 +41,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		cachedCount,
 		searchMode,
 	} = useAdvancedSearch();
-
+	console.log("emails", emails);
 	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(initialSelectedEmailId ?? null);
 
 	// Find the selected email and ensure it has a body (fetch if needed)
@@ -86,7 +86,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedEmailId, emails, accessToken]);
-
+	console.log("emails", emails);
 	// Scroll the selected row into view so the left list matches the right preview
 	// (esp. on "Back to email"). This MUST run after `selectedEmail` is set: that's
 	// what flips the layout to the 40%-width preview split, which re-wraps the rows
@@ -126,6 +126,27 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		},
 		[accessToken, searchEmails, filterCachedEmails],
 	);
+
+	const emailDateRange = useMemo(() => {
+		if (emails.length === 0) return null;
+
+		const dates = emails.map((email) => new Date(email.date)).filter((date) => !Number.isNaN(date.getTime()));
+
+		if (dates.length === 0) return null;
+
+		const newest = new Date(Math.max(...dates.map((d) => d.getTime())));
+		const oldest = new Date(Math.min(...dates.map((d) => d.getTime())));
+
+		const formatter = new Intl.DateTimeFormat("en-US", {
+			month: "short",
+			year: "numeric",
+		});
+
+		return {
+			oldest: formatter.format(oldest),
+			newest: formatter.format(newest),
+		};
+	}, [emails]);
 
 	const handleDefaultSearch = useCallback(() => {
 		if (accessToken) {
@@ -291,13 +312,25 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				<div className={selectedEmail ? "display-email-preview-panel" : "gmail-results"}>
 					<div className="gmail-list-panel">
 						<h3 className="gmail-section-title">
-							Found {emails.length} email
+							<span>Found</span> {emails.length} email
 							{emails.length !== 1 ? "s" : ""}
+							{emailDateRange && (
+								<>
+									<br />
+									<span>Date range: </span>
+									{emailDateRange.newest} - {emailDateRange.oldest}
+								</>
+							)}
 							{cachedCount > 0 && emails.length !== cachedCount && (
 								<span className="gmail-cache-hint"> (of {cachedCount} cached)</span>
 							)}
 						</h3>
-						<EmailList emails={emails} selectedEmailId={selectedEmailId} onToggleSelect={handleToggleSelect} listRef={listRef} />
+						<EmailList
+							emails={emails}
+							selectedEmailId={selectedEmailId}
+							onToggleSelect={handleToggleSelect}
+							listRef={listRef}
+						/>
 						{isFetchingMore && (
 							<>
 								<div className="gmail-skeleton-row" aria-hidden="true" />
@@ -349,13 +382,10 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 	);
 }
 
-
-
-// TODO: 
-// test for REI 
+// TODO:
 // test for EXPRESS
-//make swim category -> if swimsuit might be european size ie 38 - 36-Flamingo 
+//make swim category -> if swimsuit might be european size ie 38 - 36-Flamingo
 //REI Order Confirmation #A307597894
 // shoe sizes have 1/2 sizes
-// add more than one sender, for serch
+// advanced search - add more than one sender, for serch
 // ebay Eddie Bauer Shoes 9 M Mocassins Loafers- Mocassins Loafers

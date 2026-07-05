@@ -46,7 +46,7 @@ Canonical *post-launch* sequence. Supersedes both the earlier _E2-before-E1_ pla
 | --------------- | ---------------------------------------------- | ---------------------------------------------------------------------- |
 | ✅ done         | **E0 · Trustworthy Core**                      | green suite, core bugs fixed, types tightened                          |
 | ✅ done         | **Security + Backend Foundation**              | localStorage purge (#76/#78), Phase 0 scaffold, Supabase + Azure setup |
-| **1 · current** | **Sprint 3.5 · Hotfixes**                      | re-auth bug, import/form UX, mobile + branding polish                  |
+| ✅ done         | **Sprint 3.5 · Hotfixes**                      | re-auth bug, import/form UX, mobile + branding polish                  |
 | 2               | **E1 · Cloud Backend** (+ E3 web-enrich spike) | Supabase + RLS + service-layer port + image storage; Cloudflare spike  |
 | 3               | **E5 · Mobile & PWA**                          | installable, touch-friendly, bottom nav, offline                       |
 | 4               | **E2 · Inventory Truth** ⭐                    | location, status, availability, taxonomy, photos, provenance, fit      |
@@ -94,7 +94,7 @@ Completed between Block A and B:
 **P1 — Bugs / regressions**
 
 - ✅ `E3-bug.3` **Skip item hidden under Add to Closet** — layout regression in `EditItemView` batch controls; z-index / order fix.
-- `E5-bug.1` **Mobile: item detail header under sticky nav** — full-height card heading slides under the sticky nav; add `margin-top`/`scroll-margin-top`.
+- ✅ `E5-bug.1` **Mobile: item detail header under sticky nav** — full-height card heading slides under the sticky nav; add `margin-top`/`scroll-margin-top`.
 - ✅ `E3-bug.4` **Email fetch loading pulse** — restore visible pulse/spinner in `GmailImport` during live Gmail API calls.
 - ✅ `E0-7.1` **Onboarding says "MyCloset"** — update branding to "Nothing To Wear".
 
