@@ -1,4 +1,5 @@
 import { ClothingItem } from "../../utils/types";
+import { BorderMode } from "../../utils/borderMode";
 import FilteredCard from "./FilteredCard";
 import "./EntireCloset.css";
 import { AnimatePresence, motion, Variants } from "framer-motion";
@@ -17,6 +18,7 @@ interface FilteredItemGridProps {
 	onToggleDensity?: () => void;
 	onEditItem?: (item: ClothingItem) => void;
 	onRemoveItem?: (id: string) => void;
+	borderMode?: BorderMode;
 }
 
 // Per-card variants. The stagger is driven by a per-index `delay` (via `custom`)
@@ -43,7 +45,7 @@ const cardVariants: Variants = {
 	exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
 };
 
-const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, compact, onToggleDensity, onEditItem, onRemoveItem }: FilteredItemGridProps) => {
+const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, compact, onToggleDensity, onEditItem, onRemoveItem, borderMode = "off" }: FilteredItemGridProps) => {
 	return (
 		<>
 			<div className="entire-closet__meta-row">
@@ -81,6 +83,7 @@ const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, compact, 
 									matchKeys={matchKeysById.get(item.id) ?? []}
 									onEditItem={onEditItem}
 									onRemoveItem={onRemoveItem}
+									borderMode={borderMode}
 								/>
 							</motion.div>
 						))}

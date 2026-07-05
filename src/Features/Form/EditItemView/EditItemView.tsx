@@ -7,7 +7,9 @@ import TextInput from "../TextInput/TextInput";
 // import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
-import { formItem, conditionOptions } from "../../../utils/constants";
+import { formItem, conditionOptions, statusOptions } from "../../../utils/constants";
+import { LOCATIONS } from "../../../utils/locations";
+import type { ItemStatus } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import { formatItemAge } from "../../../utils/itemAge";
 import { matchedCondition } from "../../../utils/condition";
@@ -76,6 +78,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		style,
 		originalPrice: _originalPrice,
 		qty: _qty,
+		// status + locationId get bespoke selects below (not generic text inputs).
+		status: _status,
+		locationId: _locationId,
 		...remaining
 	} = item;
 	const inputsToSeperate = { id, onSale, notes, style };
@@ -99,9 +104,18 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// const onToggleDetail = useCallback((key: string, value: any) => {
 	// 	setFormData((prev) => ({ ...prev, [key]: !value }));
 	// }, []);
+	console.log("formData.material", formData, formData.material);
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData((prev) => ({ ...prev, condition: e.target.value }));
+	}, []);
+
+	const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFormData((prev) => ({ ...prev, status: e.target.value as ItemStatus }));
+	}, []);
+
+	const handleLocationChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFormData((prev) => ({ ...prev, locationId: e.target.value }));
 	}, []);
 
 	// Manual-entry fallback when an imported email had no parseable date.
@@ -290,7 +304,12 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					{/* Material blend — rendered separately from generic fields */}
 					<div className="edit-form-material">
 						<label className="edit-form-material__label">Material Composition</label>
-						<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
+						{formData.material && formData.material.length > 0 && (
+							<>
+								<p>nothing here</p>
+								<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
+							</>
+						)}
 						<MaterialBlendInput
 							value={normalizeMaterial(formData.material)}
 							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
@@ -310,6 +329,42 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							{conditionOptions.map((opt) => (
 								<option key={opt} value={opt}>
 									{opt}
+								</option>
+							))}
+						</select>
+					</label>
+
+					{/* Status — E2 lifecycle state (clean/dirty/at cleaner/etc.). Default "clean". */}
+					<label className="edit-form-condition">
+						status
+						<select
+							name="status"
+							className="edit-form-condition__select"
+							value={formData.status ?? "clean"}
+							onChange={handleStatusChange}
+							aria-label="status"
+						>
+							{statusOptions.map((opt) => (
+								<option key={opt} value={opt}>
+									{opt.replace(/_/g, " ")}
+								</option>
+							))}
+						</select>
+					</label>
+
+					{/* Location — E2 US-2.2. Default the primary (home) location. */}
+					<label className="edit-form-condition">
+						location
+						<select
+							name="locationId"
+							className="edit-form-condition__select"
+							value={formData.locationId ?? "home"}
+							onChange={handleLocationChange}
+							aria-label="location"
+						>
+							{LOCATIONS.map((loc) => (
+								<option key={loc.id} value={loc.id}>
+									{loc.label}
 								</option>
 							))}
 						</select>
