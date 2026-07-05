@@ -1,4 +1,4 @@
-import { Option, Step, MaterialBlend } from "./types.ts";
+import { Option, Step, MaterialBlend, ItemStatus } from "./types.ts";
 import TopIcon from "../assets/clothes-icons/blouse.svg";
 import BottomIcon from "../assets/clothes-icons/trousers.svg";
 import SweaterIcon from "../assets/clothes-icons/sweater.svg";
@@ -50,6 +50,9 @@ export const clothesAgesOptions = ["new", "3 months", "6 months", "1 year", "18 
 
 // Subjective condition states (replaces the old free-text "age" picker).
 export const conditionOptions = ["new", "like new", "good", "fair", "needs repair"];
+
+// E2: mutable lifecycle status (distinct from condition). E11 owns clean/dirty.
+export const statusOptions: ItemStatus[] = ["clean", "dirty", "at_cleaner", "in_repair", "traveling", "on_loan"];
 
 export const brandExamples = [
 	"aritzia",
@@ -140,6 +143,8 @@ export const categoryDecisionTree = {
 export const MY_CLOSET_DATA = [
 	{
 		id: "001",
+		status: "dirty" as ItemStatus,
+		locationId: "home",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378561/Screenshot_2025-10-13_at_11.02.15_AM_iigax2.png",
 		name: "Sculpt Knit Racer Mini Dress | Bodycon Knit Pink dress",
 		category: "dress",
@@ -166,6 +171,8 @@ export const MY_CLOSET_DATA = [
 	},
 	{
 		id: "002",
+		status: "on_loan" as ItemStatus,
+		locationId: "other",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378561/Screenshot_2025-10-13_at_11.01.47_AM_cteckm.png",
 		name: "Henrietta Dress | Black spaghetti strap",
 		category: "dress",
@@ -215,6 +222,8 @@ export const MY_CLOSET_DATA = [
 	},
 	{
 		id: "004",
+		status: "traveling" as ItemStatus,
+		locationId: "suitcase",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378564/Screenshot_2025-10-13_at_11.01.56_AM_bj8hhy.png",
 		name: "Contour Squareneck Mini Dress | Bodycon soft dress",
 		category: "dress",
@@ -237,6 +246,8 @@ export const MY_CLOSET_DATA = [
 	},
 	{
 		id: "005",
+		status: "at_cleaner" as ItemStatus,
+		locationId: "home",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378560/Screenshot_2025-10-13_at_11.02.21_AM_wtckqg.png",
 		name: "Sculpt Knit Squareneck Mini Dress | Brown midi dress",
 		category: "dress",
@@ -262,6 +273,8 @@ export const MY_CLOSET_DATA = [
 
 	{
 		id: "006",
+		status: "clean" as ItemStatus,
+		locationId: "storage",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378929/Screenshot_2025-10-13_at_11.07.28_AM_n555pt.png",
 		name: "Contour Off-shoulder Longsleeve Dress | Black off the shoulder dress",
 		category: "dress",
@@ -281,6 +294,8 @@ export const MY_CLOSET_DATA = [
 	},
 	{
 		id: "007",
+		status: "in_repair" as ItemStatus,
+		locationId: "home",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760425172/Screenshot_2025-10-13_at_11.59.09_PM_gb0zvn.png",
 		name: "Chill Malibu Dress | Roughed Black mini dress",
 		category: "dress",
@@ -327,6 +342,8 @@ export const MY_CLOSET_DATA = [
 
 	{
 		id: "009",
+		status: "clean" as ItemStatus,
+		locationId: "suitcase",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760467752/Screenshot_2025-10-14_at_11.48.56_AM_fxlwhs.png",
 		name: "High-rise A-line mini skirt | black skirt",
 		category: "bottom",
@@ -368,6 +385,8 @@ export const MY_CLOSET_DATA = [
 	},
 	{
 		id: "011",
+		status: "traveling" as ItemStatus,
+		locationId: "suitcase",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1781163001/l_wp_699bd186ff353a34a178dd67_es6xwd.webp",
 		name: "Sherpa Car Coat | Double-breasted blazer with shoulder pads",
 		category: "coat",
@@ -391,6 +410,8 @@ export const MY_CLOSET_DATA = [
 	},
 	{
 		id: "012",
+		status: "clean" as ItemStatus,
+		locationId: "storage",
 		imageURL: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1760378933/Screenshot_2025-10-13_at_11.07.52_AM_o4sbhu.png",
 		name: "Deniro Vest | Softly structured button-up suit vest",
 		category: "top",

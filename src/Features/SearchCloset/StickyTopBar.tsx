@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FilterDimension, FilterOptions, FilterState } from "../../hooks/useClosetFilters";
 import { SortKey } from "../../hooks/useClosetSort";
+import { BorderMode } from "../../utils/borderMode";
 import SearchSortBar from "./SearchSortBar";
 import FilterPillsRow from "./FilterPillsRow";
 import FilterSidePanel from "./FilterSidePanel";
@@ -14,6 +15,8 @@ interface StickyTopBarProps {
 	activeFilterCount: number;
 	onToggleFilter: (dim: FilterDimension, value: string) => void;
 	onClearAll: () => void;
+	borderMode: BorderMode;
+	onCycleBorderMode: () => void;
 }
 
 const StickyTopBar = ({
@@ -24,6 +27,8 @@ const StickyTopBar = ({
 	activeFilterCount,
 	onToggleFilter,
 	onClearAll,
+	borderMode,
+	onCycleBorderMode,
 }: StickyTopBarProps) => {
 	const [showFilters, setShowFilters] = useState(false);
 
@@ -35,6 +40,8 @@ const StickyTopBar = ({
 				showFilters={showFilters}
 				onToggleFilters={() => setShowFilters((v) => !v)}
 				activeFilterCount={activeFilterCount}
+				borderMode={borderMode}
+				onCycleBorderMode={onCycleBorderMode}
 			/>
 			<FilterPillsRow
 				filters={filters}
