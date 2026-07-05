@@ -151,7 +151,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		}
 	};
 
-	const separateFeilds = () => {
+	const separateFields = () => {
 		return Object.entries(inputsToSeperate).map(([key, value]) => {
 			if (key === "imageURL") {
 				return (
@@ -319,7 +319,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					    shown read-only (disabled); the rare no-date import falls back to a
 					    manual date entry. */}
 
-					{separateFeilds()}
+					{separateFields()}
 				</div>
 
 				<div className="edit-form-actions">

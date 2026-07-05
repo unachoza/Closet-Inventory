@@ -188,7 +188,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		}
 	};
 
-	const separateFeilds = () => {
+	const separateFields = () => {
 		return Object.entries(inputsToSeperate).map(([key, value]) => {
 			if (key === "imageURL") {
 				return (
@@ -341,7 +341,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						</select>
 					</label>
 
-					{separateFeilds()}
+					{separateFields()}
 				</div>
 
 				<div className="edit-form-actions">
