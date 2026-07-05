@@ -3,16 +3,13 @@ import { describe, it, expect } from "vitest";
 import MaterialCompositionBar from "./MaterialCompositionBar";
 
 describe("MaterialCompositionBar", () => {
-	it("does not crash when blend is undefined", () => {
+	it("renders nothing when blend is undefined", () => {
 		const { container } = render(<MaterialCompositionBar blend={undefined} />);
-
-		expect(container.firstChild).toBeInTheDocument();
-		// expect(screen.getAllByTestId("material-segment")).toHaveLength(0);
+		expect(container.firstChild).toBeNull();
 	});
-	it("renders an empty shell for an empty blend", () => {
+	it("renders nothing for an empty blend", () => {
 		const { container } = render(<MaterialCompositionBar blend={[]} />);
-		expect(container.firstChild).toBeInTheDocument();
-		// expect(screen.get("material-segment")).toHaveLength(0);
+		expect(container.firstChild).toBeNull();
 	});
 
 	it("renders one segment per material", () => {
