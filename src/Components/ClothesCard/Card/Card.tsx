@@ -22,20 +22,27 @@ interface Geometry {
 
 const DESKTOP_MODAL_MAX_WIDTH = 500;
 const MOBILE_BREAKPOINT = 768;
+const NAV_CLEARANCE = 12;
 
 function prefersReducedMotion(): boolean {
 	return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
+function getNavHeight(): number {
+	const nav = document.querySelector(".top-nav");
+	return nav ? nav.getBoundingClientRect().height : 56;
+}
+
 /** Centered resting geometry for the details modal — near-fullscreen on phones.
- *  Height is omitted so the modal sizes to its content (CSS handles max/min). */
+ *  Height is omitted so the modal sizes to its content (CSS handles max/min).
+ *  The top edge is clamped below the sticky nav so the title is never clipped. */
 function centeredGeometry(): Geometry {
 	const isSmall = window.innerWidth <= MOBILE_BREAKPOINT;
 	const width = isSmall ? window.innerWidth * 0.94 : Math.min(DESKTOP_MODAL_MAX_WIDTH, window.innerWidth * 0.92);
+	const navBottom = getNavHeight() + NAV_CLEARANCE;
 	return {
 		width,
-		// top: 50vh — CSS translateY(-50%) on the --centered class handles true vertical centering.
-		top: window.innerHeight * 0.55,
+		top: navBottom,
 		left: (window.innerWidth - width) / 2,
 	};
 }
@@ -159,7 +166,8 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 							left: geometry.left,
 							width: geometry.width,
 							...(geometry.height !== undefined && { height: geometry.height }),
-						}}
+							"--card-modal-top": `${geometry.top}px`,
+						} as React.CSSProperties}
 						onClick={(e) => e.stopPropagation()}
 						onTransitionEnd={handleModalTransitionEnd}
 					>

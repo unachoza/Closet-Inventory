@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 100vw;
+    width: 100%;
      height: var(--header-height);
     padding: 0 20px;
     border: 1px solid var(--border-hairline);
@@ -163,11 +163,16 @@ div.search-container > input {
       width: 260px;
       max-width: 80vw;
       padding: 16px;
+      padding-top: max(16px, env(safe-area-inset-top));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      padding-left: max(16px, env(safe-area-inset-left));
       border: 1px solid var(--border-hairline);
       background-color: var(--bg-surface-primary);
       box-shadow: var(--elevation-high);
       animation: nav-drawer-in 0.2s ease;
       gap: 16px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
 }
 
 @keyframes nav-drawer-in {

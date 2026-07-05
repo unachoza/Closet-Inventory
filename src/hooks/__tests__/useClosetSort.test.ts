@@ -136,4 +136,54 @@ describe("useClosetSort", () => {
 		expect(() => result.current.sortedItems([])).not.toThrow();
 		expect(result.current.sortedItems([])).toEqual([]);
 	});
+
+	// E0-2.3: material-% sort. Inputs use MaterialBlend[] to match the live
+	// pipeline (useCloudCloset normalizes every item's material before it reaches
+	// the sort).
+	describe("materialPct sort (E0-2.3)", () => {
+		const MATERIAL_ITEMS: ClothingItem[] = [
+			makeItem({ id: "c60", material: [{ material: "cotton", percentage: 60 }, { material: "polyester", percentage: 40 }] }),
+			makeItem({ id: "c100", material: [{ material: "cotton", percentage: 100 }] }),
+			makeItem({ id: "c85", material: [{ material: "cotton", percentage: 85 }, { material: "elastane", percentage: 15 }] }),
+			makeItem({ id: "wool", material: [{ material: "wool", percentage: 100 }] }),
+		];
+
+		it("ranks items descending by the selected material's percentage (100% cotton first)", () => {
+			const { result } = renderHook(() => useClosetSort("materialPct"));
+			const sorted = result.current.sortedItems(MATERIAL_ITEMS, ["Cotton"]);
+			expect(sorted.map((i) => i.id)).toEqual(["c100", "c85", "c60", "wool"]);
+		});
+
+		it("sinks items that lack the selected material to the bottom", () => {
+			const { result } = renderHook(() => useClosetSort("materialPct"));
+			const sorted = result.current.sortedItems(MATERIAL_ITEMS, ["Cotton"]);
+			expect(sorted[sorted.length - 1].id).toBe("wool"); // no cotton → -Infinity
+		});
+
+		it("matches selected fibers through canonicalization (Spandex ↔ elastane)", () => {
+			const items: ClothingItem[] = [
+				makeItem({ id: "e20", material: [{ material: "nylon", percentage: 80 }, { material: "elastane", percentage: 20 }] }),
+				makeItem({ id: "e8", material: [{ material: "cotton", percentage: 92 }, { material: "elastane", percentage: 8 }] }),
+			];
+			const { result } = renderHook(() => useClosetSort("materialPct"));
+			// "Spandex" is the canonical label for elastane in the filter UI.
+			const sorted = result.current.sortedItems(items, ["Spandex"]);
+			expect(sorted.map((i) => i.id)).toEqual(["e20", "e8"]);
+		});
+
+		it("falls back to the dominant fiber percentage when no material is selected", () => {
+			const { result } = renderHook(() => useClosetSort("materialPct"));
+			const sorted = result.current.sortedItems(MATERIAL_ITEMS, []);
+			// c100 & wool are 100%, c85 is 85%, c60 is 60% (dominant fiber).
+			expect(sorted[sorted.length - 1].id).toBe("c60");
+			expect(sorted.slice(0, 2).map((i) => i.id).sort()).toEqual(["c100", "wool"]);
+		});
+
+		it("does not mutate the original array", () => {
+			const original = MATERIAL_ITEMS.map((i) => i.id);
+			const { result } = renderHook(() => useClosetSort("materialPct"));
+			result.current.sortedItems(MATERIAL_ITEMS, ["Cotton"]);
+			expect(MATERIAL_ITEMS.map((i) => i.id)).toEqual(original);
+		});
+	});
 });

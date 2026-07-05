@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { ClothingItem } from "../utils/types";
+import { canonicalizeMaterial, normalizeMaterial } from "../utils/materialUtils";
 
 export type SortKey =
 	| "dateAdded"
@@ -10,7 +11,8 @@ export type SortKey =
 	| "purchasedNewest"
 	| "purchasedOldest"
 	| "nameAZ"
-	| "nameZA";
+	| "nameZA"
+	| "materialPct";
 
 export const SORT_LABELS: Record<SortKey, string> = {
 	dateAdded: "Date Added",
@@ -22,6 +24,7 @@ export const SORT_LABELS: Record<SortKey, string> = {
 	purchasedOldest: "Purchased: Oldest First",
 	nameAZ: "Name: A → Z",
 	nameZA: "Name: Z → A",
+	materialPct: "Material: Highest %",
 };
 
 // Condition ranking, best → worst. Includes the canonical 5 options plus a few
@@ -60,6 +63,23 @@ const parsePurchaseDate = (item: ClothingItem): number | null => {
 	return isNaN(t) ? null : t;
 };
 
+// E0-2.3: rank an item by its material blend percentage. When a material filter
+// is active, `selected` holds the canonicalized selected fibers and the rank is
+// the highest percentage among *those* fibers (so 100% cotton outranks a 60%
+// cotton blend). With no selection it falls back to the item's dominant fiber.
+// Items with no material blend sink to the bottom via -Infinity.
+//
+// Note: the closet is normalized to MaterialBlend[] upstream (useCloudCloset),
+// so a legacy bare string like "cotton" arrives as 100% and ranks accordingly —
+// it is not treated as unknown.
+const materialPercentage = (item: ClothingItem, selected: Set<string>): number => {
+	const blend = normalizeMaterial(item.material);
+	if (blend.length === 0) return -Infinity;
+	const relevant = selected.size > 0 ? blend.filter((b) => selected.has(canonicalizeMaterial(b.material).toLowerCase())) : blend;
+	if (relevant.length === 0) return -Infinity;
+	return Math.max(...relevant.map((b) => b.percentage));
+};
+
 // Sort by purchaseDate; items with no/invalid date always sink to the bottom,
 // regardless of direction, so they don't masquerade as the newest or oldest.
 const byPurchaseDate =
@@ -78,7 +98,7 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 
 	const sortedItems = useMemo(
 		() =>
-			(items: ClothingItem[]): ClothingItem[] => {
+			(items: ClothingItem[], selectedMaterials: string[] = []): ClothingItem[] => {
 				const copy = [...items];
 				switch (sortKey) {
 					case "priceAsc":
@@ -97,6 +117,10 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 						return copy.sort((a, b) => a.name.localeCompare(b.name));
 					case "nameZA":
 						return copy.sort((a, b) => b.name.localeCompare(a.name));
+					case "materialPct": {
+						const selected = new Set(selectedMaterials.map((m) => canonicalizeMaterial(m).toLowerCase()));
+						return copy.sort((a, b) => materialPercentage(b, selected) - materialPercentage(a, selected));
+					}
 					case "dateAdded":
 					default:
 						return copy;

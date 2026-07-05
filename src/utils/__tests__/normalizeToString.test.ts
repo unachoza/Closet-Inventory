@@ -22,6 +22,14 @@ describe("normalizeToString", () => {
 		expect(normalizeToString(["cotton", 50])).toBe("");
 	});
 
+	it("converts true to 'True'", () => {
+		expect(normalizeToString(true)).toBe("True");
+	});
+
+	it("converts false to 'False'", () => {
+		expect(normalizeToString(false)).toBe("False");
+	});
+
 	it("returns empty string for null", () => {
 		expect(normalizeToString(null)).toBe("");
 	});

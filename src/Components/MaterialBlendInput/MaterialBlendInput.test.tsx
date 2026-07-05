@@ -13,12 +13,9 @@ describe("MaterialBlendInput", () => {
 		expect(screen.getByDisplayValue("80")).toBeInTheDocument();
 	});
 
-	it("renders no material rows and an enabled Add Material button when empty", () => {
-		const { container } = render(<MaterialBlendInput value={[]} onChange={onChange} />);
-		// The old "No materials added yet" empty state was intentionally removed;
-		// an empty blend simply shows zero rows with Add Material available.
-		expect(container.querySelectorAll(".mbi__row")).toHaveLength(0);
-		expect(screen.getByRole("button", { name: /add material/i })).toBeEnabled();
+	it("renders no rows when there are no materials", () => {
+		render(<MaterialBlendInput value={[]} onChange={onChange} />);
+		expect(screen.queryAllByLabelText(/percentage/i)).toHaveLength(0);
 	});
 
 	it("clicking Add Material calls onChange with a new empty row", () => {

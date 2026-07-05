@@ -4,7 +4,6 @@ import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
-// import AnimatedCheckbox from "../CheckboxCollection/RadixCheckbox";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem, conditionOptions, statusOptions } from "../../../utils/constants";
@@ -18,12 +17,11 @@ import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
 import close from "../../../assets/close.svg";
+import { toAbsoluteDate } from "../../../utils/dateUtils";
 
 /** Fields the user may leave blank when adding/editing an item **/
 const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
 
-/** Extract form-editable fields from a ClothingItem. Used for both
- *  initial state and when the item prop changes (batch import queue). */
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	return {
 		...item,
@@ -32,7 +30,6 @@ function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	};
 }
 
-/** Convert an ISO/RFC date string to the "yyyy-MM-dd" value a <input type="date"> expects. */
 function toDateInputValue(iso?: string): string {
 	if (!iso) return "";
 	const d = new Date(iso);
@@ -40,32 +37,34 @@ function toDateInputValue(iso?: string): string {
 	return d.toISOString().slice(0, 10);
 }
 
-import { toAbsoluteDate } from "../../../utils/dateUtils";
+/**
+ * Helper utility to turn the raw text layout back into a clean string array
+ * by discarding bullet artifacts.
+ */
+function parseTextToNotesArray(text: string): string[] {
+	if (!text || !text.trim()) return [];
+	return text
+		.split("\n")
+		.map((line) => line.replace(/^\s*[•\-*]\s*/, "").trim())
+		.filter((line) => line.length > 0);
+}
 
 export interface EditItemViewProps {
 	item: ClothingItem;
 	mode?: "edit" | "create";
 	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
 	setView: Dispatch<SetStateAction<ViewType>>;
-	/** Return to the Gmail email preview the user imported from */
 	onReturnToEmail?: () => void;
-	/** Skip this item in a batch import queue */
 	onSkipItem?: () => void;
-	/** Called after item is added to closet in batch mode (advances queue) */
 	onItemAdded?: () => void;
-	/** Current position in import queue (1-based) */
 	queuePosition?: number;
-	/** Total items in import queue */
 	queueTotal?: number;
 }
 
 const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
-	// age/condition/purchaseDate are pulled out of `remaining` so they are NOT
-	// auto-rendered as generic editable text inputs. They get bespoke controls:
-	// condition → a fixed-option selector, purchaseDate → a disabled display
-	// (or a manual-entry prompt when an import has no date), factual age → read-only.
+
 	const {
 		id,
 		imageURL,
@@ -86,24 +85,25 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	const inputsToSeperate = { id, onSale, notes, style };
 	const { updateItem, addFullItem } = useLocalStorageCloset();
 	const { showToast } = useToast();
-	// Parent renders <EditItemView key={item.id} ...> so React remounts the
-	// component for each new item, reinitializing useState with fresh data.
-	// No useEffect needed — key-based remount is the React-idiomatic approach.
+
 	const [formData, setFormData] = useState<Partial<ClothingItem>>(() => buildFormDataFromItem(item));
 	const previewSrc = useSignedImageUrl(formData.imageURL);
 
-	// Stable ref — uses functional update so it never needs formData in deps.
-	// TextInput is wrapped in memo(), so a stable handleChange means only the
-	// TextInput whose value actually changed will re-render (not all 10+).
+	// Local state specifically managing the raw text string inside the textarea field
+	const [textAreaNotes, setTextAreaNotes] = useState<string>(() => {
+		const initialNotes = formData.notes ?? notes;
+		return initialNotes && initialNotes.length > 0 ? `• ${initialNotes.join("\n• ")}` : "";
+	});
+
 	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => {
 		if (typeof e === "string") return;
 		const { name, value } = e.target;
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
-	// const onToggleDetail = useCallback((key: string, value: any) => {
-	// 	setFormData((prev) => ({ ...prev, [key]: !value }));
-	// }, []);
+	const handleNotesTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setTextAreaNotes(e.target.value);
+	};
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData((prev) => ({ ...prev, condition: e.target.value as WearState }));
@@ -117,18 +117,52 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		setFormData((prev) => ({ ...prev, locationId: e.target.value }));
 	}, []);
 
-	// Manual-entry fallback when an imported email had no parseable date.
 	const handlePurchaseDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
 		const { value } = e.target;
 		setFormData((prev) => ({ ...prev, purchaseDate: value ? new Date(value).toISOString() : "" }));
 	}, []);
 
+	const handleNotesKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+		const textarea = e.currentTarget;
+		const { value, selectionStart, selectionEnd } = textarea;
+
+		if (e.key === "Enter") {
+			e.preventDefault();
+
+			const bulletStr = "• ";
+			const beforeCursor = value.substring(0, selectionStart);
+			const afterCursor = value.substring(selectionEnd);
+
+			let replacementText: string;
+			let newCursorPos: number;
+
+			if (value.trim() === "") {
+				replacementText = bulletStr;
+				newCursorPos = bulletStr.length;
+			} else {
+				replacementText = `${beforeCursor}\n${bulletStr}${afterCursor}`;
+				newCursorPos = beforeCursor.length + 1 + bulletStr.length;
+			}
+
+			setTextAreaNotes(replacementText);
+
+			setTimeout(() => {
+				textarea.focus();
+				textarea.setSelectionRange(newCursorPos, newCursorPos);
+			}, 0);
+		}
+	};
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
+
+		// Convert the textarea text block back into a clean string array before updating state or local closet storage structures
+		const finalNotesArray = parseTextToNotesArray(textAreaNotes);
 
 		if (isCreateMode) {
 			const imageURL = formData.imageURL || getStockPhoto(formData.category as CategoryType);
 			const displayName = formData.name || (formData.brand ? `${formData.brand} ${formData.category}` : formData.category) || "New Item";
+
 			addFullItem({
 				...item,
 				...formData,
@@ -138,17 +172,22 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				color: (formData.color ?? "").toLowerCase(),
 				material: normalizeMaterial(formData.material),
 				condition: formData.condition ?? "new",
+				notes: finalNotesArray, // Injected parsed string[]
 			} as ClothingItem);
+
 			showToast(`${displayName} added to your closet!`);
 
-			// In batch mode, advance to next item instead of going to carousel
 			if (isInBatchMode && onItemAdded) {
 				setTimeout(() => onItemAdded());
 				return;
 			}
 		} else {
-			updateItem(item.id, formData);
-			setFormData(formItem as Partial<ClothingItem>);
+			updateItem(item.id, {
+				...formData,
+				notes: finalNotesArray, // Injected parsed string[]
+			});
+			setFormData(formItem);
+			setTextAreaNotes("");
 			showToast(`${formData.name} updated`);
 		}
 
@@ -164,7 +203,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		}
 	};
 
-	const separateFeilds = () => {
+	const separateFields = () => {
 		return Object.entries(inputsToSeperate).map(([key, value]) => {
 			if (key === "imageURL") {
 				return (
@@ -178,18 +217,18 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					/>
 				);
 			} else if (key === "onSale") {
-				// TODO: re-enable onSale checkbox when needed
 				return null;
 			} else if (key === "notes") {
 				return (
-					<label key={key}>
+					<label key={key} className="edit-form-notes-label">
 						{key}
 						<textarea
 							name={key}
 							className="textarea"
-							value={normalizeToString(formData[key] ?? value)}
-							placeholder={!value ? `Enter ${key}` : ""}
-							onChange={handleChange}
+							value={textAreaNotes}
+							placeholder="Press Enter to start adding bulleted notes..."
+							onChange={handleNotesTextAreaChange}
+							onKeyDown={handleNotesKeyDown}
 						></textarea>
 					</label>
 				);
@@ -219,7 +258,6 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			>
 				<h2 className="card-title">{isCreateMode ? "Import Item" : item.name}</h2>
 
-				{/* Queue progress indicator for batch imports */}
 				{isInBatchMode && (
 					<div className="edit-form-queue-progress">
 						<span className="edit-form-queue-badge">
@@ -228,20 +266,11 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					</div>
 				)}
 
-				{/* Return to email button for create mode */}
-				{/* {isCreateMode && onReturnToEmail && (
-					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
-						&larr; Return to Email Preview
-					</button>
-				)} */}
-
-				{/* Return to email button for create mode */}
 				{isCreateMode && onReturnToEmail && (
 					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
 						&larr; Back to Email
 					</button>
 				)}
-				{/* Image preview for create mode */}
 
 				{isCreateMode && previewSrc && (
 					<div className="edit-form-image-preview">
@@ -300,7 +329,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							</span>
 						</label>
 					)}
-					{/* Material blend — rendered separately from generic fields */}
+
 					<div className="edit-form-material">
 						<label className="edit-form-material__label">Material Composition</label>
 						<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
@@ -310,7 +339,6 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						/>
 					</div>
 
-					{/* Condition — fixed options, always editable (default "new"). */}
 					<label className="edit-form-condition">
 						condition
 						<select
@@ -364,11 +392,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						</select>
 					</label>
 
-					{/* Purchase date — drives factual age. When captured from an email it is
-					    shown read-only (disabled); the rare no-date import falls back to a
-					    manual date entry. */}
-
-					{separateFeilds()}
+					{separateFields()}
 				</div>
 
 				<div className="edit-form-actions">

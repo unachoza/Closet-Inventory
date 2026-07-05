@@ -14,7 +14,7 @@ vi.mock("../../Components/Toast/Toast", () => ({
 	useToast: () => ({ showToast: mockShowToast }),
 }));
 
-vi.mock("../../hooks/uselocalStorage", () => ({
+vi.mock("../../hooks/useLocalStorage", () => ({
 	useLocalStorage: (_key: string, init: unknown) => [init, vi.fn()],
 }));
 

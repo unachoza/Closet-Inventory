@@ -1,0 +1,29 @@
+name: Dependabot Auto-Merge
+
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    # Only run this job if the PR was actually opened by Dependabot
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      # 1. Fetch metadata about the package updates inside the PR
+      - name: Fetch Dependabot metadata
+        uses: dependabot/fetch-metadata@v2
+        id: metadata
+
+      # 2. Approve and flag the PR for auto-merge ONLY if it matches the group name
+      - name: Approve and Enable Auto-Merge
+        if: steps.metadata.outputs.dependency-group == 'dev-dependencies'
+        run: |
+          gh pr review --approve "$PR_URL"
+          gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

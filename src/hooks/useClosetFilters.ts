@@ -3,35 +3,9 @@ import { ClothingItem, MaterialBlend } from "../utils/types";
 import normalizeColor, { normalizeColorGroups } from "../Features/FashionParser/normalizers/normalizeColor";
 import normalizeCategory from "../Features/FashionParser/normalizers/normalizeCategory";
 import { parseCareLabels } from "../utils/careUtils";
+import { canonicalizeMaterial } from "../utils/materialUtils";
 
 const MATERIAL_MIN_PCT = 6;
-
-// Exact-key overrides — checked first.
-const MATERIAL_EXACT: Record<string, string> = {
-	lycra: "Spandex",
-	elastane: "Spandex",
-	lyocell: "Tencel",
-	"cupro rayon": "Cupro",
-};
-
-// Substring rules — applied in order when no exact match found.
-// A material name that *contains* the keyword maps to the canonical value.
-const MATERIAL_CONTAINS: [substring: string, canonical: string][] = [
-	["tencel", "Tencel"],
-	["viscose", "Viscose"],
-	["polyester", "Polyester"],
-	["cupro", "Cupro"],
-	["spandex", "Spandex"],
-];
-
-function canonicalizeMaterial(name: string): string {
-	const key = name.trim().toLowerCase();
-	if (MATERIAL_EXACT[key]) return MATERIAL_EXACT[key];
-	for (const [sub, canonical] of MATERIAL_CONTAINS) {
-		if (key.includes(sub)) return canonical;
-	}
-	return capitalize(name.trim());
-}
 
 // Extract canonical material names from a raw material field.
 // Skips minor fibers (≤ 6%) so "95% Cotton, 5% Elastane" → ["Cotton"] not ["Cotton", "Elastane"].
@@ -46,10 +20,6 @@ const extractMaterialNames = (raw: unknown): string[] => {
 	}
 	return [];
 };
-
-function capitalize(s: string): string {
-	return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-}
 
 export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care";
 export type FilterState = Record<FilterDimension, string[]>;

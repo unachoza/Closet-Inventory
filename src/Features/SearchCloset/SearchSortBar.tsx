@@ -24,6 +24,7 @@ const SORT_OPTIONS: SortKey[] = [
 	"purchasedOldest",
 	"nameAZ",
 	"nameZA",
+	"materialPct",
 ];
 
 const SearchSortBar = ({

@@ -9,7 +9,7 @@ import { useLocalStorageCloset } from "./hooks/useLocalCloset";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
-import EditItemView from "./Features/Form/EditItemView/EditItemViewGeminiV2";
+import EditItemView from "./Features/Form/EditItemView/EditItemView";
 import MultiStepForm from "./Features/Form/Form";
 import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";

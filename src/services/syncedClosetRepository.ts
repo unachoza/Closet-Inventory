@@ -2,6 +2,7 @@ import type { ClothingItem } from "../utils/types";
 import type { ClosetRepository, ImportMode } from "./closetRepository";
 import { LocalClosetRepository } from "./localClosetRepository";
 import { SupabaseClosetRepository } from "./supabaseClosetRepository";
+import { clearSyncFailures, recordSyncFailure } from "./syncFailureTracker";
 
 function ts(iso: string | undefined): number {
 	return iso ? new Date(iso).getTime() : 0;
@@ -50,6 +51,7 @@ export class SyncedClosetRepository implements ClosetRepository {
 			// E1-1.5: seed — remote is empty, push all local items
 			if (remote.length === 0 && local.length > 0) {
 				await this.remote.importItems(local, "replace");
+				clearSyncFailures();
 				return local;
 			}
 
@@ -65,10 +67,17 @@ export class SyncedClosetRepository implements ClosetRepository {
 				return !r || ts(item.updatedAt) > ts(r.updatedAt);
 			});
 			if (localWins.length > 0) {
-				void this.remote.importItems(localWins, "merge").catch(() => {
-					// offline — local mirror is already up to date; remote will catch
-					// up on next successful getAll()
-				});
+				void this.remote
+					.importItems(localWins, "merge")
+					.then(() => clearSyncFailures())
+					.catch((error) => {
+						// offline — local mirror is already up to date; remote will catch
+						// up on next successful getAll()
+						recordSyncFailure("reconcile", error);
+					});
+			} else {
+				// Remote already had everything — nothing pending.
+				clearSyncFailures();
 			}
 
 			return merged;
@@ -86,9 +95,7 @@ export class SyncedClosetRepository implements ClosetRepository {
 		const stamped: ClothingItem = { ...item, updatedAt: item.updatedAt ?? new Date().toISOString() };
 		await this.local.add(stamped);
 		if (this.remote) {
-			void this.remote.add(stamped).catch(() => {
-				// TODO E1-1.6: enqueue for retry when online
-			});
+			void this.remote.add(stamped).catch((error) => recordSyncFailure("add", error));
 		}
 		return stamped;
 	}
@@ -97,7 +104,7 @@ export class SyncedClosetRepository implements ClosetRepository {
 		const stamped = { ...patch, updatedAt: new Date().toISOString() };
 		const result = await this.local.update(id, stamped);
 		if (this.remote) {
-			void this.remote.update(id, stamped).catch(() => {});
+			void this.remote.update(id, stamped).catch((error) => recordSyncFailure("update", error));
 		}
 		return result;
 	}
@@ -105,14 +112,14 @@ export class SyncedClosetRepository implements ClosetRepository {
 	async remove(id: string): Promise<void> {
 		await this.local.remove(id);
 		if (this.remote) {
-			void this.remote.remove(id).catch(() => {});
+			void this.remote.remove(id).catch((error) => recordSyncFailure("remove", error));
 		}
 	}
 
 	async importItems(items: ClothingItem[], mode: ImportMode): Promise<ClothingItem[]> {
 		const result = await this.local.importItems(items, mode);
 		if (this.remote) {
-			void this.remote.importItems(items, mode).catch(() => {});
+			void this.remote.importItems(items, mode).catch((error) => recordSyncFailure("importItems", error));
 		}
 		return result;
 	}
@@ -120,7 +127,7 @@ export class SyncedClosetRepository implements ClosetRepository {
 	async clear(): Promise<void> {
 		await this.local.clear();
 		if (this.remote) {
-			void this.remote.clear().catch(() => {});
+			void this.remote.clear().catch((error) => recordSyncFailure("clear", error));
 		}
 	}
 }
