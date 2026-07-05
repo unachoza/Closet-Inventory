@@ -53,10 +53,6 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 			</datalist>
 
 			<div className="mbi__rows">
-				{value.length === 0 && (
-					<p className="mbi__empty">No materials added yet. Click "+ Add Material" to start.</p>
-				)}
-
 				{value.map((blend, index) => {
 					const color = blend.material ? getMaterialColor(blend.material) : "#6b7280";
 					return (
