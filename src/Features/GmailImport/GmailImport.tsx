@@ -41,7 +41,6 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		cachedCount,
 		searchMode,
 	} = useAdvancedSearch();
-	console.log("emails", emails);
 	const [selectedEmailId, setSelectedEmailId] = useState<string | null>(initialSelectedEmailId ?? null);
 
 	// Find the selected email and ensure it has a body (fetch if needed)
@@ -86,7 +85,6 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [selectedEmailId, emails, accessToken]);
-	console.log("emails", emails);
 	// Scroll the selected row into view so the left list matches the right preview
 	// (esp. on "Back to email"). This MUST run after `selectedEmail` is set: that's
 	// what flips the layout to the 40%-width preview split, which re-wraps the rows
