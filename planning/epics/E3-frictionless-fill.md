@@ -117,6 +117,50 @@ _As a shopper, I want to add an item to my closet straight from a retailer's pro
 
 **Ticket stubs:** extension scaffold · PDP scraper · auth handshake to the app · dedupe against email import.
 
+## US-3.10 — Classify purchase emails into type (order · shipping · receipt) 🆕 2026-07-05
+
+_As a user, I want my order emails sorted into **order confirmation / shipping confirmation / receipt** so that parsing is smarter and I can see, while browsing my inbox, which kind each email is._
+
+- **Why it helps parsing:** the type predicts the payload. **Order confirmations** almost always carry
+  **prices + line items**; **shipping** emails often **lack price** but carry the **item image + tracking**;
+  **receipts** carry the **final total** (incl. tax/shipping). Knowing the type lets each retailer strategy
+  expect the right fields instead of guessing.
+- **Cheap classifier first:** subject-line heuristics — the material already exists in
+  [`GmailImport/constants.ts`](../../src/Features/GmailImport/constants.ts) (`GMAIL_SEARCH_SUBJECTS`): e.g.
+  "thank you for your purchase" / "order confirmation" → **order**; "your order has shipped" / "on its way" →
+  **shipping**; "receipt for your purchase" → **receipt**. Fall back to body cues + a confidence score.
+- **⚠️ Not MECE (pushback baked in):** many retailers send **one combined email** (confirmation *and* receipt,
+  price + items together), and some bundle everything. So the model is **4 buckets** — order · shipping ·
+  receipt · **combined/other** — each with a **confidence**, not a rigid 3-way.
+- **Inbox UI:** show a small **type chip** on each email row in the import inbox ("Order" · "Shipped" ·
+  "Receipt") so the user sees the grouping while reviewing — and can trust why an email was/wasn't parsed.
+- Localization/retailer variance means subject strings won't always match → the confidence + body fallback is
+  required, not optional.
+
+**Ticket stubs:** `E3-10.1` subject+body classifier → `{type, confidence}` (4 buckets) · `E3-10.2` per-retailer
+strategies read the type hint (expect price on order, image on shipping) · `E3-10.3` type chip in the inbox
+email list · `E3-10.4` fixtures across all 4 types per retailer.
+
+## US-3.11 — Correlate the three emails of one purchase (dedup + field-merge) 🆕 2026-07-05 ⭐
+
+_As a user, I want the order/shipping/receipt emails for the **same purchase** recognized as one so that an item isn't added **three times** and each item gets the **best** data from across the three._
+
+- **The real prize (was the blind spot):** one purchase generates up to three emails. Parse them naively and
+  you **triple-add the same item**. Classification (US-3.10) is the setup; **correlation + dedup is the payoff.**
+- **Join key:** **order number** (most reliable) + retailer + a date window as fallback. Same order # across a
+  "confirmation" and a "shipped" email → one purchase, N line items.
+- **Field-merge (best-of):** take **price + line items** from the order confirmation, **image** from the
+  shipping email, **final total / tax** from the receipt — producing a richer item than any single email.
+- **Dedup at the item level too:** same item across emails (by name + order line) collapses to one closet entry.
+- **Cost win (ties to [E10 US-10.4](./E10-monetization.md#us-104--enrichment-paywall-hybrid-quota--age)):**
+  dedup avoids paying to enrich the same item three times — correlation *reduces* enrichment spend.
+- **Edge cases to spec:** partial shipments (one order → several shipping emails), cancellations/returns
+  (a later email negates an item), and split-tender receipts.
+
+**Ticket stubs:** `E3-11.1` extract order # (+retailer/date) as a correlation key · `E3-11.2` group emails →
+one "purchase" record · `E3-11.3` best-of field-merge across types · `E3-11.4` item-level dedupe into the
+closet · `E3-11.5` handle partial-shipment / cancellation / return signals.
+
 ---
 
 ## Shipped

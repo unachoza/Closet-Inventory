@@ -117,11 +117,18 @@ Each item maps to an existing E1-4.x ticket; this is the launch-ordered view.
 
 Pull from `E2-inventory-truth.md`. Status clean/dirty + wornCount stay E11's canonical fields; E2 extends the enum.
 
-- **Status:** `E2-1.2` `statusTransitions.ts` + tests · `E2-1.3` status chip on card · `E2-1.4` quick-action menu (desktop ⋯ / mobile long-press)
-- **Location:** `E2-2.1` location field + primary default · `E2-2.2` `locationGroups.ts` + tests · `E2-2.3` location tag on card (hidden at home) · `E2-2.4` "where is everything" grouped view
-- **Filters:** `E2-3.1` status+location dimensions in `useClosetFilters` (⚠️ hardcoded `DIMENSIONS` array edit) · `E2-3.2` quick-view presets
-- **Simple lend (MVP version):** `E2-5.1` `loan` object + lend modal (free-text borrower + due date) · `E2-5.2` "lent out" view + overdue flag
-- **Availability:** `E2-6.1` `isAvailable(item)` = clean + home + not on loan
+> ✅ **In progress on branch `EPIC-status-location`** (2026-07-04/05) — see
+> [E2-part-une-inventory-truth-status-location.md](epics/E2-part-une-inventory-truth-status-location.md) for the
+> full ticket-level breakdown (`P1-*`) and a July roadmap re-cut in
+> [LAUNCH_ROADMAP_July_update.md](LAUNCH_ROADMAP_July_update.md).
+
+- **Status:** `E2-1.2` `statusTransitions.ts` + tests _(not started — `P1-9`)_ · [x] `E2-1.3` status chip on card (2026-07-04) — shipped as the overview status **dot** in `Location + Status` border-toggle mode ([FilteredCard.tsx](../../src/Features/SearchCloset/FilteredCard.tsx)) · `E2-1.4` quick-action menu (desktop ⋯ / mobile long-press) _(not started — `P1-4`)_
+- **Location:** [x] `E2-2.1` location field + primary default (2026-07-04) — [`locations.ts`](../../src/utils/locations.ts) registry + `EditItemView` select, home = neutral default · `E2-2.2` `locationGroups.ts` + tests _(not started — `P1-5`)_ · [x] `E2-2.3` location tag on card, hidden at home (2026-07-04) — border-toggle color-coding · `E2-2.4` "where is everything" grouped view _(not started — `P1-5`)_
+- **Filters:** `E2-3.1` status+location dimensions in `useClosetFilters` (⚠️ hardcoded `DIMENSIONS` array edit) _(not started — `P1-8`)_ · `E2-3.2` quick-view presets _(not started)_
+- **Simple lend (MVP version):** `E2-5.1` `loan` object + lend modal (free-text borrower + due date) _(not started — parent E2, out of branch scope)_ · `E2-5.2` "lent out" view + overdue flag _(not started)_
+- **Availability:** `E2-6.1` `isAvailable(item)` = clean + home + not on loan _(not started — depends on E2-5.*)_
+
+**Beyond the original ticket map — added this branch:** an overview **border-toggle** (Off → Location → Location+Status, cycling control in the sticky top bar) as the visible surface for status/location, plus seeded demo data so it's visible immediately. Not in the original scope note above, but it *is* the status+location differentiator this block promised.
 
 ---
 
