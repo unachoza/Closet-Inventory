@@ -3,6 +3,7 @@ import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData, WearState } from "../utils/types";
 import { normalizeMaterial } from "../utils/materialUtils";
 import getStockPhoto from "../utils/getStockPhoto";
+import { safeSetItem } from "../utils/safeStorage";
 import { closetRepository } from "../services";
 
 const STORAGE_KEY = "my_closet_key";
@@ -22,7 +23,11 @@ const STORAGE_KEY = "my_closet_key";
 function seed(): ClothingItem[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY);
-		return stored ? (JSON.parse(stored) as ClothingItem[]) : MY_CLOSET_DATA;
+		if (stored) return JSON.parse(stored) as ClothingItem[];
+		// Persist the demo fallback so the repository's update/remove paths have a
+		// store to patch — otherwise edits to seed items silently vanish on reload.
+		safeSetItem(STORAGE_KEY, JSON.stringify(MY_CLOSET_DATA));
+		return MY_CLOSET_DATA;
 	} catch {
 		return MY_CLOSET_DATA;
 	}

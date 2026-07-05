@@ -466,7 +466,7 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 - 🔲 Clothing lifespan tracker ("estimated wears remaining")
 - 🔲 Repair and alteration log (date, description, cost)
 - 🔲 Search fiber and fabric
-- 🔲 Search stain removal
+- 🔲 Search stain on - stain removal guide
 
 
 ---

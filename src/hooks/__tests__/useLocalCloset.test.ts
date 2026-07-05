@@ -1,9 +1,13 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach } from "vitest";
 import { useLocalStorageCloset as useLocalStorageClosetBase } from "../useLocalCloset";
+import { MY_CLOSET_DATA } from "../../utils/constants";
 import type { ClothingItem } from "../../utils/types";
 
 const STORAGE_KEY = "my_closet_key";
+
+/** Flush pending microtasks so the repository's async localStorage write lands. */
+const flush = () => act(async () => { await Promise.resolve(); });
 
 const makeItem = (overrides: Partial<ClothingItem> = {}): ClothingItem => ({
 	id: "test-id",
@@ -116,6 +120,36 @@ describe("useLocalStorageClosetBase", () => {
 
 		expect(direct).toHaveLength(1);
 		expect(direct[0].id).toBe("direct");
+	});
+
+	// Regression: editing a demo (MY_CLOSET_DATA) item on a fresh install used to
+	// silently drop the write — seed() returned the demo data in memory but never
+	// persisted it, so the repository's update read an empty store, found no id,
+	// and never wrote. The seed now write-through-persists the fallback.
+	describe("fresh install (empty localStorage) — seed persistence", () => {
+		beforeEach(() => {
+			localStorage.removeItem(STORAGE_KEY);
+		});
+
+		it("write-through persists MY_CLOSET_DATA on first seed", () => {
+			renderHook(() => useLocalStorageClosetBase());
+			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!) as ClothingItem[];
+			expect(stored).toHaveLength(MY_CLOSET_DATA.length);
+		});
+
+		it("edits to a seed item persist to localStorage (survives reload)", async () => {
+			const { result } = renderHook(() => useLocalStorageClosetBase());
+			const seedId = MY_CLOSET_DATA[0].id;
+
+			act(() => result.current.updateItem(seedId, { originalPrice: "$88.00", status: "traveling", locationId: "suitcase" }));
+			await flush();
+
+			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!) as ClothingItem[];
+			const persisted = stored.find((i) => i.id === seedId);
+			expect(persisted?.originalPrice).toBe("$88.00");
+			expect(persisted?.status).toBe("traveling");
+			expect(persisted?.locationId).toBe("suitcase");
+		});
 	});
 
 	it("normalises legacy string material fields to MaterialBlend[] on read", () => {

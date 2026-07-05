@@ -3,6 +3,7 @@ import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData, WearState } from "../utils/types";
 import { normalizeMaterial } from "../utils/materialUtils";
 import getStockPhoto from "../utils/getStockPhoto";
+import { safeSetItem } from "../utils/safeStorage";
 import { SupabaseAuthContext } from "../context/SupabaseAuthContext";
 import { SyncedClosetRepository } from "../services/syncedClosetRepository";
 
@@ -10,10 +11,18 @@ export type SyncStatus = "synced" | "syncing" | "offline" | "error";
 
 const STORAGE_KEY = "my_closet_key";
 
+/**
+ * Seed the in-memory closet. On a fresh store (empty localStorage) we fall back
+ * to the demo `MY_CLOSET_DATA` AND persist it — otherwise the repository's
+ * update/remove paths read an empty store, can't find the item by id, and
+ * silently drop the write (edits vanish on reload).
+ */
 function seed(): ClothingItem[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEY);
-		return stored ? (JSON.parse(stored) as ClothingItem[]) : MY_CLOSET_DATA;
+		if (stored) return JSON.parse(stored) as ClothingItem[];
+		safeSetItem(STORAGE_KEY, JSON.stringify(MY_CLOSET_DATA));
+		return MY_CLOSET_DATA;
 	} catch {
 		return MY_CLOSET_DATA;
 	}
