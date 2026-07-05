@@ -149,7 +149,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			}
 		} else {
 			updateItem(item.id, formData);
-			setFormData(formItem);
+			setFormData(formItem as Partial<ClothingItem>);
 			showToast(`${formData.name} updated`);
 		}
 
@@ -304,12 +304,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					{/* Material blend — rendered separately from generic fields */}
 					<div className="edit-form-material">
 						<label className="edit-form-material__label">Material Composition</label>
-						{formData.material && formData.material.length > 0 && (
-							<>
-								<p>nothing here</p>
-								<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
-							</>
-						)}
+						<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
 						<MaterialBlendInput
 							value={normalizeMaterial(formData.material)}
 							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
