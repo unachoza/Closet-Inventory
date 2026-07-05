@@ -36,9 +36,11 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 	// 3. Sort the search results
 	const { sortKey, setSortKey, sortedItems } = useClosetSort();
 
-	// Pipeline: closet → filter → search → sort
+	// Pipeline: closet → filter → search → sort. The material-% sort (E0-2.3)
+	// ranks by the selected material's blend percentage, so it needs the active
+	// material selection.
 	const searched = useMemo(() => searchResults(filteredItems), [searchResults, filteredItems]);
-	const displayed = useMemo(() => sortedItems(searched), [sortedItems, searched]);
+	const displayed = useMemo(() => sortedItems(searched, filters.material), [sortedItems, searched, filters.material]);
 
 	// Match metadata for highlighting which fields were hit
 	const matchKeysById = useMemo(() => getMatchKeys(filteredItems), [getMatchKeys, filteredItems]);
