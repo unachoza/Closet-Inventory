@@ -126,32 +126,134 @@ _As Sloane / the Closet Pair, I want to filter my closet by location from the ex
 
 ### D3 · Status model v2 — reasons + resting/stored states (`P1-11`)
 
-_The dirty/in_repair scenarios you described are **reasons**, not new statuses — but two genuinely-missing states surfaced._
+> **Framing correction (2026-07-05):** the original framing was too narrow ("reasons for dirty or in_repair").
+> The real question is: **why isn't this item wearable right now, even though it's physically in my location?**
+> That framing covers all non-wearable statuses and is what drives useful nudges. `dirty` and `in_repair` are
+> the most common cases, but the model must accommodate anything that makes an item temporarily unavailable.
 
 **Two states to re-add** (they were in the original [WardrobeStatusAndLocation](../../WardrobeStatusAndLocation.md) spec and got dropped):
 
-| State | Meaning | Example |
+| State | Meaning | Wearable? | Example |
+|---|---|---|---|
+| `airing` | Worn briefly, hung to air out — **not dirty yet, will be wearable again** without a full wash | Soon | "Wore it an hour, hung it back up" |
+| `stored` | Intentionally out of rotation — off-season / archived | Not now | "Winter sweaters boxed until October" |
+
+> `airing` sits **between clean and dirty** — it is the state the "post-wear storage" scenario needs.
+> `stored` pairs naturally with `location.kind = storage`. **Ownership note:** E11 owns `clean`/`dirty`; these
+> two are "sidelined / where-it-is" states, which are E2's half of the enum — same split as `at_cleaner`/`on_loan`.
+
+---
+
+**Structured `statusReason` — capture the *specific* why, without exploding the enum:**
+
+The reason field answers: *what needs to happen before this item is wearable again?* That framing drives
+actionable nudges and filters. Reasons are **optional** — marking something dirty without a reason is fine;
+the reason makes nudges smarter.
+
+| Status | `statusReason` values | What it tells you to do |
 |---|---|---|
-| `airing` | Worn briefly, hung to air out — **wearable again without a full wash** (not dirty yet) | "Wore it an hour, hung it back up" |
-| `stored` | Intentionally out of rotation — off-season / archived | "Winter sweaters boxed until October" |
+| `dirty` | `stain` | Treat the stain *before* washing (wrong order sets it) |
+| `dirty` | `musty_seasonal` | Needs a refresh cycle after sitting in storage |
+| `dirty` | `spill` | Spot-treat as soon as possible |
+| `in_repair` | `hardware` | Fix or replace a fastener (see sub-reasons below) |
+| `in_repair` | `wear_damage` | Structural fabric fix needed (see sub-reasons below) |
+| `in_repair` | `fit` | Tailoring required (see sub-reasons below) |
+| `stored` | `off_season` | Rotate back in when the season changes |
+| `stored` | `sentimental` | Kept intentionally; not in active rotation |
+| `stored` | `overflow` | No room in the primary closet |
 
-> `airing` sits **between clean and dirty** and is the state the "post-wear storage" scenario needs. `stored`
-> pairs naturally with `location.kind = storage`. **Ownership note:** E11 owns `clean`/`dirty`; these two are
-> "sidelined / where-it-is" states, which are E2's half of the enum — same split as `at_cleaner`/`on_loan`.
+> **`airing` has no reason field** — the state itself is complete. "I aired it briefly and it's resting"
+> needs no further explanation. Adding a reason select to `airing` creates noise without signal.
 
-**Structured `statusReason` (optional) — capture the *why* without exploding the enum:**
+**`in_repair` sub-reasons — exactly 3, named (2026-07-05):**
 
-| Status | `statusReason` vocab | From your scenarios |
-|---|---|---|
-| `dirty` | `airing_then_wash` · `stain` · `musty_seasonal` · `spill` | brief-wear-then-wash · accidental stains · seasonal-transition musty |
-| `in_repair` | `hardware` · `fabric` · `fit` | broken zipper/button/belt-loop · ripped seam/hem/hole/snag · needs tailoring |
-| `stored` | `off_season` · `sentimental` · `overflow` | seasonal storage · keepsake · no room |
+These are the three distinct repair categories that map directly to what needs to happen next. They are not
+freeform text; they are a closed vocabulary of 3.
 
-- Model: `status: ItemStatus` stays a **single enum**; add `statusReason?: string` (+ optional free-text `statusNote?`). Reasons are **filterable** and drive smarter nudges later (e.g. "3 items airing — wash soon", "2 items need tailoring").
-- **Cross-links (don't duplicate):** `in_repair` + `fit` reason ↔ **US-2.8 fit/measurements** (parent E2); `in_repair` "at tailor" ↔ `location.kind = other`; repair reason vs `condition: needs_repair` (wear-quality) stay distinct — *status* is the active state, *condition* is the standing fact.
-- Edit form: `in_repair`/`dirty`/`stored` reveal a second **reason** select; the card can show the reason on the status-dot tooltip.
+| Sub-reason | `statusReason` value | Examples | What needs to happen |
+|---|---|---|---|
+| Hardware / fastener | `hardware` | Broken zipper · missing button · snapped snap · broken belt loop · bent clasp | Replace or repair the fastener — tailor or DIY |
+| Wear damage | `wear_damage` | Hole · rip · thread came loose · seam pulled out · hem unraveled · snag in knit | Structural fabric repair — tailor, darner, or retire |
+| Fit adjustment | `fit` | Needs hemming · needs to be taken in · needs letting out · too long | Tailoring session required before it's wearable |
 
-**Tickets:** `P1-11.1` add `airing` + `stored` to `ItemStatus` + colors/legend · `P1-11.2` `statusReason` vocab + optional `statusNote` on `ClothingItem` · `P1-11.3` reason select in `EditItemView` (conditional on status) · `P1-11.4` reason as a filter facet under Status.
+> **Why exactly 3, not freeform?** Because "what tailor/task needs to happen" maps cleanly to these three
+> buckets. A user seeing these three options immediately knows which applies. A free-text `statusNote` can
+> capture specifics ("left side seam, 3cm gap") without the category being freeform.
+
+---
+
+**The `status: in_repair` vs `condition: needs_repair` distinction — don't conflate:**
+
+| Field | Type | Meaning | Example |
+|---|---|---|---|
+| `status: in_repair` | Active lifecycle state | *Right now*, this item is being repaired / waiting for repair | "I pulled a button off last week, it's in the sewing pile" |
+| `condition: needs_repair` | Standing wear-quality fact | This item's general physical state is degraded | "This jacket has always had a wonky zip" |
+
+An item can have `condition: needs_repair` (long-standing quality note) but `status: clean` (it's clean and
+you're still wearing it). Or it can flip to `status: in_repair` when you've finally decided to deal with it.
+The `in_repair` status with a reason is the *active tracking* layer; `condition` is the *quality rating* layer.
+
+---
+
+**Nudge connections — what each reason eventually drives:**
+
+These are future-facing; the reason field is the data foundation. Nudges belong to a later notification/insight
+epic, but the `statusReason` vocab must be designed with them in mind now.
+
+| Reason cluster | Nudge example |
+|---|---|
+| `dirty` + `stain` | "2 items have stains — treat before washing or the stain sets" |
+| `dirty` + `musty_seasonal` | "3 seasonal pieces need a refresh cycle before rotation" |
+| `in_repair` + `hardware` | "2 items need a hardware fix — zipper, button, or clasp" |
+| `in_repair` + `wear_damage` | "Your cashmere sweater has a hole — repair or retire?" |
+| `in_repair` + `fit` | "1 item is waiting on tailoring — schedule it or it stays unworn" |
+| `airing` (group, 3+ items) | "4 items airing — plan a wash day" |
+| `stored` + `off_season` | "October: 6 stored items may be ready to rotate back in" |
+
+---
+
+**Model shape (internal planning — no code yet):**
+
+```ts
+// Additive to ClothingItem — no breaking change
+statusReason?: 'stain' | 'musty_seasonal' | 'spill'
+              | 'hardware' | 'wear_damage' | 'fit'
+              | 'off_season' | 'sentimental' | 'overflow';
+statusNote?: string;  // free-text for specifics ("left sleeve seam, 3cm")
+```
+
+- `statusReason` is **only meaningful when `status` is `dirty`, `in_repair`, or `stored`**. Clear it when
+  status changes away from those three.
+- `statusNote` is always optional, always free-text. It's the "left side seam" detail that can't be a dropdown.
+
+---
+
+**Tickets (`P1-11.*`) — fuller specs:**
+
+- [ ] **`P1-11.1`** Add `airing` + `stored` to `ItemStatus` union, update `statusOptions` array, add
+  token colors + legend entries for both. Update `FilteredCard` data-status attributes.
+  _~0.5d · risk: hardcoded-list gotcha — verify `DIMENSIONS` and legend render, not just tsc_
+
+- [ ] **`P1-11.2`** Add `statusReason` + `statusNote` fields to `ClothingItem` type (optional, additive).
+  Define the `StatusReason` union type (9 values) in `types.ts`. No migration needed — additive field.
+  _~0.25d_
+
+- [ ] **`P1-11.3`** Conditional reason `<select>` in `EditItemView` — visible only when status is
+  `dirty`, `in_repair`, or `stored`. Options filtered by status (e.g. `in_repair` shows only `hardware` /
+  `wear_damage` / `fit`). Optional `statusNote` text input below the reason select.
+  Humanized labels: `wear_damage` → "Wear damage (hole, rip, seam)", `hardware` → "Hardware or fastener",
+  `fit` → "Fit adjustment (tailoring)".
+  _~1d · includes tests for the conditional render_
+
+- [ ] **`P1-11.4`** `statusReason` as a **sub-facet filter** under Status in `useClosetFilters`. When
+  status filter = `in_repair`, an optional sub-filter exposes `hardware` / `wear_damage` / `fit`. Same
+  pattern for `dirty` sub-reasons. Reason clears if parent status filter is removed.
+  _~0.5d · hardcoded-list gotcha applies to DIMENSIONS_
+
+- [ ] **`P1-11.5`** Status-dot tooltip on card shows reason label when present (e.g. "In repair · Fit
+  adjustment" on hover / long-press). No new state needed — reads `item.statusReason` from the existing
+  data prop passed to `FilteredCard`.
+  _~0.25d_
 
 ### D4 · Profile setup — naming locations (multi-home) (`P1-6` / `P1-7`)
 

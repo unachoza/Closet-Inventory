@@ -52,11 +52,15 @@ _As a new user, I want a genuinely useful free tier so that I try before I buy �
       devices, social/borrow, camera import, multi-home custom locations (coordinate w/ E2 `P1-6`).
 - [ ] Item-limit + feature enforcement in the closet hook / gate helper.
 
-> **⚠️ Open tension to resolve (flagged, not decided):** the earlier steer was "free users get **local storage
-> as much as the phone allows (~80)**"; the newer steer is "**require a lightweight account, images stored
-> securely**." These pull opposite ways. Reconciliation drafted here: **free = lightweight account + secure
-> storage**, and the **~80** becomes a *storage-cost* cap rather than the base64 ceiling. Confirm: (a) is ~80
-> the number, and (b) is a truly-no-account/offline mode still wanted as a fallback?
+> **✅ Resolved (2026-07-05):**
+> - **(a) ~80 items confirmed** as the free-tier cap. Reframed: once images are in secure storage, 80 is a
+>   **business/cost cap**, not a base64 technical ceiling. Validate against storage $ and conversion goals
+>   before launch; the number is the right *order of magnitude*, not a sacred figure.
+> - **(b) A true no-account/offline mode still exists as a fallback** — but it carries real data-loss risk
+>   (iOS Safari evicts localStorage after ~7 idle days for non-installed sites) and is not the recommended
+>   path. Users in offline mode are **progressively warned** at 30 / 50 / 75 items (see US-10.7 below).
+>   Rejected alternative: force account creation immediately — too aggressive; a genuine free/local path must
+>   remain for discovery and trust-building.
 
 **Ticket stubs:** free-limit enforcement · gate helper · lightweight-auth (anonymous/OTP) onboarding.
 
@@ -101,6 +105,70 @@ _As a user, I want a clear, non-nagging indicator that deeper web scraping is av
 - [ ] Copy is internal-placeholder for now.
 
 **Ticket stubs:** enrich-available badge on sparse items · quota-aware CTA state.
+
+## US-10.7 — Progressive no-account warnings (offline → account conversion funnel)
+_As a user in offline/no-account mode, I want clear, honest warnings as my closet grows so that I understand the risk to my data and can choose to protect it — without being forced into an account I didn't ask for._
+
+> **Context (2026-07-05):** a true no-account offline mode still exists as a fallback. But iOS Safari evicts
+> localStorage after ~7 idle days for non-installed sites — a user who hasn't visited in a week can silently
+> lose their entire closet with zero warning. The progressive modal sequence is the mitigation: honest
+> disclosure at each threshold, with a clear path to safety, without forced conversion.
+
+**Three trigger thresholds:**
+
+| Items | Modal tone | Core message |
+|---|---|---|
+| 30 | Informational (low urgency) | "Your closet is growing — create a free account to keep it safe" |
+| 50 | Advisory (medium urgency) | "50 items stored locally — here's what that means for your data" |
+| 75 | Warning (high urgency) | "75 items at risk — local storage can be cleared by your browser at any time" |
+
+**Each modal must cover two distinct risks (both, not just one):**
+
+1. **Security:** local storage has no access controls — on a shared device, another app or browser tab
+   can read it. Your closet items (including photo data if base64) are not private without an account.
+2. **iOS Safari 7-day idle eviction:** for non-installed web apps on iOS, Safari evicts localStorage for
+   sites not visited in ~7 days. A user who travels and doesn't open the app for a week comes back to an
+   empty closet. This is not hypothetical — it is Apple's documented ITP behavior.
+
+**Modal spec per threshold:**
+
+```
+[30 items]
+Title: "Your closet is growing"
+Body:  "You have 30 items saved locally. Create a free account to back them up securely — 
+        your data stays on your device right now, but it can be cleared if you don't visit 
+        for a while. It takes 30 seconds."
+CTA:   "Create free account" (primary) · "Not now" (dismiss, does not re-show until 50)
+
+[50 items]
+Title: "Keep your closet safe"
+Body:  "50 items saved on this device. Two things to know: (1) On iPhone, Safari can 
+        automatically clear app data after about a week of not visiting. (2) On a shared 
+        device, anyone can access local data. A free account protects both."
+CTA:   "Secure my closet" (primary) · "I understand the risk" (dismiss, re-shows at 75)
+
+[75 items]
+Title: "75 items at risk"  
+Body:  "You've built a real wardrobe here. Local storage isn't backed up and can be 
+        cleared without warning — especially on iPhone Safari. Create a free account now 
+        to protect it. Free accounts include secure image storage."
+CTA:   "Protect my closet — it's free" (primary) · "Remind me later" (snooze 7 days only)
+```
+
+**Behavior rules:**
+- Each modal fires **once per threshold crossing** — not on every session.
+- The 75-item modal snoozes for 7 days maximum, then re-shows if still no account. It does **not** have a
+  permanent dismiss — at 75 items the risk is too high to let users silently ignore it forever.
+- Modals are **non-blocking** — the user can always dismiss and continue using the app. No forced wall.
+- Once a lightweight account is created, all three modals are permanently suppressed.
+- Copy is **internal-placeholder** for now — final tone TBD, but the two risks (security + iOS eviction)
+  must both be present in the 50 and 75 item modals.
+
+**Ticket stubs:**
+- `E10-7.1` Item-count threshold hook — fires when count crosses 30 / 50 / 75 in no-auth mode
+- `E10-7.2` Modal component (3 variants keyed by threshold, dismissal state persisted to localStorage)
+- `E10-7.3` 75-item 7-day snooze + re-show logic
+- `E10-7.4` Suppress all modals on account creation (clear the threshold flags)
 
 ---
 
