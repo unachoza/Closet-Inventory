@@ -104,7 +104,6 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	// const onToggleDetail = useCallback((key: string, value: any) => {
 	// 	setFormData((prev) => ({ ...prev, [key]: !value }));
 	// }, []);
-	console.log("formData.material", formData, formData.material);
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData((prev) => ({ ...prev, condition: e.target.value as WearState }));
