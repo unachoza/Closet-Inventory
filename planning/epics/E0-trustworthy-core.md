@@ -81,7 +81,7 @@ Small UX wins that don't warrant a new epic — slot between sprints as palate c
 - `E0-7.1` **Onboarding app name + step demo order** — updated branding to "MyCloset"; reordered onboarding demo steps for clarity — _✅ PR #80_
 - `E0-7.3` **Clear Closet button + density toggle** — "Clear Closet" nav action with confirm modal deletes all items (incl. sample data); compact/comfortable grid toggle persisted to localStorage, shared between Closet + EntireCloset views — _✅ PR #80_
 - `E0-7.2` **Sloppy search pills** (filter pills wrap awkwardly on narrow viewports) — _✅ PR #86_
-- `E0-2.3` **Material filter: sort options by blend %** (e.g. "80% cotton" before "20% polyester") — _pending_
+- ✅`E0-2.3` **Material filter: sort options by blend %** (e.g. "80% cotton" before "20% polyester") — added `materialPct` sort ("Material: Highest %"); ranks by max % among selected fibers via shared `canonicalizeMaterial`. See post-completion polish entry for details.
 
 ---
 
@@ -103,6 +103,9 @@ _Epic DoD is met ✅; these are small correctness/branding nits surfaced from us
 
 - ✅`E0-7.1` **Onboarding still says "MyCloset"** — the onboarding flow shows the old "MyCloset" name; update all copy to **"Nothing To Wear"**. Audit `src/Features/Onboarding/` (and anywhere else) for stale branding. — _0.25d_
 - ✅`E0-7.2` **Search-result pills look "floppy"** — when a search query is active, the match pills render at the bottom of the clothing cards but read as a separate, detached layer (especially on hover, where they separate from the card). Pull the pills **inside** the card on their own layer so they feel attached, not floating. Card / search-pill styling fix. — _0.5d_
-- `E0-2.3` **Material filter sort by blend %** — when filtering by a material, sort results descending by that material's `MaterialBlend.percentage` (100% cotton first); regression test. — _0.5d_
+- ✅`E0-2.3` **Material filter sort by blend %** — when filtering by a material, sort results descending by that material's `MaterialBlend.percentage` (100% cotton first); regression test. — _0.5d_
+  - Added `materialPct` sort key ("Material: Highest %") in [`useClosetSort.ts`](../../src/hooks/useClosetSort.ts); ranks by the max percentage among the selected fibers (falls back to dominant fiber when none selected), matching selections through the shared `canonicalizeMaterial` (extracted to [`materialUtils.ts`](../../src/utils/materialUtils.ts)). Wired the active material selection into the sort in [`EntireClosetView.tsx`](../../src/Features/SearchCloset/EntireClosetView.tsx) and added the option to `SearchSortBar`.
+  - Regression tests: `materialPct sort (E0-2.3)` block in [`useClosetSort.test.ts`](../../src/hooks/__tests__/useClosetSort.test.ts) (descending by selected %, sinks non-matching items, canonicalization Spandex↔elastane, no-mutation).
+  - _Note:_ items are normalized to `MaterialBlend[]` upstream, so a legacy bare string ("cotton") arrives as 100% and ranks at top rather than sinking — accepted as within hot-fix scope.
 
 _(US-0.5 "Don't import junk" shipped in PR #72: skip-on-no-category guard + "Include" recovery UI + excluded senders + category-keyword cleanup.)_

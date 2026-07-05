@@ -8,6 +8,7 @@ import "./NavBar.css";
 import { importClosetFromFile } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 import ClearClosetModal from "./ClearModal/ClearClosetModal";
+import SyncStatusIndicator from "../SyncStatusIndicator/SyncStatusIndicator";
 
 interface NavBarProps {
 	/**
@@ -179,6 +180,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 					<Menu size={24} />
 				</button>
 				<h1 className="page-title">Nothing To Wear</h1>
+				<SyncStatusIndicator />
 			</div>
 
 			{drawerOpen && (

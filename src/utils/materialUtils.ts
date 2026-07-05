@@ -161,6 +161,40 @@ export function blendTotal(blend: MaterialBlend[]): number {
 	return blend.reduce((sum, b) => sum + b.percentage, 0);
 }
 
+// ── Canonicalization ──────────────────────────────────────────────────────────
+// Collapse synonymous / branded fiber names onto a single canonical label so the
+// material filter and the material-percentage sort agree on identity
+// (e.g. "elastane"/"lycra" → "Spandex", "lyocell" → "Tencel"). Shared by
+// useClosetFilters (filter grouping) and useClosetSort (blend-% ranking).
+
+// Exact-key overrides — checked first.
+const MATERIAL_EXACT: Record<string, string> = {
+	lycra: "Spandex",
+	elastane: "Spandex",
+	lyocell: "Tencel",
+	"cupro rayon": "Cupro",
+};
+
+// Substring rules — applied in order when no exact match found.
+// A material name that *contains* the keyword maps to the canonical value.
+const MATERIAL_CONTAINS: [substring: string, canonical: string][] = [
+	["tencel", "Tencel"],
+	["viscose", "Viscose"],
+	["polyester", "Polyester"],
+	["cupro", "Cupro"],
+	["spandex", "Spandex"],
+];
+
+/** Map a raw fiber name onto its canonical, capitalized label. */
+export function canonicalizeMaterial(name: string): string {
+	const key = name.trim().toLowerCase();
+	if (MATERIAL_EXACT[key]) return MATERIAL_EXACT[key];
+	for (const [sub, canonical] of MATERIAL_CONTAINS) {
+		if (key.includes(sub)) return canonical;
+	}
+	return capitalize(name.trim());
+}
+
 function capitalize(s: string): string {
 	return s.charAt(0).toUpperCase() + s.slice(1);
 }

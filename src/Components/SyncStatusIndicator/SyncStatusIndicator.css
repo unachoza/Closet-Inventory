@@ -1,0 +1,21 @@
+.sync-status-indicator {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 8px;
+	border: 1px solid var(--status-warning);
+	border-radius: var(--layout-radius-pill, 999px);
+	color: var(--status-warning);
+	background: var(--bg-surface-primary);
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+/* Collapse to the icon-only pill on narrow screens; the tooltip still carries detail. */
+@media (max-width: 640px) {
+	.sync-status-indicator__label {
+		display: none;
+	}
+}

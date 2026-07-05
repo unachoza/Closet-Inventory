@@ -21,6 +21,7 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 - `E1-1.4` Port `useCloudCloset` to Supabase client; keep `useLocalCloset` as offline cache — _2–3d_
 - `E1-1.5` First-sign-in seed: upload local closet to Supabase — _1d_
 - `E1-1.6` Offline-first reconcile (last-write-wins via `updatedAt`) — _1–1.5d_
+  - _Hardening (hot fix):_ background writes no longer swallow failures silently (`.catch(() => {})`). `SyncedClosetRepository` now reports failures to a `syncFailureTracker`, which logs the real error and drives a `SyncStatusIndicator` in the NavBar ("N changes not synced"). A successful `getAll` reconcile clears it. Tests: `syncFailureTracker.test.ts`, `syncedClosetRepository.syncFailure.test.ts`, `SyncStatusIndicator.test.tsx`. **Retry queue still deferred** — recovery rides on the next successful reconcile (reload / sign-in).
 
 ## US-1.2 — Images that don't blow the storage budget
 _As Maya, I want my photos stored properly so that big closets and camera imports don't silently fail._
