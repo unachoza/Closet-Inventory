@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 import SearchSortBar from "./SearchSortBar";
 import { SORT_LABELS } from "../../hooks/useClosetSort";
 import { SearchProvider, useSearch } from "../../context/SearchContext";
+import type { BorderMode } from "../../utils/borderMode";
 
 const baseProps = {
 	sortKey: "dateAdded" as const,
@@ -11,7 +12,7 @@ const baseProps = {
 	showFilters: false,
 	onToggleFilters: vi.fn(),
 	activeFilterCount: 0,
-	borderMode: "off" as const,
+	borderMode: "off" as BorderMode,
 	onCycleBorderMode: vi.fn(),
 };
 

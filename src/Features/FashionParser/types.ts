@@ -32,4 +32,4 @@ export interface MaterialBlend {
 	percentage: number;
 }
 
-type Season = "spring" | "summer" | "fall" | "winter";
+export type Season = "spring" | "summer" | "fall" | "winter";

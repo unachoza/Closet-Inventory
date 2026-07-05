@@ -1,4 +1,4 @@
-import type { ItemFormData } from "./types";
+import type { ItemFormData, WearState } from "./types";
 import { formItem } from "./constants";
 import { parseInlineColorSize, stripBrandFromName, extractColorFromName } from "./parseNameHelpers";
 import normalizeColor from "../Features/FashionParser/normalizers/normalizeColor";
@@ -329,7 +329,7 @@ export function parseEmailToFormData(subject: string, body: string, from: string
 
 	// For reseller platforms, default to "good" (unknown secondhand condition);
 	// only upgrade to "new" if the listing explicitly says NWT/new with tags.
-	let condition: string | undefined;
+	let condition: WearState | undefined;
 	if (isFromReseller(from)) {
 		condition = hasNewTags(combinedText) ? "new" : "good";
 	} else {

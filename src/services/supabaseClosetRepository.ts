@@ -23,7 +23,7 @@ function rowToItem(row: ItemRow): ClothingItem {
 		price: row.purchase_price != null ? String(row.purchase_price) : undefined,
 		originalPrice: row.original_price != null ? String(row.original_price) : undefined,
 		purchaseDate: row.purchase_date ?? undefined,
-		condition: row.condition ?? undefined,
+		condition: (row.condition as ClothingItem["condition"]) ?? undefined,
 		onSale: row.on_sale,
 		notes: row.notes.length > 0 ? row.notes : undefined,
 		occasion: row.occasion ?? "",

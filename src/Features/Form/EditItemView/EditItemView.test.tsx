@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { ChangeEventHandler } from "react";
+import type { ClothingItem } from "../../../utils/types";
 import EditItemView from "./EditItemView";
 
 vi.mock("framer-motion");
@@ -45,7 +46,7 @@ vi.mock("../../../Components/Toast/Toast", () => ({
 	}),
 }));
 
-const mockItem = {
+const mockItem: ClothingItem = {
 	id: "1",
 	name: "Test Item",
 	size: "M",

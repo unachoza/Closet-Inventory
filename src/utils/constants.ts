@@ -23,7 +23,7 @@ export const formItem = {
 	material: [] as import("./types").MaterialBlend[],
 	occasion: "",
 	age: "",
-	condition: "new",
+	condition: "new" as WearState,
 	purchaseDate: "",
 	care: "",
 	imageURL: "",
@@ -153,7 +153,7 @@ export const MY_CLOSET_DATA = [
 		brand: "aritzia",
 		price: "$43.99",
 		purchaseDate: "2026-06-05T21:11:11.000Z",
-		condition: "good",
+		condition: "good" as WearState,
 		material: [
 			{ material: "nylon", percentage: 99 },
 			{ material: "elastane", percentage: 1 },
@@ -181,7 +181,7 @@ export const MY_CLOSET_DATA = [
 		brand: "aritzia",
 		price: "$38.99",
 		purchaseDate: "2023-03-07T05:59:07.000Z",
-		condition: "good",
+		condition: "good" as WearState,
 		material: [
 			{ material: "viscose", percentage: 48 },
 			{ material: "polyester", percentage: 30 },
@@ -206,7 +206,7 @@ export const MY_CLOSET_DATA = [
 		brand: "aritzia",
 		price: "$34.99",
 		purchaseDate: "2026-06-05T21:11:11.000Z",
-		condition: "good",
+		condition: "good" as WearState,
 		material: [
 			{ material: "linen", percentage: 55 },
 			{ material: "viscose", percentage: 45 },
@@ -255,7 +255,7 @@ export const MY_CLOSET_DATA = [
 		size: "L",
 		brand: "aritzia",
 		price: "$32.99",
-		condition: "new",
+		condition: "new" as WearState,
 		material: [
 			{ material: "nylon", percentage: 99 },
 			{ material: "elastane", percentage: 1 },
@@ -310,7 +310,7 @@ export const MY_CLOSET_DATA = [
 		occasion: "casual",
 		purchaseDate: "2026-06-05T21:11:11.000Z",
 		care: ["machine wash", "cold water"],
-		nnotes: ["Fit: Slim — Streamlined to fit close to the body", "Length: Mini — Intended to hit between mid thigh and low thigh"],
+		notes: ["Fit: Slim — Streamlined to fit close to the body", "Length: Mini — Intended to hit between mid thigh and low thigh"],
 		onSale: true,
 	},
 	{
@@ -356,7 +356,7 @@ export const MY_CLOSET_DATA = [
 			{ material: "nylon", percentage: 30 },
 			{ material: "elastane", percentage: 5 },
 		],
-		condition: "good",
+		condition: "good" as WearState,
 		occasion: "going out",
 		purchaseDate: "2023-08-17T03:24:11.000Z",
 		care: ["machine wash", "lay flat"],
@@ -375,7 +375,7 @@ export const MY_CLOSET_DATA = [
 		material: [b("recycled polyester", 61), b("viscose", 26), b("cotton", 7), b("elastane", 6)],
 		occasion: "work",
 		purchaseDate: "2023-08-23T01:59:09.000Z",
-		condition: "good",
+		condition: "good" as WearState,
 		care: "dry clean",
 		notes: [
 			"loose fitting",
@@ -397,7 +397,7 @@ export const MY_CLOSET_DATA = [
 		// was 400
 		material: [b("polyester", 100)],
 		occasion: "winter",
-		condition: "good",
+		condition: "good" as WearState,
 		purchaseDate: "2023-01-19T21:19:18.000Z",
 		care: "machine wash",
 		notes: [
@@ -405,7 +405,7 @@ export const MY_CLOSET_DATA = [
 			"Take a trip of unexpected luxury with this sumptuously soft sherpa coat with meticulous diamond quilted lining to keep you cozy on every adventure. Oversized. Notch collar. Button closure. On-seam pockets. Two interior pockets. WARMER: Lightly lined with quilted lining so you can layer it through the seasons ",
 			"Below-knee length",
 			"SHERPA: Luxuriously soft, this vegan-friendly faux fur fabric looks and feels even better than the real thing. WARMEST: Fully lined and ultra-cozy, this style is designed to keep you warm through the coldest days. Wide notch lapel, Front pockets, Center back vent, Fully lined, Semi-fitted with room through the chest, arms and waist, Long sleeves, Knee length",
-			"Take a trip of unexpected luxury with this sumptuously soft sherpa coat with meticulous diamond quilted lining to keep you cozy on every adventure. Oversized, WARMER: Lightly lined with quilted lining so you can layer it through the seasons., OVERSIZED FIT: Expertly cut for a loose fit. Size down if you prefer more form-fitting., Notch collar. Button closure., On-seam pockets. Two interior pockets., Fully lined., Product #506005"
+			"Take a trip of unexpected luxury with this sumptuously soft sherpa coat with meticulous diamond quilted lining to keep you cozy on every adventure. Oversized, WARMER: Lightly lined with quilted lining so you can layer it through the seasons., OVERSIZED FIT: Expertly cut for a loose fit. Size down if you prefer more form-fitting., Notch collar. Button closure., On-seam pockets. Two interior pockets., Fully lined., Product #506005",
 		],
 		onSale: true,
 	},
@@ -423,7 +423,7 @@ export const MY_CLOSET_DATA = [
 		// was 400
 		material: [b("polyester", 61), b("viscose", 26), b("cotton", 7), b("elastane", 6)],
 		occasion: "wear to work",
-		condition: "good",
+		condition: "good" as WearState,
 		purchaseDate: "2023-01-19T21:19:18.000Z",
 		care: "dry clean",
 		notes: [
@@ -445,7 +445,7 @@ export const MY_CLOSET_DATA = [
 		// was 44
 		material: [b("cotton", 95), b("spandex", 5)],
 		purchaseDate: "2021-11-10T01:02:37.000Z",
-		condition: "needs_repair",
+		condition: "needs_repair" as WearState,
 		occasion: "casual",
 		care: " wash cold",
 		notes: ["we fight about this", "fits perfect", "small hole"],
