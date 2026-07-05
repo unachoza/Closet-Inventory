@@ -118,8 +118,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 			const beforeCursor = value.substring(0, selectionStart);
 			const afterCursor = value.substring(selectionEnd);
 
-			let replacementText = "";
-			let newCursorPos = selectionStart;
+			let replacementText: string;
+			let newCursorPos: number;
 
 			if (value.trim() === "") {
 				replacementText = bulletStr;
