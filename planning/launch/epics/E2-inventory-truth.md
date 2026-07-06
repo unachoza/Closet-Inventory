@@ -35,7 +35,7 @@ _As Maya, I want to mark an item clean/dirty/at-the-cleaner/needs-repair/traveli
 **Tickets** _(parked unless E2 is rescheduled)_
 - `E2-1.1` → see `E11-1.1` (fields moved)
 - `E2-1.2` `utils/statusTransitions.ts` (immutable transitions) + unit tests — _1d_ (parked → `P1-9`)
-- [x] `E2-1.3` Status chip on card (tokens.css colors) — ✅ done as the token-colored **status dot** on `EPIC-status-location`
+- `E2-1.3` Status chip on card (tokens.css colors) — ✅ done as the token-colored **status dot** on `EPIC-status-location`
 - `E2-1.4` Quick-action menu (desktop ⋯ + mobile long-press) — _1–1.5d_ (parked → `P1-4`)
 - `E2-1.5` "Log a Wear" → **moved to `E11-1.2`**
 

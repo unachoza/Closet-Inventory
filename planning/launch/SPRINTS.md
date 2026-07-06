@@ -102,13 +102,13 @@ Completed between Block A and B:
 
 - ✅ `E3-6.1` **EditItemView optional fields** — relax validation for `mode === "create"`: `price`/`occasion`/`care` optional; `name`/`category`/`color`/`size`/`brand` mandatory.
 - ✅ `E3-4.1` **Email-list header: count + date range** — "Found 20 emails · May 2018 – Dec 2018" instead of just "Found 100 emails".
-- `E3-7.1` **Material-blend editor rework** — fix the disabled-at-100% / hard-to-reach-100% interaction.
+- ✅ `E3-7.1` **Material-blend editor rework** — fix the disabled-at-100% / hard-to-reach-100% interaction.
 - ✅ `E0-2.3` **Material filter sort by blend %** — sort filtered results descending by matched fiber's `MaterialBlend.percentage`; regression test.
 
 **P3 — Polish / small features**
 
 - ✅ `E0-7.2` **Search-result pills "Sloppy"** — pull match pills inside the card on their own layer so they don't detach on hover.
-- `E2-9.1` **Swim category** — add `swim` to `CategoryType` + Form list + Carousel; map bikini/one-piece/swimsuit/tankini/two-piece. ⚠️ hardcoded-list audit.
+- ✅ `E2-9.1` **Swim category** — add `swim` to `CategoryType` + Form list + Carousel; map bikini/one-piece/swimsuit/tankini/two-piece. ⚠️ hardcoded-list audit.
 - ✅ `E2-7.1` **Notes as bulleted list** — auto-bullet textarea + `<ul>` read mode.
 - `E8-3.1` **Stain guide** — add nail polish + turmeric; expand stain coverage.
 

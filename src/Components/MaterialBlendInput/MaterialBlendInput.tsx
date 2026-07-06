@@ -27,8 +27,17 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 	};
 
 	const handleAddRow = () => {
-		if (total >= 100) return;
-		onChange([...value, { material: "", percentage: remaining }]);
+		if (remaining > 0) {
+			onChange([...value, { material: "", percentage: remaining }]);
+			return;
+		}
+		// At 100%: steal from the largest fiber so the new row gets a non-zero share
+		const largestIdx = value.reduce((max, b, i) => (b.percentage > value[max].percentage ? i : max), 0);
+		const stolen = Math.max(1, Math.floor(value[largestIdx].percentage / 2));
+		const adjusted = value.map((b, i) =>
+			i === largestIdx ? { ...b, percentage: b.percentage - stolen } : b,
+		);
+		onChange([...adjusted, { material: "", percentage: stolen }]);
 	};
 
 	const handleRemove = (index: number) => {
@@ -110,7 +119,6 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 					type="button"
 					className="mbi__add"
 					onClick={handleAddRow}
-					disabled={total >= 100}
 				>
 					<Plus size={14} />
 					Add Material

@@ -61,49 +61,49 @@ _As a user, I want imports to reuse cached emails and clearly tell me what they'
 
 - [ ] Cache all fetched emails (metadata + bodies); deliberate, careful cache invalidation (don't clear on every visit) — never leave a stale or oversized cache around
 - [ ] Distinguish an entirely-new fetch from a filter over cached results; default to cache, only hit the API when the query shape actually changed
-- [ ] **Email-list header shows count + date range, not just count.** Today it reads "Found 100 emails." It should read e.g. **"Found 20 emails · May 2018 – Dec 2018"** so it's obvious which tranche the user is viewing. Also surface cached vs. fresh count + last-fetched indicator.
+- [x] **Email-list header shows count + date range, not just count.** Today it reads "Found 100 emails." It should read e.g. **"Found 20 emails · May 2018 – Dec 2018"** so it's obvious which tranche the user is viewing. Also surface cached vs. fresh count + last-fetched indicator.
 
 **Ticket stubs:** cache lifecycle + invalidation/TTL audit · cache-key by query signature · new-vs-cached resolver · `E3-4.1` count + date-range + cached/fresh indicator in the email-list header.
 
-## US-3.5 — Cleaner import results
+## US-3.5 — Cleaner import results ✅
 
 _As Maya, I want obvious non-purchases filtered out and a way to recover anything wrongly skipped so that the import list is trustworthy and reversible._
 
-- [ ] Tighten the default search query to exclude noise senders (Eventbrite, DoorDash, …)
-- [ ] "Review skipped" affordance — show what was filtered/uncategorized, with one-tap add-back
-- [ ] (The core skip-on-no-category guard lives in **E0 US-0.5** (`E0-5.1`); this story is the surrounding UX.)
+- [x] Tighten the default search query to exclude noise senders (Eventbrite, DoorDash, …)
+- [x] "Review skipped" affordance — show what was filtered/uncategorized, with one-tap add-back
+- [x] (The core skip-on-no-category guard lives in **E0 US-0.5** (`E0-5.1`); this story is the surrounding UX.)
 
 **Ticket stubs:** sender denylist on the default query · skipped-items drawer + restore action.
 
 ---
 
-## US-3.6 — Correct import form validation
+## US-3.6 — Correct import form validation ✅
 
 _As Maya, I want the Edit Item form to only require fields that matter at import time so that I can save an item without being forced to fill in price, occasion, or care._
 
-- [ ] Optional in email-import flow: `price`, `occasion`, `care`
-- [ ] Mandatory: `name`, `category`, `color`, `size`, `brand`
-- [ ] Both single-item and batch-import flows use the relaxed ruleset
+- [x] Optional in email-import flow: `price`, `occasion`, `care`
+- [x] Mandatory: `name`, `category`, `color`, `size`, `brand`
+- [x] Both single-item and batch-import flows use the relaxed ruleset
 
 **Ticket:** `E3-6.1` Relax `EditItemView` validation when `mode === "create"` from email import; add regression test — _0.5d_
 
-## US-3.7 — Easier material-blend editing
+## US-3.7 — Easier material-blend editing ✅
 
 _As Maya, I want editing a material blend to be intuitive so that I can correct fabric percentages without fighting the control._
 
-- [ ] The blend editor is hard to use: the percentage control is disabled at 100% and it's awkward to dial back down to 100% from a multi-fiber blend
-- [ ] Rework so adding/removing fibers and redistributing percentages is smooth; 100% single-fiber and multi-fiber states both editable
-- [ ] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
+- [x] The blend editor is hard to use: the percentage control is disabled at 100% and it's awkward to dial back down to 100% from a multi-fiber blend
+- [x] Rework so adding/removing fibers and redistributing percentages is smooth; 100% single-fiber and multi-fiber states both editable
+- [x] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
 
 **Ticket:** `E3-7.1` Redesign the material-blend editor interaction in `EditItemView` — _1d_
 
-## US-3.8 — Tap-to-tag on email import (mobile friction killer)
+## US-3.8 — Tap-to-tag on email import (mobile friction killer) ✅
 
 _As Maya importing on my phone, I want to tap pills for occasion / vibe / care / season instead of typing so that ingestion isn't clunky on mobile._
 
-- [ ] Email-import `EditItemView` uses the same **pill-tag inputs** that manual add already has for material/brand/care
-- [ ] Dropdown-style fields become tappable tags: care (machine wash · cold · hang dry), occasion, vibe, season
-- [ ] No free-typing required for controlled-vocab fields (`tag_vocab`)
+- [x] Email-import `EditItemView` uses the same **pill-tag inputs** that manual add already has for material/brand/care
+- [x] Dropdown-style fields become tappable tags: care (machine wash · cold · hang dry), occasion, vibe, season
+- [x] No free-typing required for controlled-vocab fields (`tag_vocab`)
 
 **Ticket:** `E3-8.1` Port the manual pill-tag inputs into the email-import edit flow (care/occasion/vibe/season) — _1d_
 
@@ -176,9 +176,9 @@ closet · `E3-11.5` handle partial-shipment / cancellation / return signals.
 
 - ✅`E3-bug.4` **Email fetch loading state not visible** — The "fetching from email" pulse indicator is no longer obvious. Users can't tell if a live Gmail API call is in progress. Restore or improve the loading pulse in `GmailImport` (tracked in US-3.4 cache/fetch UX work).
 
-- `E3-bug.1` ✅ **Email preview mangling / horizontal scroll** — real reporter emails (Shopbop, Express, SwimOutlet, Lulus) showed the real cause: `word-break: break-word` on `.gmail-preview-html` let the browser break text mid-word, collapsing these emails' fixed-width (600–720px) tables to ~1 character per column on narrow viewports (the "one letter per line" mangling). **Fix:** removed `word-break` from `.gmail-preview-html` (emails keep natural column widths) and added explicit `overflow-x: auto` to `.gmail-preview-body` so a genuinely-wide email scrolls horizontally _inside_ the preview box (like Gmail's own preview) — never the panel or page. Verified by screenshot (clean word-wrap) + e2e (`e2e/gmail-preview-overflow.mobile.spec.ts`: word-break contract guard flips red on regression; page-overflow + body-scroll behavioural checks). _(The earlier 2026-06-24 "could not reproduce" pass failed because synthetic wide tables scrolled cleanly; the reporter's `width="100%"` nested tables were the missing ingredient.)_ — _✅ FIXED_
+- ✅ `E3-bug.1` **Email preview mangling / horizontal scroll** — real reporter emails (Shopbop, Express, SwimOutlet, Lulus) showed the real cause: `word-break: break-word` on `.gmail-preview-html` let the browser break text mid-word, collapsing these emails' fixed-width (600–720px) tables to ~1 character per column on narrow viewports (the "one letter per line" mangling). **Fix:** removed `word-break` from `.gmail-preview-html` (emails keep natural column widths) and added explicit `overflow-x: auto` to `.gmail-preview-body` so a genuinely-wide email scrolls horizontally _inside_ the preview box (like Gmail's own preview) — never the panel or page. Verified by screenshot (clean word-wrap) + e2e (`e2e/gmail-preview-overflow.mobile.spec.ts`: word-break contract guard flips red on regression; page-overflow + body-scroll behavioural checks). _(The earlier 2026-06-24 "could not reproduce" pass failed because synthetic wide tables scrolled cleanly; the reporter's `width="100%"` nested tables were the missing ingredient.)_ — _✅ FIXED_
 - ✅`E3-bug.2` ⚠️ **Back to email forces full re-auth** — `useGmailAuth` token was lost when the Gmail view unmounted; returning from item edit triggered a full OAuth flow. Fixed by lifting the hook into a session-scoped `GmailAuthProvider` (`src/context/GmailAuthContext.tsx`) mounted above the view switch in `App()`. Token stays memory-only (still dies on reload, not on navigation). Email list + selected preview already survive via the sessionStorage cache + preserved `gmailSourceEmailId`. — _✅ FIXED (P0)_
-- `E3-bug.5` **List/preview scroll mismatch** — on "Back to email" (and any selection) the left email list reset to the top while the right preview showed an out-of-view row — confusing, especially on mobile where the preview overlays the list. Fixed: `EmailList` scrolls the selected row into view (`scrollIntoView({ behavior: "smooth", block: "start" })`) so the highlighted list row always matches the open preview. — _✅ FIXED_
+- ✅ `E3-bug.5` **List/preview scroll mismatch** — on "Back to email" (and any selection) the left email list reset to the top while the right preview showed an out-of-view row — confusing, especially on mobile where the preview overlays the list. Fixed: `EmailList` scrolls the selected row into view (`scrollIntoView({ behavior: "smooth", block: "start" })`) so the highlighted list row always matches the open preview. — _✅ FIXED_
 - ✅`E3-bug.6` **"Include" skipped-item identity by name** — when an email skipped multiple items sharing a name (e.g. four "The Highwaist"), clicking one Include dropped all same-named items from the drawer but moved only one into the detected list; the leftovers leaked into the next email's detected list (unskip state never reset on email change). Fixed in `EmailPreview`: identity is now the per-email skipped index (not name), and unskip selections reset on `email.id` change. Added a batch **"Include all N items"** button (parallels Import All). — _✅ FIXED_
 - ✅`E3-bug.3` **Skip item button hidden under Add to Closet** — on the multi-item edit view from email ingestion, the Skip button was positioned under the submit button. Fixed with `position: initial` — _✅ PR #80_
 - ✅`E3-bug.4` **Inbox loading text — pulse scale animation** — added pulse-scale keyframe to the loading indicator text in the inbox view for better perceived feedback — _✅ PR #80_
