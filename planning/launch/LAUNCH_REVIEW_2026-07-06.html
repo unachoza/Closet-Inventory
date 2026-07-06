@@ -1,0 +1,1050 @@
+<title>Nothing To Wear — Launch Review & Priority Board</title>
+<style>
+  @font-face {
+    font-family: 'Display';
+    src: local('Georgia'), local('Times New Roman');
+    font-weight: 400 700;
+  }
+
+  :root {
+    --ground: #FAF9F7;
+    --surface: #FFFFFF;
+    --surface-raised: #F3F2EF;
+    --ink: #1A1816;
+    --ink-secondary: #5C574F;
+    --ink-tertiary: #8A847A;
+    --border: #E4E1DB;
+    --border-subtle: #EDEBE7;
+    --accent: #2D6A4F;
+    --accent-light: #D8F3DC;
+    --accent-muted: #40916C;
+    --warning: #C25B28;
+    --warning-light: #FDEBD0;
+    --critical: #B33A3A;
+    --critical-light: #FDE8E8;
+    --done: #2D6A4F;
+    --done-light: #D8F3DC;
+    --progress: #1B6B93;
+    --progress-light: #D4EEF7;
+    --blocked: #C25B28;
+    --blocked-light: #FDE8D0;
+    --not-started: #8A847A;
+    --not-started-light: #F0EEEA;
+    --font-display: 'Georgia', 'Times New Roman', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #141210;
+      --surface: #1C1A17;
+      --surface-raised: #252320;
+      --ink: #E8E4DE;
+      --ink-secondary: #A9A49B;
+      --ink-tertiary: #7A756D;
+      --border: #333028;
+      --border-subtle: #2A2722;
+      --accent: #52B788;
+      --accent-light: #1A3328;
+      --accent-muted: #74C69D;
+      --warning: #E07A4A;
+      --warning-light: #3D2A1A;
+      --critical: #E05555;
+      --critical-light: #3D1A1A;
+      --done: #52B788;
+      --done-light: #1A3328;
+      --progress: #4FC3F7;
+      --progress-light: #122A38;
+      --blocked: #E07A4A;
+      --blocked-light: #3D2A1A;
+      --not-started: #7A756D;
+      --not-started-light: #252320;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #141210;
+    --surface: #1C1A17;
+    --surface-raised: #252320;
+    --ink: #E8E4DE;
+    --ink-secondary: #A9A49B;
+    --ink-tertiary: #7A756D;
+    --border: #333028;
+    --border-subtle: #2A2722;
+    --accent: #52B788;
+    --accent-light: #1A3328;
+    --accent-muted: #74C69D;
+    --warning: #E07A4A;
+    --warning-light: #3D2A1A;
+    --critical: #E05555;
+    --critical-light: #3D1A1A;
+    --done: #52B788;
+    --done-light: #1A3328;
+    --progress: #4FC3F7;
+    --progress-light: #122A38;
+    --blocked: #E07A4A;
+    --blocked-light: #3D2A1A;
+    --not-started: #7A756D;
+    --not-started-light: #252320;
+  }
+  :root[data-theme="light"] {
+    --ground: #FAF9F7;
+    --surface: #FFFFFF;
+    --surface-raised: #F3F2EF;
+    --ink: #1A1816;
+    --ink-secondary: #5C574F;
+    --ink-tertiary: #8A847A;
+    --border: #E4E1DB;
+    --border-subtle: #EDEBE7;
+    --accent: #2D6A4F;
+    --accent-light: #D8F3DC;
+    --accent-muted: #40916C;
+    --warning: #C25B28;
+    --warning-light: #FDEBD0;
+    --critical: #B33A3A;
+    --critical-light: #FDE8E8;
+    --done: #2D6A4F;
+    --done-light: #D8F3DC;
+    --progress: #1B6B93;
+    --progress-light: #D4EEF7;
+    --blocked: #C25B28;
+    --blocked-light: #FDE8D0;
+    --not-started: #8A847A;
+    --not-started-light: #F0EEEA;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 1080px; margin: 0 auto; padding: var(--space-xl) var(--space-lg); }
+
+  /* Header */
+  .header {
+    padding: var(--space-2xl) 0 var(--space-xl);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-2xl);
+  }
+  .header-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: var(--space-sm);
+  }
+  .header h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: var(--space-sm);
+  }
+  .header-date {
+    font-size: 13px;
+    color: var(--ink-tertiary);
+  }
+
+  /* Summary strip */
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-md) var(--space-lg);
+  }
+  .stat-label {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-tertiary);
+    margin-bottom: var(--space-xs);
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-value.green { color: var(--done); }
+  .stat-value.amber { color: var(--warning); }
+  .stat-value.red { color: var(--critical); }
+  .stat-value.blue { color: var(--progress); }
+  .stat-sub {
+    font-size: 12px;
+    color: var(--ink-tertiary);
+    margin-top: 2px;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: var(--space-2xl);
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .section-header h2 {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .section-header .tag {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  /* Progress bars */
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+  .progress-label {
+    min-width: 160px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .progress-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: var(--surface-raised);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .progress-fill.green { background: var(--done); }
+  .progress-fill.amber { background: var(--warning); }
+  .progress-fill.blue { background: var(--progress); }
+  .progress-pct {
+    min-width: 40px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-secondary);
+  }
+
+  /* Checklist */
+  .checklist {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: var(--space-lg);
+  }
+  .checklist-title {
+    font-size: 14px;
+    font-weight: 700;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--surface-raised);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .checklist-count {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-tertiary);
+    font-weight: 400;
+  }
+  .check-item {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-lg);
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 14px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-item .icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .check-item.done { color: var(--ink-tertiary); }
+  .check-item.done .text { text-decoration: line-through; text-decoration-color: var(--border); }
+  .check-item.open .icon { color: var(--not-started); }
+  .check-item.critical .icon { color: var(--critical); }
+
+  /* Ticket table */
+  .ticket-table-wrap { overflow-x: auto; margin-bottom: var(--space-lg); }
+  .ticket-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .ticket-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-tertiary);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  .ticket-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: top;
+  }
+  .ticket-table tr:last-child td { border-bottom: none; }
+  .ticket-table .ticket-id {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-muted);
+    white-space: nowrap;
+  }
+
+  /* Status pills */
+  .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  .pill-done { background: var(--done-light); color: var(--done); }
+  .pill-progress { background: var(--progress-light); color: var(--progress); }
+  .pill-blocked { background: var(--blocked-light); color: var(--blocked); }
+  .pill-not-started { background: var(--not-started-light); color: var(--not-started); }
+  .pill-critical { background: var(--critical-light); color: var(--critical); }
+
+  /* Priority column */
+  .priority {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .priority.p0 { color: var(--critical); }
+  .priority.p1 { color: var(--warning); }
+  .priority.p2 { color: var(--progress); }
+  .priority.p3 { color: var(--ink-tertiary); }
+
+  /* Feedback card */
+  .feedback-card {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-md);
+  }
+  .feedback-card h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+  }
+  .feedback-card p, .feedback-card ul {
+    font-size: 14px;
+    color: var(--ink-secondary);
+    line-height: 1.6;
+  }
+  .feedback-card ul {
+    padding-left: var(--space-lg);
+    margin-top: var(--space-xs);
+  }
+  .feedback-card li { margin-bottom: var(--space-xs); }
+
+  .feedback-card.warn { border-left-color: var(--warning); }
+  .feedback-card.crit { border-left-color: var(--critical); }
+
+  /* Budget table */
+  .budget-table-wrap { overflow-x: auto; }
+  .budget-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .budget-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-tertiary);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  .budget-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-subtle);
+    vertical-align: top;
+    font-variant-numeric: tabular-nums;
+  }
+  .budget-table tr:last-child td { border-bottom: none; }
+  .budget-table .cost {
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+  .budget-table tfoot td {
+    border-top: 2px solid var(--border);
+    font-weight: 700;
+  }
+  .budget-table tfoot .cost { color: var(--accent); }
+
+  /* Prose */
+  .prose { max-width: 72ch; }
+  .prose p { margin-bottom: var(--space-md); color: var(--ink-secondary); }
+  .prose strong { color: var(--ink); font-weight: 600; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: var(--space-2xl) 0;
+  }
+
+  /* Value indicator */
+  .value-bar {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+  .value-pip {
+    width: 6px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--border);
+  }
+  .value-pip.filled { background: var(--accent); }
+  .value-pip.filled.high { background: var(--warning); }
+
+  .footer {
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--ink-tertiary);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 640px) {
+    .page { padding: var(--space-md); }
+    .header h1 { font-size: 22px; }
+    .summary-strip { grid-template-columns: repeat(2, 1fr); }
+    .progress-label { min-width: 100px; font-size: 12px; }
+    .ticket-table { font-size: 12px; }
+    .budget-table { font-size: 12px; }
+  }
+</style>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-eyebrow">Nothing To Wear &middot; Launch Review</div>
+    <h1>Sprint Health & Priority Board</h1>
+    <div class="header-date">Generated July 6, 2026 &middot; Reviewing progress against June 29 launch roadmap</div>
+  </header>
+
+  <!-- Summary strip -->
+  <div class="summary-strip">
+    <div class="stat-card">
+      <div class="stat-label">Tests Passing</div>
+      <div class="stat-value green">1,158</div>
+      <div class="stat-sub">90 files &middot; 0 failures</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">TypeScript</div>
+      <div class="stat-value green">Clean</div>
+      <div class="stat-sub">tsc --noEmit &middot; strict mode</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Launch Readiness</div>
+      <div class="stat-value amber">~35%</div>
+      <div class="stat-sub">Block A/C untouched</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Merged PRs (30d)</div>
+      <div class="stat-value blue">16</div>
+      <div class="stat-sub">#96&ndash;#113</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Security Vulns</div>
+      <div class="stat-value green">0</div>
+      <div class="stat-sub">npm audit clean</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Open Issues</div>
+      <div class="stat-value green">0</div>
+      <div class="stat-sub">GitHub issue tracker</div>
+    </div>
+  </div>
+
+  <!-- Progress by Block -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Launch Block Progress</h2>
+      <span class="tag pill-progress">Roadmap</span>
+    </div>
+
+    <div class="progress-row">
+      <div class="progress-label">Block 0 &middot; Prove-it</div>
+      <div class="progress-bar-wrap"><div class="progress-fill green" style="width:100%"></div></div>
+      <div class="progress-pct">100%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Block A &middot; Security</div>
+      <div class="progress-bar-wrap"><div class="progress-fill amber" style="width:35%"></div></div>
+      <div class="progress-pct">35%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Block B &middot; Inventory</div>
+      <div class="progress-bar-wrap"><div class="progress-fill blue" style="width:45%"></div></div>
+      <div class="progress-pct">45%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Block C &middot; Mobile/PWA</div>
+      <div class="progress-bar-wrap"><div class="progress-fill amber" style="width:5%"></div></div>
+      <div class="progress-pct">5%</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-label">Sprint 3.5 &middot; Polish</div>
+      <div class="progress-bar-wrap"><div class="progress-fill green" style="width:92%"></div></div>
+      <div class="progress-pct">92%</div>
+    </div>
+  </div>
+
+  <!-- What Shipped -->
+  <div class="section">
+    <div class="section-header">
+      <h2>What Shipped (Last 4 Weeks)</h2>
+      <span class="tag pill-done">Completed</span>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">Block 0 &mdash; Prove-It Gates <span class="checklist-count">3/3</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">G0.1 Gmail import end-to-end (Google OAuth + parsing verified)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">G0.2 RLS isolation &mdash; 11/11 checks pass (user B blocked from A's data)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">G0.3 Cloud sync round-trip (item on device A appears on device B)</span></div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">Block B &mdash; Inventory Spine (Status + Location) <span class="checklist-count">5/13</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">P1-1 Location registry + primary-home default (locations.ts + tests)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">P1-2 Location border indicator on card (hidden at home)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">P1-3 Status dot indicator on card (combined mode)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">P1-3b Status + Location capture in edit form (selects)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">P1-3c Overview border-mode toggle (Off / Location / Location+Status)</span></div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">Sprint 3.5 &mdash; Polish & Hotfixes <span class="checklist-count">11/12</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E3-bug.2 Re-auth bug (token lost on Gmail view unmount)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E3-bug.3 Skip item hidden under Add to Closet</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E5-bug.1 Mobile header under sticky nav</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E3-bug.4 Email fetch loading pulse</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E0-7.1 Branding: "MyCloset" &rarr; "Nothing To Wear"</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E3-6.1 EditItemView optional fields relaxed</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E3-4.1 Email list header: count + date range</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E3-7.1 Material-blend editor rework (pill inputs)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E0-2.3 Material filter sort by blend %</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E0-7.2 Sloppy search pills fixed</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E2-9.1 Swim category added</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E8-3.1 Stain guide (nail polish + turmeric) &mdash; not started</span></div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">E1 Cloud Backend &mdash; Foundation <span class="checklist-count">10/12</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-1.1 Gmail OAuth spike (Supabase-mediated) verified</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-1.2 Full relational schema (6 migrations)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-1.3 RLS isolation verified (11/11)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-1.4 useCloudCloset port (synced repository)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-1.5 First-sign-in seed</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-2.1 Storage upload (off base64)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-4.1 Bucket privacy audit</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-4.2 RLS isolation test script</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-4.3 CI security scanning (gitleaks + npm audit)</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E1-4.11 Storage upload validation pushed</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E1-2.2 Migrate existing base64 &rarr; Storage (legacy wipe)</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E1-4.12 Dev/prod Supabase split</span></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- What's Blocked / Not Started -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Launch Blockers &mdash; Still Open</h2>
+      <span class="tag pill-critical">Attention</span>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">Block A &mdash; Security & Privacy (Hard Gate) <span class="checklist-count">3/8 done</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">RLS second-account isolation</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">Storage validation pushed to prod</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">CI dependency + secret scanning</span></div>
+      <div class="check-item critical"><span class="icon">&#9679;</span><span class="text"><strong>Dev/prod Supabase split</strong> &mdash; real users' data must not mix with dev data</span></div>
+      <div class="check-item critical"><span class="icon">&#9679;</span><span class="text"><strong>Account deletion + data export</strong> &mdash; legal right-to-erasure; privacy policy promises this</span></div>
+      <div class="check-item critical"><span class="icon">&#9679;</span><span class="text"><strong>Base64 &rarr; Storage migration + legacy wipe</strong></span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">CSP + HSTS at Vercel layer</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Supabase hardening (service_role audit, SECURITY DEFINER review)</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Logging hygiene &mdash; never log tokens/OAuth/PII</span></div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">Privacy Policy & Gmail OAuth <span class="checklist-count">0/10 done</span></div>
+      <div class="check-item critical"><span class="icon">&#9679;</span><span class="text"><strong>Privacy policy</strong> at a public URL (Google OAuth requirement)</span></div>
+      <div class="check-item critical"><span class="icon">&#9679;</span><span class="text"><strong>Google Limited Use disclosure</strong> in privacy policy</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Terms of Service URL</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Add 30 waitlisters as Google test users</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Onboarding copy for unverified-app warning</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Domain verification (Search Console)</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Demo video of consent flow</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Submit for OAuth verification (Gate 1)</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">CASA tier determination + validator engagement</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">Refresh token 7-day expiry caveat confirmed</span></div>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">Block C &mdash; Mobile & PWA <span class="checklist-count">1/7 done</span></div>
+      <div class="check-item done"><span class="icon">&#10003;</span><span class="text">E5-bug.1 Sticky-nav overlap fix</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E5-1.1 44&times;44 tap-target audit</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E5-1.2 Bottom nav</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E5-1.3 Add-Item FAB</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E5-2.1 Manifest + icons (PWA installable)</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E5-2.2 Service worker (offline shell)</span></div>
+      <div class="check-item open"><span class="icon">&#9675;</span><span class="text">E5-2.3 iOS full-screen</span></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Engineering Quality Review -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Engineering Quality Review</h2>
+      <span class="tag pill-done">Mid/Sr Assessment</span>
+    </div>
+
+    <div class="prose" style="margin-bottom: var(--space-lg)">
+      <p><strong>Overall grade: Strong.</strong> This codebase demonstrates engineering maturity well above what you'd expect from a solo project. Strict TypeScript with zero <code>any</code> types, 1,158 passing tests across 90 files, a clean Repository Pattern abstraction, and thoughtful security practices (DOMPurify XSS protection, in-memory-only OAuth tokens, localStorage cleanup of legacy credentials). The architecture decisions are defensible and the test coverage is real, not ceremonial.</p>
+    </div>
+
+    <div class="feedback-card">
+      <h4>Strengths</h4>
+      <ul>
+        <li><strong>Type safety:</strong> Zero <code>any</code> types in source. Strict mode + noUnusedLocals + noFallthroughCases. Auto-generated Supabase types used correctly.</li>
+        <li><strong>Repository pattern:</strong> Clean <code>ClosetRepository</code> interface with Local, Supabase, and Synced implementations. Backend swap is a one-line change.</li>
+        <li><strong>Security posture:</strong> Gmail tokens in-memory only. DOMPurify with link sanitization. Legacy credential cleanup on mount. Gitleaks CI. RLS proven with real tests.</li>
+        <li><strong>Test quality:</strong> XSS-specific tests, animation regression tests, sync failure lifecycle tests, integration tests. Not just happy-path coverage.</li>
+        <li><strong>Domain modeling:</strong> FashionParser is a proper module (17 attribute maps, normalizers, inference engine), not scattered utils.</li>
+      </ul>
+    </div>
+
+    <div class="feedback-card warn">
+      <h4>Issues to Address Before Launch</h4>
+      <ul>
+        <li><strong>Data integrity:</strong> <code>upsertMaterials</code> does delete-then-insert without a transaction. If the insert fails, materials are lost. Wrap in an RPC or use <code>ON CONFLICT</code>.</li>
+        <li><strong>N+1 on import:</strong> <code>importItems</code> fires a separate delete+insert pair per item for materials. A 50-item import is 100+ queries. Batch this.</li>
+        <li><strong>Keyboard accessibility:</strong> <code>Card.tsx</code> uses <code>onClick</code> on a div without <code>role="button"</code>, <code>tabIndex</code>, or keyboard handlers. Close button in <code>EditItemView</code> is an <code>&lt;img onClick&gt;</code>. These are WCAG failures.</li>
+        <li><strong>No focus trapping:</strong> Card detail modal doesn't trap focus. Tab can reach content behind the overlay.</li>
+      </ul>
+    </div>
+
+    <div class="feedback-card">
+      <h4>Recommendations (Post-Launch)</h4>
+      <ul>
+        <li><strong>Extract email parser:</strong> <code>parseProductsFromEmail.ts</code> is 4,000+ lines. Each retailer strategy should be its own module.</li>
+        <li><strong>Memoize Fuse index:</strong> <code>useFuzzySearch</code> creates a new Fuse instance on every search call. Memoize against the items array.</li>
+        <li><strong>Code splitting:</strong> No <code>React.lazy</code> anywhere. GmailImport, FabricCare, Onboarding should lazy-load.</li>
+        <li><strong>Unify <code>care</code> type:</strong> Currently <code>string | string[]</code>, forcing defensive normalization everywhere. Standardize to <code>string[]</code>.</li>
+        <li><strong>Missing Supabase repo tests:</strong> Only local + synced repos have tests. The Supabase repo's row mapping and error paths are untested.</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Priority Todo Board -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Priority Ticket Board</h2>
+      <span class="tag pill-blocked">Action Required</span>
+    </div>
+
+    <div class="prose" style="margin-bottom: var(--space-lg)">
+      <p>Tickets ordered by launch-gate criticality, then by value toward the 30-person beta. <strong>Value</strong> rates how much each ticket moves the needle on shipping to waitlisters. <strong>Effort</strong> is ideal dev-days at ~30 hrs/week.</p>
+    </div>
+
+    <div class="ticket-table-wrap">
+      <table class="ticket-table">
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Ticket</th>
+            <th>Description</th>
+            <th>Effort</th>
+            <th>Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- P0: Hard launch gate -->
+          <tr>
+            <td><span class="priority p0">P0</span></td>
+            <td class="ticket-id">E1-4.12</td>
+            <td><strong>Dev/prod Supabase split</strong> &mdash; create prod project, migrate schema, env swap</td>
+            <td>1.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p0">P0</span></td>
+            <td class="ticket-id">E1-4.8</td>
+            <td><strong>Account deletion + data export</strong> &mdash; delete rows + Storage objects + export JSON</td>
+            <td>2d</td>
+            <td><div class="value-bar"><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p0">P0</span></td>
+            <td class="ticket-id">LEGAL-1</td>
+            <td><strong>Privacy policy</strong> &mdash; public URL, Google Limited Use disclosure, retention, rights</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p0">P0</span></td>
+            <td class="ticket-id">E1-2.2</td>
+            <td><strong>Base64 &rarr; Storage migration</strong> &mdash; convert existing items, wipe legacy blobs</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip filled high"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+
+          <!-- P1: Launch quality -->
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">E1-4.7</td>
+            <td><strong>CSP + HSTS</strong> at Vercel &mdash; verify doesn't break Google OAuth SDK</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">E1-4.10</td>
+            <td><strong>Supabase hardening</strong> &mdash; service_role audit, SECURITY DEFINER review, leaked-password protection</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">A11Y-1</td>
+            <td><strong>Card keyboard accessibility</strong> &mdash; role="button", tabIndex, focus trap on modal</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">DATA-1</td>
+            <td><strong>upsertMaterials transaction</strong> &mdash; wrap delete+insert in RPC or use ON CONFLICT</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">GMAIL-1</td>
+            <td><strong>Add 30 waitlisters as test users</strong> + write unverified-app onboarding copy</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+
+          <!-- P1: Inventory spine (differentiator) -->
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">P1-4</td>
+            <td><strong>Quick-action menu</strong> &mdash; set status/location from card (desktop &hellip; / mobile long-press)</td>
+            <td>1.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">P1-8</td>
+            <td><strong>Status + Location filter dimensions</strong> in useClosetFilters</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p1">P1</span></td>
+            <td class="ticket-id">P1-10</td>
+            <td><strong>Border/status legend</strong> &mdash; dismissible strip + a11y non-color cues</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+
+          <!-- P2: Mobile (needed but can cut to responsive-only) -->
+          <tr>
+            <td><span class="priority p2">P2</span></td>
+            <td class="ticket-id">E5-1.1</td>
+            <td>44&times;44 tap-target audit (mobile touch)</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p2">P2</span></td>
+            <td class="ticket-id">E5-1.2</td>
+            <td>Bottom nav (mobile navigation)</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p2">P2</span></td>
+            <td class="ticket-id">E5-1.3</td>
+            <td>Add-Item FAB (floating action button)</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p2">P2</span></td>
+            <td class="ticket-id">E5-2.1</td>
+            <td>Manifest + icons (make installable)</td>
+            <td>0.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+
+          <!-- P2: Block B remaining -->
+          <tr>
+            <td><span class="priority p2">P2</span></td>
+            <td class="ticket-id">P1-5</td>
+            <td>"Where is everything" grouped-by-location view</td>
+            <td>1.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p2">P2</span></td>
+            <td class="ticket-id">P1-9</td>
+            <td>Status transition helper (statusTransitions.ts)</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+
+          <!-- P3: Post-MVP scope for launch, nice-to-have -->
+          <tr>
+            <td><span class="priority p3">P3</span></td>
+            <td class="ticket-id">P1-11</td>
+            <td>Status model v2 (airing + stored states, statusReason)</td>
+            <td>2d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p3">P3</span></td>
+            <td class="ticket-id">P1-6/7</td>
+            <td>Custom / multi-home locations + onboarding presets</td>
+            <td>2d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p3">P3</span></td>
+            <td class="ticket-id">E5-2.2</td>
+            <td>Service worker (offline shell)</td>
+            <td>1.5d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+          <tr>
+            <td><span class="priority p3">P3</span></td>
+            <td class="ticket-id">E8-3.1</td>
+            <td>Stain guide (turmeric, nail polish, food stains)</td>
+            <td>1d</td>
+            <td><div class="value-bar"><span class="value-pip filled"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span><span class="value-pip"></span></div></td>
+            <td><span class="pill pill-not-started">Not started</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Budget Estimator -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Budget & Timeline Estimate</h2>
+      <span class="tag pill-progress">Forecast</span>
+    </div>
+
+    <div class="prose" style="margin-bottom: var(--space-lg)">
+      <p>Based on ~30 hrs/week solo capacity. <strong>Ideal dev-days</strong> exclude context-switching, debugging, and review overhead. Calendar estimates include a 25% buffer. The table groups work by launch phase, not priority order.</p>
+    </div>
+
+    <div class="budget-table-wrap">
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th>Phase</th>
+            <th>Scope</th>
+            <th>Dev-Days</th>
+            <th>Calendar</th>
+            <th>Gate?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Block A &mdash; Security</strong></td>
+            <td>Dev/prod split, account deletion, privacy policy, CSP/HSTS, hardening, logging</td>
+            <td class="cost">5.5&ndash;7d</td>
+            <td>~2.5 weeks</td>
+            <td><span class="pill pill-critical">Hard gate</span></td>
+          </tr>
+          <tr>
+            <td><strong>Block B &mdash; Remaining</strong></td>
+            <td>Quick-actions, filters, legend, grouped view, transition helper</td>
+            <td class="cost">5.5&ndash;7d</td>
+            <td>~2.5 weeks</td>
+            <td><span class="pill pill-progress">Differentiator</span></td>
+          </tr>
+          <tr>
+            <td><strong>Block C &mdash; Mobile</strong></td>
+            <td>Tap targets, bottom nav, FAB, manifest+icons</td>
+            <td class="cost">2.5&ndash;3.5d</td>
+            <td>~1.5 weeks</td>
+            <td><span class="pill pill-blocked">Launch gate</span></td>
+          </tr>
+          <tr>
+            <td><strong>Block C &mdash; PWA</strong></td>
+            <td>Service worker, offline shell, iOS full-screen</td>
+            <td class="cost">2.5&ndash;3d</td>
+            <td>~1.5 weeks</td>
+            <td><span class="pill pill-not-started">Deferrable</span></td>
+          </tr>
+          <tr>
+            <td><strong>Quality fixes</strong></td>
+            <td>A11y, transaction safety, import batch, Fuse memoization</td>
+            <td class="cost">2&ndash;3d</td>
+            <td>~1 week</td>
+            <td><span class="pill pill-progress">Recommended</span></td>
+          </tr>
+          <tr>
+            <td><strong>Gmail onboarding</strong></td>
+            <td>Add test users, unverified-app copy, submit Gate 1 verification</td>
+            <td class="cost">0.5&ndash;1d</td>
+            <td>~0.5 week</td>
+            <td><span class="pill pill-critical">Hard gate</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2"><strong>Total to launch-ready beta</strong></td>
+            <td class="cost">18.5&ndash;24.5d</td>
+            <td><strong>~6&ndash;8 weeks</strong></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td colspan="2"><strong>If PWA deferred to fast-follow</strong></td>
+            <td class="cost">16&ndash;21.5d</td>
+            <td><strong>~5&ndash;7 weeks</strong></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Strategic Summary -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Strategic Assessment</h2>
+    </div>
+
+    <div class="feedback-card">
+      <h4>What went well</h4>
+      <p>The last month focused deeply on Block B (Inventory Spine) and delivered the data model, edit-form capture, border-toggle UI, and seed data for status + location. Sprint 3.5 cleared nearly all user-feedback bugs. The FashionParser matured into a proper module. The E1 cloud backend is functionally complete (schema, RLS, sync, storage). Most critically, all three Block 0 prove-it gates were cleared on June 30, validating the launch thesis.</p>
+    </div>
+
+    <div class="feedback-card warn">
+      <h4>The honest gap</h4>
+      <p><strong>Block A (security/privacy) and Block C (mobile) have had zero movement since June 29.</strong> The inventory spine work is encouraging, but it is not launch-readiness progress. The actual hard gates &mdash; dev/prod split, account deletion, privacy policy &mdash; remain at 0%. This means the ~6-8 week launch target from June 29 has not gotten closer; it has effectively restarted. At current pace, a realistic launch date is <strong>mid-to-late August</strong> if Block A is prioritized immediately.</p>
+    </div>
+
+    <div class="feedback-card">
+      <h4>Recommended next 2 weeks</h4>
+      <ul>
+        <li><strong>Week 1:</strong> Dev/prod Supabase split (E1-4.12) + account deletion & export (E1-4.8). These are the two hardest launch gates and unblock the privacy policy.</li>
+        <li><strong>Week 2:</strong> Privacy policy + Google Limited Use disclosure (LEGAL-1) + CSP/HSTS (E1-4.7) + add test users (GMAIL-1). This clears Block A and unblocks the 30-person beta.</li>
+        <li><strong>Parallel:</strong> Submit Gmail OAuth verification Gate 1 as soon as privacy policy has a URL. The review queue is weeks-to-months; starting now is free.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Nothing To Wear &middot; Closet Inventory</span>
+    <span>Auto-generated review &middot; July 6, 2026</span>
+  </div>
+
+</div>
