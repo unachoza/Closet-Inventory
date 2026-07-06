@@ -6,7 +6,8 @@ import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
-import { formItem, conditionOptions, statusOptions } from "../../../utils/constants";
+import { formItem, conditionOptions, statusOptions, occasionExamples, careExamples } from "../../../utils/constants";
+import PillComboField from "../../../Components/PillComboField/PillComboField";
 import { LOCATIONS } from "../../../utils/locations";
 import type { ItemStatus, WearState } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
@@ -77,9 +78,11 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		style,
 		originalPrice: _originalPrice,
 		qty: _qty,
-		// status + locationId get bespoke selects below (not generic text inputs).
+		// These fields get bespoke controls below (not generic text inputs).
 		status: _status,
 		locationId: _locationId,
+		occasion: _occasion,
+		care: _care,
 		...remaining
 	} = item;
 	const inputsToSeperate = { id, onSale, notes, style };
@@ -115,6 +118,28 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 
 	const handleLocationChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
 		setFormData((prev) => ({ ...prev, locationId: e.target.value }));
+	}, []);
+
+	const handleOccasionAdd = useCallback((value: string) => {
+		setFormData((prev) => ({ ...prev, occasion: value }));
+	}, []);
+
+	const handleOccasionRemove = useCallback(() => {
+		setFormData((prev) => ({ ...prev, occasion: "" }));
+	}, []);
+
+	const handleCareAdd = useCallback((value: string) => {
+		setFormData((prev) => {
+			const current = Array.isArray(prev.care) ? prev.care : prev.care ? [prev.care] : [];
+			return { ...prev, care: current.includes(value) ? current : [...current, value] };
+		});
+	}, []);
+
+	const handleCareRemove = useCallback((value: string) => {
+		setFormData((prev) => {
+			const current = Array.isArray(prev.care) ? prev.care : prev.care ? [prev.care] : [];
+			return { ...prev, care: current.filter((c) => c !== value) };
+		});
 	}, []);
 
 	const handlePurchaseDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -391,6 +416,24 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							))}
 						</select>
 					</label>
+
+					<PillComboField
+						label="occasion"
+						options={occasionExamples}
+						selected={formData.occasion ? [formData.occasion] : []}
+						onAdd={handleOccasionAdd}
+						onRemove={handleOccasionRemove}
+						multiSelect={false}
+					/>
+
+					<PillComboField
+						label="care"
+						options={careExamples}
+						selected={Array.isArray(formData.care) ? formData.care : formData.care ? [formData.care] : []}
+						onAdd={handleCareAdd}
+						onRemove={handleCareRemove}
+						multiSelect={true}
+					/>
 
 					{separateFields()}
 				</div>

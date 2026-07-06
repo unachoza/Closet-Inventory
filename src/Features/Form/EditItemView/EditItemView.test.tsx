@@ -86,11 +86,11 @@ describe("EditItemView", () => {
 		// row's name and percentage inputs reflect the item's MaterialBlend[].
 		expect(screen.getByLabelText("Material 1 name")).toHaveValue(mockItem.material[0].material);
 		expect(screen.getByLabelText("Material 1 percentage")).toHaveValue(mockItem.material[0].percentage);
-		expect(screen.getByLabelText("occasion")).toHaveValue(mockItem.occasion);
+		// Occasion is now a chip-combobox — verify the pre-selected value renders as a chip
+		expect(screen.getByText("casual")).toBeInTheDocument();
 		// "age" is no longer a generic text input — condition is a fixed-option selector,
 		// and purchase date is a read-only display (factual age derived from it).
 		expect(screen.getByLabelText("condition")).toHaveValue(mockItem.condition);
-		expect(screen.getByLabelText("care")).toHaveValue(mockItem.care);
 	});
 
 	it("renders condition as an editable selector and purchase date as a read-only display", () => {
@@ -163,5 +163,40 @@ describe("EditItemView", () => {
 	it("displays Import Item as the card title in create mode", () => {
 		render(<EditItemView item={mockItem} setView={mockSetView} mode="create" />);
 		expect(screen.getByText("Import Item")).toBeInTheDocument();
+	});
+
+	it("renders the pre-selected occasion as a chip and lets the user pick a new one", () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} />);
+		// Pre-selected value shows as a chip inside the combobox
+		expect(screen.getByText("casual")).toBeInTheDocument();
+
+		// Open the occasion selector and pick a new value
+		fireEvent.click(screen.getByRole("button", { name: /occasion selector/i }));
+		fireEvent.click(screen.getByRole("button", { name: "formal" }));
+
+		// Single-select: previous chip is replaced by the new one
+		expect(screen.getByText("formal")).toBeInTheDocument();
+		expect(screen.queryByText("casual")).not.toBeInTheDocument();
+	});
+
+	it("allows multiple care selections", () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} />);
+		fireEvent.click(screen.getByRole("button", { name: /care selector/i }));
+		fireEvent.click(screen.getByRole("button", { name: "hand wash" }));
+		fireEvent.click(screen.getByRole("button", { name: /care selector/i }));
+		fireEvent.click(screen.getByRole("button", { name: "cold water" }));
+
+		expect(screen.getByText("hand wash")).toBeInTheDocument();
+		expect(screen.getByText("cold water")).toBeInTheDocument();
+	});
+
+	it("removes a care chip when its remove control is clicked", () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} />);
+		fireEvent.click(screen.getByRole("button", { name: /care selector/i }));
+		fireEvent.click(screen.getByRole("button", { name: "hand wash" }));
+		expect(screen.getByText("hand wash")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: /remove hand wash/i }));
+		expect(screen.queryByText("hand wash")).not.toBeInTheDocument();
 	});
 });
