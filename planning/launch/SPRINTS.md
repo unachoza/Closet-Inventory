@@ -108,7 +108,7 @@ Completed between Block A and B:
 **P3 — Polish / small features**
 
 - ✅ `E0-7.2` **Search-result pills "Sloppy"** — pull match pills inside the card on their own layer so they don't detach on hover.
-- `E2-9.1` **Swim category** — add `swim` to `CategoryType` + Form list + Carousel; map bikini/one-piece/swimsuit/tankini/two-piece. ⚠️ hardcoded-list audit.
+- ✅ `E2-9.1` **Swim category** — add `swim` to `CategoryType` + Form list + Carousel; map bikini/one-piece/swimsuit/tankini/two-piece. ⚠️ hardcoded-list audit.
 - ✅ `E2-7.1` **Notes as bulleted list** — auto-bullet textarea + `<ul>` read mode.
 - `E8-3.1` **Stain guide** — add nail polish + turmeric; expand stain coverage.
 

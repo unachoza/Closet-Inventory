@@ -116,6 +116,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	tankini: "swim",
 	onepiece: "swim",
 	"one-piece": "swim",
+	"two-piece": "swim",
 	bodysuit: "body",
 	jumpsuit: "body",
 	cheeky: "intimates",
