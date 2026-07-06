@@ -87,13 +87,13 @@ _As Maya, I want the Edit Item form to only require fields that matter at import
 
 **Ticket:** `E3-6.1` Relax `EditItemView` validation when `mode === "create"` from email import; add regression test — _0.5d_
 
-## US-3.7 — Easier material-blend editing
+## US-3.7 — Easier material-blend editing ✅
 
 _As Maya, I want editing a material blend to be intuitive so that I can correct fabric percentages without fighting the control._
 
-- [ ] The blend editor is hard to use: the percentage control is disabled at 100% and it's awkward to dial back down to 100% from a multi-fiber blend
-- [ ] Rework so adding/removing fibers and redistributing percentages is smooth; 100% single-fiber and multi-fiber states both editable
-- [ ] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
+- [x] The blend editor is hard to use: the percentage control is disabled at 100% and it's awkward to dial back down to 100% from a multi-fiber blend
+- [x] Rework so adding/removing fibers and redistributing percentages is smooth; 100% single-fiber and multi-fiber states both editable
+- [x] Keep total ≤ 100% invariant clear (e.g. show remaining %, auto-balance, or free-form with validation)
 
 **Ticket:** `E3-7.1` Redesign the material-blend editor interaction in `EditItemView` — _1d_
 

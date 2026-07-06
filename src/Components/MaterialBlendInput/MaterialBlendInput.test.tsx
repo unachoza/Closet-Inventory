@@ -25,9 +25,31 @@ describe("MaterialBlendInput", () => {
 		expect(fn).toHaveBeenCalledWith([{ material: "", percentage: 100 }]);
 	});
 
-	it("disables Add Material when total is already 100%", () => {
-		render(<MaterialBlendInput value={[{ material: "cotton", percentage: 100 }]} onChange={onChange} />);
-		expect(screen.getByRole("button", { name: /add material/i })).toBeDisabled();
+	it("Add Material at 100% steals half from the largest fiber", () => {
+		const fn = vi.fn();
+		render(<MaterialBlendInput value={[{ material: "cotton", percentage: 100 }]} onChange={fn} />);
+		const btn = screen.getByRole("button", { name: /add material/i });
+		expect(btn).not.toBeDisabled();
+		fireEvent.click(btn);
+		expect(fn).toHaveBeenCalledWith([
+			{ material: "cotton", percentage: 50 },
+			{ material: "", percentage: 50 },
+		]);
+	});
+
+	it("Add Material at 100% multi-fiber steals from the largest", () => {
+		const fn = vi.fn();
+		const blend100: MaterialBlend[] = [
+			{ material: "cotton", percentage: 70 },
+			{ material: "polyester", percentage: 30 },
+		];
+		render(<MaterialBlendInput value={blend100} onChange={fn} />);
+		fireEvent.click(screen.getByRole("button", { name: /add material/i }));
+		expect(fn).toHaveBeenCalledWith([
+			{ material: "cotton", percentage: 35 },
+			{ material: "polyester", percentage: 30 },
+			{ material: "", percentage: 35 },
+		]);
 	});
 
 	it("changing percentage calls onChange with the updated value", () => {

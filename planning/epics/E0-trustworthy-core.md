@@ -81,7 +81,7 @@ Small UX wins that don't warrant a new epic — slot between sprints as palate c
 - `E0-7.1` **Onboarding app name + step demo order** — updated branding to "MyCloset"; reordered onboarding demo steps for clarity — _✅ PR #80_
 - `E0-7.3` **Clear Closet button + density toggle** — "Clear Closet" nav action with confirm modal deletes all items (incl. sample data); compact/comfortable grid toggle persisted to localStorage, shared between Closet + EntireCloset views — _✅ PR #80_
 - `E0-7.2` **Sloppy search pills** (filter pills wrap awkwardly on narrow viewports) — _✅ PR #86_
-- ✅`E0-2.3` **Material filter: sort options by blend %** (e.g. "80% cotton" before "20% polyester") — added `materialPct` sort ("Material: Highest %"); ranks by max % among selected fibers via shared `canonicalizeMaterial`. See post-completion polish entry for details.
+- `E0-2.3` **Material filter: sort options by blend %** (e.g. "80% cotton" before "20% polyester") — added `materialPct` sort ("Material: Highest %"); ranks by max % among selected fibers via shared `canonicalizeMaterial`. See post-completion polish entry for details. _✅ PR #109_
 
 ---
 
