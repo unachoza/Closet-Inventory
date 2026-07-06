@@ -7,7 +7,7 @@ export interface MaterialBlend {
 }
 
 /** E2 US-2.8: does this item fit the user right now? Distinct from style.fit (a style descriptor). */
-export type ItemFit = 'fits' | 'too_big' | 'too_small' | 'unknown';
+export type ItemFit = 'fits' | 'tailored' | 'too_big' | 'too_small' | 'unknown';
 
 /** E2 US-2.8: a single body measurement stored with its unit for in↔cm conversion. */
 export interface Measurement {
@@ -49,7 +49,10 @@ export type ItemStatus =
 	| 'at_cleaner'
 	| 'in_repair'
 	| 'traveling'
-	| 'on_loan';
+	| 'on_loan'
+	| 'archived_seasonal'
+
+export type WearState = 'new' | 'like_new' | 'good' | 'fair' | 'poor' | 'needs_repair';
 
 export type ClothingItem = {
 	id: string;
@@ -64,12 +67,10 @@ export type ClothingItem = {
 	originalPrice?: string;
 	qty?: number;
 	material: MaterialBlend[];
-	/** Legacy single-value occasion. Migrated to item_tags (season/occasion/vibe) in E2-10.3. */
 	occasion: string;
 	/** Legacy free-text age (e.g. "1 year"). Superseded by purchaseDate + condition. */
 	age?: string;
-	/** Subjective wear state: "new" | "like new" | "good" | "fair" | "needs repair". */
-	condition?: string;
+	condition?: WearState;
 	/** ISO date the item was purchased — source of the card's factual age. */
 	purchaseDate?: string;
 	care: string | string[];
@@ -127,7 +128,7 @@ export interface ItemFormData {
 	image?: string;
 }
 
-export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "underwear" | "shoes" | null;
+export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "shoes" | "swim" | null;
 
 export type ViewType = "carousel" | "form" | "overview" | "edit" | "gmail" | "fabric" | "journey" | "entireCloset";
 

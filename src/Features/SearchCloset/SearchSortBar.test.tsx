@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 import SearchSortBar from "./SearchSortBar";
 import { SORT_LABELS } from "../../hooks/useClosetSort";
 import { SearchProvider, useSearch } from "../../context/SearchContext";
+import type { BorderMode } from "../../utils/borderMode";
 
 const baseProps = {
 	sortKey: "dateAdded" as const,
@@ -11,6 +12,8 @@ const baseProps = {
 	showFilters: false,
 	onToggleFilters: vi.fn(),
 	activeFilterCount: 0,
+	borderMode: "off" as BorderMode,
+	onCycleBorderMode: vi.fn(),
 };
 
 // SearchSortBar now reads/writes SearchContext, so it must render inside a
@@ -51,6 +54,23 @@ describe("SearchSortBar", () => {
 		renderBar({ onToggleFilters });
 		fireEvent.click(screen.getByRole("button", { name: /filters/i }));
 		expect(onToggleFilters).toHaveBeenCalled();
+	});
+
+	it("border toggle sits between the search box and the Filters button", () => {
+		renderBar();
+		const borderBtn = screen.getByRole("button", { name: /card borders/i });
+		const filterBtn = screen.getByRole("button", { name: /filters/i });
+		// DOM order: search input → border toggle → filter button.
+		expect(borderBtn.compareDocumentPosition(filterBtn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+	});
+
+	it("border toggle labels the current mode and calls onCycleBorderMode when clicked", () => {
+		const onCycleBorderMode = vi.fn();
+		renderBar({ borderMode: "location", onCycleBorderMode });
+		const borderBtn = screen.getByRole("button", { name: /card borders/i });
+		expect(borderBtn).toHaveTextContent("Location");
+		fireEvent.click(borderBtn);
+		expect(onCycleBorderMode).toHaveBeenCalled();
 	});
 
 	it("shows active filter count badge when filters are applied", () => {

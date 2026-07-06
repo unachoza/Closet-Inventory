@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useGmailAuthContext } from "../../context/GmailAuthContext";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
-import type { ClothingItem } from "../../utils/types";
+import type { ClothingItem, WearState } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
 import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
 import { parseEmailToFormData, extractForwardedSender, extractForwardedPurchaseDate } from "../../utils/parseEmailToFormData";
@@ -193,7 +193,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				material,
 				onSale: product.onSale,
 				// condition + purchaseDate already provided by emailData (parseEmailToFormData)
-				condition: emailData.condition,
+				condition: emailData.condition as WearState | undefined,
 				// Recompute care from the RESOLVED color/material — the card's color
 				// (e.g. "Color: White") isn't visible to parseEmailToFormData.
 				care: inferCare(product.name, color, material),

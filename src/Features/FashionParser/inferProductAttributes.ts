@@ -1,4 +1,4 @@
-import type { ProductAttributes } from "./types";
+import type { ProductAttributes, Season } from "./types";
 import { matchFirst, matchAll } from "./utils";
 import { SILHOUETTE_MAP } from "./maps/silhouette";
 import { FIT_MAP } from "./maps/fit";
@@ -51,7 +51,7 @@ export function inferProductAttributes(name: string): ProductAttributes {
   if (pattern) attrs.pattern = pattern;
 
   const season = matchFirst(name, SEASON_MAP);
-  if (season) attrs.season = season;
+  if (season) attrs.season = season as Season;
 
   const material = matchFirst(name, MATERIAL_MAP);
   if (material) attrs.material = material;

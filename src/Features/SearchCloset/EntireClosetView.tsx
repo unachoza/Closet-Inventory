@@ -6,6 +6,7 @@ import { useClosetSort } from "../../hooks/useClosetSort";
 import { useSearch } from "../../context/SearchContext";
 import StickyTopBar from "./StickyTopBar";
 import FilteredItemGrid from "./FilteredItemGrid";
+import { BorderMode, nextBorderMode } from "../../utils/borderMode";
 import "./EntireCloset.css";
 
 interface EntireClosetViewProps {
@@ -13,6 +14,12 @@ interface EntireClosetViewProps {
 }
 
 const DENSITY_KEY = "closet_density";
+const BORDER_MODE_KEY = "closet_border_mode";
+
+const readBorderMode = (): BorderMode => {
+	const stored = localStorage.getItem(BORDER_MODE_KEY);
+	return stored === "location" || stored === "location_status" ? stored : "off";
+};
 
 const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 	const { closet, removeItem } = useLocalStorageCloset();
@@ -22,6 +29,15 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 		setCompact((prev) => {
 			const next = !prev;
 			localStorage.setItem(DENSITY_KEY, next ? "compact" : "comfortable");
+			return next;
+		});
+	}, []);
+
+	const [borderMode, setBorderMode] = useState<BorderMode>(readBorderMode);
+	const cycleBorderMode = useCallback(() => {
+		setBorderMode((prev) => {
+			const next = nextBorderMode(prev);
+			localStorage.setItem(BORDER_MODE_KEY, next);
 			return next;
 		});
 	}, []);
@@ -64,6 +80,8 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				activeFilterCount={activeFilterCount}
 				onToggleFilter={toggleFilter}
 				onClearAll={clearAll}
+				borderMode={borderMode}
+				onCycleBorderMode={cycleBorderMode}
 			/>
 			<FilteredItemGrid
 				items={displayed}
@@ -74,6 +92,7 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				onToggleDensity={toggleDensity}
 				onEditItem={onEditItem}
 				onRemoveItem={removeItem}
+				borderMode={borderMode}
 			/>
 		</main>
 	);

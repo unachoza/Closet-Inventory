@@ -465,6 +465,9 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 - ✅ Stain removal guide by fabric and common weaves
 - 🔲 Clothing lifespan tracker ("estimated wears remaining")
 - 🔲 Repair and alteration log (date, description, cost)
+- 🔲 Search fiber and fabric
+- 🔲 Search stain on - stain removal guide
+
 
 ---
 
@@ -483,7 +486,7 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 
 **Free tier**
 
-- Up to 35 closet items
+- Up to 80 closet items
 - Manual item entry
 - Local storage only
 

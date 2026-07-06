@@ -6,7 +6,9 @@ import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
 import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialBlendInput";
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
-import { formItem, conditionOptions } from "../../../utils/constants";
+import { formItem, conditionOptions, statusOptions } from "../../../utils/constants";
+import { LOCATIONS } from "../../../utils/locations";
+import type { ItemStatus, WearState } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import { formatItemAge } from "../../../utils/itemAge";
 import { matchedCondition } from "../../../utils/condition";
@@ -75,6 +77,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		style,
 		originalPrice: _originalPrice,
 		qty: _qty,
+		// status + locationId get bespoke selects below (not generic text inputs).
+		status: _status,
+		locationId: _locationId,
 		...remaining
 	} = item;
 	const inputsToSeperate = { id, onSale, notes, style };
@@ -101,7 +106,15 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	};
 
 	const handleConditionChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-		setFormData((prev) => ({ ...prev, condition: e.target.value }));
+		setFormData((prev) => ({ ...prev, condition: e.target.value as WearState }));
+	}, []);
+
+	const handleStatusChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFormData((prev) => ({ ...prev, status: e.target.value as ItemStatus }));
+	}, []);
+
+	const handleLocationChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+		setFormData((prev) => ({ ...prev, locationId: e.target.value }));
 	}, []);
 
 	const handlePurchaseDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -337,7 +350,43 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						>
 							{conditionOptions.map((opt) => (
 								<option key={opt} value={opt}>
-									{opt}
+									{opt.replace(/_/g, " ")}
+								</option>
+							))}
+						</select>
+					</label>
+
+					{/* Status — E2 lifecycle state (clean/dirty/at cleaner/etc.). Default "clean". */}
+					<label className="edit-form-condition">
+						status
+						<select
+							name="status"
+							className="edit-form-condition__select"
+							value={formData.status ?? "clean"}
+							onChange={handleStatusChange}
+							aria-label="status"
+						>
+							{statusOptions.map((opt) => (
+								<option key={opt} value={opt}>
+									{opt.replace(/_/g, " ")}
+								</option>
+							))}
+						</select>
+					</label>
+
+					{/* Location — E2 US-2.2. Default the primary (home) location. */}
+					<label className="edit-form-condition">
+						location
+						<select
+							name="locationId"
+							className="edit-form-condition__select"
+							value={formData.locationId ?? "home"}
+							onChange={handleLocationChange}
+							aria-label="location"
+						>
+							{LOCATIONS.map((loc) => (
+								<option key={loc.id} value={loc.id}>
+									{loc.label}
 								</option>
 							))}
 						</select>

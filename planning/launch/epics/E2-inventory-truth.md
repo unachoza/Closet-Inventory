@@ -5,6 +5,12 @@
 > The flagship, uncompeted feature. Full spec: [WardrobeStatusAndLocation.md](../../WardrobeStatusAndLocation.md).
 > Buildable localStorage-first; sync rides along when E1 lands.
 >
+> ### 🧵 CARVE-OUT (2026-07-04) — status + location split to its own branch/doc
+> The **status · location** primitives are being built on branch `EPIC-status-location`. Their stories,
+> tickets, and the edit-form + Gmail-import **update flows** now live in
+> [E2 Part Une — Inventory Truth · Status & Location](./E2-part-une-inventory-truth-status-location.md).
+> Personas: [USER_PERSONAS.md](../../USER_PERSONAS.md) (consolidated). Completed items are checked off below.
+>
 > ### 🚀 PROMOTED TO LAUNCH BLOCK B (2026-06-29) — see [LAUNCH_ROADMAP](../LAUNCH_ROADMAP_2026-06-29.md)
 > The **inventory spine** (status · location · availability · **simple** free-text lending) is now core MVP, not #4-backlog.
 > **Reality check:** the data model exists (`ClothingItem.status`/`locationId`/`loan` + DB columns) but the **UI is ~0% built** — no status chip, no quick-action menu, no `statusTransitions.ts`, no location field/tag/grouped view, no lend modal. This is the bulk of remaining MVP work. Launch scope = US-2.2 (location), US-2.3 (filters), US-2.5 (simple lend), US-2.6 (availability) + the status chip/menu from US-2.1. **Second-wave** (taxonomy US-2.10, provenance US-2.11, multi-photo US-2.12, fit/measurements US-2.8) stays post-launch.
@@ -22,29 +28,29 @@
 ## US-2.1 — Mark what state a piece is in → **partly moved to E11**
 _As Maya, I want to mark an item clean/dirty/at-the-cleaner/needs-repair/traveling/on-loan so that I know its real status._
 - → **clean/dirty + wornCount + Log a Wear moved to [E11](../../epics/E11-laundry-forecasting.md) (US-11.1).** `status`/`wornCount`/`lastWornAt` are **owned by E11**.
-- [ ] (parked) Extended statuses: `at_cleaner`, `in_repair`, `traveling`, `on_loan` — extend E11's enum
-- [ ] (parked) Status chip on the card (token-colored)
-- [ ] (parked) Quick-action menu sets status (context-aware per transition table)
+- [x] Extended statuses: `at_cleaner`, `in_repair`, `traveling`, `on_loan` — in `ItemStatus` enum ✅ `EPIC-status-location`
+- [x] Status chip on the card (token-colored) — shipped as a token-colored **status dot** in the overview border toggle's "Location + Status" mode ([FilteredCard.tsx](../../../src/Features/SearchCloset/FilteredCard.tsx)) ✅
+- [ ] (parked) Quick-action menu sets status (context-aware per transition table) — → `P1-4` in [E2 Part Une](./E2-part-une-inventory-truth-status-location.md)
 
 **Tickets** _(parked unless E2 is rescheduled)_
 - `E2-1.1` → see `E11-1.1` (fields moved)
-- `E2-1.2` `utils/statusTransitions.ts` (immutable transitions) + unit tests — _1d_ (parked)
-- `E2-1.3` Status chip on card (tokens.css colors) — _0.5d_ (parked)
-- `E2-1.4` Quick-action menu (desktop ⋯ + mobile long-press) — _1–1.5d_ (parked)
+- `E2-1.2` `utils/statusTransitions.ts` (immutable transitions) + unit tests — _1d_ (parked → `P1-9`)
+- [x] `E2-1.3` Status chip on card (tokens.css colors) — ✅ done as the token-colored **status dot** on `EPIC-status-location`
+- `E2-1.4` Quick-action menu (desktop ⋯ + mobile long-press) — _1–1.5d_ (parked → `P1-4`)
 - `E2-1.5` "Log a Wear" → **moved to `E11-1.2`**
 
 ## US-2.2 — Know where everything is
 _As the "Our Closet" user, I want to tag an item's location so that I know if it's home, in storage, in a suitcase, or at another house._
-- [ ] `location` field (label + kind: home/storage/suitcase/other)
-- [ ] Location tag on card only when not at primary location
-- [ ] "Where is everything" grouped-by-location view
-- [ ] Multi-home presets + free-text
+- [x] `location` field (label + kind: home/storage/suitcase/other) — [`src/utils/locations.ts`](../../../src/utils/locations.ts) registry + `ClothingItem.locationId` ✅ `EPIC-status-location`
+- [x] Location tag on card only when not at primary location — card **border** colors by location; home = neutral ([FilteredCard.tsx](../../../src/Features/SearchCloset/FilteredCard.tsx)) ✅
+- [ ] "Where is everything" grouped-by-location view — → `P1-5` in [E2 Part Une](./E2-part-une-inventory-truth-status-location.md)
+- [ ] Multi-home presets + free-text — partial: 4 starter kinds ship; custom/multi-home labels → `P1-6`
 
 **Tickets**
-- `E2-2.1` Add `location` to `ClothingItem`; primary-location default — _0.5d_
-- `E2-2.2` `utils/locationGroups.ts` + tests — _0.5d_
-- `E2-2.3` Location tag on card (hidden at home) — _0.5d_
-- `E2-2.4` "Where is everything" grouped view — _1.5d_
+- [x] `E2-2.1` Add `location` to `ClothingItem`; primary-location default — ✅ `locations.ts` (`getLocation`/`isPrimaryLocation`, absent → home) + tests
+- `E2-2.2` `utils/locationGroups.ts` + tests — _0.5d_ (→ `P1-5`)
+- [x] `E2-2.3` Location tag on card (hidden at home) — ✅ done as the location-colored card border (home neutral)
+- `E2-2.4` "Where is everything" grouped view — _1.5d_ (→ `P1-5`)
 
 ## US-2.3 — Filter by status & location
 _As Maya, I want to filter by status and location so that I can see "everything clean," "everything dirty," or "everything in Italy."_
@@ -130,11 +136,13 @@ _As Maya, I want to mark whether an item currently fits and record its measureme
 
 ## US-2.9 — Swim category
 _As Maya, I want a Swim category so that swimsuits classify correctly instead of falling into tops/bottoms._
-- [ ] Add `swim` to `CategoryType` (`src/utils/types.ts`) + the Form category list (`src/Features/Form/constants.ts`) + Carousel
-- [ ] Category-map keywords: bikini, one-piece, swimsuit, tankini, two-piece → `swim`
-- [ ] ⚠️ Hardcoded-list gotcha: also update any `DIMENSIONS` / category arrays `tsc` won't catch (see [[closet-hardcoded-ui-lists]])
+- [x] Add `swim` to `CategoryType` (`src/utils/types.ts`) + the Form category list (`src/Features/Form/constants.ts`) + Carousel (`carouselCategories`, leotard icon) ✅ `EPIC-status-location`
+- [x] Category-map keywords → `swim`: `swimsuit`, `swimwear`, `bikini` added ([parseEmailToFormData.ts](../../../src/utils/parseEmailToFormData.ts) + [normalizeCategory.ts](../../../src/Features/FashionParser/normalizers/normalizeCategory.ts)) · _still to add: one-piece, tankini, two-piece_
+- [x] ⚠️ Hardcoded-list gotcha: updated `categoryOptions`, `carouselCategories`, Form `options`, `getStockPhoto` (swim photo added, `underwear` key retired → intimates fallback) ✅
 
-**Ticket:** `E2-9.1` Add Swim category + keyword mappings across the hardcoded lists — _0.5d_
+> Companion cleanup shipped alongside: **`underwear` retired as a category → folds into `intimates`** (bras/briefs/underwear), and **`condition` canonicalized to underscore `WearState`** (humanized at display).
+
+**Ticket:** [x] `E2-9.1` Add Swim category + keyword mappings across the hardcoded lists — ✅ (minor keyword tail remains)
 
 ## US-2.7 — Notes field supports bulleted lists
 _As Maya, I want to write structured notes on an item so that care tips and style reminders stay readable instead of a wall of text._

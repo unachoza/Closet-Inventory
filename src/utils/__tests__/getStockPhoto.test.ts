@@ -3,12 +3,17 @@ import getStockPhoto from "../getStockPhoto";
 
 describe("getStockPhoto", () => {
 	it("returns a non-empty URL for every known category", () => {
-		const categories = ["tops", "bottoms", "dresses", "coats", "sweaters", "athleisure", "intimates", "socks", "underwear"] as const;
+		const categories = ["tops", "bottoms", "dresses", "coats", "sweaters", "athleisure", "intimates", "socks", "swim"] as const;
 		categories.forEach((cat) => {
 			const url = getStockPhoto(cat);
 			expect(url, `expected a URL for category "${cat}"`).toBeTruthy();
 			expect(url).toMatch(/^https:\/\//);
 		});
+	});
+
+	it("falls back to the intimates photo for the retired 'underwear' category", () => {
+		// Legacy items may still carry "underwear"; it now folds into intimates.
+		expect(getStockPhoto("underwear" as never)).toMatch(/^https:\/\//);
 	});
 
 	it("returns empty string for null (no category selected)", () => {

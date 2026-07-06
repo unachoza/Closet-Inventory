@@ -1,6 +1,7 @@
-import { SlidersHorizontal, Search, X } from "lucide-react";
+import { SlidersHorizontal, Search, X, MapPin } from "lucide-react";
 import { SortKey, SORT_LABELS } from "../../hooks/useClosetSort";
 import { useSearch } from "../../context/SearchContext";
+import { BorderMode, BORDER_MODE_LABELS } from "../../utils/borderMode";
 import "./EntireCloset.css";
 
 interface SearchSortBarProps {
@@ -9,6 +10,8 @@ interface SearchSortBarProps {
 	showFilters: boolean;
 	onToggleFilters: () => void;
 	activeFilterCount: number;
+	borderMode: BorderMode;
+	onCycleBorderMode: () => void;
 }
 
 const SORT_OPTIONS: SortKey[] = [
@@ -30,6 +33,8 @@ const SearchSortBar = ({
 	showFilters,
 	onToggleFilters,
 	activeFilterCount,
+	borderMode,
+	onCycleBorderMode,
 }: SearchSortBarProps) => {
 	const { searchQuery, setSearchQuery } = useSearch();
 
@@ -54,6 +59,19 @@ const SearchSortBar = ({
 					</button>
 				)}
 			</div>
+
+			{/* Border-mode toggle — cycles Off → Location → Location + Status. Colors
+			    the card borders (and adds a status dot in the combined mode) so the
+			    closet grid surfaces inventory truth at a glance. */}
+			<button
+				className={`search-sort-bar__border-btn${borderMode !== "off" ? " search-sort-bar__border-btn--active" : ""}`}
+				onClick={onCycleBorderMode}
+				aria-label={`Card borders: ${BORDER_MODE_LABELS[borderMode]}. Click to change.`}
+				title="Toggle location / status borders"
+			>
+				<MapPin size={15} />
+				{BORDER_MODE_LABELS[borderMode]}
+			</button>
 
 			{/* Filter toggle */}
 			<button

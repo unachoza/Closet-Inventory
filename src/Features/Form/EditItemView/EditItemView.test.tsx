@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { ChangeEventHandler } from "react";
+import type { ClothingItem } from "../../../utils/types";
 import EditItemView from "./EditItemView";
 
 vi.mock("framer-motion");
@@ -45,7 +46,7 @@ vi.mock("../../../Components/Toast/Toast", () => ({
 	}),
 }));
 
-const mockItem = {
+const mockItem: ClothingItem = {
 	id: "1",
 	name: "Test Item",
 	size: "M",
@@ -96,8 +97,8 @@ describe("EditItemView", () => {
 		render(<EditItemView item={mockItem} setView={mockSetView} />);
 		const condition = screen.getByLabelText("condition") as HTMLSelectElement;
 		expect(condition.tagName).toBe("SELECT");
-		// All five condition options are offered.
-		expect(condition.querySelectorAll("option")).toHaveLength(5);
+		// All six WearState condition options are offered.
+		expect(condition.querySelectorAll("option")).toHaveLength(6);
 
 		const purchaseDate = screen.getByLabelText("purchase date") as HTMLInputElement;
 		expect(purchaseDate).toBeDisabled();

@@ -113,6 +113,31 @@
 	color: var(--text-primary);
 }
 
+/* Border-mode toggle — matches the Filters button; sits between search and Filters. */
+.search-sort-bar__border-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 0.5rem 1rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+	font-family: var(--primitive-font-family-sans);
+	font-size: var(--primitive-font-size-sm);
+	white-space: nowrap;
+	cursor: pointer;
+	transition: background 0.15s, border-color 0.15s;
+}
+.search-sort-bar__border-btn:hover {
+	border-color: var(--text-primary);
+	background: var(--bg-surface-secondary);
+}
+.search-sort-bar__border-btn--active {
+	border-color: var(--border-brand);
+	background: var(--bg-surface-secondary);
+}
+
 .search-sort-bar__badge {
 	display: inline-flex;
 	justify-content: center;
@@ -595,15 +620,72 @@ button.filter-accordion__header:focus{
 
 /* ── Filtered card wrapper ── */
 .filtered-card {
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	background-color: var(--bg-surface-primary);
 	gap: var(--spacing-50);
+	/* Always reserve the 3px border so toggling the border mode only changes the
+	   color — never the box size — and the grid never reflows on toggle. */
+	border: 3px solid var(--bg-surface-secondary);
+	border-radius: var(--layout-radius-card);
+	transition: border-color 0.15s ease;
 }
 
 .filtered-card:hover {
 	box-shadow: none;
       transform: none;
+}
+
+/* ── E2: location / status borders (see FilteredCard.tsx + utils/locations.ts) ──
+   Border color encodes the item's location. Home/primary is neutral (transparent)
+   by design — indicators only appear when an item is *away*. */
+.filtered-card[data-border] {
+	border-color: var(--inv-border-color, transparent);
+}
+.filtered-card[data-location-kind="home"] {
+	--inv-border-color: var(--bg-surface-secondary);
+}
+.filtered-card[data-location-kind="storage"] {
+	--inv-border-color: var(--primitive-brand-deep-umber);
+}
+.filtered-card[data-location-kind="suitcase"] {
+	--inv-border-color: var(--primitive-brand-muted-clay);
+}
+.filtered-card[data-location-kind="other"] {
+	--inv-border-color: var(--status-info);
+}
+
+/* Status dot — shown only in the "Location + Status" mode. */
+.filtered-card__status-dot {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 11;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	border: 2px solid var(--bg-surface-primary);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+	background: var(--status-info);
+}
+.filtered-card__status-dot[data-status="clean"] {
+	background: var(--status-success);
+}
+.filtered-card__status-dot[data-status="dirty"] {
+	background: var(--status-warning);
+}
+.filtered-card__status-dot[data-status="at_cleaner"] {
+	background: var(--status-info);
+}
+.filtered-card__status-dot[data-status="in_repair"] {
+	background: var(--status-error);
+}
+.filtered-card__status-dot[data-status="traveling"] {
+	background: var(--primitive-brand-muted-clay);
+}
+.filtered-card__status-dot[data-status="on_loan"] {
+	background: var(--primitive-brand-rose-terracotta);
 }
 
 /* ── Match pills on cards ── */

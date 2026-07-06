@@ -11,15 +11,16 @@ const stockPhotoMap: StockPhotoMapType = {
 	athleisure: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780702924/f48e72a201f05e5852a9991af0d295b1_zgaoou.jpg",
 	intimates: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332283/Screenshot_2025-10-24_at_11.56.38_AM_qynpnn.png",
 	socks: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.53.37_AM_apfogb.png",
-	underwear: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332283/Screenshot_2025-10-24_at_11.55.50_AM_mx8dri.png",
+	swim: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.54.40_AM_ml9yqu.png",
 	// TODO: dedicated shoes stock photo; empty falls back to no image for now.
 	shoes: "",
-	// swim: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1761332284/Screenshot_2025-10-24_at_11.54.40_AM_ml9yqu.png",
 };
 
 const getStockPhoto = (category: CategoryType): string => {
 	if (!category) return "";
-	return stockPhotoMap[category];
+	// Legacy items may still carry the retired "underwear" category → fall back to
+	// the intimates photo (underwear now folds into intimates).
+	return stockPhotoMap[category] ?? stockPhotoMap.intimates;
 };
 
 export default getStockPhoto;

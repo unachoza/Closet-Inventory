@@ -32,6 +32,9 @@ export const SORT_LABELS: Record<SortKey, string> = {
 const AGE_ORDER: Record<string, number> = {
 	"brand new": 0,
 	new: 0,
+	like_new: 1,
+	needs_repair: 5,
+	// …plus legacy space-form values still stored under the free-text `age` field.
 	"like new": 1,
 	excellent: 2,
 	good: 3,
