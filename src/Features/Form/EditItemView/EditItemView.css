@@ -35,7 +35,7 @@
 
 .edit-form.form label{
       margin: 0;
-      gap: .25rem;
+      gap: var(--spacing-50, 0.25rem);
       color: var(--text-secondary);
       font-size: .8rem;
       width: 100%;
@@ -324,6 +324,7 @@ button.submit.ingestion-edit-form {
 	flex-direction: column;
 	gap: 0.25rem;
 	margin-top: 0.5rem;
+      justify-content: flex-start;
 }
 
 .edit-form-condition__select {

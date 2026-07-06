@@ -355,15 +355,6 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						</label>
 					)}
 
-					<div className="edit-form-material">
-						<label className="edit-form-material__label">Material Composition</label>
-						<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
-						<MaterialBlendInput
-							value={normalizeMaterial(formData.material)}
-							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
-						/>
-					</div>
-
 					<label className="edit-form-condition">
 						condition
 						<select
@@ -434,6 +425,14 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						onRemove={handleCareRemove}
 						multiSelect={true}
 					/>
+					<div className="edit-form-material">
+						<label className="edit-form-material__label">Material Composition</label>
+						<MaterialCompositionBar blend={normalizeMaterial(formData.material)} showLegend={true} />
+						<MaterialBlendInput
+							value={normalizeMaterial(formData.material)}
+							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
+						/>
+					</div>
 
 					{separateFields()}
 				</div>
