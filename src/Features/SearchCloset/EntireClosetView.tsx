@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { ClothingItem } from "../../utils/types";
-import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
+import { useCloset } from "../../context/ClosetContext";
 import { useClosetFilters } from "../../hooks/useClosetFilters";
 import { useClosetSort } from "../../hooks/useClosetSort";
 import { useSearch } from "../../context/SearchContext";
@@ -22,7 +22,7 @@ const readBorderMode = (): BorderMode => {
 };
 
 const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
-	const { closet, removeItem } = useLocalStorageCloset();
+	const { closet, removeItem } = useCloset();
 
 	const [compact, setCompact] = useState(() => localStorage.getItem(DENSITY_KEY) === "compact");
 	const toggleDensity = useCallback(() => {

@@ -70,13 +70,13 @@ vi.mock("../../../hooks/useAdvancedSearch", () => ({
 	}),
 }));
 
-// useLocalStorageCloset — used by EditItemView to save items
+// useCloset — used by EditItemView to save items
 const mockUpdateItem = vi.fn();
 const mockAddItem = vi.fn();
 const mockAddFullItem = vi.fn();
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		updateItem: mockUpdateItem,
 		addItem: mockAddItem,
 		addFullItem: mockAddFullItem,

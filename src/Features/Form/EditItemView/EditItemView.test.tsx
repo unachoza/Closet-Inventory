@@ -32,8 +32,8 @@ vi.mock("../TextInput/TextInput", () => ({
 	),
 }));
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		updateItem: mockUpdateItem,
 		addItem: mockAddItem,
 		addFullItem: mockAddFullItem,

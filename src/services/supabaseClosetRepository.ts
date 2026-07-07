@@ -3,6 +3,7 @@ import { normalizeMaterial } from "../utils/materialUtils";
 import type { ClothingItem, MaterialBlend } from "../utils/types";
 import type { ClosetRepository, ImportMode } from "./closetRepository";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "../lib/database.types";
+import { ensureStoredPhoto } from "./base64PhotoGuard";
 
 type ItemRow = Tables<"items"> & {
 	item_materials: Array<{ fiber: string; percentage: number | null }>;
@@ -214,16 +215,24 @@ export class SupabaseClosetRepository implements ClosetRepository {
 		const supabase = getSupabase();
 		const closetId = await this.resolveClosetId();
 
-		const { error } = await supabase.from("items").upsert(itemToInsertRow(item, closetId));
+		// E1-2.2: convert any base64 photo to a Storage path before it hits the DB.
+		const guarded = { ...item, imageURL: await ensureStoredPhoto(item.imageURL, this.userId) };
+
+		const { error } = await supabase.from("items").upsert(itemToInsertRow(guarded, closetId));
 		if (error) throw new Error(`add failed: ${error.message}`);
 
-		await upsertMaterials(item.id, item.material);
-		return item;
+		await upsertMaterials(guarded.id, guarded.material);
+		return guarded;
 	}
 
 	async update(id: string, patch: Partial<ClothingItem>): Promise<ClothingItem | null> {
 		const supabase = getSupabase();
-		const updateRow = patchToUpdateRow(patch);
+		// E1-2.2: a freshly-attached base64 photo in the patch → Storage path first.
+		const guardedPatch =
+			patch.imageURL !== undefined
+				? { ...patch, imageURL: await ensureStoredPhoto(patch.imageURL, this.userId) }
+				: patch;
+		const updateRow = patchToUpdateRow(guardedPatch);
 
 		const { data, error } = await supabase
 			.from("items")
@@ -251,12 +260,17 @@ export class SupabaseClosetRepository implements ClosetRepository {
 
 		if (items.length === 0) return [];
 
-		const rows = items.map((item) => itemToInsertRow(item, closetId));
+		// E1-2.2: convert base64 photos to Storage paths before the bulk upsert.
+		const guarded = await Promise.all(
+			items.map(async (item) => ({ ...item, imageURL: await ensureStoredPhoto(item.imageURL, this.userId) })),
+		);
+
+		const rows = guarded.map((item) => itemToInsertRow(item, closetId));
 		const { error } = await supabase.from("items").upsert(rows);
 		if (error) throw new Error(`importItems failed: ${error.message}`);
 
-		await Promise.all(items.map((item) => upsertMaterials(item.id, item.material)));
-		return items;
+		await Promise.all(guarded.map((item) => upsertMaterials(item.id, item.material)));
+		return guarded;
 	}
 
 	async clear(): Promise<void> {

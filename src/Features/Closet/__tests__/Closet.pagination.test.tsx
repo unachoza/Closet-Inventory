@@ -21,8 +21,8 @@ vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: { name: string } }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({ closet: MY_CLOSET_DATA, removeItem: vi.fn() }),
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({ closet: MY_CLOSET_DATA, removeItem: vi.fn() }),
 }));
 
 const ITEMS_PER_PAGE = 6;

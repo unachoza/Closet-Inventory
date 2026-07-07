@@ -12,21 +12,21 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 - [x] Supabase Auth sign-in (Google)
 - [x] Per-user `items` table; RLS so a user reads/writes only their own rows
 - [x] localStorage acts as offline cache; reconciles on reconnect
-- [ ] First sign-in seeds the cloud from existing local closet
+- [x] First sign-in seeds the cloud from existing local closet _(code-complete + wired via `E1-1.4`; live browser seed round-trip against dev still to be QA'd)_
 
 **Tickets**
 - `E1-1.1` ✅ **Done** (2026-06-30) — `GmailSpike.tsx` + `useSupabaseAuth.ts` implement the token flow; live Google OAuth sign-in verified (G0.1). Gmail access token survives under Supabase Auth and email import works end-to-end. — _1–1.5d_
 - `E1-1.2` ✅ **Done** (PR#88, 2026-06-26) — `items` table mirroring `ClothingItem` incl. E2 status/location columns; migrations `20260626000001_v1_spine.sql` + `20260628000004_items_e2_columns.sql`, pushed to remote. — _1d_
 - `E1-1.3` ✅ **Done** (2026-06-30) — owner-only RLS policies (PR#88, `20260626000002_rls.sql`) verified via real two-account isolation test (`scripts/test-rls-isolation.mjs`): 11/11 checks pass — user B cannot read/update/delete user A's items, closet_members, or Storage objects. Required a critical GRANT fix first (`20260629000002_grant_table_privileges.sql`) — see `E1-4.2`. — _0.5d_
-- `E1-1.4` Port `useCloudCloset` to Supabase client; keep `useLocalCloset` as offline cache — _2–3d_
-- `E1-1.5` First-sign-in seed: upload local closet to Supabase — _1d_
+- `E1-1.4` ✅ **Done** (2026-07-06, branch `feat/cloud-sync-wiring`) — `useCloudCloset` wired into the app via a single **`ClosetProvider`** (`src/context/ClosetContext.tsx`): the 6 components that each called `useLocalStorageCloset()` now share ONE cloud-backed instance through `useCloset()`, so there's a single sync loop (not 6 racy reconciles). Signed-out falls through to pure-local (unchanged UX). A **`CloudSyncControl`** in the NavBar exposes "Sign in to sync" + a Local-only/Synced indicator (the main app's only Supabase sign-in entry now that the spike is gone). Tests: `ClosetContext.test.tsx`, `CloudSyncControl.test.tsx`; full suite green (1172). — _2–3d_
+- `E1-1.5` ✅ **Reachable** (2026-07-06) — the first-sign-in seed (`SyncedClosetRepository.getAll` → push local to empty remote) already existed; wiring `E1-1.4` makes it actually run on sign-in from the main app. Live seed round-trip still to be verified in-browser against dev.
 - `E1-1.6` Offline-first reconcile (last-write-wins via `updatedAt`) — _1–1.5d_
   - _Hardening (hot fix):_ background writes no longer swallow failures silently (`.catch(() => {})`). `SyncedClosetRepository` now reports failures to a `syncFailureTracker`, which logs the real error and drives a `SyncStatusIndicator` in the NavBar ("N changes not synced"). A successful `getAll` reconcile clears it. Tests: `syncFailureTracker.test.ts`, `syncedClosetRepository.syncFailure.test.ts`, `SyncStatusIndicator.test.tsx`. **Retry queue still deferred** — recovery rides on the next successful reconcile (reload / sign-in).
 
 ## US-1.2 — Images that don't blow the storage budget
 _As Maya, I want my photos stored properly so that big closets and camera imports don't silently fail._
 - [x] Images upload to Supabase Storage; row stores a **path**, not a URL or base64 (signed URLs are resolved at display time, never persisted — see `useSignedImageUrl`)
-- [ ] Existing base64 images migrate to Storage (`E1-2.2`, not started)
+- [x] ~~Existing base64 images migrate to Storage~~ → **reframed as a write-path guard** (`E1-2.2`): prod+dev have 0 base64 rows so there was no backfill; `ensureStoredPhoto` now stops base64 reaching `items.primary_photo_url` at sync time
 - [x] Upload handles failure with a user-facing message
 
 **Tickets**
@@ -34,15 +34,15 @@ _As Maya, I want my photos stored properly so that big closets and camera import
   - Photos are downscaled/recompressed (≤1200px longest edge, JPEG q0.8 — `compressImageToBlob`) before upload, same pipeline as the offline base64 path. Reduction is proportional to original size, not a fixed target — see `scaledSize` tests.
   - ✅ Server-side bucket constraints pushed to remote (2026-06-30) — `20260629000001_storage_validation.sql` enforces `file_size_limit` (10MB) + `allowed_mime_types` (jpeg/png/webp/heic) at the bucket level.
   - Verified: `tsc --noEmit` clean, full vitest suite green (1089 tests incl. new compression/validation tests). NOT verified: a live signed-in upload round-trip against Supabase Storage (no authenticated browser session available in-session) — the actual bucket RLS/size/mime enforcement is unverified end-to-end.
-- `E1-2.2` One-time migration: base64 localStorage images → Storage URLs — _1d_ — not started
+- `E1-2.2` ✅ **Done as a write-path guard** (2026-07-06, branch `feat/cloud-sync-wiring`) — **corrected scope:** the cloud repo stores photos in `items.primary_photo_url` (not `item_photos`), and querying prod+dev showed **0 items / 0 base64 rows** — so there was never a backfill to run. The real risk was *future*: `E1-1.4` sync would push offline base64 `imageURL`s into `primary_photo_url` as multi-MB blobs. Fixed with `ensureStoredPhoto` (`src/services/base64PhotoGuard.ts`) — detects `data:image…` at the remote-write boundary, uploads to Storage via `uploadItemPhoto`, writes the path instead. Wired into `SupabaseClosetRepository.add/update/importItems`. Never throws (keeps base64 if upload fails). Tests: `base64PhotoGuard.test.ts` (7). — _1d_
 
 ## US-1.3 — Know my sync state
 _As Maya, I want a sync indicator so that I know my data is safe / when I'm offline._
-- [ ] Nav shows synced / syncing / offline
-- [ ] Pending local writes flush on reconnect
+- [x] Nav shows synced / syncing / offline — `SyncStatusIndicator` (failed-write pill, PR#109) + `CloudSyncControl` (2026-07-06) showing Local↔Cloud, Signed out↔Signed in, and Synced/Behind/Offline/Error
+- [ ] Pending local writes flush on reconnect — **partial**: recovery rides on the next successful `getAll` reconcile (reload / sign-in); no active retry queue yet (deferred, see `E1-1.6`)
 
 **Tickets**
-- `E1-3.1` Sync-status indicator in NavBar — _0.5d_
+- `E1-3.1` ✅ **Done** (2026-07-06) — sync-status surfaced in NavBar via `SyncStatusIndicator` + `CloudSyncControl`. ⚠️ Follow-up ticket filed to make the auth/store/sync distinction more intuitive (Gmail-vs-Supabase auth conflation). — _0.5d_
 
 ## US-1.4 — Trust NTW with my login & profile data
 _As Maya, I want to trust NTW with my Google login and personal profile info so that my identity, photos, and wardrobe data can't be leaked or accessed by anyone but me._

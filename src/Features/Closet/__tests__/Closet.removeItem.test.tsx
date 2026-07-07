@@ -1,7 +1,7 @@
 /**
  * Regression test for the remove-item re-render bug.
  *
- * Before the fix: Card called its own useLocalStorageCloset() instance,
+ * Before the fix: Card called its own useCloset() instance,
  * so removeItem updated localStorage but Closet's state never re-rendered.
  * After the fix: Closet owns removeItem and passes it as onRemoveItem prop.
  */
@@ -16,8 +16,8 @@ const ITEMS: ClothingItem[] = [
 	{ id: "3", name: "Levi Jeans", category: "bottoms", color: "blue", size: "28", brand: "Levi's", material: [{ material: "denim", percentage: 100 }], occasion: "casual", age: "2 years", care: "machine wash", imageURL: "" },
 ];
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		closet: ITEMS,
 		removeItem: (id: string) => {
 			// Simulate the real hook writing to localStorage — the Closet

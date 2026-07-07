@@ -1,6 +1,6 @@
 import "./EditItemView.css";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
-import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
+import { useCloset } from "../../../context/ClosetContext";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
@@ -86,7 +86,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 		...remaining
 	} = item;
 	const inputsToSeperate = { id, onSale, notes, style };
-	const { updateItem, addFullItem } = useLocalStorageCloset();
+	const { updateItem, addFullItem } = useCloset();
 	const { showToast } = useToast();
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>(() => buildFormDataFromItem(item));

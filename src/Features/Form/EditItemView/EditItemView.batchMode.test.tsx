@@ -15,8 +15,8 @@ const mockAddFullItem = vi.fn();
 const mockShowToast = vi.fn();
 const mockSetView = vi.fn();
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		updateItem: vi.fn(),
 		addItem: vi.fn(),
 		addFullItem: mockAddFullItem,

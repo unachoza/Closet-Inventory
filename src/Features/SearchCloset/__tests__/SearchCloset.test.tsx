@@ -67,8 +67,12 @@ const mockCloset: ClothingItem[] = [
 	},
 ];
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+// The real NavBar (rendered to reach its search box) pulls in CloudSyncControl,
+// which needs Supabase auth context. Stub it — not under test here.
+vi.mock("../../../Components/CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
+
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		closet: mockCloset,
 		addItem: vi.fn(),
 		removeItem: vi.fn(),

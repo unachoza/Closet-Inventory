@@ -16,7 +16,7 @@ import {
 	occasionExamples,
 } from "../../utils/constants";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
+import { useCloset } from "../../context/ClosetContext";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
@@ -45,7 +45,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	const [brandOptions, setBrandOptions] = useLocalStorage(BRAND_OPTIONS_KEY, brandExamples);
 	const [careOptions, setCareOptions] = useLocalStorage(CARE_OPTIONS_KEY, careExamples);
 
-	const { addItem } = useLocalStorageCloset();
+	const { addItem } = useCloset();
 	const { showToast } = useToast();
 
 	const toggleValue = (value: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => {

@@ -1,0 +1,67 @@
+.cloud-sync-control {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.75rem;
+}
+
+.cloud-sync-control__store {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	white-space: nowrap;
+	font-weight: 600;
+}
+
+.cloud-sync-control__store--local {
+	opacity: 0.7;
+}
+
+.cloud-sync-control__store--cloud {
+	color: var(--color-success, #2e7d32);
+}
+
+/* Secondary auth label (signed out) */
+.cloud-sync-control__auth {
+	opacity: 0.6;
+	white-space: nowrap;
+}
+
+/* Sync axis pill — colour keyed to state */
+.cloud-sync-control__sync {
+	padding: 0.1rem 0.4rem;
+	border-radius: 999px;
+	white-space: nowrap;
+	background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.cloud-sync-control__sync--synced {
+	color: var(--color-success, #2e7d32);
+}
+
+.cloud-sync-control__sync--syncing {
+	color: var(--color-warning, #b26a00);
+}
+
+.cloud-sync-control__sync--offline {
+	opacity: 0.7;
+}
+
+.cloud-sync-control__sync--error {
+	color: var(--color-danger, #c62828);
+}
+
+.cloud-sync-control__btn {
+	font-size: 0.75rem;
+	padding: 0.2rem 0.6rem;
+	border-radius: 999px;
+	border: 1px solid currentColor;
+	background: transparent;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.cloud-sync-control__btn:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
