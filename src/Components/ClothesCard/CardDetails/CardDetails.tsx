@@ -57,9 +57,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
-	const identityParts = [style?.season, item.condition && humanizeCondition(item.condition), item.price].filter(
-		(p): p is string => !!p,
-	);
+	const identityParts = [style?.season, item.condition && humanizeCondition(item.condition), item.price].filter(Boolean);
 	const hasIdentity = !!purchasedLabel || identityParts.length > 0 || !!item.age;
 
 	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!item.notes;
@@ -192,7 +190,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 										</p>
 									)}
 									{item.condition && <p className="card-details__identity-text">Condition: {humanizeCondition(item.condition)}</p>}
-									{item.price && <p className="card-details__identity-text">Price: {item.price}</p>}
+									{item.price != null && <p className="card-details__identity-text">Price: ${item.price}</p>}
 								</div>
 							</div>
 						)}

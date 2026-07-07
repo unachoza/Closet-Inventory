@@ -70,8 +70,8 @@ Plus a **knowledge layer** (fabric/fiber/care — now formalized as `FashionPars
 
 ## Personas
 
-### Maya — "The Overwhelmed Fashionista" *(existing marketing persona)*
-Big closet, decision fatigue, re-buys duplicates, over-packs, has guilt items. Out of sight, out of mind.
+### Becca — "The Executive Mom" *(existing marketing persona)*
+Morning time-poverty, laundry chaos **Her "nothing to wear":** not style, not quantity — a **logistics** problem. The closet is full; the information layer is missing.
 → Served by inventory truth + frictionless fill + outfit help.
 
 ### "Our Closet" pair — sharers & travelers *(the founder persona)*

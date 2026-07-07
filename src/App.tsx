@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect } from "react";
-import { EditProvider } from "./Features/Form/EditContext";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
@@ -29,7 +28,6 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		color: "",
 		size: "",
 		brand: "",
-		price: "",
 		material: [],
 		occasion: "",
 		age: "",
@@ -164,52 +162,50 @@ function AppShell() {
 				onClearCloset={clearCloset}
 				closetItemCount={closet.length}
 			/>
-			<EditProvider>
-				<ToastProvider>
-					<div className="app-content">
-						{/* Keyed by view so a crash in one screen resets when navigating away.
-					     "Try again" sends the user back to the overview (closet) screen. */}
-						<ErrorBoundary key={view} onReset={() => setView("overview")}>
-							{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />}
-							{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
-							{view === "gmail" && (
-								<GmailImport
-									onImport={handleGmailImport}
-									onImportAll={handleGmailImportAll}
-									initialSelectedEmailId={gmailSourceEmailId}
-									onSourceEmailChange={handleSourceEmailChange}
-								/>
-							)}
-							{view === "fabric" && <InteractiveGuide />}
-							{view === "journey" && <JourneyC />}
-							{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
-							{view === "carousel" && (
-								<>
-									<div data-testid="carousel">
-										<Carousel setCategory={setSelectedCategory} />
-									</div>
-									<div data-testid="closet-container">
-										<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
-									</div>
-								</>
-							)}
-							{view === "edit" && editItem && (
-								<EditItemView
-									key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
-									item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
-									mode={editMode}
-									setView={setView}
-									onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
-									onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
-									onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
-									queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
-									queueTotal={isInBatchMode ? importQueue.length : undefined}
-								/>
-							)}
-						</ErrorBoundary>
-					</div>
-				</ToastProvider>
-			</EditProvider>
+			<ToastProvider>
+				<div className="app-content">
+					{/* Keyed by view so a crash in one screen resets when navigating away.
+				     "Try again" sends the user back to the overview (closet) screen. */}
+					<ErrorBoundary key={view} onReset={() => setView("overview")}>
+						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />}
+						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
+						{view === "gmail" && (
+							<GmailImport
+								onImport={handleGmailImport}
+								onImportAll={handleGmailImportAll}
+								initialSelectedEmailId={gmailSourceEmailId}
+								onSourceEmailChange={handleSourceEmailChange}
+							/>
+						)}
+						{view === "fabric" && <InteractiveGuide />}
+						{view === "journey" && <JourneyC />}
+						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
+						{view === "carousel" && (
+							<>
+								<div data-testid="carousel">
+									<Carousel setCategory={setSelectedCategory} />
+								</div>
+								<div data-testid="closet-container">
+									<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
+								</div>
+							</>
+						)}
+						{view === "edit" && editItem && (
+							<EditItemView
+								key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
+								item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
+								mode={editMode}
+								setView={setView}
+								onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
+								onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
+								onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+								queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
+								queueTotal={isInBatchMode ? importQueue.length : undefined}
+							/>
+						)}
+					</ErrorBoundary>
+				</div>
+			</ToastProvider>
 		</div>
 	);
 }

@@ -13,7 +13,7 @@ const item: ClothingItem = {
 	material: [{ material: "cotton", percentage: 100 }],
 	occasion: "casual",
 	age: "new",
-	price: "$40",
+	price: 40,
 	care: "machine wash",
 	imageURL: "https://example.com/img.jpg",
 };

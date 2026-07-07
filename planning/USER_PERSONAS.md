@@ -192,8 +192,7 @@ thing she could confirm, without investigation, was clean and video-call appropr
 | Age       | 41 · VP Marketing (B2B SaaS) · Hoboken, commutes to NYC 2×/wk |
 | Household | Married · kids 6 & 9 · husband travels Mon–Thu · $280K        |
 
-**Her "nothing to wear":** not style, not quantity — a **logistics** problem. The closet is full; the
-information layer is missing. If the app shows her something that's in the dryer, she'll delete it and never
+**Her "nothing to wear":** not style, not quantity — a **logistics** problem. The closet is full; the information layer is missing. If the app shows her something that's in the dryer, she'll delete it and never
 return.
 
 **User stories:**

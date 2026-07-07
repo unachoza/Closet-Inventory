@@ -63,8 +63,8 @@ export type ClothingItem = {
 	size: string;
 	brand: string;
 	retailer?: string;
-	price?: string;
-	originalPrice?: string;
+	price?: number;
+	originalPrice?: number;
 	qty?: number;
 	material: MaterialBlend[];
 	occasion: string;
@@ -125,7 +125,6 @@ export interface ItemFormData {
 	condition?: string;
 	purchaseDate?: string;
 	care: string | string[];
-	image?: string;
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "shoes" | "swim" | null;

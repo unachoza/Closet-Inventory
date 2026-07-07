@@ -72,4 +72,29 @@ describe("Closet — pagination shows new items on Next/Previous", () => {
 		// A changed key forces React to mount a fresh element — different node identity.
 		expect(gridAfter).not.toBe(gridBefore);
 	});
+
+	it("resets to page 1 when category changes but doesn't re-trigger on re-renders (regression: goToPage stability)", () => {
+		// Bug: if goToPage wasn't memoized, adding it to the effect deps would cause
+		// the effect to re-run on every render, resetting the page to 1 every time.
+		// This test verifies that's fixed — category change DOES reset to page 1
+		// (intended behavior), but re-renders afterwards don't.
+		const { rerender } = render(<Closet selectedCategory={null} />);
+		const page1Initial = renderedNames();
+
+		// Advance to page 2
+		fireEvent.click(screen.getByRole("button", { name: /next/i }));
+		const page2 = renderedNames();
+		expect(page2).not.toEqual(page1Initial);
+
+		// Change category — should reset to page 1
+		rerender(<Closet selectedCategory="tops" />);
+		// Wait for the category filter to apply
+		const page1AfterCategoryChange = renderedNames();
+		expect(page1AfterCategoryChange.length).toBeLessThanOrEqual(ITEMS_PER_PAGE);
+
+		// Re-render with the same category — should NOT reset to page 1 again
+		// (i.e. goToPage must be memoized so the effect doesn't retrigger)
+		rerender(<Closet selectedCategory="tops" />);
+		expect(renderedNames()).toEqual(page1AfterCategoryChange);
+	});
 });

@@ -43,10 +43,8 @@ const AGE_ORDER: Record<string, number> = {
 	poor: 5,
 };
 
-const parsePrice = (price?: string): number => {
-	if (!price) return 0;
-	const num = parseFloat(price.replace(/[^0-9.]/g, ""));
-	return isNaN(num) ? 0 : num;
+const parsePrice = (price?: number): number => {
+	return price ?? 0;
 };
 
 // Rank by subjective condition, falling back to the legacy `age` string for older items.

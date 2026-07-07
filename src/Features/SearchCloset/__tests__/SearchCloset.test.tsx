@@ -21,7 +21,7 @@ const mockCloset: ClothingItem[] = [
 		occasion: "casual",
 		age: "new",
 		care: "machine wash",
-		price: "$120",
+		price: 120,
 	},
 	{
 		id: "2",
@@ -35,7 +35,7 @@ const mockCloset: ClothingItem[] = [
 		occasion: "formal",
 		age: "like new",
 		care: "dry clean",
-		price: "$200",
+		price: 200,
 	},
 	{
 		id: "3",
@@ -49,7 +49,7 @@ const mockCloset: ClothingItem[] = [
 		occasion: "casual",
 		age: "good",
 		care: "machine wash",
-		price: "$25",
+		price: 25,
 	},
 	{
 		id: "4",
@@ -63,7 +63,7 @@ const mockCloset: ClothingItem[] = [
 		occasion: "casual",
 		age: "excellent",
 		care: "hand wash",
-		price: "$180",
+		price: 180,
 	},
 ];
 

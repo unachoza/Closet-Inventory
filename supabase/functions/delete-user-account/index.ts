@@ -1,3 +1,11 @@
+// @ts-nocheck — Deno runtime file. `Deno.serve`, `Deno.env` and the remote
+// `https://esm.sh/...` import only resolve under the Deno Edge runtime / Deno
+// language server, NOT the app's Node tsconfig. This directive silences the
+// spurious "Cannot find name 'Deno'" / "Cannot find module" errors the Node TS
+// server reports; the file is excluded from `tsc -b` and the vitest suite, so it
+// never affects the app build. Do NOT `import { Deno } ...` — `Deno` is a runtime
+// global, not an importable symbol; that import breaks the deployed function.
+//
 // E1-4.8 — service_role account deletion (true identity erasure).
 //
 // The client-side `deleteAccountData` (RLS-scoped) removes the user's data
@@ -16,7 +24,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const BUCKET = "item-photos";
 
+// CORS — the app calls this from the browser, so the preflight (OPTIONS) must be
+// answered and every response must carry allow-origin/headers or the browser
+// rejects it. Origin is left permissive (the Authorization bearer JWT is the real
+// gate); tighten to the app's domain if we ever lock this down.
+const CORS_HEADERS: Record<string, string> = {
+	"Access-Control-Allow-Origin": "*",
+	"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+	"Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
+};
+
 Deno.serve(async (req: Request) => {
+	// Preflight — answer before any method/auth checks.
+	if (req.method === "OPTIONS") {
+		return new Response(null, { status: 204, headers: CORS_HEADERS });
+	}
+
 	if (req.method !== "POST" && req.method !== "DELETE") {
 		return json({ error: "Method not allowed" }, 405);
 	}
@@ -53,5 +76,8 @@ Deno.serve(async (req: Request) => {
 });
 
 function json(body: unknown, status: number): Response {
-	return new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+	return new Response(JSON.stringify(body), {
+		status,
+		headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+	});
 }

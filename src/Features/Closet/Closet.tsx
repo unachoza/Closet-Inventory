@@ -100,7 +100,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 
 	useEffect(() => {
 		goToPage(1);
-	}, [selectedCategory, compact]);
+	}, [selectedCategory, compact, goToPage]);
 
 	const hasItems = paginatedItems.length > 0;
 	const emptyLabel = selectedCategory?.trim() ? selectedCategory : "your closet";

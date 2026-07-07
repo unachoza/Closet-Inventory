@@ -202,7 +202,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 							<ImageUploaderInput
 								image={formData.imageURL}
 								onImageSelect={(base64) => setFormData((prev) => ({ ...prev, imageURL: base64 }))}
-								onImageRemove={() => setFormData((prev) => ({ ...prev, image: "" }))}
+								onImageRemove={() => setFormData((prev) => ({ ...prev, imageURL: "" }))}
 							/>
 							<div className="image-uploader">
 								<label className="step-label">or use default image?</label>
@@ -243,7 +243,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 						</button>
 					)}
 					{step === 9 && (
-						<button type="submit" className="submit" onClick={handleSubmit}>
+						<button type="submit" className="submit">
 							Submit
 						</button>
 					)}

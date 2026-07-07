@@ -19,11 +19,11 @@ const makeItem = (overrides: Partial<ClothingItem>): ClothingItem => ({
 });
 
 const ITEMS: ClothingItem[] = [
-	makeItem({ id: "1", name: "Blazer", price: "$120", age: "excellent" }),
-	makeItem({ id: "2", name: "Jeans", price: "$45", age: "good" }),
-	makeItem({ id: "3", name: "Dress", price: "$200", age: "like new" }),
-	makeItem({ id: "4", name: "Tee", price: "", age: "fair" }),
-	makeItem({ id: "5", name: "Coat", price: "$90", age: "brand new" }),
+	makeItem({ id: "1", name: "Blazer", price: 120, age: "excellent" }),
+	makeItem({ id: "2", name: "Jeans", price: 45, age: "good" }),
+	makeItem({ id: "3", name: "Dress", price: 200, age: "like new" }),
+	makeItem({ id: "4", name: "Tee", price: undefined, age: "fair" }),
+	makeItem({ id: "5", name: "Coat", price: 90, age: "brand new" }),
 ];
 
 describe("useClosetSort", () => {
@@ -46,8 +46,8 @@ describe("useClosetSort", () => {
 			result.current.setSortKey("priceAsc");
 		});
 		const sorted = result.current.sortedItems(ITEMS);
-		expect(sorted[0].id).toBe("4"); // price=""  → 0
-		expect(sorted[sorted.length - 1].id).toBe("3"); // $200
+		expect(sorted[0].id).toBe("4"); // price=undefined → 0
+		expect(sorted[sorted.length - 1].id).toBe("3"); // 200
 	});
 
 	it("priceDesc: most expensive first", () => {

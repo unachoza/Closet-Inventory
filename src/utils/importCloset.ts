@@ -58,17 +58,36 @@ function coerceOnSale(raw: unknown): boolean {
 }
 
 /**
+ * Validate a parsed record before it's cast to a ClothingItem.
+ * `name` is the one field the app can't sanely default (it's the item's identity
+ * and display key everywhere), so a row without it is rejected with a clear
+ * message rather than silently producing a nameless, un-editable item. Structural
+ * fields that would otherwise crash rendering (`material`, `notes` — iterated with
+ * `.map`) are coerced to safe arrays below.
+ */
+function validateImportedItem(raw: Record<string, unknown>): void {
+	if (typeof raw.name !== "string" || !raw.name.trim()) {
+		throw new Error("Import row is missing a required 'name' field.");
+	}
+}
+
+/**
  * Normalize a parsed record into a persistable ClothingItem.
  * Guarantees a stable `id` (so later edit/delete-by-id works) and coerces
  * the fields that CSV would otherwise leave as raw strings.
  */
 function normalizeImportedItem(raw: Record<string, unknown>): ClothingItem {
+	validateImportedItem(raw);
 	const existingId = typeof raw.id === "string" && raw.id.trim() ? raw.id : crypto.randomUUID();
 
 	return {
 		...(raw as ClothingItem),
 		id: existingId,
 		imageURL: typeof raw.imageURL === "string" ? raw.imageURL : "",
+		// Guard the fields the UI iterates with `.map` — a non-array here would crash
+		// the card on render.
+		material: Array.isArray(raw.material) ? (raw.material as ClothingItem["material"]) : [],
+		notes: Array.isArray(raw.notes) ? (raw.notes as string[]) : (typeof raw.notes === "string" ? [raw.notes] : undefined),
 		onSale: coerceOnSale(raw.onSale),
 	};
 }
