@@ -15,7 +15,7 @@ jobs:
     steps:
       # 1. Fetch metadata about the package updates inside the PR
       - name: Fetch Dependabot metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: dependabot/fetch-metadata@v3
         id: metadata
 
       # 2. Approve and flag the PR for auto-merge ONLY if it matches the group name
