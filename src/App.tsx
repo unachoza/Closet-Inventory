@@ -4,8 +4,8 @@ import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
+import { ClosetProvider, useCloset } from "./context/ClosetContext";
 import NavBar from "./Components/NavBar/NavBar";
-import { useLocalStorageCloset } from "./hooks/useLocalCloset";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
@@ -48,7 +48,7 @@ const ONBOARDING_KEY = "closetly-onboarding-complete";
 
 function AppShell() {
 	const { view, setView } = useView();
-	const { closet, getCloset, importItems, clearCloset } = useLocalStorageCloset();
+	const { closet, getCloset, importItems, clearCloset } = useCloset();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -217,15 +217,19 @@ function AppShell() {
 function App() {
 	return (
 		<SupabaseAuthProvider>
-			<ViewProvider initialView="carousel">
-				<SearchProvider>
-					{/* Session-scoped Gmail auth — mounted above the view switch so the
-					    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
-					<GmailAuthProvider>
-						<AppShell />
-					</GmailAuthProvider>
-				</SearchProvider>
-			</ViewProvider>
+			{/* Single cloud-backed closet instance shared by all consumers (E1-1.4).
+			    Inside SupabaseAuthProvider so it can read the signed-in userId. */}
+			<ClosetProvider>
+				<ViewProvider initialView="carousel">
+					<SearchProvider>
+						{/* Session-scoped Gmail auth — mounted above the view switch so the
+						    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
+						<GmailAuthProvider>
+							<AppShell />
+						</GmailAuthProvider>
+					</SearchProvider>
+				</ViewProvider>
+			</ClosetProvider>
 		</SupabaseAuthProvider>
 	);
 }

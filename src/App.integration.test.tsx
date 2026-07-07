@@ -13,6 +13,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SearchProvider } from "./context/SearchContext";
 import { ViewProvider } from "./context/ViewContext";
+import { ClosetProvider } from "./context/ClosetContext";
 import { ToastProvider } from "./Components/Toast/Toast";
 import MultiStepForm from "./Features/Form/Form";
 import Closet from "./Features/Closet/Closet";
@@ -46,11 +47,13 @@ const STORAGE_KEY = "my_closet_key";
 
 function Providers({ children }: { children: React.ReactNode }) {
 	return (
-		<ViewProvider>
-			<SearchProvider>
-				<ToastProvider>{children}</ToastProvider>
-			</SearchProvider>
-		</ViewProvider>
+		<ClosetProvider>
+			<ViewProvider>
+				<SearchProvider>
+					<ToastProvider>{children}</ToastProvider>
+				</SearchProvider>
+			</ViewProvider>
+		</ClosetProvider>
 	);
 }
 

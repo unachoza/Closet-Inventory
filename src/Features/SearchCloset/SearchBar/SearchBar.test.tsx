@@ -5,8 +5,8 @@ vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: { name: string } }) => <div data-testid="card">{item.name}</div>,
 }));
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		closet: [
 			{ id: "1", name: "Nike Top", brand: "Nike", category: "tops", color: "black", material: [{ material: "cotton", percentage: 100 }], notes: [] },
 			{ id: "2", name: "Zara Dress", brand: "Zara", category: "dresses", color: "red", material: [{ material: "silk", percentage: 100 }], notes: [] },

@@ -21,8 +21,8 @@ vi.mock("../../../Components/ClothesCard/Card/Card", () => ({
 	default: ({ item }: { item: ClothingItem }) => <div data-testid="clothes-card">{item.name}</div>,
 }));
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({
 		closet: mockCloset,
 	}),
 }));

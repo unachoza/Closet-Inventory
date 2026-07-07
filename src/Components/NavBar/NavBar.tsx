@@ -9,6 +9,7 @@ import { importClosetFromFile } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 import ClearClosetModal from "./ClearModal/ClearClosetModal";
 import SyncStatusIndicator from "../SyncStatusIndicator/SyncStatusIndicator";
+import CloudSyncControl from "../CloudSyncControl/CloudSyncControl";
 
 interface NavBarProps {
 	/**
@@ -181,6 +182,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 				</button>
 				<h1 className="page-title">Nothing To Wear</h1>
 				<SyncStatusIndicator />
+				<CloudSyncControl />
 			</div>
 
 			{drawerOpen && (

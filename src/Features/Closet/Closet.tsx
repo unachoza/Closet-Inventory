@@ -3,7 +3,7 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import { LayoutGrid, Grid3x3 } from "lucide-react";
 import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
-import { useLocalStorageCloset } from "../../hooks/useLocalCloset";
+import { useCloset } from "../../context/ClosetContext";
 import usePagination from "../../hooks/usePagination";
 import { ClothingItem } from "../../utils/types";
 import "./Closet.css";
@@ -45,7 +45,7 @@ const COMPACT_ITEMS_PER_PAGE = 15;
 const DENSITY_KEY = "closet_density";
 
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
-	const { closet, removeItem } = useLocalStorageCloset();
+	const { closet, removeItem } = useCloset();
 
 	// Persisted so the user's density preference sticks across sessions.
 	const [compact, setCompact] = useState(() => {

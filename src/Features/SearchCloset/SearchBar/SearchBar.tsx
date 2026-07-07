@@ -2,11 +2,11 @@ import { useState, useMemo } from "react";
 import { Search } from "lucide-react";
 import Card from "../../../Components/ClothesCard/Card/Card";
 import Fuse from "fuse.js";
-import { useLocalStorageCloset } from "../../../hooks/useLocalCloset";
+import { useCloset } from "../../../context/ClosetContext";
 
 const SearchBar = () => {
 	const [searchQuery, setSearchQuery] = useState<string>("");
-	const { closet } = useLocalStorageCloset();
+	const { closet } = useCloset();
 
 	// Memoized Filtering & Sorting
 	const filteredAndSortedItems = useMemo(() => {

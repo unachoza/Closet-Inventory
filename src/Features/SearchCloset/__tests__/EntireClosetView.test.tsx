@@ -52,8 +52,8 @@ const CLOSET: ClothingItem[] = [
 	},
 ];
 
-vi.mock("../../../hooks/useLocalCloset", () => ({
-	useLocalStorageCloset: () => ({ closet: CLOSET, removeItem: removeItemSpy }),
+vi.mock("../../../context/ClosetContext", () => ({
+	useCloset: () => ({ closet: CLOSET, removeItem: removeItemSpy }),
 }));
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

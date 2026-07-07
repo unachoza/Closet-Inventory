@@ -1,0 +1,36 @@
+.cloud-sync-control {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.cloud-sync-control__mode {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.75rem;
+	white-space: nowrap;
+}
+
+.cloud-sync-control__mode--local {
+	opacity: 0.7;
+}
+
+.cloud-sync-control__mode--synced {
+	color: var(--color-success, #2e7d32);
+}
+
+.cloud-sync-control__btn {
+	font-size: 0.75rem;
+	padding: 0.2rem 0.6rem;
+	border-radius: 999px;
+	border: 1px solid currentColor;
+	background: transparent;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.cloud-sync-control__btn:disabled {
+	opacity: 0.5;
+	cursor: default;
+}

@@ -1,7 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ReactNode } from "react";
+import { vi } from "vitest";
 import NavBar from "./NavBar";
 import { ViewProvider, useView } from "../../context/ViewContext";
+
+// CloudSyncControl needs Supabase + Closet contexts; its behaviour is covered by
+// its own test. Stub it here so NavBar tests stay focused on navigation.
+vi.mock("../CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
 import { SearchProvider, useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
 
