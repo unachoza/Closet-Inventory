@@ -125,7 +125,6 @@ export interface ItemFormData {
 	condition?: string;
 	purchaseDate?: string;
 	care: string | string[];
-	image?: string;
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "shoes" | "swim" | null;

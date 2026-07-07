@@ -130,14 +130,23 @@ function patchToUpdateRow(patch: Partial<ClothingItem>): TablesUpdate<"items"> {
 async function upsertMaterials(itemId: string, material: ClothingItem["material"]): Promise<void> {
 	const supabase = getSupabase();
 	const normalized = normalizeMaterial(material);
-	await supabase.from("item_materials").delete().eq("item_id", itemId);
+
+	// supabase-js reports failures in `result.error` (it does NOT throw), so both
+	// calls must be checked explicitly. Throwing surfaces the failure to the
+	// caller's `.catch(recordSyncFailure)` net — otherwise a failed insert after a
+	// successful delete would silently wipe the item's materials (and never show
+	// in the sync-status indicator).
+	const { error: deleteError } = await supabase.from("item_materials").delete().eq("item_id", itemId);
+	if (deleteError) throw new Error(`Failed to clear materials for ${itemId}: ${deleteError.message}`);
+
 	if (normalized.length > 0) {
 		const rows: TablesInsert<"item_materials">[] = normalized.map((m) => ({
 			item_id: itemId,
 			fiber: m.material,
 			percentage: m.percentage,
 		}));
-		await supabase.from("item_materials").insert(rows);
+		const { error: insertError } = await supabase.from("item_materials").insert(rows);
+		if (insertError) throw new Error(`Failed to save materials for ${itemId}: ${insertError.message}`);
 	}
 }
 

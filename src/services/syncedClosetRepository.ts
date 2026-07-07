@@ -67,12 +67,18 @@ export class SyncedClosetRepository implements ClosetRepository {
 				return !r || ts(item.updatedAt) > ts(r.updatedAt);
 			});
 			if (localWins.length > 0) {
+				// The local mirror already holds the full merged UNION (written above),
+				// so nothing is lost locally here. If this push fails it is recorded
+				// (drives the SyncStatusIndicator) and re-attempted on the next
+				// successful getAll() — eventual consistency, not silent data loss.
+				// The one real gap: a localWin whose push never lands before the local
+				// cache is cleared (tab closed, never reloaded/signed-in again) stays
+				// stale in the cloud. A durable retry queue is deferred — tracked
+				// separately (see E1-1.6 "retry queue still deferred").
 				void this.remote
 					.importItems(localWins, "merge")
 					.then(() => clearSyncFailures())
 					.catch((error) => {
-						// offline — local mirror is already up to date; remote will catch
-						// up on next successful getAll()
 						recordSyncFailure("reconcile", error);
 					});
 			} else {

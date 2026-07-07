@@ -129,4 +129,15 @@ describe("MultiStepForm — submit", () => {
 		fireEvent.submit(form);
 		await waitFor(() => expect(mockSetView).toHaveBeenCalled());
 	});
+
+	// Regression: the submit button must NOT wire both onClick={handleSubmit} and
+	// live inside <form onSubmit={handleSubmit}> — that double-fires addItem (and
+	// creates duplicate items) the moment the click handler stops calling
+	// preventDefault. Clicking the real button must add exactly one item.
+	it("clicking the Submit button adds exactly one item (no double-submit)", () => {
+		renderForm();
+		advanceToStep(9);
+		fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+		expect(mockAddItem).toHaveBeenCalledTimes(1);
+	});
 });

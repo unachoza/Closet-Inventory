@@ -1,18 +1,13 @@
 /**
- * Service layer — the single place the app talks to storage.
+ * Service layer barrel — re-exports the repository types + implementations.
  *
- * Import `closetRepository` (or the interface) from here; never reach for
- * localStorage or a DB client directly in components/hooks. During the Supabase
- * port, swap the one line below for a `SupabaseClosetRepository` and the rest of
- * the app is unaffected.
+ * The app talks to the closet through `useCloset()` / `ClosetProvider`
+ * (`SyncedClosetRepository` under the hood). There is deliberately NO shared
+ * repository singleton here: a bare `LocalClosetRepository` instance would be a
+ * second write path to the same localStorage key, bypassing cloud sync (removed
+ * with the dead `useLocalStorageCloset` hook, 2026-07-07).
  */
-import { LocalClosetRepository } from "./localClosetRepository";
-import type { ClosetRepository } from "./closetRepository";
-
 export type { ClosetRepository, ImportMode } from "./closetRepository";
 export { LocalClosetRepository } from "./localClosetRepository";
 export { SupabaseClosetRepository } from "./supabaseClosetRepository";
 export { SyncedClosetRepository } from "./syncedClosetRepository";
-
-/** The active repository. Swap during the cloud port. */
-export const closetRepository: ClosetRepository = new LocalClosetRepository();
