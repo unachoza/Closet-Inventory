@@ -87,7 +87,7 @@ function normalizeImportedItem(raw: Record<string, unknown>): ClothingItem {
 		// Guard the fields the UI iterates with `.map` — a non-array here would crash
 		// the card on render.
 		material: Array.isArray(raw.material) ? (raw.material as ClothingItem["material"]) : [],
-		notes: Array.isArray(raw.notes) ? (raw.notes as string[]) : undefined,
+		notes: Array.isArray(raw.notes) ? (raw.notes as string[]) : (typeof raw.notes === "string" ? [raw.notes] : undefined),
 		onSale: coerceOnSale(raw.onSale),
 	};
 }
