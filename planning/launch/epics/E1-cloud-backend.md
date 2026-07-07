@@ -12,7 +12,7 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 - [x] Supabase Auth sign-in (Google)
 - [x] Per-user `items` table; RLS so a user reads/writes only their own rows
 - [x] localStorage acts as offline cache; reconciles on reconnect
-- [ ] First sign-in seeds the cloud from existing local closet
+- [x] First sign-in seeds the cloud from existing local closet _(code-complete + wired via `E1-1.4`; live browser seed round-trip against dev still to be QA'd)_
 
 **Tickets**
 - `E1-1.1` ✅ **Done** (2026-06-30) — `GmailSpike.tsx` + `useSupabaseAuth.ts` implement the token flow; live Google OAuth sign-in verified (G0.1). Gmail access token survives under Supabase Auth and email import works end-to-end. — _1–1.5d_
@@ -26,7 +26,7 @@ _As Maya, I want my closet synced to my account so that I see the same wardrobe 
 ## US-1.2 — Images that don't blow the storage budget
 _As Maya, I want my photos stored properly so that big closets and camera imports don't silently fail._
 - [x] Images upload to Supabase Storage; row stores a **path**, not a URL or base64 (signed URLs are resolved at display time, never persisted — see `useSignedImageUrl`)
-- [ ] Existing base64 images migrate to Storage (`E1-2.2`, not started)
+- [x] ~~Existing base64 images migrate to Storage~~ → **reframed as a write-path guard** (`E1-2.2`): prod+dev have 0 base64 rows so there was no backfill; `ensureStoredPhoto` now stops base64 reaching `items.primary_photo_url` at sync time
 - [x] Upload handles failure with a user-facing message
 
 **Tickets**
@@ -38,11 +38,11 @@ _As Maya, I want my photos stored properly so that big closets and camera import
 
 ## US-1.3 — Know my sync state
 _As Maya, I want a sync indicator so that I know my data is safe / when I'm offline._
-- [ ] Nav shows synced / syncing / offline
-- [ ] Pending local writes flush on reconnect
+- [x] Nav shows synced / syncing / offline — `SyncStatusIndicator` (failed-write pill, PR#109) + `CloudSyncControl` (2026-07-06) showing Local↔Cloud, Signed out↔Signed in, and Synced/Behind/Offline/Error
+- [ ] Pending local writes flush on reconnect — **partial**: recovery rides on the next successful `getAll` reconcile (reload / sign-in); no active retry queue yet (deferred, see `E1-1.6`)
 
 **Tickets**
-- `E1-3.1` Sync-status indicator in NavBar — _0.5d_
+- `E1-3.1` ✅ **Done** (2026-07-06) — sync-status surfaced in NavBar via `SyncStatusIndicator` + `CloudSyncControl`. ⚠️ Follow-up ticket filed to make the auth/store/sync distinction more intuitive (Gmail-vs-Supabase auth conflation). — _0.5d_
 
 ## US-1.4 — Trust NTW with my login & profile data
 _As Maya, I want to trust NTW with my Google login and personal profile info so that my identity, photos, and wardrobe data can't be leaked or accessed by anyone but me._
