@@ -103,7 +103,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] ⚠️ **Google OAuth restricted-scope review** — `gmail.readonly` is a *restricted* scope; a public production app needs Google's verification + an annual third-party **CASA security assessment**. Scope this early (long lead time)
 
 **Operational**
-- [ ] Separate dev / prod Supabase projects; no prod data in dev
+- [x] ✅ **Separate dev / prod Supabase projects; no prod data in dev** (2026-07-06) — dev project `closet-inventory-dev` (ref `lfdpvyygqblnckksvufn`, us-east-1) created; all 8 migrations pushed (Local=Remote verified); `.env.local` (gitignored) points local dev at the dev project, `.env`/Vercel stay on prod (`rawuntspvetfdtrqggen`). Verified end-to-end: signed in via Google against dev, `profiles` row created on dev dashboard, app-bound URL confirmed = dev. Same Google OAuth client serves both (extra redirect URI added). Part of `E1-4.12`.
 - [ ] Backups + point-in-time recovery enabled and restore-tested
 - [ ] Logging hygiene — never log tokens, OAuth codes, or PII; error messages don't leak internals
 - [x] ✅ Dependency security in CI (2026-06-29) — `npm audit --audit-level=high` step + `dependabot.yml` weekly auto-update PRs configured; lockfile already committed. Current state: 1 critical + 8 high, all in devDependencies (vite/vitest/jsdom/stylelint toolchain — not shipped to the browser bundle, not in `package.json` `dependencies`). `npm audit fix` available, not yet run.
@@ -120,9 +120,9 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
   - `E1-4.9d` Remediate any CASA findings (likely overlaps E1-4.6/4.7/4.10) — _tbd_
   - `E1-4.9e` Submit CASA report to Google; **recurring annually** for as long as `gmail.readonly` is used — _recurring_
   - `E1-4.9f` Add "Limited Use" data-policy disclosure to privacy policy (no ad use, no resale, no human review w/o consent) — _bundled w/ E1-4.13_
-- `E1-4.10` Supabase platform hardening: leaked-password protection, CAPTCHA, `service_role` audit, `SECURITY DEFINER` review — _0.5d_
+- `E1-4.10` 🟡 **Mostly done** (2026-07-06) — `service_role` audit ✅ (zero secret-key refs in `src/`), `SECURITY DEFINER` review ✅ (`is_closet_member` + `handle_new_user` both safe: pin `search_path`, touch only caller's own rows) — documented in `docs/SECURITY_CONFIG.md`. Leaked-password protection: **blocked on free tier** (Pro-plan only, $25/mo) — deferred, and a no-op anyway for Google-OAuth-only. **CAPTCHA skipped** (moot: nothing to attach to in Google-only flow). **2FA/TOTP deferred post-beta** (needs enroll/challenge UI; first-factor protection rides on Google account security). — _0.5d_
 - `E1-4.11` ✅ **Done** (2026-06-30) — Upload validation (type/size) + short-expiry signed URLs. Client validation + 5-min signed URLs with auto-refresh live. Server-side bucket constraints (`file_size_limit` 10MB, `allowed_mime_types` jpeg/png/webp/heic) pushed to remote via `20260629000001_storage_validation.sql`. Dimension capping not addressed (compression already caps display dims). — _0.5d_
-- `E1-4.12` Backups/PITR enabled + restore test; dev/prod project split; logging-hygiene pass — _0.5–1d_
+- `E1-4.12` 🟡 **Partial** — **dev/prod project split ✅ Done (2026-07-06)** (dev `lfdpvyygqblnckksvufn` + prod `rawuntspvetfdtrqggen`, `.env.local` override, verified end-to-end). Remaining: Backups/PITR enabled + restore test; logging-hygiene pass. — _0.5–1d_
 - `E1-4.13` Publish privacy policy (data collected, retention, third parties/Supabase, deletion/export rights, Limited Use disclosure) — _0.5–1d, blocked on E1-4.8 existing first_
 
 ## US-1.5 — Import from Hotmail/Outlook and Yahoo, not just Gmail
