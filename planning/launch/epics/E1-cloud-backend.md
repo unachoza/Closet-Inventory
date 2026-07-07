@@ -99,7 +99,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 
 **Privacy & compliance**
 - [ ] Privacy policy + ToS; explicit consent for the Gmail scope at connect time
-- [ ] Self-serve **account deletion + data export** (GDPR/CCPA right-to-erasure / portability) — delete rows *and* Storage objects
+- [x] Self-serve **account deletion + data export** (GDPR/CCPA) — `accountDataService` + `AccountDataModal` (NavBar → "Account & Data"). Export = full JSON (items+profile+closets+wear_events). Delete = Storage wipe + profile delete → ON DELETE CASCADE clears the whole owned graph. ⚠️ **Deploy-gated pieces:** `profiles_delete_own` migration + `delete-user-account` Edge Function (true `auth.users` erasure) not yet pushed/deployed — until then, data is wiped but the identity row persists (re-login regenerates an empty closet). See `E1-4.8` ticket.
 - [ ] ⚠️ **Google OAuth restricted-scope review** — `gmail.readonly` is a *restricted* scope; a public production app needs Google's verification + an annual third-party **CASA security assessment**. Scope this early (long lead time)
 
 **Operational**
@@ -112,7 +112,7 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 **Tickets (hardening)**
 - `E1-4.6` ✅ **Done** (PR#76, 2026-06-23) — Swap email sanitizer to DOMPurify; XSS regression tests added (`EmailPreview.xss.test.tsx`). — _0.5d_
 - `E1-4.7` CSP + HSTS + secure-cookie + CORS-allowlist config — _0.5–1d_
-- `E1-4.8` Self-serve account deletion + data export (rows + Storage) — _1–1.5d_
+- `E1-4.8` 🟡 **Code-complete** (2026-07-06, branch `feat/account-deletion-export`) — client `accountDataService` (`exportAccountData`/`downloadAccountExport` reuse `exportCloset`'s `downloadFile`; `deleteAccountData` = Storage wipe + `profiles` delete → cascade; `deleteAccount` orchestrator best-effort-invokes the Edge Function) + `AccountDataModal` in NavBar. Corrected data model: photos live in `items.primary_photo_url` + Storage under `<userId>/`, NOT `item_photos`. Tests: `accountDataService.test.ts` (6), `AccountDataModal.test.tsx` (4); suite green (1183). **Deploy-gated (needs a fresh Supabase token):** (1) `supabase db push` the `20260707000001_profiles_delete_policy.sql` migration; (2) `supabase functions deploy delete-user-account`. **Live erasure is a QA step** (0 rows today; needs an authed browser session). — _1–1.5d_
 - `E1-4.9` Google OAuth verification + CASA assessment (scoping done 2026-06-29 — needed before real-user launch) — _tbd, long lead, budget 1–3mo_
   - `E1-4.9a` OAuth consent screen: domain verification, privacy policy + ToS URLs, logo, support contact, scope justification — _0.5d_
   - `E1-4.9b` Record scope-usage demo video; submit for Google verification; respond to review rounds — _tbd, Google's queue, not ours_

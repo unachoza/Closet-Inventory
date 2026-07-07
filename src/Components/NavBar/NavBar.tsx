@@ -8,6 +8,7 @@ import "./NavBar.css";
 import { importClosetFromFile } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 import ClearClosetModal from "./ClearModal/ClearClosetModal";
+import AccountDataModal from "./AccountDataModal/AccountDataModal";
 import SyncStatusIndicator from "../SyncStatusIndicator/SyncStatusIndicator";
 import CloudSyncControl from "../CloudSyncControl/CloudSyncControl";
 
@@ -33,6 +34,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [exportModalOpen, setExportModalOpen] = useState(false);
 	const [clearModalOpen, setClearModalOpen] = useState(false);
+	const [accountModalOpen, setAccountModalOpen] = useState(false);
 
 	const [importModalOpen, setImportModalOpen] = useState(false);
 	const [pendingImportItems, setPendingImportItems] = useState<ClothingItem[]>([]);
@@ -155,6 +157,17 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 				</button>
 			)}
 
+			<button
+				className="action-btn secondary"
+				onClick={() => {
+					setAccountModalOpen(true);
+					closeDrawer();
+				}}
+				title="Download or delete your account data"
+			>
+				<Trash2 size={16} /> Account &amp; Data
+			</button>
+
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
 				<Spool size={16} /> Fabric Guide
 			</button>
@@ -232,6 +245,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 					onCancel={handleClearCancel}
 				/>
 			)}
+			<AccountDataModal isOpen={accountModalOpen} onClose={() => setAccountModalOpen(false)} />
 		</header>
 	);
 };
