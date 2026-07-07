@@ -7,6 +7,8 @@ import { ViewProvider, useView } from "../../context/ViewContext";
 // CloudSyncControl needs Supabase + Closet contexts; its behaviour is covered by
 // its own test. Stub it here so NavBar tests stay focused on navigation.
 vi.mock("../CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
+// AccountDataModal needs Supabase auth context; covered by its own test.
+vi.mock("./AccountDataModal/AccountDataModal", () => ({ default: () => null }));
 import { SearchProvider, useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
 

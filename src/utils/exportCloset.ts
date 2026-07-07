@@ -59,7 +59,7 @@ function buildCSV(items: ClothingItem[]): string {
 export type ExportFormat = "csv" | "json";
 
 /** Trigger a browser download of arbitrary text content as a named file. */
-function downloadFile(content: string, filename: string, mimeType: string): void {
+export function downloadFile(content: string, filename: string, mimeType: string): void {
 	const blob = new Blob([content], { type: mimeType });
 	const url = URL.createObjectURL(blob);
 

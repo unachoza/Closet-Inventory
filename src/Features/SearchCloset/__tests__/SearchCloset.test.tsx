@@ -70,6 +70,7 @@ const mockCloset: ClothingItem[] = [
 // The real NavBar (rendered to reach its search box) pulls in CloudSyncControl,
 // which needs Supabase auth context. Stub it — not under test here.
 vi.mock("../../../Components/CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
+vi.mock("../../../Components/NavBar/AccountDataModal/AccountDataModal", () => ({ default: () => null }));
 
 vi.mock("../../../context/ClosetContext", () => ({
 	useCloset: () => ({

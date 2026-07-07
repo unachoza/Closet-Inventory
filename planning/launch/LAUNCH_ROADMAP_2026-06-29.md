@@ -55,12 +55,13 @@
 Each item maps to an existing E1-4.x ticket; this is the launch-ordered view.
 
 **Must-have before a single real user (hard gate):**
-- [x] ✅ `G0.2` RLS second-account isolation proven (tables + Storage) (2026-06-30) — *also Block 0*
+
+- [x] ✅ `G0.2` RLS second-account isolation proven (tables + Storage) (2026-06-30) — _also Block 0_
 - [x] ✅ **Dev/prod Supabase split** (2026-07-06) — dev project `closet-inventory-dev` (`lfdpvyygqblnckksvufn`) split out from prod (`rawuntspvetfdtrqggen`); `.env.local` points local dev at dev, Vercel/prod stay on prod; verified end-to-end (Google sign-in against dev → `profiles` row on dev dashboard). (`E1-4.12` dev/prod portion)
 - [x] ✅ **Storage validation pushed to prod** (2026-06-30) — server-side size/MIME enforcement live via `20260629000001_storage_validation.sql` (`E1-4.11`)
-- [ ] **Account deletion + data export** — legal right-to-erasure/portability; your privacy policy will _promise_ this, so it must exist. Delete rows AND Storage objects. (`E1-4.8`)
+- [x] ✅ **Account deletion + data export** — legal right-to-erasure/portability; your privacy policy will _promise_ this, so it must exist. Delete rows AND Storage objects. (`E1-4.8`)
 - [x] ✅ **Secret hygiene** (2026-06-30) — `.env` gitignored ✓, full git history clean (zero leaks via gitleaks) ✓, CI secret scanning live and passing ✓ (`E1-4.3`)
-- [ ] **Base64→Storage migration + legacy wipe** for any existing cloud items; no orphaned base64 left behind (`E1-2.2` / `E1-4.5`)
+- [x] ✅ **Base64→Storage migration + legacy wipe** for any existing cloud items; no orphaned base64 left behind (`E1-2.2` / `E1-4.5`)
 
 **Strongly recommended before launch:**
 
