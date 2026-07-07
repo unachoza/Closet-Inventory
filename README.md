@@ -265,8 +265,8 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 > connects inventory → laundry → travel → social/borrow. Full spec + data model + UI:
 > [planning/WardrobeStatusAndLocation.md](./planning/WardrobeStatusAndLocation.md).
 
-- 🔲 Item `status` enum — clean / dirty / at dry cleaner / needs repair / traveling / on loan / packed
-- 🔲 Item `location` field — home label / storage unit / suitcase (presets + free-text); multi-home support
+- ✅ Item `status` enum — clean / dirty / at dry cleaner / needs repair / traveling / on loan / packed
+- ✅ Item `location` field — home label / storage unit / suitcase (presets + free-text); multi-home support
 - 🔲 Status & location filters + "where is it / what state is it in" quick views
 - 🔲 Quick status actions on the card (mark dirty / mark clean / send to cleaner / pack)
 - 🔲 **Laundry forecast** — per-category clean-vs-dirty ratio + "time to do laundry" nudge (needs `wornCount`)
@@ -405,11 +405,11 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 > DB decision made: **Supabase** (Postgres + Row-Level Security). Firebase/Firestore removed.
 
 - ✅ Supabase selected as cloud backend
-- 🚧 Offline-first: localStorage as cache via `closetRepository`
-- 🚧 First-sign-in seed: uploads localStorage closet to Supabase on initial sign-in
+- ✅ Offline-first: localStorage as cache via `closetRepository`
+- ✅ First-sign-in seed: uploads localStorage closet to Supabase on initial sign-in
 - 🔲 Conflict resolution (last-write-wins with `updatedAt` timestamps)
 - 🔲 Multi-device real-time sync (Supabase Realtime)
-- 🔲 "Sync" status indicator in nav
+- ✅ "Sync" status indicator in nav
 
 ---
 
