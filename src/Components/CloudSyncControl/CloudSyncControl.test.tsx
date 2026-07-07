@@ -20,29 +20,39 @@ describe("CloudSyncControl", () => {
 		mockCloset.syncStatus = "synced";
 	});
 
-	it("shows 'Local only' + a sign-in button when signed out", () => {
+	it("signed out: shows Local store + 'Signed out' + a sign-in button", () => {
 		render(<CloudSyncControl />);
-		expect(screen.getByText(/local only/i)).toBeInTheDocument();
+		expect(screen.getByText(/^local$/i)).toBeInTheDocument();
+		expect(screen.getByText(/signed out/i)).toBeInTheDocument();
 		const btn = screen.getByRole("button", { name: /sign in to sync/i });
 		fireEvent.click(btn);
 		expect(mockAuth.signIn).toHaveBeenCalledTimes(1);
 	});
 
-	it("shows 'Synced' + a sign-out button when signed in", () => {
+	it("signed in + synced: shows Cloud store, 'Synced', and a sign-out button", () => {
 		mockAuth.isAuthenticated = true;
 		mockAuth.user = { email: "maya@example.com" };
 		render(<CloudSyncControl />);
-		expect(screen.getByText(/^synced$/i)).toBeInTheDocument();
+		expect(screen.getByText(/^cloud$/i)).toBeInTheDocument();
+		expect(screen.getByTestId("cloud-sync-state").textContent).toMatch(/synced/i);
 		const btn = screen.getByRole("button", { name: /sign out/i });
 		fireEvent.click(btn);
 		expect(mockAuth.signOut).toHaveBeenCalledTimes(1);
 	});
 
-	it("reflects syncing state when signed in and syncing", () => {
+	it("signed in + syncing: sync axis reads 'Behind'", () => {
 		mockAuth.isAuthenticated = true;
 		mockAuth.user = { email: "maya@example.com" };
 		mockCloset.syncStatus = "syncing";
 		render(<CloudSyncControl />);
-		expect(screen.getByText(/syncing/i)).toBeInTheDocument();
+		expect(screen.getByTestId("cloud-sync-state").textContent).toMatch(/behind/i);
+	});
+
+	it("signed in + error: sync axis reads 'Error'", () => {
+		mockAuth.isAuthenticated = true;
+		mockAuth.user = { email: "maya@example.com" };
+		mockCloset.syncStatus = "error";
+		render(<CloudSyncControl />);
+		expect(screen.getByTestId("cloud-sync-state").textContent).toMatch(/error/i);
 	});
 });
