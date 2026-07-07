@@ -5,7 +5,11 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist', '.claude'] },
+  // `supabase/functions` are Deno Edge runtime files — different globals (`Deno`)
+  // and remote URL imports. They're already outside the app's tsconfig (`src`
+  // only), so keep them out of the app's ESLint scope too rather than fighting
+  // its browser-globals assumptions.
+  { ignores: ['dist', '.claude', 'supabase/functions'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],

@@ -1,3 +1,5 @@
+import type { MaterialBlend } from "../../utils/types";
+
 export type RegexMap = readonly [RegExp, string][];
 
 export interface ProductAttributes {
@@ -27,9 +29,6 @@ export interface ProductAttributes {
 	material?: string;
 }
 
-export interface MaterialBlend {
-	material: string;
-	percentage: number;
-}
+export type { MaterialBlend };
 
 export type Season = "spring" | "summer" | "fall" | "winter";

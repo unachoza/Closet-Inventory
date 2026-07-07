@@ -67,7 +67,7 @@ const mockItem: ClothingItem = {
 	imageURL: "https://example.com/image.jpg",
 	color: "Red",
 	category: "Tops",
-	price: "$20",
+	price: 20,
 	onSale: true,
 	notes: ["This is a test item."],
 };

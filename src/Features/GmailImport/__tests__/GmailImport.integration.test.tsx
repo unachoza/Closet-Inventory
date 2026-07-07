@@ -106,7 +106,7 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 		color: prefilled.color ?? "",
 		size: prefilled.size ?? "",
 		brand: prefilled.brand ?? "",
-		price: prefilled.price ?? "",
+		price: prefilled.price,
 		material: prefilled.material ?? [],
 		occasion: prefilled.occasion ?? "",
 		age: prefilled.age ?? "",
@@ -333,7 +333,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByLabelText("name")).toHaveValue("Short Jacquard Jumpsuit");
 		expect(screen.getByLabelText("color")).toHaveValue("Bluish");
 		expect(screen.getByLabelText("size")).toHaveValue("M");
-		expect(screen.getByLabelText("price")).toHaveValue("$29.99");
+		expect(screen.getByLabelText("price")).toHaveValue("29.99");
 		expect(screen.getByLabelText("brand")).toHaveValue("zara");
 		// "SHORT" matches "short" → "bottoms" before "jumpsuit" → "body" in keyword order
 		expect(screen.getByLabelText("category")).toHaveValue("bottoms");
@@ -374,7 +374,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByLabelText("name")).toHaveValue("Knotted Top");
 		expect(screen.getByLabelText("color")).toHaveValue("Red");
 		expect(screen.getByLabelText("size")).toHaveValue("L");
-		expect(screen.getByLabelText("price")).toHaveValue("$19.99");
+		expect(screen.getByLabelText("price")).toHaveValue("19.99");
 		expect(screen.getByLabelText("brand")).toHaveValue("zara");
 		expect(screen.getByLabelText("category")).toHaveValue("tops"); // top → tops
 	});
@@ -403,7 +403,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByLabelText("name")).toHaveValue("Short Jacquard Jumpsuit");
 		expect(screen.getByLabelText("color")).toHaveValue("Bluish");
 		expect(screen.getByLabelText("size")).toHaveValue("M");
-		expect(screen.getByLabelText("price")).toHaveValue("$29.99");
+		expect(screen.getByLabelText("price")).toHaveValue("29.99");
 	});
 
 	it("Import All batch queue advances to next item after Add to Closet", async () => {
@@ -437,7 +437,7 @@ describe("Gmail Import → Zara email → EditItemView integration", () => {
 		expect(screen.getByLabelText("name")).toHaveValue("Knotted Top");
 		expect(screen.getByLabelText("color")).toHaveValue("Red");
 		expect(screen.getByLabelText("size")).toHaveValue("L");
-		expect(screen.getByLabelText("price")).toHaveValue("$19.99");
+		expect(screen.getByLabelText("price")).toHaveValue("19.99");
 	});
 
 	it("Import All batch queue shows Skip button and advances on skip", async () => {

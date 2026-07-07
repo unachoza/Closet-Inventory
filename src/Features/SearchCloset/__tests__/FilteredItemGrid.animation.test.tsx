@@ -93,7 +93,7 @@ function makeItem(id: string, name: string): ClothingItem {
 		age: "new",
 		care: "machine wash",
 		imageURL: "",
-		price: "$10",
+		price: 10,
 	};
 }
 

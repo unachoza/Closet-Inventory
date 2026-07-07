@@ -21,8 +21,8 @@ function rowToItem(row: ItemRow): ClothingItem {
 		color: row.color ?? "",
 		size: row.size ?? "",
 		imageURL: row.primary_photo_url ?? "",
-		price: row.purchase_price != null ? String(row.purchase_price) : undefined,
-		originalPrice: row.original_price != null ? String(row.original_price) : undefined,
+		price: row.purchase_price ?? undefined,
+		originalPrice: row.original_price ?? undefined,
 		purchaseDate: row.purchase_date ?? undefined,
 		condition: (row.condition as ClothingItem["condition"]) ?? undefined,
 		onSale: row.on_sale,
@@ -66,8 +66,8 @@ function itemToInsertRow(item: ClothingItem, closetId: string): TablesInsert<"it
 		retailer: item.retailer || null,
 		color: item.color || null,
 		size: item.size || null,
-		purchase_price: item.price ? parseFloat(item.price) : null,
-		original_price: item.originalPrice ? parseFloat(item.originalPrice) : null,
+		purchase_price: item.price ?? null,
+		original_price: item.originalPrice ?? null,
 		purchase_date: item.purchaseDate ?? null,
 		condition: item.condition ?? null,
 		on_sale: item.onSale ?? false,
@@ -101,8 +101,8 @@ function patchToUpdateRow(patch: Partial<ClothingItem>): TablesUpdate<"items"> {
 	if (patch.retailer !== undefined) row.retailer = patch.retailer || null;
 	if (patch.color !== undefined) row.color = patch.color || null;
 	if (patch.size !== undefined) row.size = patch.size || null;
-	if (patch.price !== undefined) row.purchase_price = patch.price ? parseFloat(patch.price) : null;
-	if (patch.originalPrice !== undefined) row.original_price = patch.originalPrice ? parseFloat(patch.originalPrice) : null;
+	if (patch.price !== undefined) row.purchase_price = patch.price ?? null;
+	if (patch.originalPrice !== undefined) row.original_price = patch.originalPrice ?? null;
 	if (patch.purchaseDate !== undefined) row.purchase_date = patch.purchaseDate ?? null;
 	if (patch.condition !== undefined) row.condition = patch.condition ?? null;
 	if (patch.onSale !== undefined) row.on_sale = patch.onSale;

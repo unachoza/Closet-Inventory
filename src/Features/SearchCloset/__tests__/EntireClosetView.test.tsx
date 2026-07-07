@@ -38,17 +38,17 @@ const CLOSET: ClothingItem[] = [
 	{
 		id: "1", name: "Nike Top", brand: "Nike", category: "tops",
 		color: "black", size: "M", material: [{ material: "cotton", percentage: 100 }], occasion: "casual",
-		age: "new", care: "machine wash", imageURL: "", price: "$30",
+		age: "new", care: "machine wash", imageURL: "", price: 30,
 	},
 	{
 		id: "2", name: "Zara Dress", brand: "Zara", category: "dresses",
 		color: "red", size: "S", material: [{ material: "silk", percentage: 100 }], occasion: "formal",
-		age: "1 year", care: "dry clean", imageURL: "", price: "$80",
+		age: "1 year", care: "dry clean", imageURL: "", price: 80,
 	},
 	{
 		id: "3", name: "Levi Jeans", brand: "Levi's", category: "bottoms",
 		color: "blue", size: "28", material: [{ material: "denim", percentage: 100 }], occasion: "casual",
-		age: "2 years", care: "machine wash", imageURL: "", price: "$60",
+		age: "2 years", care: "machine wash", imageURL: "", price: 60,
 	},
 ];
 

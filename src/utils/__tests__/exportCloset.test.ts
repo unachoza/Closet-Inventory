@@ -12,7 +12,7 @@ const baseItem: ClothingItem = {
 	category: "tops",
 	color: "cream",
 	size: "XS",
-	price: "$89.00",
+	price: 89.00,
 	material: [{ material: "Silk", percentage: 100 }],
 	occasion: "work",
 	age: "new",
