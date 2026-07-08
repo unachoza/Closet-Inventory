@@ -4,6 +4,7 @@ import normalizeColor, { normalizeColorGroups } from "../Features/FashionParser/
 import normalizeCategory from "../Features/FashionParser/normalizers/normalizeCategory";
 import { parseCareLabels } from "../utils/careUtils";
 import { canonicalizeMaterial } from "../utils/materialUtils";
+import { getLocation } from "../utils/locations";
 
 const MATERIAL_MIN_PCT = 6;
 
@@ -21,12 +22,28 @@ const extractMaterialNames = (raw: unknown): string[] => {
 	return [];
 };
 
-export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care";
+export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care" | "status" | "location";
 export type FilterState = Record<FilterDimension, string[]>;
 export type FilterOption = { value: string; count: number };
 export type FilterOptions = Record<FilterDimension, FilterOption[]>;
 
-const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
+// Single source of truth for "which dimensions exist" — FilterSidePanel and
+// FilterPillsRow import this (not their own copy) specifically to close the
+// hardcoded-list gotcha: a dimension added only here used to silently not
+// appear in the UI, since tsc can't catch a missing array entry.
+export const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care", "status", "location"];
+
+/** Display label per dimension, for filter UI headers/pills. */
+export const FILTER_DIMENSION_LABELS: Record<FilterDimension, string> = {
+	category: "Category",
+	color: "Color",
+	brand: "Brand",
+	material: "Material",
+	occasion: "Occasion",
+	care: "Care",
+	status: "Status",
+	location: "Location",
+};
 
 const INITIAL_FILTERS: FilterState = {
 	category: [],
@@ -35,7 +52,20 @@ const INITIAL_FILTERS: FilterState = {
 	material: [],
 	occasion: [],
 	care: [],
+	status: [],
+	location: [],
 };
+
+/** "at_cleaner" → "At cleaner". Absent status defaults to "clean", matching statusTransitions.ts. */
+const humanizeStatus = (status?: string): string => {
+	const raw = status ?? "clean";
+	const spaced = raw.replace(/_/g, " ");
+	return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+};
+
+/** Default location-label resolver: the static starter registry. A live per-user
+ *  locations context (E12-3.2) can pass its own resolver for custom locations. */
+const defaultResolveLocationLabel = (id?: string): string => getLocation(id).label;
 
 // Flatten a raw field (string | array | object) into a list of trimmed string values.
 const extractValues = (raw: unknown): string[] => {
@@ -76,7 +106,13 @@ const canonicalValue = (dim: FilterDimension, value: string): string => normaliz
 // for non-material dimensions.
 const displayValues = (dim: FilterDimension, raw: string): string[] => (dim === "color" ? normalizeColorGroups(raw) : [normalizeForDim(dim, raw)]);
 
-export const useClosetFilters = (closet: ClothingItem[]) => {
+/**
+ * @param resolveLocationLabel Resolves a `locationId` to a display label. Defaults
+ * to the static starter registry (`utils/locations.ts`). A live per-user locations
+ * context (E12-3.2) can pass its own resolver so custom/multi-home locations show
+ * their real names instead of falling back to "Home".
+ */
+export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (id?: string) => string = defaultResolveLocationLabel) => {
 	const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
 
 	// Compute available options with counts from the full closet
@@ -86,13 +122,17 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 		for (const dim of FILTER_DIMENSIONS) {
 			const counts = new Map<string, { value: string; count: number }>();
 			for (const item of closet) {
-				// Material and care use their own extractors; all other dims use the generic path.
+				// Material/care/status/location use their own extractors; other dims use the generic path.
 				const displayList =
 					dim === "material"
 						? extractMaterialNames(item[dim])
 						: dim === "care"
 							? parseCareLabels(item.care)
-							: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
+							: dim === "status"
+								? [humanizeStatus(item.status)]
+								: dim === "location"
+									? [resolveLocationLabel(item.locationId)]
+									: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
 
 				for (const display of displayList) {
 					const key = display.toLowerCase();
@@ -108,7 +148,7 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 			result[dim] = Array.from(counts.values()).sort((a, b) => a.value.localeCompare(b.value));
 		}
 		return result;
-	}, [closet]);
+	}, [closet, resolveLocationLabel]);
 
 	// OR within a dimension, AND across dimensions
 	const filteredItems = useMemo<ClothingItem[]>(() => {
@@ -117,19 +157,23 @@ export const useClosetFilters = (closet: ClothingItem[]) => {
 				const selected = filters[dim];
 				if (selected.length === 0) continue;
 
-				// Material and care use their own extractors; all other dims use the generic path.
+				// Material/care/status/location use their own extractors; other dims use the generic path.
 				const itemKeys =
 					dim === "material"
 						? extractMaterialNames(item[dim]).map((n) => n.toLowerCase())
-						: dim === "care"
-							? parseCareLabels(item.care).map((l) => l.toLowerCase())
-							: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+						: dim === "status"
+							? [humanizeStatus(item.status).toLowerCase()]
+							: dim === "location"
+								? [resolveLocationLabel(item.locationId).toLowerCase()]
+								: dim === "care"
+									? parseCareLabels(item.care).map((l) => l.toLowerCase())
+									: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
 				if (!matches) return false;
 			}
 			return true;
 		});
-	}, [closet, filters]);
+	}, [closet, filters, resolveLocationLabel]);
 
 	const activeFilterCount = useMemo(() => FILTER_DIMENSIONS.reduce((sum, dim) => sum + filters[dim].length, 0), [filters]);
 

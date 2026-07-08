@@ -4,6 +4,7 @@ import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import { ClosetProvider, useCloset } from "./context/ClosetContext";
+import { LocationsProvider } from "./context/LocationsContext";
 import NavBar from "./Components/NavBar/NavBar";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
@@ -216,15 +217,19 @@ function App() {
 			{/* Single cloud-backed closet instance shared by all consumers (E1-1.4).
 			    Inside SupabaseAuthProvider so it can read the signed-in userId. */}
 			<ClosetProvider>
-				<ViewProvider initialView="carousel">
-					<SearchProvider>
-						{/* Session-scoped Gmail auth — mounted above the view switch so the
-						    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
-						<GmailAuthProvider>
-							<AppShell />
-						</GmailAuthProvider>
-					</SearchProvider>
-				</ViewProvider>
+				{/* Single per-user locations store (E12-3.2) — same rationale as
+				    ClosetProvider: one live list, not one fetch per consumer. */}
+				<LocationsProvider>
+					<ViewProvider initialView="carousel">
+						<SearchProvider>
+							{/* Session-scoped Gmail auth — mounted above the view switch so the
+							    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
+							<GmailAuthProvider>
+								<AppShell />
+							</GmailAuthProvider>
+						</SearchProvider>
+					</ViewProvider>
+				</LocationsProvider>
 			</ClosetProvider>
 		</SupabaseAuthProvider>
 	);

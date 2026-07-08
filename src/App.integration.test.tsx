@@ -14,6 +14,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SearchProvider } from "./context/SearchContext";
 import { ViewProvider } from "./context/ViewContext";
 import { ClosetProvider } from "./context/ClosetContext";
+import { LocationsProvider } from "./context/LocationsContext";
 import { ToastProvider } from "./Components/Toast/Toast";
 import MultiStepForm from "./Features/Form/Form";
 import Closet from "./Features/Closet/Closet";
@@ -48,11 +49,13 @@ const STORAGE_KEY = "my_closet_key";
 function Providers({ children }: { children: React.ReactNode }) {
 	return (
 		<ClosetProvider>
-			<ViewProvider>
-				<SearchProvider>
-					<ToastProvider>{children}</ToastProvider>
-				</SearchProvider>
-			</ViewProvider>
+			<LocationsProvider>
+				<ViewProvider>
+					<SearchProvider>
+						<ToastProvider>{children}</ToastProvider>
+					</SearchProvider>
+				</ViewProvider>
+			</LocationsProvider>
 		</ClosetProvider>
 	);
 }

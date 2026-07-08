@@ -324,3 +324,67 @@ describe("useClosetFilters — material (MaterialBlend[])", () => {
 		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["l1"]);
 	});
 });
+
+// P1-8 — status + location filter dimensions.
+describe("status dimension", () => {
+	const STATUS_CLOSET: ClothingItem[] = [
+		makeItem({ id: "s1", status: "clean" }),
+		makeItem({ id: "s2", status: "dirty" }),
+		makeItem({ id: "s3", status: "at_cleaner" }),
+		makeItem({ id: "s4" }), // absent status → treated as clean, per statusTransitions convention
+	];
+
+	it("offers humanized status labels ('at_cleaner' → 'At cleaner')", () => {
+		const { result } = renderHook(() => useClosetFilters(STATUS_CLOSET));
+		const labels = result.current.filterOptions.status.map((o) => o.value);
+		expect(labels).toContain("Clean");
+		expect(labels).toContain("Dirty");
+		expect(labels).toContain("At cleaner");
+	});
+
+	it("an item with no status counts under 'Clean'", () => {
+		const { result } = renderHook(() => useClosetFilters(STATUS_CLOSET));
+		const cleanOption = result.current.filterOptions.status.find((o) => o.value === "Clean");
+		expect(cleanOption?.count).toBe(2); // s1 + s4 (absent)
+	});
+
+	it("filtering by 'Dirty' returns only dirty items", () => {
+		const { result } = renderHook(() => useClosetFilters(STATUS_CLOSET));
+		act(() => result.current.toggleFilter("status", "Dirty"));
+		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["s2"]);
+	});
+});
+
+describe("location dimension", () => {
+	const LOCATION_CLOSET: ClothingItem[] = [
+		makeItem({ id: "l1", locationId: "home" }),
+		makeItem({ id: "l2", locationId: "suitcase" }),
+		makeItem({ id: "l3" }), // absent locationId → primary/home, per locations.ts convention
+	];
+
+	it("offers location labels resolved via the default registry", () => {
+		const { result } = renderHook(() => useClosetFilters(LOCATION_CLOSET));
+		const labels = result.current.filterOptions.location.map((o) => o.value);
+		expect(labels).toContain("Home");
+		expect(labels).toContain("Suitcase");
+	});
+
+	it("an item with no locationId counts under 'Home' (primary default)", () => {
+		const { result } = renderHook(() => useClosetFilters(LOCATION_CLOSET));
+		const homeOption = result.current.filterOptions.location.find((o) => o.value === "Home");
+		expect(homeOption?.count).toBe(2); // l1 + l3 (absent)
+	});
+
+	it("filtering by 'Suitcase' returns only suitcase items", () => {
+		const { result } = renderHook(() => useClosetFilters(LOCATION_CLOSET));
+		act(() => result.current.toggleFilter("location", "Suitcase"));
+		expect(result.current.filteredItems.map((i) => i.id)).toEqual(["l2"]);
+	});
+
+	it("accepts an optional resolver so a live per-user locations context can override labels", () => {
+		const customResolver = (id?: string) => (id === "custom-uuid" ? "Aspen house" : "Home");
+		const items: ClothingItem[] = [makeItem({ id: "c1", locationId: "custom-uuid" })];
+		const { result } = renderHook(() => useClosetFilters(items, customResolver));
+		expect(result.current.filterOptions.location.map((o) => o.value)).toEqual(["Aspen house"]);
+	});
+});

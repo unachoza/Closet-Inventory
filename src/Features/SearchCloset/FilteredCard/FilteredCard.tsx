@@ -1,6 +1,6 @@
 import { ClothingItem } from "../../../utils/types";
 import { BorderMode } from "../../../utils/borderMode";
-import { getLocation } from "../../../utils/locations";
+import { useLocations } from "../../../context/LocationsContext";
 import ClothingCard from "../../../Components/ClothesCard/Card/Card";
 import FilterMatchPills from "../FilterMatchPills/FilterMatchPills";
 import "../EntireCloset.css";
@@ -18,6 +18,7 @@ const FilteredCard = ({ item, matchKeys, onEditItem, onRemoveItem, borderMode = 
 	// brand tokens (see EntireCloset.css). Home/primary locations map to a neutral
 	// (transparent) border; only "away" locations show color. The status dot is
 	// added in the combined mode.
+	const { getLocation } = useLocations();
 	const showBorder = borderMode !== "off";
 	const showStatus = borderMode === "location_status";
 	const locationKind = getLocation(item.locationId).kind;

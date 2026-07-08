@@ -56,6 +56,12 @@ vi.mock("../../../context/ClosetContext", () => ({
 	useCloset: () => ({ closet: CLOSET, removeItem: removeItemSpy }),
 }));
 
+vi.mock("../../../context/LocationsContext", () => ({
+	useLocations: () => ({
+		getLocation: (id?: string) => ({ id: id ?? "home", label: id ? id : "Home", kind: "home", isPrimary: !id }),
+	}),
+}));
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function renderView() {
 	return render(

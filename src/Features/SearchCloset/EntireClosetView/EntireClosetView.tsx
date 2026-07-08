@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback } from "react";
 import { ClothingItem } from "../../../utils/types";
 import { useCloset } from "../../../context/ClosetContext";
+import { useLocations } from "../../../context/LocationsContext";
 import { useClosetFilters } from "../../../hooks/useClosetFilters";
 import { useClosetSort } from "../../../hooks/useClosetSort";
 import { useSearch } from "../../../context/SearchContext";
@@ -42,8 +43,12 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 		});
 	}, []);
 
-	// 1. Filter by dimension checkboxes
-	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } = useClosetFilters(closet);
+	// 1. Filter by dimension checkboxes. Location labels resolve through the
+	// live per-user locations store (E12-3.2/P1-8) so custom/multi-home
+	// locations show their real names in the filter panel, not "Home".
+	const { getLocation } = useLocations();
+	const resolveLocationLabel = useCallback((id?: string) => getLocation(id).label, [getLocation]);
+	const { filters, filterOptions, filteredItems, activeFilterCount, toggleFilter, clearAll } = useClosetFilters(closet, resolveLocationLabel);
 
 	// 2. Fuzzy search over filtered items — driven by the single NavBar search
 	// box via SearchContext (shared source of truth).

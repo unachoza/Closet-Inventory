@@ -18,6 +18,8 @@ const emptyFilters: FilterState = {
 	material: [],
 	occasion: [],
 	care: [],
+	status: [],
+	location: [],
 };
 
 const filterOptions: FilterOptions = {
@@ -45,6 +47,8 @@ const filterOptions: FilterOptions = {
 		{ value: "formal", count: 2 },
 	],
 	care: [],
+	status: [],
+	location: [],
 };
 
 const baseProps = {
