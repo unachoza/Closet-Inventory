@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import { FilterDimension, FilterOptions, FilterState } from "../../../hooks/useClosetFilters";
+import {
+	FilterDimension,
+	FilterOptions,
+	FilterState,
+	FILTER_DIMENSIONS,
+	FILTER_DIMENSION_LABELS,
+} from "../../../hooks/useClosetFilters";
 import FilterAccordion from "../FilterAccordion/FilterAccordion";
 import "../EntireCloset.css";
 
@@ -14,17 +20,6 @@ interface FilterSidePanelProps {
 	onToggle: (dim: FilterDimension, value: string) => void;
 	onClearAll: () => void;
 }
-
-const DIM_LABELS: Record<FilterDimension, string> = {
-	category: "Category",
-	color: "Color",
-	brand: "Brand",
-	material: "Material",
-	occasion: "Occasion",
-	care: "Care",
-};
-
-const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const FilterSidePanel = ({
 	open,
@@ -75,10 +70,10 @@ const FilterSidePanel = ({
 				</div>
 
 				<div className="filter-side-panel__body">
-					{DIMENSIONS.map((dim) => (
+					{FILTER_DIMENSIONS.map((dim) => (
 						<FilterAccordion
 							key={dim}
-							label={DIM_LABELS[dim]}
+							label={FILTER_DIMENSION_LABELS[dim]}
 							options={filterOptions[dim]}
 							selected={filters[dim]}
 							onToggle={(value) => onToggle(dim, value)}

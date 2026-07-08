@@ -331,6 +331,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_primary: boolean
           kind: string | null
           label: string
           owner_user_id: string
@@ -338,6 +339,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_primary?: boolean
           kind?: string | null
           label: string
           owner_user_id: string
@@ -345,6 +347,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_primary?: boolean
           kind?: string | null
           label?: string
           owner_user_id?: string

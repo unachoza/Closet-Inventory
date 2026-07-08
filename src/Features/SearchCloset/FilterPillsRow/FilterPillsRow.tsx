@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { FilterDimension, FilterState } from "../../../hooks/useClosetFilters";
+import { FilterDimension, FilterState, FILTER_DIMENSIONS } from "../../../hooks/useClosetFilters";
 import "../EntireCloset.css";
 
 interface FilterPillsRowProps {
@@ -9,16 +9,18 @@ interface FilterPillsRowProps {
 	onClearAll: () => void;
 }
 
-const DIM_LABELS: Record<FilterDimension, string> = {
+// Abbreviated for the compact pill row — deliberately distinct from
+// FILTER_DIMENSION_LABELS (used for full accordion headers).
+const PILL_DIM_LABELS: Record<FilterDimension, string> = {
 	category: "cat",
 	color: "color",
 	brand: "brand",
 	material: "mat",
 	occasion: "occ",
-	care: ""
+	care: "",
+	status: "status",
+	location: "loc",
 };
-
-const DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care"];
 
 const FilterPillsRow = ({
 	filters,
@@ -30,10 +32,10 @@ const FilterPillsRow = ({
 
 	return (
 		<div className="filter-pills-row" aria-label="Active filters">
-			{DIMENSIONS.flatMap((dim) =>
+			{FILTER_DIMENSIONS.flatMap((dim) =>
 				(filters[dim] ?? []).map((value) => (
 					<span key={`${dim}:${value}`} className="filter-pill">
-						<span className="filter-pill__dim">{DIM_LABELS[dim]}:</span>
+						<span className="filter-pill__dim">{PILL_DIM_LABELS[dim]}:</span>
 						{value}
 						<button
 							className="filter-pill__remove"
