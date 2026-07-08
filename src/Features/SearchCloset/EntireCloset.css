@@ -638,22 +638,28 @@ button.filter-accordion__header:focus{
 }
 
 /* ── E2: location / status borders (see FilteredCard.tsx + utils/locations.ts) ──
-   Border color encodes the item's location. Home/primary is neutral (transparent)
-   by design — indicators only appear when an item is *away*. */
+   Border color + STYLE encodes the item's location. Home/primary is neutral (transparent)
+   by design — indicators only appear when an item is *away*. Border-style provides a
+   non-color cue so the system works even in grayscale / color-blindness (P1-10.2). */
 .filtered-card[data-border] {
 	border-color: var(--inv-border-color, transparent);
+	border-style: var(--inv-border-style, solid);
 }
 .filtered-card[data-location-kind="home"] {
 	--inv-border-color: var(--bg-surface-secondary);
+	--inv-border-style: solid;
 }
 .filtered-card[data-location-kind="storage"] {
 	--inv-border-color: var(--primitive-brand-deep-umber);
+	--inv-border-style: solid;
 }
 .filtered-card[data-location-kind="suitcase"] {
 	--inv-border-color: var(--primitive-brand-muted-clay);
+	--inv-border-style: dashed;
 }
 .filtered-card[data-location-kind="other"] {
 	--inv-border-color: var(--status-info);
+	--inv-border-style: dotted;
 }
 
 /* Status dot — shown only in the "Location + Status" mode. */

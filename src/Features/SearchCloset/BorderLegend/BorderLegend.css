@@ -1,0 +1,153 @@
+/* P1-10 — Border/Status legend, shown below the border toggle when active. */
+
+.border-legend {
+	position: relative;
+	margin-top: var(--spacing-100, 0.5rem);
+	padding: var(--spacing-150, 0.75rem) var(--spacing-200, 1rem);
+	background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.03));
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--layout-radius-button);
+	font-size: 0.82rem;
+}
+
+.border-legend__content {
+	padding-right: 1.5rem; /* space for dismiss button */
+}
+
+.border-legend__title {
+	margin: 0 0 var(--spacing-100) 0;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.border-legend__subtitle {
+	margin: var(--spacing-100) 0 var(--spacing-75) 0;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.border-legend__section {
+	margin-bottom: var(--spacing-150);
+}
+.border-legend__section:last-child {
+	margin-bottom: 0;
+}
+
+.border-legend__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-75, 0.4rem);
+}
+
+.border-legend__item {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-100);
+	color: var(--text-primary);
+}
+
+/* Color + style swatches (location kinds) */
+.border-legend__swatch {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	border: 3px solid;
+	border-radius: 2px;
+}
+
+.border-legend__swatch--home {
+	border-color: var(--bg-surface-secondary);
+	border-style: solid;
+	background: transparent;
+}
+
+.border-legend__swatch--storage {
+	border-color: var(--primitive-brand-deep-umber);
+	border-style: solid;
+	background: transparent;
+}
+
+.border-legend__swatch--suitcase {
+	border-color: var(--primitive-brand-muted-clay);
+	border-style: dashed;
+	background: transparent;
+}
+
+.border-legend__swatch--other {
+	border-color: var(--status-info);
+	border-style: dotted;
+	background: transparent;
+}
+
+/* Status dots */
+.border-legend__dot {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.border-legend__dot--clean {
+	background: var(--status-success);
+}
+
+.border-legend__dot--dirty {
+	background: var(--status-warning);
+}
+
+.border-legend__dot--at-cleaner {
+	background: var(--status-info);
+}
+
+.border-legend__dot--in-repair {
+	background: var(--status-error);
+}
+
+.border-legend__dot--traveling {
+	background: var(--primitive-brand-muted-clay);
+}
+
+.border-legend__dot--on-loan {
+	background: var(--primitive-brand-rose-terracotta);
+}
+
+/* Dismiss button */
+.border-legend__dismiss {
+	position: absolute;
+	top: var(--spacing-125, 0.6rem);
+	right: var(--spacing-125, 0.6rem);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 20px;
+	height: 20px;
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	color: var(--text-muted);
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: color 0.15s ease;
+}
+
+.border-legend__dismiss:hover {
+	color: var(--text-primary);
+}
+
+.border-legend__dismiss:focus-visible {
+	outline: 2px solid var(--border-brand);
+	outline-offset: 2px;
+	border-radius: 2px;
+}

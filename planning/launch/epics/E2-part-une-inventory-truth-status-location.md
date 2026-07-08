@@ -65,7 +65,7 @@ Filtered from the persona docs to the two primitives (lending/availability logic
 | SL-6 | Sloane / Pair | **filter** the closet by location ("what's in NYC right now") | I only see what's accessible | ⏳ P1-8 |
 | SL-7 | Executive Mom | **filter** by status ("everything clean") | I plan around what's ready | ⏳ P1-8 |
 | SL-8 | Curator / Sloane | a **"where is everything"** grouped-by-location view | I see the whole wardrobe across places at once | ⏳ P1-5 |
-| SL-9 | Pair / Founder | set status/location **quickly from the card** (not only the full edit form) | updating state is one gesture, not a form | ⏳ P1-4 |
+| SL-9 | Pair / Founder | set status/location **quickly from the card** (not only the full edit form) | updating state is one gesture, not a form | ✅ quick actions menu|
 | SL-10 | Everyone | have **new imports default** to `clean` + primary `home` | I don't have to set state on every imported item | ✅ defaults (see Gmail flow) |
 | SL-11 | Everyone | a **legend** telling me what each border color / status dot means | the borders are readable without guessing | ⏳ P1-10 |
 | SL-12 | Sloane / Pair | **filter** the closet by location from the filter side panel | I can see "everything in NYC" / "everything in storage" | ⏳ P1-8 |
