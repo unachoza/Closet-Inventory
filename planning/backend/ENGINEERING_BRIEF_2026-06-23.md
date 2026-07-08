@@ -1,19 +1,19 @@
 # NTW Engineering Brief — Architecture & Roadmap
 
-_For Claude Code context. Last updated 2026-06-23._
+_Last updated 2026-07-07. Status: E1 (Cloud Backend) ~95% complete; E2 (Status/Location) in progress._
 
 ---
 
-## Current Stack (do not change)
+## Current Stack (decided, don't change)
 
 - React 19 + TypeScript + Vite 6
-- localStorage (current main storage — working, shipped)
-- Firebase Firestore — PR #44 exists, not yet merged
-- Gmail OAuth + 10+ retailer receipt parsers (shipped)
+- **Supabase** (Postgres + Auth + Storage) — chosen over Firebase; PR #44 (Firebase) abandoned
+- **Offline-first sync** via `SyncedClosetRepository` (local localStorage → cloud on sign-in; reconcile on reconnect)
+- Gmail OAuth 2.0 + 10+ retailer receipt parsers (shipped; server-side token handling)
 - Fuse.js fuzzy search (shipped)
 - Framer Motion + Radix UI (web-only, stays web-only)
-- Vitest + Playwright E2E
-- No App Store. Distribution via PWA. This is intentional — no 30% Apple/Google cut.
+- Vitest + Playwright E2E + Supabase local dev environment
+- Distribution via PWA (no App Store; intentional — no 30% cut)
 
 ---
 
@@ -26,258 +26,175 @@ _For Claude Code context. Last updated 2026-06-23._
 - iOS 16.4+ supports Web Push, camera API, offline mode
 - Revisit native only after 10K users with data to justify the rewrite cost
 
-### 2. Separate backend from frontend. API layer pattern.
+### 2. Separate backend from frontend. Service layer pattern.
 
-- Frontend never calls Firestore/database directly
-- All data access goes through a service/API layer
-- This means: adding React Native later = new frontend shell, zero backend changes
+- Frontend never calls Supabase directly (except Auth SDK for sign-in)
+- All data access goes through `ClosetRepository` interface (abstraction over Supabase)
+- Components use `useCloset()` hook; never import Supabase client
+- This means: swapping Supabase for a different DB = replace one service, zero component changes
 
-```
+```typescript
 // ❌ wrong — tight coupling
-import { getDoc, doc } from 'firebase/firestore'
-const item = await getDoc(doc(db, 'items', itemId))
+import { supabase } from '@/lib/supabaseClient'
+const items = await supabase.from('items').select()
 
 // ✅ right — abstracted
-import { itemsApi } from '@/services/api'
-const item = await itemsApi.getItem(itemId)
+const { closet } = useCloset()
+// backed by SyncedClosetRepository → SupabaseClosetRepository
 ```
 
-The service layer (`/src/services/`) is what changes if we ever swap databases. The components never know what's underneath.
+The repository layer is what changes if we ever swap databases. Components never know what's underneath.
 
-### 3. Firebase now. Postgres (Supabase) when social/sharing ships — maybe never.
+### 3. Supabase now. Full-featured, offline-first, Postgres-backed.
 
-- Merge PR #44 this week. Firebase Firestore is correct for v1 closet + ingestion.
-- Firebase can handle the social/sharing graph too. See data model below.
-- Do NOT migrate existing users from Firestore to Postgres — too much risk, no benefit yet.
-- Only migrate if the social graph becomes complex enough to warrant it (v8+, real scale).
+- ✅ Decided 2026-06-20 — Supabase Firestore as primary store (not localhost, not Firebase)
+- ✅ Merged 2026-06-30 — Supabase Auth (Google OAuth) + RLS policies verified safe
+- ✅ Merged 2026-07-06 — offline-first sync layer (E1-1.4/1.5/1.6)
+- ✅ Merged 2026-07-07 — account deletion + data export (GDPR/CCPA compliance)
+- **Do NOT migrate existing users from localStorage to Supabase** — use the sync layer (seeding on first sign-in)
+- Firebase PR #44 is explicitly abandoned; don't merge it
 
-### 4. Monorepo structure — set it up before the backend grows.
+### 4. Monorepo structure — optional, not yet needed
 
-```
-ntw/
-├── packages/
-│   └── types/               ← shared TypeScript types — Item, User, BorrowRequest, etc.
-│                               both frontend and backend import from here
-│                               npm package: @ntw/types
-├── apps/
-│   └── web/                 ← existing React app moves here (or stays, monorepo wraps it)
-└── backend/
-    └── functions/           ← Firebase Functions (the API layer)
-        ├── items/
-        ├── users/
-        ├── sharing/         ← borrow/lend endpoints go here
-        └── gmail/           ← Gmail OAuth parsing (keeps API keys server-side)
-```
-
-Use **pnpm workspaces**. Turborepo is optional but helpful for large builds.
-
-The shared `types` package is the highest-value move. Define `Item`, `User`, `BorrowRequest`, `ItemStatus`, `ItemLocation` once. Both Firebase Functions and React frontend import from `@ntw/types`. TypeScript catches mismatches at compile time.
+The current single-package structure works fine. Revisit monorepo (pnpm workspaces + shared `@ntw/types`) when the backend grows (Hotmail/Yahoo OAuth spikes, lending features, etc.). For now: keep it simple.
 
 ---
 
-## Priority Order (do not deviate)
+## Current Architecture (E1 state — post 2026-07-07)
 
-1. ✅ Closet inventory + Gmail ingestion — **ship this week**
-2. 🔲 User accounts + public profile — **prerequisite for sharing**
-3. 🔲 Sharing / borrow-lend — **next major milestone, before outfit builder**
-4. 🔲 Item status + location (v1.5) — alongside or after sharing
-5. 🔲 Outfit builder (v7) — later, table stakes, not the differentiator
-
-**Sharing is the only feature in the category with a built-in viral loop.**
-When User A sends a borrow request to User B, User B must install NTW to respond.
-One transaction = one new user. This is the growth mechanic. Build it before anything else social.
-
----
-
-## Firebase Data Model for Sharing (use this, don't design from scratch)
-
-Firestore can handle the borrow/lend social graph. No Postgres migration needed for v1 sharing.
+### Data Storage
 
 ```
-/users/{userId}
-  - displayName: string
-  - email: string
-  - photoURL: string
-  - trustedCircle: userId[]      ← people they share with
-  - createdAt: timestamp
-
-/items/{itemId}
-  - ownerId: userId
-  - name: string
-  - brand: string
-  - category: string
-  - material: string             ← inferred from product name
-  - careInstructions: string[]
-  - status: 'clean' | 'dirty' | 'at_cleaner' | 'on_loan' | 'in_repair'
-  - location: 'home' | 'storage' | 'suitcase' | 'other'
-  - locationLabel: string        ← e.g. "Aspen house", "storage unit"
-  - borrowedBy: userId | null
-  - isShareable: boolean
-  - source: 'manual' | 'gmail_import' | 'camera'
-  - retailer: string
-  - purchaseDate: timestamp
-  - purchasePrice: number
-  - wearCount: number
-  - lastWornAt: timestamp
-  - imageUrl: string
-  - createdAt: timestamp
-
-/borrow_requests/{requestId}
-  - fromUserId: userId           ← person requesting to borrow
-  - toUserId: userId             ← item owner
-  - itemId: string
-  - status: 'pending' | 'accepted' | 'declined' | 'returned'
-  - requestedAt: timestamp
-  - respondedAt: timestamp
-  - returnedAt: timestamp
-  - message: string              ← optional note from requester
-
-/connections/{connectionId}
-  - userA: userId
-  - userB: userId
-  - status: 'pending' | 'connected'
-  - createdAt: timestamp
+Supabase Project (prod + dev split)
+├── Postgres tables
+│   ├── auth.users (managed by Supabase Auth)
+│   ├── public.profiles (user account metadata)
+│   ├── public.closets (co-owned closet headers; roles for sharing)
+│   ├── public.items (primary data: clothing inventory)
+│   ├── public.item_materials (normalized fiber blends)
+│   ├── public.wear_events (wear tracking + photos)
+│   └── public.* (E2/E3 tables: locations, tags, members, etc.)
+├── Storage (bucket: item-photos)
+│   └── <userId>/<uuid>.<ext> (signed URLs, 5-min expiry, auto-refresh)
+└── Edge Functions
+    └── delete-user-account (true identity erasure: storage + auth.users deletion)
 ```
 
-Firestore security rules:
+### Sync Architecture
 
-- Users can only read items where `ownerId == request.auth.uid` OR `isShareable == true && request.auth.uid in resource.data.ownerId.trustedCircle`
-- Borrow requests: readable by fromUserId or toUserId only
+```
+App Start
+├── User signed out? → Local-only (localStorage, no Supabase)
+└── User signed in?
+    └── SyncedClosetRepository (wraps both LocalClosetRepository + SupabaseClosetRepository)
+        ├── getAll() → reconcile(local, remote) via last-write-wins (updatedAt)
+        ├── First sign-in: seed remote from local (if remote empty)
+        ├── add/update/remove → local first (instant), then async to remote
+        └── Remote failures tracked in syncFailureTracker; user sees "N changes not synced" in NavBar
+```
+
+**Recovery:** on reconnect, the next successful `getAll()` reconcile clears the failure state. No active retry queue yet (deferred post-MVP).
+
+### Service Layer
+
+```
+src/services/
+├── closetRepository.ts (interface: ClosetRepository)
+├── supabaseClosetRepository.ts (Supabase + Postgres mapping)
+├── syncedClosetRepository.ts (offline + sync orchestration)
+├── localClosetRepository.ts (localStorage fallback)
+├── accountDataService.ts (export/delete account)
+└── base64PhotoGuard.ts (write-path guard: data:image → Storage upload)
+
+src/context/
+└── ClosetContext.tsx (single useCloudCloset instance; shared via useCloset hook)
+```
+
+All data access routes through `useCloset()`, which returns a `SyncedClosetRepository` instance.
 
 ---
 
-## What to Build This Week (V1 Deploy)
+## What's Complete (E1 — Cloud Backend)
 
-**Goal: ship closet + Gmail ingestion to production by end of week.**
+✅ **E1-1:** Supabase Auth (Google OAuth) + offline-first sync  
+✅ **E1-2:** Images in Storage (not base64); write-path guard for legacy prevention  
+✅ **E1-3:** Sync status visible (SyncStatusIndicator + CloudSyncControl in NavBar)  
+✅ **E1-4:** Security hardening (RLS proven, secrets scanned, account deletion deployed)  
 
-1. **Merge PR #44** — Firebase Firestore replaces localStorage as primary storage
-2. **Set up Firebase project for production** (separate from dev)
-      - Enable Firestore, Auth (Google + email), Storage
-      - Set Firestore security rules (users can only read/write their own items)
-3. **Wrap all Firestore calls in a service layer** before merging
-      - Create `/src/services/itemsService.ts` — all CRUD for items goes here
-      - Create `/src/services/authService.ts` — auth state management
-      - Components import from services, never from firebase directly
-4. **Update Gmail OAuth consent screen** for production domain
-      - Add production domain to authorized origins in Google Cloud Console
-      - Gmail OAuth scope: `https://www.googleapis.com/auth/gmail.readonly`
-      - This is the step most likely to add days — do it first
-5. **Deploy to Vercel or Netlify**
-      - Add all Firebase + Gmail env vars to deployment config
-      - Set up custom domain if you have one
-6. **PWA manifest + service worker** — installable on home screen
-
----
-
-## What to Build Next Month (Sharing V0.5 — Achievable in 3–4 Weeks)
-
-**Lighter sharing that still creates the viral loop:**
-
-1. User profile setup (display name, photo)
-2. Connection/trust system — send a "circle invite" by email or link
-3. Item visibility toggle — mark items as shareable or private
-4. Shareable closet view — a link that shows your shareable items to a connected user (read-only)
-5. **Borrow request flow** — request an item → owner gets notification → accept/decline → item status updates to `on_loan`
-6. Web Push notifications for borrow requests (PWA supports this)
-7. In-app notification bell
-
-This is the MVP viral loop. User A sees User B's shareable closet, requests to borrow a jacket. User B gets a push notification. If User B doesn't have NTW, they get an email with a link to install. **That's the loop.**
-
-**Realistic timeline:**
-
-- Full borrow/lend with push notifications: **6–8 weeks solo**
-- Read-only shareable closet link only (no requests yet): **2–3 weeks**
-- Recommended: ship the link first (fast), then the request flow (takes longer)
+**Next:** E2 (Status + Location + Simple Lending) — in progress on `EPIC-status-location` branch
 
 ---
 
 ## What NOT to Build Yet
 
-- Outfit builder / AI suggestions — v7, not now
-- Virtual try-on — v7
-- Travel weight calculator — v6.1
-- Resale listing — never a priority
-- Color analysis — not differentiated
+- Sharing / borrow-lend requests (E4 — requires complex RLS + user profiles) — **post-MVP**
+- Outfit builder / AI suggestions (E6–E7) — **post-MVP, table stakes not differentiator**
+- Virtual try-on (E7) — **v3+**
+- Travel weight calculator (E6.1) — **post-MVP**
+- Hotmail/Outlook/Yahoo import (E1-5/E1-6) — **requires separate OAuth spikes, post-MVP**
+- Internationalization (E13) — **post-MVP, backfill task**
 
 ---
 
 ## Key Constraints
 
 - **No manual photography onboarding** — Gmail import is the wedge. If a user has to photograph every item, they will quit.
-- **30-item free tier is tight** — consider raising to 50 for beta users. Whering and Alta are fully free. Users need to hit value before the paywall.
-- **Fits (German competitor) shipped basic email import Oct 2025** — NTW's version is deeper (10+ parsers, material inference) but the moat narrows over time. Ship fast.
-- **PWA install prompt** — trigger it after the user's first successful Gmail import, not on first visit. That's the magic moment.
+- **Offline-first is non-negotiable** — users expect to see their items instantly, even on flaky WiFi. localStorage seed + async Supabase push.
+- **30-item free tier (current)** — consider raising to 50 for beta. Competitors (Whering, Alta) are fully free. Users need to hit value before paywall.
+- **Gmail import:** parsed server-side (Firebase Functions alternative) vs. client-side (current). Current approach works, but consider moving to a secure Edge Function if parsing logic grows.
+- **PWA install prompt** — trigger after first successful Gmail import, not on first visit. That's the magic moment.
 
 ---
 
-## Type Definitions to Create First (in `@ntw/types`)
+## Type Definitions (see `src/utils/types.ts`)
+
+Core types — all already in the codebase:
 
 ```typescript
-export type ItemStatus = "clean" | "dirty" | "at_cleaner" | "on_loan" | "in_repair" | "unknown";
-export type ItemLocation = "home" | "storage" | "suitcase" | "other";
-export type ItemSource = "manual" | "gmail_import" | "camera";
-export type ConnectionStatus = "pending" | "connected";
-export type BorrowStatus = "pending" | "accepted" | "declined" | "returned";
+type ItemStatus = "clean" | "dirty" | "at_cleaner" | "in_repair" | "traveling" | "on_loan" | "archived_seasonal";
+type WearState = "new" | "like_new" | "good" | "fair" | "poor" | "needs_repair";
+type ItemFit = "fits" | "tailored" | "too_big" | "too_small" | "unknown";
 
-export interface Item {
-	id: string;
-	ownerId: string;
-	name: string;
-	brand?: string;
-	category: string;
-	material?: string;
-	careInstructions?: string[];
-	status: ItemStatus;
-	location: ItemLocation;
-	locationLabel?: string;
-	borrowedBy?: string;
-	isShareable: boolean;
-	source: ItemSource;
-	retailer?: string;
-	purchaseDate?: Date;
-	purchasePrice?: number;
-	wearCount: number;
-	lastWornAt?: Date;
-	imageUrl?: string;
-	createdAt: Date;
-	updatedAt: Date;
-}
-
-export interface User {
-	id: string;
-	displayName: string;
-	email: string;
-	photoURL?: string;
-	trustedCircle: string[];
-	createdAt: Date;
-}
-
-export interface BorrowRequest {
-	id: string;
-	fromUserId: string;
-	toUserId: string;
-	itemId: string;
-	status: BorrowStatus;
-	message?: string;
-	requestedAt: Date;
-	respondedAt?: Date;
-	returnedAt?: Date;
-}
-
-export interface Connection {
-	id: string;
-	userA: string;
-	userB: string;
-	status: ConnectionStatus;
-	createdAt: Date;
+interface ClothingItem {
+  id: string;
+  imageURL: string;
+  name: string;
+  category: string;
+  color: string;
+  size: string;
+  brand: string;
+  price?: number; // numeric, not string (post-E1-1.6)
+  material: MaterialBlend[];
+  condition?: WearState;
+  purchaseDate?: string; // ISO date
+  care: string | string[];
+  status?: ItemStatus;
+  locationId?: string; // E2 location system
+  isSentimental?: boolean;
+  isLendable?: boolean; // E4 lending
+  wornCount?: number; // E11 wear tracking
+  updatedAt?: string; // last-write-wins timestamp
 }
 ```
 
+See `src/utils/types.ts` for the full definition. **Do NOT define types in multiple places.**
+
 ---
 
-## Questions This Brief Does NOT Answer (decide before building)
+## Timeline Estimate (pre-2026-06-29 = outdated)
 
-- Free tier limit: 30 items or raise to 50 for beta?
-- Auth methods: Google OAuth only, or also email/password?
-- Will borrowers need a full NTW account to respond to a request, or just a link-based response? (Full account = more installs but more friction)
-- Gmail import: run server-side in Firebase Functions (more secure, API keys hidden) or client-side (current approach)? Recommend moving to server-side before production.
+**Revised timeline post-E1 completion (2026-07-07):**
+
+- **E2 (Status + Location)**: ~2–3 weeks (in progress on branch)
+- **E5 (Mobile + PWA polish)**: ~1–2 weeks (responsive fixes, touch targets, installable)
+- **Beta launch to 30 waitlisters**: ~6–8 weeks from 2026-06-29 → end of July / early August
+- **Post-MVP**: Sharing (E4), Outfit Builder (E6), Internationalization (E13)
+
+---
+
+## Questions This Brief Does NOT Answer (decide later)
+
+- Free tier limit: raise 30 → 50 for beta?
+- Sharing model: E4 (full borrow-lend) or E4.5 (read-only links first)?
+- Server-side receipt parsing: move Gmail parser to an Edge Function (same security as Firebase Functions)?
+- i18n: when does it become a priority? (post-MVP, backfill task)

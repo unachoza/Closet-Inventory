@@ -6,8 +6,7 @@
 > [STRATEGY_REVIEW_2026-06-20.md](./STRATEGY_REVIEW_2026-06-20.md),
 > [COMPETITIVE_ANALYSIS_2026-06-20.md](../docs/COMPETITIVE_ANALYSIS_2026-06-20.md), and
 > [EngagingWebForProductDetails.md](./EngagingWebForProductDetails.md) all defer to it.
-> Until this is resolved, **priority #2 ("stand up the cloud DB") is ambiguous** — it means
-> either "merge PR #44 (Firestore)" or "pivot to Supabase." Resolve this first.
+
 
 ---
 

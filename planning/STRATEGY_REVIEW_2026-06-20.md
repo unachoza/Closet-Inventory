@@ -10,7 +10,7 @@
 
 ## Snapshot (as of 2026-06-20)
 
-- `main` is **localStorage-only** via `closetRepository`; Supabase chosen as cloud backend (PR #44 closed, Firebase removed).
+- `main` is **localStorage-only** via `closetRepository`; Supabase chosen as cloud backend 
 - 74 test files (1165 passing as of 2026-06-28); design-token system (`tokens.css`) layered over legacy `index.css`.
 - Recently merged: unified search/filter (#69), filter-drawer fixes (#70), design-principles pass (#64), Nordstrom multi-size + inference improvements (#84).
 - **FashionParser refactor (2026-06-28):** the ~8 scattered `infer*` / `normalize*` utils are now a proper domain module at `src/Features/FashionParser/`. 17 attribute maps, 6 normalizers, 6 inference functions, all consumers importing directly, legacy stubs deleted.

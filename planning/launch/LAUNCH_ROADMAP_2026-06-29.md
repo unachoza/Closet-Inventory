@@ -54,14 +54,16 @@
 
 Each item maps to an existing E1-4.x ticket; this is the launch-ordered view.
 
+### ✅ **BLOCK A COMPLETE — ALL MUST-HAVES DONE (2026-07-07)** 
+
 **Must-have before a single real user (hard gate):**
 
 - [x] ✅ `G0.2` RLS second-account isolation proven (tables + Storage) (2026-06-30) — _also Block 0_
 - [x] ✅ **Dev/prod Supabase split** (2026-07-06) — dev project `closet-inventory-dev` (`lfdpvyygqblnckksvufn`) split out from prod (`rawuntspvetfdtrqggen`); `.env.local` points local dev at dev, Vercel/prod stay on prod; verified end-to-end (Google sign-in against dev → `profiles` row on dev dashboard). (`E1-4.12` dev/prod portion)
 - [x] ✅ **Storage validation pushed to prod** (2026-06-30) — server-side size/MIME enforcement live via `20260629000001_storage_validation.sql` (`E1-4.11`)
-- [x] ✅ **Account deletion + data export** — legal right-to-erasure/portability; your privacy policy will _promise_ this, so it must exist. Delete rows AND Storage objects. (`E1-4.8`)
+- [x] ✅ **Account deletion + data export** (2026-07-07) — legal right-to-erasure/portability deployed. Delete rows AND Storage objects. Edge Function live on prod + dev. (`E1-4.8`)
 - [x] ✅ **Secret hygiene** (2026-06-30) — `.env` gitignored ✓, full git history clean (zero leaks via gitleaks) ✓, CI secret scanning live and passing ✓ (`E1-4.3`)
-- [x] ✅ **Base64→Storage migration + legacy wipe** for any existing cloud items; no orphaned base64 left behind (`E1-2.2` / `E1-4.5`)
+- [x] ✅ **Base64→Storage migration + legacy wipe** (2026-07-06) — prod/dev have 0 base64 rows; write-path guard `ensureStoredPhoto` prevents future base64 reaching `primary_photo_url`. (`E1-2.2` / `E1-4.5`)
 
 **Strongly recommended before launch:**
 
@@ -72,20 +74,20 @@ Each item maps to an existing E1-4.x ticket; this is the launch-ordered view.
 
 ---
 
-## 📜 Privacy Policy — to-do (required for Google + for launch)
+## 📜 Privacy Policy — LEGAL-1 (required for Google + for launch) — ⏳ IN PROGRESS (2026-07-07)
+
+**Status:** E1-4.8 (account deletion + export) now live and verified deployed (2026-07-07). Unblocks writing and publishing the policy.
 
 - [ ] **Engage:** write or generate (Termly/iubenda/Vanta-style) a policy hosted at a **public URL** (needed for the OAuth consent screen)
 - [ ] **Data collected:** Google account identity; Gmail message content (read-only, parsed for import only); uploaded photos; wardrobe data
 - [ ] **Why each is collected** — plain-language Gmail-parsing-for-import justification
-- [ ] **Retention:** how long emails/photos are kept; what "delete" means in your system
+- [ ] **Retention:** how long emails/photos are kept; what "delete" means in your system (permanent via cascading Storage + profiles deletion)
 - [ ] **Third parties:** name Supabase as infra processor; state data is **not sold / not used for ads**
-- [ ] **User rights:** account deletion + data export (must match the built `E1-4.8` feature)
+- [ ] **User rights:** account deletion + data export (must match the built `E1-4.8` feature — both now live)
 - [ ] **Google Limited Use disclosure** (required for restricted scopes): Gmail data won't be used for ads, won't be sold/transferred except for security, isn't human-read except w/ consent or for security/legal
 - [ ] **Contact** for privacy requests
 - [ ] **Terms of Service** URL (recommended; sometimes required by Google)
 - [ ] Link both URLs in the Google OAuth consent screen config
-
-> **Dependency:** finalize the policy _after_ `E1-4.8` (deletion/export) is built, so it doesn't promise something that isn't there.
 
 ---
 

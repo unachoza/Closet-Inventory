@@ -24,7 +24,7 @@ Every competitor is an **outfit-styling app**. NTW's uncompeted ground is **ward
 | **Smart Closet** | Small / declining | Limited | $2.99 one-time + $0.99/mo Pro | Hybrid |
 | **Closet+** | Negligible | Limited | $2.99–$5.99 one-time IAP | Dead / abandoned |
 | **Indyx** | Unknown (US, growing) | Unlimited items, packing | $12.99/mo · $74.99/yr | Freemium sub |
-| **NTW (planned)** | — | 30 items, manual, local only | Unlimited + Gmail import + sync | Freemium sub (Stripe) |
+| **NTW (planned)** | — | 80 items, manual, local only | Unlimited + Gmail import + sync | Freemium sub (Stripe) |
 
 ---
 
@@ -54,12 +54,12 @@ Every competitor is an **outfit-styling app**. NTW's uncompeted ground is **ward
 | **Travel weight calculator** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ planned v6.1 |
 | Social — view friends' wardrobes | ✅ | ❌ | ✅ | ❌ | 🟡 | 🟡 | 🔲 v8 |
 | **Borrow / lend between users** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ planned v8 |
-| **Item status (dirty / clean / away)** | ❌ | ❌ | 🟡 repair only | ❌ | ❌ | ❌ | ⭐ planned v1.5 |
-| **Item location (multi-home / storage)** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ planned v1.5 |
-| **Laundry forecasting** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ planned v1.5 |
+| **Item status (dirty / clean / away)** | ❌ | ❌ | 🟡 repair only | ❌ | ❌ | ❌ | ⭐ in progress |
+| **Item location (multi-home / storage)** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ in progress |
+| **Laundry forecasting** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ planned v5 |
 | Resale listing | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Color analysis | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Cloud sync / multi-device | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | 🔲 PR #44 |
+| Cloud sync / multi-device | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅  |
 | PWA / no App Store gate | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ⭐ planned |
 | Android | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | 🔲 via PWA |
 
