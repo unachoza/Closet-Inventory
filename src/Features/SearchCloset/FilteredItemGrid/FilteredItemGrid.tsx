@@ -1,7 +1,7 @@
-import { ClothingItem } from "../../utils/types";
-import { BorderMode } from "../../utils/borderMode";
-import FilteredCard from "./FilteredCard";
-import "./EntireCloset.css";
+import { ClothingItem } from "../../../utils/types";
+import { BorderMode } from "../../../utils/borderMode";
+import FilteredCard from "../FilteredCard/FilteredCard";
+import "../EntireCloset.css";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { LayoutGrid, Grid3x3 } from "lucide-react";
 

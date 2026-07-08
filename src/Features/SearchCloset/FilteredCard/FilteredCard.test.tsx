@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import FilteredCard from "./FilteredCard";
-import type { ClothingItem } from "../../utils/types";
+import type { ClothingItem } from "../../../utils/types";
 
 // Isolate the wrapper's border/dot logic from the heavy 3D flip card.
 vi.mock("../../Components/ClothesCard/Card/Card", () => ({

@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { FilterDimension, FilterOptions, FilterState } from "../../hooks/useClosetFilters";
-import { SortKey } from "../../hooks/useClosetSort";
-import { BorderMode } from "../../utils/borderMode";
-import SearchSortBar from "./SearchSortBar";
-import FilterPillsRow from "./FilterPillsRow";
-import FilterSidePanel from "./FilterSidePanel";
-import "./EntireCloset.css";
+import { FilterDimension, FilterOptions, FilterState } from "../../../hooks/useClosetFilters";
+import { SortKey } from "../../../hooks/useClosetSort";
+import { BorderMode } from "../../../utils/borderMode";
+import SearchSortBar from "../SearchSortBar/SearchSortBar";
+import { BorderLegend } from "../BorderLegend/BorderLegend";
+import FilterPillsRow from "../FilterPillsRow/FilterPillsRow";
+import FilterSidePanel from "../FilterSidePanel/FilterSidePanel";
+import "../EntireCloset.css";
 
 interface StickyTopBarProps {
 	sortKey: SortKey;
@@ -43,6 +44,8 @@ const StickyTopBar = ({
 				borderMode={borderMode}
 				onCycleBorderMode={onCycleBorderMode}
 			/>
+			{/* P1-10: legend shows mapping of border colors/styles + status dots (P1-10.1) */}
+			<BorderLegend borderMode={borderMode} />
 			<FilterPillsRow
 				filters={filters}
 				activeFilterCount={activeFilterCount}

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import FilterAccordion from "./FilterAccordion";
-import type { FilterOption } from "../../hooks/useClosetFilters";
+import type { FilterOption } from "../../../hooks/useClosetFilters";
 
 const options: FilterOption[] = [
 	{ value: "tops", count: 5 },

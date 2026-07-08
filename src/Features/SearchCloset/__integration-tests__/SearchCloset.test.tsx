@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import EntireClosetView from "../EntireClosetView";
+import EntireClosetView from "../EntireClosetView/EntireClosetView";
 import NavBar from "../../../Components/NavBar/NavBar";
 import { SearchProvider } from "../../../context/SearchContext";
 import { ViewProvider } from "../../../context/ViewContext";

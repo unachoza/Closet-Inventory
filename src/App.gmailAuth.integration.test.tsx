@@ -61,7 +61,7 @@ vi.mock("./Features/Closet/Closet", () => ({ default: () => <div data-testid="vi
 vi.mock("./Features/Form/Form", () => ({ default: () => <div data-testid="view-form">Form</div> }));
 vi.mock("./Features/FabricCare/InteractiveGuide", () => ({ default: () => <div data-testid="view-fabric">Fabric Guide</div> }));
 vi.mock("./Components/GuideComponents/FiberJourney/JourneyC", () => ({ default: () => <div data-testid="view-journey">Journey</div> }));
-vi.mock("./Features/SearchCloset/EntireClosetView", () => ({ default: () => <div data-testid="view-entire-closet">Entire Closet</div> }));
+vi.mock("./Features/SearchCloset/EntireClosetView/EntireClosetView", () => ({ default: () => <div data-testid="view-entire-closet">Entire Closet</div> }));
 vi.mock("./Features/Form/EditItemView/EditItemView", () => ({ default: () => <div data-testid="view-edit">Edit Item</div> }));
 
 import App from "./App";

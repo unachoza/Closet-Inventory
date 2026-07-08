@@ -46,7 +46,7 @@ vi.mock("./Features/FabricCare/InteractiveGuide", () => ({
 vi.mock("./Components/GuideComponents/FiberJourney/JourneyC", () => ({
 	default: () => <div data-testid="view-journey">Fiber Journey</div>,
 }));
-vi.mock("./Features/SearchCloset/EntireClosetView", () => ({
+vi.mock("./Features/SearchCloset/EntireClosetView/EntireClosetView", () => ({
 	default: () => <div data-testid="view-entire-closet">Entire Closet</div>,
 }));
 vi.mock("./Features/Form/EditItemView/EditItemView", () => ({

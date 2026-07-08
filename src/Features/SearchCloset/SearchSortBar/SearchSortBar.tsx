@@ -1,8 +1,8 @@
 import { SlidersHorizontal, Search, X, MapPin } from "lucide-react";
-import { SortKey, SORT_LABELS } from "../../hooks/useClosetSort";
-import { useSearch } from "../../context/SearchContext";
-import { BorderMode, BORDER_MODE_LABELS } from "../../utils/borderMode";
-import "./EntireCloset.css";
+import { SortKey, SORT_LABELS } from "../../../hooks/useClosetSort";
+import { useSearch } from "../../../context/SearchContext";
+import { BorderMode, BORDER_MODE_LABELS } from "../../../utils/borderMode";
+import "../EntireCloset.css";
 
 interface SearchSortBarProps {
 	sortKey: SortKey;

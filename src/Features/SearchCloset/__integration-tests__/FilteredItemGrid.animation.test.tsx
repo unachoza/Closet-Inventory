@@ -25,7 +25,7 @@
 import { render } from "@testing-library/react";
 import { describe, it, expect } from "vitest";
 import { createElement, type ReactNode } from "react";
-import FilteredItemGrid from "../FilteredItemGrid";
+import FilteredItemGrid from "../FilteredItemGrid/FilteredItemGrid";
 import type { ClothingItem } from "../../../utils/types";
 
 // Lightweight framer-motion mock: render motion.* as the plain tag and surface

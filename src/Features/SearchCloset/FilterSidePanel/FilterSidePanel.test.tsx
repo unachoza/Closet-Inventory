@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import FilterSidePanel from "./FilterSidePanel";
-import type { FilterState, FilterOptions } from "../../hooks/useClosetFilters";
+import type { FilterState, FilterOptions } from "../../../hooks/useClosetFilters";
 
 const emptyFilters: FilterState = {
 	category: [],
@@ -34,7 +34,7 @@ const baseProps = {
 // Regression: filter panel has reverted to left-side entry multiple times via
 // merge conflicts. Assert the CSS properties that control slide direction.
 describe("FilterSidePanel CSS — slide direction regression", () => {
-	const css = readFileSync(resolve(__dirname, "EntireCloset.css"), "utf8");
+	const css = readFileSync(resolve(__dirname, "../EntireCloset.css"), "utf8");
 
 	// Extract just the .filter-side-panel block (stops before the next rule)
 	const panelBlock = css.match(/\.filter-side-panel\s*\{([^}]*)\}/)?.[1] ?? "";
