@@ -4,6 +4,7 @@ import type { ClothingItem, MaterialBlend } from "../utils/types";
 import type { ClosetRepository, ImportMode } from "./closetRepository";
 import type { Json, Tables, TablesInsert, TablesUpdate } from "../lib/database.types";
 import { ensureStoredPhoto } from "./base64PhotoGuard";
+import { ensureUserLocations, type LocationIdMap } from "./locationSync";
 
 type ItemRow = Tables<"items"> & {
 	item_materials: Array<{ fiber: string; percentage: number | null }>;
@@ -11,7 +12,7 @@ type ItemRow = Tables<"items"> & {
 
 // ── Mapping helpers ───────────────────────────────────────────────────────────
 
-function rowToItem(row: ItemRow): ClothingItem {
+function rowToItem(row: ItemRow, locations: LocationIdMap): ClothingItem {
 	return {
 		id: row.id,
 		name: row.name,
@@ -34,7 +35,8 @@ function rowToItem(row: ItemRow): ClothingItem {
 		material: (row.item_materials ?? []).map(
 			(m): MaterialBlend => ({ material: m.fiber, percentage: m.percentage ?? 0 }),
 		),
-		locationId: row.location_id ?? undefined,
+		// E2-sync.1: row uuid → registry id so `getLocation()` resolves it client-side.
+		locationId: locations.toRegistryId(row.location_id),
 		status: (row.status as ClothingItem["status"]) ?? undefined,
 		itemFit: (row.item_fit as ClothingItem["itemFit"]) ?? undefined,
 		measurements: (row.measurements as ClothingItem["measurements"]) ?? undefined,
@@ -55,11 +57,13 @@ function notesToDb(notes: ClothingItem["notes"]): string[] {
 	return notes ?? [];
 }
 
-function itemToInsertRow(item: ClothingItem, closetId: string): TablesInsert<"items"> {
+function itemToInsertRow(item: ClothingItem, closetId: string, locations: LocationIdMap): TablesInsert<"items"> {
 	return {
 		id: item.id,
 		closet_id: closetId,
-		location_id: item.locationId ?? null,
+		// E2-sync.1: registry id ('suitcase') → row uuid. The raw registry string
+		// in this uuid FK column rejects the ENTIRE upsert at Postgres.
+		location_id: locations.toUuid(item.locationId),
 		name: item.name,
 		category: item.category,
 		brand: item.brand || null,
@@ -92,9 +96,9 @@ function itemToInsertRow(item: ClothingItem, closetId: string): TablesInsert<"it
 	};
 }
 
-function patchToUpdateRow(patch: Partial<ClothingItem>): TablesUpdate<"items"> {
+function patchToUpdateRow(patch: Partial<ClothingItem>, locations: LocationIdMap): TablesUpdate<"items"> {
 	const row: TablesUpdate<"items"> = {};
-	if (patch.locationId !== undefined) row.location_id = patch.locationId ?? null;
+	if (patch.locationId !== undefined) row.location_id = locations.toUuid(patch.locationId);
 	if (patch.name !== undefined) row.name = patch.name;
 	if (patch.category !== undefined) row.category = patch.category;
 	if (patch.brand !== undefined) row.brand = patch.brand || null;
@@ -155,9 +159,21 @@ async function upsertMaterials(itemId: string, material: ClothingItem["material"
 export class SupabaseClosetRepository implements ClosetRepository {
 	private readonly userId: string;
 	private closetIdCache: string | null = null;
+	private locationsCache: LocationIdMap | null = null;
 
 	constructor(userId: string) {
 		this.userId = userId;
+	}
+
+	/**
+	 * E2-sync.1: registry-id ↔ uuid map for `items.location_id`. Seeds the
+	 * user's starter locations on first use; cached per repository instance
+	 * (one per signed-in session — same lifecycle as closetIdCache).
+	 */
+	private async resolveLocations(): Promise<LocationIdMap> {
+		if (this.locationsCache) return this.locationsCache;
+		this.locationsCache = await ensureUserLocations(this.userId);
+		return this.locationsCache;
 	}
 
 	/**
@@ -196,6 +212,7 @@ export class SupabaseClosetRepository implements ClosetRepository {
 	async getAll(): Promise<ClothingItem[]> {
 		const supabase = getSupabase();
 		const closetId = await this.resolveClosetId();
+		const locations = await this.resolveLocations();
 
 		const { data, error } = await supabase
 			.from("items")
@@ -204,11 +221,12 @@ export class SupabaseClosetRepository implements ClosetRepository {
 			.order("created_at");
 
 		if (error) throw new Error(`getAll failed: ${error.message}`);
-		return ((data ?? []) as ItemRow[]).map(rowToItem);
+		return ((data ?? []) as ItemRow[]).map((row) => rowToItem(row, locations));
 	}
 
 	async getById(id: string): Promise<ClothingItem | null> {
 		const supabase = getSupabase();
+		const locations = await this.resolveLocations();
 
 		const { data, error } = await supabase
 			.from("items")
@@ -217,17 +235,18 @@ export class SupabaseClosetRepository implements ClosetRepository {
 			.single();
 
 		if (error) return null;
-		return rowToItem(data as ItemRow);
+		return rowToItem(data as ItemRow, locations);
 	}
 
 	async add(item: ClothingItem): Promise<ClothingItem> {
 		const supabase = getSupabase();
 		const closetId = await this.resolveClosetId();
+		const locations = await this.resolveLocations();
 
 		// E1-2.2: convert any base64 photo to a Storage path before it hits the DB.
 		const guarded = { ...item, imageURL: await ensureStoredPhoto(item.imageURL, this.userId) };
 
-		const { error } = await supabase.from("items").upsert(itemToInsertRow(guarded, closetId));
+		const { error } = await supabase.from("items").upsert(itemToInsertRow(guarded, closetId, locations));
 		if (error) throw new Error(`add failed: ${error.message}`);
 
 		await upsertMaterials(guarded.id, guarded.material);
@@ -236,12 +255,13 @@ export class SupabaseClosetRepository implements ClosetRepository {
 
 	async update(id: string, patch: Partial<ClothingItem>): Promise<ClothingItem | null> {
 		const supabase = getSupabase();
+		const locations = await this.resolveLocations();
 		// E1-2.2: a freshly-attached base64 photo in the patch → Storage path first.
 		const guardedPatch =
 			patch.imageURL !== undefined
 				? { ...patch, imageURL: await ensureStoredPhoto(patch.imageURL, this.userId) }
 				: patch;
-		const updateRow = patchToUpdateRow(guardedPatch);
+		const updateRow = patchToUpdateRow(guardedPatch, locations);
 
 		const { data, error } = await supabase
 			.from("items")
@@ -255,7 +275,7 @@ export class SupabaseClosetRepository implements ClosetRepository {
 		if (patch.material !== undefined) {
 			await upsertMaterials(id, patch.material);
 		}
-		return rowToItem(data as ItemRow);
+		return rowToItem(data as ItemRow, locations);
 	}
 
 	async remove(id: string): Promise<void> {
@@ -269,12 +289,14 @@ export class SupabaseClosetRepository implements ClosetRepository {
 
 		if (items.length === 0) return [];
 
+		const locations = await this.resolveLocations();
+
 		// E1-2.2: convert base64 photos to Storage paths before the bulk upsert.
 		const guarded = await Promise.all(
 			items.map(async (item) => ({ ...item, imageURL: await ensureStoredPhoto(item.imageURL, this.userId) })),
 		);
 
-		const rows = guarded.map((item) => itemToInsertRow(item, closetId));
+		const rows = guarded.map((item) => itemToInsertRow(item, closetId, locations));
 		const { error } = await supabase.from("items").upsert(rows);
 		if (error) throw new Error(`importItems failed: ${error.message}`);
 

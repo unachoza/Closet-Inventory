@@ -23,6 +23,14 @@ vi.mock("../../lib/supabaseClient", () => ({
 	}),
 }));
 
+// Location resolver isn't under test here — covered by locationSync.test.ts.
+vi.mock("../locationSync", () => ({
+	ensureUserLocations: vi.fn().mockResolvedValue({
+		toUuid: () => null,
+		toRegistryId: () => undefined,
+	}),
+}));
+
 import { SupabaseClosetRepository } from "../supabaseClosetRepository";
 
 const item = (): ClothingItem => ({ id: "i1", imageURL: "", name: "Tee", category: "tops", color: "black", size: "M", brand: "X", material: [{ material: "cotton", percentage: 100 }], occasion: "casual", age: "new", care: "wash" }) as ClothingItem;
