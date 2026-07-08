@@ -21,7 +21,7 @@ const { removeItemSpy } = vi.hoisted(() => ({ removeItemSpy: vi.fn() }));
 // Each card exposes a Remove button so we can verify onRemoveItem is threaded
 // all the way down (regression: RemoveButtonWhileOverview — remove in the
 // search/entire-closet view was a no-op because onRemoveItem was never passed).
-vi.mock("../FilteredItemGrid", () => ({
+vi.mock("../FilteredItemGrid/FilteredItemGrid", () => ({
 	default: ({ items, onRemoveItem }: { items: ClothingItem[]; onRemoveItem?: (id: string) => void }) => (
 		<div data-testid="item-grid">
 			{items.map((item) => (

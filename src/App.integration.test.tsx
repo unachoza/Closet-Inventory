@@ -33,7 +33,7 @@ vi.mock("./Components/ClothesCard/Card/Card", () => ({
 		<div data-testid="clothes-card">{item.name || item.category}</div>
 	),
 }));
-vi.mock("./Features/SearchCloset/FilteredItemGrid", () => ({
+vi.mock("./Features/SearchCloset/FilteredItemGrid/FilteredItemGrid", () => ({
 	default: ({ items }: { items: ClothingItem[] }) => (
 		<div data-testid="item-grid">
 			{items.map((item) => (

@@ -24,9 +24,8 @@ describe("BorderLegend", () => {
 
 	it("renders when borderMode is 'location_status'", () => {
 		render(<BorderLegend borderMode="location_status" />);
-		expect(screen.getByText("Location & Status")).toBeInTheDocument();
-		expect(screen.getByText(/Location \(borders\)/)).toBeInTheDocument();
-		expect(screen.getByText(/Status \(dots\)/)).toBeInTheDocument();
+		expect(screen.getByText("Location :")).toBeInTheDocument();
+		expect(screen.getByText("Status:")).toBeInTheDocument();
 	});
 
 	it("does not render when borderMode is 'off'", () => {
@@ -39,13 +38,13 @@ describe("BorderLegend", () => {
 		expect(screen.getByText(/Home/)).toBeInTheDocument();
 		expect(screen.getByText(/Storage/)).toBeInTheDocument();
 		// No status section
-		expect(screen.queryByText(/Status \(dots\)/)).not.toBeInTheDocument();
+		expect(screen.queryByText("Status:")).not.toBeInTheDocument();
 	});
 
 	it("'Location + Status' mode lists both location kinds and status values", () => {
 		render(<BorderLegend borderMode="location_status" />);
-		expect(screen.getByText(/Location \(borders\)/)).toBeInTheDocument();
-		expect(screen.getByText(/Status \(dots\)/)).toBeInTheDocument();
+		expect(screen.getByText("Location :")).toBeInTheDocument();
+		expect(screen.getByText("Status:")).toBeInTheDocument();
 		expect(screen.getByText(/Clean/)).toBeInTheDocument();
 		expect(screen.getByText(/Dirty/)).toBeInTheDocument();
 	});
