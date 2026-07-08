@@ -1,13 +1,13 @@
 import { useMemo, useState, useCallback } from "react";
-import { ClothingItem } from "../../utils/types";
-import { useCloset } from "../../context/ClosetContext";
-import { useClosetFilters } from "../../hooks/useClosetFilters";
-import { useClosetSort } from "../../hooks/useClosetSort";
-import { useSearch } from "../../context/SearchContext";
-import StickyTopBar from "./StickyTopBar";
-import FilteredItemGrid from "./FilteredItemGrid";
-import { BorderMode, nextBorderMode } from "../../utils/borderMode";
-import "./EntireCloset.css";
+import { ClothingItem } from "../../../utils/types";
+import { useCloset } from "../../../context/ClosetContext";
+import { useClosetFilters } from "../../../hooks/useClosetFilters";
+import { useClosetSort } from "../../../hooks/useClosetSort";
+import { useSearch } from "../../../context/SearchContext";
+import StickyTopBar from "../StickyTopBar/StickyTopBar";
+import FilteredItemGrid from "../FilteredItemGrid/FilteredItemGrid";
+import { BorderMode, nextBorderMode } from "../../../utils/borderMode";
+import "../EntireCloset.css";
 
 interface EntireClosetViewProps {
 	onEditItem?: (item: ClothingItem) => void;

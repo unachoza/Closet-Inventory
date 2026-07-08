@@ -9,7 +9,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import FilterSidePanel from "./FilterSidePanel";
-import type { FilterState, FilterOptions } from "../../hooks/useClosetFilters";
+import type { FilterState, FilterOptions } from "../../../hooks/useClosetFilters";
 
 const emptyFilters: FilterState = {
 	category: [],

@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
-import { FilterDimension, FilterState } from "../../hooks/useClosetFilters";
-import "./EntireCloset.css";
+import { FilterDimension, FilterState } from "../../../hooks/useClosetFilters";
+import "../EntireCloset.css";
 
 interface FilterPillsRowProps {
 	filters: FilterState;

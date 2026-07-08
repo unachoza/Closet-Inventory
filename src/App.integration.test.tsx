@@ -17,7 +17,7 @@ import { ClosetProvider } from "./context/ClosetContext";
 import { ToastProvider } from "./Components/Toast/Toast";
 import MultiStepForm from "./Features/Form/Form";
 import Closet from "./Features/Closet/Closet";
-import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
+import EntireClosetView from "./Features/SearchCloset/EntireClosetView/EntireClosetView";
 import type { ClothingItem, ViewType } from "./utils/types";
 import { useState } from "react";
 

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import { FilterDimension, FilterOptions, FilterState } from "../../hooks/useClosetFilters";
-import FilterAccordion from "./FilterAccordion";
-import "./EntireCloset.css";
+import { FilterDimension, FilterOptions, FilterState } from "../../../hooks/useClosetFilters";
+import FilterAccordion from "../FilterAccordion/FilterAccordion";
+import "../EntireCloset.css";
 
 interface FilterSidePanelProps {
 	open: boolean;

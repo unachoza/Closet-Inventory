@@ -1,4 +1,4 @@
-import "./EntireCloset.css";
+import "../EntireCloset.css";
 
 interface FilterMatchPillsProps {
 	matchKeys: string[];

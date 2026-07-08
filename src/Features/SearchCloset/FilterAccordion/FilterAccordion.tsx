@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { FilterOption } from "../../hooks/useClosetFilters";
-import "./EntireCloset.css";
+import { FilterOption } from "../../../hooks/useClosetFilters";
+import "../EntireCloset.css";
 
 interface FilterAccordionProps {
 	label: string;

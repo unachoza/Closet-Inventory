@@ -2,9 +2,9 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ReactNode } from "react";
 import { describe, it, expect, vi } from "vitest";
 import SearchSortBar from "./SearchSortBar";
-import { SORT_LABELS } from "../../hooks/useClosetSort";
-import { SearchProvider, useSearch } from "../../context/SearchContext";
-import type { BorderMode } from "../../utils/borderMode";
+import { SORT_LABELS } from "../../../hooks/useClosetSort";
+import { SearchProvider, useSearch } from "../../../context/SearchContext";
+import type { BorderMode } from "../../../utils/borderMode";
 
 const baseProps = {
 	sortKey: "dateAdded" as const,

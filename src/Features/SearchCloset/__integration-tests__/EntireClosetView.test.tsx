@@ -10,7 +10,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { SearchProvider } from "../../../context/SearchContext";
 import { ViewProvider } from "../../../context/ViewContext";
-import EntireClosetView from "../EntireClosetView";
+import EntireClosetView from "../EntireClosetView/EntireClosetView";
 import type { ClothingItem } from "../../../utils/types";
 
 // Module-level spy so the closet mock and the assertions share one reference.

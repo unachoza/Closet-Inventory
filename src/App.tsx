@@ -14,7 +14,7 @@ import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
-import EntireClosetView from "./Features/SearchCloset/EntireClosetView";
+import EntireClosetView from "./Features/SearchCloset/EntireClosetView/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";

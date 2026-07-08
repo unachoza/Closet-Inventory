@@ -1,9 +1,9 @@
-import { ClothingItem } from "../../utils/types";
-import { BorderMode } from "../../utils/borderMode";
-import { getLocation } from "../../utils/locations";
-import ClothingCard from "../../Components/ClothesCard/Card/Card";
-import FilterMatchPills from "./FilterMatchPills";
-import "./EntireCloset.css";
+import { ClothingItem } from "../../../utils/types";
+import { BorderMode } from "../../../utils/borderMode";
+import { getLocation } from "../../../utils/locations";
+import ClothingCard from "../../../Components/ClothesCard/Card/Card";
+import FilterMatchPills from "../FilterMatchPills/FilterMatchPills";
+import "../EntireCloset.css";
 
 interface FilteredCardProps {
 	item: ClothingItem;

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import FilterPillsRow from "./FilterPillsRow";
-import type { FilterState } from "../../hooks/useClosetFilters";
+import type { FilterState } from "../../../hooks/useClosetFilters";
 
 const emptyFilters: FilterState = {
 	category: [],
