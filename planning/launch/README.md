@@ -12,8 +12,8 @@
 ## What you're building
 
 Not another outfit-planner. **An inventory & logistics system for your closet** — what you own, what
-state it's in, where it physically is, and who has it. The name asks the real question: *do I actually
-have nothing to wear, or is it dirty, in storage, or at Sarah's apartment?* That's a genuinely different
+state it's in, where it physically is, and who has it. The name asks the real question: _do I actually
+have nothing to wear, or is it dirty, in storage, or at Sarah's apartment?_ That's a genuinely different
 product from "here's an outfit," and it's the wedge nobody else in this space has built. (Consistent
 with [PRODUCT_VISION_2026-06-20.md](../PRODUCT_VISION_2026-06-20.md) — this doc doesn't redefine the
 vision, it scopes the next 6–8 weeks of it.)
@@ -37,7 +37,7 @@ That's not flattery, that's the actual state of the repo.
 The thing you should sit with: **the feature you're proudest of — status & location — is the least
 finished thing in the codebase.** The types and DB columns exist; the UI is close to 0% built (no
 status chip, no location tag, no lend modal, no filters for either). That's not a criticism of the
-plan, it's a correction to the *feeling* that this is "mostly done, just needs hooking up." It's the
+plan, it's a correction to the _feeling_ that this is "mostly done, just needs hooking up." It's the
 largest single block of remaining work, sized at 6–9 dev-days in the roadmap.
 
 The second thing has been resolved: **all three Block 0 assumptions are now verified** (2026-06-30).
@@ -52,28 +52,28 @@ You explicitly invoked the Tea App breach in your own planning docs, which is th
 most solo builders don't think about this until something leaks. The seriousness shows up as **hard
 gates, not a checkbox you tick and move on from**:
 
-- RLS isolation must be *proven* against a second account before anyone else's data goes near it (Block 0)
+- RLS isolation must be _proven_ against a second account before anyone else's data goes near it (Block 0)
 - Dev and prod are currently the **same Supabase project** — that gets split before real users land
-- Account deletion + data export get built *before* the privacy policy promises them, not after
+- Account deletion + data export get built _before_ the privacy policy promises them, not after
 - The Storage upload-validation migration is written but not pushed — it doesn't count as "done" until it's live
 - Every one of the Tea App's specific failures (open buckets, no RLS, no deletion, hardcoded secrets, no audits) has a corresponding checklist item in the roadmap, not a vague "we'll be careful"
 
 If I'd written you a section saying "security is locked down," that would be the false-confidence
 version of exactly the mistake the Tea App made. The true version is: you know precisely what's unproven,
-you've gated launch on proving it, and you're not shipping past those gates. That *is* taking it
+you've gated launch on proving it, and you're not shipping past those gates. That _is_ taking it
 seriously — more so than a green checkmark would be.
 
 ---
 
 ## MVP — what actually ships at launch
 
-| Feature | Your words | Build status |
-|---|---|---|
-| **Manual closet upload** | upload your closet manually | ✅ Built — 9-step guided form, image upload (Storage + base64 fallback) |
-| **Gmail auto-import** | scrape auto-import from Gmail | ✅ Live end-to-end verified (2026-06-30) — Google OAuth sign-in, email import, parsing confirmed (G0.1) |
-| **Status** | know the status — dirty, needs repair, too small | 🔴 Modeled (type+DB), **UI ~0% built** — Block B |
-| **Location** | know the location — storage, lent out, dry cleaner, summer house | 🔴 Modeled (type+DB), **UI ~0% built** — Block B |
-| **PWA / mobile** | needs to look better on mobile, browser rendering too buggy | 🔴 0% built — no manifest/service worker yet; full installable PWA chosen — Block C |
+| Feature                  | Your words                                                       | Build status                                                                                            |
+| ------------------------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Manual closet upload** | upload your closet manually                                      | ✅ Built — 9-step guided form, image upload (Storage + base64 fallback)                                 |
+| **Gmail auto-import**    | scrape auto-import from Gmail                                    | ✅ Live end-to-end verified (2026-06-30) — Google OAuth sign-in, email import, parsing confirmed (G0.1) |
+| **Status**               | know the status — dirty, needs repair, too small                 | 🟡 Modeled (type+DB), **UI ~15% built** — Block B                                                       |
+| **Location**             | know the location — storage, lent out, dry cleaner, summer house | 🟡 Modeled (type+DB), **UI ~15% built** — Block B                                                       |
+| **PWA / mobile**         | needs to look better on mobile, browser rendering too buggy      | 🔴 0% built — no manifest/service worker yet; full installable PWA chosen — Block C                     |
 
 Plus, implicitly required to ship any of the above to real users responsibly:
 **simple lend tracking** (free-text "lent to Sarah, due back," part of Status/Location, not the social
@@ -81,9 +81,10 @@ loop) and **the security/privacy gate** above (Block A) — not in your bullet l
 doesn't work without them.
 
 **Explicitly NOT in MVP** (your stated next priorities, in order — tracked, not forgotten):
+
 1. **Lending / Request-to-Borrow** as a social feature (E4) — accounts, invites, approve/return, trust model
 2. **Hotmail/Outlook import** (E1-5.x) — separate identity provider, separate verification gate
-3. *(implied third)* Yahoo import (E1-6.x) — separate protocol shape (IMAP, not REST), separate review
+3. _(implied third)_ Yahoo import (E1-6.x) — separate protocol shape (IMAP, not REST), separate review
 
 ## Timeline
 
