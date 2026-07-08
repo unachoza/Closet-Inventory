@@ -2,7 +2,7 @@
 
 .border-legend {
 	position: relative;
-	margin-top: var(--spacing-100, 0.5rem);
+	margin: var(--spacing-100, 0.5rem) 0;
 	padding: var(--spacing-150, 0.75rem) var(--spacing-200, 1rem);
 	background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.03));
 	border: 1px solid var(--border-hairline);
@@ -43,7 +43,6 @@
 	padding: 0;
 	list-style: none;
 	display: flex;
-	flex-direction: column;
 	gap: var(--spacing-75, 0.4rem);
 }
 
@@ -67,7 +66,7 @@
 .border-legend__swatch--home {
 	border-color: var(--bg-surface-secondary);
 	border-style: solid;
-	background: transparent;
+	background:white
 }
 
 .border-legend__swatch--storage {
