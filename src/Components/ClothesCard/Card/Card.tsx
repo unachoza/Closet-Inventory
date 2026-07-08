@@ -1,7 +1,9 @@
 import "./Card.css";
 import { ClothingItem } from "../../../utils/types";
 import { CardDetails } from "../CardDetails/CardDetails";
+import { CardQuickActions } from "../CardQuickActions/CardQuickActions";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
+import { useLongPress } from "../../../hooks/useLongPress";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 interface CardProps {
@@ -58,6 +60,8 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	const [expanded, setExpanded] = useState(false);
 	const [geometry, setGeometry] = useState<Geometry | null>(null);
 	const [closing, setClosing] = useState(false);
+	// P1-4: long-press on the front opens the quick-action menu (no flip).
+	const [quickActionsOpen, setQuickActionsOpen] = useState(false);
 
 	const cardRef = useRef<HTMLDivElement>(null);
 
@@ -116,6 +120,8 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 	);
 
 	const handleCardClick = () => {
+		// A long-press opens the quick menu instead of flipping; ignore the click.
+		if (quickActionsOpen) return;
 		// Flipped (but not yet expanded): clicking the card flips it back to front.
 		// CardDetails stops propagation, so clicks on its content/buttons are safe.
 		if (flipped) {
@@ -124,6 +130,14 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 		}
 		setFlipped(true);
 	};
+
+	// P1-4: press-and-hold the front to open quick actions (only while on the front).
+	const longPress = useLongPress({
+		onLongPress: () => {
+			if (!flipped) setQuickActionsOpen(true);
+		},
+		onClick: handleCardClick,
+	});
 
 	const detailHandlers = {
 		onEdit: () => {
@@ -139,7 +153,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 
 	return (
 		<>
-			<div ref={cardRef} data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} onClick={handleCardClick}>
+			<div ref={cardRef} data-testid="clothes-card" className={`card ${flipped ? "flipped" : ""}`} {...longPress}>
 				<div className="card-inner">
 					{/* Front */}
 					<div className="card-front">
@@ -154,6 +168,11 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 						<CardDetails item={item} variant="compact" onExpand={growIntoModal} {...detailHandlers} />
 					</div>
 				</div>
+
+				{/* P1-4: long-press quick actions, overlaid on the front (no flip). */}
+				{quickActionsOpen && !flipped && (
+					<CardQuickActions item={item} onClose={() => setQuickActionsOpen(false)} />
+				)}
 			</div>
 
 			{/* The flipped card grows into a centered details modal */}

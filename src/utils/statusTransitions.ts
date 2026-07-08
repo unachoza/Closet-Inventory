@@ -90,6 +90,12 @@ export function getNextStatus(status: ItemStatus | undefined, action: StatusActi
 	return t ? t.to : null;
 }
 
+/** Human label for an action (e.g. "Send to cleaner"). */
+export function actionLabel(action: StatusAction): string {
+	const t = STATUS_TRANSITIONS.find((x) => x.action === action);
+	return t ? t.label : action;
+}
+
 /** The actions legal from a given status — drives the quick-action menu (P1-4). */
 export function availableActions(status?: ItemStatus): StatusAction[] {
 	const current = resolveStatus(status);

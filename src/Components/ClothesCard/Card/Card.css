@@ -9,6 +9,11 @@
       cursor: pointer;
       transition: transform 0.2s ease;
       perspective: 1000px;
+      position: relative; /* anchor for the P1-4 quick-action overlay */
+      /* Stop iOS's long-press callout / text selection from fighting the hold. */
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
 }
 
 .card:hover {

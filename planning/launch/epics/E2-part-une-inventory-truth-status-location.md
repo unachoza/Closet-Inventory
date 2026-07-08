@@ -85,12 +85,12 @@ Filtered from the persona docs to the two primitives (lending/availability logic
 - [x] `P1-3c` Overview border-mode toggle (Off / Location / Location+Status) + seed data — _new_
 
 **Next (still status/location scope):**
-- [ ] `P1-4` Card quick-action menu to set status/location without the full form (desktop ⋯ + mobile long-press) — _~1–1.5d_
+- [x] `P1-4` Card quick-action menu to set status/location without the full form (desktop ⋯ + mobile long-press) — _~1–1.5d_
 - [ ] `P1-5` "Where is everything" grouped-by-location view (counts per group) — _~1.5d_
 - [ ] `P1-6` Custom / multi-home locations: user-defined labels beyond the 4 starter kinds (Sloane's 4 homes) — _~1.5d_
 - [ ] `P1-7` Per-persona / per-user location presets (seed a starter set from onboarding) — _~0.5d_
 - [ ] `P1-8` Status + Location **filter dimensions** in `useClosetFilters` + hardcoded `DIMENSIONS` array — _~1d_ ⚠️ hardcoded-list gotcha
-- [ ] `P1-9` Status transition helper (`utils/statusTransitions.ts`) so quick-actions are consistent — _~1d_
+- [x] `P1-9` Status transition helper (`utils/statusTransitions.ts`) so quick-actions are consistent — _~1d_
 - [ ] `P1-10` **Border/status legend** on the overview when the toggle is active, with a non-color cue (a11y) — _~0.5d_
 - [ ] `P1-11` **Status model v2** — re-add `stored` + `airing` states and an optional structured `statusReason` (dirty: airing/stain/musty/seasonal · in_repair: hardware/fabric/fit) — _~1d_ (model + edit-form + filter)
 
