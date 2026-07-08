@@ -72,6 +72,12 @@ const mockCloset: ClothingItem[] = [
 vi.mock("../../../Components/CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
 vi.mock("../../../Components/NavBar/AccountDataModal/AccountDataModal", () => ({ default: () => null }));
 
+vi.mock("../../../context/LocationsContext", () => ({
+	useLocations: () => ({
+		getLocation: (id?: string) => ({ id: id ?? "home", label: id ? id : "Home", kind: "home", isPrimary: !id }),
+	}),
+}));
+
 vi.mock("../../../context/ClosetContext", () => ({
 	useCloset: () => ({
 		closet: mockCloset,

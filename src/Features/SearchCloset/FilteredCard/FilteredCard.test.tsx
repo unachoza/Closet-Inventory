@@ -8,6 +8,20 @@ vi.mock("../../Components/ClothesCard/Card/Card", () => ({
 	default: () => <div data-testid="clothing-card" />,
 }));
 
+vi.mock("../../../context/LocationsContext", () => ({
+	useLocations: () => ({
+		getLocation: (id?: string) => {
+			const registry: Record<string, { id: string; label: string; kind: string; isPrimary?: boolean }> = {
+				home: { id: "home", label: "Home", kind: "home", isPrimary: true },
+				storage: { id: "storage", label: "Storage", kind: "storage" },
+				suitcase: { id: "suitcase", label: "Suitcase", kind: "suitcase" },
+				other: { id: "other", label: "Other", kind: "other" },
+			};
+			return registry[id ?? "home"] ?? registry.home;
+		},
+	}),
+}));
+
 const baseItem: ClothingItem = {
 	id: "x1",
 	imageURL: "",

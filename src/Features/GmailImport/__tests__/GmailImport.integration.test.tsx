@@ -83,6 +83,17 @@ vi.mock("../../../context/ClosetContext", () => ({
 	}),
 }));
 
+vi.mock("../../../context/LocationsContext", () => ({
+	useLocations: () => ({
+		locations: [
+			{ id: "home", label: "Home", kind: "home", isPrimary: true },
+			{ id: "storage", label: "Storage", kind: "storage" },
+			{ id: "suitcase", label: "Suitcase", kind: "suitcase" },
+			{ id: "other", label: "Other", kind: "other" },
+		],
+	}),
+}));
+
 // detectDominantColor uses canvas — not available in jsdom
 vi.mock("../../utils/detectColorFromImage", () => ({
 	detectDominantColor: vi.fn().mockResolvedValue(null),

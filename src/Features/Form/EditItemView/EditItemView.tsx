@@ -1,6 +1,7 @@
 import "./EditItemView.css";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useCloset } from "../../../context/ClosetContext";
+import { useLocations } from "../../../context/LocationsContext";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import getStockPhoto from "../../../utils/getStockPhoto";
 import TextInput from "../TextInput/TextInput";
@@ -8,7 +9,6 @@ import MaterialBlendInput from "../../../Components/MaterialBlendInput/MaterialB
 import MaterialCompositionBar from "../../../Components/MaterialCompositionBar/MaterialCompositionBar";
 import { formItem, conditionOptions, statusOptions, occasionExamples, careExamples } from "../../../utils/constants";
 import PillComboField from "../../../Components/PillComboField/PillComboField";
-import { LOCATIONS } from "../../../utils/locations";
 import type { ItemStatus, WearState } from "../../../utils/types";
 import { normalizeMaterial } from "../../../utils/materialUtils";
 import { formatItemAge } from "../../../utils/itemAge";
@@ -87,6 +87,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	} = item;
 	const inputsToSeperate = { id, onSale, notes, style };
 	const { updateItem, addFullItem } = useCloset();
+	// E12-3.2 / P1-6.2: live per-user locations (custom/multi-home aware) —
+	// replaces the static 4-kind registry as this picker's source of truth.
+	const { locations } = useLocations();
 	const { showToast } = useToast();
 
 	const [formData, setFormData] = useState<Partial<ClothingItem>>(() => buildFormDataFromItem(item));
@@ -400,7 +403,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 							onChange={handleLocationChange}
 							aria-label="location"
 						>
-							{LOCATIONS.map((loc) => (
+							{locations.map((loc) => (
 								<option key={loc.id} value={loc.id}>
 									{loc.label}
 								</option>

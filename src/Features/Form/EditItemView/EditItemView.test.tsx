@@ -40,6 +40,17 @@ vi.mock("../../../context/ClosetContext", () => ({
 	}),
 }));
 
+vi.mock("../../../context/LocationsContext", () => ({
+	useLocations: () => ({
+		locations: [
+			{ id: "home", label: "Home", kind: "home", isPrimary: true },
+			{ id: "storage", label: "Storage", kind: "storage" },
+			{ id: "suitcase", label: "Suitcase", kind: "suitcase" },
+			{ id: "other", label: "Other", kind: "other" },
+		],
+	}),
+}));
+
 vi.mock("../../../Components/Toast/Toast", () => ({
 	useToast: () => ({
 		showToast: mockShowToast,

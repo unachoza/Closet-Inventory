@@ -76,7 +76,7 @@ vi.mock("framer-motion", () => {
 });
 
 // Stub the heavy card (pulls in the full ClothingCard) — we only care about wiring.
-vi.mock("../FilteredCard", () => ({
+vi.mock("../FilteredCard/FilteredCard", () => ({
 	default: ({ item }: { item: ClothingItem }) => <div data-testid="card-inner">{item.name}</div>,
 }));
 
