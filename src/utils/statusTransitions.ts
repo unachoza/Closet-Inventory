@@ -28,7 +28,7 @@ export type StatusAction =
 	| "lend" //            (present) → on_loan
 	| "return_loan" //     on_loan → clean
 	| "pack" //            (present) → traveling
-	| "return_home"; //    traveling → clean
+	| "return_home"; //    traveling → dirty (you come home with worn clothes)
 
 export interface StatusTransition {
 	readonly action: StatusAction;
@@ -59,7 +59,10 @@ export const STATUS_TRANSITIONS: readonly StatusTransition[] = [
 	{ action: "lend", from: "*", to: "on_loan", label: "Lend…" },
 	{ action: "return_loan", from: "on_loan", to: "clean", label: "Returned" },
 	{ action: "pack", from: "*", to: "traveling", label: "Pack for trip" },
-	{ action: "return_home", from: "traveling", to: "clean", label: "Back home" },
+	// Coming home from a trip → dirty, not clean: worn travel clothes need washing.
+	// (Original spec flagged this as "clean/dirty — ask"; dirty is the realistic
+	// default. A separate "unworn" path can be added if users want the nuance.)
+	{ action: "return_home", from: "traveling", to: "dirty", label: "Back home" },
 ];
 
 function resolveStatus(status?: ItemStatus): ItemStatus {

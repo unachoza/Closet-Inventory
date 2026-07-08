@@ -65,8 +65,8 @@ describe("getNextStatus", () => {
 		expect(getNextStatus("on_loan", "return_loan")).toBe("clean");
 	});
 
-	it("traveling → clean via 'return_home'", () => {
-		expect(getNextStatus("traveling", "return_home")).toBe("clean");
+	it("traveling → dirty via 'return_home' (come home with worn clothes)", () => {
+		expect(getNextStatus("traveling", "return_home")).toBe("dirty");
 	});
 
 	it("absent status is treated as 'clean'", () => {
@@ -147,9 +147,9 @@ describe("applyStatusAction — immutable patch", () => {
 		expect(patch).toEqual({ status: "clean", loan: undefined });
 	});
 
-	it("resets location to primary (home) when returning home from traveling", () => {
+	it("returning home from a trip → dirty + location reset to home", () => {
 		const patch = applyStatusAction(item({ status: "traveling", locationId: "suitcase" }), "return_home");
-		expect(patch?.status).toBe("clean");
+		expect(patch?.status).toBe("dirty");
 		expect(patch?.locationId).toBe("home");
 	});
 });
