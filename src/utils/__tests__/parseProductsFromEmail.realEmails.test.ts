@@ -984,3 +984,65 @@ describe("real emails > eBay (Eddie Bauer shoes, excludes sponsored items)", () 
 		expect(products.some((p) => /boat shoes/i.test(p.name))).toBe(false);
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Alo Yoga — Shopify inline order template with per-line discount codes.
+// Previously the "(-$14.70)" discount-allocation amount was mistaken for the
+// paid price and the bare <del> original wasn't detected as a sale.
+// ---------------------------------------------------------------------------
+
+describe("real emails > Alo Yoga (Shopify inline sale)", () => {
+	const products = parseProductsFromEmail(loadFixture("alo-shopify-sale.html"));
+
+	it("detects all 3 items with paid price, struck original, and onSale", () => {
+		expect(products.map((p) => [p.name, p.price, p.originalPrice, p.onSale])).toEqual([
+			['5" Game Time Ripstop 2-In-1 Short', "$83.30", "$98.00", true],
+			["Alo Vapor Crewneck Long Sleeve", "$62.90", "$74.00", true],
+			["Conquer Reform Crewneck Short Sleeve", "$57.80", "$68.00", true],
+		]);
+	});
+
+	it("classifies a '...Short Sleeve' crewneck as a top, not bottoms", () => {
+		expect(categoryFromName("Conquer Reform Crewneck Short Sleeve")).toBe("tops");
+		// but a genuine pair of shorts is still bottoms
+		expect(categoryFromName('5" Game Time Ripstop 2-In-1 Short')).toBe("bottoms");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// HOKA — Deckers/Cordial order confirmation. Anchor on dms.deckers.com/hoka
+// photos so the emltrk open-tracking pixel's giant preheader alt-text isn't
+// mis-detected as a product.
+// ---------------------------------------------------------------------------
+
+describe("real emails > HOKA order confirmation", () => {
+	const products = parseProductsFromEmail(loadFixture("hoka-order.html"));
+
+	it("detects exactly the two line items (not the tracking-pixel blob)", () => {
+		expect(products.map((p) => [p.name, p.price, p.size])).toEqual([
+			["Bondi 9", "$175.00", "10D"],
+			["SkyGlide Short", "$84.00", "M"],
+		]);
+	});
+
+	it("classifies the Bondi shoe model as shoes", () => {
+		expect(categoryFromName("Bondi 9")).toBe("shoes");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// BYLT Basics — Klaviyo/Shopify template with the name in an <h3> (not <p>)
+// and a " - COLOR / SIZE" suffix. Previously nothing was detected.
+// ---------------------------------------------------------------------------
+
+describe("real emails > BYLT Basics order confirmation", () => {
+	const products = parseProductsFromEmail(loadFixture("bylt-order.html"));
+
+	it("detects both items with name/color/size/total and classifies as tops", () => {
+		expect(products.map((p) => [p.name, p.price, p.color, p.size])).toEqual([
+			["Ribbed Short Sleeve Drop-Cut", "$52.00", "black", "M"],
+			["Pulse Short Sleeve Drop-Cut", "$35.00", "black", "M"],
+		]);
+		expect(categoryFromName("Ribbed Short Sleeve Drop-Cut")).toBe("tops");
+	});
+});

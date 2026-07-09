@@ -145,6 +145,14 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	pump: "shoes",
 	wedge: "shoes",
 	clog: "shoes",
+	// HOKA shoe silhouettes — distinctive model names that carry no generic
+	// footwear word (e.g. "Bondi 9", "Clifton"). Kept narrow to avoid collisions.
+	bondi: "shoes",
+	clifton: "shoes",
+	arahi: "shoes",
+	gaviota: "shoes",
+	kawana: "shoes",
+	speedgoat: "shoes",
 	// Weak top clues — placed LAST so any more-specific garment (e.g. "crew
 	// socks" → socks, "crewneck sweater" → sweaters) wins first. "crew" catches
 	// the British "crewe" spelling REI uses ("Sphere LS Low Crewe") via substring.
@@ -167,12 +175,19 @@ function extractBrand(text: string, from: string): string {
 }
 
 function extractCategory(text: string): string {
+	// Drop "short sleeve" / "long sleeve" phrases first so the "short" → bottoms
+	// keyword doesn't misfire on a top described by its sleeve length (e.g.
+	// "Conquer Reform Crewneck Short Sleeve" is a top, not shorts).
 	const lower = text.toLowerCase();
+	const stripped = lower.replace(/\b(short|long|three[\s-]?quarter|3\/4)[\s-]?sleeve/g, " ");
 	for (const [keyword, category] of Object.entries(CATEGORY_KEYWORDS)) {
-		if (lower.includes(keyword)) {
+		if (stripped.includes(keyword)) {
 			return category;
 		}
 	}
+	// A garment described by its sleeve length (but no more specific word) is a
+	// top — "Ribbed Short Sleeve Drop-Cut", "Pulse Short Sleeve Drop-Cut".
+	if (/\bsleeve\b/.test(lower)) return "tops";
 	return "";
 }
 
