@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
+import { captureException } from "../../lib/monitoring";
 import "./ErrorBoundary.css";
 
 interface ErrorBoundaryProps {
@@ -37,6 +38,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 	componentDidCatch(error: Error, info: ErrorInfo) {
 		// Surface detailed context for diagnostics. Swap for a real logger later.
 		console.error("ErrorBoundary caught an error:", error, info.componentStack);
+		void captureException(error);
 		this.props.onError?.(error, info);
 	}
 
