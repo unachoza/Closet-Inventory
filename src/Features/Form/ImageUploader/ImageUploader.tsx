@@ -3,6 +3,7 @@ import { compressImage, compressImageToBlob } from "../../../utils/compressImage
 import { uploadItemPhoto, validateImageFile } from "../../../services/storageService";
 import { SupabaseAuthContext } from "../../../context/SupabaseAuthContext";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
+import { logDebug } from "../../../utils/logger";
 import "./ImageUploader.css";
 
 interface ImageUploaderProps {
@@ -42,6 +43,7 @@ const ImageUploaderInput = ({ image, onImageRemove, onImageSelect }: ImageUpload
 				// path) before upload, so a multi-MB phone photo doesn't go to Storage
 				// raw — smaller uploads, smaller signed-URL downloads, lower storage cost.
 				const { blob, ext } = await compressImageToBlob(file);
+				logDebug("ImageUploader", `compressed photo: ${blob.size} bytes (was ${file.size})`);
 				const path = await uploadItemPhoto(blob, userId, ext);
 				setImageValue(path);
 				onImageSelect(path);
