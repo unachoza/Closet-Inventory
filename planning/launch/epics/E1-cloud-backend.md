@@ -90,8 +90,8 @@ _As Maya, I want to trust NTW with my Google login and personal profile info so 
 - [ ] Supabase client uses parameterized queries — never string-concatenate SQL in edge functions
 
 **Network & transport**
-- [ ] **Content-Security-Policy — `script-src 'self'`** as the defense-in-depth backstop to the DOMPurify fix (blocks inline/injected script execution even if a sanitizer is ever bypassed). Set at the hosting layer (Vercel/Netlify headers) or an `index.html` `<meta>` tag; verify it doesn't break the Google OAuth SDK or inline styles before enabling. Then lock down `style-src`/`img-src`/`connect-src` (Supabase, Gmail API, Cloudinary origins).
-- [ ] HSTS + HTTPS-only; secure cookies (`HttpOnly`, `Secure`, `SameSite`) for any session cookie
+- [x] ✅ **Content-Security-Policy — `script-src 'self'`** as the defense-in-depth backstop to the DOMPurify fix (blocks inline/injected script execution even if a sanitizer is ever bypassed). Set via `vercel.json` headers (`script-src 'self' https://accounts.google.com` — the Google Identity Services script origin used by `@react-oauth/google`; plus `object-src 'none'; base-uri 'self'`). Deliberately scoped to `script-src` only for this pass — **not yet verified live against a deployed Vercel preview**, and `style-src`/`img-src`/`connect-src` are still open (unrestricted for now) since locking those down needs the real Supabase/Gmail/font origins confirmed against a live deploy first.
+- [ ] HSTS + HTTPS-only — `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` added in `vercel.json`, not yet verified live; secure cookies (`HttpOnly`, `Secure`, `SameSite`) N/A — Supabase auth here uses browser storage, not session cookies
 - [ ] Lock CORS to known origins on edge functions (no `*` in production)
 
 **Storage upload safety**

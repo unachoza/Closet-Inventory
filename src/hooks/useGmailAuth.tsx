@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useGoogleLogin } from "@react-oauth/google";
+import { logWarn } from "../utils/logger";
 
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 // Legacy key — the access token used to be persisted here. We now keep it in
@@ -81,7 +82,7 @@ export function useGmailAuth() {
 			// Safari can block the OAuth popup outright; don't leave the button hung.
 			setIsLoading(false);
 			setError("Couldn't open Google sign-in. Please allow pop-ups for this site and try again.");
-			console.warn("Gmail login failed to open", err);
+			logWarn("useGmailAuth: login failed to open", err);
 		}
 	}, [login, setIsLoading, setError]);
 

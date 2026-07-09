@@ -6,12 +6,14 @@
  * app keeps its in-memory state working rather than crashing on a failed write.
  */
 
+import { logWarn } from "./logger";
+
 function safeSet(storage: Storage, key: string, value: string): boolean {
 	try {
 		storage.setItem(key, value);
 		return true;
 	} catch (error) {
-		console.warn(`safeSet: could not persist "${key}" (storage full or unavailable)`, error);
+		logWarn(`safeSet: could not persist "${key}" (storage full or unavailable)`, error);
 		return false;
 	}
 }

@@ -1,0 +1,50 @@
+import Modal from "../../Components/Modal/Modal";
+import "./GoogleUnverifiedNotice.css";
+
+interface GoogleUnverifiedNoticeProps {
+	readonly isOpen: boolean;
+	readonly onContinue: () => void;
+	readonly onCancel: () => void;
+}
+
+/**
+ * Explains the "Google hasn't verified this app" interstitial before the user
+ * hits it. Nothing To Wear is a small beta still going through Google's
+ * verification review, so every sign-in shows that screen — without warning,
+ * it reads as a scam prompt to non-technical users (see P0 backlog: 40–60%
+ * onboarding drop-off risk).
+ */
+export default function GoogleUnverifiedNotice({ isOpen, onContinue, onCancel }: GoogleUnverifiedNoticeProps) {
+	return (
+		<Modal
+			isOpen={isOpen}
+			onClose={onCancel}
+			title="One heads-up before you sign in"
+			footer={
+				<>
+					<button className="btn btn--ghost" type="button" onClick={onCancel}>
+						Cancel
+					</button>
+					<button className="btn btn--primary" type="button" onClick={onContinue}>
+						Continue to Google sign-in
+					</button>
+				</>
+			}
+		>
+			<p className="gun-lead">
+				Nothing To Wear is a small beta app, still going through Google's app-verification review. Until that finishes, Google shows
+				every visitor a warning screen — it isn't a sign that anything is wrong.
+			</p>
+			<ol className="gun-steps">
+				<li>
+					On the screen titled <strong>"Google hasn't verified this app"</strong>, click <strong>Advanced</strong> (bottom left).
+				</li>
+				<li>
+					Click <strong>Go to Nothing To Wear (unsafe)</strong> — that "(unsafe)" wording is Google's generic label for any
+					unverified app, not specific to this one.
+				</li>
+				<li>Sign in with your Google account as normal.</li>
+			</ol>
+		</Modal>
+	);
+}

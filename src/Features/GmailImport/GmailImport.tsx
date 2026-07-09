@@ -11,6 +11,8 @@ import { normalizeMaterial } from "../../utils/materialUtils";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
+import { useGoogleUnverifiedNotice } from "../Onboarding/useGoogleUnverifiedNotice";
+import GoogleUnverifiedNotice from "../Onboarding/GoogleUnverifiedNotice";
 import "./GmailImport.css";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
@@ -26,6 +28,7 @@ interface GmailImportProps {
 
 export default function GmailImport({ onImport, onImportAll, initialSelectedEmailId, onSourceEmailChange }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
+	const googleNotice = useGoogleUnverifiedNotice();
 
 	const {
 		emails,
@@ -258,10 +261,16 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 					<p className="gmail-description">
 						Connect your Gmail account to find order confirmation emails and import clothing items into your closet.
 					</p>
-					<button className="gmail-login-btn" onClick={login} disabled={authLoading} type="button">
+					<button
+						className="gmail-login-btn"
+						onClick={() => googleNotice.requestGoogleSignIn(login)}
+						disabled={authLoading}
+						type="button"
+					>
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
 					{error && <p className="gmail-error">{error}</p>}
+					<GoogleUnverifiedNotice isOpen={googleNotice.isOpen} onContinue={googleNotice.confirm} onCancel={googleNotice.dismiss} />
 				</div>
 			</div>
 		);

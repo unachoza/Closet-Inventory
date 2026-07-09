@@ -2,6 +2,8 @@ import { Cloud, CloudOff } from "lucide-react";
 import { useSupabaseAuthContext } from "../../context/SupabaseAuthContext";
 import { useCloset } from "../../context/ClosetContext";
 import type { SyncStatus } from "../../hooks/useCloudCloset";
+import { useGoogleUnverifiedNotice } from "../../Features/Onboarding/useGoogleUnverifiedNotice";
+import GoogleUnverifiedNotice from "../../Features/Onboarding/GoogleUnverifiedNotice";
 import "./CloudSyncControl.css";
 
 // The sync axis (only meaningful when signed in). "Behind" = a write is still
@@ -28,6 +30,7 @@ const SYNC_LABEL: Record<SyncStatus, string> = {
 const CloudSyncControl = () => {
 	const { isAuthenticated, user, signIn, signOut, isLoading } = useSupabaseAuthContext();
 	const { syncStatus } = useCloset();
+	const googleNotice = useGoogleUnverifiedNotice();
 
 	if (!isAuthenticated) {
 		return (
@@ -40,9 +43,18 @@ const CloudSyncControl = () => {
 					<CloudOff size={14} aria-hidden="true" /> Local
 				</span>
 				<span className="cloud-sync-control__auth">Signed out</span>
-				<button className="cloud-sync-control__btn" onClick={() => void signIn()} disabled={isLoading}>
+				<button
+					className="cloud-sync-control__btn"
+					onClick={() => googleNotice.requestGoogleSignIn(() => void signIn())}
+					disabled={isLoading}
+				>
 					Sign in to sync
 				</button>
+				<GoogleUnverifiedNotice
+					isOpen={googleNotice.isOpen}
+					onContinue={googleNotice.confirm}
+					onCancel={googleNotice.dismiss}
+				/>
 			</div>
 		);
 	}

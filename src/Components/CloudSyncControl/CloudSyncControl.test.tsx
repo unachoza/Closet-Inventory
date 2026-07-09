@@ -18,15 +18,29 @@ describe("CloudSyncControl", () => {
 		mockAuth.signIn.mockReset();
 		mockAuth.signOut.mockReset();
 		mockCloset.syncStatus = "synced";
+		localStorage.clear();
 	});
 
-	it("signed out: shows Local store + 'Signed out' + a sign-in button", () => {
+	it("signed out, first visit: sign-in button shows the Google-unverified explainer before calling signIn", () => {
 		render(<CloudSyncControl />);
 		expect(screen.getByText(/^local$/i)).toBeInTheDocument();
 		expect(screen.getByText(/signed out/i)).toBeInTheDocument();
 		const btn = screen.getByRole("button", { name: /sign in to sync/i });
 		fireEvent.click(btn);
+		expect(mockAuth.signIn).not.toHaveBeenCalled();
+		expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: /continue to google sign-in/i }));
 		expect(mockAuth.signIn).toHaveBeenCalledTimes(1);
+	});
+
+	it("signed out, notice already seen: sign-in button calls signIn immediately", () => {
+		localStorage.setItem("closetly-google-notice-seen", "true");
+		render(<CloudSyncControl />);
+		const btn = screen.getByRole("button", { name: /sign in to sync/i });
+		fireEvent.click(btn);
+		expect(mockAuth.signIn).toHaveBeenCalledTimes(1);
+		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	});
 
 	it("signed in + synced: shows Cloud store, 'Synced', and a sign-out button", () => {
