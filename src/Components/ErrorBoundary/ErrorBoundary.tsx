@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
+import { logDebug, logError } from "../../utils/logger";
 import { captureException } from "../../lib/monitoring";
 import "./ErrorBoundary.css";
 
@@ -36,14 +37,15 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 	}
 
 	componentDidCatch(error: Error, info: ErrorInfo) {
-		// Surface detailed context for diagnostics. Swap for a real logger later.
-		console.error("ErrorBoundary caught an error:", error, info.componentStack);
+		logError("ErrorBoundary", error);
+		logDebug("ErrorBoundary", info.componentStack ?? undefined);
+		// Report to Sentry too — no-ops without consent/DSN (see lib/monitoring).
 		void captureException(error);
 		this.props.onError?.(error, info);
 	}
 
 	handleReset = () => {
-		console.log("ErrorBoundary reset triggered");
+		logDebug("ErrorBoundary", "reset triggered");
 		// Clear our own error state, then let the app move to a safe screen.
 		// Without onReset the same child would re-render and throw again.
 		this.setState({ hasError: false, error: null });
