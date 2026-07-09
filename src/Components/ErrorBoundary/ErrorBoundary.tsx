@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { logDebug, logError } from "../../utils/logger";
+import { captureException } from "../../lib/monitoring";
 import "./ErrorBoundary.css";
 
 interface ErrorBoundaryProps {
@@ -38,6 +39,8 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 	componentDidCatch(error: Error, info: ErrorInfo) {
 		logError("ErrorBoundary", error);
 		logDebug("ErrorBoundary", info.componentStack ?? undefined);
+		// Report to Sentry too — no-ops without consent/DSN (see lib/monitoring).
+		void captureException(error);
 		this.props.onError?.(error, info);
 	}
 
