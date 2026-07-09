@@ -21,9 +21,16 @@ export async function clickNavAction(page: Page, label: string | RegExp): Promis
 	await page.locator(".nav-drawer__actions").getByRole("button", { name: label }).click();
 }
 
-/** Seed localStorage before the app boots to bypass the onboarding overlay. */
+/**
+ * Seed localStorage before the app boots to bypass the onboarding overlay and
+ * the analytics-consent banner, so neither intrudes on unrelated flows. The
+ * consent banner has its own dedicated spec (consent-banner.spec.ts) which does
+ * NOT call this helper. Consent is seeded "declined" so no analytics SDK loads
+ * during e2e runs.
+ */
 export async function skipOnboarding(page: Page): Promise<void> {
 	await page.addInitScript(() => {
 		localStorage.setItem("closetly-onboarding-complete", "true");
+		localStorage.setItem("closetly-analytics-consent", "declined");
 	});
 }

@@ -20,6 +20,7 @@ import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
 import { OnboardingExpanded } from "./Features/Onboarding/OnboardingSteps";
+import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -213,7 +214,9 @@ function AppShell() {
 
 function App() {
 	return (
-		<SupabaseAuthProvider>
+		<>
+			<ConsentBanner />
+			<SupabaseAuthProvider>
 			{/* Single cloud-backed closet instance shared by all consumers (E1-1.4).
 			    Inside SupabaseAuthProvider so it can read the signed-in userId. */}
 			<ClosetProvider>
@@ -232,6 +235,7 @@ function App() {
 				</LocationsProvider>
 			</ClosetProvider>
 		</SupabaseAuthProvider>
+		</>
 	);
 }
 
