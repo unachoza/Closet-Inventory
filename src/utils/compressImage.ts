@@ -8,6 +8,8 @@
  * error, non-image file) it falls back to the original so uploads never break.
  */
 
+import { logWarn } from "./logger";
+
 export interface CompressOptions {
 	/** Longest edge in pixels. Larger images are scaled down to fit. */
 	readonly maxDimension?: number;
@@ -87,7 +89,7 @@ async function prepareCanvas(file: File, maxDimension: number): Promise<HTMLCanv
 		}
 		return canvas;
 	} catch (error) {
-		console.warn("compressImage: falling back to the original image", error);
+		logWarn("compressImage: falling back to the original image", error);
 		return null;
 	}
 }

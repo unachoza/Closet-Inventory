@@ -15,6 +15,8 @@
  * held as immutable snapshots so subscribers can compare by reference.
  */
 
+import { logError } from "../utils/logger";
+
 export interface SyncFailureState {
 	/** Number of background write operations that failed since the last clear. */
 	failedWriteCount: number;
@@ -49,7 +51,7 @@ export function getSyncFailureState(): SyncFailureState {
 export function recordSyncFailure(operation: string, error: unknown): void {
 	const message = error instanceof Error ? error.message : String(error);
 	// Surface the real cause — this replaces a silent `.catch(() => {})`.
-	console.error(`[sync] "${operation}" failed to reach Supabase:`, error);
+	logError(`sync: "${operation}" failed to reach Supabase`, error);
 	state = {
 		failedWriteCount: state.failedWriteCount + 1,
 		lastError: message,
