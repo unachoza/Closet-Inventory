@@ -1964,18 +1964,27 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 			}
 		}
 
+		// Sale detection: struck-through original price present. The classed
+		// template tags the <del> with a class; inline templates (Alo Yoga) use a
+		// bare <del>. Fall back to any <del> in the row.
+		const delEl = row.querySelector("del.order-list__item-original-price") ?? row.querySelector("del");
+		const onSale = Boolean(delEl);
+		const delText = delEl ? (delEl.textContent ?? "").trim() : "";
+
 		// Price: read directly from the dedicated price element, divide by qty for per-unit
 		// Classed template has a dedicated price element; the inline template puts
 		// the line total in an adjacent cell — scan the row text for the first "$".
+		// Before scanning the whole row, drop (a) discount-allocation amounts like
+		// "(-$14.70)" from the discount-code tag and (b) the struck original — both
+		// otherwise get mistaken for the paid price.
 		const priceEl = row.querySelector("p.order-list__item-price");
-		const priceText = priceEl ? (priceEl.textContent ?? "").trim() : getCellText(row);
+		let priceText = priceEl ? (priceEl.textContent ?? "").trim() : getCellText(row);
+		priceText = priceText.replace(/\(-\s*\$[\d.,]+\)/g, " ");
+		if (delText) priceText = priceText.replace(delText, " ");
 		const prices = extractPrices(priceText);
 		const totalPrice = prices[0] ?? "";
 		const price = totalPrice && qty > 1 ? `$${(parseFloat(totalPrice.replace("$", "")) / qty).toFixed(2)}` : totalPrice;
 
-		// Sale detection: struck-through original price present
-		const delEl = row.querySelector("del.order-list__item-original-price");
-		const onSale = Boolean(delEl);
 		const delPrices = delEl ? extractPrices(delEl.textContent ?? "") : [];
 		const originalPriceTotal = delPrices[0] ?? "";
 		const originalPrice =
@@ -3719,6 +3728,122 @@ function parseReiName(raw: string): { brand: string; name: string; color: string
 	return { brand, name, color, size };
 }
 
+/**
+ * Strategy: HOKA order confirmations (emails.hoka.com / Deckers Cordial).
+ *
+ * Each line item is its own table: a product photo served from
+ * dms.deckers.com/hoka + a sibling <p> holding "<name><br>Quantity: N<br>
+ * Size: X<br>$PRICE". The generic image fallback otherwise ignored the real
+ * items and instead latched onto an emltrk.com open-tracking pixel whose alt
+ * text is a giant "You've got good taste…" preheader (mis-detected as a dress).
+ * We anchor on the Deckers product images only, so the tracking pixel, logo,
+ * and membership banners are excluded.
+ */
+function extractFromHokaLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/dms\.deckers\.com\/hoka|emails\.hoka\.com|updates\.hoka\.com/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	const skuImages = Array.from(doc.querySelectorAll("img")).filter((img) =>
+		/dms\.deckers\.com\/hoka/i.test(img.getAttribute("src") ?? ""),
+	);
+
+	for (const img of skuImages) {
+		const imageUrl = img.getAttribute("src") ?? "";
+		const name = (img.getAttribute("alt") ?? "").trim();
+		if (!name) continue;
+
+		// Climb to the smallest ancestor that holds the item's "Quantity/Size/$"
+		// block (a sibling cell of the image). Each item is its own table, so this
+		// never bleeds into another line item's price.
+		let block: Element = img;
+		for (let i = 0; i < 8; i++) {
+			const parent = block.parentElement;
+			if (!parent) break;
+			block = parent;
+			const t = block.textContent ?? "";
+			if (/quantity/i.test(t) && /\$\d/.test(t)) break;
+		}
+
+		const lines = getTextLines(block);
+		const sizeLine = lines.find((l) => /^size\s*:/i.test(l));
+		const size = sizeLine ? sizeLine.replace(/^size\s*:\s*/i, "").trim() : "";
+		const prices = extractPrices(block.textContent ?? "");
+		const price = prices[prices.length - 1] ?? "";
+
+		const dedupeKey = name.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({ imageUrl, name, brand: "", price, color: "", size, itemNumber: "", material: "", onSale: false });
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: BYLT Basics order confirmations (byltbasics.com / Klaviyo).
+ *
+ * Each line item is a two-cell <tr>: a product photo (alt="line.title", an
+ * un-rendered Liquid variable) and a details cell with an <h3> name +
+ * "<p>Quantity: N<br>Total: $PRICE". The name carries a " - COLOR / SIZE"
+ * suffix ("Ribbed Short Sleeve Drop-Cut - Black / M"). Nothing matched before:
+ * the generic image fallback produced a bogus "line.title" item, and the
+ * paragraph strategy needs the name in a <p> (here it's an <h3>). Guarded by
+ * the BYLT sender/CDN signal.
+ */
+function extractFromByltLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/byltbasics\.com/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const h3 of Array.from(doc.querySelectorAll("h3"))) {
+		const cell = h3.closest("td");
+		const cellText = cell?.textContent ?? "";
+		// A real line item pairs the <h3> name with a "Total: $" line.
+		if (!/total\s*:\s*\$\d/i.test(cellText)) continue;
+
+		const rawName = (h3.textContent ?? "").replace(/\s+/g, " ").trim();
+		if (!rawName) continue;
+
+		// Split the " - COLOR / SIZE" variant suffix off the name.
+		let name = rawName;
+		let color = "";
+		let size = "";
+		const dashIdx = rawName.lastIndexOf(" - ");
+		if (dashIdx !== -1) {
+			const variant = rawName.slice(dashIdx + 3).trim(); // "Black / M"
+			const parts = variant.split("/").map((p) => p.trim());
+			if (parts.length === 2 && parts[0] && parts[1] && (looksLikeSize(parts[1]) || looksLikeSize(parts[0]))) {
+				name = rawName.slice(0, dashIdx).trim();
+				for (const part of parts) {
+					if (looksLikeSize(part) && !size) size = part;
+					else if (!color) color = part.toLowerCase();
+				}
+			}
+		}
+
+		// Per-item Total (line total). qty is usually 1 in these emails.
+		const totalMatch = cellText.match(/total\s*:\s*(\$\d{1,5}(?:\.\d{2})?)/i);
+		const price = totalMatch ? totalMatch[1] : "";
+
+		const img = cell?.closest("tr")?.querySelector("img");
+		const imageUrl = img && isProductImage(img as HTMLImageElement) ? (img.getAttribute("src") ?? "") : "";
+
+		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({ imageUrl, name, brand: "", price, color, size, itemNumber: "", material: "", onSale: false });
+	}
+
+	return products;
+}
+
 // Garment/shoe words that mark where an eBay title's leading brand ends
 // (e.g. "Eddie Bauer SHOES Womens 9 M Mocassins..." → brand stops at "Shoes").
 const EBAY_GARMENT_WORDS = new Set([
@@ -3964,6 +4089,8 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 
 	const strategies = [
 		extractFromEbayLayout, // eBay: only the Order number:/Item ID:/Seller: block, excludes sponsored "complement your purchase" items — guarded by ebay.com, must run before generic table/image strategies which would otherwise match eBay's plain image+link+price rows (real item AND sponsored alike)
+		extractFromHokaLayout, // HOKA: dms.deckers.com/hoka product photos + Quantity/Size/$ block; excludes emltrk tracking-pixel preheader blob (guarded)
+		extractFromByltLayout, // BYLT Basics: <h3> name + "Total: $" cell (name in <h3>, not <p>, so paragraph strategy misses it) (guarded)
 		extractFromNestedTables,
 		extractFromLabeledFieldLayout,
 		extractFromReactEmailLayout,
