@@ -44,6 +44,20 @@ _As Maya on the subway, I want to view my closet offline so that the app is reli
 
 ---
 
+## Phase E — baseline verification + Lighthouse audit (2026-07-10, branch `feat/e5-e-baselines-lighthouse`)
+
+- **Screenshot baselines: current, no refresh needed.** Only 2 specs carry `toHaveScreenshot` baselines (`card-detail-modal.mobile.spec.ts`, `gmail-import.mobile.spec.ts`); both were refreshed in E5-1.3 (2026-07-10) after the nav/layout changes and pass as-is — 26/26 green across both mobile projects. Satisfies the end-of-sprint snapshot-cadence check.
+- **Lighthouse** (production `vite build` + `preview`, headless Chrome, mobile throttling; Lighthouse ≥12 dropped the PWA category — installability was verified in E5-2.2):
+  **Performance 55 · Accessibility 96 · Best Practices 100 · SEO 92**
+  - Perf detail: FCP 4.1s, LCP 7.1s, Speed Index 11.2s, TBT 210ms, CLS 0.001. Root cause is the single monolithic JS chunk (~291KiB, ~200KiB unused on first paint — no code splitting; Vite already warns >500kB pre-minify).
+  - A11y detail: color-contrast failures on the onboarding overlay (`.ob-welcome-tagline`, `.ob-next-btn`) and `.btn--primary.btn--sm`.
+
+**Follow-ups (logged, not in E5 scope):**
+- `E5-follow.1` Code-split the main bundle (route/view-level dynamic `import()`) — biggest perf lever; target LCP <2.5s.
+- `E5-follow.2` Fix contrast on onboarding overlay + small primary button (a11y 96→100).
+
+---
+
 ## Known bugs
 - `E5-bug.1` **Mobile card "See all details" clipped + card top hidden** — `overflow: scroll` on `.card-details` + `margin-top: 3vh` in mobile caused the footer button to be clipped by `.card-back`'s `overflow: hidden`, and pushed card content below the visible card bounds. Fixed by removing both rules and adjusting grow-modal geometry — _✅ PR #80 (commit c7922e2)_
 
