@@ -25,14 +25,14 @@ _As Maya on her phone, I want tap targets and primary actions within thumb reach
 
 ## US-5.2 — Use it like an installed app
 _As Maya, I want to add it to my home screen and launch full-screen so that it feels native without an App Store._
-- [ ] `vite-plugin-pwa`: `manifest.json` + icons
-- [ ] Service worker for install + offline shell
-- [ ] iOS meta tags; full-screen launch (no Safari chrome)
+- [x] `vite-plugin-pwa`: `manifest.json` + icons
+- [x] Service worker for install + offline shell
+- [x] iOS meta tags; full-screen launch (no Safari chrome) — _metas verified in build; physical-device add-to-home-screen still to be eyeballed once deployed_
 
 **Tickets**
-- `E5-2.1` `vite-plugin-pwa` + manifest + app icons — _1–1.5d_
-- `E5-2.2` Service worker (app shell + cached closet) — _1.5d_
-- `E5-2.3` iOS full-screen meta + add-to-home-screen polish — _1d_
+- `E5-2.1` ✅ **Done** (2026-07-10, branch `feat/e5-c-pwa-shell`) — `vite-plugin-pwa@1.3.0` (`generateSW`, `registerType: autoUpdate`); manifest: name "Nothing To Wear" / short_name "NTW", `display: standalone`, 192+512+maskable-512 icons derived from `src/assets/hangerLogo.png` via `sips` (square-padded on the logo's own `#071128` navy; maskable padded to the 80% safe zone) + 180px `apple-touch-icon.png`, all in `public/`. — _1–1.5d_
+- `E5-2.2` ✅ **Done** (same PR) — Workbox precache of the built app shell (24 entries ≈2.2MB; HTML/JS/CSS/icons). **Closet data offline comes from localStorage (`useCloudCloset` seed, E1-1.6), NOT SW response caching — deliberately zero `runtimeCaching` for `*.supabase.co`** (stale rows / auth-response caching trap; verified 0 supabase refs in `dist/sw.js`). Verified end-to-end via a scripted preview-build check: SW registers + activates → network cut → reload → **app shell serves from SW cache AND closet cards render from localStorage while fully offline** (this also satisfies US-5.3's "cached closet viewable offline"). `devOptions.enabled: false` keeps dev + Playwright SW-free. — _1.5d_
+- `E5-2.3` ✅ **Done** (same PR) — `index.html`: `theme-color`, `mobile-web-app-capable` + `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`, `apple-mobile-web-app-title: NTW`, `apple-touch-icon` link, real `<title>` ("Nothing To Wear", was "Closet") + meta description; `viewport-fit=cover` retained. — _1d_
 
 ## US-5.3 — Works offline
 _As Maya on the subway, I want to view my closet offline so that the app is reliable._
