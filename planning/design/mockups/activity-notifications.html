@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NTW · Activity & Notifications — Mockups (E4 Part Deux rev 2)</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap");
+
+  :root {
+    --alabaster: #faf8f5; --white: #fff; --sand: #f3eee7;
+    --terracotta: #b28675; --terracotta-deep: #9c7060;
+    --espresso: #492f28; --ink: #231612; --muted: #8a7a72;
+    --hairline: rgba(73, 47, 40, 0.14);
+    --serif: "Lora", Georgia, serif; --sans: "DM Sans", system-ui, sans-serif;
+    --shadow-phone: 0 24px 60px -24px rgba(35, 22, 18, 0.45), 0 6px 18px -8px rgba(35, 22, 18, 0.25);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background:
+      radial-gradient(1100px 480px at 90% -5%, rgba(178, 134, 117, 0.13), transparent 60%),
+      var(--alabaster);
+    color: var(--espresso); font-family: var(--sans); -webkit-font-smoothing: antialiased;
+  }
+  .sheet { max-width: 1480px; margin: 0 auto; padding: 56px 40px 96px; }
+  header.masthead { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--espresso); padding-bottom: 28px; margin-bottom: 14px; }
+  .kicker { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--terracotta-deep); font-weight: 600; margin-bottom: 10px; }
+  .brandline { display: flex; align-items: center; gap: 14px; }
+  .brandline svg { width: 40px; height: 40px; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 4vw, 46px); line-height: 1.05; }
+  h1 em { font-style: italic; color: var(--terracotta-deep); }
+  .meta { text-align: right; font-size: 12px; color: var(--muted); line-height: 1.7; white-space: nowrap; }
+  .meta b { color: var(--espresso); font-weight: 600; }
+  .intro { max-width: 72ch; font-size: 14.5px; line-height: 1.75; color: #6b564d; margin: 22px 0 8px; }
+  .intro b { color: var(--espresso); }
+
+  section.act { margin-top: 56px; }
+  .act-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 34px; }
+  .act-num { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--terracotta-deep); border: 1px solid var(--terracotta); border-radius: 999px; padding: 4px 14px; white-space: nowrap; }
+  .act-title { font-family: var(--serif); font-size: 24px; font-weight: 500; }
+  .act-sub { font-size: 13px; color: var(--muted); }
+  .flow { display: flex; flex-wrap: wrap; gap: 34px 26px; align-items: flex-start; }
+  .step { width: 316px; }
+  .step-caption { margin-top: 18px; padding: 0 6px; }
+  .step-num { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--terracotta-deep); }
+  .step-title { font-family: var(--serif); font-size: 17px; font-weight: 600; margin: 3px 0 7px; }
+  .step-note { font-size: 12.5px; line-height: 1.65; color: #6b564d; }
+  .step-note code { font-family: ui-monospace, Menlo, monospace; font-size: 11px; background: var(--sand); padding: 1px 5px; border-radius: 4px; color: var(--espresso); }
+  .arrow { align-self: center; color: var(--terracotta); font-size: 22px; padding-bottom: 120px; font-family: var(--serif); font-style: italic; }
+
+  .phone { width: 316px; border-radius: 44px; background: var(--ink); padding: 10px; box-shadow: var(--shadow-phone); }
+  .screen { border-radius: 36px; overflow: hidden; background: var(--alabaster); height: 640px; position: relative; display: flex; flex-direction: column; }
+  .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 96px; height: 24px; border-radius: 999px; background: var(--ink); z-index: 40; }
+  .statusbar { height: 44px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 0; font-size: 11.5px; font-weight: 600; color: var(--espresso); }
+  .homebar { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; border-radius: 4px; background: rgba(35,22,18,0.35); z-index: 40; }
+
+  .ntw-top { flex: none; padding: 12px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+  .ntw-word { display: flex; align-items: center; gap: 8px; }
+  .ntw-word svg { width: 22px; height: 22px; }
+  .ntw-word span { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--espresso); }
+  .nav-ava { position: relative; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--terracotta), #d4b3a4); display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--serif); font-style: italic; font-size: 13px; }
+  .nav-ava .ping { position: absolute; top: -1px; right: -1px; width: 9px; height: 9px; border-radius: 50%; background: var(--terracotta-deep); border: 2px solid var(--alabaster); }
+
+  .view-title { font-family: var(--serif); font-size: 24px; font-weight: 500; padding: 14px 20px 0; }
+  .view-title em { font-style: italic; color: var(--terracotta-deep); }
+  .view-sub { font-size: 11.5px; color: var(--muted); padding: 2px 20px 0; }
+
+  /* profile hub cards (flat, calm — per the profile prompt) */
+  .hub-card { margin: 10px 16px 0; background: var(--white); border: 1px solid var(--hairline); border-radius: 12px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; }
+  .hub-ico { width: 34px; height: 34px; border-radius: 10px; background: var(--sand); display: flex; align-items: center; justify-content: center; flex: none; }
+  .hub-ico svg { width: 18px; height: 18px; stroke: var(--terracotta-deep); }
+  .hub-main { flex: 1; min-width: 0; }
+  .hub-name { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .hub-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .hub-count { min-width: 20px; height: 20px; border-radius: 999px; background: var(--terracotta); color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
+  .hub-chev { color: var(--muted); font-size: 14px; }
+
+  /* activity rows */
+  .grp-label { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--terracotta-deep); padding: 16px 20px 6px; display: flex; align-items: center; gap: 8px; }
+  .grp-label.quiet { color: var(--muted); }
+  .grp-label .line { flex: 1; height: 1px; background: var(--hairline); }
+  .notif { margin: 6px 16px 0; background: var(--white); border: 1px solid var(--hairline); border-radius: 14px; padding: 12px 14px; }
+  .notif.waiting { border-color: rgba(178,134,117,0.45); background: #fdfaf7; }
+  .n-head { display: flex; gap: 10px; align-items: flex-start; }
+  .n-ico { width: 32px; height: 32px; border-radius: 10px; background: var(--sand); display: flex; align-items: center; justify-content: center; flex: none; position: relative; }
+  .n-ico svg { width: 17px; height: 17px; }
+  .n-txt { flex: 1; min-width: 0; font-size: 12px; line-height: 1.5; }
+  .n-txt b { font-weight: 600; }
+  .n-when { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .n-actions { display: flex; gap: 7px; margin-top: 10px; margin-left: 42px; }
+  .n-btn { font-size: 11px; font-weight: 600; border-radius: 999px; padding: 7px 14px; border: 0; }
+  .n-btn.go { background: var(--terracotta); color: #fff; }
+  .n-btn.no { background: transparent; color: var(--espresso); border: 1px solid var(--hairline); }
+  .notif.read { opacity: 0.72; }
+
+  /* empty state */
+  .empty-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 40px; }
+  .empty-ico { width: 66px; height: 66px; border-radius: 22px; background: var(--sand); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .empty-ico svg { width: 30px; height: 30px; stroke: var(--terracotta); }
+  .empty-title { font-family: var(--serif); font-size: 20px; font-weight: 500; }
+  .empty-sub { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  /* icon legend */
+  .legend { margin-top: 10px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  .leg-row { display: flex; gap: 12px; align-items: flex-start; background: var(--white); border: 1px solid var(--hairline); border-radius: 14px; padding: 14px 16px; }
+  .leg-ico { width: 38px; height: 38px; border-radius: 12px; background: var(--sand); display: flex; align-items: center; justify-content: center; flex: none; }
+  .leg-ico svg { width: 20px; height: 20px; }
+  .leg-name { font-size: 12.5px; font-weight: 600; }
+  .leg-name code { font-family: ui-monospace, Menlo, monospace; font-size: 10px; background: var(--sand); padding: 1px 5px; border-radius: 4px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+  .leg-desc { font-size: 11.5px; color: #6b564d; line-height: 1.55; margin-top: 3px; }
+
+  .rules { margin-top: 72px; border-top: 1px solid var(--espresso); padding-top: 26px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px 36px; }
+  .rule h3 { font-family: var(--serif); font-size: 15px; font-weight: 600; margin-bottom: 7px; }
+  .rule h3 span { color: var(--terracotta-deep); font-style: italic; margin-right: 6px; }
+  .rule p { font-size: 12.5px; line-height: 1.7; color: #6b564d; }
+
+  @media (max-width: 720px) {
+    .sheet { padding: 32px 18px 64px; }
+    header.masthead { flex-direction: column; align-items: flex-start; }
+    .meta { text-align: left; }
+    .arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <div>
+      <div class="kicker">E4 Part Deux · rev 2 · Notifications · 2026-07-10</div>
+      <div class="brandline">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#492f28" stroke-width="2.6" stroke-linecap="round">
+          <path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" /><path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" />
+        </svg>
+        <h1><em>Activity</em>, not alerts</h1>
+      </div>
+    </div>
+    <div class="meta">
+      <b>Nothing To Wear</b> · notifications live in the profile<br />
+      No bell · no tray · no push (later, separately)<br />
+      Lending flow: <b>lending-borrow-requests.html</b>
+    </div>
+  </header>
+
+  <p class="intro">
+    Notifications live in an <b>Activity section of the Profile hub</b> — one calm place, visited on the
+    user's terms. The only ambient signal is a <b>small terracotta dot</b> on the profile avatar: no numbers
+    in the nav, no red, no badges shouting. Things that need <b>your action</b> wait at the top with their
+    actions inline; everything else files itself under "Earlier."
+  </p>
+
+  <section class="act">
+    <div class="act-head">
+      <span class="act-num">Where it lives</span>
+      <span class="act-title">Dot → hub → activity</span>
+      <span class="act-sub">three waiting notifications, start to finish</span>
+    </div>
+
+    <div class="flow">
+
+      <!-- 1 · Hub with badge -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>8:05</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="ntw-top">
+            <div class="ntw-word">
+              <svg viewBox="0 0 48 48" fill="none" stroke="#492f28" stroke-width="2.6" stroke-linecap="round"><path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" /><path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" /></svg>
+              <span>Profile</span>
+            </div>
+            <div class="nav-ava">A<span class="ping"></span></div>
+          </div>
+          <div class="view-title">Arianna</div>
+          <div class="view-sub">Your profile powers your closet — each section unlocks a capability.</div>
+
+          <div class="hub-card" style="border-color: rgba(178,134,117,0.45); background: #fdfaf7;">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="#9c7060" stroke-linecap="round"><path d="M4 12h6l2-3 2 6 2-3h4"/></svg></div>
+            <div class="hub-main">
+              <div class="hub-name">Activity <span class="hub-count">3</span></div>
+              <div class="hub-sub">2 requests + 1 return waiting on you</div>
+            </div>
+            <div class="hub-chev">›</div>
+          </div>
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="#9c7060" stroke-linecap="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Where my clothes live</div><div class="hub-sub">4 locations</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="#9c7060" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 2.9-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><circle cx="17.5" cy="9.5" r="2.4"/><path d="M15.6 14.9c2.6.1 4.3 1.4 4.9 4.1"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Sharing and borrowers</div><div class="hub-sub">3 viewers · 2 on loan</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke="#9c7060" stroke-linecap="round"><path d="M12 4v16M5 8c2 0 3-2 3-2s1 2 3 2 3-2 3-2 1 2 3 2"/></svg></div>
+            <div class="hub-main"><div class="hub-name">My measurements</div><div class="hub-sub">Unlocks "Fits me now"</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">01 — The signal</div>
+          <div class="step-title">One dot, no numbers in the nav</div>
+          <div class="step-note">The avatar carries a small terracotta dot when anything waits. Inside the hub, the Activity card states plainly what's waiting ("2 requests + 1 return") — informative, never urgent-sounding.</div>
+        </div>
+      </div>
+
+      <div class="arrow">⟶</div>
+
+      <!-- 2 · Activity: 3 waiting -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>8:05</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="ntw-top">
+            <div class="ntw-word"><span>‹ Profile</span></div>
+            <div class="nav-ava">A<span class="ping"></span></div>
+          </div>
+          <div class="view-title">Activity</div>
+
+          <div class="grp-label">Waiting on you · 3 <span class="line"></span></div>
+
+          <div class="notif waiting">
+            <div class="n-head">
+              <div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M12 4a2 2 0 1 1 2 2c-1 0-2 .8-2 2v1"/><path d="m12 9-8 5.2c-.7.5-.4 1.8.5 1.8h15c.9 0 1.2-1.3.5-1.8L12 9Z"/><path d="M17 19l3 3m0-3-3 3" transform="translate(0,-2)"/></svg></div>
+              <div class="n-txt"><b>MJ</b> asked to borrow the <b>grey wool blazer</b><br /><span style="font-style:italic; color:#6b564d;">"For the Miami trip! Back by the 24th 🤞"</span><div class="n-when">10 minutes ago</div></div>
+            </div>
+            <div class="n-actions"><button class="n-btn go">Approve…</button><button class="n-btn no">Deny</button></div>
+          </div>
+
+          <div class="notif waiting">
+            <div class="n-head">
+              <div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M4 9h16v10H4z"/><path d="m4 9 2-4h12l2 4M12 13v3"/></svg></div>
+              <div class="n-txt"><b>Chloe</b> marked the <b>Valentino heels</b> returned · says <b>returning clean</b><div class="n-when">2 hours ago</div></div>
+            </div>
+            <div class="n-actions"><button class="n-btn go">Confirm return…</button></div>
+          </div>
+
+          <div class="notif waiting">
+            <div class="n-head">
+              <div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></svg></div>
+              <div class="n-txt"><b>Sasha</b> asked to borrow the <b>linen co-ord</b><div class="n-when">yesterday · expires in 13 days</div></div>
+            </div>
+            <div class="n-actions"><button class="n-btn go">Approve…</button><button class="n-btn no">Deny</button></div>
+          </div>
+
+          <div class="grp-label quiet">Earlier <span class="line"></span></div>
+          <div class="notif read">
+            <div class="n-head">
+              <div class="n-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#8a7a72" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="8" r="3.2"/><path d="M4.5 19c.8-3 2.9-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><path d="m15.5 8.5 2 2 3.5-3.5"/></svg></div>
+              <div class="n-txt"><b>MJ</b> is now viewing your closet<div class="n-when">Tuesday</div></div>
+            </div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">02 — Three waiting</div>
+          <div class="step-title">Actions live in the row</div>
+          <div class="step-note">"Waiting on you" pins actionable items with their verbs inline — Approve/Deny opens the approve sheet (care terms + due date), Confirm return opens the condition chips. "Earlier" items auto-read on view; no unread bookkeeping to manage.</div>
+        </div>
+      </div>
+
+      <div class="arrow">⟶</div>
+
+      <!-- 3 · Empty state -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>9:30</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="ntw-top">
+            <div class="ntw-word"><span>‹ Profile</span></div>
+            <div class="nav-ava">A</div>
+          </div>
+          <div class="view-title">Activity</div>
+          <div class="empty-wrap">
+            <div class="empty-ico">
+              <svg viewBox="0 0 48 48" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" /><path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" /></svg>
+            </div>
+            <div class="empty-title">All quiet.</div>
+            <div class="empty-sub">Nothing needs you. Requests, returns, and due dates will gather here when they do.</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">03 — Empty</div>
+          <div class="step-title">A state to aspire to</div>
+          <div class="step-note">No dot on the avatar, no guilt copy, no "engage more" prompts. Calm is the product promise; an empty Activity is the app working.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- icon system -->
+  <section class="act">
+    <div class="act-head">
+      <span class="act-num">Icon system</span>
+      <span class="act-title">Seven types, one language</span>
+      <span class="act-sub">line icons on sand tiles · terracotta accent · never red</span>
+    </div>
+    <div class="legend">
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M12 4a2 2 0 1 1 2 2c-1 0-2 .8-2 2v1"/><path d="m12 9-8 5.2c-.7.5-.4 1.8.5 1.8h15c.9 0 1.2-1.3.5-1.8L12 9Z"/><path d="m16 20 4-0m-2-2 2 2-2 2"/></svg></div>
+        <div><div class="leg-name">Borrow request <code>borrow_request</code></div><div class="leg-desc">Hanger with an outbound arrow. Actionable → Approve… / Deny inline. To the owner.</div></div>
+      </div>
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M12 4a2 2 0 1 1 2 2c-1 0-2 .8-2 2v1"/><path d="m12 9-8 5.2c-.7.5-.4 1.8.5 1.8h15c.9 0 1.2-1.3.5-1.8L12 9Z"/><path d="m15.5 19.5 2 2 4-4"/></svg></div>
+        <div><div class="leg-name">Request approved <code>request_approved</code></div><div class="leg-desc">Hanger with a check. Carries care terms + due date; "Got it" stamps the care acknowledgement. To the borrower.</div></div>
+      </div>
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M12 4a2 2 0 1 1 2 2c-1 0-2 .8-2 2v1"/><path d="m12 9-8 5.2c-.7.5-.4 1.8.5 1.8h15c.9 0 1.2-1.3.5-1.8L12 9Z"/><path d="M16 20h6"/></svg></div>
+        <div><div class="leg-name">Request declined <code>request_denied</code></div><div class="leg-desc">Hanger with a dash — soft, not an ✕. Shows the owner's softener ("it's delicate"). To the borrower.</div></div>
+      </div>
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l2.5 2"/></svg></div>
+        <div><div class="leg-name">Due soon <code>due_soon</code></div><div class="leg-desc">Clock. Fires 3 days before due-back, to both parties. Owner's copy offers the prewritten reminder text (sent from her own messenger).</div></div>
+      </div>
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M4 9h16v10H4z"/><path d="m4 9 2-4h12l2 4M12 13v3"/></svg></div>
+        <div><div class="leg-name">Marked returned <code>marked_returned</code></div><div class="leg-desc">Open box. Actionable → Confirm return… opens the condition chips. Shows the borrower's clean / needs-laundering declaration. To the owner.</div></div>
+      </div>
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="m4 10 6-6h5a2 2 0 0 1 2 2v5l-6 6-7-7Z"/><circle cx="13.5" cy="8.5" r="1.2"/></svg></div>
+        <div><div class="leg-name">Condition logged <code>condition_logged</code></div><div class="leg-desc">Tag. Informational close-out to the borrower: "Arianna confirmed the return." Discrepancies are recorded quietly, not surfaced as conflict.</div></div>
+      </div>
+      <div class="leg-row">
+        <div class="leg-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="8" r="3.2"/><path d="M4.5 19c.8-3 2.9-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><path d="m15.5 8.5 2 2 3.5-3.5"/></svg></div>
+        <div><div class="leg-name">New viewer <code>viewer_joined</code></div><div class="leg-desc">Person with a check (Part Une): "MJ is now viewing your closet," with a one-tap path to the sharing panel to revoke.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rules">
+    <div class="rule">
+      <h3><span>i.</span>Notifications live in the profile</h3>
+      <p>Locked 2026-07-10: no global bell, no tray, no push (a later, separate design). Activity is a hub section; the only ambient signal is the avatar dot. Calm beats immediate.</p>
+    </div>
+    <div class="rule">
+      <h3><span>ii.</span>Waiting ≠ unread</h3>
+      <p>The model is "things needing my action" vs "things that happened." Waiting items pin to the top with inline verbs; Earlier items mark themselves read on view — the user never manages an inbox.</p>
+    </div>
+    <div class="rule">
+      <h3><span>iii.</span>The dot is the loudest we get</h3>
+      <p>Terracotta, small, numberless in the nav. Counts appear only inside the hub card. Nothing is red; overdue is "a while," a denial is a dash — the palette carries the tone.</p>
+    </div>
+    <div class="rule">
+      <h3><span>iv.</span>One table, one writer</h3>
+      <p><code>notifications</code> (user_id, type, payload, read_at, acted_at), RLS owner-scoped, written in the same transaction as the borrow-request mutation that caused it — Activity can never disagree with the loan's actual state.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
