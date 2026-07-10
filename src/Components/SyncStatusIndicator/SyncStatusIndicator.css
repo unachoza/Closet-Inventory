@@ -1,3 +1,5 @@
+@import "../../styles/breakpoints.css";
+
 .sync-status-indicator {
 	display: inline-flex;
 	align-items: center;
@@ -14,7 +16,7 @@
 }
 
 /* Collapse to the icon-only pill on narrow screens; the tooltip still carries detail. */
-@media (max-width: 640px) {
+@media (--bp-sm) {
 	.sync-status-indicator__label {
 		display: none;
 	}

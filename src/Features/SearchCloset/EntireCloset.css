@@ -1,3 +1,5 @@
+@import "../../styles/breakpoints.css";
+
 /* =========================================================
    EntireCloset — layout & search/filter/sort UI
    ========================================================= */
@@ -570,7 +572,7 @@ button.filter-accordion__header:focus{
    renders `items-grid`) and has been removed. Only `__empty` below is used. */
 
 /* Mobile — panel takes full width, footer stays pinned via flex layout */
-@media (max-width: 480px) {
+@media (--bp-xs) {
 	.filter-side-panel {
 		width: 100vw;
 		max-width: 100vw;
@@ -583,7 +585,7 @@ button.filter-accordion__header:focus{
 	flex-direction: column;
 	align-items: center;
 	padding: var(--spacing-400) 0;
-	    background: var(--bg-surface-glass)
+	background: var(--bg-surface-glass);
 	color: var(--Op-Light-Grey, #aaa); /* or #b9b9b9 */
 	text-align: center;
     backdrop-filter: var(--blur, blur(12px));

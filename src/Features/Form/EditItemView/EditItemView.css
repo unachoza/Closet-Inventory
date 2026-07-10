@@ -1,3 +1,5 @@
+@import "../../../styles/breakpoints.css";
+
 .edit-form {
       position: relative;
       overflow: hidden; /* important for max-height animations */
@@ -249,7 +251,7 @@ button.submit.ingestion-edit-form {
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 /* Tablet — form is 45rem wide, so use container query breakpoints not viewport */
-@media (max-width: 768px) {
+@media (--bp-md) {
   .edit-form {
     margin: 0;
     border-radius: 0;
@@ -265,7 +267,7 @@ button.submit.ingestion-edit-form {
   /* material already spans 2 cols — keep that on tablet */
 }
 
-@media (max-width: 520px) {
+@media (--bp-xs) {
   .form-fields {
     grid-template-columns: 1fr;
   }
@@ -289,7 +291,7 @@ button.submit.ingestion-edit-form {
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .edit-form-preview-img {
     max-width: 100px;
     max-height: 100px;

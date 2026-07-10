@@ -1,3 +1,5 @@
+@import "../../styles/breakpoints.css";
+
 .gmail-container {
 	/* width: 100%; */
 	display: flex;
@@ -194,7 +196,7 @@
 	display: none;
 }
 
-@media (max-width: 768px) {
+@media (--bp-md) {
 	.gmail-results {
 		grid-template-columns: 1fr;
 	}
@@ -587,7 +589,7 @@
 }
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
+@media (--bp-md) {
   .gmail-container {
     margin: 0.5rem;
     padding: var(--spacing-100);
@@ -695,7 +697,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .gmail-auth-section {
     padding: var(--spacing-200);
   }

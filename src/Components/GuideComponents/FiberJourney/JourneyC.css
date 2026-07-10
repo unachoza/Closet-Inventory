@@ -1,3 +1,5 @@
+@import "../../../styles/breakpoints.css";
+
 /* ── Journey C: Dark Flowchart Swimlanes ── */
 
 /* Token definitions — ported from FiberJourneyC.html prototype */
@@ -475,7 +477,7 @@
 /* ── Single-column layout: ≤ 768px ─────────────────────────────────────────
    Below this width two columns of ~44vw no longer fit comfortably.
    Switch to a simple vertical stack with down arrows between phases.       */
-@media (max-width: 768px) {
+@media (--bp-md) {
   .jc-container {
     flex-direction: column;
     align-items: center;
@@ -524,7 +526,7 @@
 }
 
 /* ── Compact tweaks for small phones ────────────────────────────────────── */
-@media (max-width: 450px) {
+@media (--bp-xs) {
   .jc-phase-col,
   .jc-phase-col-0,
   .jc-phase-col-1,

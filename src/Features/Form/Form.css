@@ -1,3 +1,5 @@
+@import "../../styles/breakpoints.css";
+
 :root {
 	--background-form: #31341c59;
 	--Form-width: 45rem;
@@ -180,7 +182,7 @@ button.submit:hover {
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
+@media (--bp-md) {
   :root {
     --Form-width: calc(100vw - 1rem);
     --Form-padding: 1rem;
@@ -208,7 +210,7 @@ button.submit:hover {
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   :root {
     --Form-padding: 0.75rem;
   }
