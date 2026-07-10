@@ -89,11 +89,13 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					</div>
 				</div>
 
-				{/* Composition bar — proportional segments + dot legend */}
+				{/* Composition bar — proportional segments + dot legend. Compact on the
+				    flipped card-back (no legend text) since the card is only ~47vw wide
+				    on phones; full legend shows in the expanded modal. */}
 				{blend.length > 0 && (
 					<div className="card-details__composition">
 						<SectionTitle label="Composition" />
-						<MaterialCompositionBar blend={blend} />
+						<MaterialCompositionBar blend={blend} compact={!isFull} />
 					</div>
 				)}
 

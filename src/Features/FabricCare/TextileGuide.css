@@ -492,16 +492,21 @@ button:focus-visible .toc-link.active {
 /* ── DETAIL PANEL (modal) ──
    Rendered via a portal at document.body (see Modal.tsx), so this no longer
    fights the sticky NavBar's stacking context — z-index just needs to clear
-   ordinary page content. Top/bottom padding gives real breathing room above
-   and below the panel (was 40px, less than the nav height, so the panel's
-   top edge sat behind the header); the panel itself now scrolls its own
-   body instead of the whole overlay, so the header + close button stay put
-   and the card never grows taller than the viewport. */
+   ordinary page content. Top padding is tied to the same --header-height
+   token the NavBar itself uses (defined in :root, src/index.css) so the
+   panel's top edge always clears the real nav height instead of a guessed
+   constant — with align-items:center below, a tall panel gets clamped by
+   max-height and its top lands exactly at this padding, so an insufficient
+   value here reproduces the "hidden under header" bug even though the panel
+   nominally has "more space". Bottom padding gives the same breathing room
+   at the bottom; the panel itself now scrolls its own body instead of the
+   whole overlay, so the header + close button stay put and the card never
+   grows taller than the viewport. */
 .detail-overlay {
       position: fixed;
       z-index: 2000;
       display: none;
-      padding: max(24px, env(safe-area-inset-top) + 16px) 20px max(24px, env(safe-area-inset-bottom) + 16px);
+      padding: calc(var(--header-height, 56px) + 16px) 20px max(24px, env(safe-area-inset-bottom) + 16px);
       background: rgba(28, 26, 23, 0.55);
       inset: 0;
       overflow: hidden;
@@ -520,7 +525,12 @@ button:focus-visible .toc-link.active {
       overflow: hidden;
       width: 100%;
       max-width: 700px;
-      max-height: 100%;
+      /* `max-height: 100%` here (a cross-axis percentage inside .detail-overlay's
+         row-direction flex box) resolved inconsistently across browsers —
+         WebKit honored it, Chrome did not, letting the panel overflow the
+         viewport bottom. Computed explicitly instead (mirrors .card-grow-modal's
+         proven max-height pattern), independent of flex percentage resolution. */
+      max-height: calc(100dvh - var(--header-height, 56px) - 16px - max(24px, env(safe-area-inset-bottom) + 16px));
       margin: auto;
       border-radius: 20px;
       background: var(--warm-white);
