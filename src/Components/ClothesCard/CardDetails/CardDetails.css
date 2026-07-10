@@ -1,41 +1,63 @@
 /* Main container */
 .card-details {
-	background: var(--bg-surface-primary);
-	border-radius: 12px;
-	width: 100%;
-	height: 100%;
 	display: flex;
 	flex-direction: column;
-	box-sizing: border-box;
-	font-family: var(--font-ui);
 	overflow: hidden;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	border-radius: 12px;
+	background: var(--bg-surface-primary);
+	font-family: var(--font-ui);
 	text-align: left;
+	/* When nested inside .card-grow-modal (a flex column with a clamped
+	   max-height), stretch to fill it and allow shrinking so the scrollable
+	   area below can actually scroll instead of pushing the footer off-screen.
+	   Ignored when .card-details is a plain block child of .card-back (compact
+	   view) — height:100% governs there, same as before. */
+	flex: 1 1 auto;
 }
 
 /* Scrollable content area */
 .card-details__scrollable {
-	flex: 1;
-	overflow-y: auto;
-	overflow-x: initial;
-	padding: 20px 20px 14px;
+	position: relative;
 	display: flex;
 	flex-direction: column;
+	min-height: 0;
+	padding: 20px 20px 14px;
+	-webkit-overflow-scrolling: touch;
+	flex: 1 1 auto;
 	gap: 10px;
-	position: relative;
+	overflow-x: initial;
+	overflow-y: auto;
 }
 
-/* Footer — toggle button always pinned at bottom */
+/* Footer — toggle button / action buttons always pinned at bottom, outside
+   the scrollable area, so they never scroll out of reach. */
 .card-details__footer {
-	flex-shrink: 0;
 	padding: 0 20px 16px;
+	flex-shrink: 0;
+	padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-/* Header: name + category badge */
+/* Full-view action footer (Edit/Remove) — separated from scrollable content
+   with a hairline so it doesn't read as floating. */
+.card-details__footer--actions {
+	border-top: 1px solid var(--border-hairline);
+	padding-top: 14px;
+}
+
+/* Header: name + category badge. padding-right reserves a gutter so the
+   absolutely-positioned close button (below) never overlaps the title text,
+   however narrow the card is. */
 .card-details__header {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	width: 95%;
+	box-sizing: border-box;
+	width: 100%;
+	padding-right: 36px;
 }
 
 .card-details__header-text {
@@ -80,6 +102,7 @@
 	line-height: 1.2;
 	margin: 0 0 3px 0;
 	text-align: left;
+	overflow-wrap: break-word;
 }
 
 .card-details__brand {
@@ -337,8 +360,8 @@
 
 @media (max-width: 480px) {
   .card-details__close {
-    top: 0;
-    right: 0;
+    top: 4px;
+    right: 4px;
   }
   .card-details__name {
     font-size: 1.05rem;
@@ -353,11 +376,18 @@
   }
   .card-details__footer {
     padding: 5px 10px 10px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
   }
-  .card-details__name {
-    width: calc(var(--Card-width) - 10px);
+  .card-details__footer--actions {
+    /* Re-assert padding-top: the shorthand above (same specificity, later in
+       source) would otherwise clobber it back down to 5px. */
+    padding-top: 14px;
   }
-  .card-details__header{
-	width: 93%;
+  .card-details__header {
+    /* Narrower gutter at this size (close button is smaller/closer to the
+       edge here) — was a hardcoded width that ignored the close button and
+       caused the title to render underneath it; now flows naturally within
+       the padded, gutter-reserving header (see base rule above). */
+    padding-right: 32px;
   }
 }

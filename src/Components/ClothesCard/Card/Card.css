@@ -190,13 +190,18 @@
 .card-grow-modal {
 	position: fixed;
 	z-index: 1001;
+	display: flex;
+	flex-direction: column;
+	/* .card-details (inside) owns scrolling via .card-details__scrollable, so
+	   its pinned action footer never scrolls out of view — this container
+	   just clips at the flex-clamped height instead of scrolling as a whole. */
+	overflow: hidden;
 	box-sizing: border-box;
+	max-height: calc(100dvh - var(--card-modal-top, 68px) - 12px);
+	min-height: 300px;
 	border: 1px solid var(--border-hairline);
 	border-radius: var(--border-radius-md);
-	overflow-y: auto;
 	box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.45);
-	min-height: 300px;
-	max-height: calc(100dvh - var(--card-modal-top, 68px) - 12px);
 	transition:
 		top 0.55s cubic-bezier(0.32, 0.7, 0, 1),
 		left 0.55s cubic-bezier(0.32, 0.7, 0, 1),
@@ -238,12 +243,15 @@
   :root {
     /* Two cards per row on small phones */
     /* --Card-width: calc(40vw - 3rem); */
-    --Card-height: 13rem;
+    --Card-height: 15rem;
   }
 
   .card {
       width: 47vw;
-      height: 13.5rem;
+      /* Was 13.5rem — too little room for title + pills + the Composition
+         section before the "See all details" footer button, so the bar
+         rendered just past the scrollable fold and read as "cut off". */
+      height: 15rem;
   }
 
   .card-image img {
