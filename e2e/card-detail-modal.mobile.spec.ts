@@ -23,6 +23,13 @@ async function expectWithinViewport(page: Page, selector: string) {
 	expect(box!.x + box!.width, `${selector} overflows the right edge`).toBeLessThanOrEqual(viewport!.width + 1);
 }
 
+type Box = { x: number; y: number; width: number; height: number };
+
+/** True if two axis-aligned boxes intersect (no tolerance — any pixel of overlap counts). */
+function boxesOverlap(a: Box, b: Box): boolean {
+	return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+}
+
 test.describe("Card detail modal — mobile", () => {
 	// The grow/shrink modal tears down on a `width` transitionend, which WebKit
 	// fires unreliably under automation — leaving the modal "stuck" open. Reduced
@@ -174,5 +181,90 @@ test.describe("Card detail modal — mobile", () => {
 			expect(box, `card ${i} has no bounding box`).not.toBeNull();
 			expect(box!.y, `card ${i} top is above the viewport`).toBeGreaterThanOrEqual(-1);
 		}
+	});
+
+	// ── Regression: E5 mobile debug pass (close button / edit-remove / composition) ──
+	//
+	// Seed item "001" ("Sculpt Knit Racer Mini Dress | Bodycon Knit Pink dress")
+	// is the exact fixture from the reported screenshots — a long two-line name
+	// with a material blend, which is what made these three bugs visible.
+
+	test("close button does not overlap the item name (regression: close button over title text)", async ({ page }) => {
+		const card = page.getByTestId("clothes-card").first();
+		await card.tap();
+		await expect(card).toHaveClass(/flipped/);
+		await page.waitForTimeout(900);
+
+		const closeBox = await card.locator(".card-details__close").boundingBox();
+		const nameBox = await card.locator(".card-details__name").boundingBox();
+		expect(closeBox, "close button should have a bounding box").not.toBeNull();
+		expect(nameBox, "item name should have a bounding box").not.toBeNull();
+
+		expect(
+			boxesOverlap(closeBox as Box, nameBox as Box),
+			`close button ${JSON.stringify(closeBox)} overlaps item name ${JSON.stringify(nameBox)}`,
+		).toBe(false);
+	});
+
+	test("Edit and Remove buttons are fully within the modal and viewport (regression: action buttons cut off)", async ({
+		page,
+	}) => {
+		const card = page.getByTestId("clothes-card").first();
+		await card.tap();
+		await expect(card).toHaveClass(/flipped/);
+		await page.waitForTimeout(900);
+		await card.getByRole("button", { name: /see all details/i }).tap({ force: true });
+
+		const modal = page.locator(".card-grow-modal");
+		await expect(modal).toBeVisible();
+		await page.waitForTimeout(450);
+
+		const modalBox = await modal.boundingBox();
+		const editBox = await modal.getByRole("button", { name: "Edit" }).boundingBox();
+		const removeBox = await modal.getByRole("button", { name: "Remove" }).boundingBox();
+		const viewportHeight = page.viewportSize()!.height;
+
+		expect(modalBox, "modal should have a bounding box").not.toBeNull();
+		expect(editBox, "Edit button should have a bounding box").not.toBeNull();
+		expect(removeBox, "Remove button should have a bounding box").not.toBeNull();
+
+		const modalBottom = modalBox!.y + modalBox!.height;
+		for (const [label, box] of [
+			["Edit", editBox!],
+			["Remove", removeBox!],
+		] as const) {
+			const bottom = box.y + box.height;
+			expect(bottom, `${label} bottom (${bottom.toFixed(1)}) overflows modal bottom (${modalBottom.toFixed(1)})`).toBeLessThanOrEqual(
+				modalBottom + 2,
+			);
+			expect(bottom, `${label} is below the visible viewport`).toBeLessThanOrEqual(viewportHeight);
+		}
+
+		// Cleanup
+		await modal.getByRole("button", { name: "Close" }).dispatchEvent("click");
+		await expect(modal).toBeHidden();
+	});
+
+	test("Composition section is visible on the flipped card without scrolling (regression: composition bar cut off)", async ({
+		page,
+	}) => {
+		const card = page.getByTestId("clothes-card").first();
+		await card.tap();
+		await expect(card).toHaveClass(/flipped/);
+		await page.waitForTimeout(900);
+
+		const cardBox = await card.boundingBox();
+		const compositionBox = await card.locator(".card-details__composition").boundingBox();
+		expect(cardBox, "card should have a bounding box").not.toBeNull();
+		expect(compositionBox, "composition section should have a bounding box").not.toBeNull();
+
+		expect(compositionBox!.height, "composition section is rendered with zero height").toBeGreaterThan(0);
+
+		const cardBottom = cardBox!.y + cardBox!.height;
+		const compositionBottom = compositionBox!.y + compositionBox!.height;
+		expect(
+			compositionBottom,
+			`composition bottom (${compositionBottom.toFixed(1)}) is cut off below the card (${cardBottom.toFixed(1)})`,
+		).toBeLessThanOrEqual(cardBottom + 2);
 	});
 });

@@ -180,10 +180,24 @@ describe("CardDetails", () => {
 		expect(inlineStyle).not.toMatch(/display\s*:\s*none/);
 	});
 
-	it("full variant: no footer element is rendered (regression: phantom footer in modal)", () => {
+	it("full variant: compact's 'See all details' toggle is not rendered (regression: phantom footer in modal)", () => {
 		render(<CardDetails item={item} variant="full" onEdit={() => {}} onRemove={() => {}} />);
 
-		expect(document.querySelector(".card-details__footer")).not.toBeInTheDocument();
+		expect(screen.queryByRole("button", { name: /see all details/i })).not.toBeInTheDocument();
+	});
+
+	it("full variant: Edit/Remove action footer is a direct child of .card-details, not nested inside .card-details__scrollable (E5 regression: buttons cut off / unreachable)", () => {
+		render(<CardDetails item={item} variant="full" onEdit={() => {}} onRemove={() => {}} />);
+
+		const footer = document.querySelector(".card-details__footer--actions");
+		const scrollable = document.querySelector(".card-details__scrollable");
+		const container = document.querySelector(".card-details");
+
+		expect(footer, "actions footer must exist in full variant").toBeInTheDocument();
+		expect(scrollable, "scrollable must exist").toBeInTheDocument();
+		expect(container, "card-details container must exist").toBeInTheDocument();
+		expect(footer!.parentElement).toBe(container);
+		expect(scrollable!.contains(footer)).toBe(false);
 	});
 
 	it("compact variant: footer not rendered when item has no expandable content (no ghost button)", () => {

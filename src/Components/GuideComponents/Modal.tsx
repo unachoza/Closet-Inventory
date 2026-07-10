@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
 
@@ -25,7 +26,14 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 
 	if (!fiber) return null;
 
-	return (
+	// Rendered via a portal directly under <body>: this modal is otherwise
+	// mounted inside .app-content, which has its own `z-index: 1` (needed to
+	// sit above the background scrim) and therefore establishes a stacking
+	// context. That traps this modal's z-index underneath the sticky NavBar
+	// (`z-index: 100`, a sibling of .app-content) no matter how high the
+	// modal's own z-index is set. Escaping to document.body sidesteps that
+	// entirely so the modal reliably renders above the header.
+	return createPortal(
 		<div
 			className="detail-overlay open"
 			onClick={(e) => e.target === e.currentTarget && onClose()}
@@ -65,7 +73,8 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 					))}
 				</div>
 			</div>
-		</div>
+		</div>,
+		document.body,
 	);
 }
 

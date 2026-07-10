@@ -89,11 +89,13 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					</div>
 				</div>
 
-				{/* Composition bar — proportional segments + dot legend */}
+				{/* Composition bar — proportional segments + dot legend. Compact on the
+				    flipped card-back (no legend text) since the card is only ~47vw wide
+				    on phones; full legend shows in the expanded modal. */}
 				{blend.length > 0 && (
 					<div className="card-details__composition">
 						<SectionTitle label="Composition" />
-						<MaterialCompositionBar blend={blend} />
+						<MaterialCompositionBar blend={blend} compact={!isFull} />
 					</div>
 				)}
 
@@ -219,41 +221,6 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 								))}
 							</div>
 						)}
-						{/* Action buttons */}
-						{confirming ? (
-							<div className="card-details__confirm-section">
-								<p className="card-details__confirm-text">Remove this item?</p>
-								<div className="card-details__buttons">
-									<button
-										onClick={() => setConfirming(false)}
-										className="card-details__button card-details__button--cancel"
-									>
-										Cancel
-									</button>
-									<button
-										onClick={() => {
-											setConfirming(false);
-											onRemove?.();
-										}}
-										className="card-details__button card-details__button--confirm"
-									>
-										Yes, remove
-									</button>
-								</div>
-							</div>
-						) : (
-							<div className="card-details__buttons">
-								<button onClick={onEdit} className="card-details__button">
-									Edit
-								</button>
-								<button
-									onClick={() => setConfirming(true)}
-									className="card-details__button card-details__button--remove"
-								>
-									Remove
-								</button>
-							</div>
-						)}
 					</div>
 				)}
 			</div>
@@ -264,6 +231,47 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<button onClick={onExpand} className="card-details__toggle-details">
 						See all details
 					</button>
+				</div>
+			)}
+
+			{/* Full view only: action buttons pinned in their own footer, outside the
+			    scrollable content area, so they never scroll out of reach / get clipped. */}
+			{isFull && (
+				<div className="card-details__footer card-details__footer--actions">
+					{confirming ? (
+						<div className="card-details__confirm-section">
+							<p className="card-details__confirm-text">Remove this item?</p>
+							<div className="card-details__buttons">
+								<button
+									onClick={() => setConfirming(false)}
+									className="card-details__button card-details__button--cancel"
+								>
+									Cancel
+								</button>
+								<button
+									onClick={() => {
+										setConfirming(false);
+										onRemove?.();
+									}}
+									className="card-details__button card-details__button--confirm"
+								>
+									Yes, remove
+								</button>
+							</div>
+						</div>
+					) : (
+						<div className="card-details__buttons">
+							<button onClick={onEdit} className="card-details__button">
+								Edit
+							</button>
+							<button
+								onClick={() => setConfirming(true)}
+								className="card-details__button card-details__button--remove"
+							>
+								Remove
+							</button>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

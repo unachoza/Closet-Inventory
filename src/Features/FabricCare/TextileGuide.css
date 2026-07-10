@@ -489,27 +489,48 @@ button:focus-visible .toc-link.active {
       background: var(--border);
 }
 
-/* ── DETAIL PANEL (modal) ── */
+/* ── DETAIL PANEL (modal) ──
+   Rendered via a portal at document.body (see Modal.tsx), so this no longer
+   fights the sticky NavBar's stacking context — z-index just needs to clear
+   ordinary page content. Top padding is tied to the same --header-height
+   token the NavBar itself uses (defined in :root, src/index.css) so the
+   panel's top edge always clears the real nav height instead of a guessed
+   constant — with align-items:center below, a tall panel gets clamped by
+   max-height and its top lands exactly at this padding, so an insufficient
+   value here reproduces the "hidden under header" bug even though the panel
+   nominally has "more space". Bottom padding gives the same breathing room
+   at the bottom; the panel itself now scrolls its own body instead of the
+   whole overlay, so the header + close button stay put and the card never
+   grows taller than the viewport. */
 .detail-overlay {
       position: fixed;
-      z-index: 500;
+      z-index: 2000;
       display: none;
-      padding: 40px 20px;
+      padding: calc(var(--header-height, 56px) + 16px) 20px max(24px, env(safe-area-inset-bottom) + 16px);
       background: rgba(28, 26, 23, 0.55);
       inset: 0;
-      overflow-y: auto;
+      overflow: hidden;
+      box-sizing: border-box;
 }
 
 .detail-overlay.open {
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
 }
 
 .detail-panel {
+      display: flex;
+      flex-direction: column;
       overflow: hidden;
       width: 100%;
       max-width: 700px;
+      /* `max-height: 100%` here (a cross-axis percentage inside .detail-overlay's
+         row-direction flex box) resolved inconsistently across browsers —
+         WebKit honored it, Chrome did not, letting the panel overflow the
+         viewport bottom. Computed explicitly instead (mirrors .card-grow-modal's
+         proven max-height pattern), independent of flex percentage resolution. */
+      max-height: calc(100dvh - var(--header-height, 56px) - 16px - max(24px, env(safe-area-inset-bottom) + 16px));
       margin: auto;
       border-radius: 20px;
       background: var(--warm-white);
@@ -520,6 +541,7 @@ button:focus-visible .toc-link.active {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      flex-shrink: 0;
       padding: 32px 36px 24px;
       border-bottom: 1px solid var(--border);
       text-align: left;
@@ -543,7 +565,13 @@ button:focus-visible .toc-link.active {
 
 .detail-close:hover { background: var(--cream); }
 
-.detail-body { padding: 32px 36px; }
+.detail-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 32px 36px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+}
 
 .detail-section { margin-bottom: 28px; text-align: left; }
 
