@@ -1,3 +1,5 @@
+@import "../../../styles/breakpoints.css";
+
 /* Main container */
 .card-details {
 	display: flex;
@@ -358,7 +360,7 @@
 	border-color: var(--primitive-brand-deep-umber);
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .card-details__close {
     top: 4px;
     right: 4px;

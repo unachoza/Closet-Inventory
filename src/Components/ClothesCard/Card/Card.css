@@ -1,3 +1,5 @@
+@import "../../../styles/breakpoints.css";
+
 :root {
       --Card-width: 20rem;
       --Card-height: 21rem;
@@ -225,21 +227,21 @@
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
-@media (max-width: 1045px) {
+@media (--bp-lg) {
   :root {
     --Card-width: 14.5rem;
     --Card-height: 16.75rem;
   }
 }
 
-@media (max-width: 780px) {
+@media (--bp-md) {
   :root {
     --Card-width: 13rem;
     --Card-height: 15rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   :root {
     /* Two cards per row on small phones */
     /* --Card-width: calc(40vw - 3rem); */

@@ -1,0 +1,26 @@
+/* ── Breakpoint tokens ────────────────────────────────────────────────────
+   Canonical `max-width` scale, resolved by postcss-custom-media (see
+   postcss.config.js) at build time — `@media (--bp-md)` becomes
+   `@media (max-width: 768px)` in the compiled CSS.
+
+   Consolidates 9 ad-hoc breakpoint values (450/480/520/600/640/768/780/
+   1045px, plus a dead 389px rule below the 375px mobile floor) down to this
+   4-value scale. `--bp-xs`/`--bp-md` already matched the de-facto majority
+   values (480/768px, 14 uses each); the others (450, 520, 640, 780, 1045)
+   each had exactly one use and are folded into their nearest neighbor.
+
+   postcss-custom-media (v12+) requires these definitions to be present in
+   the same processed stylesheet — Vite inlines real CSS `@import`s before
+   running PostCSS, so any file using `@media (--bp-*)` must
+   `@import "../../styles/breakpoints.css";` (path relative to that file) at
+   its top. This file has no other content; the import contributes nothing
+   to compiled output beyond the substitution.
+
+   Site-wide 375px floor: iPhone 12 mini / SE2 is the minimum supported
+   layout width (see planning/launch/epics/E5-mobile-pwa.md). Do not add a
+   breakpoint narrower than --bp-xs for that reason. */
+
+@custom-media --bp-xs (max-width: 480px);
+@custom-media --bp-sm (max-width: 600px);
+@custom-media --bp-md (max-width: 768px);
+@custom-media --bp-lg (max-width: 1024px);

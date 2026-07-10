@@ -1,3 +1,4 @@
+@import "./styles/breakpoints.css";
 
 .main{
   display: flex;
@@ -98,7 +99,7 @@
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
+@media (--bp-md) {
   .button-container {
     flex-wrap: wrap;
     /* gap: 0.5rem; */
@@ -118,28 +119,21 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .button-container button {
     margin: 2px
   }
 }
 
-@media (max-width: 768px) {
+@media (--bp-md) {
   :root {
     --Card-width: 15rem;
     --Card-height: 17rem;
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
  h1 {
     font-size: 2rem;
-  }
-}
-
-@media screen and (max-width: 389px) {
- /* Style adjustments for compact screens */
- h1 {
-    font-size: 1.8rem;
   }
 }

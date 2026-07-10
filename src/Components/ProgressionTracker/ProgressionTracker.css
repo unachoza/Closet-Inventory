@@ -1,3 +1,5 @@
+@import "../../styles/breakpoints.css";
+
 :root {
       /* --FORM-WIDTH: 42rem */
 }
@@ -57,7 +59,7 @@
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
+@media (--bp-md) {
   .step-tabs-list {
     justify-content: flex-start;
     gap: 0;
@@ -80,7 +82,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .step-tab {
     padding: 0.35rem 0.4rem;
     font-size: 0.7rem;

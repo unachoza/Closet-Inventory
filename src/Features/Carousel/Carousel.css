@@ -1,3 +1,5 @@
+@import "../../styles/breakpoints.css";
+
 .carousel-container {
 	display: flex;
 	justify-content: center;
@@ -83,7 +85,7 @@
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
-@media (max-width: 768px) {
+@media (--bp-md) {
   .group-with-arrow-buttons {
     width: 100%;
     max-width: 100%;
@@ -112,7 +114,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (--bp-xs) {
   .emoji {
     font-size: 3.3rem;
   }
