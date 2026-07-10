@@ -36,11 +36,20 @@ _As Maya, I want to add it to my home screen and launch full-screen so that it f
 
 ## US-5.3 — Works offline
 _As Maya on the subway, I want to view my closet offline so that the app is reliable._
-- [ ] Cached closet viewable offline
-- [ ] Writes queue and flush on reconnect (pairs with E1 offline-first)
+- [x] Cached closet viewable offline
+- [x] Writes queue and flush on reconnect (pairs with E1 offline-first) — _delivered by E1's reconcile, not a separate outbox; see note below_
 
 **Tickets**
-- `E5-3.1` Offline closet view via SW cache — _1.5d_
+- `E5-3.1` ✅ **Done** (2026-07-10, branch `feat/e5-d-offline-verification`) — Automated regression coverage for the offline story (the E5-2.2 verification was a one-off script; this makes it repeatable). **New e2e suite** `e2e/offline-closet.pwa.spec.ts` under its own config `playwright.pwa.config.ts` (`npm run test:e2e:pwa`, port 4174): runs against `vite build && vite preview` because the SW is disabled in dev; excluded from the main dev-server suite via `testIgnore`. Tests: (1) first visit installs SW + persists closet → cut network → reload → app shell serves from SW precache AND closet cards render from the localStorage mirror, on Pixel 7 + Desktop Chrome; (2) guard test: no cache entry may reference `supabase` (stale-rows/auth-caching trap stays closed). **New unit tests** `src/services/__tests__/syncedClosetRepository.offline.test.ts`: offline read serves local cache when remote `getAll` rejects; offline write lands locally + records a sync failure; next successful reconcile pushes local-wins via `importItems(…, "merge")` and clears the indicator. 4/4 pwa e2e + 1303 unit tests green. — _0.5d actual_
+
+> **Write-queue note (documented, not built):** "writes queue and flush on reconnect" is delivered by
+> E1's offline-first sync (`src/services/syncedClosetRepository.ts`), not a dedicated outbox. Writes go
+> local-first (instant), the remote push is fire-and-forget, and a failed push is recorded by
+> `syncFailureTracker` (drives `SyncStatusIndicator`). The "flush" is the next successful `getAll()`
+> reconcile: last-write-wins merge on `updatedAt`, local-wins pushed back via `importItems("merge")`.
+> Known accepted gap (E1-1.6): a local win whose push never lands before the local cache is cleared
+> (tab closed, never reloaded again) stays stale in the cloud — a durable retry queue is deferred.
+> Covered by `syncedClosetRepository.offline.test.ts` + `syncedClosetRepository.syncFailure.test.ts`.
 
 ---
 
