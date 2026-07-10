@@ -100,6 +100,12 @@
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (--bp-md) {
+  /* Clear the fixed BottomNav so the last row of content is never covered.
+     Matches the bar's own height + safe-area padding (BottomNav.css). */
+  .app-content {
+    padding-bottom: calc(var(--bottom-nav-height, 60px) + env(safe-area-inset-bottom));
+  }
+
   .button-container {
     flex-wrap: wrap;
     /* gap: 0.5rem; */

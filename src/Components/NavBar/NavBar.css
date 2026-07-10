@@ -238,9 +238,20 @@ div.search-container > input {
 
 
       .page-title {
+            overflow: hidden;
+            min-width: 0;
             text-align: left;
             flex: 1;
             text-overflow: ellipsis;
+      }
+
+      /* The full sync/auth control (nowrap labels + "Sign in to sync" button,
+         ~240px) can't share the header row with the title on phones — it was
+         the root cause of a ~98px page-wide horizontal overflow. The drawer
+         instance (below) is its mobile home; the icon-only
+         SyncStatusIndicator stays in the header for at-a-glance state. */
+      .nav-left__sync-control {
+            display: none;
       }
       .top-nav--search .search-input {
     width: 100%;
@@ -255,6 +266,19 @@ div.search-container > input {
 
       .search-input {
             width: 100%;
+      }
+}
+
+/* Drawer copy of the sync/auth control — mobile only (complement of the
+   header instance hidden above). Bordered footer-style row for separation. */
+.nav-drawer__sync-control {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-hairline);
+}
+
+@media (--bp-md-up) {
+      .nav-drawer__sync-control {
+            display: none;
       }
 }
 

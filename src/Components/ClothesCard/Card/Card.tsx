@@ -5,6 +5,7 @@ import { CardQuickActions } from "../CardQuickActions/CardQuickActions";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import { useLongPress } from "../../../hooks/useLongPress";
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 interface CardProps {
 	item: ClothingItem;
@@ -175,25 +176,33 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 				)}
 			</div>
 
-			{/* The flipped card grows into a centered details modal */}
-			{expanded && geometry && (
-				<div className={`card-modal-overlay ${closing ? "card-modal-overlay--closing" : ""}`} onClick={handleClose}>
-					<div
-						className={`card-grow-modal${!closing ? " card-grow-modal--centered" : ""}`}
-						style={{
-							top: geometry.top,
-							left: geometry.left,
-							width: geometry.width,
-							...(geometry.height !== undefined && { height: geometry.height }),
-							"--card-modal-top": `${geometry.top}px`,
-						} as React.CSSProperties}
-						onClick={(e) => e.stopPropagation()}
-						onTransitionEnd={handleModalTransitionEnd}
-					>
-						<CardDetails item={item} variant="full" {...detailHandlers} />
-					</div>
-				</div>
-			)}
+			{/* The flipped card grows into a centered details modal. Portaled to
+			    document.body: this card sits inside .app-content, whose z-index:1
+			    creates a stacking context that would trap the fixed overlay below
+			    sibling chrome (sticky NavBar z:100, mobile BottomNav) no matter how
+			    high its own z-index is — the BottomNav was intercepting taps on the
+			    modal's pinned Edit/Remove footer. Same fix as the fabric DetailModal. */}
+			{expanded &&
+				geometry &&
+				createPortal(
+					<div className={`card-modal-overlay ${closing ? "card-modal-overlay--closing" : ""}`} onClick={handleClose}>
+						<div
+							className={`card-grow-modal${!closing ? " card-grow-modal--centered" : ""}`}
+							style={{
+								top: geometry.top,
+								left: geometry.left,
+								width: geometry.width,
+								...(geometry.height !== undefined && { height: geometry.height }),
+								"--card-modal-top": `${geometry.top}px`,
+							} as React.CSSProperties}
+							onClick={(e) => e.stopPropagation()}
+							onTransitionEnd={handleModalTransitionEnd}
+						>
+							<CardDetails item={item} variant="full" {...detailHandlers} />
+						</div>
+					</div>,
+					document.body,
+				)}
 		</>
 	);
 };

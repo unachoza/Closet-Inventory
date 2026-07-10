@@ -14,7 +14,7 @@
  * switch (the bug), the token would die on unmount and the user would be dumped
  * back to the "Connect Gmail Account" screen — this test would go red.
  */
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ── Google SDK: capture onSuccess so we can drive the REAL useGmailAuth ────────
@@ -67,7 +67,12 @@ vi.mock("./Features/Form/EditItemView/EditItemView", () => ({ default: () => <di
 import App from "./App";
 
 const openMenu = () => fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
-const clickMenuItem = (name: RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+// Scoped to the drawer: "Add Item" also exists in the mobile BottomNav FAB
+// (E5-1.3), so an unscoped query would match two buttons.
+const clickMenuItem = (name: RegExp) => {
+	const drawer = document.querySelector(".nav-drawer") as HTMLElement;
+	fireEvent.click(within(drawer).getByRole("button", { name }));
+};
 
 beforeEach(() => {
 	vi.clearAllMocks();

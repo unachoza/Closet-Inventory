@@ -3,6 +3,12 @@
 .carousel-container {
 	display: flex;
 	justify-content: center;
+	/* The centered arrow+cards row can exceed narrow viewports by a few px
+	   (justify-content:center bleeds symmetrically past both edges) and was
+	   creating page-level horizontal scroll on phones. Clip here so any
+	   residual bleed stays inside the carousel instead of widening the page. */
+	overflow: clip;
+	max-width: 100%;
 }
 
 .group-with-arrow-buttons {

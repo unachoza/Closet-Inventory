@@ -195,7 +195,13 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 				</button>
 				<h1 className="page-title">Nothing To Wear</h1>
 				<SyncStatusIndicator />
-				<CloudSyncControl />
+				{/* Full sync/auth control fits the header on desktop only; on mobile it
+				    caused a ~98px page overflow (nowrap labels + button can't fit next
+				    to the title at 375–430px), so CSS hides this instance ≤--bp-md and
+				    the drawer copy below takes over. */}
+				<div className="nav-left__sync-control">
+					<CloudSyncControl />
+				</div>
 			</div>
 
 			{drawerOpen && (
@@ -205,6 +211,11 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 						<button className="nav-drawer__close" aria-label="Close menu" onClick={closeDrawer}>
 							<X size={20} />
 						</button>
+						{/* Mobile home of the sync/auth control (hidden on desktop, where
+						    the header instance shows). Keeps "Sign in to sync" reachable. */}
+						<div className="nav-drawer__sync-control">
+							<CloudSyncControl />
+						</div>
 						<div className="nav-drawer__actions">{navActions}</div>
 					</nav>
 				</>

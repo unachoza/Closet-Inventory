@@ -6,6 +6,7 @@ import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import { ClosetProvider, useCloset } from "./context/ClosetContext";
 import { LocationsProvider } from "./context/LocationsContext";
 import NavBar from "./Components/NavBar/NavBar";
+import BottomNav from "./Components/BottomNav/BottomNav";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
@@ -208,6 +209,9 @@ function AppShell() {
 					</ErrorBoundary>
 				</div>
 			</ToastProvider>
+			{/* Mobile-only fixed bar (hidden ≥769px in CSS); shares the same
+			    Add-Item handler as the NavBar drawer (E5-1.2/E5-1.3). */}
+			<BottomNav onAddItem={handleAddItem} />
 		</div>
 	);
 }
