@@ -1,0 +1,107 @@
+@import "../../styles/breakpoints.css";
+
+/* ── Bottom navigation (mobile only, E5-1.2/E5-1.3) ──────────────────────────
+   Fixed thumb-reach bar: Home | Closet | [Add FAB] | Search | Import.
+   Hidden entirely above --bp-md — desktop keeps the hamburger drawer.
+
+   z-index 90 — deliberately BELOW the sticky .top-nav (100): the hamburger
+   drawer + its overlay live INSIDE .top-nav's stacking context, so their own
+   200/201 values can never exceed layer 100 relative to this bar; anything
+   ≥100 here would paint the bar over the open drawer. Above page content
+   (.app-content is layer 1). Modals don't rely on beating this value — the
+   card grow-modal and fabric detail modal are portaled to document.body
+   (layers 1000/2000) precisely so no in-content stacking context caps them.
+   `.app-content` reserves matching bottom padding in App.css so the bar
+   never covers scrollable content. */
+
+.bottom-nav {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 90;
+	display: grid;
+	align-items: stretch;
+	min-height: var(--bottom-nav-height, 60px);
+	background: var(--bg-surface-primary);
+	box-shadow: var(--elevation-high);
+	border-top: 1px solid var(--border-hairline);
+	grid-template-columns: repeat(5, 1fr);
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Mobile-first: visible by default, hidden on desktop where the hamburger
+   drawer remains the primary nav. (Also keeps the component visible to
+   jsdom/testing-library, which applies base rules but not media queries.) */
+@media (--bp-md-up) {
+	.bottom-nav {
+		display: none;
+	}
+}
+
+.bottom-nav__tab {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	min-height: 44px; /* comfortable tap target (E5-1.1 guideline) */
+	margin: 0;
+	padding: 6px 4px;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	color: var(--text-secondary);
+	cursor: pointer;
+	transition: color 0.15s ease;
+	gap: 3px;
+}
+
+.bottom-nav__tab:hover {
+	color: var(--text-primary);
+}
+
+.bottom-nav__tab--active {
+	color: var(--bg-surface-brand);
+}
+
+.bottom-nav__tab-label {
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+}
+
+/* Center cell: the FAB floats half above the bar for reach + prominence. */
+.bottom-nav__fab-slot {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.bottom-nav__fab {
+	position: relative;
+	top: -14px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 52px;
+	height: 52px;
+	margin: 0;
+	padding: 0;
+	border: 1px solid var(--border-brand);
+	border-radius: 50%;
+	background: var(--bg-surface-brand);
+	box-shadow: var(--elevation-high);
+	color: var(--text-on-brand);
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.bottom-nav__fab:hover {
+	background: var(--primitive-brand-deep-umber);
+}
+
+.bottom-nav__fab:active {
+	transform: scale(0.96);
+}

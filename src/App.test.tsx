@@ -5,7 +5,7 @@
  *   - The correct view stub is visible after each navigation action.
  *   - NavBar actions trigger the right view transitions.
  */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // GmailAuthProvider (mounted in App) calls useGmailAuth → useGoogleLogin, which
@@ -70,10 +70,17 @@ describe("App — view transitions", () => {
 		expect(screen.getByTestId("view-closet")).toBeInTheDocument();
 	});
 
+	// "Add Item" exists in BOTH the drawer and the mobile BottomNav FAB
+	// (E5-1.3), so drawer clicks must be scoped to the drawer element.
+	const clickDrawerAddItem = () => {
+		const drawer = document.querySelector(".nav-drawer") as HTMLElement;
+		fireEvent.click(within(drawer).getByRole("button", { name: /add item/i }));
+	};
+
 	it("Add Item navigates to form view", () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
-		fireEvent.click(screen.getByRole("button", { name: /add item/i }));
+		clickDrawerAddItem();
 		expect(screen.getByTestId("view-form")).toBeInTheDocument();
 		expect(screen.queryByTestId("view-carousel")).not.toBeInTheDocument();
 	});
@@ -81,7 +88,7 @@ describe("App — view transitions", () => {
 	it("from form view, Back to Carousel returns to carousel", () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
-		fireEvent.click(screen.getByRole("button", { name: /add item/i }));
+		clickDrawerAddItem();
 		expect(screen.getByTestId("view-form")).toBeInTheDocument();
 		// The form stub has a "Back to Carousel" button — click it by test id
 		fireEvent.click(screen.getByTestId("view-form").querySelector("button")!);

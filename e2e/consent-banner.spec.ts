@@ -8,12 +8,12 @@ import { test, expect } from "@playwright/test";
  * NOT asserted here (they need live keys); the unit suite mocks and verifies
  * that wiring.
  *
- * Deliberately points at :5199 (the `closet-preview` server) instead of the
- * default :5173 baseURL — :5173 is frequently occupied by a manually-run dev
- * server, so this avoids the port conflict. Start it with the `closet-preview`
- * launch config before running: it must be listening on 5199.
+ * Uses the shared Playwright baseURL like every other spec. (An earlier
+ * revision hardcoded :5199 to dodge a manually-run :5173 dev server, but the
+ * webServer config already handles that via reuseExistingServer — the
+ * hardcoded port just made the spec fail whenever :5199 wasn't running.)
  */
-const BASE = "http://localhost:5199";
+const BASE = "/";
 
 // This spec seeds its own consent state, so skip the shared skipOnboarding
 // helper (which pre-declines consent and would hide the banner).

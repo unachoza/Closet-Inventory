@@ -24,3 +24,8 @@
 @custom-media --bp-sm (max-width: 600px);
 @custom-media --bp-md (max-width: 768px);
 @custom-media --bp-lg (max-width: 1024px);
+
+/* Exact complement of --bp-md, for mobile-first components that render by
+   default and hide on desktop (e.g. BottomNav). Prefer this over a second
+   hardcoded 769px so the md boundary stays defined in exactly one place. */
+@custom-media --bp-md-up (min-width: 769px);
