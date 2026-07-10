@@ -8,6 +8,13 @@
 
 ---
 
+> **📐 2026-07-10 — US-4.1 designed:** the share-link MVP (hybrid 2-hour teaser link → Google sign-in →
+> durable viewer grant, framed as the acquisition funnel) is fully specced in
+> [E4 Part Une — View a Friend's Closet](./E4-part-une-view-friends-closet.md) with UI mockups in
+> [planning/design/mockups/friend-view-flow.html](../design/mockups/friend-view-flow.html).
+> Simple lending (loan modal + lent view) is specced in
+> [E4 Part Deux — Simple Lending](./E4-part-deux-simple-lending.md) (post-MVP).
+
 ## US-4.1 — Share my closet with someone I trust
 _As the "Our Closet" user, I want to share my closet (or parts of it) with a friend so that we can see each other's wardrobes._
 - [ ] Invite a friend (link or email)
