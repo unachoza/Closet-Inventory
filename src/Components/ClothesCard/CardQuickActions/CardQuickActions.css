@@ -40,6 +40,9 @@
 }
 
 .card-quick-actions__item {
+	display: flex;
+	align-items: center;
+	min-height: 44px;
 	appearance: none;
 	border: none;
 	background: transparent;

@@ -17,7 +17,7 @@ _As Maya on her phone, I want tap targets and primary actions within thumb reach
 - [ ] "Add Item" FAB / bottom-nav action (out of the hamburger)
 
 **Tickets**
-- `E5-1.1` Touch-target audit + fixes (44×44px) across nav, cards, filters — _1d_
+- `E5-1.1` ✅ **Done** (2026-07-09, branch `feat/e5-a-css-bugfixes-touch-targets`) — Touch-target audit + fixes (≥44px) on `.hamburger-btn`, `.action-btn`, `.nav-drawer__close`, `.import-error-banner__close` (NavBar.css), `.card-quick-actions__item` (CardQuickActions.css), `.density-toggle` (Closet.css), `.filter-accordion__option` (EntireCloset.css). Bundled CSS breakage fixes: `.main`/`#root`/`body` `100vh→100dvh`, defined `--header-height`/`--bottom-nav-height` in `:root`, `--card-width`→`--Card-width` typo (CardDetails.css), deleted dead `≤389px` card rule (Card.css) + dead `.filtered-item-grid` grid (EntireCloset.css). Build + 1262 tests green. — _1d_
 - `E5-1.2` Bottom navigation bar (mobile breakpoint) — _2d_
 - `E5-1.3` "Add Item" FAB / primary action in bottom nav — _1d_
 

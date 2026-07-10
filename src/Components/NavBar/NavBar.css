@@ -7,7 +7,7 @@
     flex-direction: column;
     justify-content: space-between;
     width: 100%;
-     height: var(--header-height);
+     height: var(--header-height, 56px);
     padding: 0 20px;
     border: 1px solid var(--border-hairline);
     /* NOTE: no backdrop-filter here — it creates a containing block for the
@@ -29,6 +29,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      min-width: 44px;
+      min-height: 44px;
       border: none;
       background: none;
       color: var(--text-primary);
@@ -80,7 +82,9 @@
 .action-btn {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
+    min-height: 44px;
     margin: 0;
     border: 1px solid var(--bg-surface-brand);
     border-radius: var(--layout-radius-button);
@@ -188,6 +192,8 @@ div.search-container > input {
       display: flex;
       justify-content: center;
       align-items: center;
+      min-width: 44px;
+      min-height: 44px;
       border: none;
       background: none;
       color: var(--text-primary);
@@ -272,6 +278,8 @@ div.search-container > input {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	min-width: 44px;
+	min-height: 44px;
 	padding: 2px;
 	background: transparent;
 	border: none;

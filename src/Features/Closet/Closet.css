@@ -25,6 +25,7 @@
 .density-toggle {
       display: inline-flex;
       align-items: center;
+      min-height: 44px;
       gap: 0.4rem;
       padding: 0.35rem 0.75rem;
       border: 1px solid var(--text-primary);

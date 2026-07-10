@@ -355,7 +355,7 @@
     padding: 5px 10px 10px;
   }
   .card-details__name {
-    width: calc(var(--card-width) - 10px);
+    width: calc(var(--Card-width) - 10px);
   }
   .card-details__header{
 	width: 93%;

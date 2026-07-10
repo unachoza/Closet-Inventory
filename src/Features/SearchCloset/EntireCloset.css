@@ -454,6 +454,7 @@
 .filter-accordion__option {
 	display: flex;
 	align-items: center;
+	min-height: 44px;
 	padding: 5px 6px;
 	border-radius: var(--layout-radius-button);
 	color: var(--text-secondary);
@@ -564,37 +565,15 @@ button.filter-accordion__header:focus{
 	/* width: 102%; */
 }
 
-/* ── Items grid ── */
-.filtered-item-grid {
-	display: grid;
-	padding: var(--spacing-200);
-	gap: var(--spacing-200);
-	grid-template-columns: repeat(2, 1fr);
-}
+/* NOTE: the real items grid is the flexbox `.items-grid` (Closet.css). The old
+   `.filtered-item-grid` responsive CSS-grid was never wired up (FilteredItemGrid
+   renders `items-grid`) and has been removed. Only `__empty` below is used. */
 
 /* Mobile — panel takes full width, footer stays pinned via flex layout */
 @media (max-width: 480px) {
 	.filter-side-panel {
 		width: 100vw;
 		max-width: 100vw;
-	}
-}
-
-@media (min-width: 600px) {
-	.filtered-item-grid {
-		grid-template-columns: repeat(3, 1fr);
-	}
-}
-
-@media (min-width: 900px) {
-	.filtered-item-grid {
-		grid-template-columns: repeat(4, 1fr);
-	}
-}
-
-@media (min-width: 1200px) {
-	.filtered-item-grid {
-		grid-template-columns: repeat(5, 1fr);
 	}
 }
 

@@ -2,7 +2,8 @@
 .main{
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; /* fallback for browsers without dvh */
+  height: 100dvh;
 }
 
 /* ── Background photo as adaptive backdrop ────────────────────────────────────
