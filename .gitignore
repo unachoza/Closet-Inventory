@@ -46,3 +46,7 @@ coverage/
 # Supabase local-only dirs (not needed in version control)
 supabase/.branches/
 supabase/.temp/
+
+# legal
+
+docs/legal/
