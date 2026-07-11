@@ -22,6 +22,8 @@ import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
 import { OnboardingExpanded } from "./Features/Onboarding/OnboardingSteps";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
+import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
+import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -50,6 +52,7 @@ const ONBOARDING_KEY = "closetly-onboarding-complete";
 function AppShell() {
 	const { view, setView } = useView();
 	const { closet, getCloset, importItems, clearCloset } = useCloset();
+	const demoLifecycle = useDemoLifecycle();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -212,6 +215,8 @@ function AppShell() {
 			{/* Mobile-only fixed bar (hidden ≥769px in CSS); shares the same
 			    Add-Item handler as the NavBar drawer (E5-1.2/E5-1.3). */}
 			<BottomNav onAddItem={handleAddItem} />
+			{/* Calm demo-data acknowledgement + clear-samples prompt (BUG-2 lifecycle). */}
+			<DemoDataPrompt prompt={demoLifecycle.activePrompt} onKeep={demoLifecycle.keepDemo} onClear={demoLifecycle.clearDemo} />
 		</div>
 	);
 }

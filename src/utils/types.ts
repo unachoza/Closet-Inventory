@@ -110,6 +110,13 @@ export type ClothingItem = {
 
 	// ── sync metadata (set by SyncedClosetRepository; used for last-write-wins) ─
 	updatedAt?: string;    // ISO datetime
+
+	// ── demo-seed marker (BUG-2) ──────────────────────────────────────────────
+	// True only for the starter closet (MY_CLOSET_DATA). Demo items are shown
+	// locally so a new closet isn't empty, but must NEVER be pushed to the cloud
+	// and are the target of the "clear demo data" prompt. Real items (added,
+	// imported) never carry this flag.
+	isDemo?: boolean;
 };
 
 export interface ItemFormData {

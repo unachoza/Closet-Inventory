@@ -8,6 +8,15 @@ function ts(iso: string | undefined): number {
 	return iso ? new Date(iso).getTime() : 0;
 }
 
+/**
+ * BUG-2: demo-seed items (`isDemo`) are local-only decoration for a fresh
+ * closet — they must never be written to Supabase. This strips them at every
+ * remote-write boundary; real items pass through untouched.
+ */
+function realItemsOnly(items: ClothingItem[]): ClothingItem[] {
+	return items.filter((item) => !item.isDemo);
+}
+
 /** Last-write-wins merge: union of local + remote, newer updatedAt wins per id. */
 function mergeItems(local: ClothingItem[], remote: ClothingItem[]): ClothingItem[] {
 	const byId = new Map<string, ClothingItem>();
@@ -48,9 +57,12 @@ export class SyncedClosetRepository implements ClosetRepository {
 		try {
 			const remote = await this.remote.getAll();
 
-			// E1-1.5: seed — remote is empty, push all local items
+			// E1-1.5: seed — remote is empty, push local items (never demo, BUG-2)
 			if (remote.length === 0 && local.length > 0) {
-				await this.remote.importItems(local, "replace");
+				const seedable = realItemsOnly(local);
+				if (seedable.length > 0) {
+					await this.remote.importItems(seedable, "replace");
+				}
 				clearSyncFailures();
 				return local;
 			}
@@ -61,8 +73,8 @@ export class SyncedClosetRepository implements ClosetRepository {
 			// Keep local mirror current
 			await this.local.importItems(merged, "replace");
 
-			// Push local-wins items back to Supabase
-			const localWins = merged.filter((item) => {
+			// Push local-wins items back to Supabase (never demo items, BUG-2)
+			const localWins = realItemsOnly(merged).filter((item) => {
 				const r = remote.find((ri) => ri.id === item.id);
 				return !r || ts(item.updatedAt) > ts(r.updatedAt);
 			});
@@ -100,7 +112,8 @@ export class SyncedClosetRepository implements ClosetRepository {
 	async add(item: ClothingItem): Promise<ClothingItem> {
 		const stamped: ClothingItem = { ...item, updatedAt: item.updatedAt ?? new Date().toISOString() };
 		await this.local.add(stamped);
-		if (this.remote) {
+		// BUG-2: demo items live only in the local mirror, never in the cloud.
+		if (this.remote && !stamped.isDemo) {
 			void this.remote.add(stamped).catch((error) => recordSyncFailure("add", error));
 		}
 		return stamped;
@@ -109,7 +122,9 @@ export class SyncedClosetRepository implements ClosetRepository {
 	async update(id: string, patch: Partial<ClothingItem>): Promise<ClothingItem | null> {
 		const stamped = { ...patch, updatedAt: new Date().toISOString() };
 		const result = await this.local.update(id, stamped);
-		if (this.remote) {
+		// BUG-2: never push an edit to a demo item (it has no remote row anyway).
+		// The patch may not carry `isDemo`, so consult the resulting local item.
+		if (this.remote && !result?.isDemo) {
 			void this.remote.update(id, stamped).catch((error) => recordSyncFailure("update", error));
 		}
 		return result;
@@ -124,8 +139,10 @@ export class SyncedClosetRepository implements ClosetRepository {
 
 	async importItems(items: ClothingItem[], mode: ImportMode): Promise<ClothingItem[]> {
 		const result = await this.local.importItems(items, mode);
-		if (this.remote) {
-			void this.remote.importItems(items, mode).catch((error) => recordSyncFailure("importItems", error));
+		// BUG-2: strip demo items before the remote write.
+		const remoteItems = realItemsOnly(items);
+		if (this.remote && remoteItems.length > 0) {
+			void this.remote.importItems(remoteItems, mode).catch((error) => recordSyncFailure("importItems", error));
 		}
 		return result;
 	}

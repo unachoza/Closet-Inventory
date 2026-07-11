@@ -2,7 +2,7 @@ import type { ClothingItem, ItemStatus, WearState } from "./types";
 
 const b = (material: string, percentage: number) => ({ material, percentage });
 
-export const MY_CLOSET_DATA: ClothingItem[] = [
+const DEMO_ITEMS: ClothingItem[] = [
 	{
 		id: "001",
 		status: "dirty" as ItemStatus,
@@ -310,3 +310,11 @@ export const MY_CLOSET_DATA: ClothingItem[] = [
 		onSale: true,
 	},
 ];
+
+/**
+ * The starter closet. Every item is tagged `isDemo: true` so it can be shown
+ * locally (a new user's closet isn't empty) while being excluded from every
+ * cloud write (BUG-2) and targeted by the "clear demo data" prompt. Tagging
+ * here — one immutable map — guarantees no demo object can ever ship untagged.
+ */
+export const MY_CLOSET_DATA: ClothingItem[] = DEMO_ITEMS.map((item) => ({ ...item, isDemo: true }));
