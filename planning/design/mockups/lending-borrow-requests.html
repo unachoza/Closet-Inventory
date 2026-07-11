@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NTW · Lending via Borrow Requests — Flow Mockups (E4 Part Deux rev 2)</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap");
+
+  :root {
+    --alabaster: #faf8f5; --white: #fff; --sand: #f3eee7;
+    --terracotta: #b28675; --terracotta-deep: #9c7060;
+    --espresso: #492f28; --ink: #231612; --muted: #8a7a72;
+    --hairline: rgba(73, 47, 40, 0.14);
+    --serif: "Lora", Georgia, serif; --sans: "DM Sans", system-ui, sans-serif;
+    --shadow-phone: 0 24px 60px -24px rgba(35, 22, 18, 0.45), 0 6px 18px -8px rgba(35, 22, 18, 0.25);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background:
+      radial-gradient(1100px 480px at 10% -5%, rgba(178, 134, 117, 0.13), transparent 60%),
+      radial-gradient(900px 420px at 105% 40%, rgba(243, 238, 231, 0.9), transparent 55%),
+      var(--alabaster);
+    color: var(--espresso); font-family: var(--sans); -webkit-font-smoothing: antialiased;
+  }
+  .sheet { max-width: 1480px; margin: 0 auto; padding: 56px 40px 96px; }
+  header.masthead { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--espresso); padding-bottom: 28px; margin-bottom: 14px; }
+  .kicker { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--terracotta-deep); font-weight: 600; margin-bottom: 10px; }
+  .brandline { display: flex; align-items: center; gap: 14px; }
+  .brandline svg { width: 40px; height: 40px; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 4vw, 46px); line-height: 1.05; }
+  h1 em { font-style: italic; color: var(--terracotta-deep); }
+  .meta { text-align: right; font-size: 12px; color: var(--muted); line-height: 1.7; white-space: nowrap; }
+  .meta b { color: var(--espresso); font-weight: 600; }
+  .intro { max-width: 72ch; font-size: 14.5px; line-height: 1.75; color: #6b564d; margin: 22px 0 8px; }
+  .intro b { color: var(--espresso); }
+
+  section.act { margin-top: 56px; }
+  .act-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 34px; }
+  .act-num { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--terracotta-deep); border: 1px solid var(--terracotta); border-radius: 999px; padding: 4px 14px; white-space: nowrap; }
+  .act-title { font-family: var(--serif); font-size: 24px; font-weight: 500; }
+  .act-sub { font-size: 13px; color: var(--muted); }
+
+  .flow { display: flex; flex-wrap: wrap; gap: 34px 26px; align-items: flex-start; }
+  .step { width: 316px; }
+  .step-caption { margin-top: 18px; padding: 0 6px; }
+  .step-num { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--terracotta-deep); letter-spacing: 0.04em; }
+  .role-tag { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; border-radius: 999px; padding: 3px 9px; margin-left: 8px; vertical-align: 1px; }
+  .role-tag.b { background: #eef0f4; color: #55617a; }
+  .role-tag.o { background: #f7e9e2; color: var(--terracotta-deep); }
+  .step-title { font-family: var(--serif); font-size: 17px; font-weight: 600; margin: 3px 0 7px; }
+  .step-note { font-size: 12.5px; line-height: 1.65; color: #6b564d; }
+  .step-note code { font-family: ui-monospace, Menlo, monospace; font-size: 11px; background: var(--sand); padding: 1px 5px; border-radius: 4px; color: var(--espresso); }
+  .arrow { align-self: center; color: var(--terracotta); font-size: 22px; padding-bottom: 120px; font-family: var(--serif); font-style: italic; }
+
+  .phone { width: 316px; border-radius: 44px; background: var(--ink); padding: 10px; box-shadow: var(--shadow-phone); }
+  .screen { border-radius: 36px; overflow: hidden; background: var(--alabaster); height: 640px; position: relative; display: flex; flex-direction: column; }
+  .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 96px; height: 24px; border-radius: 999px; background: var(--ink); z-index: 40; }
+  .statusbar { height: 44px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 0; font-size: 11.5px; font-weight: 600; color: var(--espresso); }
+  .homebar { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; border-radius: 4px; background: rgba(35,22,18,0.35); z-index: 40; }
+
+  .ntw-top { flex: none; padding: 12px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+  .ntw-word { display: flex; align-items: center; gap: 8px; }
+  .ntw-word svg { width: 22px; height: 22px; }
+  .ntw-word span { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--espresso); }
+  .chip { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--hairline); color: var(--muted); background: var(--white); }
+
+  .swatch { position: relative; overflow: hidden; }
+  .sw-1 { background: linear-gradient(160deg, #c9a28f, #8f6b5b); }
+  .sw-2 { background: linear-gradient(160deg, #4e5d52, #2e3a33); }
+  .sw-3 { background: linear-gradient(160deg, #d9cfc0, #b3a48e); }
+  .sw-5 { background: linear-gradient(160deg, #b45a44, #7e3b2d); }
+  .sw-7 { background: linear-gradient(160deg, #3b3f52, #23263a); }
+  .swatch::after { content: ""; position: absolute; inset: 0; background: radial-gradient(70% 45% at 30% 12%, rgba(255,255,255,0.28), transparent 60%), repeating-linear-gradient(115deg, transparent 0 7px, rgba(255,255,255,0.045) 7px 8px); }
+
+  .card-hero { margin: 14px 20px 0; border-radius: 18px; aspect-ratio: 3/2.1; position: relative; overflow: hidden; box-shadow: 0 14px 30px -14px rgba(35,22,18,0.4); }
+  .card-hero .t-name { position: absolute; left: 14px; bottom: 12px; color: #fff; font-size: 14px; font-weight: 600; }
+  .card-hero .t-brand { display: block; font-size: 10px; opacity: 0.85; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400; margin-top: 2px; }
+  .viewer-banner { display: flex; align-items: center; gap: 8px; background: var(--sand); border-radius: 10px; padding: 8px 12px; margin: 10px 20px 0; font-size: 11px; color: var(--espresso); font-weight: 500; }
+  .viewer-banner b { font-weight: 600; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--terracotta); flex: none; }
+
+  .dim { position: absolute; inset: 0; background: rgba(35,22,18,0.45); z-index: 10; backdrop-filter: blur(2px); }
+  .sheet-up { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--alabaster); border-radius: 26px 26px 36px 36px; padding: 20px 22px 28px; box-shadow: 0 -18px 48px -20px rgba(35,22,18,0.5); }
+  .grabber { width: 40px; height: 4px; border-radius: 4px; background: rgba(73,47,40,0.2); margin: 0 auto 16px; }
+  .sheet-title { font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.2; margin-bottom: 3px; }
+  .sheet-title em { font-style: italic; color: var(--terracotta-deep); }
+  .sheet-sub { font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
+
+  .field-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; color: var(--muted); margin: 12px 0 6px; }
+  .input { border: 1px solid var(--hairline); background: var(--white); border-radius: 12px; padding: 11px 13px; font-size: 12.5px; color: var(--espresso); display: flex; justify-content: space-between; align-items: center; }
+  .input .ph { color: var(--muted); }
+  .care-box { border: 1px dashed rgba(178,134,117,0.55); background: #fdf9f6; border-radius: 12px; padding: 10px 12px; font-size: 11.5px; line-height: 1.55; color: #7e5a4c; }
+  .care-box b { color: var(--espresso); }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .care-chip { font-size: 10.5px; padding: 6px 11px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--white); font-weight: 500; color: var(--espresso); }
+  .care-chip.on { background: var(--espresso); color: var(--alabaster); border-color: var(--espresso); }
+  .care-chip.add { border-style: dashed; color: var(--muted); }
+  .cta { display: block; width: 100%; border: 0; border-radius: 14px; padding: 14px; background: var(--terracotta); color: #fff; font-family: var(--sans); font-size: 14px; font-weight: 600; letter-spacing: 0.02em; box-shadow: 0 12px 24px -12px rgba(156,112,96,0.8); text-align: center; margin-top: 14px; }
+  .cta.ghost { background: transparent; color: var(--espresso); border: 1px solid var(--hairline); box-shadow: none; font-weight: 500; }
+  .auto-line { text-align: center; font-size: 10.5px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+  .l-ava { width: 34px; height: 34px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--serif); font-style: italic; font-size: 14px; }
+  .req-note { display: flex; gap: 10px; align-items: flex-start; background: var(--white); border: 1px solid var(--hairline); border-radius: 14px; padding: 12px 14px; }
+  .req-note .txt { font-size: 12px; line-height: 1.55; }
+  .req-note .who { font-weight: 600; font-size: 12.5px; }
+  .req-note .ask { color: #6b564d; font-style: italic; margin-top: 2px; }
+
+  .approved-hero { text-align: center; padding: 24px 24px 0; }
+  .approved-sw { width: 104px; height: 130px; border-radius: 16px; margin: 0 auto 14px; box-shadow: 0 18px 36px -16px rgba(35,22,18,0.45); }
+  .approved-title { font-family: var(--serif); font-size: 22px; font-weight: 500; line-height: 1.2; }
+  .approved-title em { font-style: italic; color: var(--terracotta-deep); }
+  .approved-sub { font-size: 12px; color: #6b564d; line-height: 1.6; margin-top: 6px; }
+  .terms-card { margin: 16px 22px 0; text-align: left; background: var(--white); border: 1px solid var(--hairline); border-radius: 16px; padding: 14px 16px; }
+  .terms-head { font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; color: var(--terracotta-deep); margin-bottom: 7px; }
+  .terms-line { font-size: 12px; line-height: 1.65; color: var(--espresso); }
+  .terms-due { font-size: 11px; color: var(--muted); margin-top: 8px; border-top: 1px solid var(--hairline); padding-top: 8px; }
+
+  .seg { display: flex; border: 1px solid var(--hairline); border-radius: 13px; overflow: hidden; background: var(--white); }
+  .seg > div { flex: 1; text-align: center; padding: 12px 6px; font-size: 12px; font-weight: 500; color: var(--muted); }
+  .seg > div.on { background: var(--espresso); color: var(--alabaster); font-weight: 600; }
+
+  .status-map { display: flex; align-items: center; gap: 8px; background: var(--sand); border-radius: 12px; padding: 10px 12px; margin-top: 12px; font-size: 11px; color: var(--espresso); }
+  .status-pill { font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 999px; padding: 4px 10px; background: #eadfce; color: #7a5f39; }
+
+  .rules { margin-top: 72px; border-top: 1px solid var(--espresso); padding-top: 26px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px 36px; }
+  .rule h3 { font-family: var(--serif); font-size: 15px; font-weight: 600; margin-bottom: 7px; }
+  .rule h3 span { color: var(--terracotta-deep); font-style: italic; margin-right: 6px; }
+  .rule p { font-size: 12.5px; line-height: 1.7; color: #6b564d; }
+  .rule code { font-family: ui-monospace, Menlo, monospace; font-size: 11px; background: var(--sand); padding: 1px 5px; border-radius: 4px; }
+
+  @media (max-width: 720px) {
+    .sheet { padding: 32px 18px 64px; }
+    header.masthead { flex-direction: column; align-items: flex-start; }
+    .meta { text-align: left; }
+    .arrow { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="masthead">
+    <div>
+      <div class="kicker">E4 Part Deux · rev 2 · Design Spec · 2026-07-10 · Post-MVP</div>
+      <div class="brandline">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#492f28" stroke-width="2.6" stroke-linecap="round">
+          <path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" /><path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" />
+        </svg>
+        <h1>Lending via <em>borrow requests</em></h1>
+      </div>
+    </div>
+    <div class="meta">
+      <b>Nothing To Wear</b> · request → approve → return → condition<br />
+      Replaces owner-recorded simple lending (rev 1)<br />
+      Notifications: <b>activity-notifications.html</b>
+    </div>
+  </header>
+
+  <p class="intro">
+    Every borrow is a <b>request</b>. The borrower asks in one tap; the owner approves with
+    <b>care instructions prefilled from the item's care data</b> and a due date; the borrower marks the return
+    (clean, or needs laundering); the owner confirms the condition it actually came back in — and that
+    condition <b>updates the item's status automatically</b>. All events land in the calm
+    <b>Activity</b> tab of the profile — no bells, no push, no noise.
+  </p>
+
+  <!-- ══════════════════ ACT I — THE ASK ══════════════════ -->
+  <section class="act">
+    <div class="act-head">
+      <span class="act-num">Act I</span>
+      <span class="act-title">The ask</span>
+      <span class="act-sub">MJ (borrower, a Part-Une viewer) · Arianna (owner)</span>
+    </div>
+
+    <div class="flow">
+
+      <!-- 1 · Borrower: request -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>7:12</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="viewer-banner"><span class="dot"></span><span>Viewing <b>Arianna's closet</b> · view only</span></div>
+          <div class="card-hero swatch sw-2">
+            <span class="t-name">Grey wool blazer<span class="t-brand">Theory · lendable</span></span>
+          </div>
+          <div class="dim"></div>
+          <div class="sheet-up">
+            <div class="grabber"></div>
+            <div class="sheet-title">Ask to borrow the <em>grey blazer</em></div>
+            <div class="sheet-sub">Arianna decides — you'll hear back in your Activity.</div>
+            <div class="field-label">Add a note · optional</div>
+            <div class="input"><span>For the Miami trip! Back by the 24th 🤞</span></div>
+            <button class="cta">Request to borrow</button>
+            <div class="auto-line">Only lendable pieces show this button — Arianna's not-for-loan items don't ask you to ask.</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">01 — Request <span class="role-tag b">Borrower</span></div>
+          <div class="step-title">One tap, optional context</div>
+          <div class="step-note">Available only to signed-in viewers (Part Une) on items with <code>isLendable</code>. Creates a <code>borrow_requests</code> row (pending) + an Activity notification for the owner. Expires quietly after 14 days.</div>
+        </div>
+      </div>
+
+      <div class="arrow">⟶</div>
+
+      <!-- 2 · Owner: approve sheet -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>7:40</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="card-hero swatch sw-2" style="filter: saturate(0.75);"></div>
+          <div class="dim"></div>
+          <div class="sheet-up">
+            <div class="grabber"></div>
+            <div class="req-note">
+              <div class="l-ava" style="background: linear-gradient(135deg, #7d8f83, #4e5d52);">M</div>
+              <div class="txt"><div class="who">MJ asked to borrow the grey blazer</div><div class="ask">"For the Miami trip! Back by the 24th 🤞"</div></div>
+            </div>
+            <div class="field-label">Care instructions · prefilled from item care</div>
+            <div class="care-box"><b>Dry clean only</b> — do not machine wash.</div>
+            <div class="chip-row">
+              <span class="care-chip on">Must return dry cleaned</span>
+              <span class="care-chip on">Do not put in dryer</span>
+              <span class="care-chip">Hang, don't fold</span>
+              <span class="care-chip add">＋ Add your own</span>
+            </div>
+            <div class="field-label">Due back</div>
+            <div class="input"><span>Fri, Jul 24</span><b>📅</b></div>
+            <button class="cta">Approve loan</button>
+            <button class="cta ghost" style="margin-top: 8px;">Deny — "it's delicate" ›</button>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">02 — Approve <span class="role-tag o">Owner</span></div>
+          <div class="step-title">Terms attached, guilt-free deny</div>
+          <div class="step-note">Care terms prefill from the item's care data (US-4.5), then augment via chips or free text. Due date required on approve. Deny offers prewritten softeners. On approve: status → <code>on_loan</code>, location → "With MJ".</div>
+        </div>
+      </div>
+
+      <div class="arrow">⟶</div>
+
+      <!-- 3 · Borrower: approved + care ack -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>7:41</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="approved-hero">
+            <div class="approved-sw swatch sw-2"></div>
+            <div class="approved-title">It's <em>yours</em> till the 24th.</div>
+            <p class="approved-sub">Arianna approved your request 🤍</p>
+          </div>
+          <div class="terms-card">
+            <div class="terms-head">Arianna's care terms</div>
+            <div class="terms-line">Must return dry cleaned · do not put in dryer</div>
+            <div class="terms-due">Due back <b>Fri, Jul 24</b> · these terms stay visible for the whole loan</div>
+          </div>
+          <div style="padding: 0 22px;">
+            <button class="cta">Got it — I'll take care of it</button>
+          </div>
+          <div class="auto-line">One tap = care acknowledged (US-4.5's care_ack, no extra screen)</div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">03 — Approved <span class="role-tag b">Borrower</span></div>
+          <div class="step-title">The care contract, acknowledged</div>
+          <div class="step-note">"Got it" stamps <code>care_ack</code> — the loan activates with terms both sides can re-read all loan long. The thesis-prover: the borrower can't ruin it by washing it wrong <em>and claiming nobody said so</em>.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════ ACT II — THE RETURN ══════════════════ -->
+  <section class="act">
+    <div class="act-head">
+      <span class="act-num">Act II</span>
+      <span class="act-title">The return</span>
+      <span class="act-sub">honest handoff, automatic truth</span>
+    </div>
+
+    <div class="flow">
+
+      <!-- 4 · Borrower: mark returned -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>5:02</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="approved-hero" style="filter: saturate(0.85);">
+            <div class="approved-sw swatch sw-2"></div>
+            <div class="approved-title">Giving it <em>back</em>?</div>
+          </div>
+          <div class="dim"></div>
+          <div class="sheet-up">
+            <div class="grabber"></div>
+            <div class="sheet-title">Return the <em>grey blazer</em></div>
+            <div class="sheet-sub">How is it going back to Arianna?</div>
+            <div class="seg" style="margin-top: 8px;">
+              <div class="on">Returning clean ✨</div>
+              <div>Needs laundering</div>
+            </div>
+            <div class="care-box" style="margin-top: 12px;">Her terms: <b>must return dry cleaned</b> — did the cleaner run happen?</div>
+            <button class="cta">Mark as returned</button>
+            <div class="auto-line">Arianna confirms on her side — the loan closes when she does.</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">04 — Mark returned <span class="role-tag b">Borrower</span></div>
+          <div class="step-title">Clean, or honest about it</div>
+          <div class="step-note">Sets <code>borrower_return_state</code> (clean / needs_laundering) and notifies the owner. The care terms resurface right here — the gentlest possible "did you dry clean it?".</div>
+        </div>
+      </div>
+
+      <div class="arrow">⟶</div>
+
+      <!-- 5 · Owner: confirm condition -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>6:15</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="approved-hero" style="filter: saturate(0.85);">
+            <div class="approved-sw swatch sw-2"></div>
+          </div>
+          <div class="dim"></div>
+          <div class="sheet-up">
+            <div class="grabber"></div>
+            <div class="req-note" style="margin-bottom: 4px;">
+              <div class="l-ava" style="background: linear-gradient(135deg, #7d8f83, #4e5d52);">M</div>
+              <div class="txt"><div class="who">MJ marked the blazer returned</div><div class="ask">"returning clean" · 12 days · met the due date</div></div>
+            </div>
+            <div class="field-label">What state is it in? · pick all that apply</div>
+            <div class="chip-row">
+              <span class="care-chip">Dry-cleaned</span>
+              <span class="care-chip">Clean</span>
+              <span class="care-chip">Needs wash</span>
+              <span class="care-chip on">Smells of perfume</span>
+              <span class="care-chip">Stain</span>
+              <span class="care-chip">Rip</span>
+            </div>
+            <div class="input" style="margin-top: 10px;"><span class="ph">Add a note… (kept in loan history)</span></div>
+            <div class="status-map">→ status becomes <span class="status-pill">Dirty</span>&nbsp;· location back to <b>home</b></div>
+            <button class="cta">Confirm return</button>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">05 — Confirm condition <span class="role-tag o">Owner</span></div>
+          <div class="step-title">The condition <em>is</em> the status</div>
+          <div class="step-note">Auto-map, worst wins: dry-cleaned/clean → <code>clean</code> · needs wash/perfume → <code>dirty</code> · stain/rip → <code>in_repair</code>. Chips + note close into loan history (Sloane's provenance). Borrower said clean, owner smelled perfume — both records kept, no dispute UI.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="rules">
+    <div class="rule">
+      <h3><span>i.</span>Every borrow is a request</h3>
+      <p>Rev 2 replaces owner-recorded lending: the borrower must be a signed-in viewer (Part Une makes that free). One state machine — <code>pending → approved/denied → returned_pending → closed</code> — with both parties' actions logged.</p>
+    </div>
+    <div class="rule">
+      <h3><span>ii.</span>Care terms are the contract</h3>
+      <p>Prefilled from the item's care data at approval, editable and augmentable, visible to both for the loan's duration, acknowledged in one tap. US-4.5 delivered inside the approve flow — no separate ceremony.</p>
+    </div>
+    <div class="rule">
+      <h3><span>iii.</span>Two honest checkpoints beat one</h3>
+      <p>The borrower declares (clean / needs laundering), the owner confirms (six condition chips + note). Disagreement is recorded, never litigated — this is a trusted circle, and the history is the memory.</p>
+    </div>
+    <div class="rule">
+      <h3><span>iv.</span>Condition drives truth</h3>
+      <p>The owner's condition log auto-maps to status — <code>clean</code>, <code>dirty</code>, or <code>in_repair</code> — so confirming the return and updating the closet are one gesture. Supersedes the old <code>return_loan → clean</code> transition.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
