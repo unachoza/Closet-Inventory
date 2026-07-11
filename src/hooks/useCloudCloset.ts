@@ -3,6 +3,7 @@ import { MY_CLOSET_DATA } from "../utils/constants";
 import type { CategoryType, ClothingItem, ItemFormData, WearState } from "../utils/types";
 import { normalizeMaterial } from "../utils/materialUtils";
 import getStockPhoto from "../utils/getStockPhoto";
+import { computeUpdatePatch } from "./computeUpdatePatch";
 import { safeSetItem } from "../utils/safeStorage";
 import { SupabaseAuthContext } from "../context/SupabaseAuthContext";
 import { SyncedClosetRepository } from "../services/syncedClosetRepository";
@@ -104,10 +105,10 @@ export function useCloudCloset() {
 	};
 
 	const updateItem = (id: string, updatedData: Partial<ClothingItem>) => {
-		const patch: Partial<ClothingItem> = { ...updatedData };
-		if (!updatedData.imageURL && updatedData.category) {
-			patch.imageURL = getStockPhoto(updatedData.category as CategoryType);
-		}
+		const existing = closet.find((item) => item.id === id);
+		// BUG-1: preserve the existing photo — only backfill a stock photo when the
+		// item genuinely has none (never overwrite a real photo on a category change).
+		const patch = existing ? computeUpdatePatch(existing, updatedData) : { ...updatedData };
 		setCloset((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
 		void repo.update(id, patch);
 	};
@@ -119,5 +120,26 @@ export function useCloudCloset() {
 		void repo.clear();
 	};
 
-	return { closet: normalizedCloset, addItem, addFullItem, importItems, removeItem, updateItem, getCloset, clearCloset, isLoading, syncStatus };
+	// Remove only the demo starter items (BUG-2 lifecycle). Demo items never
+	// reached the cloud, so persist the trimmed closet to the local mirror via a
+	// "replace" of the real items — the remote-write is real-only + idempotent.
+	const clearDemoItems = () => {
+		const remaining = closet.filter((item) => !item.isDemo);
+		setCloset(remaining);
+		void repo.importItems(remaining, "replace");
+	};
+
+	return {
+		closet: normalizedCloset,
+		addItem,
+		addFullItem,
+		importItems,
+		removeItem,
+		updateItem,
+		getCloset,
+		clearCloset,
+		clearDemoItems,
+		isLoading,
+		syncStatus,
+	};
 }
