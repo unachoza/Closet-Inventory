@@ -1,4 +1,23 @@
-# 🚀 Launch Roadmap — July Update (2026-07-05)
+# 🚀 Launch Roadmap — July Update (2026-07-05, amended 2026-07-11)
+
+> **Amendment (2026-07-11):** this doc's central claim below — *"Block A has had zero movement since June
+> 29 · Block C not touched this cycle"* — was accurate on 2026-07-05 and is **no longer true**. Both blocks
+> completed the same week this doc's ink dried:
+> - **Block A (security/privacy)** ✅ done 2026-07-06/07 — dev/prod Supabase split (PR #115), account
+>   deletion + data export (PR #117), base64→Storage write-guard, logging hygiene + Sentry/PostHog
+>   (PR #128/#129). Only the privacy policy itself (`E1-4.13`) remains open — see
+>   [E1-cloud-backend.md](epics/E1-cloud-backend.md) for the full checklist.
+> - **Block C (mobile + PWA)** ✅ done 2026-07-09/10 — touch targets, bottom nav + FAB (PR #130/#133), PWA
+>   shell + service worker + offline (PR #132/#134), Lighthouse audit (PR #135). See
+>   [E5-mobile-pwa.md](epics/E5-mobile-pwa.md).
+> - Also since this doc: `P1-4`/`P1-9`/`P1-10` (quick actions, status-transition machine, a11y legend)
+>   shipped, closing most of "still open within Block B" below — only `P1-5`/`P1-6`/`P1-7`/`P1-8`/`P1-11`
+>   remain. And the two open gaps this doc surfaced (share ticket home, stain-guide scoping) got answered:
+>   share got its ticket as [E4 Part Une](../epics/E4-part-une-view-friends-closet.md) (design, PR #136),
+>   with lending as Part Deux in [E4-shared-social.md](../epics/E4-shared-social.md) (PR #137) — neither
+>   built yet. Stain guide (`E8-3.1`) is still unscoped/open.
+>
+> The rest of this document is left as-is below — a historical record of the 2026-07-05 re-cut.
 
 > **Supersedes nothing** — this is a **re-cut of priorities**, not a redo. [LAUNCH_ROADMAP_2026-06-29.md](LAUNCH_ROADMAP_2026-06-29.md)
 > stays the record of the original launch-gate plan (Block 0 gates, Block A security, Block C mobile/PWA); it has

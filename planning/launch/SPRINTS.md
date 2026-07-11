@@ -1,13 +1,13 @@
 # Sprints — 2-Day Sprint Sequencing
 
-> **Date:** 2026-06-20 · **Audience:** personal build plan. Index of epics: [README.md](../epics/README.md).
+> **Date:** 2026-06-20 · **Updated:** 2026-07-11 · **Audience:** personal build plan. Index of epics: [README.md](../epics/README.md).
 > Each sprint ≈ **2 ideal dev-days**. Calendar time will run longer — treat the sprint _number_ as
 > sequence, not a calendar promise. Tickets reference epic files (e.g. `E2-1.3`).
 > Now part of the launch package — see [planning/launch/README.md](./README.md) for the launch overview.
 
 ---
 
-## 🚀 LAUNCH MODE (2026-06-30) — see [LAUNCH_ROADMAP](./LAUNCH_ROADMAP_2026-06-29.md)
+## 🚀 LAUNCH MODE (2026-06-30, revised 2026-07-11) — see [LAUNCH_ROADMAP](./LAUNCH_ROADMAP_2026-06-29.md) + [July update](./LAUNCH_ROADMAP_July_update.md)
 
 > ✅ **Block 0 COMPLETE (2026-06-30)** — All three gates verified:
 > - G0.1 Gmail import: live end-to-end (Google OAuth + parsing)
@@ -15,10 +15,24 @@
 > - G0.3 Cloud sync: round-trip verified (item on device A appears on device B)
 > - **Critical fix:** Postgres GRANT bug (zero table privileges) discovered and fixed.
 >
+> ✅ **Block A (security/privacy) COMPLETE (2026-07-06/07, PR #115–#117, #128–#129)** — dev/prod Supabase
+> split, account deletion + data export, base64→Storage write-guard, secret hygiene, logging hygiene,
+> Sentry+PostHog. Only the privacy policy itself (`E1-4.13`) remains open, now unblocked and in progress.
+>
+> ✅ **Block B (inventory spine) MOSTLY DONE** — status/location core (border toggle, edit-form, quick
+> actions, state machine, a11y legend) shipped PR #112, #122–#126. Open: grouped "where is everything"
+> view, multi-home locations, status+location filters, status-reason model v2 — see
+> [E2-part-une-inventory-truth-status-location.md](epics/E2-part-une-inventory-truth-status-location.md).
+>
+> ✅ **Block C (mobile + full PWA) COMPLETE (2026-07-09/10, PR #130–#135)** — touch targets, bottom nav +
+> FAB, PWA manifest + service worker, offline shell, Lighthouse audit (55/96/100/92).
+>
 > **The 8-item order below is the BACKLOG sequence. For the next ~6–8 weeks it is SUPERSEDED by the
 > launch roadmap**, which reorders around shipping a safe beta to the 30-person waitlist:
-> **✅ Block 0 (done) → A (security/privacy) → B (inventory spine: status·location·availability·simple-lend) → C (mobile + full PWA) → 🚀 launch (Gmail test-user mode).**
-> Lending social loop (E4) and Hotmail/Yahoo import (E1-5/6) are explicitly **post-MVP** — user's stated next priorities, in that order. Resume the backlog order below after launch.
+> **✅ Block 0 (done) → ✅ A (done) → B (inventory spine — mostly done, filters/multi-home open) → ✅ C (done) → 🚀 launch (privacy policy is now the critical path, then Gmail test-user mode).**
+> Lending social loop (E4) and Hotmail/Yahoo import (E1-5/6) are explicitly **post-MVP** — user's stated
+> next priorities, in that order. E4's first slice (view-a-friend's-closet) and the E12 profile hub are
+> now **designed** (PR #136–#138) but not scheduled/built. Resume the backlog order below after launch.
 
 ---
 
@@ -83,7 +97,7 @@ Completed between Block A and B:
 
 ---
 
-### Sprint 3.5 — Import UX Debt, Bugs & Polish ← **CURRENT**
+### Sprint 3.5 — Import UX Debt, Bugs & Polish ✅ DONE (except `E8-3.1`, still open)
 
 > User-feedback grab-bag. The CRITICAL re-auth bug blocks user testing of the import flow — do it first. This is bigger than 2 days; split into 3.5a (bugs) and 3.5b (polish/features) if needed.
 
@@ -119,33 +133,39 @@ Completed between Block A and B:
 
 ---
 
-### Block B — E1 Cloud Backend (Supabase) · Priority 2
+### Block B — E1 Cloud Backend (Supabase) ✅ DONE · Priority 2
 
 - ✅ **Spike + schema (2026-06-30):** `E1-1.1` Gmail-token-under-Supabase verified ✅ · `E1-1.2` schema (incl. E11 wear/status + E12 profile columns)
-- ✅ **RLS + port (2026-06-30):** `E1-1.3` RLS isolation verified ✅ (G0.2, 11/11) · `E1-1.4` port `useCloudCloset`
-- ✅ **Seed + offline:** `E1-1.5` first-sign-in seed · `E1-1.6` offline-first reconcile · `E1-3.1` sync indicator (next ticket)
-- ✅ **Security hardening (2026-06-30):** `E1-4.1` bucket privacy audit ✅ · `E1-4.2` RLS isolation test ✅ · `E1-4.3` CI security scanning live ✅ · `E1-4.11` upload validation pushed ✅
-- **Image storage:** `E1-2.1` Storage upload (off base64) ✅ · `E1-2.2` migrate existing base64 (not started)
-     > _DoD:_ private synced offline-capable closet on Supabase; images in Storage; Gmail import works under Supabase Auth. Block 0 foundation verified; moving to Block A (dev/prod split, account deletion, privacy policy).
+- ✅ **RLS + port:** `E1-1.3` RLS isolation verified ✅ (G0.2, 11/11) · `E1-1.4` port `useCloudCloset` ✅ (2026-07-06, wired behind a single `ClosetProvider`)
+- ✅ **Seed + offline:** `E1-1.5` first-sign-in seed ✅ · `E1-1.6` offline-first reconcile ✅ (2026-07-07) · `E1-3.1` sync indicator ✅ (2026-07-06, `CloudSyncControl` + `SyncStatusIndicator`)
+- ✅ **Security hardening:** `E1-4.1` bucket privacy audit ✅ · `E1-4.2` RLS isolation test ✅ · `E1-4.3` CI security scanning live ✅ · `E1-4.11` upload validation pushed ✅ · `E1-4.8` account deletion + export ✅ (2026-07-07, PR #117) · `E1-4.12` dev/prod Supabase split ✅ (2026-07-06, PR #115)
+- **Image storage:** `E1-2.1` Storage upload (off base64) ✅ · `E1-2.2` base64→Storage ✅ (2026-07-06) — reframed as a write-path guard (`ensureStoredPhoto`); prod/dev had 0 base64 rows, so this is prevention, not backfill
+- **Still open:** `E1-4.13` privacy policy (in progress, unblocked by `E1-4.8`) · `E1-4.9` Google OAuth verification + CASA (long external queue, start it) · backups/PITR
+     > _DoD:_ private synced offline-capable closet on Supabase; images in Storage; Gmail import works under Supabase Auth. **Met.** Full detail: [E1-cloud-backend.md](epics/E1-cloud-backend.md).
 
-### Block C — E5 Mobile & PWA · Priority 3
+### Block C — E5 Mobile & PWA ✅ DONE (2026-07-09/10) · Priority 3
 
-- **Touch + nav:** `E5-1.1` 44×44 audit · `E5-1.2` bottom nav · `E5-1.3` Add-Item FAB · `E5-bug.1` sticky-nav overlap (if not already done in 3.5)
-- **PWA shell:** `E5-2.1` manifest + icons · `E5-2.2` service worker
-- **iOS + offline:** `E5-2.3` iOS full-screen · `E5-3.1` offline closet view
-     > _DoD:_ installable PWA, full-screen iOS, touch-friendly, bottom nav, offline closet.
+- ✅ **Touch + nav:** `E5-1.1` 44×44 audit (PR #130) · `E5-1.2` bottom nav (PR #133) · `E5-1.3` Add-Item FAB (PR #133) · `E5-bug.1` sticky-nav overlap
+- ✅ **PWA shell (PR #132):** `E5-2.1` manifest + icons · `E5-2.2` service worker (Workbox precache, deliberately zero `runtimeCaching` for Supabase)
+- ✅ **iOS + offline:** `E5-2.3` iOS full-screen meta tags · `E5-3.1` offline closet view + e2e regression suite (PR #134)
+- ✅ **Phase E — baselines + Lighthouse (PR #135):** screenshot baselines current; Lighthouse Performance 55 / Accessibility 96 / Best Practices 100 / SEO 92. Follow-ups logged, not launch-blocking: code-split main bundle (`E5-follow.1`), onboarding-overlay contrast (`E5-follow.2`).
+     > _DoD:_ installable PWA, full-screen iOS, touch-friendly, bottom nav, offline closet. **Met.** Full detail: [E5-mobile-pwa.md](epics/E5-mobile-pwa.md).
 
-### Block D — E2 Inventory Truth ⭐ · Priority 4
+### Block D — E2 Inventory Truth ⭐ 🟡 CORE DONE, second wave open · Priority 4
 
-> Back in the plan. Builds everything except the clean/dirty wear bits (those are E11). `status` here = E11's enum extended, one field.
+> Status/location core shipped on branch `EPIC-status-location` (PR #112, #122–#126) — see
+> [E2-part-une-inventory-truth-status-location.md](epics/E2-part-une-inventory-truth-status-location.md)
+> for the full `P1-*` ticket list. Builds everything except the clean/dirty wear bits (those are E11).
 
-- **Location:** `E2-2.x` location field + groups + tag + "where is everything"
-- **Extended statuses + filters:** `E2-1.2`/`E2-1.3`/`E2-1.4` (`at_cleaner`/`on_loan`/`in_repair`) · `E2-3.x` status/location filters + quick views
-- **Availability + lending:** `E2-6.1` `isAvailable` · `E2-5.x` lend modal + "Lent out" view
-- **Second-wave (this is where the differentiator data lands):** `E2-10.x` taxonomy (season/occasion/vibe tags) · `E2-11.x` provenance/origin/sentiment · `E2-12.x` multi-photo + view modes · `E2-8.x` fit + measurements · `E2-9.1` swim (swim can ship early in 3.5)
-     > _DoD:_ location + status + availability live; taxonomy tags, photos, provenance, fit/measurements modeled.
+- ✅ **Location core:** `E2-2.1` location field + primary default · `E2-2.3` location tag on card (border toggle). **Open:** `E2-2.2`/`P1-5` "where is everything" grouped view · `P1-6`/`P1-7` custom/multi-home locations
+- ✅ **Status core:** `E2-1.3` status chip/dot on card · `P1-3b` edit-form capture · `P1-4` quick-action menu · `P1-9` status-transition state machine · `P1-10` a11y legend. **Open:** `P1-11` status model v2 (`airing`/`stored` + reasons)
+- **Still open:** `P1-8` status/location filter dimensions · **Availability + lending** (`E2-6.1` `isAvailable`, `E2-5.x` lend modal + "Lent out" view — not started)
+- **Second-wave (this is where the differentiator data lands):** `E2-10.x` taxonomy (season/occasion/vibe tags) · `E2-11.x` provenance/origin/sentiment · `E2-12.x` multi-photo + view modes ✅ (multi-photo shipped, E1-2.3) · `E2-8.x` fit + measurements · `E2-9.1` swim ✅ done (Sprint 3.5)
+     > _DoD:_ location + status + availability live; taxonomy tags, photos, provenance, fit/measurements modeled. **Location + status live; availability/lending + second-wave still open.**
 
-### Block E — E12 User Profile · Priority 5
+### Block E — E12 User Profile 📐 mockups designed, not built · Priority 5
+
+> Profile-hub mockups (hub, locations, sharing) shipped as design docs 2026-07-11 (PR #138) — no code yet.
 
 - `E12-1.x` profile (functional vs. social split) + machine/lifestyle config
 - `E12-4.x` body measurements → "fits me now" filter (uses E2 item measurements)
@@ -163,9 +183,14 @@ Completed between Block A and B:
      > 🔭 Calendar planning (`E11-5.x`) stays LIGHT — far horizon.
      > _DoD:_ one-tap wear logging + history; forecast respects machine + lifestyle; items carry weight/volume.
 
-### Block G — E4 Shared & Social ⭐ · Priority 7
+### Block G — E4 Shared & Social ⭐ 📐 first slice + lending designed, not built · Priority 7
 
 Needs E1 (RLS) + E12 (shareable profile) + E2 (loan/availability). Spec cold-start + trust first.
+
+> **Design docs shipped 2026-07-11** (PR #136/#137, no code yet): [E4 Part Une](../../epics/E4-part-une-view-friends-closet.md)
+> — teaser share-link MVP (view-only, converts to a Google-sign-in viewer grant) — and Part Deux in
+> [E4-shared-social.md](../../epics/E4-shared-social.md) — lending via borrow requests + Activity
+> notifications, rev 2. `return_loan` dirty-default is an open question flagged in that doc.
 
 - connections/shares model + RLS + invite/accept (`E4-1.1`, `E4-1.2`)
 - **privacy: `isPrivate` + `isLendable`, intimates private by default** (`E4-4.x`) + per-item privacy + friends' closets (`E4-1.3`, `E4-1.4`)

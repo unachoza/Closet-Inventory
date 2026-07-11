@@ -143,18 +143,22 @@ Pull from `E2-inventory-truth.md`. Status clean/dirty + wornCount stay E11's can
 
 ## 📱 Block C — Mobile + Full PWA — ticket map
 
-Pull from `E5-mobile-pwa.md`. (Lever: if cutting to ~4-5 weeks, do only the _touch/responsive_ half now, defer the PWA-shell half.)
+### ✅ **BLOCK C COMPLETE (2026-07-10)**
 
-- **Mobile/touch:** `E5-1.1` 44×44 tap-target audit · `E5-1.2` bottom nav · `E5-1.3` Add-Item FAB · `E5-bug.1` sticky-nav overlap
-- **PWA shell:** `E5-2.1` manifest + icons · `E5-2.2` service worker · `E5-2.3` iOS full-screen · `E5-3.1` offline closet view
+Pull from [`E5-mobile-pwa.md`](epics/E5-mobile-pwa.md). Full PWA was shipped, not just the touch/responsive half.
+
+- [x] ✅ **Mobile/touch** (PR #130, #133) — `E5-1.1` 44×44 tap-target audit · `E5-1.2` bottom nav · `E5-1.3` Add-Item FAB · `E5-bug.1` sticky-nav overlap
+- [x] ✅ **PWA shell** (PR #132) — `E5-2.1` manifest + icons · `E5-2.2` service worker · `E5-2.3` iOS full-screen
+- [x] ✅ **Offline** (PR #134) — `E5-3.1` offline closet view + e2e regression suite
+- [x] ✅ **Phase E — baselines + Lighthouse** (PR #135) — Performance 55 / Accessibility 96 / Best Practices 100 / SEO 92; follow-ups logged (code-splitting, onboarding contrast), not launch-blocking
 
 ---
 
-## 🎯 Definition of "ready to launch"
+## 🎯 Definition of "ready to launch" (status as of 2026-07-11)
 
-- [ ] Block 0 gates all green (Gmail import, RLS isolation, sync round-trip proven)
-- [ ] Block A security must-haves complete; privacy policy live
-- [ ] Status + location + simple-lend usable on mobile
-- [ ] App is installable / mobile-clean (per chosen PWA scope)
+- [x] Block 0 gates all green (Gmail import, RLS isolation, sync round-trip proven)
+- [ ] Block A security must-haves complete ✅; **privacy policy still not live** — the one remaining blocker
+- [ ] Status + location usable on mobile ✅ (core shipped); **simple-lend modal not built yet** (E2-5.x)
+- [x] App is installable / mobile-clean — full PWA shipped 2026-07-10
 - [ ] 30 waitlisters added as Google test users + onboarding email with the unverified-app explainer
 - [ ] Gmail verification Gate 1 _submitted_ (not necessarily approved)

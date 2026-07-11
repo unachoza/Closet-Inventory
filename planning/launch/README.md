@@ -1,11 +1,24 @@
 # 🚀 Launch Package — Nothing To Wear
 
-> **Date:** 2026-06-29 · **Audience:** founder (you), internal. Not customer-facing copy.
+> **Date:** 2026-06-29 · **Updated:** 2026-07-11 · **Audience:** founder (you), internal. Not customer-facing copy.
 > This folder is the active launch package: this README (vision + MVP + honest read) +
-> [LAUNCH_ROADMAP_2026-06-29.md](./LAUNCH_ROADMAP_2026-06-29.md) (timeline, checklists, ticket maps) +
+> [LAUNCH_ROADMAP_2026-06-29.md](./LAUNCH_ROADMAP_2026-06-29.md) (original Block 0/A/B/C plan, checked off in place) +
+> [LAUNCH_ROADMAP_July_update.md](./LAUNCH_ROADMAP_July_update.md) (re-cut around Block B + the Block A/C completion amendment) +
 > [SPRINTS.md](./SPRINTS.md) (sequencing, supersedes the backlog order for now) +
-> `epics/` (the three epics currently being built: [E1](./epics/E1-cloud-backend.md), [E2](./epics/E2-inventory-truth.md), [E5](./epics/E5-mobile-pwa.md)).
-> The other ten epics stay in [planning/epics/](../epics/README.md) — they're real, just not this sprint.
+> `epics/` (the epics currently being built: [E1](./epics/E1-cloud-backend.md), [E2](./epics/E2-inventory-truth.md) +
+> [E2 Part Une](./epics/E2-part-une-inventory-truth-status-location.md), [E5](./epics/E5-mobile-pwa.md)).
+> The other epics — including the now-designed (not yet built) [E4 Part Une](../epics/E4-part-une-view-friends-closet.md),
+> the lending slice in [E4 Shared & Social](../epics/E4-shared-social.md), and the [E12 profile hub](../epics/E12-user-profile.md) —
+> stay in [planning/epics/](../epics/README.md).
+
+## Where things actually stand (2026-07-11)
+
+> **Block 0 · Block A (security/privacy) · Block C (mobile/PWA) are all DONE.** Only Block B (inventory
+> spine) has open tickets, and the launch-blocking piece left overall is the **privacy policy** (E1-4.13,
+> in progress — unblocked since E1-4.8 shipped) plus Gmail verification Gate 1 (long external queue, start
+> it, don't wait on it). See [LAUNCH_ROADMAP_July_update.md](./LAUNCH_ROADMAP_July_update.md) for the
+> detail — this corrects that doc's own "zero movement on A/C" note, which was true on 2026-07-05 and is
+> no longer true as of 2026-07-06 (A) / 2026-07-10 (C).
 
 ---
 
@@ -24,27 +37,38 @@ social Share loop (E4) come after.
 
 ## You should feel good about this
 
-You have **1089 passing tests**, a real type system threading through forms → parser → repository →
-Postgres, a working Gmail-HTML parser handling a dozen+ retailer email layouts, an offline-first sync
-design (local-first writes, last-write-wins reconcile), and you caught the Storage-pipeline gaps
+You have **1303 passing tests** (up from 1089 at the June cut), a real type system threading through
+forms → parser → repository → Postgres, a working Gmail-HTML parser handling a dozen+ retailer email
+layouts, an offline-first sync design (local-first writes, last-write-wins reconcile) that's now wired
+into the live app behind a single `ClosetProvider`, and you caught the Storage-pipeline gaps
 (uncompressed uploads, hour-long signed URLs, missing bucket validation) **before** they shipped to a
 real user, not after. You're also the one who keeps surfacing "wait, is this actually secure / does
 this actually work" — that instinct is what's going to keep this launch from being a Tea-App headline.
 That's not flattery, that's the actual state of the repo.
 
-## Now the honest part
+## Now the honest part (updated 2026-07-11)
 
-The thing you should sit with: **the feature you're proudest of — status & location — is the least
-finished thing in the codebase.** The types and DB columns exist; the UI is close to 0% built (no
-status chip, no location tag, no lend modal, no filters for either). That's not a criticism of the
-plan, it's a correction to the _feeling_ that this is "mostly done, just needs hooking up." It's the
-largest single block of remaining work, sized at 6–9 dev-days in the roadmap.
+The June honest-take called out two things. Both have moved:
 
-The second thing has been resolved: **all three Block 0 assumptions are now verified** (2026-06-30).
-Gmail import works end-to-end against a real Google account (G0.1). RLS isolation holds against a
-second account (G0.2, 11/11 checks pass). Cloud sync round-trips across devices (G0.3). The only
-remaining infrastructure risk that surfaced: zero Postgres table GRANTs meant no signed-in user could
-read/write their data — this was caught and fixed before launch (`20260629000002_grant_table_privileges.sql`).
+**"Status & location is the least finished thing in the codebase"** — no longer true. The border-toggle
+UI, edit-form capture, quick-action menu (`P1-4`), status-transition state machine (`P1-9`), and the
+accessibility legend (`P1-10`) all shipped (PRs #112, #122–#126). What's still open in Block B is real
+but smaller: the "where is everything" grouped view (`P1-5`), custom/multi-home locations (`P1-6`/`P1-7`),
+status+location filter dimensions (`P1-8`), and status model v2 — `airing`/`stored` + reasons (`P1-11`).
+See [E2 Part Une](./epics/E2-part-une-inventory-truth-status-location.md) for the live ticket list.
+
+**Block 0 (prove-it gates)** — resolved 2026-06-30, unchanged since. Gmail import works end-to-end
+against a real Google account (G0.1). RLS isolation holds against a second account (G0.2, 11/11 checks
+pass). Cloud sync round-trips across devices (G0.3). The only remaining infrastructure risk that
+surfaced: zero Postgres table GRANTs meant no signed-in user could read/write their data — this was
+caught and fixed before launch (`20260629000002_grant_table_privileges.sql`).
+
+**New honest thing to sit with:** the two blocks that were "fully open, zero movement" in the July 5
+re-cut are now both **done** — Block A (security/privacy, PR #115–#117, #128–#129) and Block C (mobile +
+PWA, PR #130–#135). That's real progress, but it also means **the privacy policy (E1-4.13) is now the
+critical path**, not a background item — it's the only Block-A checklist item still open, and Gmail's
+production verification queue (weeks-to-months, external, not on your clock) can't start in earnest
+without it live at a public URL.
 
 ## How seriously you're taking security — and why "not yet passed" is the right answer
 
@@ -71,14 +95,14 @@ seriously — more so than a green checkmark would be.
 | ------------------------ | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | **Manual closet upload** | upload your closet manually                                      | ✅ Built — 9-step guided form, image upload (Storage + base64 fallback)                                 |
 | **Gmail auto-import**    | scrape auto-import from Gmail                                    | ✅ Live end-to-end verified (2026-06-30) — Google OAuth sign-in, email import, parsing confirmed (G0.1) |
-| **Status**               | know the status — dirty, needs repair, too small                 | 🟡 Modeled (type+DB), **UI ~15% built** — Block B                                                       |
-| **Location**             | know the location — storage, lent out, dry cleaner, summer house | 🟡 Modeled (type+DB), **UI ~15% built** — Block B                                                       |
-| **PWA / mobile**         | needs to look better on mobile, browser rendering too buggy      | 🔴 0% built — no manifest/service worker yet; full installable PWA chosen — Block C                     |
+| **Status**               | know the status — dirty, needs repair, too small                 | 🟡 Core built (border/dot, edit-form, quick actions, state machine, legend) — reasons (`P1-11`) + filters (`P1-8`) open |
+| **Location**             | know the location — storage, lent out, dry cleaner, summer house | 🟡 Core built (registry, edit-form, border toggle) — multi-home (`P1-6/7`), grouped view (`P1-5`), filters (`P1-8`) open |
+| **PWA / mobile**         | needs to look better on mobile, browser rendering too buggy      | ✅ Built (2026-07-10) — manifest+icons, service worker, offline shell, iOS full-screen, bottom nav + FAB, Lighthouse 55/96/100/92 |
 
 Plus, implicitly required to ship any of the above to real users responsibly:
-**simple lend tracking** (free-text "lent to Sarah, due back," part of Status/Location, not the social
-loop) and **the security/privacy gate** above (Block A) — not in your bullet list, but the bullet list
-doesn't work without them.
+**simple lend tracking** (free-text "lent to Sarah, due back," still open, part of Status/Location, not
+the social loop) and **the security/privacy gate** above (Block A — ✅ done, PR #115–#117/#128–#129,
+except the privacy policy itself which is in progress, `E1-4.13`).
 
 **Explicitly NOT in MVP** (your stated next priorities, in order — tracked, not forgotten):
 
@@ -96,7 +120,8 @@ CASA run in parallel for the public launch).
 
 ## Where to look next
 
-- **Detailed checklists, ticket maps, Block 0/A/B/C breakdowns:** [LAUNCH_ROADMAP_2026-06-29.md](./LAUNCH_ROADMAP_2026-06-29.md)
+- **Detailed checklists, ticket maps, Block 0/A/B/C breakdowns:** [LAUNCH_ROADMAP_2026-06-29.md](./LAUNCH_ROADMAP_2026-06-29.md) (Block 0/A checked off in place) + [LAUNCH_ROADMAP_July_update.md](./LAUNCH_ROADMAP_July_update.md) (Block B re-cut + the Block A/C completion amendment)
 - **Sequencing / what supersedes the backlog right now:** [SPRINTS.md](./SPRINTS.md)
-- **The three epics being built:** [E1 Cloud Backend](./epics/E1-cloud-backend.md) · [E2 Inventory Truth](./epics/E2-inventory-truth.md) · [E5 Mobile & PWA](./epics/E5-mobile-pwa.md)
+- **The epics being built:** [E1 Cloud Backend](./epics/E1-cloud-backend.md) (done) · [E2 Inventory Truth](./epics/E2-inventory-truth.md) + [E2 Part Une](./epics/E2-part-une-inventory-truth-status-location.md) (in progress) · [E5 Mobile & PWA](./epics/E5-mobile-pwa.md) (done)
+- **Designed but not yet built:** [E4 Part Une — view a friend's closet](../epics/E4-part-une-view-friends-closet.md) · [E4 Shared & Social](../epics/E4-shared-social.md) (Part Deux — lending via borrow requests, rev 2) · [E12 profile hub](../epics/E12-user-profile.md)
 - **Everything else (post-MVP backlog, unchanged):** [planning/epics/](../epics/README.md)
