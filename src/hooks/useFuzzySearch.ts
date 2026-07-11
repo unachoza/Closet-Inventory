@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
 import { ClothingItem } from "../utils/types";
 import { normalizeColorGroups } from "../Features/FashionParser/normalizers/normalizeColor";
@@ -43,16 +43,30 @@ export const useFuzzySearch = () => {
 		return () => clearTimeout(timer);
 	}, [searchQuery]);
 
+	// Build the Fuse index once per `items` reference and reuse it across every
+	// keystroke (both getters), instead of rebuilding it on each query change.
+	// The index is the expensive part; `items` only changes when the closet does.
+	const indexRef = useRef<{ items: ClothingItem[]; fuse: Fuse<SearchableItem>; byId: Map<string, ClothingItem> } | null>(null);
+	const getIndex = useCallback((items: ClothingItem[]) => {
+		if (!indexRef.current || indexRef.current.items !== items) {
+			indexRef.current = {
+				items,
+				fuse: new Fuse(toSearchable(items), FUSE_OPTIONS),
+				byId: new Map(items.map((item) => [item.id, item])),
+			};
+		}
+		return indexRef.current;
+	}, []);
+
 	// Returns filtered items; also returns match data for highlighting
 	const searchResults = useMemo(
 		() =>
 			(items: ClothingItem[]): ClothingItem[] => {
 				if (!debouncedQuery.trim()) return items;
-				const byId = new Map(items.map((item) => [item.id, item]));
-				const fuse = new Fuse(toSearchable(items), FUSE_OPTIONS);
+				const { fuse, byId } = getIndex(items);
 				return fuse.search(debouncedQuery).map((res) => byId.get(res.item.id)!);
 			},
-		[debouncedQuery],
+		[debouncedQuery, getIndex],
 	);
 
 	// Separate getter for match metadata (used by FilterMatchPills)
@@ -60,7 +74,7 @@ export const useFuzzySearch = () => {
 		() =>
 			(items: ClothingItem[]): Map<string, string[]> => {
 				if (!debouncedQuery.trim()) return new Map();
-				const fuse = new Fuse(toSearchable(items), FUSE_OPTIONS);
+				const { fuse } = getIndex(items);
 				const results = fuse.search(debouncedQuery);
 				const map = new Map<string, string[]>();
 				for (const result of results) {
@@ -70,7 +84,7 @@ export const useFuzzySearch = () => {
 				}
 				return map;
 			},
-		[debouncedQuery],
+		[debouncedQuery, getIndex],
 	);
 
 	return { searchQuery, setSearchQuery, searchResults, getMatchKeys, debouncedQuery };
