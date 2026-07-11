@@ -12,6 +12,9 @@ const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
 	testDir: "./e2e",
+	// *.pwa.spec.ts need the service worker, which only runs in a preview
+	// build — they have their own config (playwright.pwa.config.ts).
+	testIgnore: /\.pwa\.spec\.ts$/,
 	// Snapshots (toHaveScreenshot baselines) live next to the specs.
 	snapshotDir: "./e2e/__screenshots__",
 	fullyParallel: true,
@@ -50,12 +53,12 @@ export default defineConfig({
 			use: { ...devices["Desktop Chrome"] },
 			// *.mobile.spec.ts use touch (.tap()) + phone-viewport assertions; desktop
 			// contexts have no touch support, so scope them to the mobile projects.
-			testIgnore: /\.mobile\.spec\.ts$/,
+			testIgnore: [/\.mobile\.spec\.ts$/, /\.pwa\.spec\.ts$/],
 		},
 		{
 			name: "Desktop Safari (WebKit)",
 			use: { ...devices["Desktop Safari"] },
-			testIgnore: /\.mobile\.spec\.ts$/,
+			testIgnore: [/\.mobile\.spec\.ts$/, /\.pwa\.spec\.ts$/],
 		},
 	],
 
