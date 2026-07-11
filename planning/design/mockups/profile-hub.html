@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NTW · Profile Hub — Core-Slice Mockups (E12)</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap");
+
+  :root {
+    --alabaster: #faf8f5; --white: #fff; --sand: #f3eee7;
+    --terracotta: #b28675; --terracotta-deep: #9c7060;
+    --espresso: #492f28; --ink: #231612; --muted: #8a7a72;
+    --hairline: rgba(73, 47, 40, 0.14);
+    --serif: "Lora", Georgia, serif; --sans: "DM Sans", system-ui, sans-serif;
+    --shadow-phone: 0 24px 60px -24px rgba(35, 22, 18, 0.45), 0 6px 18px -8px rgba(35, 22, 18, 0.25);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: radial-gradient(1100px 480px at 15% -5%, rgba(178, 134, 117, 0.12), transparent 60%), var(--alabaster);
+    color: var(--espresso); font-family: var(--sans); -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1480px; margin: 0 auto; padding: 56px 40px 96px; }
+  header.masthead { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--espresso); padding-bottom: 28px; margin-bottom: 14px; }
+  .kicker { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--terracotta-deep); font-weight: 500; margin-bottom: 10px; }
+  .brandline { display: flex; align-items: center; gap: 14px; }
+  .brandline svg { width: 40px; height: 40px; }
+  h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 4vw, 46px); line-height: 1.05; }
+  h1 em { font-style: italic; color: var(--terracotta-deep); }
+  .meta { text-align: right; font-size: 12px; color: var(--muted); line-height: 1.7; white-space: nowrap; }
+  .meta b { color: var(--espresso); font-weight: 500; }
+  .intro { max-width: 72ch; font-size: 14.5px; line-height: 1.75; color: #6b564d; margin: 22px 0 8px; }
+  .intro b { color: var(--espresso); font-weight: 500; }
+
+  section.act { margin-top: 56px; }
+  .act-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 34px; }
+  .act-num { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--terracotta-deep); border: 1px solid var(--terracotta); border-radius: 999px; padding: 4px 14px; white-space: nowrap; }
+  .act-title { font-family: var(--serif); font-size: 24px; font-weight: 500; }
+  .act-sub { font-size: 13px; color: var(--muted); }
+  .flow { display: flex; flex-wrap: wrap; gap: 34px 26px; align-items: flex-start; }
+  .step { width: 316px; }
+  .step.wide { width: 100%; max-width: 980px; }
+  .step-caption { margin-top: 18px; padding: 0 6px; }
+  .step-num { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--terracotta-deep); }
+  .step-title { font-family: var(--serif); font-size: 17px; font-weight: 600; margin: 3px 0 7px; }
+  .step-note { font-size: 12.5px; line-height: 1.65; color: #6b564d; }
+  .step-note code { font-family: ui-monospace, Menlo, monospace; font-size: 11px; background: var(--sand); padding: 1px 5px; border-radius: 4px; color: var(--espresso); }
+
+  .phone { width: 316px; border-radius: 44px; background: var(--ink); padding: 10px; box-shadow: var(--shadow-phone); }
+  .screen { border-radius: 36px; overflow: hidden; background: var(--alabaster); height: 640px; position: relative; display: flex; flex-direction: column; }
+  .notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 96px; height: 24px; border-radius: 999px; background: var(--ink); z-index: 40; }
+  .statusbar { height: 44px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 24px 0; font-size: 11.5px; font-weight: 500; color: var(--espresso); }
+  .homebar { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); width: 110px; height: 4px; border-radius: 4px; background: rgba(35,22,18,0.35); z-index: 40; }
+
+  /* desktop browser frame */
+  .browser { width: 100%; max-width: 980px; border-radius: 16px; background: var(--ink); padding: 8px; box-shadow: var(--shadow-phone); }
+  .browser-bar { display: flex; align-items: center; gap: 8px; padding: 6px 10px 10px; }
+  .b-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(250,248,245,0.3); }
+  .b-url { flex: 1; max-width: 320px; margin: 0 auto; background: rgba(250,248,245,0.12); border-radius: 8px; color: rgba(250,248,245,0.7); font-size: 11px; text-align: center; padding: 5px 12px; }
+  .browser-screen { border-radius: 10px; background: var(--alabaster); overflow: hidden; }
+
+  /* profile UI (flat, calm) */
+  .prof-head { display: flex; align-items: center; gap: 14px; padding: 22px 20px 4px; }
+  .prof-ava { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--terracotta), #d4b3a4); display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--serif); font-style: italic; font-size: 24px; position: relative; flex: none; }
+  .prof-ava .ping { position: absolute; top: 1px; right: 1px; width: 11px; height: 11px; border-radius: 50%; background: var(--terracotta-deep); border: 2.5px solid var(--alabaster); }
+  .prof-name { font-family: var(--serif); font-size: 22px; font-weight: 500; }
+  .prof-cap { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .prof-cap b { color: var(--terracotta-deep); font-weight: 500; }
+
+  .pillar-tag { font-size: 8.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--hairline); border-radius: 999px; padding: 2px 7px; font-weight: 500; }
+  .hub-card { margin: 10px 16px 0; background: var(--white); border: 1px solid var(--hairline); border-radius: 12px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; }
+  .hub-card.attn { border-color: rgba(178,134,117,0.45); background: #fdfaf7; }
+  .hub-ico { width: 34px; height: 34px; border-radius: 10px; background: var(--sand); display: flex; align-items: center; justify-content: center; flex: none; }
+  .hub-ico svg { width: 18px; height: 18px; }
+  .hub-main { flex: 1; min-width: 0; }
+  .hub-name { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+  .hub-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .hub-sub.invite { color: var(--terracotta-deep); }
+  .hub-count { min-width: 20px; height: 20px; border-radius: 999px; background: var(--terracotta); color: #fff; font-size: 10.5px; font-weight: 500; display: flex; align-items: center; justify-content: center; padding: 0 6px; }
+  .hub-done { font-size: 10px; color: var(--muted); }
+  .hub-chev { color: var(--muted); font-size: 14px; }
+  .lockmark { font-size: 10px; color: var(--muted); }
+
+  .view-title { font-family: var(--serif); font-size: 24px; font-weight: 500; padding: 14px 20px 0; }
+  .view-sub { font-size: 11.5px; color: var(--muted); padding: 2px 20px 0; line-height: 1.5; }
+
+  /* location manager */
+  .loc-row { margin: 10px 16px 0; background: var(--white); border: 1px solid var(--hairline); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .loc-sw { width: 30px; height: 30px; border-radius: 9px; background: var(--sand); flex: none; }
+  .loc-sw.home { border: 2px solid rgba(73,47,40,0.35); }
+  .loc-sw.storage { border: 2px solid var(--terracotta); }
+  .loc-sw.suitcase { border: 2px dashed var(--terracotta); }
+  .loc-sw.other { border: 2px dotted var(--terracotta); }
+  .loc-main { flex: 1; }
+  .loc-name { font-size: 13px; font-weight: 500; }
+  .loc-kind { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+  .primary-tag { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--terracotta-deep); background: #f7ede7; border-radius: 999px; padding: 3px 8px; font-weight: 500; }
+  .dots { color: var(--muted); letter-spacing: 2px; }
+  .add-btn { margin: 14px 16px 0; border: 1px dashed rgba(178,134,117,0.6); border-radius: 12px; padding: 12px; text-align: center; font-size: 12.5px; color: var(--terracotta-deep); font-weight: 500; background: transparent; width: calc(100% - 32px); }
+
+  .dim { position: absolute; inset: 0; background: rgba(35,22,18,0.4); z-index: 10; }
+  .sheet-up { position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--alabaster); border-radius: 22px 22px 36px 36px; padding: 18px 20px 26px; }
+  .grabber { width: 40px; height: 4px; border-radius: 4px; background: rgba(73,47,40,0.2); margin: 0 auto 14px; }
+  .sheet-title-sm { font-family: var(--serif); font-size: 18px; font-weight: 500; margin-bottom: 12px; }
+  .field-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500; color: var(--muted); margin: 10px 0 6px; }
+  .input { border: 1px solid var(--hairline); background: var(--white); border-radius: 12px; padding: 11px 13px; font-size: 12.5px; }
+  .kind-row { display: flex; gap: 7px; }
+  .kind-pill { flex: 1; text-align: center; font-size: 11px; padding: 9px 4px; border-radius: 10px; border: 1px solid var(--hairline); background: var(--white); color: var(--muted); }
+  .kind-pill.on { border-color: var(--espresso); color: var(--espresso); font-weight: 500; background: var(--sand); }
+  .cta { display: block; width: 100%; border: 0; border-radius: 12px; padding: 13px; background: var(--terracotta); color: #fff; font-family: var(--sans); font-size: 13.5px; font-weight: 500; text-align: center; margin-top: 14px; }
+
+  /* sharing detail */
+  .divider-note { display: flex; align-items: center; gap: 8px; margin: 14px 20px 0; font-size: 10.5px; color: var(--muted); }
+  .divider-note .line { flex: 1; height: 1px; background: var(--hairline); }
+  .l-row { margin: 8px 16px 0; background: var(--white); border: 1px solid var(--hairline); border-radius: 12px; padding: 11px 14px; display: flex; align-items: center; gap: 11px; }
+  .l-ava { width: 32px; height: 32px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--serif); font-style: italic; font-size: 13px; }
+  .l-main { flex: 1; min-width: 0; }
+  .l-name { font-size: 12.5px; font-weight: 500; }
+  .l-meta { font-size: 10.5px; color: var(--muted); margin-top: 1px; }
+  .revoke { font-size: 11px; font-weight: 500; color: #a04b34; background: #f9ece7; border-radius: 999px; padding: 6px 12px; flex: none; }
+
+  /* desktop hub layout */
+  .d-wrap { display: flex; min-height: 470px; }
+  .d-side { width: 200px; flex: none; background: var(--sand); padding: 20px 0; }
+  .d-side .item { font-size: 12.5px; padding: 9px 22px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .d-side .item.on { color: var(--espresso); font-weight: 500; background: rgba(255,255,255,0.65); border-right: 2px solid var(--terracotta); }
+  .d-main { flex: 1; padding: 26px 30px; }
+  .d-head { display: flex; align-items: center; gap: 16px; margin-bottom: 6px; }
+  .d-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+  .d-grid .hub-card { margin: 0; }
+
+  .rules { margin-top: 72px; border-top: 1px solid var(--espresso); padding-top: 26px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px 36px; }
+  .rule h3 { font-family: var(--serif); font-size: 15px; font-weight: 600; margin-bottom: 7px; }
+  .rule h3 span { color: var(--terracotta-deep); font-style: italic; margin-right: 6px; }
+  .rule p { font-size: 12.5px; line-height: 1.7; color: #6b564d; }
+
+  @media (max-width: 720px) {
+    .page { padding: 32px 18px 64px; }
+    header.masthead { flex-direction: column; align-items: flex-start; }
+    .meta { text-align: left; }
+    .d-side { display: none; }
+    .d-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <div>
+      <div class="kicker">E12 · Profile · Core Slice · 2026-07-10</div>
+      <div class="brandline">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#492f28" stroke-width="2.6" stroke-linecap="round">
+          <path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" /><path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" />
+        </svg>
+        <h1>The profile <em>hub</em></h1>
+      </div>
+    </div>
+    <div class="meta">
+      <b>Nothing To Wear</b> · organizing a wardrobe, not building a social profile<br />
+      Spec: <b>planning/design/FIGMA_MAKE_PROMPT_profile.md</b> · epic: <b>E12</b><br />
+      Core slice: hub (mobile + desktop) · locations · sharing
+    </div>
+  </header>
+
+  <p class="intro">
+    The profile is <b>a hub of sections, each of which unlocks a capability</b> — never one big form, never a
+    completeness guilt-meter. Every section states its pillar (<b>Inventory → Location → Status → Care → Share</b>)
+    and empty sections read as invitations. Flat surfaces, 12px cards, sentence case, two type weights.
+    This core slice covers the hub on mobile + desktop, the location manager, and sharing &amp; borrowers;
+    onboarding + measurements/laundry details come in a later pass.
+  </p>
+
+  <!-- ══════════ HUB — MOBILE ══════════ -->
+  <section class="act">
+    <div class="act-head">
+      <span class="act-num">B</span>
+      <span class="act-title">The hub</span>
+      <span class="act-sub">Arianna: 3 of 6 sections done · 3 activity items waiting</span>
+    </div>
+
+    <div class="flow">
+
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>8:05</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="prof-head">
+            <div class="prof-ava">A<span class="ping"></span></div>
+            <div>
+              <div class="prof-name">Arianna</div>
+              <div class="prof-cap">3 of 6 — <b>add measurements to unlock Fits me now</b></div>
+            </div>
+          </div>
+
+          <div class="hub-card attn">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h6l2-3 2 6 2-3h4"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Activity <span class="hub-count">3</span></div><div class="hub-sub">2 requests + 1 return waiting on you</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="9" r="4"/><path d="M5 20c1-3.6 3.7-5.5 7-5.5s6 1.9 7 5.5"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Identity <span class="pillar-tag">share</span></div><div class="hub-sub">Arianna · photo from Google</div></div>
+            <span class="hub-done">Done ✓</span>
+          </div>
+
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Where my clothes live <span class="pillar-tag">location</span></div><div class="hub-sub">4 locations · SD condo is primary</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M9 6V4h6v2M12 10v6M9 13h6"/></svg></div>
+            <div class="hub-main"><div class="hub-name">My closets <span class="pillar-tag">inventory</span></div><div class="hub-sub">Just mine · 87 pieces</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v16M5 8c2 0 3-2 3-2s1 2 3 2 3-2 3-2 1 2 3 2"/></svg></div>
+            <div class="hub-main"><div class="hub-name">My measurements <span class="lockmark">🔒 only you</span></div><div class="hub-sub invite">Add measurements → unlocks Fits me now</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="6"/><path d="M12 13V9M8 4h8"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Laundry and lifestyle <span class="lockmark">🔒 only you</span></div><div class="hub-sub">Standard machine · activewear not set</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+
+          <div class="hub-card">
+            <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 2.9-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><circle cx="17.5" cy="9.5" r="2.4"/><path d="M15.6 14.9c2.6.1 4.3 1.4 4.9 4.1"/></svg></div>
+            <div class="hub-main"><div class="hub-name">Sharing and borrowers <span class="pillar-tag">share</span></div><div class="hub-sub">3 viewers · 2 pieces on loan</div></div>
+            <div class="hub-chev">›</div>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">B1 — Hub · mobile</div>
+          <div class="step-title">Sections unlock capabilities</div>
+          <div class="step-note">The completeness line is capability-framed ("add measurements to unlock…"), never a percentage. Each card shows its pillar tag; "only you" sections carry the 🔒 functional-privacy mark. Activity (E4 rev 2) sits on top only when something waits.</div>
+        </div>
+      </div>
+
+      <!-- desktop -->
+      <div class="step wide">
+        <div class="browser">
+          <div class="browser-bar"><span class="b-dot"></span><span class="b-dot"></span><span class="b-dot"></span><div class="b-url">ntw.app/profile</div></div>
+          <div class="browser-screen">
+            <div class="d-wrap">
+              <div class="d-side">
+                <div class="item">◧ Closet</div>
+                <div class="item">◎ Search</div>
+                <div class="item">✉ Import</div>
+                <div class="item on">◉ Profile <span class="hub-count" style="margin-left:auto; margin-right:14px;">3</span></div>
+              </div>
+              <div class="d-main">
+                <div class="d-head">
+                  <div class="prof-ava">A<span class="ping"></span></div>
+                  <div>
+                    <div class="prof-name">Arianna</div>
+                    <div class="prof-cap">3 of 6 — <b>add measurements to unlock Fits me now</b></div>
+                  </div>
+                </div>
+                <div class="d-grid">
+                  <div class="hub-card attn">
+                    <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h6l2-3 2 6 2-3h4"/></svg></div>
+                    <div class="hub-main"><div class="hub-name">Activity <span class="hub-count">3</span></div><div class="hub-sub">2 requests + 1 return waiting on you</div></div>
+                    <div class="hub-chev">›</div>
+                  </div>
+                  <div class="hub-card">
+                    <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="9" r="4"/><path d="M5 20c1-3.6 3.7-5.5 7-5.5s6 1.9 7 5.5"/></svg></div>
+                    <div class="hub-main"><div class="hub-name">Identity <span class="pillar-tag">share</span></div><div class="hub-sub">Arianna · photo from Google</div></div>
+                    <span class="hub-done">Done ✓</span>
+                  </div>
+                  <div class="hub-card">
+                    <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/></svg></div>
+                    <div class="hub-main"><div class="hub-name">Where my clothes live <span class="pillar-tag">location</span></div><div class="hub-sub">4 locations · SD condo is primary</div></div>
+                    <div class="hub-chev">›</div>
+                  </div>
+                  <div class="hub-card">
+                    <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="6" width="16" height="14" rx="2"/><path d="M9 6V4h6v2M12 10v6M9 13h6"/></svg></div>
+                    <div class="hub-main"><div class="hub-name">My closets <span class="pillar-tag">inventory</span></div><div class="hub-sub">Just mine · 87 pieces</div></div>
+                    <div class="hub-chev">›</div>
+                  </div>
+                  <div class="hub-card">
+                    <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v16M5 8c2 0 3-2 3-2s1 2 3 2 3-2 3-2 1 2 3 2"/></svg></div>
+                    <div class="hub-main"><div class="hub-name">My measurements <span class="lockmark">🔒 only you</span></div><div class="hub-sub invite">Add measurements → unlocks Fits me now</div></div>
+                    <div class="hub-chev">›</div>
+                  </div>
+                  <div class="hub-card">
+                    <div class="hub-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9c7060" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.8-3 2.9-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><circle cx="17.5" cy="9.5" r="2.4"/><path d="M15.6 14.9c2.6.1 4.3 1.4 4.9 4.1"/></svg></div>
+                    <div class="hub-main"><div class="hub-name">Sharing and borrowers <span class="pillar-tag">share</span></div><div class="hub-sub">3 viewers · 2 pieces on loan</div></div>
+                    <div class="hub-chev">›</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step-caption">
+          <div class="step-num">B2 — Hub · desktop</div>
+          <div class="step-title">Same cards, two columns, side nav</div>
+          <div class="step-note">The hub scales to desktop as a two-column card grid beside the existing nav — no separate "settings page" pattern. Room to grow: future sections (body stage tags, archive) join the grid without crowding.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════ DETAIL SCREENS ══════════ -->
+  <section class="act">
+    <div class="act-head">
+      <span class="act-num">C</span>
+      <span class="act-title">Detail screens</span>
+      <span class="act-sub">location manager (Sloane) · sharing &amp; borrowers (Arianna)</span>
+    </div>
+
+    <div class="flow">
+
+      <!-- Location manager -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>9:14</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="view-title">Where my clothes live</div>
+          <div class="view-sub">Every item points at one of these. Kind sets its card border in the closet.</div>
+
+          <div class="loc-row">
+            <div class="loc-sw home"></div>
+            <div class="loc-main"><div class="loc-name">Nolita apartment</div><div class="loc-kind">home · 68 items</div></div>
+            <span class="primary-tag">Primary</span>
+            <span class="dots">⋯</span>
+          </div>
+          <div class="loc-row">
+            <div class="loc-sw other"></div>
+            <div class="loc-main"><div class="loc-name">Hamptons house</div><div class="loc-kind">other · 31 items</div></div>
+            <span class="dots">⋯</span>
+          </div>
+          <div class="loc-row">
+            <div class="loc-sw other"></div>
+            <div class="loc-main"><div class="loc-name">Paris pied-à-terre</div><div class="loc-kind">other · 22 items</div></div>
+            <span class="dots">⋯</span>
+          </div>
+          <div class="loc-row">
+            <div class="loc-sw storage"></div>
+            <div class="loc-main"><div class="loc-name">Aspen — safe</div><div class="loc-kind">storage · 4 items</div></div>
+            <span class="dots">⋯</span>
+          </div>
+          <div class="loc-row">
+            <div class="loc-sw suitcase"></div>
+            <div class="loc-main"><div class="loc-name">Carry-on</div><div class="loc-kind">suitcase · 9 items</div></div>
+            <span class="dots">⋯</span>
+          </div>
+          <button class="add-btn">＋ Add a location</button>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">C1 — Location manager</div>
+          <div class="step-title">Sloane's four homes, finally expressible</div>
+          <div class="step-note">Kind is encoded in the swatch border (home solid-neutral · storage solid · suitcase dashed · other dotted) — same language as closet card borders. Exactly one primary. Deleting a location with items prompts "move its items to…". Backed by the existing per-user <code>locations</code> table; only new schema is <code>is_primary</code>.</div>
+        </div>
+      </div>
+
+      <!-- Add-location sheet -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>9:15</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="view-title" style="filter: saturate(0.8);">Where my clothes live</div>
+          <div class="loc-row" style="filter: saturate(0.8);">
+            <div class="loc-sw home"></div>
+            <div class="loc-main"><div class="loc-name">Nolita apartment</div><div class="loc-kind">home</div></div>
+          </div>
+          <div class="dim"></div>
+          <div class="sheet-up">
+            <div class="grabber"></div>
+            <div class="sheet-title-sm">Add a location</div>
+            <div class="field-label">Label</div>
+            <div class="input">Lake Como house</div>
+            <div class="field-label">Kind</div>
+            <div class="kind-row">
+              <div class="kind-pill on">Home</div>
+              <div class="kind-pill">Storage</div>
+              <div class="kind-pill">Suitcase</div>
+              <div class="kind-pill">Other</div>
+            </div>
+            <button class="cta">Add location</button>
+          </div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">C1b — Add sheet</div>
+          <div class="step-title">Two fields, bottom sheet, done</div>
+          <div class="step-note">Same sheet serves onboarding and the manager. Label free-text + kind picker — nothing else. Bottom sheets over full-screen forms, per the spec.</div>
+        </div>
+      </div>
+
+      <!-- Sharing & borrowers -->
+      <div class="step">
+        <div class="phone"><div class="screen">
+          <div class="notch"></div>
+          <div class="statusbar"><span>9:20</span><span>𝄙 ᯤ ▮</span></div>
+          <div class="view-title">Sharing and borrowers</div>
+          <div class="view-sub">Who can see your closet, and who has pieces of it. Private items and "only you" data are never shared.</div>
+
+          <div class="divider-note"><span>👁 Can view my closet</span><span class="line"></span></div>
+          <div class="l-row">
+            <div class="l-ava" style="background: linear-gradient(135deg, #55617a, #7e8aa0);">M</div>
+            <div class="l-main"><div class="l-name">MJ Castillo</div><div class="l-meta">Since today · via share link</div></div>
+            <span class="revoke">Revoke</span>
+          </div>
+          <div class="l-row">
+            <div class="l-ava" style="background: linear-gradient(135deg, #4e5d52, #7d8f83);">S</div>
+            <div class="l-main"><div class="l-name">Sloane Whitmore</div><div class="l-meta">Since Jun 2 · viewed 14×</div></div>
+            <span class="revoke">Revoke</span>
+          </div>
+
+          <div class="divider-note"><span>⇄ Currently borrowing</span><span class="line"></span></div>
+          <div class="l-row">
+            <div class="l-ava" style="background: linear-gradient(135deg, #55617a, #7e8aa0);">M</div>
+            <div class="l-main"><div class="l-name">MJ · grey wool blazer</div><div class="l-meta">Due back Fri, Jul 24 · care terms attached</div></div>
+          </div>
+          <div class="l-row">
+            <div class="l-ava" style="background: linear-gradient(135deg, #a68f74, #c5b096);">C</div>
+            <div class="l-main"><div class="l-name">Chloe · Valentino heels</div><div class="l-meta">Returned — confirm condition in Activity</div></div>
+          </div>
+
+          <div class="divider-note"><span>🔒 Never shared: measurements, laundry, prices, locations</span><span class="line"></span></div>
+          <div class="homebar"></div>
+        </div></div>
+        <div class="step-caption">
+          <div class="step-num">C2 — Sharing &amp; borrowers</div>
+          <div class="step-title">Viewers and loans, one honest page</div>
+          <div class="step-note">Merges the Part Une viewer list (revoke = one tap) with active borrows (Part Deux). The closing lock-line restates the functional-vs-social divider: what friends can never see, in plain words.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="rules">
+    <div class="rule">
+      <h3><span>i.</span>Capabilities, not completeness</h3>
+      <p>Empty sections invite ("Add measurements → unlocks Fits me now") — no percentages, no streaks, no badges. Users should feel organized, never judged.</p>
+    </div>
+    <div class="rule">
+      <h3><span>ii.</span>The functional–social divider is visible</h3>
+      <p>"Only you" sections (measurements, laundry) wear the 🔒; shareable ones (identity, viewers) wear their pillar tag. The sharing page ends by naming what's never shared.</p>
+    </div>
+    <div class="rule">
+      <h3><span>iii.</span>Locations speak the closet's language</h3>
+      <p>Kind-encoded borders on the manager rows match the card borders in the closet (E2) — the profile teaches the vocabulary the inventory already uses.</p>
+    </div>
+    <div class="rule">
+      <h3><span>iv.</span>Built on tables that exist</h3>
+      <p>profiles, locations (per-user, RLS-scoped), closets + closet_members are live in Supabase (E12 reality check). This core slice needs one migration: locations.is_primary.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
