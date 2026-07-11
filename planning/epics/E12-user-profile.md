@@ -1,5 +1,13 @@
 # E12 · User Profile & Identity
 
+> **📐 2026-07-10 — profile hub designed (core slice):** hub on mobile + desktop, location manager (+ add-location
+> sheet), and sharing & borrowers detail are mocked in
+> [planning/design/mockups/profile-hub.html](../design/mockups/profile-hub.html), per the
+> [Figma Make prompt](../design/FIGMA_MAKE_PROMPT_profile.md). The hub integrates the E4 rev-2 **Activity** section
+> (notifications live here — see [E4 Part Deux](./E4-part-deux-simple-lending.md) +
+> [activity-notifications.html](../design/mockups/activity-notifications.html)). Onboarding + measurements/laundry
+> detail screens are a later pass.
+
 > **Date:** 2026-06-24 · **Updated:** 2026-07-08 · **Pillar:** Foundation (load-bearing for locations + laundry + social) · **Detail:** medium · **Est:** ~tbd
 > **Goal:** Give the user a profile that serves several masters: **functional** data that tunes their own closet
 > (locations, laundry machine, lifestyle, measurements), **social** data that friends see when sharing, and the
