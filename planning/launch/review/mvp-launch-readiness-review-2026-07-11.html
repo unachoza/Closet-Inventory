@@ -1,0 +1,1951 @@
+<title>Nothing To Wear · MVP Launch Readiness Review</title>
+<style>
+	:root {
+		--ground: #f6f1ea;
+		--ground-2: #efe8dc;
+		--panel: #fbf8f2;
+		--rule: #e5dccb;
+		--rule-strong: #cfc3ac;
+		--ink: #2a1f19;
+		--ink-2: #4a3d33;
+		--muted: #7a6e63;
+		--muted-2: #98897a;
+		--brand: #c1553b;
+		--brand-soft: #ecd0c6;
+		--sage: #4b6b5f;
+		--sage-soft: #d5dfd9;
+		--good: #6b8e4e;
+		--warn: #d18a2a;
+		--crit: #a63130;
+		--info: #4a6b8a;
+		--good-soft: #dfe6d0;
+		--warn-soft: #f2dfba;
+		--crit-soft: #efc7c1;
+		--info-soft: #d3ddea;
+		--shadow: 0 1px 0 rgba(42, 31, 25, 0.04), 0 4px 20px -8px rgba(42, 31, 25, 0.08);
+		--serif: "Iowan Old Style", "Palatino Linotype", "Palatino", "Georgia", "Baskerville", serif;
+		--sans: -apple-system, "Segoe UI", "SF Pro Text", system-ui, "Helvetica Neue", sans-serif;
+		--mono: "JetBrains Mono", "SF Mono", "IBM Plex Mono", ui-monospace, "Menlo", monospace;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root {
+			--ground: #1b1611;
+			--ground-2: #24201a;
+			--panel: #221d17;
+			--rule: #3a322a;
+			--rule-strong: #574c3f;
+			--ink: #f0e6d7;
+			--ink-2: #d3c6b3;
+			--muted: #a89a87;
+			--muted-2: #86786a;
+			--brand: #e07659;
+			--brand-soft: #4a2c23;
+			--sage: #8ba895;
+			--sage-soft: #2d3f37;
+			--good: #a9c17e;
+			--warn: #e0a848;
+			--crit: #d76a63;
+			--info: #82a1c2;
+			--good-soft: #303a24;
+			--warn-soft: #453520;
+			--crit-soft: #3f2320;
+			--info-soft: #26313d;
+			--shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 4px 24px -8px rgba(0, 0, 0, 0.4);
+		}
+	}
+	:root[data-theme="light"] {
+		--ground: #f6f1ea;
+		--ground-2: #efe8dc;
+		--panel: #fbf8f2;
+		--rule: #e5dccb;
+		--rule-strong: #cfc3ac;
+		--ink: #2a1f19;
+		--ink-2: #4a3d33;
+		--muted: #7a6e63;
+		--muted-2: #98897a;
+		--brand: #c1553b;
+		--brand-soft: #ecd0c6;
+		--sage: #4b6b5f;
+		--sage-soft: #d5dfd9;
+		--good: #6b8e4e;
+		--warn: #d18a2a;
+		--crit: #a63130;
+		--info: #4a6b8a;
+		--good-soft: #dfe6d0;
+		--warn-soft: #f2dfba;
+		--crit-soft: #efc7c1;
+		--info-soft: #d3ddea;
+	}
+	:root[data-theme="dark"] {
+		--ground: #1b1611;
+		--ground-2: #24201a;
+		--panel: #221d17;
+		--rule: #3a322a;
+		--rule-strong: #574c3f;
+		--ink: #f0e6d7;
+		--ink-2: #d3c6b3;
+		--muted: #a89a87;
+		--muted-2: #86786a;
+		--brand: #e07659;
+		--brand-soft: #4a2c23;
+		--sage: #8ba895;
+		--sage-soft: #2d3f37;
+		--good: #a9c17e;
+		--warn: #e0a848;
+		--crit: #d76a63;
+		--info: #82a1c2;
+		--good-soft: #303a24;
+		--warn-soft: #453520;
+		--crit-soft: #3f2320;
+		--info-soft: #26313d;
+	}
+
+	* { box-sizing: border-box; }
+	html, body { margin: 0; padding: 0; }
+	body {
+		font-family: var(--sans);
+		font-size: 15px;
+		line-height: 1.55;
+		background: var(--ground);
+		color: var(--ink);
+		font-feature-settings: "ss01" 1, "cv11" 1;
+		-webkit-font-smoothing: antialiased;
+	}
+
+	.wrap { max-width: 1180px; margin: 0 auto; padding: 48px 28px 96px; }
+
+	/* ── HEADER ─────────────────────────────────────────────── */
+	.masthead {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: end;
+		gap: 24px;
+		padding-bottom: 20px;
+		border-bottom: 1px solid var(--rule-strong);
+	}
+	.eyebrow {
+		font-family: var(--mono);
+		font-size: 11px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	h1 {
+		font-family: var(--serif);
+		font-weight: 400;
+		font-size: clamp(38px, 5vw, 56px);
+		line-height: 1.05;
+		letter-spacing: -0.015em;
+		margin: 8px 0 4px;
+		text-wrap: balance;
+	}
+	h1 em { font-style: italic; color: var(--brand); font-weight: 400; }
+	.lede {
+		font-family: var(--serif);
+		font-size: 19px;
+		line-height: 1.4;
+		color: var(--ink-2);
+		max-width: 46em;
+		margin: 4px 0 0;
+		font-style: italic;
+	}
+	.masthead-meta {
+		font-family: var(--mono);
+		font-size: 11px;
+		color: var(--muted);
+		text-align: right;
+		letter-spacing: 0.03em;
+	}
+	.masthead-meta div + div { margin-top: 4px; }
+	.masthead-meta strong { color: var(--ink); font-weight: 500; }
+
+	/* ── HERO: readiness gauge + KPI row ───────────────────── */
+	.hero {
+		margin-top: 32px;
+		display: grid;
+		grid-template-columns: minmax(280px, 340px) 1fr;
+		gap: 32px;
+		align-items: stretch;
+	}
+	@media (max-width: 720px) {
+		.hero { grid-template-columns: 1fr; }
+	}
+	.gauge-card {
+		background: var(--panel);
+		border: 1px solid var(--rule);
+		border-radius: 4px;
+		padding: 28px 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		box-shadow: var(--shadow);
+	}
+	.gauge-svg { width: 220px; height: 130px; }
+	.gauge-pct {
+		font-family: var(--serif);
+		font-size: 62px;
+		line-height: 1;
+		font-weight: 500;
+		color: var(--ink);
+		letter-spacing: -0.02em;
+		margin-top: -4px;
+		font-variant-numeric: tabular-nums;
+	}
+	.gauge-label {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--muted);
+		margin-top: 6px;
+	}
+	.gauge-verdict {
+		margin-top: 14px;
+		font-family: var(--serif);
+		font-style: italic;
+		color: var(--ink-2);
+		font-size: 16px;
+	}
+
+	.kpi-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 10px;
+	}
+	@media (max-width: 900px) {
+		.kpi-grid { grid-template-columns: repeat(2, 1fr); }
+	}
+	.kpi {
+		background: var(--panel);
+		border: 1px solid var(--rule);
+		border-left: 3px solid var(--sage);
+		border-radius: 3px;
+		padding: 16px 14px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		min-height: 110px;
+	}
+	.kpi.brand { border-left-color: var(--brand); }
+	.kpi.warn { border-left-color: var(--warn); }
+	.kpi.crit { border-left-color: var(--crit); }
+	.kpi-label {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	.kpi-value {
+		font-family: var(--serif);
+		font-size: 34px;
+		line-height: 1;
+		font-weight: 500;
+		color: var(--ink);
+		font-variant-numeric: tabular-nums;
+		letter-spacing: -0.01em;
+	}
+	.kpi-unit {
+		font-family: var(--sans);
+		font-size: 12px;
+		color: var(--muted);
+		font-weight: 400;
+	}
+	.kpi-sub { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+	/* ── SECTION ─────────────────────────────────────────────── */
+	section { margin-top: 56px; }
+	.sec-head {
+		display: flex;
+		align-items: baseline;
+		gap: 16px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid var(--rule);
+		margin-bottom: 24px;
+	}
+	.sec-num {
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 22px;
+		color: var(--brand);
+		font-weight: 400;
+	}
+	h2 {
+		font-family: var(--serif);
+		font-size: 28px;
+		font-weight: 500;
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		margin: 0;
+		flex: 1;
+	}
+	.sec-tag {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	h3 {
+		font-family: var(--serif);
+		font-size: 19px;
+		font-weight: 500;
+		margin: 24px 0 8px;
+		color: var(--ink);
+	}
+	h4 {
+		font-family: var(--sans);
+		font-size: 12px;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: var(--muted);
+		font-weight: 600;
+		margin: 20px 0 8px;
+	}
+	p { margin: 8px 0; max-width: 68ch; }
+	p.wide { max-width: none; }
+
+	/* ── PANELS ─────────────────────────────────────────────── */
+	.panel {
+		background: var(--panel);
+		border: 1px solid var(--rule);
+		border-radius: 4px;
+		padding: 20px 22px;
+		box-shadow: var(--shadow);
+	}
+	.panel + .panel { margin-top: 14px; }
+
+	.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+	.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+	@media (max-width: 800px) {
+		.grid-2, .grid-3 { grid-template-columns: 1fr; }
+	}
+
+	.callout {
+		border-left: 3px solid var(--brand);
+		padding: 4px 0 4px 16px;
+		background: transparent;
+		margin: 14px 0;
+	}
+	.callout.warn { border-left-color: var(--warn); }
+	.callout.good { border-left-color: var(--good); }
+	.callout.crit { border-left-color: var(--crit); }
+	.callout .lbl {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--muted);
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	/* ── PILLS / CHIPS ──────────────────────────────────────── */
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		padding: 3px 8px;
+		border-radius: 100px;
+		background: var(--ground-2);
+		color: var(--ink-2);
+		border: 1px solid var(--rule);
+		white-space: nowrap;
+	}
+	.chip.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+	.chip.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+	.chip.crit { background: var(--crit-soft); color: var(--crit); border-color: transparent; }
+	.chip.info { background: var(--info-soft); color: var(--info); border-color: transparent; }
+	.chip.brand { background: var(--brand-soft); color: var(--brand); border-color: transparent; }
+	.chip.sage { background: var(--sage-soft); color: var(--sage); border-color: transparent; }
+	@media (prefers-color-scheme: dark) {
+		.chip.good, .chip.warn, .chip.crit, .chip.info, .chip.brand, .chip.sage { color: var(--ink); }
+	}
+
+	/* ── TABLES ─────────────────────────────────────────────── */
+	.table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--rule); border-radius: 4px; background: var(--panel); }
+	table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+	th {
+		text-align: left;
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--muted);
+		font-weight: 500;
+		padding: 12px 14px;
+		border-bottom: 1px solid var(--rule);
+		background: var(--ground-2);
+		white-space: nowrap;
+		user-select: none;
+		cursor: pointer;
+		position: relative;
+	}
+	th.sortable::after {
+		content: "↕";
+		opacity: 0.35;
+		margin-left: 6px;
+		font-size: 10px;
+	}
+	th.sort-asc::after { content: "↑"; opacity: 1; color: var(--brand); }
+	th.sort-desc::after { content: "↓"; opacity: 1; color: var(--brand); }
+	td { padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+	tr:last-child td { border-bottom: none; }
+	tr:hover td { background: var(--ground-2); }
+	td.num { font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 12px; }
+	td.name { font-weight: 500; }
+	.filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: center;
+		padding: 10px 14px;
+		background: var(--ground-2);
+		border-bottom: 1px solid var(--rule);
+		font-family: var(--mono);
+		font-size: 11px;
+		color: var(--muted);
+	}
+	.filter-bar button {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		padding: 4px 10px;
+		background: transparent;
+		border: 1px solid var(--rule-strong);
+		color: var(--ink-2);
+		border-radius: 100px;
+		cursor: pointer;
+	}
+	.filter-bar button.active {
+		background: var(--ink);
+		color: var(--ground);
+		border-color: var(--ink);
+	}
+
+	/* ── PROGRESS BARS ──────────────────────────────────────── */
+	.pbar {
+		height: 8px;
+		background: var(--ground-2);
+		border-radius: 4px;
+		overflow: hidden;
+		position: relative;
+	}
+	.pbar-fill { height: 100%; background: var(--sage); transition: width 0.4s; }
+	.pbar-fill.brand { background: var(--brand); }
+	.pbar-fill.good { background: var(--good); }
+	.pbar-fill.warn { background: var(--warn); }
+	.pbar-fill.crit { background: var(--crit); }
+	.pbar-row { display: grid; grid-template-columns: 160px 1fr 48px; gap: 12px; align-items: center; padding: 8px 0; font-size: 13px; }
+	.pbar-row .lbl { color: var(--ink-2); font-weight: 500; }
+	.pbar-row .val { font-family: var(--mono); font-size: 12px; text-align: right; color: var(--muted); }
+
+	/* ── SCORECARD RADIAL ───────────────────────────────────── */
+	.score-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+	@media (max-width: 900px) { .score-grid { grid-template-columns: repeat(2, 1fr); } }
+	.score-tile {
+		background: var(--panel);
+		border: 1px solid var(--rule);
+		border-radius: 4px;
+		padding: 18px 16px;
+		text-align: center;
+		box-shadow: var(--shadow);
+	}
+	.score-svg { width: 90px; height: 90px; margin: 0 auto 6px; display: block; }
+	.score-name {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--muted);
+		margin-bottom: 4px;
+	}
+	.score-val {
+		font-family: var(--serif);
+		font-size: 24px;
+		font-weight: 500;
+		color: var(--ink);
+	}
+	.score-val small { font-size: 12px; color: var(--muted); font-weight: 400; }
+	.score-note { font-size: 12px; color: var(--ink-2); margin-top: 8px; line-height: 1.35; max-width: 22ch; margin-left: auto; margin-right: auto; }
+
+	/* ── MATURITY STAGES ────────────────────────────────────── */
+	.maturity-track {
+		display: grid;
+		grid-template-columns: 160px 1fr;
+		gap: 16px;
+		align-items: center;
+		padding: 10px 0;
+		border-bottom: 1px dashed var(--rule);
+		font-size: 13px;
+	}
+	.maturity-track:last-child { border-bottom: none; }
+	.maturity-lbl { font-weight: 500; }
+	.maturity-lbl-sub { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+	.stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+	.stage {
+		height: 26px;
+		border-radius: 3px;
+		background: var(--ground-2);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-family: var(--mono);
+		font-size: 9px;
+		color: var(--muted);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		border: 1px solid var(--rule);
+	}
+	.stage.done { background: var(--sage); color: white; border-color: var(--sage); }
+	.stage.current { background: var(--brand); color: white; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+	@media (prefers-color-scheme: dark) {
+		.stage.done, .stage.current { color: var(--ground); }
+	}
+
+	/* ── PILLAR STRIP ───────────────────────────────────────── */
+	.pillars {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		gap: 12px;
+		margin: 16px 0;
+	}
+	@media (max-width: 760px) { .pillars { grid-template-columns: repeat(2, 1fr); } }
+	.pillar {
+		background: var(--panel);
+		border: 1px solid var(--rule);
+		border-top: 3px solid var(--brand);
+		border-radius: 3px;
+		padding: 14px;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.pillar .n {
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 13px;
+		color: var(--brand);
+	}
+	.pillar .name {
+		font-family: var(--serif);
+		font-size: 18px;
+		font-weight: 500;
+	}
+	.pillar .pct {
+		font-family: var(--mono);
+		font-size: 22px;
+		color: var(--ink);
+		font-weight: 500;
+		letter-spacing: -0.02em;
+	}
+	.pillar .note { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+	/* ── QUOTES / VALUE PROP ────────────────────────────────── */
+	blockquote {
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 22px;
+		line-height: 1.4;
+		color: var(--ink);
+		border-left: 3px solid var(--brand);
+		padding-left: 20px;
+		margin: 20px 0;
+		max-width: 34em;
+	}
+	blockquote cite {
+		display: block;
+		font-family: var(--mono);
+		font-size: 10px;
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+		color: var(--muted);
+		font-style: normal;
+		margin-top: 10px;
+	}
+
+	/* ── ONBOARDING STORYBOARD ──────────────────────────────── */
+	.storyboard {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 12px;
+		margin-top: 14px;
+	}
+	@media (max-width: 900px) { .storyboard { grid-template-columns: repeat(2, 1fr); } }
+	.frame {
+		aspect-ratio: 9 / 16;
+		background: var(--ground-2);
+		border: 1px solid var(--rule);
+		border-radius: 12px;
+		padding: 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		position: relative;
+	}
+	.frame-n {
+		font-family: var(--mono);
+		font-size: 10px;
+		letter-spacing: 0.12em;
+		color: var(--muted);
+		text-transform: uppercase;
+	}
+	.frame-h {
+		font-family: var(--serif);
+		font-size: 18px;
+		font-weight: 500;
+		line-height: 1.15;
+		color: var(--ink);
+	}
+	.frame-b { font-size: 12px; color: var(--ink-2); line-height: 1.4; flex: 1; }
+	.frame-cta {
+		font-family: var(--mono);
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		padding: 8px 12px;
+		background: var(--ink);
+		color: var(--ground);
+		border-radius: 100px;
+		text-align: center;
+		font-weight: 500;
+	}
+	.frame-persona {
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 12px;
+		color: var(--brand);
+		border-top: 1px dashed var(--rule-strong);
+		padding-top: 6px;
+	}
+
+	/* ── FOOTER ─────────────────────────────────────────────── */
+	.foot {
+		margin-top: 64px;
+		padding-top: 20px;
+		border-top: 1px solid var(--rule-strong);
+		display: flex;
+		justify-content: space-between;
+		font-family: var(--mono);
+		font-size: 10px;
+		color: var(--muted);
+		letter-spacing: 0.06em;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		font-family: var(--mono);
+		font-size: 10px;
+		color: var(--muted);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		margin-top: 8px;
+	}
+	.swatch {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 2px;
+		margin-right: 5px;
+		vertical-align: middle;
+	}
+
+	ul.tight { margin: 6px 0; padding-left: 20px; }
+	ul.tight li { margin: 3px 0; }
+	.dl-tight { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; font-size: 13px; margin: 8px 0; }
+	.dl-tight dt { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); align-self: center; }
+	.dl-tight dd { margin: 0; color: var(--ink-2); }
+
+	code { font-family: var(--mono); font-size: 12px; background: var(--ground-2); padding: 1px 5px; border-radius: 3px; color: var(--brand); }
+
+	.actions-list {
+		counter-reset: act;
+		list-style: none;
+		padding: 0;
+		margin: 12px 0;
+	}
+	.actions-list li {
+		counter-increment: act;
+		display: grid;
+		grid-template-columns: 42px 1fr auto;
+		gap: 16px;
+		align-items: start;
+		padding: 14px 0;
+		border-bottom: 1px dashed var(--rule);
+	}
+	.actions-list li:last-child { border-bottom: none; }
+	.actions-list li::before {
+		content: counter(act, decimal-leading-zero);
+		font-family: var(--serif);
+		font-style: italic;
+		font-size: 28px;
+		color: var(--brand);
+		line-height: 1;
+	}
+	.act-title { font-weight: 500; margin-bottom: 3px; }
+	.act-body { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+	.act-meta { text-align: right; font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+	.moat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+	@media (max-width: 720px) { .moat-grid { grid-template-columns: 1fr; } }
+	.moat-col h4 { margin-top: 0; }
+	.moat-col ul { padding-left: 20px; margin: 4px 0; font-size: 13px; }
+	.moat-col li { margin: 6px 0; }
+
+	/* ── SCATTER (DECISION MATRIX) ───────────────────────────── */
+	.scatter-svg { width: 100%; height: auto; }
+	.scatter-point { cursor: pointer; }
+	.scatter-point circle { transition: r 0.2s; }
+	.scatter-point:hover circle { r: 12; }
+
+	/* Focus */
+	:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+	@media (prefers-reduced-motion: reduce) {
+		* { transition: none !important; animation: none !important; }
+	}
+</style>
+
+<div class="wrap">
+
+	<!-- ═══ MASTHEAD ═══════════════════════════════════════════ -->
+	<header class="masthead">
+		<div>
+			<div class="eyebrow">MVP Launch Readiness Review · Nothing To Wear</div>
+			<h1>The closet <em>almost</em> knows the truth about itself.</h1>
+			<p class="lede">A wardrobe inventory &amp; logistics app — not another outfit planner — evaluated against every launch gate the founder set for the 30-person Gmail-waitlist beta.</p>
+		</div>
+		<div class="masthead-meta">
+			<div>Reviewed <strong>2026·07·11</strong> · rev. 2</div>
+			<div>Branch <strong>claude/hopeful-pascal-v7pc3j</strong></div>
+			<div>vs. <strong>MVP_LAUNCH_ACTION_LIST</strong> (07·11) + legal drafts</div>
+			<div style="margin-top:10px">Staff Eng · TL · PM · CTO lens</div>
+		</div>
+	</header>
+
+	<!-- ═══ HERO — READINESS + KPI ═══════════════════════════ -->
+	<div class="hero">
+		<div class="gauge-card">
+			<svg class="gauge-svg" viewBox="0 0 220 130" aria-hidden="true">
+				<path d="M 20 120 A 90 90 0 0 1 200 120" fill="none" stroke="var(--ground-2)" stroke-width="14" stroke-linecap="round"/>
+				<path d="M 20 120 A 90 90 0 0 1 200 120" fill="none" stroke="var(--brand)" stroke-width="14" stroke-linecap="round"
+					stroke-dasharray="282.7" stroke-dashoffset="62.19"/>
+				<circle cx="20" cy="120" r="3" fill="var(--muted)"/>
+				<circle cx="200" cy="120" r="3" fill="var(--muted)"/>
+				<text x="14" y="126" font-family="var(--mono)" font-size="9" fill="var(--muted)">0</text>
+				<text x="196" y="126" font-family="var(--mono)" font-size="9" fill="var(--muted)">100</text>
+			</svg>
+			<div class="gauge-pct">78<small style="font-size:26px;color:var(--muted)">%</small></div>
+			<div class="gauge-label">Launch Readiness</div>
+			<div class="gauge-verdict">Not today. Yes in <strong style="font-style:normal">6–9 days</strong>.</div>
+		</div>
+
+		<div class="kpi-grid">
+			<div class="kpi brand">
+				<div>
+					<div class="kpi-label">Tests Passing</div>
+					<div class="kpi-value">1,475<span class="kpi-unit"> · 118 files</span></div>
+				</div>
+				<div class="kpi-sub">+ <strong>14 Playwright</strong> e2e suites (144/144 green). Zero <code>.skip</code>, zero <code>any</code>, zero <code>@ts-ignore</code> in <code>src/</code>.</div>
+			</div>
+			<div class="kpi">
+				<div>
+					<div class="kpi-label">Block A Security</div>
+					<div class="kpi-value">DONE <span class="kpi-unit">2026·07·07</span></div>
+				</div>
+				<div class="kpi-sub">RLS 11/11 ✓ · dev/prod split ✓ · deletion + export ✓ · CI scanning ✓ (PR #115–117, #128–129)</div>
+			</div>
+			<div class="kpi brand">
+				<div>
+					<div class="kpi-label">Legal &amp; Compliance</div>
+					<div class="kpi-value">DRAFTED <span class="kpi-unit">Tier 2</span></div>
+				</div>
+				<div class="kpi-sub">Privacy policy + CASA tier determination written 2026·07·11 — needs sign-off + public URL.</div>
+			</div>
+			<div class="kpi">
+				<div>
+					<div class="kpi-label">PWA / Mobile</div>
+					<div class="kpi-value">7/7 <span class="kpi-unit">shipped</span></div>
+				</div>
+				<div class="kpi-sub">Installable · offline shell · bottom nav · FAB · A11y 96, Perf <span style="color:var(--warn)">55</span></div>
+			</div>
+			<div class="kpi warn">
+				<div>
+					<div class="kpi-label">Inventory Spine</div>
+					<div class="kpi-value">8/12 <span class="kpi-unit">P1 tickets</span></div>
+				</div>
+				<div class="kpi-sub">P1-8 filters shipped; only grouped view + multi-home + status v2 open.</div>
+			</div>
+			<div class="kpi crit">
+				<div>
+					<div class="kpi-label">Blockers Remaining</div>
+					<div class="kpi-value">9<span class="kpi-unit"> of founder's 10</span></div>
+				</div>
+				<div class="kpi-sub">#6 (filters) is likely already shipped (PR #126) — see §iii discrepancy note. Plus 3 bugs this review found.</div>
+			</div>
+			<div class="kpi">
+				<div>
+					<div class="kpi-label">Migrations Live</div>
+					<div class="kpi-value">11</div>
+				</div>
+				<div class="kpi-sub">v1 spine, RLS, storage, taxonomy, wear-events, GRANT fix, locations v2.</div>
+			</div>
+			<div class="kpi">
+				<div>
+					<div class="kpi-label">Est. Remaining</div>
+					<div class="kpi-value">40–55 <span class="kpi-unit">hrs</span></div>
+				</div>
+				<div class="kpi-sub">Down from the June estimate — Blocks A + C confirmed done. Solo, ~6–9 calendar days at 30 hrs/wk.</div>
+			</div>
+			<div class="kpi">
+				<div>
+					<div class="kpi-label">Confidence</div>
+					<div class="kpi-value">HIGH<span class="kpi-unit"> · beta scope</span></div>
+				</div>
+				<div class="kpi-sub">Scope is well-defined; the longest pole is Google's external review queue, not code.</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- ═══ §1 · EXECUTIVE SUMMARY ═══════════════════════════ -->
+	<section id="s1">
+		<div class="sec-head">
+			<div class="sec-num">§ i</div>
+			<h2>Executive Summary</h2>
+			<div class="sec-tag">STAFF · TL · PM · CTO lens</div>
+		</div>
+
+		<div class="grid-2">
+			<div class="panel">
+				<h4>Biggest Accomplishments</h4>
+				<ul class="tight">
+					<li><strong>Blocks 0, A, and C are all now formally complete</strong> — confirmed by the 2026-07-11 amendment to the July roadmap: Block A (PR #115–117, #128–129) and Block C (PR #130–135) both finished the same week the July 5 "zero movement" note was written.</li>
+					<li><strong>Privacy policy + CASA tier are drafted, not just planned</strong> — <code>docs/legal/PRIVACY_POLICY_DRAFT.md</code> (10 sections, Google Limited Use disclosure verbatim) and <code>CASA_TIER_DETERMINATION.md</code> (correctly reasoned Tier 2) both exist. This was "not started" a week ago.</li>
+					<li><strong>Full installable PWA landed in one week</strong> — manifest + icons + Workbox precache + offline closet + 144/144 e2e green across 4 Playwright projects.</li>
+					<li><strong>Security foundation on par with funded startups</strong> — private buckets, path-scoped RLS, signed URLs w/ auto-refresh, CI gitleaks + npm-audit on every PR, dev/prod split, deletion + export deployed as an Edge Function.</li>
+					<li><strong>FashionParser is a real domain module</strong> — 17 attribute maps, 6 normalizers, 6 inference functions. This is the moat surface, and it works against real retailer fixtures (dozen+ layouts).</li>
+					<li><strong>Planning hygiene is exceptional</strong> — dated docs, cross-linked epics, "done in docs ≠ done on main" reconciliation, and an honest amendment note correcting the doc's own prior claim. Rare in solo builders.</li>
+				</ul>
+			</div>
+			<div class="panel">
+				<h4>Biggest Risks</h4>
+				<ul class="tight">
+					<li><strong style="color:var(--crit)">Privacy Policy is drafted but not published</strong> — still a hard block on Google OAuth even in test-user mode. Needs a human sign-off + placeholders filled + a public URL, not more writing.</li>
+					<li><strong style="color:var(--crit)">Lend modal + <code>isAvailable</code> have zero code</strong> — confirmed via repo search. These are the founder's own Top-10 blockers #4/#5, and "simple lend tracking" is called out in the launch README as implicitly required to ship Status/Location responsibly.</li>
+					<li><strong style="color:var(--crit)">Lighthouse Perf 55 · LCP 7.1s</strong> — single 291 KiB monolithic JS chunk on a mobile-first app. Waitlisters on 4G will bounce before the closet paints.</li>
+					<li><strong style="color:var(--warn)">No Supabase backups/PITR configured</strong> — confirmed, nothing in <code>supabase/</code>. Founder's own #10 blocker; cheap to fix, expensive to skip once real user data lands.</li>
+					<li><strong style="color:var(--warn)">Retention loop is thin</strong> — no wear-logging, no laundry forecast, no share/borrow. The MVP demos beautifully but has no reason to open on day 3.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="callout">
+			<span class="lbl">One-sentence verdict</span>
+			<p style="margin:0;font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.45;">
+				Blocks 0, A, and C are genuinely done and the privacy policy has moved from blank page to drafted document — the honest gap left is narrow: publish the policy, build the lend modal, fix three hidden client bugs, and turn on backups.
+			</p>
+		</div>
+
+		<h3>Newly Surfaced — hidden bugs that must be fixed before the 30-user beta</h3>
+		<div class="panel" style="border-left:3px solid var(--crit)">
+			<div class="grid-3">
+				<div>
+					<div class="chip crit">Critical · S effort</div>
+					<h4 style="margin-top:8px">Fuse.js index rebuilt twice per interaction</h4>
+					<p style="font-size:13px;color:var(--ink-2);margin:0"><code>src/hooks/useFuzzySearch.ts:47-73</code> closes over <code>debouncedQuery</code> only, so <code>new Fuse(...)</code> runs on every <code>items</code> mutation, and <code>EntireClosetView</code> invokes both <code>searchResults</code> and <code>getMatchKeys</code> per render — <strong>two full re-indexes</strong> per filter/search change. At 300+ items iPhone SE will visibly stall.</p>
+				</div>
+				<div>
+					<div class="chip crit">Critical · S effort</div>
+					<h4 style="margin-top:8px">Silent <code>QuotaExceededError</code> on signed-out writes</h4>
+					<p style="font-size:13px;color:var(--ink-2);margin:0"><code>src/utils/safeStorage.ts:11-19</code> catches quota errors and only logs a warning. Signed-out users see a green success toast while their new item was not persisted. Safari's ~5 MB localStorage ceiling hits at ~20 base64 photos. <strong>Data-loss UX bug</strong>.</p>
+				</div>
+				<div>
+					<div class="chip crit">High · S effort</div>
+					<h4 style="margin-top:8px">CSP is skeletal, not defense-in-depth</h4>
+					<p style="font-size:13px;color:var(--ink-2);margin:0"><code>vercel.json</code> sets only <code>script-src</code>, <code>object-src</code>, <code>base-uri</code>. No <code>default-src</code>, <code>connect-src</code>, <code>img-src</code>, <code>style-src</code>, <code>frame-ancestors</code>. Ship it right before waitlisters land — <strong>test in report-only mode first</strong> so Supabase + Google OAuth still resolve.</p>
+				</div>
+			</div>
+			<div class="grid-3" style="margin-top:16px">
+				<div>
+					<div class="chip warn">Med · S effort</div>
+					<h4 style="margin-top:8px">Docs drift: README + ARCHITECTURE describe deleted hooks</h4>
+					<p style="font-size:13px;color:var(--ink-2);margin:0"><code>useLocalCloset</code>, <code>useLocalStorageCloset</code>, and a duplicate <code>inferProductAttributes.ts</code> are all referenced in docs but no longer exist in <code>src/</code>. <code>ClothingItem</code>'s "index signature" warning is stale. Onboarding-hazard for the future dev partner.</p>
+				</div>
+				<div>
+					<div class="chip warn">Med · S effort</div>
+					<h4 style="margin-top:8px">Two write paths to the same localStorage key</h4>
+					<p style="font-size:13px;color:var(--ink-2);margin:0"><code>useCloudCloset.ts:21-30</code>'s <code>seed()</code> writes <code>my_closet_key</code> directly, and <code>localClosetRepository.ts:28-30</code> writes the same key. Race on first-mount reconcile. Route seed through repo.</p>
+				</div>
+				<div>
+					<div class="chip warn">Med · M effort</div>
+					<h4 style="margin-top:8px">Clock-skew data loss in sync</h4>
+					<p style="font-size:13px;color:var(--ink-2);margin:0">Last-write-wins uses client-set <code>updatedAt</code>. A device with a fast clock will overwrite a device that saved later. Server-side <code>updated_at</code> trigger exists; make it authoritative.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ §2 · PROGRESS REVIEW ═══════════════════════════ -->
+	<section id="s2">
+		<div class="sec-head">
+			<div class="sec-num">§ ii</div>
+			<h2>Progress Review — Blocks &amp; Epics</h2>
+			<div class="sec-tag">sortable · click headers</div>
+		</div>
+
+		<div class="table-wrap">
+			<div class="filter-bar">
+				<span>Filter</span>
+				<button class="active" data-f="all">All</button>
+				<button data-f="Complete">Complete</button>
+				<button data-f="In Progress">In Progress</button>
+				<button data-f="Not Started">Not Started</button>
+				<button data-f="Critical">Critical only</button>
+			</div>
+			<table id="progress-table">
+				<thead>
+					<tr>
+						<th class="sortable" data-sort="str">Block / Epic</th>
+						<th class="sortable" data-sort="status">Status</th>
+						<th class="sortable" data-sort="importance">Importance</th>
+						<th class="sortable" data-sort="pct">Prod-ready %</th>
+						<th>Next action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-status="Complete" data-importance="Critical" data-pct="100">
+						<td class="name">Block 0 · Prove-it gates</td>
+						<td><span class="chip good">Complete</span></td>
+						<td><span class="chip crit">Critical</span></td>
+						<td class="num">100</td>
+						<td>—</td>
+					</tr>
+					<tr data-status="In Progress" data-importance="Critical" data-pct="88">
+						<td class="name">Block A · Security &amp; Privacy</td>
+						<td><span class="chip warn">In Progress</span></td>
+						<td><span class="chip crit">Critical</span></td>
+						<td class="num">88</td>
+						<td>Publish privacy policy + Limited Use disclosure; deploy CSP/HSTS check.</td>
+					</tr>
+					<tr data-status="In Progress" data-importance="Critical" data-pct="72">
+						<td class="name">Block B · Inventory Spine (E2 Part Une)</td>
+						<td><span class="chip warn">In Progress</span></td>
+						<td><span class="chip crit">Critical</span></td>
+						<td class="num">72</td>
+						<td>Ship P1-5 grouped view (only remaining launch-critical); defer P1-6/7/11 to fast-follow.</td>
+					</tr>
+					<tr data-status="Complete" data-importance="Critical" data-pct="100">
+						<td class="name">Block C · Mobile + Full PWA (E5)</td>
+						<td><span class="chip good">Complete</span></td>
+						<td><span class="chip crit">Critical</span></td>
+						<td class="num">100</td>
+						<td>Fix Lighthouse Perf 55 (code-split); a11y contrast on onboarding.</td>
+					</tr>
+					<tr data-status="Complete" data-importance="High" data-pct="95">
+						<td class="name">E1 · Cloud Backend (Supabase)</td>
+						<td><span class="chip good">Complete</span></td>
+						<td><span class="chip warn">High</span></td>
+						<td class="num">95</td>
+						<td>Add durable write-queue (deferred hardening).</td>
+					</tr>
+					<tr data-status="Complete" data-importance="High" data-pct="82">
+						<td class="name">E3 · Frictionless Fill (Gmail import)</td>
+						<td><span class="chip good">Complete (MVP)</span></td>
+						<td><span class="chip warn">High</span></td>
+						<td class="num">82</td>
+						<td>Onboarding copy for "unverified app" warning.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Medium" data-pct="10">
+						<td class="name">E4 · Shared &amp; Social (Part Une — Friend View)</td>
+						<td><span class="chip">Designed</span></td>
+						<td><span class="chip sage">Medium</span></td>
+						<td class="num">10</td>
+						<td>Post-launch fast-follow — the growth loop, not launch-critical.</td>
+					</tr>
+					<tr data-status="In Progress" data-importance="Medium" data-pct="55">
+						<td class="name">E8 · Care &amp; Knowledge (Fabric + stain guide)</td>
+						<td><span class="chip warn">Partial</span></td>
+						<td><span class="chip sage">Medium</span></td>
+						<td class="num">55</td>
+						<td>Stain guide (food: tomato · turmeric · curry) — greenfield content.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Low" data-pct="0">
+						<td class="name">E11 · Laundry &amp; Wear Forecast</td>
+						<td><span class="chip">Not Started</span></td>
+						<td><span class="chip">Low</span></td>
+						<td class="num">0</td>
+						<td>Post-launch. Consumes E12.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Low" data-pct="18">
+						<td class="name">E12 · User Profile Hub</td>
+						<td><span class="chip">Designed</span></td>
+						<td><span class="chip sage">Medium</span></td>
+						<td class="num">18</td>
+						<td>Backend already exists; UI hub deferred.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Low" data-pct="0">
+						<td class="name">E6 · Outfit Builder</td>
+						<td><span class="chip">Backlog</span></td>
+						<td><span class="chip">Low</span></td>
+						<td class="num">0</td>
+						<td>Post-MVP. Explicitly not a wedge.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Low" data-pct="0">
+						<td class="name">E7 · Insights &amp; Viz</td>
+						<td><span class="chip">Backlog</span></td>
+						<td><span class="chip">Low</span></td>
+						<td class="num">0</td>
+						<td>Post-MVP.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Low" data-pct="0">
+						<td class="name">E9 · Travel Packing</td>
+						<td><span class="chip">Backlog</span></td>
+						<td><span class="chip">Low</span></td>
+						<td class="num">0</td>
+						<td>Post-MVP.</td>
+					</tr>
+					<tr data-status="Not Started" data-importance="Low" data-pct="0">
+						<td class="name">E10 · Monetization</td>
+						<td><span class="chip">Backlog</span></td>
+						<td><span class="chip">Low</span></td>
+						<td class="num">0</td>
+						<td>PWA lands after 30-user beta, so App Store-cut argument holds.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<h3>Block B · Inventory Spine — P1 ticket detail</h3>
+		<div class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>Ticket</th><th>Feature</th><th>Status</th><th>Est</th><th>Verdict</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><td class="num">P1-1</td><td>Location registry + default</td><td><span class="chip good">Done</span></td><td class="num">—</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-2</td><td>Location border on card</td><td><span class="chip good">Done</span></td><td class="num">—</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-3</td><td>Status dot on card</td><td><span class="chip good">Done</span></td><td class="num">—</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-3b</td><td>Status+Loc capture in Edit form</td><td><span class="chip good">Done</span></td><td class="num">—</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-3c</td><td>Border-mode toggle + seed data</td><td><span class="chip good">Done</span></td><td class="num">—</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-4</td><td>Quick-action menu (long-press)</td><td><span class="chip good">Done</span></td><td class="num">1.5d</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-9</td><td>Status transition state machine</td><td><span class="chip good">Done</span></td><td class="num">1d</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-10</td><td>Legend + non-color a11y cue</td><td><span class="chip good">Done</span></td><td class="num">0.5d</td><td>Shipped.</td></tr>
+					<tr><td class="num">P1-5</td><td>"Where is everything" grouped view</td><td><span class="chip crit">Open</span></td><td class="num">1.5d</td><td><strong>Ship for launch</strong> — the marketing screenshot.</td></tr>
+					<tr><td class="num">P1-8</td><td>Status+Location filter dimensions</td><td><span class="chip good">Done</span></td><td class="num">1d</td><td>Shipped — <code>e2e/location-status-filters.spec.ts</code> + <code>useClosetFilters.test</code> (38 cases).</td></tr>
+					<tr><td class="num">P1-6</td><td>Custom/multi-home locations</td><td><span class="chip warn">Open</span></td><td class="num">1.5d</td><td>Defer to fast-follow — Sloane persona only.</td></tr>
+					<tr><td class="num">P1-7</td><td>Per-persona location presets</td><td><span class="chip warn">Open</span></td><td class="num">0.5d</td><td>Defer to fast-follow.</td></tr>
+					<tr><td class="num">P1-11</td><td>Status v2: airing/stored + reasons</td><td><span class="chip warn">Open</span></td><td class="num">1d</td><td>Defer to fast-follow — adds depth, not spine.</td></tr>
+					<tr><td class="num">E2-5.x</td><td>Simple lend modal (free-text borrower + due date)</td><td><span class="chip crit">Open</span></td><td class="num">1d</td><td>On the founder's own Top-10 blocker list (#4) — no code found.</td></tr>
+					<tr><td class="num">E2-6.1</td><td>"Lent out" view + <code>isAvailable</code> derivation</td><td><span class="chip crit">Open</span></td><td class="num">1d</td><td>Top-10 blocker #5 — depends on E2-5.x landing first.</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="callout warn">
+			<span class="lbl">Discrepancy found — worth a founder gut-check</span>
+			<p style="margin:0">The 2026-07-11 <code>MVP_LAUNCH_ACTION_LIST</code> still lists "add status/location filter dimensions" as blocker <strong>#6, unstarted (🔴)</strong>. The code disagrees: <code>useClosetFilters.ts:25,34</code> already types <code>FilterDimension</code> to include <code>"status" | "location"</code> and <code>FILTER_DIMENSIONS</code> ships both — landed in <strong>PR #126 (2026-07-08, ticket P1-8)</strong>, three days before the action list was written, with e2e coverage in <code>e2e/location-status-filters.spec.ts</code>. Likely just a stale checklist item, not a real gap — worth a 5-minute click-through to confirm the filter panel actually shows Status/Location as options, then cross it off.</p>
+		</div>
+	</section>
+
+	<!-- ═══ §3 · LEGAL & COMPLIANCE ═══════════════════════════ -->
+	<section id="s3legal">
+		<div class="sec-head">
+			<div class="sec-num">§ iii</div>
+			<h2>Legal &amp; Compliance Readiness</h2>
+			<div class="sec-tag">privacy policy · CASA tier · the actual critical path</div>
+		</div>
+
+		<p class="wide">Three new documents (<code>docs/legal/</code>) move this from "not started" to "drafted, needs a signature and a URL." This is now genuinely the single longest pole in the launch tent — everything else on the Top-10 list is engineering hours; this one has a human legal-review step and an external Google review queue that don't compress no matter how fast the code moves.</p>
+
+		<div class="grid-3">
+			<div class="panel">
+				<h4>Privacy Policy Draft <span class="chip warn" style="margin-left:6px">Drafted</span></h4>
+				<p style="font-size:13px;color:var(--ink-2);margin:6px 0 0">10 sections, Google Limited Use disclosure included verbatim, data-table format (what/source/why). Correctly scopes Gmail access to <code>gmail.readonly</code> only — no send/modify claimed.</p>
+				<h4 style="margin-top:14px">Still open before publish</h4>
+				<ul class="tight">
+					<li>Fill <code>{{launch date}}</code> + <code>{{privacy contact email}}</code> placeholders</li>
+					<li>Wire the consent-banner link (plumbed, not yet pointed at the doc)</li>
+					<li>Have an actual lawyer or policy-generation service sign off — the doc itself says it isn't legal advice</li>
+					<li>Publish at a stable public URL + link in Google Cloud Console OAuth consent screen</li>
+				</ul>
+			</div>
+			<div class="panel">
+				<h4>CASA Tier Determination <span class="chip info" style="margin-left:6px">Tier 2</span></h4>
+				<p style="font-size:13px;color:var(--ink-2);margin:6px 0 0">Correctly reasoned: only restricted scope is <code>gmail.readonly</code>, no send/modify/delete — puts NTW in Tier 2 (self-assessment via an approved scanning tool), not Tier 3 (full manual pentest). Low-hundreds-to-low-thousands USD, weeks not months.</p>
+				<h4 style="margin-top:14px">Risk flagged honestly in the doc itself</h4>
+				<ul class="tight">
+					<li>Google assigns the tier at verification time — this is a planning assumption, not a guarantee</li>
+					<li><strong>Recurring cost</strong>: re-assessment required <em>annually</em> for as long as <code>gmail.readonly</code> is in use — budget for this as an ongoing line item, not a one-time gate</li>
+				</ul>
+			</div>
+			<div class="panel">
+				<h4>Security Config Audit <span class="chip good" style="margin-left:6px">Moved to docs/legal/</span></h4>
+				<p style="font-size:13px;color:var(--ink-2);margin:6px 0 0">Content unchanged from the prior audit (service_role clean, <code>SECURITY DEFINER</code> functions reviewed safe, RLS verified) — its relocation into <code>docs/legal/</code> signals it's now bundled as part of the CASA/verification evidence packet, which is the right call.</p>
+				<h4 style="margin-top:14px">Confirmed still open</h4>
+				<ul class="tight">
+					<li>Leaked-password protection — blocked on Supabase Pro tier, correctly deprioritized (moot for Google-OAuth-only)</li>
+					<li>Supabase email/password provider still enabled with no UI — shrink attack surface by disabling it</li>
+					<li>2FA/TOTP — deferred post-beta, reasonable for 30 trusted testers</li>
+				</ul>
+			</div>
+		</div>
+
+		<h3>The founder's own Top-10 launch blockers (<code>MVP_LAUNCH_ACTION_LIST-JULY-11-2026.md</code>) — now the source of truth</h3>
+		<div class="table-wrap">
+			<table>
+				<thead><tr><th>#</th><th>Blocker</th><th>Owner area</th><th>Verdict</th></tr></thead>
+				<tbody>
+					<tr><td class="num">1</td><td>Publish privacy policy at a public URL</td><td><span class="chip info">Legal</span></td><td>Drafted (this review) — needs sign-off + hosting + placeholders filled.</td></tr>
+					<tr><td class="num">2</td><td>Add 30 waitlisters as Google OAuth test users</td><td><span class="chip info">Legal</span></td><td>Mechanical once #1 is live.</td></tr>
+					<tr><td class="num">3</td><td>Write "unverified app" onboarding copy</td><td><span class="chip sage">UX</span></td><td>Not built — small, ~1-2 hrs.</td></tr>
+					<tr><td class="num">4</td><td>Build simple lend modal (free-text + due date)</td><td><span class="chip crit">Eng</span></td><td>Not started — no code found in <code>src/</code>.</td></tr>
+					<tr><td class="num">5</td><td>Build "lent out" view + <code>isAvailable</code></td><td><span class="chip crit">Eng</span></td><td>Not started — depends on #4.</td></tr>
+					<tr><td class="num">6</td><td>Status/location filter dimensions</td><td><span class="chip sage">Eng</span></td><td><strong>Likely already done</strong> — see discrepancy callout above (PR #126).</td></tr>
+					<tr><td class="num">7</td><td>Verify CSP/HSTS live on deployed Vercel preview</td><td><span class="chip warn">Eng</span></td><td>Open — also flagged independently in our engineering audit (CSP is skeletal, needs <code>connect-src</code>/<code>img-src</code> too).</td></tr>
+					<tr><td class="num">8</td><td>Submit Gmail OAuth verification Gate 1</td><td><span class="chip info">Legal</span></td><td>Blocked on #1. Start the day the policy is live — external queue is weeks.</td></tr>
+					<tr><td class="num">9</td><td>Confirm 7-day test-mode refresh-token expiry policy</td><td><span class="chip info">Legal</span></td><td>Open — verify against current Google docs; sets onboarding-copy expectations (#3).</td></tr>
+					<tr><td class="num">10</td><td>Enable Supabase backups/PITR + run one restore test</td><td><span class="chip warn">Eng</span></td><td>Not started — confirmed, no backup config in <code>supabase/</code>. Cheap insurance, do before real user data lands.</td></tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<!-- ═══ §4 · ENGINEERING REVIEW ═══════════════════════════ -->
+	<section id="s3">
+		<div class="sec-head">
+			<div class="sec-num">§ iv</div>
+			<h2>Engineering Review</h2>
+			<div class="sec-tag">performance · scalability · maintenance</div>
+		</div>
+
+		<div class="grid-2">
+			<div class="panel">
+				<h4>Strengths</h4>
+				<ul class="tight">
+					<li><strong>Clean repository seam</strong> — <code>services/closetRepository</code> with <code>Local</code> and <code>Synced</code> implementations. Hooks never touch localStorage or the DB client directly.</li>
+					<li><strong>Offline-first sync design</strong> — last-write-wins on <code>updatedAt</code>, background push, <code>syncFailureTracker</code> surfaces in NavBar, verified in an E2E PWA suite (<code>offline-closet.pwa.spec.ts</code>).</li>
+					<li><strong>Type safety end-to-end</strong> — <code>@ntw/types</code> workspace package; TS strict mode with <code>noUnusedLocals</code>, <code>noUnusedParameters</code>, <code>noFallthroughCasesInSwitch</code>.</li>
+					<li><strong>Storage pipeline is right</strong> — client-side compression (≤1200px, JPEG q0.8), Storage upload, path-only in row, signed URL at render with auto-refresh. Server-side bucket MIME/size enforcement live.</li>
+					<li><strong>Testing culture</strong> — 1,300+ Vitest specs + 14 Playwright suites; regression tests were added for every bug-review finding. This is not typical of solo builds.</li>
+				</ul>
+			</div>
+			<div class="panel">
+				<h4>Weaknesses / Bottlenecks</h4>
+				<ul class="tight">
+					<li><strong style="color:var(--crit)">Lighthouse Perf 55</strong> — single 291 KiB JS chunk on first paint, ~200 KiB unused. LCP 7.1s on throttled mobile. Route-level dynamic <code>import()</code> is the #1 fix.</li>
+					<li><strong style="color:var(--warn)">Three icon libraries</strong> — <code>@heroicons/react</code>, <code>@phosphor-icons/react</code>, <code>lucide-react</code>. Pick one; drop the others (~40-60 KB tree-shakeable).</li>
+					<li><strong style="color:var(--warn)">Fuse.js index rebuild on every closet mutation</strong> — for 500+ item closets this becomes noticeable. Memoize the index by items.length + updatedAt max.</li>
+					<li><strong style="color:var(--warn)">base64 in localStorage</strong> for signed-out photo storage — Safari 5 MB quota fails silently. Bounded now by the guard, but no per-item size ceiling in the client.</li>
+					<li><strong style="color:var(--warn)">Sync retry queue deferred</strong> — offline write that never reconciles (tab closes before reload) stays stale in cloud. Accepted risk in E1-1.6.</li>
+					<li><strong style="color:var(--info)">No indexed access patterns</strong> in RLS SELECTs for future <code>status</code>/<code>location_id</code> filters. Add btree on <code>(user_id, status)</code> before item counts get real.</li>
+				</ul>
+			</div>
+		</div>
+
+		<h3>Scalability outlook</h3>
+		<p class="wide">The offline-first architecture is the right long-term choice — writes are instant, network failures degrade gracefully, and RLS makes multi-tenant safety straightforward. What breaks at scale isn't the design, it's the client-side <em>everything</em>: Fuse index rebuilds, full-closet re-sorts, and localStorage-as-cache for 5,000-item power users. Instrument first — real p95 numbers from the 30-user beta will separate the theoretical from the actual bottleneck. The Supabase Postgres side is not the risk; the browser is.</p>
+	</section>
+
+	<!-- ═══ §4 · PRODUCT REVIEW + PILLARS ═══════════════════════ -->
+	<section id="s4">
+		<div class="sec-head">
+			<div class="sec-num">§ v</div>
+			<h2>Product Review — Five Pillars</h2>
+			<div class="sec-tag">persona resonance · value · share hook</div>
+		</div>
+
+		<div class="pillars">
+			<div class="pillar">
+				<div class="n">Pillar 01</div>
+				<div class="name">Inventory</div>
+				<div class="pct">85%</div>
+				<div class="note">Persona: <em>all</em>. Speaks to: Maya. Wow: "I imported 300 items from my inbox and never typed a word."</div>
+			</div>
+			<div class="pillar" style="border-top-color:var(--sage)">
+				<div class="n">Pillar 02</div>
+				<div class="name">Location</div>
+				<div class="pct">65%</div>
+				<div class="note">Persona: Closet Pair · Sloane. Speaks to: multi-home travelers. Wow: "your sweater is in Aspen."</div>
+			</div>
+			<div class="pillar" style="border-top-color:var(--info)">
+				<div class="n">Pillar 03</div>
+				<div class="name">Status</div>
+				<div class="pct">70%</div>
+				<div class="note">Persona: Becca. Speaks to: laundry-chaos parents. Wow: "clean · dirty · dry cleaner — visible at a glance."</div>
+			</div>
+			<div class="pillar" style="border-top-color:var(--warn)">
+				<div class="n">Pillar 04</div>
+				<div class="name">Care</div>
+				<div class="pct">55%</div>
+				<div class="note">Persona: Curator · Founder. Speaks to: quality-obsessed. Wow: "silk + oil = don't put water on it yet."</div>
+			</div>
+			<div class="pillar" style="border-top-color:var(--muted)">
+				<div class="n">Pillar 05</div>
+				<div class="name">Share</div>
+				<div class="pct">10%</div>
+				<div class="note">Persona: Closet Pair. Speaks to: viral loop. Wow — <em>the growth engine, intentionally post-MVP</em>.</div>
+			</div>
+		</div>
+
+		<div class="callout warn">
+			<span class="lbl">§ 4B · Feature Resonance</span>
+			<p style="margin:0"><strong>Gmail import</strong> is the acquisition hook for <strong>Maya</strong> — it does what she thought would take a weekend. She'll <em>screenshot</em> the count ("400 items imported in 3 minutes"). <strong>Location + status border toggle</strong> is the retention hook for the <strong>Closet Pair</strong> — the moment they realize the sweater in Italy is <em>visible on the card</em> is the moment they text a friend to install it. <strong>Fabric care</strong> is the trust hook — one turmeric-stain answer and the app becomes an authority, not a database.</p>
+		</div>
+
+		<div class="callout warn">
+			<span class="lbl">Positioning Fracture</span>
+			<p style="margin:0"><code>docs/MARKETING.md</code> leads with <em>"your whole wardrobe, organized in the time it takes to forward an email"</em> — the Gmail-import pitch. <code>planning/PRODUCT_VISION_2026-06-20.md</code> leads with <em>"the closet that tells you the truth about itself"</em> — the status/location pitch. <strong>These are two different products in two different files.</strong> Reconcile before waitlisters read either — the vision's own answer is that the inbox is <em>how</em>, the truth is <em>what</em>.</p>
+		</div>
+
+		<div class="callout crit">
+			<span class="lbl">Moat Erosion Signal</span>
+			<p style="margin:0"><strong>Fits (Germany) shipped basic email receipt import in Oct 2025.</strong> The inbox-ingestion moat is no longer uncontested. NTW's version is deeper (OAuth + 30+ retailer parsers + FashionParser inference vs. forward-a-receipt) — <em>lead with that depth explicitly</em>, don't assume prospects know why 30 parsers beats one.</p>
+		</div>
+
+		<h3>Onboarding today — 9 screens, ~1,099 LOC — condense to 4</h3>
+		<p>Current <code>src/Features/Onboarding/OnboardingSteps.tsx</code> is a <em>feature tour</em>: Welcome → Gmail connect → find purchases → advanced search → pick items → review → manual entry → search+filter → fabric guide. Zero screens on <strong>status</strong>, <strong>location</strong>, or <strong>share</strong> — the actual wedges. Beautiful animated demos, wrong content. Replace with a persona-adaptive 4-screen sequence — each screen commits to one promise:</p>
+
+		<div class="storyboard">
+			<div class="frame">
+				<div class="frame-n">Screen 01 · Promise</div>
+				<div class="frame-h">Nothing To Wear? Or just out of sight?</div>
+				<div class="frame-b">Your closet's inventory + logistics. Know what you own, where it is, and whether it's clean.<br><br>Not another outfit planner.</div>
+				<div class="frame-cta">Start</div>
+				<div class="frame-persona">Maya hears: "finally, the receipts stop being useless."<br>Pair hears: "finally, someone gets it."</div>
+			</div>
+			<div class="frame">
+				<div class="frame-n">Screen 02 · Fill it</div>
+				<div class="frame-h">Import from Gmail in 60 seconds.</div>
+				<div class="frame-b">We parse 12+ retailers. Zara, Aritzia, SKIMS, Nordstrom, Nike, Shein — every purchase in your inbox becomes a card.</div>
+				<div class="frame-cta">Connect Gmail</div>
+				<div class="frame-persona">Maya hears: "no typing. See it work."<br>Pair hears: "same, no photography chore."</div>
+			</div>
+			<div class="frame">
+				<div class="frame-n">Screen 03 · The truth layer</div>
+				<div class="frame-h">Where is it? What state is it in?</div>
+				<div class="frame-b">Tag home · storage · suitcase · lent-out. Mark clean · dirty · at the cleaner. Long-press to update. The border colors tell the truth.</div>
+				<div class="frame-cta">See the closet</div>
+				<div class="frame-persona">Pair hears: "your sweater in Italy — you'll never lose it."<br>Maya hears: "no more digging."</div>
+			</div>
+			<div class="frame">
+				<div class="frame-n">Screen 04 · Care + share</div>
+				<div class="frame-h">Care guidance built in. Sharing arrives soon.</div>
+				<div class="frame-b">Every fabric, every fiber, every stain — cross-referenced. Ready when it's dirty, not when you've ruined it.</div>
+				<div class="frame-cta">Add to Home Screen</div>
+				<div class="frame-persona">Both hear: "this is not another database."</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ §5 · TECHNICAL DEBT ═══════════════════════════ -->
+	<section id="s5">
+		<div class="sec-head">
+			<div class="sec-num">§ vi</div>
+			<h2>Technical Debt</h2>
+			<div class="sec-tag">ranked · sortable</div>
+		</div>
+		<div class="table-wrap">
+			<table id="debt-table">
+				<thead>
+					<tr>
+						<th class="sortable" data-sort="str">Item</th>
+						<th class="sortable" data-sort="sev">Severity</th>
+						<th class="sortable" data-sort="eff">Effort</th>
+						<th class="sortable" data-sort="when">Before / After launch</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="name"><strong>Fuse.js index rebuilt twice per interaction</strong> (<code>useFuzzySearch.ts</code>)</td>
+						<td><span class="chip crit">High</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name"><strong>Silent QuotaExceededError on signed-out writes</strong> (<code>safeStorage.ts</code>)</td>
+						<td><span class="chip crit">High</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">CSP skeletal — missing <code>default-src</code>, <code>connect-src</code>, <code>img-src</code>, <code>frame-ancestors</code></td>
+						<td><span class="chip crit">High</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Two write paths to <code>my_closet_key</code> — <code>useCloudCloset.seed()</code> vs <code>LocalClosetRepository</code></td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Clock-skew data loss — client-set <code>updatedAt</code> in LWW reconcile</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">M (1d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Stale core docs — README + ARCHITECTURE describe deleted hooks &amp; duplicated files</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Dead dep <code>gapi-script</code> — 0 imports; ship removal + <code>heroicons</code> + <code>phosphor</code> consolidation</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Orphaned duplicate — <code>TextileGuildInteractive.tsx</code> unwired, mirrors <code>InteractiveGuide.tsx</code></td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">No grid virtualization on <code>FilteredItemGrid</code> — framer-motion <code>layout</code> across 500 cards</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">M (1d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Playwright not run in CI — regression protection is local-only</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Lighthouse Perf 55 — route-level code splitting (single 291 KiB chunk)</td>
+						<td><span class="chip crit">High</span></td>
+						<td class="num">M (1d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Onboarding a11y — contrast fails on <code>.ob-welcome-tagline</code>, <code>.ob-next-btn</code></td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Three icon libraries (<code>heroicons</code> + <code>phosphor</code> + <code>lucide</code>)</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Fuse.js index rebuild on every mutation (memoize by items.length + max updatedAt)</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">No durable write-queue — offline writes that never reconcile stay stale</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">M (1.5d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">CSP allows only <code>script-src 'self' https://accounts.google.com</code> — verify Google OAuth still loads post-deploy</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Logging hygiene — E1-4.12 (never log tokens/OAuth codes/PII)</td>
+						<td><span class="chip warn">Med</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip brand">Before</span></td>
+					</tr>
+					<tr>
+						<td class="name">Missing btree indexes on <code>(user_id, status)</code>, <code>(user_id, location_id)</code> for filter dimensions</td>
+						<td><span class="chip info">Low</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Legacy <code>GmailSpike.tsx</code> — README says can be cleaned post-launch</td>
+						<td><span class="chip info">Low</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Two <code>inferProductAttributes.ts</code> locations in tree (README structure block)</td>
+						<td><span class="chip info">Low</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">Bundle: <code>framer-motion</code>@12 + <code>gapi-script</code> may be dead code — audit</td>
+						<td><span class="chip info">Low</span></td>
+						<td class="num">S (0.5d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+					<tr>
+						<td class="name">TS 6.0 + React 19 + Vite 8 bleeding edge — pin a support matrix</td>
+						<td><span class="chip info">Low</span></td>
+						<td class="num">S (0.25d)</td>
+						<td><span class="chip">After</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<!-- ═══ §6 · BUDGET ═══════════════════════════ -->
+	<section id="s6">
+		<div class="sec-head">
+			<div class="sec-num">§ vii</div>
+			<h2>Budget Estimation</h2>
+			<div class="sec-tag">remaining engineering to safe beta</div>
+		</div>
+
+		<div class="grid-3">
+			<div class="panel">
+				<h4>Effort Breakdown</h4>
+				<dl class="dl-tight">
+					<dt>Engineering</dt><dd>44–68 hrs</dd>
+					<dt>Design</dt><dd>6–10 hrs (privacy policy layout, onboarding contrast, "where is everything" IA)</dd>
+					<dt>QA</dt><dd>8–12 hrs (RLS + storage smoke; 30-user waitlist onboarding rehearsal)</dd>
+					<dt>Docs / legal</dt><dd>4–6 hrs (privacy policy body, Limited Use disclosure, ToS stub)</dd>
+					<dt><strong>Total</strong></dt><dd><strong>62–96 hrs</strong> · ≈ 2–3 wks solo</dd>
+				</dl>
+			</div>
+			<div class="panel">
+				<h4>Cost — Junior Eng</h4>
+				<dl class="dl-tight">
+					<dt>Rate</dt><dd>US $50/hr</dd>
+					<dt>Range</dt><dd>$3,100 – $4,800</dd>
+					<dt>Risk</dt><dd>High — 30% of debt is decisions-under-uncertainty (privacy scope, code-split strategy). Junior would slow those calls.</dd>
+				</dl>
+			</div>
+			<div class="panel">
+				<h4>Cost — Mid Eng</h4>
+				<dl class="dl-tight">
+					<dt>Rate</dt><dd>US $95/hr</dd>
+					<dt>Range</dt><dd>$5,890 – $9,120</dd>
+					<dt>Risk</dt><dd>Low — this is the sweet spot. Can own the code-split + a11y + write-queue independently.</dd>
+				</dl>
+			</div>
+		</div>
+		<div class="panel" style="margin-top:14px">
+			<h4>Cost — Senior Eng (fastest path)</h4>
+			<dl class="dl-tight">
+				<dt>Rate</dt><dd>US $165/hr</dd>
+				<dt>Range</dt><dd>$10,230 – $15,840</dd>
+				<dt>Risk</dt><dd>Very low — likely compresses to 30–45 hrs. Would insist on measuring perf before code-splitting speculatively.</dd>
+				<dt>Founder-solo baseline</dt><dd><strong>$0 out-of-pocket · 2–3 weeks calendar</strong> at the current sustainable pace.</dd>
+			</dl>
+		</div>
+	</section>
+
+	<!-- ═══ §7 · SCORECARD ═══════════════════════════ -->
+	<section id="s7">
+		<div class="sec-head">
+			<div class="sec-num">§ viii</div>
+			<h2>Launch Readiness Scorecard</h2>
+			<div class="sec-tag">1–10 per category</div>
+		</div>
+		<div class="score-grid">
+			<div class="score-tile" data-score="8">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="52.78" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">Product</div>
+				<div class="score-val">8<small>/10</small></div>
+				<div class="score-note">The wedge (inventory-not-planner) is clear, defensible, uncompeted.</div>
+			</div>
+			<div class="score-tile" data-score="7">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="79.17" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">UX</div>
+				<div class="score-val">7<small>/10</small></div>
+				<div class="score-note">Import flow is delightful. Grouped-view + filters missing hurts scan-first use.</div>
+			</div>
+			<div class="score-tile" data-score="7">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="79.17" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">UI</div>
+				<div class="score-val">7<small>/10</small></div>
+				<div class="score-note">Real token system, coherent identity. Contrast fixes + a few density passes shy of 9.</div>
+			</div>
+			<div class="score-tile" data-score="9">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="26.39" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">Architecture</div>
+				<div class="score-val">9<small>/10</small></div>
+				<div class="score-note">Repository seam, offline-first, typed contracts, ADR-quality planning. Exemplary.</div>
+			</div>
+			<div class="score-tile" data-score="8">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="52.78" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">Security</div>
+				<div class="score-val">8<small>/10</small></div>
+				<div class="score-note">RLS 11/11, CI scans, dev/prod split, deletion + export live. Docks 2 for pending policy publication.</div>
+			</div>
+			<div class="score-tile" data-score="7">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="79.17" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">Branding</div>
+				<div class="score-val">7<small>/10</small></div>
+				<div class="score-note">"Nothing To Wear" name owns the pain. Voice consistent. Missing: marketing site, screenshots.</div>
+			</div>
+			<div class="score-tile" data-score="7">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="79.17" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">Launch-Ready</div>
+				<div class="score-val">7<small>/10</small></div>
+				<div class="score-note">Two hard gates left (policy · perf). Everything else is polish + a fast-follow list.</div>
+			</div>
+			<div class="score-tile" data-score="9">
+				<svg class="score-svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--ground-2)" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--brand)" stroke-width="8" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="26.39" transform="rotate(-90 50 50)"/></svg>
+				<div class="score-name">Planning</div>
+				<div class="score-val">9<small>/10</small></div>
+				<div class="score-note">Bonus category. Dated docs, epic reconciliation, honest "not yet" checkoffs.</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ §8 · DATA VIZ — MATRIX + MATURITY + ALIGNMENT ═══════ -->
+	<section id="s8">
+		<div class="sec-head">
+			<div class="sec-num">§ ix</div>
+			<h2>Launch Decision Matrix</h2>
+			<div class="sec-tag">impact × effort · every remaining task</div>
+		</div>
+
+		<div class="panel">
+			<svg class="scatter-svg" viewBox="0 0 720 440" role="img" aria-label="Launch Decision Matrix - impact by effort">
+				<!-- Grid -->
+				<rect x="60" y="30" width="620" height="360" fill="var(--ground-2)" opacity="0.4" rx="4"/>
+				<line x1="370" y1="30" x2="370" y2="390" stroke="var(--rule-strong)" stroke-dasharray="3 4"/>
+				<line x1="60" y1="210" x2="680" y2="210" stroke="var(--rule-strong)" stroke-dasharray="3 4"/>
+
+				<!-- Quadrant labels -->
+				<text x="70" y="50" font-family="var(--mono)" font-size="10" fill="var(--muted)" letter-spacing="1">QUICK WINS · DO NOW</text>
+				<text x="500" y="50" font-family="var(--mono)" font-size="10" fill="var(--muted)" letter-spacing="1">BIG BETS · SCHEDULE</text>
+				<text x="70" y="380" font-family="var(--mono)" font-size="10" fill="var(--muted)" letter-spacing="1">FILL-IN · WHEN IDLE</text>
+				<text x="500" y="380" font-family="var(--mono)" font-size="10" fill="var(--muted)" letter-spacing="1">MONEY PIT · AVOID</text>
+
+				<!-- Axes -->
+				<line x1="60" y1="390" x2="680" y2="390" stroke="var(--rule-strong)" stroke-width="1"/>
+				<line x1="60" y1="30" x2="60" y2="390" stroke="var(--rule-strong)" stroke-width="1"/>
+				<text x="370" y="420" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--muted)" letter-spacing="2">EFFORT →</text>
+				<text x="30" y="210" text-anchor="middle" font-family="var(--mono)" font-size="10" fill="var(--muted)" letter-spacing="2" transform="rotate(-90 30 210)">← IMPACT</text>
+
+				<!-- Points: cx (60-680 → effort), cy (30-390 → impact inverted) -->
+				<g class="scatter-point">
+					<circle cx="110" cy="55" r="9" fill="var(--brand)" opacity="0.85"/>
+					<text x="125" y="59" font-size="11" fill="var(--ink)" font-family="var(--sans)">Publish drafted privacy policy (sign-off + URL)</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="260" cy="75" r="9" fill="var(--brand)" opacity="0.85"/>
+					<text x="275" y="79" font-size="11" fill="var(--ink)" font-family="var(--sans)">Build lend modal + isAvailable (zero code today)</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="220" cy="105" r="9" fill="var(--brand)" opacity="0.85"/>
+					<text x="235" y="109" font-size="11" fill="var(--ink)" font-family="var(--sans)">Code-split main bundle</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="270" cy="135" r="8" fill="var(--sage)" opacity="0.85"/>
+					<text x="285" y="139" font-size="11" fill="var(--ink)" font-family="var(--sans)">P1-5 "Where is everything" view</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="150" cy="160" r="6" fill="var(--muted)" opacity="0.6"/>
+					<text x="163" y="164" font-size="11" fill="var(--muted)" font-family="var(--sans)">P1-8 filters — verify only, likely already shipped</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="140" cy="185" r="7" fill="var(--sage)" opacity="0.85"/>
+					<text x="155" y="189" font-size="11" fill="var(--ink)" font-family="var(--sans)">Onboarding contrast (a11y)</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="120" cy="215" r="7" fill="var(--info)" opacity="0.85"/>
+					<text x="135" y="219" font-size="11" fill="var(--ink)" font-family="var(--sans)">Enable Supabase backups/PITR</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="130" cy="245" r="7" fill="var(--info)" opacity="0.85"/>
+					<text x="145" y="249" font-size="11" fill="var(--ink)" font-family="var(--sans)">CSP live-check post-deploy</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="350" cy="180" r="8" fill="var(--warn)" opacity="0.85"/>
+					<text x="365" y="184" font-size="11" fill="var(--ink)" font-family="var(--sans)">Marketing site (landing)</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="410" cy="130" r="9" fill="var(--warn)" opacity="0.85"/>
+					<text x="425" y="134" font-size="11" fill="var(--ink)" font-family="var(--sans)">Gmail OAuth verification (start now)</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="330" cy="260" r="7" fill="var(--info)" opacity="0.85"/>
+					<text x="345" y="264" font-size="11" fill="var(--ink)" font-family="var(--sans)">P1-11 status v2 (airing/stored)</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="380" cy="290" r="7" fill="var(--info)" opacity="0.85"/>
+					<text x="395" y="294" font-size="11" fill="var(--ink)" font-family="var(--sans)">P1-6/7 multi-home locations</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="510" cy="150" r="9" fill="var(--warn)" opacity="0.85"/>
+					<text x="525" y="154" font-size="11" fill="var(--ink)" font-family="var(--sans)">E4 Part Une friend view</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="560" cy="215" r="8" fill="var(--info)" opacity="0.85"/>
+					<text x="575" y="219" font-size="11" fill="var(--ink)" font-family="var(--sans)">E8 stain guide content</text>
+				</g>
+				<g class="scatter-point">
+					<circle cx="600" cy="315" r="8" fill="var(--crit)" opacity="0.85"/>
+					<text x="500" y="335" font-size="11" fill="var(--crit)" font-family="var(--sans)">E6 outfit builder — do not build for launch</text>
+				</g>
+			</svg>
+			<div class="legend">
+				<span><span class="swatch" style="background:var(--brand)"></span>Launch-critical</span>
+				<span><span class="swatch" style="background:var(--sage)"></span>Ship for beta</span>
+				<span><span class="swatch" style="background:var(--warn)"></span>Fast-follow</span>
+				<span><span class="swatch" style="background:var(--info)"></span>Post-launch</span>
+				<span><span class="swatch" style="background:var(--crit)"></span>Avoid</span>
+				<span><span class="swatch" style="background:var(--muted)"></span>Verify, don't rebuild</span>
+			</div>
+		</div>
+
+		<h3>Feature Maturity — Concept → Polished</h3>
+		<div class="panel">
+			<div class="maturity-track">
+				<div class="maturity-lbl">Gmail Import<span class="maturity-lbl-sub">E3 · Frictionless Fill</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage done">Prototype</div>
+					<div class="stage done">Working</div>
+					<div class="stage current">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">FashionParser inference<span class="maturity-lbl-sub">17 maps · 6 fns</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage done">Prototype</div>
+					<div class="stage done">Working</div>
+					<div class="stage done">Prod-Ready</div>
+					<div class="stage current">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Cloud sync + RLS<span class="maturity-lbl-sub">E1</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage done">Prototype</div>
+					<div class="stage done">Working</div>
+					<div class="stage current">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Mobile + PWA<span class="maturity-lbl-sub">E5</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage done">Prototype</div>
+					<div class="stage done">Working</div>
+					<div class="stage current">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Status + Location<span class="maturity-lbl-sub">E2 Part Une</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage done">Prototype</div>
+					<div class="stage current">Working</div>
+					<div class="stage">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Fabric &amp; Fiber care<span class="maturity-lbl-sub">E8</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage done">Prototype</div>
+					<div class="stage current">Working</div>
+					<div class="stage">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Onboarding<span class="maturity-lbl-sub">Persona-adaptive</span></div>
+				<div class="stages">
+					<div class="stage done">Concept</div>
+					<div class="stage current">Prototype</div>
+					<div class="stage">Working</div>
+					<div class="stage">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Friend share link<span class="maturity-lbl-sub">E4 Part Une</span></div>
+				<div class="stages">
+					<div class="stage current">Concept</div>
+					<div class="stage">Prototype</div>
+					<div class="stage">Working</div>
+					<div class="stage">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+			<div class="maturity-track">
+				<div class="maturity-lbl">Laundry forecast<span class="maturity-lbl-sub">E11</span></div>
+				<div class="stages">
+					<div class="stage current">Concept</div>
+					<div class="stage">Prototype</div>
+					<div class="stage">Working</div>
+					<div class="stage">Prod-Ready</div>
+					<div class="stage">Polished</div>
+				</div>
+			</div>
+		</div>
+
+		<h3>Strategic Pillar Alignment — % of remaining work by pillar</h3>
+		<div class="panel">
+			<div class="pbar-row"><div class="lbl">Inventory</div><div class="pbar"><div class="pbar-fill good" style="width:20%"></div></div><div class="val">20%</div></div>
+			<div class="pbar-row"><div class="lbl">Location</div><div class="pbar"><div class="pbar-fill brand" style="width:35%"></div></div><div class="val">35%</div></div>
+			<div class="pbar-row"><div class="lbl">Status</div><div class="pbar"><div class="pbar-fill brand" style="width:30%"></div></div><div class="val">30%</div></div>
+			<div class="pbar-row"><div class="lbl">Care</div><div class="pbar"><div class="pbar-fill" style="width:10%"></div></div><div class="val">10%</div></div>
+			<div class="pbar-row"><div class="lbl">Share</div><div class="pbar"><div class="pbar-fill" style="width:5%"></div></div><div class="val">5%</div></div>
+			<p style="font-size:12px;color:var(--muted);margin-top:12px">Remaining launch work concentrates on the <strong style="color:var(--brand)">Location + Status</strong> pillars — the twin differentiators. This is the correct allocation. Care and Share are intentionally thin for beta.</p>
+		</div>
+	</section>
+
+	<!-- ═══ §9 · MOAT ═══════════════════════════ -->
+	<section id="s9">
+		<div class="sec-head">
+			<div class="sec-num">§ x</div>
+			<h2>Moat · Uniqueness · Competitive Read</h2>
+			<div class="sec-tag">what to defend · what to cut</div>
+		</div>
+
+		<blockquote>
+			The closet that tells you the truth about itself.
+			<cite>— proposed one-liner, from PRODUCT_VISION_2026-06-20.md</cite>
+		</blockquote>
+
+		<div class="moat-grid">
+			<div class="moat-col">
+				<h4>What is the moat?</h4>
+				<ul>
+					<li><strong>Status + Location as core primitives</strong> — no competitor treats "where is my sweater right now" as first-class product data. It's the <em>uncompeted core</em>.</li>
+					<li><strong>Frictionless fill from Gmail back-catalog</strong> — competitors ask you to photograph 300 items. NTW parses years of receipts. This is the acquisition wedge.</li>
+					<li><strong>FashionParser inference engine</strong> — 17 attribute maps, 6 normalizers, 6 inference fns. Domain-specific knowledge that grows with each retailer added.</li>
+					<li><strong>Borrow / share loop (post-MVP)</strong> — the only feature with a native viral mechanic. Every "can I see your closet?" is a warm referral.</li>
+				</ul>
+			</div>
+			<div class="moat-col">
+				<h4>What is table stakes?</h4>
+				<ul>
+					<li>Grid view, cards, photos — everyone has this.</li>
+					<li>Fuzzy search, filters, sort — table stakes but well-executed.</li>
+					<li>Multi-material composition bar — pretty, not defensible.</li>
+					<li>Fabric care content — nice differentiator, not defensible alone.</li>
+					<li>Outfit builder / weather / packing — competitors compete here; NTW deliberately doesn't.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="grid-2" style="margin-top:20px">
+			<div class="panel">
+				<h4>vs. Whering / Stylebook / Acloset / OpenWardrobe</h4>
+				<ul class="tight">
+					<li><strong>Whering</strong> · outfit + style AI. Better: polished mobile app, AI outfit suggestions. NTW better: inventory-truth layer, Gmail auto-fill, no styling AI required.</li>
+					<li><strong>Stylebook</strong> · manual catalog + calendar. Better: 12+ years of polish, packing lists, calendar. NTW better: no manual photography chore, status/location tracking, cloud sync.</li>
+					<li><strong>Acloset</strong> · AI stylist + community. Better: AI generation, look feeds. NTW better: privacy-first, receipts-import, actual logistics data.</li>
+					<li><strong>OpenWardrobe</strong> · open-source purist. Better: transparency, self-host. NTW better: hosted UX, retailer parsing, launch-ready polish.</li>
+				</ul>
+			</div>
+			<div class="panel">
+				<h4>If you cut 50% of the roadmap</h4>
+				<p style="margin:0"><strong>Keep</strong>: Inventory (E3 fill), Location (E2 spine), Status (E2 spine), Care (E8 content), the friend-view share link (E4 Part Une — the growth loop).</p>
+				<p style="margin:8px 0 0"><strong>Cut</strong>: outfit builder (E6), insights/viz (E7), travel packing (E9), monetization scaffolding (E10), laundry forecast (E11), i18n (E13), full profile hub (E12 — keep only locations).</p>
+				<p style="margin:8px 0 0;font-family:var(--serif);font-style:italic;color:var(--ink-2)">The docs already point this direction. The MVP shipping today <em>is</em> the 50% cut. That's the discipline win.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ §10 · SHAREABILITY / WOW ═══════════════════════════ -->
+	<section id="s10">
+		<div class="sec-head">
+			<div class="sec-num">§ xi</div>
+			<h2>Wow, Screenshot, Share</h2>
+			<div class="sec-tag">retention vs acquisition</div>
+		</div>
+		<div class="grid-2">
+			<div class="panel">
+				<h4>Screenshots that would make someone install</h4>
+				<ul class="tight">
+					<li>The Gmail import result: "Found 240 items · 2018 – 2025" — the count is the wow.</li>
+					<li>Border-toggle mode: a grid where every card visibly shows <em>where the piece is</em>. "The blue border means Aspen."</li>
+					<li>A single item card with 100% material breakdown + care symbols + fabric guide link.</li>
+					<li>The "where is everything" grouped view (not built yet — the moment it ships, this is the marketing hero).</li>
+				</ul>
+			</div>
+			<div class="panel">
+				<h4>Retention vs acquisition split</h4>
+				<ul class="tight">
+					<li><strong>Acquisition</strong> — Gmail import (the wow), friend-view link (the viral loop, post-MVP), care guide (the trust anchor).</li>
+					<li><strong>Retention</strong> — status/location updates (weekly), laundry loop (E11, post-MVP), lending (E4, post-MVP).</li>
+					<li>Current MVP: <strong>acquisition-heavy</strong>. Retention loop is the deferred half. That's fine for a 30-user beta — it's where you learn what people actually return for.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="callout good">
+			<span class="lbl">10-second value prop test</span>
+			<p style="margin:0;font-family:var(--serif);font-style:italic;font-size:16px">"Nothing To Wear tells you what's clean, where each piece is, and who has it — not just what you own." A stranger would understand. The tightening: drop the second clause of the current README pitch ("auto-imports from your inbox, infers material...") into a subtitle, not the lede. The <em>truth about your closet</em> is the noun.</p>
+		</div>
+	</section>
+
+	<!-- ═══ §11 · FINAL RECOMMENDATION ═══════════════════════════ -->
+	<section id="s11">
+		<div class="sec-head">
+			<div class="sec-num">§ xii</div>
+			<h2>Final Recommendation</h2>
+			<div class="sec-tag">would you launch today?</div>
+		</div>
+
+		<div class="callout crit">
+			<span class="lbl">Verdict</span>
+			<p style="margin:0;font-family:var(--serif);font-size:20px;line-height:1.4"><strong>No — not today, but closer than either the founder's June docs or last week's re-cut suggest.</strong> Blocks 0, A, and C are done. The privacy policy is drafted, not absent. What's left is a short, concrete list: publish the policy, build the lend modal, fix three hidden client bugs, turn on backups, and submit Gate 1.</p>
+		</div>
+
+		<h3>Minimum remaining to launch — the "yes" list</h3>
+		<ol style="max-width:70ch">
+			<li><strong>Get the drafted Privacy Policy + ToS signed off and published at a public URL</strong> — fill the <code>{{launch date}}</code>/<code>{{contact email}}</code> placeholders, wire the consent-banner link, link both in the Google OAuth consent screen.</li>
+			<li><strong>Build the simple lend modal + "lent out" view + <code>isAvailable</code></strong> — founder's own Top-10 #4/#5; zero code found for either.</li>
+			<li><strong>Fix the three hidden client bugs</strong> — Fuse.js double-rebuild, silent quota-exceeded swallow, skeletal CSP.</li>
+			<li><strong>Enable Supabase backups/PITR + run one restore test</strong> — founder's own #10; nothing configured today.</li>
+			<li><strong>Route-level code-split</strong> to bring LCP under 2.5s — Vite dynamic <code>import()</code>.</li>
+			<li><strong>Onboarding contrast fixes</strong> — a11y from 96 → 100.</li>
+			<li><strong>Google OAuth test-user allowlist populated</strong> with the 30 waitlist Gmail addresses + onboarding copy for the "unverified app" warning + confirm the 7-day test-mode refresh-token policy.</li>
+			<li><strong>Submit Gmail OAuth verification Gate 1</strong> the day the policy goes live — Google's queue doesn't start until then, and a Tier-2 CASA assessment sits behind it.</li>
+			<li><strong>P1-5 grouped "Where is everything" view</strong> — the one real Inventory-Spine gap left; P1-8 filters are likely already shipped (verify, don't rebuild).</li>
+		</ol>
+
+		<h3>Top 5 highest-impact actions</h3>
+		<ol class="actions-list">
+			<li>
+				<div>
+					<div class="act-title">Get the drafted privacy policy signed off and published, linked in Google OAuth consent</div>
+					<div class="act-body">The document exists (<code>docs/legal/PRIVACY_POLICY_DRAFT.md</code>) — the remaining work is placeholders, a real legal read, hosting, and linking it in the <code>ConsentBanner</code> + Cloud Console. This is the one item every other blocker (#2, #8, #9 on the founder's list) sequences behind.</div>
+				</div>
+				<div class="act-meta">4–6h<br>UNBLOCKS EVERYTHING</div>
+			</li>
+			<li>
+				<div>
+					<div class="act-title">Build the simple lend modal + "lent out" view + <code>isAvailable</code></div>
+					<div class="act-body">Founder's own Top-10 blockers #4/#5 — confirmed zero code exists for either. The launch README itself calls "simple lend tracking" implicitly required to ship Status/Location responsibly, not an optional extra.</div>
+				</div>
+				<div class="act-meta">1.5–2d<br>ZERO CODE TODAY</div>
+			</li>
+			<li>
+				<div>
+					<div class="act-title">Fix the three hidden client bugs — Fuse rebuild · silent quota · CSP shape</div>
+					<div class="act-body">Memoize <code>new Fuse(items)</code> in <code>useFuzzySearch.ts</code>. Have <code>safeSetItem</code> return failure so the toast can say "storage full — sign in to sync." Expand CSP to include <code>default-src</code> / <code>connect-src supabase.co accounts.google.com</code> / <code>img-src</code> — this also satisfies the founder's own #7 (verify CSP/HSTS live).</div>
+				</div>
+				<div class="act-meta">1 day<br>CORRECTNESS · MUST</div>
+			</li>
+			<li>
+				<div>
+					<div class="act-title">Route-level code-split the main bundle + turn on Supabase backups/PITR</div>
+					<div class="act-body">Single 291 KiB chunk → dynamic <code>import()</code> per view, target LCP &lt; 2.5s. Separately: enable backups + run one restore test (founder's own #10, confirmed nothing configured) — cheap now, expensive to discover missing after real user data lands.</div>
+				</div>
+				<div class="act-meta">8–14h<br>PERF + DATA SAFETY</div>
+			</li>
+			<li>
+				<div>
+					<div class="act-title">Submit Gmail OAuth Gate 1 the day the policy goes live + rehearse onboarding end-to-end</div>
+					<div class="act-body">Google's verification queue doesn't start until the policy is public — submit same-day so the ~1-3 month external clock and the Tier-2 CASA assessment behind it aren't blocking the eventual public launch. In parallel, sign in with a fresh Google account, import, long-press, edit, sign out/in — any friction found here is worth 10 code fixes.</div>
+				</div>
+				<div class="act-meta">2–3h + async<br>STARTS THE CLOCK</div>
+			</li>
+		</ol>
+
+		<div class="callout good" style="margin-top:24px">
+			<span class="lbl">What would make this product memorable</span>
+			<p style="margin:0">Every wardrobe app so far markets itself as a lookbook. NTW is the only one that treats the closet as <em>logistics</em>. The memorable act isn't the outfit — it's the moment a user watches their inbox become a wardrobe in 60 seconds, and then long-presses a card to move it from Aspen to Nolita, and the border changes color. Ship that experience and the story tells itself.</p>
+		</div>
+	</section>
+
+	<!-- ═══ FOOTER ═══════════════════════════ -->
+	<footer class="foot">
+		<div>Nothing To Wear · MVP Launch Readiness Review · v1 · 2026·07·11</div>
+		<div>Compiled from 15+ planning + legal docs · 13 epics · 11 migrations · 118 test files · 1,475 test cases · 14 Playwright specs · 293 TS/TSX files</div>
+	</footer>
+</div>
+
+<script>
+	// ── Sortable tables ──────────────────────────────────────
+	function makeSortable(table) {
+		const heads = table.querySelectorAll("th.sortable");
+		heads.forEach((th, colIdx) => {
+			th.addEventListener("click", () => {
+				const dir = th.classList.contains("sort-asc") ? "desc" : "asc";
+				heads.forEach((h) => h.classList.remove("sort-asc", "sort-desc"));
+				th.classList.add("sort-" + dir);
+				const tbody = table.tBodies[0];
+				const rows = Array.from(tbody.rows);
+				const sortType = th.dataset.sort || "str";
+				const importanceOrder = { critical: 4, high: 3, medium: 2, med: 2, low: 1 };
+				const statusOrder = { complete: 4, "in progress": 3, "not started": 2, backlog: 1 };
+				const sevOrder = { high: 3, med: 2, low: 1 };
+				rows.sort((a, b) => {
+					let av, bv;
+					if (sortType === "pct") {
+						av = +a.dataset.pct || +a.cells[colIdx].textContent;
+						bv = +b.dataset.pct || +b.cells[colIdx].textContent;
+					} else if (sortType === "importance") {
+						av = importanceOrder[(a.dataset.importance || a.cells[colIdx].textContent).toLowerCase().trim()] || 0;
+						bv = importanceOrder[(b.dataset.importance || b.cells[colIdx].textContent).toLowerCase().trim()] || 0;
+					} else if (sortType === "status") {
+						av = statusOrder[(a.dataset.status || a.cells[colIdx].textContent).toLowerCase().trim()] || 0;
+						bv = statusOrder[(b.dataset.status || b.cells[colIdx].textContent).toLowerCase().trim()] || 0;
+					} else if (sortType === "sev") {
+						av = sevOrder[a.cells[colIdx].textContent.trim().toLowerCase()] || 0;
+						bv = sevOrder[b.cells[colIdx].textContent.trim().toLowerCase()] || 0;
+					} else if (sortType === "eff") {
+						av = a.cells[colIdx].textContent;
+						bv = b.cells[colIdx].textContent;
+					} else if (sortType === "when") {
+						av = a.cells[colIdx].textContent.toLowerCase().includes("before") ? 2 : 1;
+						bv = b.cells[colIdx].textContent.toLowerCase().includes("before") ? 2 : 1;
+					} else {
+						av = a.cells[colIdx].textContent.trim().toLowerCase();
+						bv = b.cells[colIdx].textContent.trim().toLowerCase();
+					}
+					if (av < bv) return dir === "asc" ? -1 : 1;
+					if (av > bv) return dir === "asc" ? 1 : -1;
+					return 0;
+				});
+				rows.forEach((r) => tbody.appendChild(r));
+			});
+		});
+	}
+	document.querySelectorAll("table").forEach(makeSortable);
+
+	// ── Filter buttons ───────────────────────────────────────
+	document.querySelectorAll(".filter-bar").forEach((bar) => {
+		const table = bar.closest(".table-wrap").querySelector("table");
+		bar.querySelectorAll("button").forEach((btn) => {
+			btn.addEventListener("click", () => {
+				bar.querySelectorAll("button").forEach((b) => b.classList.remove("active"));
+				btn.classList.add("active");
+				const f = btn.dataset.f;
+				const rows = table.tBodies[0].rows;
+				Array.from(rows).forEach((r) => {
+					if (f === "all") { r.style.display = ""; return; }
+					if (f === "Critical only") {
+						r.style.display = r.dataset.importance === "Critical" ? "" : "none";
+						return;
+					}
+					r.style.display = r.dataset.status === f ? "" : "none";
+				});
+			});
+		});
+	});
+</script>
