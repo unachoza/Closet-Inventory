@@ -12,8 +12,9 @@
 > durable viewer grant, framed as the acquisition funnel) is fully specced in
 > [E4 Part Une — View a Friend's Closet](./E4-part-une-view-friends-closet.md) with UI mockups in
 > [planning/design/mockups/friend-view-flow.html](../design/mockups/friend-view-flow.html).
-> Simple lending (loan modal + lent view) is specced in
-> [E4 Part Deux — Simple Lending](./E4-part-deux-simple-lending.md) (post-MVP).
+> Lending is specced in [E4 Part Deux — Lending via Borrow Requests](./E4-part-deux-simple-lending.md)
+> (post-MVP; rev 2 replaced owner-recorded simple lending with request → approve-with-care-terms →
+> return → condition-confirm, and puts notifications in a profile **Activity** tab).
 
 ## US-4.1 — Share my closet with someone I trust
 _As the "Our Closet" user, I want to share my closet (or parts of it) with a friend so that we can see each other's wardrobes._
