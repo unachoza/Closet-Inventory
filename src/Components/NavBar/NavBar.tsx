@@ -131,7 +131,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 				<LayoutGrid size={16} /> View All
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("whereIsEverything")}>
-				<MapPin size={16} /> Where Is Everything
+				<MapPin size={16} /> Where Are My Clothes
 			</button>
 			<button className="action-btn" onClick={handleAddItem}>
 				<Plus size={16} /> Add Item
@@ -151,11 +151,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 				</button>
 			)}
 			{onClearCloset && (
-				<button
-					className="action-btn secondary"
-					onClick={handleClearClick}
-					title="Delete every item in your closet"
-				>
+				<button className="action-btn secondary" onClick={handleClearClick} title="Delete every item in your closet">
 					<Trash2 size={16} /> Clear Closet
 				</button>
 			)}

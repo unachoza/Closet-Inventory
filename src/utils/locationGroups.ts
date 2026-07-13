@@ -8,7 +8,7 @@ export interface LocationGroup {
 }
 
 /**
- * P1-5 — "Where is everything": group the closet by location for a
+ * P1-5 — "Where are my clothes": group the closet by location for a
  * grouped-by-location overview, with per-group counts.
  *
  * Every known location gets a group, even with zero items — an empty

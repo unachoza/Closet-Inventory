@@ -20,9 +20,9 @@ const WhereIsEverythingView = ({ onEditItem }: WhereIsEverythingViewProps) => {
 	const groups = useMemo(() => groupItemsByLocation(closet, locations), [closet, locations]);
 
 	return (
-		<main className="where-is-everything" aria-label="Where is everything">
+		<main className="where-is-everything" aria-label="Where are my clothes">
 			<div className="where-is-everything__header">
-				<h1 className="where-is-everything__title">Where is everything</h1>
+				<h1 className="where-is-everything__title">Where are my clothes</h1>
 				<p className="where-is-everything__meta">
 					<strong>{closet.length}</strong> item{closet.length === 1 ? "" : "s"} across {groups.length} location
 					{groups.length === 1 ? "" : "s"}

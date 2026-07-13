@@ -88,7 +88,7 @@ Filtered from the persona docs to the two primitives (lending/availability logic
 **Next (still status/location scope):**
 
 - [x] `P1-4` Card quick-action menu to set status/location without the full form (desktop ⋯ + mobile long-press) — _~1–1.5d_
-- [ ] `P1-5` "Where is everything" grouped-by-location view (counts per group) — _~1.5d_
+- [ ] `P1-5` "Where are my clothes" grouped-by-location view (counts per group) — _~1.5d_
 - [ ] `P1-6` Custom / multi-home locations: user-defined labels beyond the 4 starter kinds (Sloane's 4 homes) — _~1.5d_
 - [ ] `P1-7` Per-persona / per-user location presets (seed a starter set from onboarding) — _~0.5d_
 - [ ] `P1-8` Status + Location **filter dimensions** in `useClosetFilters` + hardcoded `DIMENSIONS` array — _~1d_ ⚠️ hardcoded-list gotcha
