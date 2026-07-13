@@ -1,0 +1,139 @@
+/* P1-5 — "Where is everything": grouped-by-location view. */
+
+.where-is-everything {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	padding: var(--primitive-spacing-md, 1rem) var(--primitive-spacing-md, 1rem) var(--spacing-400);
+}
+
+.where-is-everything__header {
+	margin-bottom: var(--spacing-200, 1rem);
+}
+
+.where-is-everything__title {
+	margin: 0 0 var(--spacing-75, 0.35rem) 0;
+	font-size: var(--primitive-font-size-xl);
+	color: var(--text-primary);
+}
+
+.where-is-everything__meta {
+	margin: 0;
+	font-size: var(--primitive-font-size-sm);
+	color: var(--text-muted);
+}
+
+.where-is-everything__loading,
+.where-is-everything__error {
+	color: var(--text-muted);
+}
+
+.where-is-everything__error {
+	color: var(--status-error);
+}
+
+.where-is-everything__groups {
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-150, 0.75rem);
+}
+
+/* ── Location group section ── */
+
+.location-group {
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--layout-radius-button);
+	background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.02));
+	overflow: hidden;
+}
+
+.location-group__header {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-125, 0.6rem);
+	width: 100%;
+	padding: var(--spacing-150, 0.75rem) var(--spacing-200, 1rem);
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	font: inherit;
+	color: var(--text-primary);
+}
+
+.location-group__label {
+	flex: 1;
+	font-weight: 600;
+	font-size: var(--primitive-font-size-base);
+}
+
+.location-group__count {
+	min-width: 1.75rem;
+	padding: 0.1rem 0.5rem;
+	border-radius: 999px;
+	background: var(--bg-surface-primary, #fff);
+	border: 1px solid var(--border-hairline);
+	font-size: var(--primitive-font-size-xs);
+	font-weight: 600;
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.location-group__chevron {
+	flex-shrink: 0;
+	transition: transform 0.15s ease;
+	color: var(--text-muted);
+}
+
+.location-group__chevron--open {
+	transform: rotate(180deg);
+}
+
+.location-group__swatch {
+	display: inline-block;
+	flex-shrink: 0;
+	width: 14px;
+	height: 14px;
+	border: 3px solid;
+	border-radius: 2px;
+}
+
+.location-group__swatch--home {
+	border-color: var(--bg-surface-secondary);
+	border-style: solid;
+	background: #fff;
+}
+
+.location-group__swatch--storage {
+	border-color: var(--primitive-brand-deep-umber);
+	border-style: solid;
+	background: transparent;
+}
+
+.location-group__swatch--suitcase {
+	border-color: var(--primitive-brand-muted-clay);
+	border-style: dashed;
+	background: transparent;
+}
+
+.location-group__swatch--other {
+	border-color: var(--status-info);
+	border-style: dotted;
+	background: transparent;
+}
+
+.location-group__body {
+	padding: 0 var(--spacing-200, 1rem) var(--spacing-200, 1rem);
+	border-top: 1px solid var(--border-hairline);
+}
+
+.location-group__empty {
+	margin: var(--spacing-150, 0.75rem) 0 0;
+	color: var(--text-muted);
+	font-size: var(--primitive-font-size-sm);
+	font-style: italic;
+}
+
+.location-group__body .items-grid {
+	padding: var(--spacing-150, 0.75rem) 0 0;
+}

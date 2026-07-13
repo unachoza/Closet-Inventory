@@ -17,6 +17,7 @@ import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
 import EntireClosetView from "./Features/SearchCloset/EntireClosetView/EntireClosetView";
+import WhereIsEverythingView from "./Features/WhereIsEverything/WhereIsEverythingView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
@@ -186,6 +187,7 @@ function AppShell() {
 						{view === "fabric" && <InteractiveGuide />}
 						{view === "journey" && <JourneyC />}
 						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
+						{view === "whereIsEverything" && <WhereIsEverythingView onEditItem={handleEditItem} />}
 						{view === "carousel" && (
 							<>
 								<div data-testid="carousel">
