@@ -104,6 +104,30 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          context: Json
+          created_at: string
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          context?: Json
+          created_at?: string
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          context?: Json
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       item_materials: {
         Row: {
           fiber: string

@@ -13,7 +13,7 @@ vi.mock("@sentry/react", () => ({
 }));
 
 vi.mock("posthog-js", () => ({
-	default: { init: posthogInit },
+	default: { init: posthogInit, register: vi.fn(), identify: vi.fn(), reset: vi.fn(), capture: vi.fn() },
 }));
 
 describe("monitoring", () => {
@@ -48,7 +48,9 @@ describe("monitoring", () => {
 
 		await initMonitoring();
 
-		expect(sentryInit).toHaveBeenCalledWith({ dsn: "https://example.test/1", sendDefaultPii: false });
+		expect(sentryInit).toHaveBeenCalledWith(
+			expect.objectContaining({ dsn: "https://example.test/1", sendDefaultPii: false, release: expect.any(String) }),
+		);
 		expect(posthogInit).not.toHaveBeenCalled();
 	});
 

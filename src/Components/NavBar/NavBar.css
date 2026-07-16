@@ -312,3 +312,12 @@ div.search-container > input {
 	color: inherit;
 	cursor: pointer;
 }
+
+/* Subtle build-version stamp at the foot of the drawer (beta bug reports). */
+.nav-drawer__version {
+	margin-top: auto;
+	padding: 0.75rem 0.25rem 0.25rem;
+	font-size: 0.7rem;
+	opacity: 0.5;
+	font-variant-numeric: tabular-nums;
+}

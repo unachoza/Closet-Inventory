@@ -1,5 +1,6 @@
-import { createContext, useCallback, useContext, useState, ReactNode, Dispatch, SetStateAction } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, ReactNode, Dispatch, SetStateAction } from "react";
 import { ViewType } from "../utils/types";
+import { track } from "../lib/analytics";
 
 interface ViewContextType {
 	view: ViewType;
@@ -29,6 +30,17 @@ export function ViewProvider({ children, initialView = "carousel" }: ViewProvide
 			return next;
 		});
 	}, []);
+
+	// Central nav analytics — one effect covers every feature surface (closet/
+	// care/search/email/form). Runs as a side effect of the committed `view`,
+	// not inside the state updater, so StrictMode can't double-fire it.
+	const lastTracked = useRef<ViewType | null>(null);
+	useEffect(() => {
+		if (lastTracked.current === view) return;
+		track("screen_viewed", { view, from: lastTracked.current });
+		if (view === "fabric") track("care_guide_opened", { from: lastTracked.current });
+		lastTracked.current = view;
+	}, [view]);
 
 	return <ViewContext.Provider value={{ view, previousView, setView }}>{children}</ViewContext.Provider>;
 }
