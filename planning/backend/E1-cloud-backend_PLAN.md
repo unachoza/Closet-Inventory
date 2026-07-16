@@ -61,3 +61,9 @@ To eliminate risks like misconfigured storage, hardcoded secrets, and insufficie
 ### 5. Observability Integration
 
 We integrated **Datadog APM via OpenTelemetry (OTel)** to ensure comprehensive monitoring. This infrastructure captures GraphQL field resolver execution times to catch performance bottlenecks, injects active user and organization context metadata into server logs, tracks Supabase database health with `pg_stat_statements`, and leverages Datadog's Sensitive Data Scanner to prevent personal data from spilling into log aggregation pools.
+
+
+<!-- TODO -->
+
+Elegant 403 message, you need to click confirm
+waistStyle
