@@ -345,15 +345,27 @@ Email HTML → multi-retailer parsers → FashionParser inference → ClothingIt
 
 ### v3.0 — Mobile & PWA
 
-> **Active priority** (see Near-Term Priority Order). Responsive layout is done; PWA, touch-target audit, and bottom nav / "Add Item" FAB are the next mobile work.
+> **Tight-MVP launch pivot (2026-07-16):** stripping to three well-done features — **Inventory · Search · Care** — plus a friendlier, shorter onboarding, for the **Founding Members beta (30 testers, Sunday 2026-07-19)**. Status & location are **flagged off** (Supabase profile flag, dark for beta), not removed. Full plan: [planning/launch/TIGHT_MVP_2026-07-16.md](./planning/launch/TIGHT_MVP_2026-07-16.md).
 
 - ✅ Responsive layout for iPhone and Android screen sizes (29 `@media` blocks; hamburger drawer nav < 768px)
-- 🔲 PWA setup (`vite-plugin-pwa`) — `manifest.json` + service worker for "Add to Home Screen" support **(unblocks v9.0 monetization + v4.0 offline)**
-- 🔲 Full-screen launch on iOS (no Safari browser chrome)
-- 🔲 Offline support via service worker cache
-- 🔲 Touch-friendly tap targets (min 44×44px) and swipe gestures
-- 🔲 Bottom navigation bar on mobile
-- 🔲 Camera input (`capture="environment"`) for direct photo capture on mobile
+- ✅ PWA setup (`vite-plugin-pwa`) — `manifest.json` + service worker for "Add to Home Screen" support (E5 shipped, PRs #134/#135)
+- ✅ Full-screen launch on iOS (no Safari browser chrome)
+- ✅ Offline support via service worker cache
+- ✅ Touch-friendly tap targets (min 44×44px)
+- 🟡 Bottom navigation bar on mobile — component built; tabs being finalized to **Closet · Care · [Add] · Search · Email**
+- 🔲 Camera input (`capture="environment"`) for direct photo capture on mobile (v3.1)
+- 🔲 Swipe gestures
+
+**Beta launch adds (see Tight MVP plan):**
+
+- 🔲 Email-import (Gmail) UX polish — progress/empty/error states (**headline feature**)
+- 🔲 Manual add-form polish
+- 🔲 Onboarding rework — shorter, friendlier, teaches the new bottom nav
+- 🔲 Observability — PostHog events + `identify` + session replay, Sentry releases (scaffold in `src/lib/monitoring.ts`)
+- 🔲 In-app feedback → Supabase `feedback` table
+- 🔲 Status/location Supabase feature flag (default off)
+- 🔲 Build version surfaced in Settings + tagged into Sentry/PostHog
+- ⚪ _Post-launch:_ waitlist-page SEO, traffic monitoring, blog/content
 
 ---
 
