@@ -318,6 +318,69 @@ describe("EmailPreview — duplicate-named skipped items", () => {
 	});
 });
 
+// ── E3-bug.9: controlled selection survives the parent (back-to-email round trip) ──
+describe("EmailPreview — controlled unskip selection", () => {
+	beforeEach(() => {
+		mockParseProducts.mockReturnValue([SHIRT, ACCESSORY]);
+	});
+
+	it("reports include clicks up to the parent instead of keeping local state", () => {
+		const onUnskippedIndicesChange = vi.fn();
+		render(
+			<EmailPreview
+				email={MOCK_EMAIL}
+				onImportProduct={vi.fn()}
+				onImportAllProducts={vi.fn()}
+				unskippedIndices={[]}
+				onUnskippedIndicesChange={onUnskippedIndicesChange}
+			/>,
+		);
+		openSkippedDrawer();
+		fireEvent.click(getIncludeButtons()[0]);
+		// ACCESSORY is index 0 in the skipped list.
+		expect(onUnskippedIndicesChange).toHaveBeenCalledWith([0]);
+	});
+
+	it("renders parent-provided selection as already included (survives remount)", () => {
+		// The parent restores the choice after gmail → edit → back-to-email: a
+		// freshly-mounted preview shows the accessory as importable, not skipped.
+		render(
+			<EmailPreview
+				email={MOCK_EMAIL}
+				onImportProduct={vi.fn()}
+				onImportAllProducts={vi.fn()}
+				unskippedIndices={[0]}
+				onUnskippedIndicesChange={vi.fn()}
+			/>,
+		);
+		expect(screen.getByText(`Import ${ACCESSORY.name}`)).toBeInTheDocument();
+	});
+
+	it("does NOT reset the parent's selection when the email id is stable", () => {
+		const onUnskippedIndicesChange = vi.fn();
+		const { rerender } = render(
+			<EmailPreview
+				email={MOCK_EMAIL}
+				onImportProduct={vi.fn()}
+				onImportAllProducts={vi.fn()}
+				unskippedIndices={[0]}
+				onUnskippedIndicesChange={onUnskippedIndicesChange}
+			/>,
+		);
+		rerender(
+			<EmailPreview
+				email={MOCK_EMAIL}
+				onImportProduct={vi.fn()}
+				onImportAllProducts={vi.fn()}
+				unskippedIndices={[0]}
+				onUnskippedIndicesChange={onUnskippedIndicesChange}
+			/>,
+		);
+		// The uncontrolled reset-on-email effect must not fire in controlled mode.
+		expect(onUnskippedIndicesChange).not.toHaveBeenCalledWith([]);
+	});
+});
+
 // ── Regression: unskip selections must not leak across emails ──────────────────
 describe("EmailPreview — selections reset when the email changes", () => {
 	it("does not carry an unskipped item into the next email's detected list", async () => {
