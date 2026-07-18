@@ -1,4 +1,4 @@
-import { LayoutGrid, Scissors, Plus, Search, Mail } from "lucide-react";
+import { Scissors, LayoutGrid, Plus, Search, Mail } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../utils/types";
@@ -21,7 +21,7 @@ interface Tab {
    tabs alongside Email (Gmail import), the primary item-ingestion path.
    The old carousel "Home" tab is dropped for the beta; Add is the center FAB. */
 const LEFT_TABS: Tab[] = [
-	{ view: "overview", label: "Closet", Icon: LayoutGrid },
+	{ view: "carousel", label: "Closet", Icon: LayoutGrid },
 	{ view: "fabric", label: "Care", Icon: Scissors },
 ];
 const RIGHT_TABS: Tab[] = [
