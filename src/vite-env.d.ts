@@ -15,3 +15,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** Build-time app version (e.g. "v0.9.0-a1b2c3d"), injected by vite `define`. */
+declare const __APP_VERSION__: string;

@@ -16,6 +16,7 @@ import GoogleUnverifiedNotice from "../Onboarding/GoogleUnverifiedNotice";
 import "./GmailImport.css";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
+import { track } from "../../lib/analytics";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -115,11 +116,24 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 		}
 	}, [accessToken, isAuthenticated, searchEmails]);
 
+	// Funnel: results shown. Fires when a search settles with emails present —
+	// the midpoint between import_started and import_finished. Re-fires only
+	// when the result set changes size, not on every re-render.
+	const lastResultCount = useRef<number | null>(null);
+	useEffect(() => {
+		if (isSearching) return;
+		if (emails.length > 0 && lastResultCount.current !== emails.length) {
+			track("import_results_shown", { count: emails.length });
+		}
+		lastResultCount.current = emails.length;
+	}, [emails.length, isSearching]);
+
 	// Advanced search: routes to fetch or filter based on user's choice
 	const handleAdvancedSearch = useCallback(
 		(params: AdvancedSearchParams, mode: SearchMode) => {
 			setSelectedEmailId(null);
 			if (mode === "fetch" && accessToken) {
+				track("import_started", { mode: "advanced" });
 				searchEmails(accessToken, params, true);
 			} else {
 				filterCachedEmails(params);
@@ -152,6 +166,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 	const handleDefaultSearch = useCallback(() => {
 		if (accessToken) {
 			setSelectedEmailId(null);
+			track("import_started", { mode: "default" });
 			searchEmails(accessToken, undefined, true);
 		}
 	}, [accessToken, searchEmails]);
@@ -202,6 +217,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				care: inferCare(product.name, color, material),
 				style,
 			});
+			track("import_finished", { count: 1, source: "single" });
 		},
 		[selectedEmail, selectedEmailId, onImport, onSourceEmailChange],
 	);
@@ -243,6 +259,7 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 				} as Partial<ClothingItem>;
 			});
 			onImportAll(items);
+			track("import_finished", { count: items.length, source: "all" });
 		},
 		[selectedEmail, selectedEmailId, onImportAll, onSourceEmailChange],
 	);

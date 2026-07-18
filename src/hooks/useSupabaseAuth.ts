@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getSupabase } from "../lib/supabaseClient";
+import { identify, resetIdentity } from "../lib/monitoring";
+import { track } from "../lib/analytics";
 
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 
@@ -38,8 +40,21 @@ export function useSupabaseAuth(): SupabaseAuthState {
       setIsLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
+
+      // Analytics identity, gated on consent inside monitoring.ts.
+      if (event === "SIGNED_OUT" || !s) {
+        void resetIdentity();
+        return;
+      }
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        void identify(s.user.id, { email: s.user.email });
+        // A brand-new account: user created within the last 2 minutes.
+        const createdAt = s.user.created_at ? Date.parse(s.user.created_at) : NaN;
+        const isNew = Number.isFinite(createdAt) && Date.now() - createdAt < 2 * 60 * 1000;
+        track(event === "SIGNED_IN" && isNew ? "account_created" : "signed_in");
+      }
     });
 
     return () => subscription.unsubscribe();

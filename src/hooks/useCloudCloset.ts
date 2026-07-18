@@ -7,6 +7,7 @@ import { computeUpdatePatch } from "./computeUpdatePatch";
 import { safeSetItem } from "../utils/safeStorage";
 import { SupabaseAuthContext } from "../context/SupabaseAuthContext";
 import { SyncedClosetRepository } from "../services/syncedClosetRepository";
+import { track } from "../lib/analytics";
 
 export type SyncStatus = "synced" | "syncing" | "offline" | "error";
 
@@ -86,12 +87,14 @@ export function useCloudCloset() {
 		};
 		setCloset((prev) => [...prev, item]);
 		void repo.add(item);
+		track("item_added", { source: "manual", category: item.category });
 	};
 
 	const addFullItem = (newItem: ClothingItem) => {
 		const item = { ...newItem, material: normalizeMaterial(newItem.material) };
 		setCloset((prev) => [...prev, item]);
 		void repo.add(item);
+		track("item_added", { source: "manual", category: item.category });
 	};
 
 	const importItems = (items: ClothingItem[], mode: "replace" | "merge") => {
@@ -102,6 +105,7 @@ export function useCloudCloset() {
 	const removeItem = (id: string) => {
 		setCloset((prev) => prev.filter((item) => item.id !== id));
 		void repo.remove(id);
+		track("item_deleted");
 	};
 
 	const updateItem = (id: string, updatedData: Partial<ClothingItem>) => {
@@ -111,6 +115,7 @@ export function useCloudCloset() {
 		const patch = existing ? computeUpdatePatch(existing, updatedData) : { ...updatedData };
 		setCloset((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
 		void repo.update(id, patch);
+		track("item_edited", { fields: Object.keys(patch) });
 	};
 
 	const getCloset = (): ClothingItem[] => closet;
