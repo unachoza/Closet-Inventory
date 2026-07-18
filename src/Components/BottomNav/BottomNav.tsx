@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Plus, Search, Mail } from "lucide-react";
+import { Scissors, LayoutGrid, Plus, Search, Mail } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../utils/types";
@@ -16,16 +16,17 @@ interface Tab {
 	Icon: LucideIcon;
 }
 
-/* Thumb-order layout: Home | Closet | [Add] | Search | Import (E5-1.2).
-   Import-from-Gmail is deliberately a first-class tab — it's the primary
-   item-ingestion path and was previously buried in the hamburger drawer. */
+/* Thumb-order layout: Closet | Care | [Add] | Search | Email (Tight MVP).
+   The three MVP features — Inventory (Closet), Care, Search — are first-class
+   tabs alongside Email (Gmail import), the primary item-ingestion path.
+   The old carousel "Home" tab is dropped for the beta; Add is the center FAB. */
 const LEFT_TABS: Tab[] = [
-	{ view: "carousel", label: "Home", Icon: Home },
-	{ view: "overview", label: "Closet", Icon: LayoutGrid },
+	{ view: "carousel", label: "Closet", Icon: LayoutGrid },
+	{ view: "fabric", label: "Care", Icon: Scissors },
 ];
 const RIGHT_TABS: Tab[] = [
 	{ view: "entireCloset", label: "Search", Icon: Search },
-	{ view: "gmail", label: "Import", Icon: Mail },
+	{ view: "gmail", label: "Email", Icon: Mail },
 ];
 
 function NavTab({ tab, active, onSelect }: { tab: Tab; active: boolean; onSelect: (view: ViewType) => void }) {

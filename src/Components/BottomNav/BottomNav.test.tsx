@@ -15,44 +15,44 @@ function renderNav({ initialView = "carousel" as ViewType, onAddItem = vi.fn() }
 }
 
 describe("BottomNav", () => {
-	it("renders the four nav tabs and the Add action (E5-1.2/E5-1.3)", () => {
+	it("renders the four MVP nav tabs and the Add action (Closet/Care/Search/Email)", () => {
 		renderNav();
 
 		expect(screen.getByRole("navigation", { name: /primary/i })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Home" })).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Closet" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Care" })).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Search" })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: "Import" })).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: "Email" })).toBeInTheDocument();
 		expect(screen.getByRole("button", { name: "Add Item" })).toBeInTheDocument();
 	});
 
 	it("marks the tab matching the current view with aria-current", () => {
 		renderNav({ initialView: "gmail" });
 
-		expect(screen.getByRole("button", { name: "Import" })).toHaveAttribute("aria-current", "page");
-		expect(screen.getByRole("button", { name: "Home" })).not.toHaveAttribute("aria-current");
+		expect(screen.getByRole("button", { name: "Email" })).toHaveAttribute("aria-current", "page");
+		expect(screen.getByRole("button", { name: "Closet" })).not.toHaveAttribute("aria-current");
 	});
 
-	it("navigates on tab click: Closet→overview, Search→entireCloset, Import→gmail, Home→carousel", () => {
+	it("navigates on tab click: Closet→carousel, Care→fabric, Search→entireCloset, Email→gmail", () => {
 		renderNav({ initialView: "carousel" });
 
-		fireEvent.click(screen.getByRole("button", { name: "Closet" }));
-		expect(screen.getByRole("button", { name: "Closet" })).toHaveAttribute("aria-current", "page");
+		fireEvent.click(screen.getByRole("button", { name: "Care" }));
+		expect(screen.getByRole("button", { name: "Care" })).toHaveAttribute("aria-current", "page");
 
 		fireEvent.click(screen.getByRole("button", { name: "Search" }));
 		expect(screen.getByRole("button", { name: "Search" })).toHaveAttribute("aria-current", "page");
 
-		fireEvent.click(screen.getByRole("button", { name: "Import" }));
-		expect(screen.getByRole("button", { name: "Import" })).toHaveAttribute("aria-current", "page");
+		fireEvent.click(screen.getByRole("button", { name: "Email" }));
+		expect(screen.getByRole("button", { name: "Email" })).toHaveAttribute("aria-current", "page");
 
-		fireEvent.click(screen.getByRole("button", { name: "Home" }));
-		expect(screen.getByRole("button", { name: "Home" })).toHaveAttribute("aria-current", "page");
+		fireEvent.click(screen.getByRole("button", { name: "Closet" }));
+		expect(screen.getByRole("button", { name: "Closet" })).toHaveAttribute("aria-current", "page");
 	});
 
-	it("no tab is active on views without a tab (form/edit/fabric/journey)", () => {
+	it("no tab is active on views without a tab (form/edit/carousel/journey)", () => {
 		renderNav({ initialView: "form" });
 
-		for (const name of ["Home", "Closet", "Search", "Import"]) {
+		for (const name of ["Closet", "Care", "Search", "Email"]) {
 			expect(screen.getByRole("button", { name })).not.toHaveAttribute("aria-current");
 		}
 	});
@@ -63,6 +63,6 @@ describe("BottomNav", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Add Item" }));
 		expect(onAddItem).toHaveBeenCalledTimes(1);
 		// View unchanged by the nav itself — the App-level handler owns navigation.
-		expect(screen.getByRole("button", { name: "Home" })).toHaveAttribute("aria-current", "page");
+		expect(screen.getByRole("button", { name: "Closet" })).toHaveAttribute("aria-current", "page");
 	});
 });
