@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>NTW · Simple Lending — Flow Mockups (E4 Part Deux)</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap");
+
+			:root {
+				--alabaster: #faf8f5;
+				--white: #fff;
+				--sand: #f3eee7;
+				--terracotta: #b28675;
+				--terracotta-deep: #9c7060;
+				--espresso: #492f28;
+				--ink: #231612;
+				--muted: #8a7a72;
+				--hairline: rgba(73, 47, 40, 0.14);
+				--serif: "Lora", Georgia, serif;
+				--sans: "DM Sans", system-ui, sans-serif;
+				--shadow-phone: 0 24px 60px -24px rgba(35, 22, 18, 0.45), 0 6px 18px -8px rgba(35, 22, 18, 0.25);
+			}
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				background:
+					radial-gradient(1100px 480px at 10% -5%, rgba(178, 134, 117, 0.13), transparent 60%),
+					radial-gradient(900px 420px at 105% 40%, rgba(243, 238, 231, 0.9), transparent 55%), var(--alabaster);
+				color: var(--espresso);
+				font-family: var(--sans);
+				-webkit-font-smoothing: antialiased;
+			}
+			.sheet {
+				max-width: 1480px;
+				margin: 0 auto;
+				padding: 56px 40px 96px;
+			}
+			header.masthead {
+				display: flex;
+				align-items: flex-end;
+				justify-content: space-between;
+				gap: 24px;
+				border-bottom: 1px solid var(--espresso);
+				padding-bottom: 28px;
+				margin-bottom: 14px;
+			}
+			.kicker {
+				font-size: 11px;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: var(--terracotta-deep);
+				font-weight: 600;
+				margin-bottom: 10px;
+			}
+			.brandline {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+			}
+			.brandline svg {
+				width: 40px;
+				height: 40px;
+			}
+			h1 {
+				font-family: var(--serif);
+				font-weight: 500;
+				font-size: clamp(30px, 4vw, 46px);
+				line-height: 1.05;
+			}
+			h1 em {
+				font-style: italic;
+				color: var(--terracotta-deep);
+			}
+			.meta {
+				text-align: right;
+				font-size: 12px;
+				color: var(--muted);
+				line-height: 1.7;
+				white-space: nowrap;
+			}
+			.meta b {
+				color: var(--espresso);
+				font-weight: 600;
+			}
+			.intro {
+				max-width: 70ch;
+				font-size: 14.5px;
+				line-height: 1.75;
+				color: #6b564d;
+				margin: 22px 0 8px;
+			}
+			.intro b {
+				color: var(--espresso);
+			}
+
+			.personas {
+				display: flex;
+				gap: 14px;
+				margin: 26px 0 6px;
+				flex-wrap: wrap;
+			}
+			.persona {
+				flex: 1;
+				min-width: 240px;
+				background: var(--white);
+				border: 1px solid var(--hairline);
+				border-radius: 16px;
+				padding: 16px 18px;
+			}
+			.p-name {
+				font-family: var(--serif);
+				font-size: 15.5px;
+				font-weight: 600;
+				margin-bottom: 4px;
+			}
+			.p-name span {
+				font-style: italic;
+				color: var(--terracotta-deep);
+				font-weight: 400;
+				font-size: 13px;
+			}
+			.p-need {
+				font-size: 12px;
+				line-height: 1.6;
+				color: #6b564d;
+			}
+
+			section.act {
+				margin-top: 56px;
+			}
+			.act-head {
+				display: flex;
+				align-items: baseline;
+				gap: 18px;
+				margin-bottom: 34px;
+			}
+			.act-num {
+				font-family: var(--serif);
+				font-style: italic;
+				font-size: 15px;
+				color: var(--terracotta-deep);
+				border: 1px solid var(--terracotta);
+				border-radius: 999px;
+				padding: 4px 14px;
+				white-space: nowrap;
+			}
+			.act-title {
+				font-family: var(--serif);
+				font-size: 24px;
+				font-weight: 500;
+			}
+			.act-sub {
+				font-size: 13px;
+				color: var(--muted);
+			}
+
+			.flow {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 34px 26px;
+				align-items: flex-start;
+			}
+			.step {
+				width: 316px;
+			}
+			.step-caption {
+				margin-top: 18px;
+				padding: 0 6px;
+			}
+			.step-num {
+				font-family: var(--serif);
+				font-style: italic;
+				font-size: 13px;
+				color: var(--terracotta-deep);
+				letter-spacing: 0.04em;
+			}
+			.step-title {
+				font-family: var(--serif);
+				font-size: 17px;
+				font-weight: 600;
+				margin: 3px 0 7px;
+			}
+			.step-note {
+				font-size: 12.5px;
+				line-height: 1.65;
+				color: #6b564d;
+			}
+			.step-note code {
+				font-family: ui-monospace, Menlo, monospace;
+				font-size: 11px;
+				background: var(--sand);
+				padding: 1px 5px;
+				border-radius: 4px;
+				color: var(--espresso);
+			}
+			.arrow {
+				align-self: center;
+				color: var(--terracotta);
+				font-size: 22px;
+				padding-bottom: 120px;
+				font-family: var(--serif);
+				font-style: italic;
+			}
+
+			.phone {
+				width: 316px;
+				border-radius: 44px;
+				background: var(--ink);
+				padding: 10px;
+				box-shadow: var(--shadow-phone);
+			}
+			.screen {
+				border-radius: 36px;
+				overflow: hidden;
+				background: var(--alabaster);
+				height: 640px;
+				position: relative;
+				display: flex;
+				flex-direction: column;
+			}
+			.notch {
+				position: absolute;
+				top: 10px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 96px;
+				height: 24px;
+				border-radius: 999px;
+				background: var(--ink);
+				z-index: 40;
+			}
+			.statusbar {
+				height: 44px;
+				flex: none;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 14px 24px 0;
+				font-size: 11.5px;
+				font-weight: 600;
+				color: var(--espresso);
+			}
+			.homebar {
+				position: absolute;
+				bottom: 7px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 110px;
+				height: 4px;
+				border-radius: 4px;
+				background: rgba(35, 22, 18, 0.35);
+				z-index: 40;
+			}
+
+			.ntw-top {
+				flex: none;
+				padding: 12px 20px 0;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.ntw-word {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.ntw-word svg {
+				width: 22px;
+				height: 22px;
+			}
+			.ntw-word span {
+				font-family: var(--serif);
+				font-style: italic;
+				font-size: 15px;
+				color: var(--espresso);
+			}
+			.chip {
+				font-size: 10px;
+				font-weight: 600;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				padding: 5px 10px;
+				border-radius: 999px;
+				border: 1px solid var(--hairline);
+				color: var(--muted);
+				background: var(--white);
+			}
+			.chip.loan {
+				border-color: rgba(178, 134, 117, 0.5);
+				color: var(--terracotta-deep);
+				background: #fdf9f6;
+			}
+
+			.swatch {
+				position: relative;
+				overflow: hidden;
+			}
+			.sw-1 {
+				background: linear-gradient(160deg, #c9a28f, #8f6b5b);
+			}
+			.sw-2 {
+				background: linear-gradient(160deg, #4e5d52, #2e3a33);
+			}
+			.sw-3 {
+				background: linear-gradient(160deg, #d9cfc0, #b3a48e);
+			}
+			.sw-4 {
+				background: linear-gradient(160deg, #7e8aa0, #55617a);
+			}
+			.sw-5 {
+				background: linear-gradient(160deg, #b45a44, #7e3b2d);
+			}
+			.sw-7 {
+				background: linear-gradient(160deg, #3b3f52, #23263a);
+			}
+			.sw-8 {
+				background: linear-gradient(160deg, #a68f74, #776249);
+			}
+			.swatch::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				background:
+					radial-gradient(70% 45% at 30% 12%, rgba(255, 255, 255, 0.28), transparent 60%),
+					repeating-linear-gradient(115deg, transparent 0 7px, rgba(255, 255, 255, 0.045) 7px 8px);
+			}
+
+			.card-hero {
+				margin: 14px 20px 0;
+				border-radius: 18px;
+				aspect-ratio: 3/2.1;
+				position: relative;
+				overflow: hidden;
+				box-shadow: 0 14px 30px -14px rgba(35, 22, 18, 0.4);
+			}
+			.card-hero .t-name {
+				position: absolute;
+				left: 14px;
+				bottom: 12px;
+				color: #fff;
+				font-size: 14px;
+				font-weight: 600;
+			}
+			.card-hero .t-brand {
+				display: block;
+				font-size: 10px;
+				opacity: 0.85;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				font-weight: 400;
+				margin-top: 2px;
+			}
+			.qa-row {
+				display: flex;
+				gap: 8px;
+				margin: 12px 20px 0;
+			}
+			.qa {
+				flex: 1;
+				text-align: center;
+				border: 1px solid var(--hairline);
+				background: var(--white);
+				border-radius: 12px;
+				padding: 10px 4px;
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--espresso);
+			}
+			.qa.hot {
+				background: var(--espresso);
+				color: var(--alabaster);
+				border-color: var(--espresso);
+				box-shadow: 0 10px 20px -10px rgba(35, 22, 18, 0.5);
+			}
+
+			.dim {
+				position: absolute;
+				inset: 0;
+				background: rgba(35, 22, 18, 0.45);
+				z-index: 10;
+				backdrop-filter: blur(2px);
+			}
+			.sheet-up {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				z-index: 20;
+				background: var(--alabaster);
+				border-radius: 26px 26px 36px 36px;
+				padding: 20px 22px 28px;
+				box-shadow: 0 -18px 48px -20px rgba(35, 22, 18, 0.5);
+			}
+			.grabber {
+				width: 40px;
+				height: 4px;
+				border-radius: 4px;
+				background: rgba(73, 47, 40, 0.2);
+				margin: 0 auto 16px;
+			}
+			.sheet-title {
+				font-family: var(--serif);
+				font-size: 21px;
+				font-weight: 500;
+				line-height: 1.2;
+				margin-bottom: 3px;
+			}
+			.sheet-title em {
+				font-style: italic;
+				color: var(--terracotta-deep);
+			}
+			.sheet-sub {
+				font-size: 11.5px;
+				color: var(--muted);
+				margin-bottom: 14px;
+			}
+
+			.field-label {
+				font-size: 10px;
+				letter-spacing: 0.14em;
+				text-transform: uppercase;
+				font-weight: 600;
+				color: var(--muted);
+				margin: 12px 0 6px;
+			}
+			.pill-row {
+				display: flex;
+				gap: 7px;
+				flex-wrap: wrap;
+			}
+			.pill {
+				font-size: 11.5px;
+				padding: 8px 13px;
+				border-radius: 999px;
+				border: 1px solid var(--hairline);
+				background: var(--white);
+				font-weight: 500;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+			}
+			.pill.on {
+				background: var(--espresso);
+				color: var(--alabaster);
+				border-color: var(--espresso);
+			}
+			.pill .mini-ava {
+				width: 16px;
+				height: 16px;
+				border-radius: 50%;
+				font-size: 9px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				font-family: var(--serif);
+				font-style: italic;
+			}
+			.input {
+				border: 1px solid var(--hairline);
+				background: var(--white);
+				border-radius: 12px;
+				padding: 11px 13px;
+				font-size: 12.5px;
+				color: var(--espresso);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+			.input .ph {
+				color: var(--muted);
+			}
+			.input-2col {
+				display: flex;
+				gap: 8px;
+			}
+			.input-2col .input {
+				flex: 1;
+			}
+			.care-box {
+				border: 1px dashed rgba(178, 134, 117, 0.55);
+				background: #fdf9f6;
+				border-radius: 12px;
+				padding: 10px 12px;
+				font-size: 11.5px;
+				line-height: 1.55;
+				color: #7e5a4c;
+			}
+			.care-box b {
+				color: var(--espresso);
+			}
+			.cta {
+				display: block;
+				width: 100%;
+				border: 0;
+				border-radius: 14px;
+				padding: 14px;
+				background: var(--terracotta);
+				color: #fff;
+				font-family: var(--sans);
+				font-size: 14px;
+				font-weight: 600;
+				letter-spacing: 0.02em;
+				box-shadow: 0 12px 24px -12px rgba(156, 112, 96, 0.8);
+				text-align: center;
+				margin-top: 14px;
+			}
+			.cta.ghost {
+				background: transparent;
+				color: var(--espresso);
+				border: 1px solid var(--hairline);
+				box-shadow: none;
+				font-weight: 500;
+			}
+			.auto-line {
+				text-align: center;
+				font-size: 10.5px;
+				color: var(--muted);
+				margin-top: 10px;
+				line-height: 1.5;
+			}
+
+			.view-title {
+				font-family: var(--serif);
+				font-size: 24px;
+				font-weight: 500;
+				padding: 14px 20px 0;
+			}
+			.view-title em {
+				font-style: italic;
+				color: var(--terracotta-deep);
+			}
+			.view-sub {
+				font-size: 11.5px;
+				color: var(--muted);
+				padding: 2px 20px 0;
+			}
+			.person-block {
+				margin: 14px 16px 0;
+				background: var(--white);
+				border: 1px solid var(--hairline);
+				border-radius: 18px;
+				overflow: hidden;
+			}
+			.person-head {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 12px 16px;
+				border-bottom: 1px solid var(--hairline);
+				background: linear-gradient(180deg, #fdfbf8, transparent);
+			}
+			.l-ava {
+				width: 34px;
+				height: 34px;
+				border-radius: 50%;
+				flex: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #fff;
+				font-family: var(--serif);
+				font-style: italic;
+				font-size: 14px;
+			}
+			.person-name {
+				font-size: 13px;
+				font-weight: 600;
+				flex: 1;
+			}
+			.person-count {
+				font-size: 10.5px;
+				color: var(--muted);
+			}
+			.loan-row {
+				display: flex;
+				align-items: center;
+				gap: 11px;
+				padding: 10px 16px;
+				border-top: 1px solid var(--hairline);
+			}
+			.loan-row:first-of-type {
+				border-top: 0;
+			}
+			.loan-sw {
+				width: 36px;
+				height: 44px;
+				border-radius: 9px;
+				flex: none;
+			}
+			.loan-main {
+				flex: 1;
+				min-width: 0;
+			}
+			.loan-name {
+				font-size: 12.5px;
+				font-weight: 600;
+			}
+			.loan-meta {
+				font-size: 10.5px;
+				color: var(--muted);
+				margin-top: 1px;
+			}
+			.overdue {
+				font-size: 9.5px;
+				font-weight: 600;
+				letter-spacing: 0.06em;
+				text-transform: uppercase;
+				color: var(--terracotta-deep);
+				background: #f7e9e2;
+				border-radius: 999px;
+				padding: 4px 9px;
+				flex: none;
+			}
+			.nudge-btn {
+				font-size: 11px;
+				font-weight: 600;
+				color: var(--espresso);
+				border: 1px solid var(--hairline);
+				background: var(--alabaster);
+				border-radius: 999px;
+				padding: 6px 12px;
+				flex: none;
+			}
+
+			.msg-preview {
+				background: var(--white);
+				border: 1px solid var(--hairline);
+				border-radius: 16px;
+				padding: 14px 16px;
+				font-size: 12.5px;
+				line-height: 1.65;
+				color: var(--espresso);
+				position: relative;
+			}
+			.msg-preview::before {
+				content: "PREWRITTEN · EDITABLE";
+				position: absolute;
+				top: -8px;
+				left: 14px;
+				font-size: 8.5px;
+				letter-spacing: 0.14em;
+				font-weight: 700;
+				color: var(--terracotta-deep);
+				background: var(--alabaster);
+				padding: 0 6px;
+			}
+			.share-row {
+				display: flex;
+				gap: 10px;
+				margin-top: 14px;
+				justify-content: center;
+			}
+			.share-app {
+				width: 46px;
+				height: 46px;
+				border-radius: 13px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 18px;
+				color: #fff;
+			}
+
+			.return-hero {
+				text-align: center;
+				padding: 26px 24px 0;
+			}
+			.return-sw {
+				width: 110px;
+				height: 138px;
+				border-radius: 16px;
+				margin: 0 auto 16px;
+				box-shadow: 0 18px 36px -16px rgba(35, 22, 18, 0.45);
+			}
+			.return-title {
+				font-family: var(--serif);
+				font-size: 23px;
+				font-weight: 500;
+				line-height: 1.2;
+			}
+			.return-title em {
+				font-style: italic;
+				color: var(--terracotta-deep);
+			}
+			.return-sub {
+				font-size: 12px;
+				color: #6b564d;
+				line-height: 1.6;
+				margin: 8px auto 0;
+				max-width: 26ch;
+			}
+			.history {
+				margin: 18px 24px 0;
+				border-top: 1px solid var(--hairline);
+				padding-top: 12px;
+				text-align: left;
+			}
+			.h-label {
+				font-size: 9.5px;
+				letter-spacing: 0.16em;
+				text-transform: uppercase;
+				font-weight: 600;
+				color: var(--muted);
+				margin-bottom: 8px;
+			}
+			.h-row {
+				font-size: 11.5px;
+				color: #6b564d;
+				padding: 4px 0;
+				display: flex;
+				justify-content: space-between;
+			}
+			.h-row b {
+				color: var(--espresso);
+				font-weight: 600;
+			}
+
+			.rules {
+				margin-top: 72px;
+				border-top: 1px solid var(--espresso);
+				padding-top: 26px;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 22px 36px;
+			}
+			.rule h3 {
+				font-family: var(--serif);
+				font-size: 15px;
+				font-weight: 600;
+				margin-bottom: 7px;
+			}
+			.rule h3 span {
+				color: var(--terracotta-deep);
+				font-style: italic;
+				margin-right: 6px;
+			}
+			.rule p {
+				font-size: 12.5px;
+				line-height: 1.7;
+				color: #6b564d;
+			}
+			.rule code {
+				font-family: ui-monospace, Menlo, monospace;
+				font-size: 11px;
+				background: var(--sand);
+				padding: 1px 5px;
+				border-radius: 4px;
+			}
+
+			@media (max-width: 720px) {
+				.sheet {
+					padding: 32px 18px 64px;
+				}
+				header.masthead {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+				.meta {
+					text-align: left;
+				}
+				.arrow {
+					display: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="sheet">
+			<header class="masthead">
+				<div>
+					<div class="kicker">E4 Part Deux · Design Spec · 2026-07-10 · Post-MVP</div>
+					<div class="brandline">
+						<svg viewBox="0 0 48 48" fill="none" stroke="#492f28" stroke-width="2.6" stroke-linecap="round">
+							<path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" />
+							<path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" />
+						</svg>
+						<h1>Simple <em>lending</em></h1>
+					</div>
+				</div>
+				<div class="meta">
+					<b>Nothing To Wear</b> · loan modal + lent view<br />
+					Owner-recorded · borrower needs no account<br />
+					Plan: <b>planning/epics/E4-part-deux-simple-lending.md</b>
+				</div>
+			</header>
+
+			<p class="intro">
+				A loan is <b>a status, a location, and a record</b> — the E2 spine already carries all three (<b>on_loan</b>, "With {person}",
+				<b>LoanRecord</b>). This design is the human layer on top: two-tap capture, a person-first lent view, and the neutral nudge
+				that saves the friendship.
+			</p>
+
+			<div class="personas">
+				<div class="persona">
+					<div class="p-name">Maya <span>· the one-off</span></div>
+					<div class="p-need">
+						Lent the going-out top after pres; forgot by Tuesday. Needs capture so fast it happens at the door — freeform
+						name, no due date, done.
+					</div>
+				</div>
+				<div class="persona">
+					<div class="p-name">The Closet Pair <span>· the recurring loop</span></div>
+					<div class="p-need">
+						The grey blazer commutes between SD and Miami. Needs "what's with MJ" at a glance, and a graceful way to ask for
+						it back that isn't a loaded text.
+					</div>
+				</div>
+				<div class="persona">
+					<div class="p-name">Sloane <span>· the high-value black hole</span></div>
+					<div class="p-need">
+						Valentino heels "with a friend, I think" since spring. Needs the care note attached at lend time, the elapsed
+						clock always visible, and loan history as provenance.
+					</div>
+				</div>
+			</div>
+
+			<section class="act">
+				<div class="act-head">
+					<span class="act-num">The loop</span>
+					<span class="act-title">Lend → see → nudge → return</span>
+					<span class="act-sub">five screens, one honest closet</span>
+				</div>
+
+				<div class="flow">
+					<!-- 1 · Card with Lend action -->
+					<div class="step">
+						<div class="phone">
+							<div class="screen">
+								<div class="notch"></div>
+								<div class="statusbar"><span>7:12</span><span>𝄙 ᯤ ▮</span></div>
+								<div class="ntw-top">
+									<div class="ntw-word">
+										<svg
+											viewBox="0 0 48 48"
+											fill="none"
+											stroke="#492f28"
+											stroke-width="2.6"
+											stroke-linecap="round"
+										>
+											<path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" />
+											<path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" />
+										</svg>
+										<span>Nothing To Wear</span>
+									</div>
+									<span class="chip">Clean · Home</span>
+								</div>
+								<div class="card-hero swatch sw-5">
+									<span class="t-name"
+										>Valentino slingback heels<span class="t-brand"
+											>Valentino Garavani · investment piece</span
+										></span
+									>
+								</div>
+								<div class="qa-row">
+									<div class="qa">Wear it</div>
+									<div class="qa">Wash</div>
+									<div class="qa hot">Lend…</div>
+								</div>
+								<div class="history" style="margin-top: 22px">
+									<div class="h-label">Loan history · provenance</div>
+									<div class="h-row">
+										<span>With <b>Chloe</b></span
+										><span>Mar – Jun 2026</span>
+									</div>
+									<div class="h-row">
+										<span>With <b>MJ</b></span
+										><span>Nov 2025 · 2 weeks</span>
+									</div>
+								</div>
+								<div class="homebar"></div>
+							</div>
+						</div>
+						<div class="step-caption">
+							<div class="step-num">01 — Entry</div>
+							<div class="step-title">"Lend…" lives with the other truths</div>
+							<div class="step-note">
+								The existing <code>lend</code> quick action (any present status → <code>on_loan</code>) opens the
+								modal. Loan history reads as provenance on the card — Sloane's SL8 for free.
+							</div>
+						</div>
+					</div>
+
+					<div class="arrow">⟶</div>
+
+					<!-- 2 · Loan modal -->
+					<div class="step">
+						<div class="phone">
+							<div class="screen">
+								<div class="notch"></div>
+								<div class="statusbar"><span>7:12</span><span>𝄙 ᯤ ▮</span></div>
+								<div class="card-hero swatch sw-5" style="filter: saturate(0.75)"></div>
+								<div class="dim"></div>
+								<div class="sheet-up">
+									<div class="grabber"></div>
+									<div class="sheet-title">Lending the <em>Valentino heels</em></div>
+									<div class="sheet-sub">Two taps now beats a lost pair later.</div>
+									<div class="field-label">To</div>
+									<div class="pill-row">
+										<span class="pill on"
+											><span class="mini-ava" style="background: #55617a">C</span> Chloe</span
+										>
+										<span class="pill"><span class="mini-ava" style="background: #7d8f83">M</span> MJ</span>
+										<span class="pill">＋ Someone new</span>
+									</div>
+									<div class="input-2col" style="margin-top: 12px">
+										<div class="input"><span>Since</span><b>Today</b></div>
+										<div class="input"><span class="ph">Back by</span><span class="ph">optional</span></div>
+									</div>
+									<div class="field-label">Care note · prefilled, high-value</div>
+									<div class="care-box">
+										<b>Suede — no rain,</b> wipe with a dry cloth only. Dust bag is in the box. 🤍
+									</div>
+									<button class="cta">Mark as lent</button>
+									<div class="auto-line">
+										Status → On loan · Location → “With Chloe” · shows in your Lent view
+									</div>
+								</div>
+								<div class="homebar"></div>
+							</div>
+						</div>
+						<div class="step-caption">
+							<div class="step-num">02 — The loan modal</div>
+							<div class="step-title">Person, dates, care — nothing else</div>
+							<div class="step-note">
+								Recents first, freeform always (borrower needs no account). Care note prefills from item care data on
+								<code>is_high_value</code> pieces — the precursor to US-4.5's care agreement. Due date optional: "no
+								rush" is a valid loan.
+							</div>
+						</div>
+					</div>
+
+					<div class="arrow">⟶</div>
+
+					<!-- 3 · Lent view -->
+					<div class="step">
+						<div class="phone">
+							<div class="screen">
+								<div class="notch"></div>
+								<div class="statusbar"><span>8:30</span><span>𝄙 ᯤ ▮</span></div>
+								<div class="ntw-top">
+									<div class="ntw-word">
+										<svg
+											viewBox="0 0 48 48"
+											fill="none"
+											stroke="#492f28"
+											stroke-width="2.6"
+											stroke-linecap="round"
+										>
+											<path d="M24 8a4 4 0 1 1 4 4c-2 0-4 1.6-4 4v2" />
+											<path d="M24 18 5 30c-1.4.9-.8 3 .9 3h36.2c1.7 0 2.3-2.1.9-3L24 18Z" />
+										</svg>
+										<span>On loan</span>
+									</div>
+									<span class="chip loan">4 pieces out</span>
+								</div>
+								<div class="view-title">Who has <em>what</em></div>
+								<div class="view-sub">Grouped by person — duration is the signal.</div>
+								<div class="person-block">
+									<div class="person-head">
+										<div class="l-ava" style="background: linear-gradient(135deg, #55617a, #7e8aa0)">C</div>
+										<span class="person-name">Chloe</span><span class="person-count">2 pieces</span>
+									</div>
+									<div class="loan-row">
+										<div class="loan-sw swatch sw-5"></div>
+										<div class="loan-main">
+											<div class="loan-name">Valentino heels</div>
+											<div class="loan-meta">3 months · asked 2w ago</div>
+										</div>
+										<span class="overdue">a while</span>
+									</div>
+									<div class="loan-row">
+										<div class="loan-sw swatch sw-3"></div>
+										<div class="loan-main">
+											<div class="loan-name">Linen co-ord</div>
+											<div class="loan-meta">2 weeks</div>
+										</div>
+										<span class="nudge-btn">Nudge</span>
+									</div>
+								</div>
+								<div class="person-block">
+									<div class="person-head">
+										<div class="l-ava" style="background: linear-gradient(135deg, #7d8f83, #4e5d52)">M</div>
+										<span class="person-name">MJ</span><span class="person-count">2 pieces</span>
+									</div>
+									<div class="loan-row">
+										<div class="loan-sw swatch sw-2"></div>
+										<div class="loan-main">
+											<div class="loan-name">Grey wool blazer</div>
+											<div class="loan-meta">5 weeks · due back Fri</div>
+										</div>
+										<span class="nudge-btn">Nudge</span>
+									</div>
+									<div class="loan-row">
+										<div class="loan-sw swatch sw-7"></div>
+										<div class="loan-main">
+											<div class="loan-name">Navy slip dress</div>
+											<div class="loan-meta">4 days</div>
+										</div>
+										<span class="nudge-btn">Nudge</span>
+									</div>
+								</div>
+								<div class="homebar"></div>
+							</div>
+						</div>
+						<div class="step-caption">
+							<div class="step-num">03 — The lent view</div>
+							<div class="step-title">"What's with MJ" in one glance</div>
+							<div class="step-note">
+								Person-first grouping (the Closet Pair's mental model). Overdue = past <code>dueBack</code> or a
+								60-day soft threshold — flagged in terracotta, calm on purpose. "Asked 2w ago" comes from
+								<code>nudgedAt</code>.
+							</div>
+						</div>
+					</div>
+
+					<div class="arrow">⟶</div>
+
+					<!-- 4 · Nudge sheet -->
+					<div class="step">
+						<div class="phone">
+							<div class="screen">
+								<div class="notch"></div>
+								<div class="statusbar"><span>8:31</span><span>𝄙 ᯤ ▮</span></div>
+								<div class="view-title" style="filter: saturate(0.75)">Who has <em>what</em></div>
+								<div class="person-block" style="filter: saturate(0.75)">
+									<div class="person-head">
+										<div class="l-ava" style="background: #55617a">C</div>
+										<span class="person-name">Chloe</span>
+									</div>
+									<div class="loan-row">
+										<div class="loan-sw swatch sw-5"></div>
+										<div class="loan-main">
+											<div class="loan-name">Valentino heels</div>
+											<div class="loan-meta">3 months</div>
+										</div>
+									</div>
+								</div>
+								<div class="dim"></div>
+								<div class="sheet-up">
+									<div class="grabber"></div>
+									<div class="sheet-title">Ask for them <em>back, nicely</em>.</div>
+									<div class="sheet-sub">You edit, you send. NTW is just the excuse.</div>
+									<div class="msg-preview" style="margin-top: 12px">
+										Hey! Packing for a trip and my closet app says my Valentino heels might still be with you
+										💛 no rush at all — just keeping my inventory honest!
+									</div>
+									<div class="share-row">
+										<div class="share-app" style="background: #3fc351">💬</div>
+										<div class="share-app" style="background: #24a0dc">✈️</div>
+										<div class="share-app" style="background: linear-gradient(135deg, #8a4fc9, #d64f7e)">
+											📸
+										</div>
+										<div class="share-app" style="background: #8a7a72">⋯</div>
+									</div>
+									<button class="cta ghost">Copy text instead</button>
+									<div class="auto-line">Marks "asked today" on the loan — so you never double-nudge.</div>
+								</div>
+								<div class="homebar"></div>
+							</div>
+						</div>
+						<div class="step-caption">
+							<div class="step-num">04 — The nudge</div>
+							<div class="step-title">The app is the bad guy, not you</div>
+							<div class="step-note">
+								Prewritten, warm, blame-free, editable — sent from <em>her</em> messenger, never by NTW (the borrower
+								may have no account). Stamps <code>nudgedAt</code>. This copy is a product surface; treat it like one.
+							</div>
+						</div>
+					</div>
+
+					<div class="arrow">⟶</div>
+
+					<!-- 5 · Return -->
+					<div class="step">
+						<div class="phone">
+							<div class="screen">
+								<div class="notch"></div>
+								<div class="statusbar"><span>6:02</span><span>𝄙 ᯤ ▮</span></div>
+								<div class="return-hero">
+									<div class="return-sw swatch sw-5"></div>
+									<div class="return-title">They're <em>home</em>.</div>
+									<p class="return-sub">Valentino heels · back from Chloe after 3 months</p>
+								</div>
+								<div style="padding: 18px 24px 0">
+									<button class="cta">Straight to the wash 🧺</button>
+									<button class="cta ghost" style="margin-top: 8px">They're clean — shelve them</button>
+									<div class="auto-line">Location → Nolita apartment · loan closed into history</div>
+								</div>
+								<div class="history">
+									<div class="h-label">Loan history · updated</div>
+									<div class="h-row">
+										<span>With <b>Chloe</b></span
+										><span>Apr – Jul 2026 ✓</span>
+									</div>
+									<div class="h-row">
+										<span>With <b>MJ</b></span
+										><span>Nov 2025 · 2 weeks ✓</span>
+									</div>
+								</div>
+								<div class="homebar"></div>
+							</div>
+						</div>
+						<div class="step-caption">
+							<div class="step-num">05 — The return</div>
+							<div class="step-title">One tap, honest status</div>
+							<div class="step-note">
+								Default is <b>dirty</b> — borrowed clothes come back worn, mirroring the
+								<code>return_home → dirty</code> rule. ⚠️ Proposes changing the current
+								<code>return_loan → clean</code> transition; domain-rule change, confirm before building.
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div class="rules">
+				<div class="rule">
+					<h3><span>i.</span>A loan is not a new system</h3>
+					<p>
+						Status <code>on_loan</code> + location "With {person}" + <code>LoanRecord</code> already exist (E2). Simple
+						lending adds <code>careNote</code>, <code>nudgedAt</code>, a viewer link, and loan history — UI-first, ~5
+						dev-days.
+					</p>
+				</div>
+				<div class="rule">
+					<h3><span>ii.</span>No account required to borrow</h3>
+					<p>
+						Owner-recorded, freeform names. If the borrower is already a Part-Une viewer, the loan links to them — so full
+						borrow-requests (US-4.2) layer on later without rework.
+					</p>
+				</div>
+				<div class="rule">
+					<h3><span>iii.</span>Duration over dates</h3>
+					<p>
+						"3 months" lands; "April 2nd" doesn't. Overdue is a soft terracotta "a while," never a red alarm — this is a
+						lending circle between friends, not accounts receivable.
+					</p>
+				</div>
+				<div class="rule">
+					<h3><span>iv.</span>Never message the borrower</h3>
+					<p>
+						All nudges leave through the owner's own share sheet, prewritten but editable. The app supplies the graceful words
+						and the plausible deniability; the human presses send.
+					</p>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -43,14 +43,14 @@ _As Maya, I want to mark an item clean/dirty/at-the-cleaner/needs-repair/traveli
 _As the "Our Closet" user, I want to tag an item's location so that I know if it's home, in storage, in a suitcase, or at another house._
 - [x] `location` field (label + kind: home/storage/suitcase/other) — [`src/utils/locations.ts`](../../../src/utils/locations.ts) registry + `ClothingItem.locationId` ✅ `EPIC-status-location`
 - [x] Location tag on card only when not at primary location — card **border** colors by location; home = neutral ([FilteredCard.tsx](../../../src/Features/SearchCloset/FilteredCard.tsx)) ✅
-- [ ] "Where is everything" grouped-by-location view — → `P1-5` in [E2 Part Une](./E2-part-une-inventory-truth-status-location.md)
+- [ ] "Where are my clothes" grouped-by-location view — → `P1-5` in [E2 Part Une](./E2-part-une-inventory-truth-status-location.md)
 - [ ] Multi-home presets + free-text — partial: 4 starter kinds ship; custom/multi-home labels → `P1-6`
 
 **Tickets**
 - [x] `E2-2.1` Add `location` to `ClothingItem`; primary-location default — ✅ `locations.ts` (`getLocation`/`isPrimaryLocation`, absent → home) + tests
 - `E2-2.2` `utils/locationGroups.ts` + tests — _0.5d_ (→ `P1-5`)
 - [x] `E2-2.3` Location tag on card (hidden at home) — ✅ done as the location-colored card border (home neutral)
-- `E2-2.4` "Where is everything" grouped view — _1.5d_ (→ `P1-5`)
+- `E2-2.4` "Where are my clothes" grouped view — _1.5d_ (→ `P1-5`)
 
 ## US-2.3 — Filter by status & location
 _As Maya, I want to filter by status and location so that I can see "everything clean," "everything dirty," or "everything in Italy."_
