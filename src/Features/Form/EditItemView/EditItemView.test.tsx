@@ -129,6 +129,19 @@ describe("EditItemView", () => {
 		expect(mockAddFullItem).toHaveBeenCalledWith(expect.objectContaining({ condition: "good", purchaseDate: "2024-03-15T00:00:00.000Z" }));
 	});
 
+	it("hands the in-progress draft up when returning to the email (E3-bug.8)", () => {
+		const onReturnToEmail = vi.fn();
+		render(<EditItemView item={mockItem} mode="create" setView={mockSetView} onReturnToEmail={onReturnToEmail} />);
+
+		// User starts adding details, then steps back to verify the source email.
+		fireEvent.change(screen.getByLabelText("size"), { target: { value: "XL", name: "size" } });
+		fireEvent.click(screen.getByRole("button", { name: /back to email/i }));
+
+		expect(onReturnToEmail).toHaveBeenCalledTimes(1);
+		// The edited value must be carried up — not the original "M".
+		expect(onReturnToEmail.mock.calls[0][0]).toMatchObject({ size: "XL" });
+	});
+
 	it("calls updateItem with updated values on form submission", () => {
 		render(<EditItemView item={mockItem} setView={mockSetView} />);
 		fireEvent.change(screen.getByLabelText("name"), {

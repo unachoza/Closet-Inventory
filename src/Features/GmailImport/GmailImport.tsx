@@ -25,9 +25,23 @@ interface GmailImportProps {
 	initialSelectedEmailId?: string | null;
 	/** Notify parent of which email the user is importing from */
 	onSourceEmailChange?: (emailId: string | null) => void;
+	/**
+	 * E3-bug.9 — parent-owned "unskipped" selection per email id, so an
+	 * include/include-all choice survives the gmail → edit → "Back to email"
+	 * round trip (this component unmounts on the view switch).
+	 */
+	unskippedByEmail?: Record<string, number[]>;
+	onUnskippedByEmailChange?: (emailId: string, indices: number[]) => void;
 }
 
-export default function GmailImport({ onImport, onImportAll, initialSelectedEmailId, onSourceEmailChange }: GmailImportProps) {
+export default function GmailImport({
+	onImport,
+	onImportAll,
+	initialSelectedEmailId,
+	onSourceEmailChange,
+	unskippedByEmail,
+	onUnskippedByEmailChange,
+}: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
 	const googleNotice = useGoogleUnverifiedNotice();
 
@@ -389,6 +403,14 @@ export default function GmailImport({ onImport, onImportAll, initialSelectedEmai
 								email={selectedEmail}
 								onImportProduct={handleImportProduct}
 								onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
+								unskippedIndices={
+									onUnskippedByEmailChange && selectedEmailId ? (unskippedByEmail?.[selectedEmailId] ?? []) : undefined
+								}
+								onUnskippedIndicesChange={
+									onUnskippedByEmailChange && selectedEmailId
+										? (indices) => onUnskippedByEmailChange(selectedEmailId, indices)
+										: undefined
+								}
 							/>
 						</div>
 					)}

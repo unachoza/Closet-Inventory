@@ -55,7 +55,11 @@ export interface EditItemViewProps {
 	mode?: "edit" | "create";
 	updateItem?: (id: string, updatedItem: Partial<ClothingItem>) => void;
 	setView: Dispatch<SetStateAction<ViewType>>;
-	onReturnToEmail?: () => void;
+	/**
+	 * E3-bug.8 — return to the email preview, handing the in-progress draft up so
+	 * the parent can restore it if the user re-imports the same product.
+	 */
+	onReturnToEmail?: (draft: Partial<ClothingItem>) => void;
 	onSkipItem?: () => void;
 	onItemAdded?: () => void;
 	queuePosition?: number;
@@ -295,7 +299,11 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				)}
 
 				{isCreateMode && onReturnToEmail && (
-					<button className="edit-form-return-btn" onClick={onReturnToEmail} type="button">
+					<button
+						className="edit-form-return-btn"
+						onClick={() => onReturnToEmail({ ...formData, notes: parseTextToNotesArray(textAreaNotes) })}
+						type="button"
+					>
 						&larr; Back to Email
 					</button>
 				)}

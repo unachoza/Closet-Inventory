@@ -18,6 +18,14 @@ interface EmailPreviewProps {
 	email: GmailEmail;
 	onImportProduct: (product: ExtractedProduct) => void;
 	onImportAllProducts?: (products: ExtractedProduct[]) => void;
+	/**
+	 * E3-bug.9 — controlled "unskipped" selection (item indices moved out of the
+	 * skipped list). When provided (with `onUnskippedIndicesChange`), the parent
+	 * owns this state so it survives the gmail → edit → "Back to email" round
+	 * trip; otherwise the component keeps it internally (standalone / tests).
+	 */
+	unskippedIndices?: number[];
+	onUnskippedIndicesChange?: (indices: number[]) => void;
 }
 
 // Order-confirmation emails are untrusted HTML. DOMPurify strips scripts,
@@ -63,7 +71,13 @@ async function enrichProductColors(products: readonly ExtractedProduct[]): Promi
 	return enriched;
 }
 
-export default function EmailPreview({ email, onImportProduct, onImportAllProducts }: EmailPreviewProps) {
+export default function EmailPreview({
+	email,
+	onImportProduct,
+	onImportAllProducts,
+	unskippedIndices,
+	onUnskippedIndicesChange,
+}: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
 	// Step 1: synchronous parse
@@ -86,13 +100,26 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 	// a single email can skip several items with the same name (e.g. four "The
 	// Highwaist"), so matching by name would unskip them all at once and drop
 	// duplicates. The index is unique and stable within one email's parse.
-	const [unskippedIdx, setUnskippedIdx] = useState<Set<number>>(new Set());
+	// E3-bug.9: this selection survives the gmail → edit → "Back to email" round
+	// trip when the parent controls it (keyed by email id). Standalone / tests
+	// fall back to internal state.
+	const isControlled = unskippedIndices !== undefined && onUnskippedIndicesChange !== undefined;
+	const [internalUnskipped, setInternalUnskipped] = useState<Set<number>>(new Set());
+	const unskippedIdx = useMemo(
+		() => (isControlled ? new Set(unskippedIndices) : internalUnskipped),
+		[isControlled, unskippedIndices, internalUnskipped],
+	);
+	const setUnskipped = (next: Set<number>) => {
+		if (isControlled) onUnskippedIndicesChange!(Array.from(next));
+		else setInternalUnskipped(next);
+	};
 
 	// Reset selections when the email changes — otherwise items unskipped on one
-	// email leak into the next email's detected list.
+	// email leak into the next email's detected list. Only needed for the
+	// internal (uncontrolled) case; the parent keys its state by email id.
 	useEffect(() => {
-		setUnskippedIdx(new Set());
-	}, [email.id]);
+		if (!isControlled) setInternalUnskipped(new Set());
+	}, [email.id, isControlled]);
 
 	const unskippedProducts = useMemo(
 		() => initialSkipped.filter((_, i) => unskippedIdx.has(i)),
@@ -105,15 +132,13 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 	const effectiveProducts = useMemo(() => [...initialClothing, ...unskippedProducts], [initialClothing, unskippedProducts]);
 
 	const handleUnskip = (index: number) => {
-		setUnskippedIdx((prev) => {
-			const next = new Set(prev);
-			next.add(index);
-			return next;
-		});
+		const next = new Set(unskippedIdx);
+		next.add(index);
+		setUnskipped(next);
 	};
 
 	const handleUnskipAll = () => {
-		setUnskippedIdx(new Set(initialSkipped.map((_, i) => i)));
+		setUnskipped(new Set(initialSkipped.map((_, i) => i)));
 	};
 
 	const [showSkipped, setShowSkipped] = useState(false);

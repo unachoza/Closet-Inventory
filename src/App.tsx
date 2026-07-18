@@ -48,6 +48,15 @@ function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	};
 }
 
+/**
+ * E3-bug.8 — stable identity for an imported product across re-imports, so a
+ * saved edit draft can be matched back to the same item. Name + brand are
+ * deterministic for a given parsed product.
+ */
+function draftSignature(prefilled: Partial<ClothingItem>): string {
+	return `${prefilled.name ?? ""}|${prefilled.brand ?? ""}`;
+}
+
 const ONBOARDING_KEY = "closetly-onboarding-complete";
 
 function AppShell() {
@@ -61,6 +70,13 @@ function AppShell() {
 	const [gmailSourceEmailId, setGmailSourceEmailId] = useState<string | null>(null);
 	const [importQueue, setImportQueue] = useState<ClothingItem[]>([]);
 	const [importQueueIndex, setImportQueueIndex] = useState(0);
+	// E3-bug.9: "unskipped" (included) product indices per email id, held here so
+	// the choice survives GmailImport unmounting on the view switch to edit.
+	const [unskippedByEmail, setUnskippedByEmail] = useState<Record<string, number[]>>({});
+	// E3-bug.8: in-progress import drafts, keyed by product signature, so edits
+	// survive an edit → "Back to email" → re-import round trip.
+	const [draftBySignature, setDraftBySignature] = useState<Record<string, ClothingItem>>({});
+	const [activeDraftSignature, setActiveDraftSignature] = useState<string | null>(null);
 
 	const [showOnboarding, setShowOnboarding] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -89,14 +105,27 @@ function AppShell() {
 
 	const handleGmailImport = useCallback(
 		(prefilled: Partial<ClothingItem>) => {
-			const newItem = buildClothingItem(prefilled);
-			setEditItem(newItem);
+			// E3-bug.8: if the user already started editing this exact product and
+			// stepped back to the email, restore that draft instead of a fresh item.
+			const signature = draftSignature(prefilled);
+			const savedDraft = draftBySignature[signature];
+			setEditItem(savedDraft ?? buildClothingItem(prefilled));
+			// Consume-once: a restored draft is removed so it can't reapply stale
+			// edits after the item is added (a later peek re-stashes it).
+			if (savedDraft) {
+				setDraftBySignature((prev) => {
+					const next = { ...prev };
+					delete next[signature];
+					return next;
+				});
+			}
+			setActiveDraftSignature(signature);
 			setEditMode("create");
 			setImportQueue([]);
 			setImportQueueIndex(0);
 			setView("edit");
 		},
-		[setView],
+		[setView, draftBySignature],
 	);
 
 	// Batch import: "Import All Items" from an email
@@ -127,15 +156,27 @@ function AppShell() {
 		}
 	}, [importQueue, importQueueIndex, setView]);
 
-	// Return to email preview from EditItemView
-	const handleReturnToEmail = useCallback(() => {
-		setImportQueue([]);
-		setImportQueueIndex(0);
-		setView("gmail");
-	}, [setView]);
+	// Return to email preview from EditItemView, stashing the in-progress draft
+	// so re-importing the same product restores the user's edits (E3-bug.8).
+	const handleReturnToEmail = useCallback(
+		(draft: Partial<ClothingItem>) => {
+			if (editItem && activeDraftSignature) {
+				const merged: ClothingItem = { ...editItem, ...draft };
+				setDraftBySignature((prev) => ({ ...prev, [activeDraftSignature]: merged }));
+			}
+			setImportQueue([]);
+			setImportQueueIndex(0);
+			setView("gmail");
+		},
+		[setView, editItem, activeDraftSignature],
+	);
 
 	const handleSourceEmailChange = useCallback((emailId: string | null) => {
 		setGmailSourceEmailId(emailId);
+	}, []);
+
+	const handleUnskippedByEmailChange = useCallback((emailId: string, indices: number[]) => {
+		setUnskippedByEmail((prev) => ({ ...prev, [emailId]: indices }));
 	}, []);
 
 	const handleAddItem = useCallback(() => {
@@ -182,6 +223,8 @@ function AppShell() {
 								onImportAll={handleGmailImportAll}
 								initialSelectedEmailId={gmailSourceEmailId}
 								onSourceEmailChange={handleSourceEmailChange}
+								unskippedByEmail={unskippedByEmail}
+								onUnskippedByEmailChange={handleUnskippedByEmailChange}
 							/>
 						)}
 						{view === "fabric" && <InteractiveGuide />}
