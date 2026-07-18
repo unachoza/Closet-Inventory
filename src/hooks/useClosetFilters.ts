@@ -5,6 +5,7 @@ import normalizeCategory from "../Features/FashionParser/normalizers/normalizeCa
 import { parseCareLabels } from "../utils/careUtils";
 import { canonicalizeMaterial } from "../utils/materialUtils";
 import { getLocation } from "../utils/locations";
+import { track } from "../lib/analytics";
 
 const MATERIAL_MIN_PCT = 6;
 
@@ -178,6 +179,8 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 	const activeFilterCount = useMemo(() => FILTER_DIMENSIONS.reduce((sum, dim) => sum + filters[dim].length, 0), [filters]);
 
 	const toggleFilter = (dim: FilterDimension, value: string) => {
+		const active = filters[dim].includes(value);
+		track("filter_used", { dimension: dim, action: active ? "remove" : "add" });
 		setFilters((prev) => {
 			const current = prev[dim];
 			const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];

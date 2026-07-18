@@ -5,6 +5,7 @@ import { ClothingItem, ViewType } from "../../utils/types";
 import ExportClosetModal from "./ExportModal/ExportClosetModal";
 import type { ExportFormat } from "../../utils/exportCloset";
 import "./NavBar.css";
+import { appVersion } from "../../lib/monitoring";
 import { importClosetFromFile } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 import ClearClosetModal from "./ClearModal/ClearClosetModal";
@@ -217,6 +218,8 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 							<CloudSyncControl />
 						</div>
 						<div className="nav-drawer__actions">{navActions}</div>
+						{/* Build version — so a beta bug report reads "on v0.9.0-a1b2c3d". */}
+						<div className="nav-drawer__version">{appVersion()}</div>
 					</nav>
 				</>
 			)}
