@@ -18,7 +18,7 @@ test.describe("Bottom navigation — mobile", () => {
 		const nav = page.getByRole("navigation", { name: "Primary" });
 		await expect(nav).toBeVisible();
 
-		for (const name of ["Home", "Closet", "Search", "Import", "Add Item"]) {
+		for (const name of ["Closet", "Care", "Search", "Email", "Add Item"]) {
 			const btn = nav.getByRole("button", { name });
 			await expect(btn).toBeVisible();
 			const box = await btn.boundingBox();
@@ -27,18 +27,18 @@ test.describe("Bottom navigation — mobile", () => {
 		}
 	});
 
-	test("tabs navigate: Import→gmail, Search→entireCloset, Home→carousel", async ({ page }) => {
+	test("tabs navigate: Email→gmail, Search→entireCloset, Care→fabric", async ({ page }) => {
 		const nav = page.getByRole("navigation", { name: "Primary" });
 
-		await nav.getByRole("button", { name: "Import" }).tap();
+		await nav.getByRole("button", { name: "Email" }).tap();
 		await expect(page.getByRole("heading", { name: /import from gmail/i })).toBeVisible();
-		await expect(nav.getByRole("button", { name: "Import" })).toHaveAttribute("aria-current", "page");
+		await expect(nav.getByRole("button", { name: "Email" })).toHaveAttribute("aria-current", "page");
 
 		await nav.getByRole("button", { name: "Search" }).tap();
 		await expect(page.locator(".search-sort-bar__input")).toBeVisible();
 
-		await nav.getByRole("button", { name: "Home" }).tap();
-		await expect(page.getByTestId("carousel")).toBeVisible();
+		await nav.getByRole("button", { name: "Care" }).tap();
+		await expect(nav.getByRole("button", { name: "Care" })).toHaveAttribute("aria-current", "page");
 	});
 
 	test("Add FAB opens the add-item form (out of the hamburger)", async ({ page }) => {
