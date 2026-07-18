@@ -1,4 +1,4 @@
-import { Home, LayoutGrid, Plus, Search, Mail } from "lucide-react";
+import { Scissors, LayoutGrid, Plus, Search, Mail } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../utils/types";
@@ -20,8 +20,8 @@ interface Tab {
    Import-from-Gmail is deliberately a first-class tab — it's the primary
    item-ingestion path and was previously buried in the hamburger drawer. */
 const LEFT_TABS: Tab[] = [
-	{ view: "carousel", label: "Home", Icon: Home },
-	{ view: "overview", label: "Closet", Icon: LayoutGrid },
+	{ view: "carousel", label: "Closet", Icon: LayoutGrid },
+	{ view: "fabric", label: "Care", Icon: Scissors },
 ];
 const RIGHT_TABS: Tab[] = [
 	{ view: "entireCloset", label: "Search", Icon: Search },
