@@ -16,6 +16,14 @@ export const GMAIL_EXCLUDE_SENDERS = [
 	"orderinquiry@burtsbees.com",
 	"payment@arryved.com",
 	"noreply@email-special.usps.com",
+	"Walgreens@ecs.walgreens.com",
+	"orders@instacart.com",
+	"members@dollarshaveclub.com",
+	"email@transaction.bedbathandbeyond.com"
+	"support@lumedeodorant.com",
+	"drink@mudwtr.com",
+	"order@email.menu11.com",
+	"concierge@brightcellars.com"
 ];
 
 export const GMAIL_SEARCH_SUBJECTS = [
