@@ -156,6 +156,53 @@ describe("useAdvancedSearch — filterCachedEmails", () => {
 
 		expect(result.current.emails).toHaveLength(0);
 	});
+
+	// The hidden "order confirmed" word-group net (GMAIL_SEARCH_SUBJECT_WORD_GROUPS)
+	// widens subject matching beyond literal phrases — it should catch real
+	// confirmation subjects that share no contiguous phrase with the configured
+	// literal subjects, without being explicitly listed as a subject filter.
+	it("matches confirmation subjects via the hidden word-group net even when no literal phrase matches", () => {
+		const emails = [
+			makeEmail({ id: "hash-number", subject: "Order #597544 confirmed" }),
+			makeEmail({ id: "letter-number", subject: "Order I538721 confirmed" }),
+			makeEmail({ id: "punctuated", subject: "Your Nordstrom Rack order #1042965288, confirmed!" }),
+			makeEmail({ id: "unrelated", subject: "Your weekly newsletter" }),
+		];
+		seedCache(emails);
+
+		const { result } = renderHook(() => useAdvancedSearch());
+		// Subject filtering is "active" (non-empty subjects array) but none of
+		// these subjects contain any of the literal configured phrases.
+		act(() => result.current.filterCachedEmails({ ...emptyParams, subjects: ["Order Confirmation"] }));
+
+		const ids = result.current.emails.map((e) => e.id).sort();
+		expect(ids).toEqual(["hash-number", "letter-number", "punctuated"]);
+	});
+
+	it("does not let the hidden word-group net override an explicit 'no subject filter'", () => {
+		const emails = [makeEmail({ id: "a", subject: "Order #597544 confirmed" })];
+		seedCache(emails);
+
+		const { result } = renderHook(() => useAdvancedSearch());
+		// subjects: [] means "no subject restriction" — every email should pass.
+		act(() => result.current.filterCachedEmails({ ...emptyParams, subjects: [] }));
+
+		expect(result.current.emails).toHaveLength(1);
+	});
+
+	it("does not let the word-group net match unrelated subjects that happen to contain one word", () => {
+		const emails = [
+			makeEmail({ id: "order-only", subject: "Save 20% on your next order" }),
+			makeEmail({ id: "confirmed-only", subject: "Your account email was confirmed" }),
+			makeEmail({ id: "both", subject: "Order confirmed — thanks for shopping" }),
+		];
+		seedCache(emails);
+
+		const { result } = renderHook(() => useAdvancedSearch());
+		act(() => result.current.filterCachedEmails({ ...emptyParams, subjects: ["Order Confirmation"] }));
+
+		expect(result.current.emails.map((e) => e.id)).toEqual(["both"]);
+	});
 });
 
 describe("useAdvancedSearch — initial state", () => {
