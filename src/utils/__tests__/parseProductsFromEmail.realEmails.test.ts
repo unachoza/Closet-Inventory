@@ -1046,3 +1046,35 @@ describe("real emails > BYLT Basics order confirmation", () => {
 		expect(categoryFromName("Ribbed Short Sleeve Drop-Cut")).toBe("tops");
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Instagram Shopping — oneoneswim (final sale + promotion discount)
+// ---------------------------------------------------------------------------
+
+describe("real emails > Instagram Shopping (oneoneswim)", () => {
+	const products = parseProductsFromEmail(loadFixture("instagram-oneoneswim.html"));
+
+	it("detects exactly 2 purchased items (excludes 3 suggested items)", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("strips '- final sale' from names and marks onSale", () => {
+		expect(products[0].name).toBe("alli bottom dusty rose");
+		expect(products[1].name).toBe("alli top dusty rose");
+		expect(products[0].onSale).toBe(true);
+		expect(products[1].onSale).toBe(true);
+	});
+
+	it("applies promotion discount: price=$31.05, originalPrice=$34.50", () => {
+		expect(products[0].price).toBe("$31.05");
+		expect(products[0].originalPrice).toBe("$34.50");
+		expect(products[1].price).toBe("$31.05");
+		expect(products[1].originalPrice).toBe("$34.50");
+	});
+
+	it("does not leak suggested items' $69 struck price onto purchased items", () => {
+		for (const p of products) {
+			expect(p.originalPrice).not.toBe("$69.00");
+		}
+	});
+});

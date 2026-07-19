@@ -1563,6 +1563,73 @@ function extractFromTextOnlyRows(doc: Document): ExtractedProduct[] {
 }
 
 /**
+ * Strategy: Instagram Shopping order confirmation.
+ * Signal: facebook.com/images/email/instagram/logo.png in the email.
+ * Items use class="ib_t" tables with an ib_img cell (product photo) and an
+ * ib_mid cell (bold name, grey size, grey price, grey qty).
+ */
+function extractFromInstagramLayout(doc: Document): ExtractedProduct[] {
+	const hasInstagramLogo = Array.from(doc.querySelectorAll("img")).some(
+		(img) => (img.getAttribute("src") ?? "").includes("instagram/logo"),
+	);
+	if (!hasInstagramLogo) return [];
+
+	const itemTables = Array.from(doc.querySelectorAll("table.ib_t"));
+	if (itemTables.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+
+	for (const table of itemTables) {
+		const imgCell = table.querySelector("td.ib_img");
+		const midCell = table.querySelector("td.ib_mid");
+		if (!imgCell || !midCell) continue;
+
+		const img = imgCell.querySelector("img");
+		if (!img) continue;
+		const imageUrl = img.getAttribute("src") ?? "";
+
+		const spans = Array.from(midCell.querySelectorAll("span.mb_text"));
+		if (spans.length < 3) continue;
+
+		const nameEl = midCell.querySelector("span[style*='font-weight: 700'], span[style*='font-weight:700']");
+		const name = (nameEl?.textContent ?? "").trim();
+		if (!name) continue;
+
+		const greySpans = spans.filter((s) => {
+			const style = s.getAttribute("style") ?? "";
+			return style.includes("#65676B") && s !== nameEl;
+		});
+
+		let size = "";
+		let price = "";
+		for (const span of greySpans) {
+			const text = (span.textContent ?? "").trim();
+			if (/^\$\d/.test(text)) {
+				price = text;
+			} else if (/^Qty:/i.test(text)) {
+				// skip qty
+			} else if (!size) {
+				size = text.replace(/,\s*$/, "");
+			}
+		}
+
+		products.push({
+			imageUrl,
+			name,
+			brand: "",
+			price,
+			color: "",
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
+/**
  * Strategy 8 (Fallback): Find product images and read nearby text.
  * Used when no structured format is detected.
  */
@@ -2086,6 +2153,39 @@ function applyDiscountFraction(p: ExtractedProduct, fraction: number): Extracted
 		originalPrice: String(p.price),
 		onSale: true,
 	};
+}
+
+/**
+ * Generic order-level promotion: "Promotion -$X.XX" or "Discount -$X.XX" paired
+ * with item prices. Returns the absolute promo amount (not a fraction) so it can
+ * be divided proportionally across detected item prices.
+ */
+function parseGenericPromotionAmount(html: string): number {
+	const promoMatch = html.match(/(?:Promotion|Discount)[\s\S]*?-\$([\d,]+\.\d{2})/i);
+	if (!promoMatch) return 0;
+	return parseFloat(promoMatch[1].replace(/,/g, ""));
+}
+
+/**
+ * Distribute an absolute promotion amount proportionally across items based on
+ * their sticker prices. Sets originalPrice = sticker, price = sticker - share.
+ */
+function applyPromotionAmount(products: ExtractedProduct[], amount: number): ExtractedProduct[] {
+	if (amount <= 0 || products.length === 0) return products;
+	const priceNums = products.map((p) => parseFloat(String(p.price).replace(/[^0-9.]/g, "")) || 0);
+	const total = priceNums.reduce((sum, n) => sum + n, 0);
+	if (total <= 0 || amount >= total) return products;
+	return products.map((p, i) => {
+		const sticker = priceNums[i];
+		if (!sticker) return p;
+		const share = (sticker / total) * amount;
+		return {
+			...p,
+			price: `$${(sticker - share).toFixed(2)}`,
+			originalPrice: `$${sticker.toFixed(2)}`,
+			onSale: true,
+		};
+	});
 }
 
 /**
@@ -4035,7 +4135,9 @@ function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 	const { material: inferredMaterial, ...restAttrs } = attrs;
 	const material = p.material || inferredMaterial || "";
 
-	return { ...p, name, color, size, material, ...restAttrs };
+	const onSale = p.onSale || /\bfinal\s+sale\b/i.test(rawName);
+
+	return { ...p, name, color, size, material, onSale, ...restAttrs };
 }
 
 export function parseProductsFromEmail(html: string): ExtractedProduct[] {
@@ -4045,6 +4147,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// removePostTotalContent strips the Subtotal sibling td and Promotions rows.
 	const brDiscountFraction = parseBRDiscountFraction(html);
 	const orderDiscountFraction = parseOrderDiscountFraction(html);
+	const genericPromoAmount = parseGenericPromotionAmount(html);
 
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, "text/html");
@@ -4120,6 +4223,7 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromColumnHeaderTable, // Generic header-mapped order tables (American Apparel, older Zara)
 		extractFromTextOnlyRows,
 		extractFromReceiptText, // Old Navy / Gap Inc. monospace POS receipt
+		extractFromInstagramLayout, // Instagram Shopping: ib_t tables with bold name + grey size/price
 		extractFromImages,
 	];
 
@@ -4132,7 +4236,12 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		const raw = strategy(doc);
 		if (raw.length > 0) {
 			const enriched = raw.map(enrichProduct);
-			return sxfDiscountFraction > 0 ? enriched.map((p) => applyDiscountFraction(p, sxfDiscountFraction)) : enriched;
+			if (sxfDiscountFraction > 0) return enriched.map((p) => applyDiscountFraction(p, sxfDiscountFraction));
+			const hasPerItemDiscount = enriched.some((p) => p.originalPrice);
+			if (genericPromoAmount > 0 && !hasPerItemDiscount && brDiscountFraction === 0 && orderDiscountFraction === 0 && sxfDiscountFraction === 0) {
+				return applyPromotionAmount(enriched, genericPromoAmount);
+			}
+			return enriched;
 		}
 	}
 
