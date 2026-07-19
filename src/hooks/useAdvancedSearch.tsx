@@ -3,6 +3,7 @@ import { useSessionStorage } from "./useSessionStorage";
 import {
 	GMAIL_API_BASE,
 	GMAIL_SEARCH_SUBJECTS,
+	GMAIL_SEARCH_SUBJECT_WORD_GROUPS,
 	GMAIL_EXCLUDE_SENDERS,
 	MAX_EMAIL_RESULTS,
 	GMAIL_CACHE_KEY,
@@ -148,6 +149,19 @@ async function fetchInBatches<TInput, TOutput>(
 	return results;
 }
 
+// Does a subject contain every word in an AND-of-words group (e.g. "order
+// confirmed")? Mirrors Gmail's `subject:(word1 word2)` search semantics —
+// unordered, non-adjacent, substring-per-word — so the local re-filter path
+// (filterEmails) agrees with what the API-side query actually fetched.
+function subjectMatchesWordGroup(subject: string, group: string): boolean {
+	const lowerSubject = subject.toLowerCase();
+	return group
+		.toLowerCase()
+		.split(/\s+/)
+		.filter(Boolean)
+		.every((word) => lowerSubject.includes(word));
+}
+
 // ── Query building ──────────────────────────────────────
 
 /**
@@ -165,10 +179,17 @@ async function fetchInBatches<TInput, TOutput>(
 function buildApiQuery(params?: AdvancedSearchParams): string {
 	const parts: string[] = [];
 
-	// Subjects
+	// Subjects — literal quoted phrases (user-editable) OR'd with a hidden set
+	// of AND-of-words groups that widen the net for subjects Gmail's phrase
+	// search can't catch (see GMAIL_SEARCH_SUBJECT_WORD_GROUPS). The word-group
+	// net only applies when subject filtering is active at all — if the user
+	// clears every subject chip, no subject restriction is applied at all,
+	// same as before this change.
 	const subjects = params?.subjects ?? GMAIL_SEARCH_SUBJECTS;
 	if (subjects.length > 0) {
-		const subjectClauses = subjects.map((s) => `subject:"${s}"`).join(" OR ");
+		const phraseClauses = subjects.map((s) => `subject:"${s}"`);
+		const wordGroupClauses = GMAIL_SEARCH_SUBJECT_WORD_GROUPS.map((g) => `subject:(${g})`);
+		const subjectClauses = [...phraseClauses, ...wordGroupClauses].join(" OR ");
 		parts.push(`(${subjectClauses})`);
 	}
 
@@ -207,11 +228,13 @@ function isCacheValid(envelope: CacheEnvelope | null): boolean {
 
 function filterEmails(emails: GmailEmailMeta[], params: AdvancedSearchParams): GmailEmailMeta[] {
 	return emails.filter((email) => {
-		// Subject filter
+		// Subject filter — literal phrases OR the hidden word-group net, so
+		// re-filtering cached emails agrees with what the API query would fetch.
 		if (params.subjects.length > 0) {
 			const lowerSubject = email.subject.toLowerCase();
-			const matchesSubject = params.subjects.some((s) => lowerSubject.includes(s.toLowerCase()));
-			if (!matchesSubject) return false;
+			const matchesPhrase = params.subjects.some((s) => lowerSubject.includes(s.toLowerCase()));
+			const matchesWordGroup = GMAIL_SEARCH_SUBJECT_WORD_GROUPS.some((g) => subjectMatchesWordGroup(email.subject, g));
+			if (!matchesPhrase && !matchesWordGroup) return false;
 		}
 
 		// Excluded senders

@@ -1,6 +1,22 @@
-export const GMAIL_EXCLUDE_SENDERS =[
-	"no-reply@spotify.com", "noreply@service.wayfair.com", "noreply@order.eventbrite.com", "no-reply@doordash.com", "Receipts@united.com", "donotreply@23andme.com", "no-reply.ecommerce@fedex.com", "contact@diginn.com", "Myaccount@spectrumemails.com", "CVS.com@cvshealth.com", "no-reply@purchase.riteaid.com", "udemy@email.udemy.com", "help@capsule.com", "googlestore-noreply@google.com", "orderinquiry@burtsbees.com"
-]
+export const GMAIL_EXCLUDE_SENDERS = [
+	"no-reply@spotify.com",
+	"noreply@service.wayfair.com",
+	"noreply@order.eventbrite.com",
+	"no-reply@doordash.com",
+	"Receipts@united.com",
+	"donotreply@23andme.com",
+	"no-reply.ecommerce@fedex.com",
+	"contact@diginn.com",
+	"Myaccount@spectrumemails.com",
+	"CVS.com@cvshealth.com",
+	"no-reply@purchase.riteaid.com",
+	"udemy@email.udemy.com",
+	"help@capsule.com",
+	"googlestore-noreply@google.com",
+	"orderinquiry@burtsbees.com",
+	"payment@arryved.com",
+	"noreply@email-special.usps.com",
+];
 
 export const GMAIL_SEARCH_SUBJECTS = [
 	"Thank you for your purchase",
@@ -9,6 +25,16 @@ export const GMAIL_SEARCH_SUBJECTS = [
 	"Your order has shipped",
 	"Receipt for your purchase",
 ];
+
+// Hidden widen-net for the Gmail subject search: AND-of-words groups (Gmail
+// syntax `subject:(word1 word2)`) that catch confirmation-stage subjects the
+// literal phrases above miss — e.g. "Order #597544 confirmed" or "Your
+// Nordstrom Rack order #1042965288, confirmed!" share no contiguous phrase
+// with "Order Confirmation", so Gmail's quoted-phrase search never fetches
+// them. Not shown in the UI and not user-editable — same pattern as
+// GMAIL_EXCLUDE_SENDERS: always applied on top of whatever subjects the user
+// has configured.
+export const GMAIL_SEARCH_SUBJECT_WORD_GROUPS = ["order confirmed"];
 
 export const GMAIL_SEARCH_BODY_KEYWORDS = [
 	"order confirmation",
