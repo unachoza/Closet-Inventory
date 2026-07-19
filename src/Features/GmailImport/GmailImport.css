@@ -359,6 +359,50 @@
 	background: color-mix(in srgb, var(--status-success) 18%, transparent);
 }
 
+/* Collapsed-order toggle: reveals the shipped/delivered copies grouped under a
+   confirmation. */
+.gmail-group-toggle-row {
+	list-style: none;
+	margin: 2px 0 4px;
+	padding-left: 34px; /* line up under the row content, past the checkbox */
+}
+
+.gmail-group-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	padding: 3px 6px;
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+	font-size: 0.72rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.gmail-group-toggle:hover {
+	background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.gmail-group-toggle-label {
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.gmail-group-toggle-stages {
+	display: inline-flex;
+	gap: 4px;
+}
+
+/* Non-primary emails in an expanded order sit slightly indented and dimmed so
+   the confirmation still reads as the representative. */
+.gmail-email-item--nested {
+	padding-left: 18px;
+	opacity: 0.82;
+}
+
 /* Empty state */
 .gmail-empty {
 	padding: var(--spacing-400);
