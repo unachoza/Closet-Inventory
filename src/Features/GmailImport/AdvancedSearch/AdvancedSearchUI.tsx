@@ -34,7 +34,10 @@ export const AdvancedSearchUI = ({ onSearch, loading, cachedCount }: AdvancedSea
 	const [from, setFrom] = useState("");
 	const [after, setAfter] = useState("");
 	const [before, setBefore] = useState("");
-	const [excludedSenders, setExcludedSenders] = useState<string[]>([...GMAIL_EXCLUDE_SENDERS]);
+	// The built-in denylist (GMAIL_EXCLUDE_SENDERS) is always applied to the Gmail
+	// query inside buildApiQuery — it does not live in this state and is not shown
+	// as pills. Only senders the user adds here surface as removable chips.
+	const [excludedSenders, setExcludedSenders] = useState<string[]>([]);
 	const [bodyKeywords, setBodyKeywords] = useState<string[]>([...GMAIL_SEARCH_BODY_KEYWORDS]);
 	const [subjects, setSubjects] = useState<string[]>([...GMAIL_SEARCH_SUBJECTS]);
 

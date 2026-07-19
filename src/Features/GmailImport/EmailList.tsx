@@ -1,6 +1,7 @@
 import { memo } from "react";
 import type { Ref } from "react";
 import type { GmailEmailMeta } from "../../hooks/useAdvancedSearch";
+import { classifyStage, STAGE_META } from "./orderStage";
 
 interface EmailListProps {
 	emails: GmailEmailMeta[];
@@ -36,6 +37,7 @@ interface EmailListItemProps {
 }
 
 const EmailListItem = memo(function EmailListItem({ email, isSelected, onToggleSelect }: EmailListItemProps) {
+	const stage = classifyStage(email.subject);
 	return (
 		<li className="gmail-email-item">
 			<label className={`gmail-email-label ${isSelected ? "gmail-email-label--selected" : ""}`}>
@@ -51,7 +53,17 @@ const EmailListItem = memo(function EmailListItem({ email, isSelected, onToggleS
 						<span className="gmail-email-sender">{extractSenderName(email.from)}</span>
 						<span className="gmail-email-date">{formatDate(email.date)}</span>
 					</div>
-					<div className="gmail-email-subject">{email.subject}</div>
+					<div className="gmail-email-subject">
+						{stage && (
+							<span
+								className={`gmail-stage-badge ${STAGE_META[stage].className}`}
+								title={`This looks like the "${STAGE_META[stage].label}" email for this order`}
+							>
+								{STAGE_META[stage].label}
+							</span>
+						)}
+						{email.subject}
+					</div>
 					<div className="gmail-email-snippet">{email.snippet}</div>
 				</div>
 			</label>

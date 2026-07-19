@@ -328,6 +328,37 @@
 	white-space: nowrap;
 }
 
+/* Order-stage badge — tags each email as its confirmation / shipped / delivered
+   copy so the same order isn't imported three times. Colors map to the shared
+   status tokens: slate (placed) → ochre (in transit) → sage (arrived). */
+.gmail-stage-badge {
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 6px;
+	padding: 1px 7px;
+	border-radius: 999px;
+	font-size: 0.62rem;
+	font-weight: 700;
+	line-height: 1.5;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.gmail-stage-badge--confirmed {
+	color: var(--status-info);
+	background: color-mix(in srgb, var(--status-info) 15%, transparent);
+}
+
+.gmail-stage-badge--shipped {
+	color: var(--status-warning);
+	background: color-mix(in srgb, var(--status-warning) 18%, transparent);
+}
+
+.gmail-stage-badge--delivered {
+	color: var(--status-success);
+	background: color-mix(in srgb, var(--status-success) 18%, transparent);
+}
+
 /* Empty state */
 .gmail-empty {
 	padding: var(--spacing-400);
