@@ -5,7 +5,7 @@ import {
 	FilterDimension,
 	FilterOptions,
 	FilterState,
-	FILTER_DIMENSIONS,
+	visibleFilterDimensions,
 	FILTER_DIMENSION_LABELS,
 } from "../../../hooks/useClosetFilters";
 import FilterAccordion from "../FilterAccordion/FilterAccordion";
@@ -70,7 +70,7 @@ const FilterSidePanel = ({
 				</div>
 
 				<div className="filter-side-panel__body">
-					{FILTER_DIMENSIONS.map((dim) => (
+					{visibleFilterDimensions().map((dim) => (
 						<FilterAccordion
 							key={dim}
 							label={FILTER_DIMENSION_LABELS[dim]}

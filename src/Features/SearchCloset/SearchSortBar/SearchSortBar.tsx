@@ -12,6 +12,8 @@ interface SearchSortBarProps {
 	activeFilterCount: number;
 	borderMode: BorderMode;
 	onCycleBorderMode: () => void;
+	/** Beta gate: the border toggle exposes Status/Location, hidden when off. Defaults visible. */
+	showBorderToggle?: boolean;
 }
 
 const SORT_OPTIONS: SortKey[] = [
@@ -35,6 +37,7 @@ const SearchSortBar = ({
 	activeFilterCount,
 	borderMode,
 	onCycleBorderMode,
+	showBorderToggle = true,
 }: SearchSortBarProps) => {
 	const { searchQuery, setSearchQuery } = useSearch();
 
@@ -62,16 +65,19 @@ const SearchSortBar = ({
 
 			{/* Border-mode toggle — cycles Off → Location → Location + Status. Colors
 			    the card borders (and adds a status dot in the combined mode) so the
-			    closet grid surfaces inventory truth at a glance. */}
-			<button
-				className={`search-sort-bar__border-btn${borderMode !== "off" ? " search-sort-bar__border-btn--active" : ""}`}
-				onClick={onCycleBorderMode}
-				aria-label={`Card borders: ${BORDER_MODE_LABELS[borderMode]}. Click to change.`}
-				title="Toggle location / status borders"
-			>
-				<MapPin size={15} />
-				{BORDER_MODE_LABELS[borderMode]}
-			</button>
+			    closet grid surfaces inventory truth at a glance. Hidden for the beta
+			    while Status/Location ship dark (config/features.ts). */}
+			{showBorderToggle && (
+				<button
+					className={`search-sort-bar__border-btn${borderMode !== "off" ? " search-sort-bar__border-btn--active" : ""}`}
+					onClick={onCycleBorderMode}
+					aria-label={`Card borders: ${BORDER_MODE_LABELS[borderMode]}. Click to change.`}
+					title="Toggle location / status borders"
+				>
+					<MapPin size={15} />
+					{BORDER_MODE_LABELS[borderMode]}
+				</button>
+			)}
 
 			{/* Filter toggle */}
 			<button

@@ -6,6 +6,7 @@ import { useView } from "../../context/ViewContext";
 import { useGoogleUnverifiedNotice } from "../Onboarding/useGoogleUnverifiedNotice";
 import GoogleUnverifiedNotice from "../Onboarding/GoogleUnverifiedNotice";
 import AccountDataModal from "../../Components/NavBar/AccountDataModal/AccountDataModal";
+import GoogleHeadsUpNotice from "../../Components/GoogleHeadsUpNotice/GoogleHeadsUpNotice";
 import FeedbackPanel from "../../Components/FeedbackButton/FeedbackPanel";
 import ProfileHeader from "./ProfileHeader";
 import { appVersion } from "../../lib/monitoring";
@@ -67,6 +68,7 @@ export default function ProfileView() {
 					>
 						Sign in with Google
 					</button>
+					<GoogleHeadsUpNotice />
 				</div>
 				<GoogleUnverifiedNotice isOpen={googleNotice.isOpen} onContinue={googleNotice.confirm} onCancel={googleNotice.dismiss} />
 				<p className="profile__version">Nothing To Wear · {appVersion()}</p>

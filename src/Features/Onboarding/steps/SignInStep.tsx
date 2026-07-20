@@ -1,4 +1,5 @@
 import OnboardingShell from "../OnboardingShell";
+import GoogleHeadsUpNotice from "../../../Components/GoogleHeadsUpNotice/GoogleHeadsUpNotice";
 import { markGoogleNoticeSeen } from "../useGoogleUnverifiedNotice";
 
 export interface SignInStepProps {
@@ -40,10 +41,7 @@ export default function SignInStep({ onSignIn, onSkip }: SignInStepProps) {
 					<GoogleMark />
 					Sign in with Google
 				</button>
-				<div className="onb-notice">
-					<strong>Heads up:</strong> Google will show a "hasn't verified this app" notice — that's expected during our
-					small beta. Tap <strong>Advanced, then Go to Nothing To Wear</strong> to continue safely.
-				</div>
+				<GoogleHeadsUpNotice />
 			</div>
 		</OnboardingShell>
 	);

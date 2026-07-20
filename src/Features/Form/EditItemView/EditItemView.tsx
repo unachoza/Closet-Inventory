@@ -14,6 +14,7 @@ import { normalizeMaterial } from "../../../utils/materialUtils";
 import { formatItemAge } from "../../../utils/itemAge";
 import { matchedCondition } from "../../../utils/condition";
 import { normalizeToString } from "../../../utils/normalizeToString";
+import { showStatusLocation } from "../../../config/features";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
@@ -22,6 +23,16 @@ import { toAbsoluteDate } from "../../../utils/dateUtils";
 
 /** Fields the user may leave blank when adding/editing an item **/
 const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
+
+/**
+ * The item fields that render as generic text inputs, as an explicit ALLOWLIST.
+ * `remaining` (below) is whatever's left after the bespoke-control fields are
+ * destructured out — a denylist that silently leaked machine fields like
+ * `isDemo` ("ISDEMO: True"), `updatedAt`, `wornCount`, etc. as raw inputs the
+ * moment an item carried them. Filtering to this set means new fields on the
+ * ClothingItem type never surface as an editable box unless deliberately added.
+ */
+const EDITABLE_TEXT_FIELDS = new Set(["name", "category", "color", "size", "brand", "retailer", "price"]);
 
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	return {
@@ -315,17 +326,19 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				)}
 
 				<div className="form-fields">
-					{Object.entries(remaining).map(([key, value]) => (
-						<TextInput
-							key={key}
-							name={key}
-							label={key}
-							value={normalizeToString(formData[key as keyof ClothingItem] ?? value)}
-							placeholder={!value ? `Enter ${key}` : ""}
-							handleFormUpdate={handleChange}
-							required={!OPTIONAL_FIELDS.has(key)}
-						/>
-					))}
+					{Object.entries(remaining)
+						.filter(([key]) => EDITABLE_TEXT_FIELDS.has(key))
+						.map(([key, value]) => (
+							<TextInput
+								key={key}
+								name={key}
+								label={key}
+								value={normalizeToString(formData[key as keyof ClothingItem] ?? value)}
+								placeholder={!value ? `Enter ${key}` : ""}
+								handleFormUpdate={handleChange}
+								required={!OPTIONAL_FIELDS.has(key)}
+							/>
+						))}
 					{onSale && (
 						<TextInput
 							name="originalPrice"
@@ -383,41 +396,48 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						</select>
 					</label>
 
-					{/* Status — E2 lifecycle state (clean/dirty/at cleaner/etc.). Default "clean". */}
-					<label className="edit-form-condition">
-						status
-						<select
-							name="status"
-							className="edit-form-condition__select"
-							value={formData.status ?? "clean"}
-							onChange={handleStatusChange}
-							aria-label="status"
-						>
-							{statusOptions.map((opt) => (
-								<option key={opt} value={opt}>
-									{opt.replace(/_/g, " ")}
-								</option>
-							))}
-						</select>
-					</label>
+					{/* Status & Location — E2 lifecycle. Dark for the beta (config/features.ts);
+					    gated so testers don't meet a clean/dirty/on-loan dropdown for a
+					    feature that isn't live yet. */}
+					{showStatusLocation() && (
+						<>
+							{/* Status — E2 lifecycle state (clean/dirty/at cleaner/etc.). Default "clean". */}
+							<label className="edit-form-condition">
+								status
+								<select
+									name="status"
+									className="edit-form-condition__select"
+									value={formData.status ?? "clean"}
+									onChange={handleStatusChange}
+									aria-label="status"
+								>
+									{statusOptions.map((opt) => (
+										<option key={opt} value={opt}>
+											{opt.replace(/_/g, " ")}
+										</option>
+									))}
+								</select>
+							</label>
 
-					{/* Location — E2 US-2.2. Default the primary (home) location. */}
-					<label className="edit-form-condition">
-						location
-						<select
-							name="locationId"
-							className="edit-form-condition__select"
-							value={formData.locationId ?? "home"}
-							onChange={handleLocationChange}
-							aria-label="location"
-						>
-							{locations.map((loc) => (
-								<option key={loc.id} value={loc.id}>
-									{loc.label}
-								</option>
-							))}
-						</select>
-					</label>
+							{/* Location — E2 US-2.2. Default the primary (home) location. */}
+							<label className="edit-form-condition">
+								location
+								<select
+									name="locationId"
+									className="edit-form-condition__select"
+									value={formData.locationId ?? "home"}
+									onChange={handleLocationChange}
+									aria-label="location"
+								>
+									{locations.map((loc) => (
+										<option key={loc.id} value={loc.id}>
+											{loc.label}
+										</option>
+									))}
+								</select>
+							</label>
+						</>
+					)}
 
 					<PillComboField
 						label="occasion"

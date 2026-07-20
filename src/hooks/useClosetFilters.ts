@@ -6,6 +6,7 @@ import { parseCareLabels } from "../utils/careUtils";
 import { canonicalizeMaterial } from "../utils/materialUtils";
 import { getLocation } from "../utils/locations";
 import { track } from "../lib/analytics";
+import { showStatusLocation } from "../config/features";
 
 const MATERIAL_MIN_PCT = 6;
 
@@ -33,6 +34,17 @@ export type FilterOptions = Record<FilterDimension, FilterOption[]>;
 // hardcoded-list gotcha: a dimension added only here used to silently not
 // appear in the UI, since tsc can't catch a missing array entry.
 export const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care", "status", "location"];
+
+// Status & Location are E2 features, dark for the beta (see config/features.ts).
+// The filter UI renders only the *visible* dimensions; the full list above still
+// backs option-building and filter state so nothing else has to know about the gate.
+const STATUS_LOCATION_DIMENSIONS: readonly FilterDimension[] = ["status", "location"];
+
+/** The dimensions the filter UI should render, honoring the beta status/location gate. */
+export function visibleFilterDimensions(): FilterDimension[] {
+	if (showStatusLocation()) return FILTER_DIMENSIONS;
+	return FILTER_DIMENSIONS.filter((dim) => !STATUS_LOCATION_DIMENSIONS.includes(dim));
+}
 
 /** Display label per dimension, for filter UI headers/pills. */
 export const FILTER_DIMENSION_LABELS: Record<FilterDimension, string> = {
