@@ -19,6 +19,7 @@ import "./GmailImport.css";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
 import { track } from "../../lib/analytics";
+import { describeGmailError } from "./gmailErrorMessages";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -52,6 +53,8 @@ export default function GmailImport({
 		emails,
 		isSearching,
 		isFetchingMore,
+		isFetchingBody,
+		progress,
 		error: searchError,
 		searchEmails,
 		fetchNextPage,
@@ -126,30 +129,52 @@ export default function GmailImport({
 		return () => cancelAnimationFrame(raf);
 	}, [selectedEmail, selectedEmailId]);
 
-	// Auto-search with defaults on first login
+	// Auto-search with defaults on first login. The on-connect search is most
+	// testers' FIRST import, so it must open the funnel: fire import_started
+	// when there's no cache to restore (a real fetch), once per mount.
+	const autoStartTracked = useRef(false);
 	useEffect(() => {
 		if (accessToken && isAuthenticated) {
+			if (!autoStartTracked.current && cachedCount === 0) {
+				autoStartTracked.current = true;
+				track("import_started", { mode: "auto" });
+			}
 			searchEmails(accessToken);
 		}
+		// cachedCount is read, not depended on: it only gates the one-shot track.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [accessToken, isAuthenticated, searchEmails]);
 
-	// Funnel: results shown. Fires when a search settles with emails present —
-	// the midpoint between import_started and import_finished. Re-fires only
-	// when the result set changes size, not on every re-render.
-	const lastResultCount = useRef<number | null>(null);
+	// Funnel: results shown. Fires when a search settles (isSearching true →
+	// false) without an error — INCLUDING zero results, so "searched and found
+	// nothing" is visible as funnel drop-off instead of silently disappearing.
+	const prevSearching = useRef(false);
 	useEffect(() => {
-		if (isSearching) return;
-		if (emails.length > 0 && lastResultCount.current !== emails.length) {
+		if (prevSearching.current && !isSearching && !searchError) {
 			track("import_results_shown", { count: emails.length });
 		}
-		lastResultCount.current = emails.length;
-	}, [emails.length, isSearching]);
+		prevSearching.current = isSearching;
+	}, [isSearching, emails.length, searchError]);
+
+	// Funnel: searches that die (expired token, network, Gmail 5xx) — reported
+	// with a coarse reason so PostHog shows WHY testers drop, deduped per error.
+	const lastTrackedError = useRef<string | null>(null);
+	const error = authError ?? searchError;
+	useEffect(() => {
+		if (!error || lastTrackedError.current === error) return;
+		lastTrackedError.current = error;
+		track("import_failed", { reason: describeGmailError(error).reason });
+	}, [error]);
+
+	// Remember the last fetch's params so "Try Again" retries the same search.
+	const lastSearchParams = useRef<AdvancedSearchParams | undefined>(undefined);
 
 	// Advanced search: routes to fetch or filter based on user's choice
 	const handleAdvancedSearch = useCallback(
 		(params: AdvancedSearchParams, mode: SearchMode) => {
 			setSelectedEmailId(null);
 			if (mode === "fetch" && accessToken) {
+				lastSearchParams.current = params;
 				track("import_started", { mode: "advanced" });
 				searchEmails(accessToken, params, true);
 			} else {
@@ -183,6 +208,7 @@ export default function GmailImport({
 	const handleDefaultSearch = useCallback(() => {
 		if (accessToken) {
 			setSelectedEmailId(null);
+			lastSearchParams.current = undefined;
 			track("import_started", { mode: "default" });
 			searchEmails(accessToken, undefined, true);
 		}
@@ -285,7 +311,24 @@ export default function GmailImport({
 		if (accessToken) fetchNextPage(accessToken);
 	}, [fetchNextPage, accessToken]);
 
-	const error = authError ?? searchError;
+	// Raw errors ("Gmail API error (401): {...}") are for Sentry, not testers —
+	// translate to plain language plus the one action that fixes it.
+	const friendlyError = error ? describeGmailError(error) : null;
+
+	const handleReconnect = useCallback(() => {
+		googleNotice.requestGoogleSignIn(login);
+	}, [googleNotice, login]);
+
+	const handleRetry = useCallback(() => {
+		if (accessToken) searchEmails(accessToken, lastSearchParams.current, true);
+	}, [accessToken, searchEmails]);
+
+	// Zero-results state can pop the advanced-search panel open (counter, so it
+	// re-opens after the user collapses it).
+	const [advancedExpandSignal, setAdvancedExpandSignal] = useState(0);
+
+	// The email whose preview is open (or opening — body may still be loading).
+	const selectedMeta = selectedEmailId ? emails.find((e) => e.id === selectedEmailId) : undefined;
 
 	if (!isAuthenticated) {
 		return (
@@ -304,7 +347,7 @@ export default function GmailImport({
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
 					<GoogleHeadsUpNotice variant="gmail-import" />
-					{error && <p className="gmail-error">{error}</p>}
+					{friendlyError && <p className="gmail-error">{friendlyError.message}</p>}
 					<GoogleUnverifiedNotice
 						isOpen={googleNotice.isOpen}
 						onContinue={googleNotice.confirm}
@@ -335,30 +378,51 @@ export default function GmailImport({
 				</div>
 			</div>
 
-			<AdvancedSearchUI onSearch={handleAdvancedSearch} loading={isSearching} cachedCount={cachedCount} />
+			<AdvancedSearchUI
+				onSearch={handleAdvancedSearch}
+				loading={isSearching}
+				cachedCount={cachedCount}
+				expandSignal={advancedExpandSignal}
+			/>
 
-			{error && <p className="gmail-error">{error}</p>}
-
-			{/* Search mode indicator */}
-			{isSearching && searchMode && (
-				<div className="gmail-loading">
-					{searchMode === "fetch" ? (
-						<p className="advanced-search-status advanced-search-status--fetch">Fetching new emails from Gmail...</p>
+			{friendlyError && !isSearching && (
+				<div className="gmail-error-box" role="alert">
+					<p className="gmail-error-message">{friendlyError.message}</p>
+					{friendlyError.action === "reconnect" ? (
+						<button className="gmail-error-action" onClick={handleReconnect} type="button">
+							Reconnect Gmail
+						</button>
 					) : (
-						<p className="advanced-search-status advanced-search-status--filter">Filtering cached emails...</p>
+						<button className="gmail-error-action" onClick={handleRetry} type="button">
+							Try Again
+						</button>
 					)}
 				</div>
 			)}
 
-			{/* Fallback loading without mode */}
-			{isSearching && !searchMode && (
-				<div className="gmail-loading">
-					<p>Searching your inbox for order confirmations...</p>
+			{/* Search progress: the metadata fetch is rate-limited (batches of 5,
+			    300ms apart) and can take tens of seconds for a full page of
+			    results — show a live count so it never reads as frozen. */}
+			{isSearching && (
+				<div className="gmail-loading" role="status">
+					<span className="gmail-spinner" aria-hidden="true" />
+					{searchMode === "filter" ? (
+						<p className="advanced-search-status advanced-search-status--filter">Filtering cached emails...</p>
+					) : progress && progress.total > 0 ? (
+						<p className="advanced-search-status advanced-search-status--fetch">
+							Found {progress.total} email{progress.total !== 1 ? "s" : ""} — loading details ({progress.fetched}/
+							{progress.total})...
+						</p>
+					) : (
+						<p className="advanced-search-status advanced-search-status--fetch">
+							Searching your inbox for order confirmations...
+						</p>
+					)}
 				</div>
 			)}
 
 			{!isSearching && emails.length > 0 && (
-				<div className={selectedEmail ? "display-email-preview-panel" : "gmail-results"}>
+				<div className={selectedMeta ? "display-email-preview-panel" : "gmail-results"}>
 					<div className="gmail-list-panel">
 						<h3 className="gmail-section-title" data-testid="email-count">
 							<span>Found</span> {emails.length} email
@@ -400,7 +464,7 @@ export default function GmailImport({
 						)}
 					</div>
 
-					{selectedEmail && (
+					{selectedMeta && (
 						<div className="gmail-preview-panel">
 							<button
 								className="gmail-preview-close"
@@ -410,29 +474,47 @@ export default function GmailImport({
 							>
 								← Back to list
 							</button>
-							<EmailPreview
-								email={selectedEmail}
-								onImportProduct={handleImportProduct}
-								onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
-								unskippedIndices={
-									onUnskippedByEmailChange && selectedEmailId ? (unskippedByEmail?.[selectedEmailId] ?? []) : undefined
-								}
-								onUnskippedIndicesChange={
-									onUnskippedByEmailChange && selectedEmailId
-										? (indices) => onUnskippedByEmailChange(selectedEmailId, indices)
-										: undefined
-								}
-							/>
+							{selectedEmail ? (
+								<EmailPreview
+									email={selectedEmail}
+									onImportProduct={handleImportProduct}
+									onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
+									unskippedIndices={
+										onUnskippedByEmailChange && selectedEmailId ? (unskippedByEmail?.[selectedEmailId] ?? []) : undefined
+									}
+									onUnskippedIndicesChange={
+										onUnskippedByEmailChange && selectedEmailId
+											? (indices) => onUnskippedByEmailChange(selectedEmailId, indices)
+											: undefined
+									}
+								/>
+							) : (
+								// Body still downloading — tapping an email must show
+								// feedback immediately, not dead air until the fetch lands.
+								<div className="gmail-preview-loading" role="status">
+									<span className="gmail-spinner" aria-hidden="true" />
+									<p>Opening email...</p>
+									{isFetchingBody && <div className="gmail-skeleton-row" aria-hidden="true" />}
+								</div>
+							)}
 						</div>
 					)}
 				</div>
 			)}
-			{!isSearching && emails.length < 1 && (
+			{!isSearching && !friendlyError && emails.length < 1 && (
 				<div className="gmail-empty">
-					<p>No order confirmation emails found.</p>
+					<p className="gmail-empty-title">No order emails found yet.</p>
 					<p className="gmail-empty-hint">
-						Try checking if your purchase confirmations use different subject lines or adjusting your search dates.
+						Every store words its emails differently — try searching for a specific sender (like orders@zara.com) or
+						widening the date range.
 					</p>
+					<button
+						className="gmail-empty-action"
+						onClick={() => setAdvancedExpandSignal((n) => n + 1)}
+						type="button"
+					>
+						Open Advanced Search
+					</button>
 				</div>
 			)}
 		</div>
