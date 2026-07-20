@@ -1,8 +1,9 @@
-import { Scissors, LayoutGrid, Plus, Search, Mail } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Scissors, Plus, Search, Mail, Icon, type LucideProps } from "lucide-react";
+import { coatHanger } from "@lucide/lab";
 import { useView } from "../../context/ViewContext";
 import type { ViewType } from "../../utils/types";
 import "./BottomNav.css";
+import { ComponentType } from "react";
 
 interface BottomNavProps {
 	/** App-level Add-Item handler (same one NavBar receives) — owns the
@@ -13,15 +14,18 @@ interface BottomNavProps {
 interface Tab {
 	view: ViewType;
 	label: string;
-	Icon: LucideIcon;
+	Icon: ComponentType<LucideProps>;
 }
 
 /* Thumb-order layout: Closet | Care | [Add] | Search | Email (Tight MVP).
    The three MVP features — Inventory (Closet), Care, Search — are first-class
    tabs alongside Email (Gmail import), the primary item-ingestion path.
    The old carousel "Home" tab is dropped for the beta; Add is the center FAB. */
+
+const CoatHangerIcon = (props: LucideProps) => <Icon iconNode={coatHanger} {...props} />;
+
 const LEFT_TABS: Tab[] = [
-	{ view: "carousel", label: "Closet", Icon: LayoutGrid },
+	{ view: "carousel", label: "Closet", Icon: CoatHangerIcon },
 	{ view: "fabric", label: "Care", Icon: Scissors },
 ];
 const RIGHT_TABS: Tab[] = [

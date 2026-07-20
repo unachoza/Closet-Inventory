@@ -1,4 +1,5 @@
-import { Scissors, LayoutGrid, Plus, Search, Mail } from "lucide-react";
+import { Scissors, Plus, Search, Mail, Icon } from "lucide-react";
+import { coatHanger } from "@lucide/lab";
 
 /**
  * A non-interactive miniature of the real BottomNav (Closet · Care · Add ·
@@ -9,7 +10,8 @@ export default function NavPreviewStrip() {
 	return (
 		<div className="onb-navstrip" aria-hidden="true">
 			<span className="onb-navstrip__tab onb-navstrip__tab--active">
-				<LayoutGrid size={18} />
+				<Icon iconNode={coatHanger} size={18} />
+				{/* <LayoutGrid size={18} /> */}
 				Closet
 			</span>
 			<span className="onb-navstrip__tab">
