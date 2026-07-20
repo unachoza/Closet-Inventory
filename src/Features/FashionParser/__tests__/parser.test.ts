@@ -60,4 +60,19 @@ describe("FashionParser — inferProductAttributes", () => {
     expect(inferProductAttributes("Silk L/S V-Neck").sleeveLength).toBe("long sleeve");
     expect(inferProductAttributes("Sphere Ls Low Crewe").sleeveLength).toBe("long sleeve");
   });
+
+  it("infers stretch from Stretchtech compound and biker shorts", () => {
+    expect(inferProductAttributes("Extra High-Waisted Stretchtech Micro-Pleated Skort").hasStretch).toBe(true);
+    expect(inferProductAttributes("Ribbed Lettuce-Edge Biker Shorts").hasStretch).toBe(true);
+  });
+
+  it("captures plain lace as an accent (not only lace trim)", () => {
+    expect(inferProductAttributes("Textured Lace Scoop-Neck Top").accents).toContain("lace");
+    expect(inferProductAttributes("Lace-Trim Cami").accents).toContain("lace trim");
+  });
+
+  it("maps strappy and spaghetti to sleeveless", () => {
+    expect(inferProductAttributes("Strappy Cami Top").sleeveLength).toBe("sleeveless");
+    expect(inferProductAttributes("Spaghetti Strap Midi Dress").sleeveLength).toBe("sleeveless");
+  });
 });

@@ -1563,6 +1563,141 @@ function extractFromTextOnlyRows(doc: Document): ExtractedProduct[] {
 }
 
 /**
+ * Strategy: Depop purchase confirmation.
+ * Signal: depop.com tracking links / media-photos.depop.com product photos.
+ * The purchased item lives in a labeled block — <b>Item:</b> name, <b>Size:</b>,
+ * <b>Item price:</b> (with an optional <s>struck original</s>). Banner images
+ * (braze-images.com) and the "Don't miss these" recommendation grid carry no
+ * Item: label, so anchoring on the label excludes them.
+ */
+function extractFromDepopLayout(doc: Document): ExtractedProduct[] {
+	const isDepop =
+		Array.from(doc.querySelectorAll("a")).some((a) => (a.getAttribute("href") ?? "").includes("depop.com")) ||
+		Array.from(doc.querySelectorAll("img")).some((img) => (img.getAttribute("src") ?? "").includes("media-photos.depop.com"));
+	if (!isDepop) return [];
+
+	// Seller handle from the preheader ("New outfit incoming – @katieaparker has
+	// your order.") — used as the brand, with the @ stripped.
+	const preheaderMatch = (doc.body.textContent ?? "").match(/@([A-Za-z0-9_.]+)\s+has\s+your\s+order/i);
+	let brand = preheaderMatch ? preheaderMatch[1] : "";
+
+	const products: ExtractedProduct[] = [];
+
+	const itemLabels = Array.from(doc.querySelectorAll("b")).filter((b) => /^Item:$/i.test((b.textContent ?? "").trim()));
+	for (const label of itemLabels) {
+		const td = label.closest("td");
+		if (!td) continue;
+		const tdText = getCellText(td);
+
+		const nameMatch = tdText.match(/Item:\s*(.+?)\s*(?:Size:|Item price:|$)/i);
+		let name = nameMatch ? nameMatch[1].trim() : "";
+		if (!name) continue;
+
+		// Listing-title junk: "Brand New w/tags swim shorts from Groovy Peacoc..."
+		// → garment words only; the seller suffix becomes the brand when the
+		// preheader didn't provide one.
+		const sellerMatch = name.match(/\bfrom\s+([^.]+?)\.{0,3}\s*$/i);
+		if (sellerMatch) {
+			if (!brand) brand = sellerMatch[1].trim();
+			name = name.slice(0, sellerMatch.index).trim();
+		}
+		name = name
+			.replace(/\bbrand\s+new\s*(?:w\/|with)?\s*tags?\b/gi, " ")
+			.replace(/\bnwt\b/gi, " ")
+			.replace(/\s{2,}/g, " ")
+			.replace(/^[,\s]+|[,\s]+$/g, "");
+		if (!name) continue;
+
+		const sizeMatch = tdText.match(/Size:\s*([^\s].*?)\s*(?:Item price:|$)/i);
+		const size = sizeMatch ? sizeMatch[1].trim() : "";
+
+		const struckEl = td.querySelector("s, strike, del");
+		const originalPrice = struckEl ? (extractPrices(struckEl.textContent ?? "")[0] ?? "") : "";
+		const priceSection = tdText.match(/Item price:\s*(.*)$/i)?.[1] ?? "";
+		const prices = extractPrices(priceSection);
+		const price = prices.length > 0 ? prices[prices.length - 1] : "";
+
+		// The photo lives in a sibling column of an OUTER row — climb until an
+		// ancestor contains a depop product photo (bounded to avoid grabbing the
+		// recommendation grid from a page-level ancestor).
+		let imageUrl = "";
+		let scope: Element | null = td;
+		for (let i = 0; i < 6 && scope; i++) {
+			const img = scope.querySelector("img[src*='media-photos.depop.com']");
+			if (img) {
+				imageUrl = img.getAttribute("src") ?? "";
+				break;
+			}
+			scope = scope.parentElement;
+		}
+
+		products.push({
+			imageUrl,
+			name,
+			brand: brand.replace(/^@/, ""),
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color: "",
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: Boolean(originalPrice),
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: L.L.Bean shipping notice.
+ * Signal: cdni.llbean.net product image. The shipped item's photo (alt = product
+ * name) sits beside a details cell with "Item: PQ…", "Size: …", "Color/Style: …"
+ * labels. The "You Might Also Like" recommendation image has alt="Image:" and no
+ * Item: label, so requiring the label excludes it.
+ */
+function extractFromLLBeanLayout(doc: Document): ExtractedProduct[] {
+	const beanImgs = Array.from(doc.querySelectorAll("img[src*='cdni.llbean.net']"));
+	if (beanImgs.length === 0) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	for (const img of beanImgs) {
+		// The details table is in the sibling column of the same two-column row.
+		const row = img.closest("tr")?.closest("table")?.closest("td")?.closest("tr");
+		const scopeText = row ? getCellText(row as unknown as Element) : "";
+		const itemMatch = scopeText.match(/Item:\s*([A-Z]{0,3}\d{4,})/i);
+		if (!itemMatch) continue;
+
+		const itemNumber = itemMatch[1];
+		if (seen.has(itemNumber)) continue;
+		seen.add(itemNumber);
+
+		const name = (img.getAttribute("alt") ?? "").trim();
+		if (!name || /^image:?$/i.test(name)) continue;
+
+		const sizeMatch = scopeText.match(/Size:\s*(.+?)\s*(?:Color\/Style:|Quantity:|$)/i);
+		const colorMatch = scopeText.match(/Color\/Style:\s*(.+?)\s*(?:Quantity:|$)/i);
+		const qtyMatch = scopeText.match(/Quantity:\s*(\d+)/i);
+
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand: "L.L.Bean",
+			price: "",
+			color: colorMatch ? colorMatch[1].trim().toLowerCase() : "",
+			size: sizeMatch ? sizeMatch[1].trim() : "",
+			itemNumber,
+			material: "",
+			onSale: false,
+			...(qtyMatch ? { qty: parseInt(qtyMatch[1], 10) } : {}),
+		});
+	}
+
+	return products;
+}
+
+/**
  * Strategy: Instagram Shopping order confirmation.
  * Signal: facebook.com/images/email/instagram/logo.png in the email.
  * Items use class="ib_t" tables with an ib_img cell (product photo) and an
@@ -1998,6 +2133,9 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 
 		if (!name || name.length < 3) continue;
 
+		// Insurance/add-on line items (Navidium, Route, etc.) are never garments.
+		if (/shipping\s+protection|package\s+protection|shipping\s+insurance|\bnavidium\b|\broute\b.*protection/i.test(name)) continue;
+
 		// Variant: "ONYX / S" → color = "onyx", size = "S". Classed template uses a
 		// dedicated span; the inline template uses a grey sibling span in the same
 		// cell (the one that isn't the bold "× N" title).
@@ -2016,6 +2154,10 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 
 		if (variantText.includes("/")) {
 			const parts = variantText.split("/").map((p) => p.trim());
+			// A part that IS a recognizable color wins over positional fallback —
+			// FaceSocks variants read "1 Face / Blue" where the color is last.
+			const colorPart = parts.find((part) => extractColorFromName(part));
+			if (colorPart) color = colorPart.toLowerCase();
 			for (const part of parts) {
 				if (looksLikeSize(part) && !size) {
 					size = part;
@@ -2057,7 +2199,9 @@ function extractFromShopifyLayout(doc: Document): ExtractedProduct[] {
 		const originalPrice =
 			originalPriceTotal && qty > 1 ? `$${(parseFloat(originalPriceTotal.replace("$", "")) / qty).toFixed(2)}` : originalPriceTotal;
 
-		const dedupeKey = `${name.toLowerCase()}|${color}|${size}`;
+		// Variant text distinguishes items the color/size pair can't — FaceSocks
+		// sells "1 Face / Blue" and "2 Faces / Blue" as separate products.
+		const dedupeKey = `${name.toLowerCase()}|${variantText.toLowerCase() || `${color}|${size}`}`;
 		if (seenKeys.has(dedupeKey)) continue;
 		seenKeys.add(dedupeKey);
 
@@ -4191,6 +4335,8 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 	// 17. Image fallback
 
 	const strategies = [
+		extractFromDepopLayout, // Depop: Item:/Size:/Item price: labeled block — guarded by depop.com signal, excludes banner + recommendation images
+		extractFromLLBeanLayout, // L.L.Bean shipping notice: cdni.llbean.net photo + Item:/Size:/Color labels — excludes You Might Also Like
 		extractFromEbayLayout, // eBay: only the Order number:/Item ID:/Seller: block, excludes sponsored "complement your purchase" items — guarded by ebay.com, must run before generic table/image strategies which would otherwise match eBay's plain image+link+price rows (real item AND sponsored alike)
 		extractFromHokaLayout, // HOKA: dms.deckers.com/hoka product photos + Quantity/Size/$ block; excludes emltrk tracking-pixel preheader blob (guarded)
 		extractFromByltLayout, // BYLT Basics: <h3> name + "Total: $" cell (name in <h3>, not <p>, so paragraph strategy misses it) (guarded)

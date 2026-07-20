@@ -1078,3 +1078,102 @@ describe("real emails > Instagram Shopping (oneoneswim)", () => {
 		}
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Depop — labeled Item:/Size:/Item price: block, banner + recommendation noise
+// ---------------------------------------------------------------------------
+
+describe("real emails > Depop (sweatpants, no sale)", () => {
+	const products = parseProductsFromEmail(loadFixture("depop-sweatpants.html"));
+
+	it("detects exactly the 1 purchased item (no banners/recommendations)", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("extracts name, size, and price from the labeled block", () => {
+		expect(products[0].name).toContain("sweatpants");
+		expect(products[0].size).toBe("L");
+		expect(products[0].price).toBe("$8.50");
+		expect(products[0].onSale).toBe(false);
+	});
+
+	it("uses the depop product photo as the image", () => {
+		expect(products[0].imageUrl).toContain("media-photos.depop.com");
+	});
+});
+
+describe("real emails > Depop (swim shorts, struck-through sale)", () => {
+	const products = parseProductsFromEmail(loadFixture("depop-swim-shorts.html"));
+
+	it("detects exactly the 1 purchased item (excludes 2x2 recommendation grid)", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("cleans the listing title to the garment words", () => {
+		expect(products[0].name.toLowerCase()).toContain("swim shorts");
+		expect(products[0].name.toLowerCase()).not.toContain("brand new");
+		expect(products[0].name.toLowerCase()).not.toContain("w/tags");
+		expect(products[0].name.toLowerCase()).not.toContain("from groovy");
+	});
+
+	it("captures the sale: paid $30.00, original $48.00", () => {
+		expect(products[0].price).toBe("$30.00");
+		expect(products[0].originalPrice).toBe("$48.00");
+		expect(products[0].onSale).toBe(true);
+	});
+
+	it("classifies swim shorts as swim", () => {
+		expect(categoryFromName("swim shorts")).toBe("swim");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// L.L.Bean shipping notice — product block with Item:/Size:/Color labels
+// ---------------------------------------------------------------------------
+
+describe("real emails > L.L.Bean shipping notice", () => {
+	const products = parseProductsFromEmail(loadFixture("llbean-shipping.html"));
+
+	it("detects exactly the 1 shipped item (excludes You Might Also Like)", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("extracts the real product name, not the package-details header", () => {
+		expect(products[0].name).toContain("Mariner Fleece Shirt");
+		expect(products[0].name).not.toContain("Package Details");
+	});
+
+	it("extracts item number, size, and color", () => {
+		expect(products[0].itemNumber).toBe("PQ524587");
+		expect(products[0].size).toBe("X-Large");
+		expect(products[0].color.toLowerCase()).toContain("navy");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// FaceSocks — Shopify template with variant colors + per-item discounts
+// ---------------------------------------------------------------------------
+
+describe("real emails > FaceSocks (Shopify variants)", () => {
+	const products = parseProductsFromEmail(loadFixture("facesocks-shopify.html"));
+
+	it("detects the 4 sock items and excludes Navidium Shipping Protection", () => {
+		expect(products).toHaveLength(4);
+		for (const p of products) {
+			expect(p.name).not.toContain("Shipping Protection");
+		}
+	});
+
+	it("captures variant colors (Blue, Purple)", () => {
+		const colors = products.map((p) => p.color.toLowerCase());
+		expect(colors).toContain("blue");
+		expect(colors).toContain("purple");
+	});
+
+	it("captures per-item sale prices with struck originals", () => {
+		const first = products[0];
+		expect(first.price).toBe("$4.95");
+		expect(first.originalPrice).toBe("$19.95");
+		expect(first.onSale).toBe(true);
+	});
+});
