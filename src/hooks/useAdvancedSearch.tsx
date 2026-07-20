@@ -133,6 +133,7 @@ async function fetchJson<T>(url: string, accessToken: string, retries = MAX_RETR
 async function fetchInBatches<TInput, TOutput>(
 	items: TInput[],
 	processFn: (item: TInput) => Promise<TOutput>,
+	onProgress?: (done: number, total: number) => void,
 ): Promise<TOutput[]> {
 	const results: TOutput[] = [];
 
@@ -140,6 +141,7 @@ async function fetchInBatches<TInput, TOutput>(
 		const batch = items.slice(i, i + BATCH_SIZE);
 		const batchResults = await Promise.all(batch.map(processFn));
 		results.push(...batchResults);
+		onProgress?.(results.length, items.length);
 
 		if (i + BATCH_SIZE < items.length) {
 			await delay(BATCH_DELAY_MS);
@@ -275,6 +277,17 @@ function filterEmails(emails: GmailEmailMeta[], params: AdvancedSearchParams): G
 
 // ── Hook ─────────────────────────────────────────────────
 
+/**
+ * Detail-fetch progress for the current search. The metadata for up to
+ * MAX_EMAIL_RESULTS messages is fetched in rate-limited batches (BATCH_SIZE
+ * every BATCH_DELAY_MS), which can take tens of seconds — the UI shows
+ * "loading details (fetched/total)" instead of a frozen-looking spinner.
+ */
+export interface SearchProgress {
+	readonly fetched: number;
+	readonly total: number;
+}
+
 const EMPTY_CACHE: CacheEnvelope = {
 	timestamp: 0,
 	emails: [],
@@ -306,10 +319,16 @@ export function useAdvancedSearch() {
 	const [error, setError] = useState<string | null>(null);
 	const [hasNextPage, setHasNextPage] = useState(false);
 	const [searchMode, setSearchMode] = useState<SearchMode | null>(null);
+	const [progress, setProgress] = useState<SearchProgress | null>(null);
 
 	// Fetch email metadata list from API (headers + snippets, no bodies)
 	const fetchEmailList = useCallback(
-		async (accessToken: string, params?: AdvancedSearchParams, pageToken?: string) => {
+		async (
+			accessToken: string,
+			params?: AdvancedSearchParams,
+			pageToken?: string,
+			onProgress?: (done: number, total: number) => void,
+		) => {
 			const query = buildApiQuery(params);
 			let url = `${GMAIL_API_BASE}/messages?q=${encodeURIComponent(query)}&maxResults=${MAX_EMAIL_RESULTS}`;
 			if (pageToken) {
@@ -327,20 +346,27 @@ export function useAdvancedSearch() {
 				return { emails: [] as GmailEmailMeta[], nextToken };
 			}
 
-			const emailMetas = await fetchInBatches(listResponse.messages, async (msg) => {
-				const detail = await fetchJson<GmailMessageResponse>(
-					`${GMAIL_API_BASE}/messages/${msg.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date`,
-					accessToken,
-				);
-				return {
-					id: detail.id,
-					threadId: detail.threadId,
-					subject: getHeader(detail.payload.headers, "Subject"),
-					from: getHeader(detail.payload.headers, "From"),
-					date: getHeader(detail.payload.headers, "Date"),
-					snippet: detail.snippet,
-				};
-			});
+			// Report the total up front so the UI can show "0 of N" immediately.
+			onProgress?.(0, listResponse.messages.length);
+
+			const emailMetas = await fetchInBatches(
+				listResponse.messages,
+				async (msg) => {
+					const detail = await fetchJson<GmailMessageResponse>(
+						`${GMAIL_API_BASE}/messages/${msg.id}?format=metadata&metadataHeaders=Subject&metadataHeaders=From&metadataHeaders=Date`,
+						accessToken,
+					);
+					return {
+						id: detail.id,
+						threadId: detail.threadId,
+						subject: getHeader(detail.payload.headers, "Subject"),
+						from: getHeader(detail.payload.headers, "From"),
+						date: getHeader(detail.payload.headers, "Date"),
+						snippet: detail.snippet,
+					};
+				},
+				onProgress,
+			);
 
 			return { emails: emailMetas, nextToken };
 		},
@@ -360,6 +386,7 @@ export function useAdvancedSearch() {
 			setIsSearching(true);
 			setSearchMode("fetch");
 			setError(null);
+			setProgress(null);
 
 			try {
 				// On initial load with no explicit params, use cache if valid
@@ -370,7 +397,9 @@ export function useAdvancedSearch() {
 					return;
 				}
 
-				const { emails: newEmails, nextToken } = await fetchEmailList(accessToken, params);
+				const { emails: newEmails, nextToken } = await fetchEmailList(accessToken, params, undefined, (fetched, total) =>
+					setProgress({ fetched, total }),
+				);
 
 				const updatedCache: CacheEnvelope = {
 					timestamp: Date.now(),
@@ -403,6 +432,7 @@ export function useAdvancedSearch() {
 			} finally {
 				setIsSearching(false);
 				setSearchMode(null);
+				setProgress(null);
 			}
 		},
 		[cache, fetchEmailList, setCache],
@@ -500,6 +530,7 @@ export function useAdvancedSearch() {
 		isSearching,
 		isFetchingMore,
 		isFetchingBody,
+		progress,
 		error,
 		searchEmails,
 		fetchNextPage,

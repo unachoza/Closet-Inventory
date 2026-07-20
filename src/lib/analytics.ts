@@ -18,6 +18,7 @@ export type AnalyticsEvent =
 	| "import_started"
 	| "import_results_shown"
 	| "import_finished"
+	| "import_failed"
 	// Inventory
 	| "item_added"
 	| "item_edited"

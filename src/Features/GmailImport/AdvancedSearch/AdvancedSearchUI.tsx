@@ -27,10 +27,20 @@ interface AdvancedSearchUIProps {
 	readonly onSearch: (params: AdvancedSearchParams, mode: SearchMode) => void;
 	readonly loading: boolean;
 	readonly cachedCount: number;
+	/**
+	 * Increment to open the panel from outside (e.g. the zero-results state's
+	 * "Open Advanced Search" action). Counter, not boolean, so repeated requests
+	 * re-open it after the user collapses the panel.
+	 */
+	readonly expandSignal?: number;
 }
 
-export const AdvancedSearchUI = ({ onSearch, loading, cachedCount }: AdvancedSearchUIProps) => {
+export const AdvancedSearchUI = ({ onSearch, loading, cachedCount, expandSignal }: AdvancedSearchUIProps) => {
 	const [isExpanded, setIsExpanded] = useState(false);
+
+	useEffect(() => {
+		if (expandSignal !== undefined && expandSignal > 0) setIsExpanded(true);
+	}, [expandSignal]);
 	const [from, setFrom] = useState("");
 	const [after, setAfter] = useState("");
 	const [before, setBefore] = useState("");
