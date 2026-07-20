@@ -21,7 +21,8 @@ import EntireClosetView from "./Features/SearchCloset/EntireClosetView/EntireClo
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
-import { OnboardingExpanded } from "./Features/Onboarding/OnboardingSteps";
+import OnboardingFlow from "./Features/Onboarding/OnboardingFlow";
+import ProfileView from "./Features/Profile/ProfileView";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
 import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
 import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
@@ -199,7 +200,7 @@ function AppShell() {
 	}
 
 	if (showOnboarding) {
-		return <OnboardingExpanded onComplete={handleComplete} />;
+		return <OnboardingFlow onComplete={handleComplete} />;
 	}
 	return (
 		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>
@@ -230,6 +231,7 @@ function AppShell() {
 						{view === "fabric" && <InteractiveGuide />}
 						{view === "journey" && <JourneyC />}
 						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
+							{view === "profile" && <ProfileView />}
 						{view === "carousel" && (
 							<>
 								<div data-testid="carousel">

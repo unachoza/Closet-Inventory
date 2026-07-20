@@ -9,6 +9,8 @@ import { ViewProvider, useView } from "../../context/ViewContext";
 vi.mock("../CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
 // AccountDataModal needs Supabase auth context; covered by its own test.
 vi.mock("./AccountDataModal/AccountDataModal", () => ({ default: () => null }));
+// AvatarButton needs Supabase auth + profile fetch; covered by its own test.
+vi.mock("./AvatarButton", () => ({ default: () => null }));
 import { SearchProvider, useSearch } from "../../context/SearchContext";
 import { ViewType } from "../../utils/types";
 

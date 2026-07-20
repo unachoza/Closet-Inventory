@@ -6,7 +6,10 @@
     top: 0;
     z-index: 100;
     display: flex;
-    flex-direction: column;
+    /* Row so .nav-left and .nav-right (profile avatar) sit at opposite edges;
+       was column when the header had a single child. */
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
     width: 100%;
      height: var(--header-height, 56px);
@@ -252,6 +255,11 @@ div.search-container > input {
          SyncStatusIndicator stays in the header for at-a-glance state. */
       .nav-left__sync-control {
             display: none;
+      }
+
+      /* Mobile header has no horizontal padding — keep the avatar off the edge. */
+      .nav-right {
+            margin-right: 10px;
       }
       .top-nav--search .search-input {
     width: 100%;

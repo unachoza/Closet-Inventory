@@ -28,6 +28,14 @@ export type AnalyticsEvent =
 	| "care_guide_opened"
 	// Navigation
 	| "screen_viewed"
+	// Onboarding funnel
+	| "onboarding_step_viewed"
+	| "onboarding_completed"
+	| "onboarding_skipped"
+	| "signin_skipped"
+	| "install_prompt_result"
+	// Profile
+	| "profile_name_confirmed"
 	// Feedback
 	| "feedback_submitted";
 
