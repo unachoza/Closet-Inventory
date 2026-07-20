@@ -266,23 +266,6 @@
 	background: var(--bg-surface-secondary);
 }
 
-.onb-notice {
-	background: var(--bg-surface-secondary);
-	border-radius: var(--primitive-radius-md);
-	padding: 12px 14px;
-	font-size: var(--primitive-font-size-xs);
-	line-height: var(--primitive-line-height-normal);
-	color: var(--text-secondary);
-	text-align: left;
-	max-width: 320px;
-	margin-top: var(--primitive-spacing-md);
-}
-
-.onb-notice strong {
-	font-weight: 500;
-	color: var(--text-primary);
-}
-
 /* Name step */
 
 .onb__name-input {

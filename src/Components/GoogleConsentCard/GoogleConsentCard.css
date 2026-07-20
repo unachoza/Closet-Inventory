@@ -1,0 +1,120 @@
+.gconsent {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.6rem;
+	/* max-width: 340px; */
+	margin: 12px auto 0;
+	padding: 14px 16px;
+	background: var(--bg-surface-secondary);
+	border-radius: var(--primitive-radius-md, 10px);
+	text-align: center;
+}
+
+.gconsent--compact {
+	padding: 10px 14px;
+	gap: 0.35rem;
+}
+
+.gconsent__marks {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.gconsent__mark {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+}
+
+.gconsent--compact .gconsent__mark {
+	width: 24px;
+	height: 24px;
+}
+
+.gconsent__mark-divider {
+	width: 1px;
+	height: 16px;
+	background: var(--border-hairline);
+}
+
+.gconsent__avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: var(--bg-surface-primary);
+	color: var(--text-secondary);
+	overflow: hidden;
+}
+
+.gconsent__avatar-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.gconsent__avatar-initials {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.gconsent__lead {
+	margin: 0;
+	font-size: 0.92rem;
+	line-height: 1.4;
+	color: var(--text-primary);
+}
+
+.gconsent--compact .gconsent__lead {
+	font-size: 0.8rem;
+}
+
+.gconsent__perms {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	width: 100%;
+	text-align: left;
+}
+
+.gconsent__perms li {
+	font-size: 0.85rem;
+	line-height: 1.4;
+	color: var(--text-secondary);
+	padding-left: 1.1rem;
+	position: relative;
+}
+
+.gconsent__perms li::before {
+	content: "✓";
+	position: absolute;
+	left: 0;
+	color: var(--border-brand);
+}
+
+.gconsent__reassurance {
+	margin: 0.2rem 0 0;
+	font-size: 0.78rem;
+	line-height: 1.5;
+	color: var(--text-secondary);
+	text-align: left;
+    	margin-left: .25rem;
+}
+
+.gconsent__reassurance strong {
+	font-weight: 500;
+	color: var(--text-primary);
+}

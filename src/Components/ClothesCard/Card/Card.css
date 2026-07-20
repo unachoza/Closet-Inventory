@@ -59,6 +59,25 @@
       background: var(--bg-surface-secondary);
 }
 
+/* "Sample" marker on starter-closet cards. Sits top-left over the image so a
+   fresh user can tell seeded demo items from their own at a glance. */
+.card-sample-chip {
+      position: absolute;
+      top: .75rem;
+      left: .75rem;
+      z-index: 2;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-on-brand, #fff);
+      background: var(--primitive-brand-rose-terracotta);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+}
+
 .card-image {
       height: 100%;
 }

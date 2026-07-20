@@ -13,6 +13,7 @@ import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import { useGoogleUnverifiedNotice } from "../Onboarding/useGoogleUnverifiedNotice";
 import GoogleUnverifiedNotice from "../Onboarding/GoogleUnverifiedNotice";
+import GoogleHeadsUpNotice from "../../Components/GoogleHeadsUpNotice/GoogleHeadsUpNotice";
 import "./GmailImport.css";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
@@ -300,8 +301,14 @@ export default function GmailImport({
 					>
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
+					<GoogleHeadsUpNotice variant="gmail-import" />
 					{error && <p className="gmail-error">{error}</p>}
-					<GoogleUnverifiedNotice isOpen={googleNotice.isOpen} onContinue={googleNotice.confirm} onCancel={googleNotice.dismiss} />
+					<GoogleUnverifiedNotice
+						isOpen={googleNotice.isOpen}
+						onContinue={googleNotice.confirm}
+						onCancel={googleNotice.dismiss}
+						variant="gmail-import"
+					/>
 				</div>
 			</div>
 		);

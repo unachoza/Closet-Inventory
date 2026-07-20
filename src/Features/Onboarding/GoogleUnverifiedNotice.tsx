@@ -1,10 +1,14 @@
 import Modal from "../../Components/Modal/Modal";
+import GoogleConsentCard from "../../Components/GoogleConsentCard/GoogleConsentCard";
 import "./GoogleUnverifiedNotice.css";
 
 interface GoogleUnverifiedNoticeProps {
 	readonly isOpen: boolean;
 	readonly onContinue: () => void;
 	readonly onCancel: () => void;
+	readonly variant?: "sign-in" | "gmail-import";
+	readonly userPhotoUrl?: string | null;
+	readonly userName?: string | null;
 }
 
 /**
@@ -14,7 +18,14 @@ interface GoogleUnverifiedNoticeProps {
  * it reads as a scam prompt to non-technical users (see P0 backlog: 40–60%
  * onboarding drop-off risk).
  */
-export default function GoogleUnverifiedNotice({ isOpen, onContinue, onCancel }: GoogleUnverifiedNoticeProps) {
+export default function GoogleUnverifiedNotice({
+	isOpen,
+	onContinue,
+	onCancel,
+	variant = "sign-in",
+	userPhotoUrl,
+	userName,
+}: GoogleUnverifiedNoticeProps) {
 	return (
 		<Modal
 			isOpen={isOpen}
@@ -31,6 +42,7 @@ export default function GoogleUnverifiedNotice({ isOpen, onContinue, onCancel }:
 				</>
 			}
 		>
+			<GoogleConsentCard variant={variant} userPhotoUrl={userPhotoUrl} userName={userName} className="gun-card" />
 			<p className="gun-lead">
 				Nothing To Wear is a small beta app, still going through Google's app-verification review. Until that finishes, Google shows
 				every visitor a warning screen — it isn't a sign that anything is wrong.

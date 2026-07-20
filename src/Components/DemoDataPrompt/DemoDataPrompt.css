@@ -10,8 +10,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: var(--color-surface-sunken, #f3eee7);
-	color: var(--color-accent, #b28675);
+	background: var(--bg-surface-secondary);
+	color: var(--primitive-brand-rose-terracotta);
 }
 
 .demo-prompt__mark svg {
@@ -22,14 +22,14 @@
 .demo-prompt__lead {
 	font-weight: 500;
 	font-size: 1rem;
-	color: var(--color-text, #492f28);
+	color: var(--text-primary);
 	margin-bottom: var(--spacing-075, 8px);
 }
 
 .demo-prompt__body {
 	font-size: 0.85rem;
 	line-height: 1.6;
-	color: var(--color-text-muted, #8a7a72);
+	color: var(--text-secondary);
 	max-width: 34ch;
 	margin: 0 auto;
 }

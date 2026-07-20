@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { FilterDimension, FilterState, FILTER_DIMENSIONS } from "../../../hooks/useClosetFilters";
+import { FilterDimension, FilterState, visibleFilterDimensions } from "../../../hooks/useClosetFilters";
 import "../EntireCloset.css";
 
 interface FilterPillsRowProps {
@@ -28,7 +28,7 @@ const FilterPillsRow = ({ filters, activeFilterCount, onRemove, onClearAll }: Fi
 
 	return (
 		<div className="filter-pills-row" aria-label="Active filters">
-			{FILTER_DIMENSIONS.flatMap((dim) =>
+			{visibleFilterDimensions().flatMap((dim) =>
 				(filters[dim] ?? []).map((value) => (
 					<span key={`${dim}:${value}`} className="filter-pill">
 						<span className="filter-pill__dim">{PILL_DIM_LABELS[dim]}:</span>
