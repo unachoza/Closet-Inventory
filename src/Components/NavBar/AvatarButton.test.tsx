@@ -68,7 +68,7 @@ describe("AvatarButton", () => {
 
 	it("falls back to the initial letter without a photo", async () => {
 		renderButton(makeAuth());
-		await waitFor(() => expect(screen.getByRole("button", { name: /profile/i })).toHaveTextContent("A"));
+		await waitFor(() => expect(screen.getByRole("button", { name: /profile/i })).toHaveTextContent("S"));
 	});
 
 	it("renders a generic icon when signed out", () => {
