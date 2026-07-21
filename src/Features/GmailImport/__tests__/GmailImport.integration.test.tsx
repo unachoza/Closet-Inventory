@@ -20,6 +20,7 @@ import EditItemView from "../../Form/EditItemView/EditItemView";
 import { EditProvider } from "../../Form/EditContext";
 import { ToastProvider } from "../../../Components/Toast/Toast";
 import { GmailAuthProvider } from "../../../context/GmailAuthContext";
+import { SupabaseAuthProvider } from "../../../context/SupabaseAuthContext";
 import type { ClothingItem, ViewType } from "../../../utils/types";
 import { ZARA_EMAIL_BODY } from "./__mocks__/emailDataMocks";
 
@@ -176,6 +177,7 @@ function TestHarness() {
 	const isInBatchMode = importQueue.length > 1;
 
 	return (
+		<SupabaseAuthProvider>
 		<GmailAuthProvider>
 			<EditProvider>
 				<ToastProvider>
@@ -203,6 +205,7 @@ function TestHarness() {
 				</ToastProvider>
 			</EditProvider>
 		</GmailAuthProvider>
+		</SupabaseAuthProvider>
 	);
 }
 
