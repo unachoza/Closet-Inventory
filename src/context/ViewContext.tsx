@@ -59,7 +59,7 @@ export function ViewProvider({ children, initialView = "carousel" }: ViewProvide
 
 	const confirmDiscard = useCallback(() => {
 		navGuardRef.current = null;
-		setPendingAction((pending) => {
+		setPendingAction((pending: SetStateAction<ViewType> | null) => {
 			if (pending !== null) applyView(pending);
 			return null;
 		});
