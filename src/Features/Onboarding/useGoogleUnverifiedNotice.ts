@@ -3,6 +3,15 @@ import { useCallback, useRef, useState } from "react";
 const NOTICE_SEEN_KEY = "closetly-google-notice-seen";
 
 /**
+ * The onboarding sign-in step shows the unverified-app explanation inline, so
+ * it marks the notice seen directly instead of opening the modal — later OAuth
+ * entry points (CloudSyncControl, Gmail import) then skip the interstitial.
+ */
+export function markGoogleNoticeSeen(): void {
+	localStorage.setItem(NOTICE_SEEN_KEY, "true");
+}
+
+/**
  * Gates any Google OAuth entry point (Supabase sign-in, Gmail import) behind a
  * one-time explainer for the "Google hasn't verified this app" interstitial.
  * Non-technical waitlisters otherwise read that screen as a scam warning and

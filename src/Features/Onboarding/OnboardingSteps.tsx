@@ -125,10 +125,10 @@ function Step1Demo() {
 // ─── Step 2: Email list ─────────────────────────────────────────────────────────
 
 const emails = [
-	{ from: "POSHMARK", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO ARIANNA! THANK YOU FOR SHOPPING ON P…" },
+	{ from: "POSHMARK", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO Susan! THANK YOU FOR SHOPPING ON P…" },
 	{ from: "ZARA", subject: "THANKS FOR YOUR PURCHASE", preview: "THANK YOU FOR YOUR PURCHASE ORDER NO. 5431…" },
 	{ from: "GAP", subject: "THANKS FOR YOUR PURCHASE", preview: "THANK YOU FOR YOUR PURCHASE ORDER NO. 546…" },
-	{ from: "MACY'S", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO ARIANNA! THANK YOU FOR SHOPPING ON P…" },
+	{ from: "MACY'S", subject: "YOUR POSHMARK ORDER CONFIRMATI…", preview: "HELLO Susan! THANK YOU FOR SHOPPING ON P…" },
 ];
 
 function Step2Demo() {

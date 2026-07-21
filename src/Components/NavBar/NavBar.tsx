@@ -12,6 +12,7 @@ import ClearClosetModal from "./ClearModal/ClearClosetModal";
 import AccountDataModal from "./AccountDataModal/AccountDataModal";
 import SyncStatusIndicator from "../SyncStatusIndicator/SyncStatusIndicator";
 import CloudSyncControl from "../CloudSyncControl/CloudSyncControl";
+import AvatarButton from "./AvatarButton";
 
 interface NavBarProps {
 	/**
@@ -203,6 +204,11 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 				<div className="nav-left__sync-control">
 					<CloudSyncControl />
 				</div>
+			</div>
+
+			{/* Profile entry — the avatar renders at all widths (E12 minimal slice). */}
+			<div className="nav-right">
+				<AvatarButton />
 			</div>
 
 			{drawerOpen && (

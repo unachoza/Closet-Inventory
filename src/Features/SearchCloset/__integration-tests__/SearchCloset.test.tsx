@@ -71,6 +71,7 @@ const mockCloset: ClothingItem[] = [
 // which needs Supabase auth context. Stub it — not under test here.
 vi.mock("../../../Components/CloudSyncControl/CloudSyncControl", () => ({ default: () => null }));
 vi.mock("../../../Components/NavBar/AccountDataModal/AccountDataModal", () => ({ default: () => null }));
+vi.mock("../../../Components/NavBar/AvatarButton", () => ({ default: () => null }));
 
 vi.mock("../../../context/LocationsContext", () => ({
 	useLocations: () => ({

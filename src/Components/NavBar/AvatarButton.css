@@ -1,0 +1,38 @@
+.avatar-btn {
+	width: 34px;
+	height: 34px;
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid var(--border-hairline);
+	border-radius: 50%;
+	background: var(--bg-surface-secondary);
+	color: var(--text-secondary);
+	cursor: pointer;
+	padding: 0;
+	overflow: hidden;
+}
+
+.avatar-btn:hover {
+	border-color: var(--border-brand);
+}
+
+.avatar-btn__photo {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.avatar-btn__initial {
+	font-family: var(--primitive-font-family-serif);
+	font-style: italic;
+	font-size: 15px;
+	color: var(--text-on-brand);
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--bg-surface-brand);
+}
