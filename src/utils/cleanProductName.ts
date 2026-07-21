@@ -7,6 +7,8 @@ const SEO_JUNK: RegExp[] = [
 	/\bbest\s+sellers?\b/gi,
 	/\bhot\s+sale\b/gi,
 	/\bflash\s+sale\b/gi,
+	/\s*-\s*final\s+sale\b/gi,
+	/\bfinal\s+sale\b/gi,
 	/\blimited\s+time\b/gi,
 	/\bbuy\s+now\b/gi,
 	/\bshop\s+now\b/gi,

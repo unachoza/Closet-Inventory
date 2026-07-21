@@ -5,6 +5,8 @@ export const SLEEVE_LENGTH_MAP: [RegExp, string][] = [
 	[/\b3\/4[- ]?sleeve\b/i, "3/4 sleeve"],
 	[/\bshort[- ]?sleeve\b/i, "short sleeve"],
 	[/\b(sleeveless|strapless|tank)\b/i, "sleeveless"],
+	// Strap-style tops have no sleeves: "Strappy Cami", "Spaghetti Strap Dress"
+	[/\b(strappy|spaghetti)\b/i, "sleeveless"],
 	[/\bcap[- ]?sleeve\b/i, "cap sleeve"],
 	[/\bflutter[- ]?sleeve\b/i, "flutter sleeve"],
 ];

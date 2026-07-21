@@ -17,5 +17,8 @@ export const ACCENTS_MAP: RegexMap = [
   [/\brhinestones?\b/i, "rhinestones"],
   [/\bstudded\b/i, "studded"],
   [/\blace[- ]?trim\b/i, "lace trim"],
+  // Plain "lace" is an embellishment ("Textured Lace Scoop-Neck Top");
+  // lookahead keeps "lace trim" mapping to its own entry above.
+  [/\blace\b(?![- ]?trim)/i, "lace"],
   [/\bappliqu[eé]\b/i, "appliqué"],
 ];

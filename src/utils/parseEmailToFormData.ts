@@ -63,6 +63,12 @@ const BRAND_PATTERNS: Record<string, string> = {
 const RESELLERS = ["poshmark", "depop", "ebay", "vinted", "threadup", "the realreal"];
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
+	// Swim compounds FIRST — "swim shorts" must win over the bare "short" →
+	// bottoms and "top" → tops keywords below.
+	"swim short": "swim",
+	"swim top": "swim",
+	"swim bottom": "swim",
+	"swim trunk": "swim",
 	dress: "dresses",
 	// bottoms
 	skirt: "bottoms",
@@ -78,6 +84,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
 	"t-shirt": "tops",
 	tee: "tops",
 	tank: "tops",
+	cami: "tops",
 	sweater: "sweaters",
 	hoodie: "sweaters",
 	hoody: "sweaters",

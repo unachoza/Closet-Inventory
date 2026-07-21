@@ -1046,3 +1046,236 @@ describe("real emails > BYLT Basics order confirmation", () => {
 		expect(categoryFromName("Ribbed Short Sleeve Drop-Cut")).toBe("tops");
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Instagram Shopping — oneoneswim (final sale + promotion discount)
+// ---------------------------------------------------------------------------
+
+describe("real emails > Instagram Shopping (oneoneswim)", () => {
+	const products = parseProductsFromEmail(loadFixture("instagram-oneoneswim.html"));
+
+	it("detects exactly 2 purchased items (excludes 3 suggested items)", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("strips '- final sale' from names and marks onSale", () => {
+		expect(products[0].name).toBe("alli bottom dusty rose");
+		expect(products[1].name).toBe("alli top dusty rose");
+		expect(products[0].onSale).toBe(true);
+		expect(products[1].onSale).toBe(true);
+	});
+
+	it("applies promotion discount: price=$31.05, originalPrice=$34.50", () => {
+		expect(products[0].price).toBe("$31.05");
+		expect(products[0].originalPrice).toBe("$34.50");
+		expect(products[1].price).toBe("$31.05");
+		expect(products[1].originalPrice).toBe("$34.50");
+	});
+
+	it("does not leak suggested items' $69 struck price onto purchased items", () => {
+		for (const p of products) {
+			expect(p.originalPrice).not.toBe("$69.00");
+		}
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Depop — labeled Item:/Size:/Item price: block, banner + recommendation noise
+// ---------------------------------------------------------------------------
+
+describe("real emails > Depop (sweatpants, no sale)", () => {
+	const products = parseProductsFromEmail(loadFixture("depop-sweatpants.html"));
+
+	it("detects exactly the 1 purchased item (no banners/recommendations)", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("extracts name, size, and price from the labeled block", () => {
+		expect(products[0].name).toContain("sweatpants");
+		expect(products[0].size).toBe("L");
+		expect(products[0].price).toBe("$8.50");
+		expect(products[0].onSale).toBe(false);
+	});
+
+	it("uses the depop product photo as the image", () => {
+		expect(products[0].imageUrl).toContain("media-photos.depop.com");
+	});
+});
+
+describe("real emails > Depop (swim shorts, struck-through sale)", () => {
+	const products = parseProductsFromEmail(loadFixture("depop-swim-shorts.html"));
+
+	it("detects exactly the 1 purchased item (excludes 2x2 recommendation grid)", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("cleans the listing title to the garment words", () => {
+		expect(products[0].name.toLowerCase()).toContain("swim shorts");
+		expect(products[0].name.toLowerCase()).not.toContain("brand new");
+		expect(products[0].name.toLowerCase()).not.toContain("w/tags");
+		expect(products[0].name.toLowerCase()).not.toContain("from groovy");
+	});
+
+	it("captures the sale: paid $30.00, original $48.00", () => {
+		expect(products[0].price).toBe("$30.00");
+		expect(products[0].originalPrice).toBe("$48.00");
+		expect(products[0].onSale).toBe(true);
+	});
+
+	it("classifies swim shorts as swim", () => {
+		expect(categoryFromName("swim shorts")).toBe("swim");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// L.L.Bean shipping notice — product block with Item:/Size:/Color labels
+// ---------------------------------------------------------------------------
+
+describe("real emails > L.L.Bean shipping notice", () => {
+	const products = parseProductsFromEmail(loadFixture("llbean-shipping.html"));
+
+	it("detects exactly the 1 shipped item (excludes You Might Also Like)", () => {
+		expect(products).toHaveLength(1);
+	});
+
+	it("extracts the real product name, not the package-details header", () => {
+		expect(products[0].name).toContain("Mariner Fleece Shirt");
+		expect(products[0].name).not.toContain("Package Details");
+	});
+
+	it("extracts item number, size, and color", () => {
+		expect(products[0].itemNumber).toBe("PQ524587");
+		expect(products[0].size).toBe("X-Large");
+		expect(products[0].color.toLowerCase()).toContain("navy");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// FaceSocks — Shopify template with variant colors + per-item discounts
+// ---------------------------------------------------------------------------
+
+describe("real emails > FaceSocks (Shopify variants)", () => {
+	const products = parseProductsFromEmail(loadFixture("facesocks-shopify.html"));
+
+	it("detects the 4 sock items and excludes Navidium Shipping Protection", () => {
+		expect(products).toHaveLength(4);
+		for (const p of products) {
+			expect(p.name).not.toContain("Shipping Protection");
+		}
+	});
+
+	it("captures variant colors (Blue, Purple)", () => {
+		const colors = products.map((p) => p.color.toLowerCase());
+		expect(colors).toContain("blue");
+		expect(colors).toContain("purple");
+	});
+
+	it("captures per-item sale prices with struck originals", () => {
+		const first = products[0];
+		expect(first.price).toBe("$4.95");
+		expect(first.originalPrice).toBe("$19.95");
+		expect(first.onSale).toBe(true);
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Levi's — scene7 product photos + labeled detail cells (Cordial template).
+// Two shapes: an order confirmation with two same-name colorways, and a ship
+// confirmation whose photo alt is a placeholder ("TBD") and whose item carries
+// a per-item discount. Order barcodes must never surface as products.
+// ---------------------------------------------------------------------------
+
+describe("real emails > Levi's order confirm (two colorways, same name)", () => {
+	const products = parseProductsFromEmail(loadFixture("levi-order-two-colors.html"));
+
+	it("imports both colorways as separate items (barcode/logo excluded)", () => {
+		expect(products).toHaveLength(2);
+	});
+
+	it("captures name, color, size, style and price per item", () => {
+		const gray = byName(products, "Tabor T-Shirt");
+		// Two items share the name — assert on each by color.
+		const chateau = products.find((p) => p.color === "Chateau Gray");
+		const anthracite = products.find((p) => p.color === "Anthracite Night");
+		expect(chateau).toBeDefined();
+		expect(anthracite).toBeDefined();
+		expect(chateau!.name).toBe("Tabor T-Shirt");
+		expect(chateau!.size).toBe("M");
+		expect(chateau!.price).toBe("$17.25");
+		expect(chateau!.itemNumber).toBe("001HI00060M");
+		expect(anthracite!.size).toBe("M");
+		expect(anthracite!.price).toBe("$20.70");
+		expect(anthracite!.itemNumber).toBe("001HI00050M");
+		expect(gray).toBeDefined();
+		expect(chateau!.imageUrl).toContain("scene7.com/is/image/lsco/001HI0006");
+		expect(anthracite!.imageUrl).toContain("scene7.com/is/image/lsco/001HI0005");
+	});
+
+	it("does not surface the order barcode as a product", () => {
+		for (const p of products) {
+			expect(p.name.toLowerCase()).not.toContain("barcode");
+			expect(p.imageUrl).not.toContain("barcode");
+		}
+	});
+});
+
+describe("real emails > Levi's ship confirm (placeholder alt, discounted)", () => {
+	const products = parseProductsFromEmail(loadFixture("levi-ship-discount.html"));
+
+	it("detects the single jeans item despite the 'TBD' photo alt", () => {
+		expect(products).toHaveLength(1);
+		// cleanProductName strips the "Women's" gender qualifier during enrichment.
+		expect(products[0].name).toBe("Wedgie Bootcut Jeans");
+	});
+
+	it("captures color, combined waist×inseam size, style, and photo", () => {
+		expect(products[0].color).toBe("Sunset Ride");
+		expect(products[0].size).toBe("30WX32L");
+		expect(products[0].itemNumber).toBe("003QB0000");
+		expect(products[0].imageUrl).toContain("scene7.com/is/image/lscoglobal");
+	});
+
+	it("uses the discounted Total as price and the Price line as original", () => {
+		expect(products[0].price).toBe("$44.00");
+		expect(products[0].originalPrice).toBe("$54.00");
+		expect(products[0].onSale).toBe(true);
+	});
+
+	it("infers bootcut leg shape from the name", () => {
+		expect(products[0].legShape).toBe("bootcut");
+	});
+
+	it("is classified as clothing (jeans), not skipped", () => {
+		expect(categoryFromName(products[0].name)).not.toBe("");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// Quince — details cell with Size:/Color: labels + name link. Recommendation
+// tiles reuse the images.quince.com CDN and must be excluded.
+// ---------------------------------------------------------------------------
+
+describe("real emails > Quince order confirm (jeans, numeric size)", () => {
+	const products = parseProductsFromEmail(loadFixture("quince-order.html"));
+
+	it("detects only the purchased item (recommendations excluded)", () => {
+		expect(products).toHaveLength(1);
+		expect(products[0].name).toBe("Bella Stretch Relaxed Straight Jeans");
+	});
+
+	it("captures numeric jean size, color and price", () => {
+		expect(products[0].size).toBe("29");
+		expect(products[0].color).toBe("Atlantic Blue");
+		expect(products[0].price).toBe("$50.00");
+	});
+
+	it("captures the product photo (sibling cell of the details block)", () => {
+		expect(products[0].imageUrl).toContain("images.quince.com");
+		expect(products[0].imageUrl).toContain("W-PNT-109-ATLBLU");
+	});
+
+	it("infers straight leg shape and stretch from the name", () => {
+		expect(products[0].legShape).toBe("straight");
+		expect(products[0].hasStretch).toBe(true);
+	});
+});
