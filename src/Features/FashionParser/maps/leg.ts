@@ -11,4 +11,9 @@ export const LEG_SHAPE_MAP: RegexMap = [
   [/\bcigarette\b/i, "cigarette"],
   [/\bpeg\b/i, "peg"],
   [/\bskinny\b/i, "skinny"],
+  // Bare cut words denim listings use without the "-leg" suffix
+  // (e.g. "Bella Stretch Relaxed Straight Jeans", "Wide Leg" → "wide leg" above,
+  // bare "Wide" here). Ordered last so the "-leg" variants win first.
+  [/\bstraight\b/i, "straight"],
+  [/\bwide\b/i, "wide leg"],
 ];
