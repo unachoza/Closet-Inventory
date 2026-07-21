@@ -36,28 +36,21 @@ function makeAuth(overrides: Partial<SupabaseAuthState> = {}): SupabaseAuthState
 }
 
 function renderFlow(auth: SupabaseAuthState, onComplete = vi.fn()) {
-	const wrapper = ({ children }: { children: ReactNode }) => (
-		<SupabaseAuthContext.Provider value={auth}>{children}</SupabaseAuthContext.Provider>
-	);
+	const wrapper = ({ children }: { children: ReactNode }) => <SupabaseAuthContext.Provider value={auth}>{children}</SupabaseAuthContext.Provider>;
 	render(<OnboardingFlow onComplete={onComplete} />, { wrapper });
 	return { onComplete, auth };
 }
 
-const TOUR_HEADINGS = [
-	/your closet/i,
-	/your inbox already knows/i,
-	/care for what you love/i,
-	/find anything in seconds/i,
-];
+const TOUR_HEADINGS = [/your closet/i, /your inbox already knows/i, /care for what you love/i, /find anything in seconds/i];
 
 describe("OnboardingFlow", () => {
 	beforeEach(() => {
 		localStorage.clear();
 		mockGetProfile.mockReset().mockResolvedValue({
 			ok: true,
-			data: { id: "user-1", created_at: "", display_name: "Arianna", photo_url: null, settings: {} },
+			data: { id: "user-1", created_at: "", display_name: "Susan", photo_url: null, settings: {} },
 		});
-		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Arianna" });
+		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Susan" });
 	});
 
 	it("shows a quiet holding state while auth is restoring", () => {
@@ -120,7 +113,7 @@ describe("OnboardingFlow", () => {
 		renderFlow(makeAuth({ user: { id: "user-1" } as User, isAuthenticated: true }));
 		await user.click(screen.getByRole("button", { name: /^skip$/i }));
 		expect(await screen.findByRole("heading", { name: /what should we call you/i })).toBeInTheDocument();
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Arianna"));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Susan"));
 		await user.click(screen.getByRole("button", { name: /that's me/i }));
 		expect(await screen.findByRole("heading", { name: /one tap away/i })).toBeInTheDocument();
 	});

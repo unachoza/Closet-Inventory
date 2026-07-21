@@ -35,9 +35,7 @@ function makeAuth(userMeta: Record<string, unknown> = {}): SupabaseAuthState {
 }
 
 function renderStep(auth = makeAuth(), onContinue = vi.fn()) {
-	const wrapper = ({ children }: { children: ReactNode }) => (
-		<SupabaseAuthContext.Provider value={auth}>{children}</SupabaseAuthContext.Provider>
-	);
+	const wrapper = ({ children }: { children: ReactNode }) => <SupabaseAuthContext.Provider value={auth}>{children}</SupabaseAuthContext.Provider>;
 	render(<NameStep onContinue={onContinue} />, { wrapper });
 	return { onContinue };
 }
@@ -47,14 +45,14 @@ describe("NameStep", () => {
 		mockTrack.mockClear();
 		mockGetProfile.mockReset().mockResolvedValue({
 			ok: true,
-			data: { id: "user-1", created_at: "", display_name: "Arianna", photo_url: null, settings: {} },
+			data: { id: "user-1", created_at: "", display_name: "Susan", photo_url: null, settings: {} },
 		});
-		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Arianna" });
+		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Susan" });
 	});
 
 	it("pre-fills the name from the profile", async () => {
 		renderStep();
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Arianna"));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Susan"));
 	});
 
 	it("falls back to Google metadata while the profile has no name", async () => {
@@ -69,7 +67,7 @@ describe("NameStep", () => {
 	it("keeps an unedited confirmation to a no-op save and continues", async () => {
 		const user = userEvent.setup();
 		const { onContinue } = renderStep();
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Arianna"));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Susan"));
 		await user.click(screen.getByRole("button", { name: /that's me/i }));
 		await waitFor(() => expect(onContinue).toHaveBeenCalled());
 		expect(mockUpdateDisplayName).not.toHaveBeenCalled();
@@ -79,7 +77,7 @@ describe("NameStep", () => {
 	it("saves an edited name before continuing", async () => {
 		const user = userEvent.setup();
 		const { onContinue } = renderStep();
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Arianna"));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Susan"));
 		await user.clear(screen.getByRole("textbox"));
 		await user.type(screen.getByRole("textbox"), "Ari");
 		await user.click(screen.getByRole("button", { name: /that's me/i }));
@@ -91,7 +89,7 @@ describe("NameStep", () => {
 	it("shows a validation error for an empty name and stays put", async () => {
 		const user = userEvent.setup();
 		const { onContinue } = renderStep();
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Arianna"));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Susan"));
 		await user.clear(screen.getByRole("textbox"));
 		await user.click(screen.getByRole("button", { name: /that's me/i }));
 		expect(await screen.findByRole("alert")).toHaveTextContent(/name/i);
@@ -102,7 +100,7 @@ describe("NameStep", () => {
 		mockUpdateDisplayName.mockResolvedValue({ ok: false, error: "network down" });
 		const user = userEvent.setup();
 		const { onContinue } = renderStep();
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Arianna"));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Susan"));
 		await user.clear(screen.getByRole("textbox"));
 		await user.type(screen.getByRole("textbox"), "Ari");
 		await user.click(screen.getByRole("button", { name: /that's me/i }));

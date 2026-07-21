@@ -21,7 +21,7 @@ import { useProfile } from "../useProfile";
 const PROFILE_ROW = {
 	id: "user-1",
 	created_at: "2026-07-01T00:00:00Z",
-	display_name: "Arianna",
+	display_name: "Susan",
 	photo_url: "https://example.com/a.jpg",
 	settings: {},
 };
@@ -94,7 +94,7 @@ describe("useProfile", () => {
 		await act(async () => {
 			await result.current.updateDisplayName("Ari");
 		});
-		expect(result.current.profile?.display_name).toBe("Arianna");
+		expect(result.current.profile?.display_name).toBe("Susan");
 	});
 
 	it("rejects an update while signed out", async () => {

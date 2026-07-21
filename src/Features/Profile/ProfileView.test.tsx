@@ -24,8 +24,7 @@ vi.mock("../../services/profileService", async (importOriginal) => ({
 }));
 
 vi.mock("../../Components/NavBar/AccountDataModal/AccountDataModal", () => ({
-	default: ({ isOpen }: { isOpen: boolean }) =>
-		isOpen ? <div role="dialog" aria-label="Account and data" /> : null,
+	default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div role="dialog" aria-label="Account and data" /> : null),
 }));
 
 import ProfileView from "./ProfileView";
@@ -58,14 +57,14 @@ describe("ProfileView", () => {
 	beforeEach(() => {
 		mockGetProfile.mockReset().mockResolvedValue({
 			ok: true,
-			data: { id: "user-1", created_at: "", display_name: "Arianna", photo_url: null, settings: {} },
+			data: { id: "user-1", created_at: "", display_name: "Susan", photo_url: null, settings: {} },
 		});
 		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Ari" });
 	});
 
 	it("shows the display name, email, and app version", async () => {
 		renderView();
-		await waitFor(() => expect(screen.getByText("Arianna")).toBeInTheDocument());
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
 		expect(screen.getByText(/a@example\.com/)).toBeInTheDocument();
 		expect(screen.getByText(/v-test-1\.2\.3/)).toBeInTheDocument();
 	});
@@ -73,7 +72,7 @@ describe("ProfileView", () => {
 	it("edits the display name inline", async () => {
 		const user = userEvent.setup();
 		renderView();
-		await waitFor(() => expect(screen.getByText("Arianna")).toBeInTheDocument());
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
 
 		await user.click(screen.getByRole("button", { name: /edit name/i }));
 		const input = screen.getByRole("textbox", { name: /your name/i });
@@ -89,7 +88,7 @@ describe("ProfileView", () => {
 		mockUpdateDisplayName.mockResolvedValue({ ok: false, error: "rls denied" });
 		const user = userEvent.setup();
 		renderView();
-		await waitFor(() => expect(screen.getByText("Arianna")).toBeInTheDocument());
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
 
 		await user.click(screen.getByRole("button", { name: /edit name/i }));
 		await user.clear(screen.getByRole("textbox", { name: /your name/i }));
