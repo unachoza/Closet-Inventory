@@ -158,6 +158,10 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 				<div className="card-inner">
 					{/* Front */}
 					<div className="card-front">
+						{/* Sample marker — starter-closet items are seeded so a new closet
+						    isn't empty; the chip answers "whose clothes are these?" before
+						    the demo-clear prompt (which only fires after the first real item). */}
+						{item.isDemo && <span className="card-sample-chip">Sample</span>}
 						<div className="card-image">{imageSrc ? <img src={imageSrc} alt={item?.name} /> : null}</div>
 						<div className="card-name-overlay">
 							<span className="card-name-label">{item.name || item.brand || item.category}</span>

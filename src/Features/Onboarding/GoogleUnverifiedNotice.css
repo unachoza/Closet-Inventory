@@ -1,3 +1,8 @@
+.gun-card {
+	margin-top: 0;
+	margin-bottom: 0.9rem;
+}
+
 .gun-lead {
 	margin: 0 0 0.75rem;
 	color: var(--text-secondary);
@@ -14,4 +19,5 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	text-align: left;
 }

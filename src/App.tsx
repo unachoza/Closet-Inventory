@@ -265,6 +265,11 @@ function AppShell() {
 			<FeedbackButton />
 			{/* Calm demo-data acknowledgement + clear-samples prompt (BUG-2 lifecycle). */}
 			<DemoDataPrompt prompt={demoLifecycle.activePrompt} onKeep={demoLifecycle.keepDemo} onClear={demoLifecycle.clearDemo} />
+			{/* Analytics/error-tracking consent. Mounted HERE (past the onboarding
+			    early-return above) so the fixed bottom banner never overlaps the tour's
+			    Next CTA on the first screen at phone width — the tour owns the screen
+			    until it's done, then the banner appears. */}
+			<ConsentBanner />
 		</div>
 	);
 }
@@ -272,7 +277,6 @@ function AppShell() {
 function App() {
 	return (
 		<>
-			<ConsentBanner />
 			<SupabaseAuthProvider>
 			{/* Single cloud-backed closet instance shared by all consumers (E1-1.4).
 			    Inside SupabaseAuthProvider so it can read the signed-in userId. */}

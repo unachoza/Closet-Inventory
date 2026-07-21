@@ -18,6 +18,8 @@ interface StickyTopBarProps {
 	onClearAll: () => void;
 	borderMode: BorderMode;
 	onCycleBorderMode: () => void;
+	/** Beta gate: hides the Status/Location border toggle when off. Defaults visible. */
+	showBorderToggle?: boolean;
 }
 
 const StickyTopBar = ({
@@ -30,6 +32,7 @@ const StickyTopBar = ({
 	onClearAll,
 	borderMode,
 	onCycleBorderMode,
+	showBorderToggle = true,
 }: StickyTopBarProps) => {
 	const [showFilters, setShowFilters] = useState(false);
 
@@ -43,6 +46,7 @@ const StickyTopBar = ({
 				activeFilterCount={activeFilterCount}
 				borderMode={borderMode}
 				onCycleBorderMode={onCycleBorderMode}
+				showBorderToggle={showBorderToggle}
 			/>
 			{/* P1-10: legend shows mapping of border colors/styles + status dots (P1-10.1) */}
 			<BorderLegend borderMode={borderMode} />

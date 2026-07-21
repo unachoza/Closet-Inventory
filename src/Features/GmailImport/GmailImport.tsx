@@ -13,6 +13,8 @@ import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
 import { useGoogleUnverifiedNotice } from "../Onboarding/useGoogleUnverifiedNotice";
 import GoogleUnverifiedNotice from "../Onboarding/GoogleUnverifiedNotice";
+import { useProfile } from "../../hooks/useProfile";
+import GoogleHeadsUpNotice from "../../Components/GoogleHeadsUpNotice/GoogleHeadsUpNotice";
 import "./GmailImport.css";
 import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
@@ -45,6 +47,7 @@ export default function GmailImport({
 }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
 	const googleNotice = useGoogleUnverifiedNotice();
+	const { profile } = useProfile();
 
 	const {
 		emails,
@@ -343,8 +346,16 @@ export default function GmailImport({
 					>
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
+					<GoogleHeadsUpNotice variant="gmail-import" />
 					{friendlyError && <p className="gmail-error">{friendlyError.message}</p>}
-					<GoogleUnverifiedNotice isOpen={googleNotice.isOpen} onContinue={googleNotice.confirm} onCancel={googleNotice.dismiss} />
+					<GoogleUnverifiedNotice
+						isOpen={googleNotice.isOpen}
+						onContinue={googleNotice.confirm}
+						onCancel={googleNotice.dismiss}
+						variant="gmail-import"
+						userPhotoUrl={profile?.photo_url}
+						userName={profile?.display_name}
+					/>
 				</div>
 			</div>
 		);

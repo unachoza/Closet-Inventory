@@ -1,5 +1,7 @@
-import React, { useState, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
+import React, { useState, useMemo, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import Modal from "../../Components/Modal/Modal";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
 import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
 import TextPillField from "./TextInput/TextPillField";
@@ -48,6 +50,27 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	const { addItem } = useCloset();
 	const { showToast } = useToast();
 
+	// The wizard's one true dead end was the nav bar: tapping any tab discarded
+	// all steps with no warning. The ✕ below is the intended exit; it only asks
+	// for confirmation when there's actual progress to lose (dirty check against
+	// the initial/prefilled baseline).
+	const initialData_json = useMemo(() => JSON.stringify({ ...formItem, ...initialData }), [initialData]);
+	const isDirty = JSON.stringify(formData) !== initialData_json;
+	const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+
+	const handleExit = () => {
+		if (isDirty) {
+			setShowDiscardConfirm(true);
+			return;
+		}
+		setView("overview");
+	};
+
+	const discardAndLeave = () => {
+		setShowDiscardConfirm(false);
+		setView("overview");
+	};
+
 	const toggleValue = (value: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => {
 		const str = typeof value === "string" ? value : value.target.value;
 		if (!label) return;
@@ -82,6 +105,14 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	};
 	return (
 		<div className="form" data-testid="multistep-form">
+			<button
+				type="button"
+				className="form-close-btn"
+				onClick={handleExit}
+				aria-label="Close and discard this item"
+			>
+				<X size={20} />
+			</button>
 			<motion.form
 				layout
 				onSubmit={handleSubmit}
@@ -249,6 +280,25 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 					)}
 				</div>
 			</motion.form>
+
+			<Modal
+				isOpen={showDiscardConfirm}
+				onClose={() => setShowDiscardConfirm(false)}
+				title="Discard this item?"
+				maxWidth={400}
+				footer={
+					<>
+						<button className="btn btn--ghost" type="button" onClick={() => setShowDiscardConfirm(false)}>
+							Keep editing
+						</button>
+						<button className="btn btn--primary" type="button" onClick={discardAndLeave}>
+							Discard
+						</button>
+					</>
+				}
+			>
+				<p>You haven't added this item yet. Leaving now will lose what you've filled in.</p>
+			</Modal>
 		</div>
 	);
 };

@@ -3,6 +3,7 @@ import { AnimatePresence, motion, Variants } from "framer-motion";
 import { LayoutGrid, Grid3x3 } from "lucide-react";
 import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
+import DemoBanner from "../../Components/DemoBanner/DemoBanner";
 import { useCloset } from "../../context/ClosetContext";
 import usePagination from "../../hooks/usePagination";
 import { ClothingItem } from "../../utils/types";
@@ -45,7 +46,11 @@ const COMPACT_ITEMS_PER_PAGE = 15;
 const DENSITY_KEY = "closet_density";
 
 const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
-	const { closet, removeItem } = useCloset();
+	const { closet, removeItem, clearDemoItems } = useCloset();
+
+	// Count seeded sample items still present, so the "these are samples" banner
+	// can name them and offer a one-tap clear on a fresh closet.
+	const demoCount = useMemo(() => closet.filter((item) => item.isDemo).length, [closet]);
 
 	// Persisted so the user's density preference sticks across sessions.
 	const [compact, setCompact] = useState(() => {
@@ -108,6 +113,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	return (
 		<>
 			<div className="items-overview">
+				<DemoBanner count={demoCount} onClear={clearDemoItems} />
 				{hasItems && (
 					<div className="density-toggle-row">
 						<button

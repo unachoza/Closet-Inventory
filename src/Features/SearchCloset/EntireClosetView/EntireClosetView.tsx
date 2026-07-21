@@ -8,6 +8,7 @@ import { useSearch } from "../../../context/SearchContext";
 import StickyTopBar from "../StickyTopBar/StickyTopBar";
 import FilteredItemGrid from "../FilteredItemGrid/FilteredItemGrid";
 import { BorderMode, nextBorderMode } from "../../../utils/borderMode";
+import { showStatusLocation } from "../../../config/features";
 import "../EntireCloset.css";
 
 interface EntireClosetViewProps {
@@ -42,6 +43,13 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 			return next;
 		});
 	}, []);
+
+	// Status/Location ship dark for the beta (config/features.ts). Coerce the
+	// effective border mode to "off" — not just hide the toggle — so a user who
+	// previously stored "location"/"location_status" doesn't get stuck with
+	// colored borders and no control to clear them.
+	const statusLocationEnabled = showStatusLocation();
+	const effectiveBorderMode: BorderMode = statusLocationEnabled ? borderMode : "off";
 
 	// 1. Filter by dimension checkboxes. Location labels resolve through the
 	// live per-user locations store (E12-3.2/P1-8) so custom/multi-home
@@ -85,8 +93,9 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				activeFilterCount={activeFilterCount}
 				onToggleFilter={toggleFilter}
 				onClearAll={clearAll}
-				borderMode={borderMode}
+				borderMode={effectiveBorderMode}
 				onCycleBorderMode={cycleBorderMode}
+				showBorderToggle={statusLocationEnabled}
 			/>
 			<FilteredItemGrid
 				items={displayed}
@@ -97,7 +106,7 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				onToggleDensity={toggleDensity}
 				onEditItem={onEditItem}
 				onRemoveItem={removeItem}
-				borderMode={borderMode}
+				borderMode={effectiveBorderMode}
 			/>
 		</main>
 	);
