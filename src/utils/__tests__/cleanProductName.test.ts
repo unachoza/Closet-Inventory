@@ -89,4 +89,12 @@ describe("cleanProductName — whitespace and punctuation cleanup", () => {
 	it("returns empty string for an all-junk input", () => {
 		expect(cleanProductName("New Arrival 2024")).toBe("");
 	});
+
+	it("strips '- final sale' suffix from product names", () => {
+		expect(cleanProductName("alli top dusty rose - final sale")).toBe("alli top dusty rose");
+	});
+
+	it("strips 'final sale' without dash prefix", () => {
+		expect(cleanProductName("jesse bottom cinnamon final sale")).toBe("jesse bottom cinnamon");
+	});
 });
