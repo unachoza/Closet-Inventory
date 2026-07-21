@@ -1,8 +1,7 @@
 describe("Form Component", () => {
-	it("should have a multistep form with 8 steps", () => {});
-  it("should have back and next buttons at bottom of form for navigation", () => {})
-  it('Returns to carousel after adding an item', () => {})
-
+	it("should have a multistep form with 4 steps (see Form.stepNavigation.test.tsx)", () => {});
+	it("should have back and next buttons at bottom of form for navigation", () => {});
+	it("Returns to closet after adding an item", () => {});
 });
 
 /*

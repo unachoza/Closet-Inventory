@@ -121,6 +121,9 @@ export type ClothingItem = {
 
 export interface ItemFormData {
 	id: string;
+	/** Editable display name; auto-generated from color/brand/category until the user edits it. */
+	name?: string;
+	price?: number;
 	imageURL?: string;
 	category: string;
 	color: string; // single color

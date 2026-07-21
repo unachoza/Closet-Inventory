@@ -81,7 +81,7 @@ export function useCloudCloset() {
 			...newItem,
 			id: crypto.randomUUID(),
 			imageURL: photo ? photo : getStockPhoto(newItem.category as CategoryType),
-			name: newItem.brand ? `${newItem.brand} ${newItem.category}` : newItem.category,
+			name: newItem.name?.trim() ? newItem.name.trim() : newItem.brand ? `${newItem.brand} ${newItem.category}` : newItem.category,
 			material: normalizeMaterial(newItem.material),
 			condition: newItem.condition as WearState | undefined,
 		};

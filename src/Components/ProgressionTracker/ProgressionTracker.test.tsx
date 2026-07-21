@@ -25,7 +25,7 @@ describe("StepTabsTracker", () => {
 	it("clicking a step calls onStepClick with the correct step number", () => {
 		const onStepClick = vi.fn();
 		render(<StepTabsTracker currentStep={1} onStepClick={onStepClick} />);
-		fireEvent.click(screen.getByText(steps[4])); // step 5
-		expect(onStepClick).toHaveBeenCalledWith(5);
+		fireEvent.click(screen.getByText(steps[3])); // step 4
+		expect(onStepClick).toHaveBeenCalledWith(4);
 	});
 });
