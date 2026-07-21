@@ -5,17 +5,23 @@
    Styles for the Complete Textile Compendium
    ─────────────────────────────────────────────*/
 
-@import "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap";
+/* Playfair Display + DM Mono are already loaded globally by index.css — no
+   render-blocking Google Fonts @import here. Fonts resolve via the shared
+   --font-display / --font-mono tokens defined in index.css. */
 
 :root {
-      --cream: #FAF7F2;
-      --warm-white: #FFFDF9;
+      /* Base neutrals aligned to brand tokens (src/tokens.css): alabaster + white. */
+      --cream: #FAF8F5;
+      --warm-white: #FFFFFF;
       --ink: #1C1A17;
       --ink-60: #6B6659;
       --ink-30: #C4BFB5;
-      --gold: #B8860B;
-      --gold-light: #E8C85A;
-      --gold-pale: #FDF4DC;
+      /* Accent remapped from gold → brand terracotta (src/tokens.css). The three
+         category colors (sage/blue/mauve) are intentionally kept: they encode the
+         natural / semi-synthetic / synthetic fiber families. */
+      --gold: #8f6256;
+      --gold-light: #b28675;
+      --gold-pale: #FBF0E8;
       --terracotta: #C1622A;
       --terra-pale: #FBF0E8;
       --sage: #5A7A60;
@@ -132,20 +138,28 @@ body {
 /* ── Table of Contents ── */
 .toc-nav {
       position: sticky;
-      top: 0;
-      z-index: 100;
+      /* Sit below the app NavBar (sticky, height --header-height, z-index 100)
+         instead of scrolling behind it. z-index kept under the NavBar's 100. */
+      top: var(--header-height, 56px);
+      z-index: 90;
       background: var(--warm-white);
       border-bottom: 1px solid var(--border);
+      /* Fade the right edge so it's visible the strip scrolls horizontally. */
+      -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+      mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
 }
 
 .toc-inner {
       display: flex;
-      justify-content: space-evenly;
+      /* Pack from the start so items keep their natural size and scroll,
+         instead of being squashed by space-evenly on narrow screens. */
+      justify-content: flex-start;
       margin: 0 auto;
       padding: 0 48px;
       gap: 0;
       overflow-x: auto;
       scrollbar-width: none;
+      scroll-behavior: smooth;
 }
 
 .toc-inner::-webkit-scrollbar {
@@ -189,26 +203,13 @@ button.toc-link:hover{
 .toc-link.active {
       color: var(--gold);
       border-bottom-color: var(--gold);
-      outline: none;
 }
 
-button.toc-link.active:focus  button.toc-link.active:focus-visible{
-      outline: none;
-       box-shadow: none;
-}
-
-button:focus .toc-link{
-      outline: none;
-}
-button:focus-visible .toc-link {
-      outline: none;
-}
-
-button:focus .toc-link.active{
-      outline: none;
-}
-button:focus-visible .toc-link.active {
-      outline: none;
+/* Single accessible focus style: no ring on mouse click, clear ring on keyboard. */
+.toc-link:focus { outline: none; }
+.toc-link:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: -2px;
 }
 .toc-dot {
       display: inline-block;
@@ -463,15 +464,14 @@ button:focus-visible .toc-link.active {
 .care-icon { font-size: 24px; }
 
 .care-label {
-      color: var(--soft-black);
+      color: var(--ink-60);
       font-size: 11px;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.10em;
-          background-color: #ffffffa6;
-    width: fit-content;
-    padding: 5px;
-      
+      background-color: rgba(255, 255, 255, 0.65);
+      width: fit-content;
+      padding: 5px;
 }
 
 .care-value {
@@ -479,9 +479,9 @@ button:focus-visible .toc-link.active {
       font-size: 14px;
       font-weight: 500;
       line-height: 1.4;
-             background-color: #ffffffa6;
-    width: fit-content;
-    padding: 5px;
+      background-color: rgba(255, 255, 255, 0.65);
+      width: fit-content;
+      padding: 5px;
 }
 
 /* ── DIVIDER ── */
@@ -618,16 +618,10 @@ button:focus-visible .toc-link.active {
 }
 
 /* ── WEAVE SECTION ── */
-#weaves > div > div.weave-tabs.toc-nav > button.weave-tab.active
-#weaves > div > div.weave-tabs.toc-nav > button:nth-child(1)
-
-div.weave-tabs.toc-nav > button.weave-tab:hover{
+div.weave-tabs.toc-nav > button.weave-tab:hover {
       border-radius: 0;
-      background-color: red;
       transform: none;
       translate: none;
-
-
 }
 .weave-tabs {
       display: flex;
@@ -826,6 +820,83 @@ tbody td:first-child {
 .pill-med  { background: var(--gold-pale);  color: var(--gold); }
 .pill-low  { background: var(--terra-pale); color: var(--terracotta); }
 
+/* ── COMPARE: sortable headers ── */
+thead th.sortable {
+      cursor: pointer;
+      user-select: none;
+}
+
+thead th.sortable:hover { color: var(--gold-light); }
+
+.sort-caret {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 9px;
+      opacity: 0.5;
+}
+
+thead th.sorted .sort-caret { opacity: 1; }
+
+/* ── COMPARE: pick-to-compare chips ── */
+.compare-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin: 24px 0 8px;
+}
+
+.compare-controls__label {
+      color: var(--ink-60);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-right: 4px;
+}
+
+.compare-chip {
+      padding: 6px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--border-radius-pill, 999px);
+      background: var(--warm-white);
+      color: var(--ink-60);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.compare-chip:hover:not(:disabled) { border-color: var(--gold); color: var(--ink); }
+
+.compare-chip.selected {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--warm-white);
+}
+
+.compare-chip:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+}
+
+.compare-clear {
+      border: none;
+      background: none;
+      color: var(--gold);
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: underline;
+}
+
+/* ── COMPARE: mobile ── keep the table (comparison intent) but tighten so a
+   picked 2–3-column view fits without body horizontal scroll. */
+@media (--bp-sm) {
+      thead th { padding: 10px 10px; font-size: 10px; letter-spacing: 0.04em; }
+      tbody td { padding: 10px 10px; font-size: 12px; }
+      .pill { padding: 2px 7px; font-size: 10px; }
+      .compare-controls__label { width: 100%; margin-bottom: 2px; }
+}
+
 /* ── FLOWCHART ── */
 .flowchart-wrap {
       margin: 32px 0;
@@ -882,8 +953,7 @@ tbody td:first-child {
 .section-header {
       /* border-radius: var(--border-radius); */
       padding: var(--spacing-900) var(--spacing-600);
-      border: solid black 1px;
-      /* background-color: #B8860BB3; */
+      border: 1px solid var(--border);
       background: color-mix(in srgb, var(--warm-white) 70%, transparent);
       text-align: left;
 }

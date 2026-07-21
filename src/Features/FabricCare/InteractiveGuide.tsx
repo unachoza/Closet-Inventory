@@ -9,11 +9,19 @@ import DetailModal from "../../Components/GuideComponents/Modal";
 import { Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { ViewType } from "../../utils/types";
+import { FIBER_ROWS, MAX_COMPARE, SortDir, SortKey, sortRows, togglePick } from "./fiberCompare";
 
 const TextileGuildInteractive = () => {
 	const [selectedFiber, setSelectedFiber] = useState<Fiber | null>(null);
 	const [activeWeave, setActiveWeave] = useState<string>("plain");
 	const [activeNavId, setActiveNavId] = useState<string>("natural");
+
+	// Comparison table: sortable columns + pick-up-to-3 side-by-side.
+	const [sortKey, setSortKey] = useState<SortKey | null>(null);
+	const [sortDir, setSortDir] = useState<SortDir>("asc");
+	const [picked, setPicked] = useState<string[]>([]);
+
+	const tocRef = useRef<HTMLElement | null>(null);
 
 	const { setView } = useView();
 
@@ -44,6 +52,28 @@ const TextileGuildInteractive = () => {
 	const scrollToSection = useCallback((id: string) => {
 		document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 	}, []);
+
+	// Keep the highlighted TOC tab in view as the user scrolls through sections
+	// (the strip scrolls horizontally on narrow screens).
+	useEffect(() => {
+		const active = tocRef.current?.querySelector<HTMLButtonElement>(`.toc-link[data-nav-id="${activeNavId}"]`);
+		active?.scrollIntoView({ inline: "nearest", block: "nearest" });
+	}, [activeNavId]);
+
+	// Comparison-table derived rows: filter to picked fibers (if any), then sort.
+	const compareRows = (() => {
+		const base = picked.length > 0 ? FIBER_ROWS.filter((r) => picked.includes(r.fiber)) : FIBER_ROWS;
+		return sortKey ? sortRows(base, sortKey, sortDir) : [...base];
+	})();
+
+	const onSort = (key: SortKey) => {
+		if (sortKey === key) {
+			setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+		} else {
+			setSortKey(key);
+			setSortDir("asc");
+		}
+	};
 
 	const animalFibers = FIBERS.filter((f) => f.category === "animal");
 	const plantFibers = FIBERS.filter((f) => f.category === "plant");
@@ -94,7 +124,7 @@ const TextileGuildInteractive = () => {
 			</section>
 
 			{/* ── STICKY NAV ── */}
-			<nav className="toc-nav">
+			<nav className="toc-nav" ref={tocRef}>
 				<div className="toc-inner">
 					{[
 						{ id: "natural", label: "Natural Fibers", dot: "#5A7A60" },
@@ -106,7 +136,12 @@ const TextileGuildInteractive = () => {
 						{ id: "care", label: "Care Guide", dot: undefined },
 						{ id: "stains", label: "Stain Removal", dot: undefined },
 					].map(({ id, label, dot }) => (
-						<button key={id} className={`toc-link${activeNavId === id ? " active" : ""}`} onClick={() => scrollToSection(id)}>
+						<button
+							key={id}
+							data-nav-id={id}
+							className={`toc-link${activeNavId === id ? " active" : ""}`}
+							onClick={() => scrollToSection(id)}
+						>
 							{dot && <span className="toc-dot" style={{ background: dot }} />}
 							{label}
 						</button>
@@ -296,66 +331,91 @@ const TextileGuildInteractive = () => {
 						<p className="section-eyebrow">At a Glance</p>
 						<h2 className="section-title">Fiber Comparison</h2>
 						<p className="section-desc">
-							Key properties side by side. Click any fiber card above for detailed care instructions.
+							Key properties side by side. Tap a column to sort, or pick up to {MAX_COMPARE} fibers to compare them
+							on their own. Click any fiber card above for detailed care instructions.
 						</p>
 					</div>
+
+					{/* Pick-to-compare chips */}
+					<div className="compare-controls">
+						<span className="compare-controls__label">Compare</span>
+						{FIBER_ROWS.map((r) => {
+							const isSelected = picked.includes(r.fiber);
+							const capReached = picked.length >= MAX_COMPARE;
+							return (
+								<button
+									key={r.fiber}
+									className={`compare-chip${isSelected ? " selected" : ""}`}
+									aria-pressed={isSelected}
+									disabled={!isSelected && capReached}
+									onClick={() => setPicked((p) => togglePick(p, r.fiber))}
+								>
+									{r.fiber}
+								</button>
+							);
+						})}
+						{picked.length > 0 && (
+							<button className="compare-clear" onClick={() => setPicked([])}>
+								Clear
+							</button>
+						)}
+					</div>
+
 					<div className="compare-table-wrap">
 						<table>
 							<thead>
 								<tr>
-									<th>Fiber</th>
-									<th>Category</th>
-									<th>Source</th>
-									<th>Breathability</th>
-									<th>Durability</th>
-									<th>Eco-Rating</th>
-									<th>Cost</th>
+									{(
+										[
+											["fiber", "Fiber"],
+											["category", "Category"],
+											["source", "Source"],
+											["breathability", "Breathability"],
+											["durability", "Durability"],
+											["ecoRating", "Eco-Rating"],
+											["cost", "Cost"],
+										] as [SortKey, string][]
+									).map(([key, label]) => (
+										<th
+											key={key}
+											className={`sortable${sortKey === key ? " sorted" : ""}`}
+											onClick={() => onSort(key)}
+											aria-sort={sortKey === key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
+										>
+											{label}
+											<span className="sort-caret">{sortKey === key ? (sortDir === "asc" ? "▲" : "▼") : "↕"}</span>
+										</th>
+									))}
 								</tr>
 							</thead>
 							<tbody>
-								{[
-									["Merino Wool", "Natural/Animal", "Merino sheep", "High", "High", "Good", "$$–$$$"],
-									["Cashmere", "Natural/Animal", "Cashmere goat", "Medium", "Low", "Fair", "$$$$"],
-									["Mohair", "Natural/Animal", "Angora goat", "High", "High", "Fair", "$$$"],
-									["Silk", "Natural/Animal", "Silkworm", "High", "Medium", "Low", "$$$$"],
-									["Alpaca", "Natural/Animal", "Alpaca", "High", "High", "Good", "$$$"],
-									["Cotton", "Natural/Plant", "Cotton plant", "High", "High", "Fair", "$"],
-									["Linen", "Natural/Plant", "Flax plant", "Very High", "Very High", "Good", "$$"],
-									["Hemp", "Natural/Plant", "Hemp plant", "High", "Very High", "Excellent", "$$"],
-									["Viscose/Rayon", "Semi-Synthetic", "Wood pulp", "High", "Low", "Poor", "$"],
-									["Modal", "Semi-Synthetic", "Beech trees", "High", "Medium", "Fair", "$$"],
-									["TENCEL™/Lyocell", "Semi-Synthetic", "Eucalyptus", "High", "Medium", "Excellent", "$$"],
-									["Polyester", "Synthetic", "Petroleum", "Low", "Very High", "Poor", "$"],
-									["Nylon", "Synthetic", "Petroleum", "Low", "Very High", "Poor", "$–$$"],
-									["Spandex/Lycra", "Synthetic", "Petroleum", "Very Low", "Medium", "Poor", "$$"],
-									["Acrylic", "Synthetic", "Petroleum", "Low", "Medium", "Poor", "$"],
-								].map(([fiber, cat, src, breath, dur, eco, cost]) => (
-									<tr key={fiber}>
-										<td>{fiber}</td>
-										<td>{cat}</td>
-										<td>{src}</td>
+								{compareRows.map((row) => (
+									<tr key={row.fiber}>
+										<td>{row.fiber}</td>
+										<td>{row.category}</td>
+										<td>{row.source}</td>
 										<td>
 											<span
-												className={`pill ${breath?.includes("High") ? "pill-high" : breath === "Medium" ? "pill-med" : "pill-low"}`}
+												className={`pill ${row.breathability.includes("High") ? "pill-high" : row.breathability === "Medium" ? "pill-med" : "pill-low"}`}
 											>
-												{breath}
+												{row.breathability}
 											</span>
 										</td>
 										<td>
 											<span
-												className={`pill ${dur?.includes("High") ? "pill-high" : dur === "Medium" ? "pill-med" : "pill-low"}`}
+												className={`pill ${row.durability.includes("High") ? "pill-high" : row.durability === "Medium" ? "pill-med" : "pill-low"}`}
 											>
-												{dur}
+												{row.durability}
 											</span>
 										</td>
 										<td>
 											<span
-												className={`pill ${eco === "Excellent" || eco === "Good" ? "pill-high" : eco === "Fair" ? "pill-med" : "pill-low"}`}
+												className={`pill ${row.ecoRating === "Excellent" || row.ecoRating === "Good" ? "pill-high" : row.ecoRating === "Fair" ? "pill-med" : "pill-low"}`}
 											>
-												{eco}
+												{row.ecoRating}
 											</span>
 										</td>
-										<td>{cost}</td>
+										<td>{row.cost}</td>
 									</tr>
 								))}
 							</tbody>
