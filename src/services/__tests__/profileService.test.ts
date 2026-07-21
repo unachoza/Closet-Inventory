@@ -16,7 +16,7 @@ vi.mock("../../lib/supabaseClient", () => ({ getSupabase: () => ({ from }) }));
 const PROFILE_ROW = {
 	id: "user-1",
 	created_at: "2026-07-01T00:00:00Z",
-	display_name: "Arianna",
+	display_name: "Susan",
 	photo_url: "https://example.com/a.jpg",
 	settings: {},
 };
@@ -59,7 +59,7 @@ describe("profileService", () => {
 
 	describe("validateDisplayName", () => {
 		it("trims and accepts a normal name", () => {
-			expect(validateDisplayName("  Arianna  ")).toEqual({ ok: true, value: "Arianna" });
+			expect(validateDisplayName("  Susan  ")).toEqual({ ok: true, value: "Susan" });
 		});
 
 		it("rejects an empty name", () => {

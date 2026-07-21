@@ -53,14 +53,14 @@ describe("AvatarButton", () => {
 	beforeEach(() => {
 		mockGetProfile.mockReset().mockResolvedValue({
 			ok: true,
-			data: { id: "user-1", created_at: "", display_name: "Arianna", photo_url: null, settings: {} },
+			data: { id: "user-1", created_at: "", display_name: "Susan", photo_url: null, settings: {} },
 		});
 	});
 
 	it("shows the Google photo when the profile has one", async () => {
 		mockGetProfile.mockResolvedValue({
 			ok: true,
-			data: { id: "user-1", created_at: "", display_name: "Arianna", photo_url: "https://example.com/a.jpg", settings: {} },
+			data: { id: "user-1", created_at: "", display_name: "Susan", photo_url: "https://example.com/a.jpg", settings: {} },
 		});
 		renderButton(makeAuth());
 		await waitFor(() => expect(screen.getByRole("img")).toHaveAttribute("src", "https://example.com/a.jpg"));
