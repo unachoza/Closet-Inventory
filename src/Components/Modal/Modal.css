@@ -13,9 +13,12 @@
 	max-width: 430px;
 	width: 90%;
 	max-height: 80vh;
-	border: 1px solid var(--text-primary);
+	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-sm);
-	background: var(--Modal-dark-grey-light-red-background);
+	/* Themed surface (white in light mode, charcoal in dark) so the modal's
+	   --text-primary / --text-secondary content always contrasts. The previous
+	   fixed grey (#7b7777) left dark light-mode text nearly illegible. */
+	background: var(--bg-surface-primary);
 	box-shadow: var(--elevation-high);
 	overflow-y: auto;
 }

@@ -26,6 +26,16 @@ export default defineConfig(() => ({
 	define: {
 		__APP_VERSION__: JSON.stringify(resolveAppVersion()),
 	},
+	build: {
+		// Emit CSS that older mobile Safari can parse. Without this, esbuild
+		// minifies media queries to the Level-4 range syntax — `@media (width<=768px)`
+		// — which Safari only understands from 16.4+. On a tester's iPhone running an
+		// older iOS, every `@media (--bp-*)` block was dropped, so the phone rendered
+		// the *desktop* layout (e.g. the two-pane email view). Pinning cssTarget to a
+		// pre-16.4 Safari keeps the classic `(max-width: 768px)` syntax those browsers
+		// support. (JS target is left at Vite's default.)
+		cssTarget: ["chrome87", "edge88", "firefox78", "safari14"],
+	},
 	plugins: [
 		react(),
 		// E5-2.1/2.2 — installable PWA shell. The service worker precaches the

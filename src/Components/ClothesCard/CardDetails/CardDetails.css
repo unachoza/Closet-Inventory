@@ -291,12 +291,17 @@
 
 .card-details__button--remove {
 	border-color: var(--primitive-status-error-crimson);
+	/* Solid fallback first: older mobile Safari (<16.2) can't parse color-mix(),
+	   drops the next line, and would otherwise leave white text on the inherited
+	   cream surface — an invisible "blank" button. */
+	background: var(--primitive-status-error-crimson);
 	background: color-mix(in srgb, var(--primitive-status-error-crimson) 70%, transparent);
 	color: #fff;
 	font-weight: 600;
 }
 
 .card-details__button--remove:hover {
+	background: var(--primitive-status-error-crimson);
 	background: color-mix(in srgb, var(--primitive-status-error-crimson) 60%, transparent);
 }
 
@@ -313,12 +318,15 @@
 
 .card-details__button--confirm {
 	border-color: var(--status-error);
+	/* Solid fallback first — see note on --remove above. */
+	background: var(--status-error);
 	background: color-mix(in srgb, var(--status-error) 60%, transparent);
 	color: #fff;
 	font-weight: 700;
 }
 
 .card-details__button--confirm:hover {
+	background: var(--status-error);
 	background: color-mix(in srgb, var(--status-error) 75%, transparent);
 }
 
