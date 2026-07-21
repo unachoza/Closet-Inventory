@@ -12,6 +12,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import GmailImport from "../GmailImport";
 import { GmailAuthProvider } from "../../../context/GmailAuthContext";
+import { SupabaseAuthProvider } from "../../../context/SupabaseAuthContext";
 
 const mockTrack = vi.fn();
 vi.mock("../../../lib/analytics", () => ({
@@ -69,9 +70,11 @@ const EMAIL_META = {
 
 function renderImport() {
 	return render(
-		<GmailAuthProvider>
-			<GmailImport onImport={vi.fn()} />
-		</GmailAuthProvider>,
+		<SupabaseAuthProvider>
+			<GmailAuthProvider>
+				<GmailImport onImport={vi.fn()} />
+			</GmailAuthProvider>
+		</SupabaseAuthProvider>,
 	);
 }
 
@@ -203,9 +206,11 @@ describe("funnel analytics", () => {
 		searchState.isSearching = false;
 		searchState.searchMode = null;
 		rerender(
-			<GmailAuthProvider>
-				<GmailImport onImport={vi.fn()} />
-			</GmailAuthProvider>,
+			<SupabaseAuthProvider>
+				<GmailAuthProvider>
+					<GmailImport onImport={vi.fn()} />
+				</GmailAuthProvider>
+			</SupabaseAuthProvider>,
 		);
 
 		expect(mockTrack).toHaveBeenCalledWith("import_results_shown", { count: 0 });
