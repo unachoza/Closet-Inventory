@@ -35,6 +35,10 @@ export interface ExtractedProduct {
 	readonly accents?: string | string[];
 	readonly pattern?: string;
 	readonly construction?: string | string[];
+	readonly legShape?: string;
+	readonly hasStretch?: boolean;
+	readonly waistStyle?: string;
+	readonly hasPockets?: boolean;
 }
 
 const PRICE_REGEX = /\$\d{1,5}(?:\.\d{2})?/g;
@@ -68,6 +72,8 @@ const SKIP_IMG_PATTERNS = [
 	"caret",
 	"star",
 	"rating",
+	// Order barcodes are not products (e.g. barcodes.cfw.cordial.com, Levi's/Walmart)
+	"barcode",
 	// Analytics / open-tracking pixels (never products)
 	"google-analytics",
 	"/collect?",
@@ -3972,6 +3978,231 @@ function parseReiName(raw: string): { brand: string; name: string; color: string
 	return { brand, name, color, size };
 }
 
+// A jean/garment size token as printed by Levi's: a letter size (S/M/L/XL…),
+// a bare waist number ("29"), a "30WX32L" waist×inseam, or "One Size".
+const LEVI_SIZE_RE = /^(?:X{0,3}[SL]|XS|XL|XXL|XXXL|M|\d{1,2}\s*W\s*X\s*\d{1,2}\s*L|\d{1,2}(?:\.\d)?|one\s*size)$/i;
+
+// Pull the "$xx.xx" out of a "Label: $xx.xx" line.
+function leviLabeledPrice(line: string): string {
+	const m = line.match(/\$\s*([\d,]+\.\d{2})/);
+	return m ? `$${m[1].replace(/,/g, "")}` : "";
+}
+
+/**
+ * Levi's renders each attribute (name/Color:/size/Style:/Qty:/Price:/Total:) as
+ * its OWN single-cell <table>, not <br>-separated text within one cell — so
+ * getTextLines (which only splits on <br>) collapses the whole details cell into
+ * one run-on line. Prefer the leaf <td>s (no nested <table>) as the line list;
+ * fall back to getTextLines for templates that do use <br>.
+ */
+function leviDetailLines(detailsCell: Element): string[] {
+	const leafCells = Array.from(detailsCell.querySelectorAll("td, th")).filter((c) => !c.querySelector("table") && (c.textContent ?? "").trim().length > 0);
+	if (leafCells.length > 1) {
+		return leafCells.map((c) => (c.textContent ?? "").trim().replace(/\s+/g, " "));
+	}
+	return getTextLines(detailsCell);
+}
+
+/**
+ * Strategy: Levi's order & shipping confirmations (info.levi.com / Cordial).
+ *
+ * Each line item is a two-cell row: a product photo served from
+ * lsco.scene7.com/is/image/lsco (order confirm) or
+ * lscoglobal.scene7.com/is/image/lscoglobal (ship confirm), plus a sibling
+ * details cell holding stacked, mostly-labeled lines:
+ *   <bold name> / Color: X / <size> / Style: NNN / Qty: N / Price: $X / Total: $X
+ * The size line is UNLABELED ("M", "30WX32L", "29"). Levi's ship-confirm photos
+ * carry a placeholder alt ("TBD"), so the name MUST come from the details link,
+ * not alt — otherwise the item was dropped as "not clothing". When a per-item
+ * discount applies, the bold "Total:" is the paid price and "Price:" is the
+ * sticker (originalPrice). Anchored on the scene7 product photos only, so the
+ * order barcode, logo, review banner and Red Tab promo are excluded.
+ */
+function extractFromLeviLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/info\.levi\.com|scene7\.com\/is\/image\/lsco(global)?/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	const skuImages = Array.from(doc.querySelectorAll("img")).filter((img) => /scene7\.com\/is\/image\/lsco(global)?/i.test(img.getAttribute("src") ?? ""));
+
+	for (const img of skuImages) {
+		// The details cell is a sibling that carries a "Style:" line. Climb until we
+		// find such a cell that does NOT contain the product photo we're anchored on.
+		let detailsCell: Element | null = null;
+		let cursor: Element | null = img;
+		for (let i = 0; i < 8 && cursor && !detailsCell; i++) {
+			cursor = cursor.parentElement;
+			if (!cursor) break;
+			detailsCell = Array.from(cursor.querySelectorAll("td, th")).find((c) => !c.contains(img) && /Style\s*:/i.test(c.textContent ?? "")) ?? null;
+		}
+		if (!detailsCell) continue;
+
+		const lines = leviDetailLines(detailsCell);
+		if (lines.length === 0) continue;
+
+		// Name: first line that isn't one of the labeled attribute lines.
+		const isLabel = (l: string): boolean => /^(Color|Style|Qty|Price|Total)\s*:/i.test(l);
+		const name = lines.find((l) => !isLabel(l) && !LEVI_SIZE_RE.test(l)) ?? "";
+		if (!name) continue;
+
+		let color = "";
+		let size = "";
+		let itemNumber = "";
+		let sticker = "";
+		let total = "";
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+			const colorM = line.match(/^Color\s*:\s*(.+)/i);
+			if (colorM) {
+				color = colorM[1].trim();
+				continue;
+			}
+			const styleM = line.match(/^Style\s*:\s*(.+)/i);
+			if (styleM) {
+				itemNumber = styleM[1].trim();
+				continue;
+			}
+			if (/^Total\s*:/i.test(line)) {
+				total = leviLabeledPrice(line);
+				continue;
+			}
+			if (/^Price\s*:/i.test(line)) {
+				sticker = leviLabeledPrice(line);
+				continue;
+			}
+			// Unlabeled size line (after the name, before Style).
+			if (line !== name && !size && LEVI_SIZE_RE.test(line)) size = line;
+		}
+
+		// "Total:" is the paid price; when it's lower than "Price:" the item was
+		// discounted, so the sticker becomes originalPrice.
+		let price = sticker;
+		let originalPrice: string | undefined;
+		let onSale = false;
+		if (total) {
+			const t = parseFloat(total.replace(/[^\d.]/g, ""));
+			const s = parseFloat(sticker.replace(/[^\d.]/g, ""));
+			price = total;
+			if (sticker && t < s) {
+				originalPrice = sticker;
+				onSale = true;
+			}
+		}
+
+		const dedupeKey = `${itemNumber}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		products.push({
+			imageUrl: img.getAttribute("src") ?? "",
+			name,
+			brand: "Levi's",
+			price,
+			...(originalPrice ? { originalPrice } : {}),
+			color,
+			size,
+			itemNumber,
+			material: "",
+			onSale,
+		});
+	}
+
+	return products;
+}
+
+/**
+ * Strategy: Quince order confirmations (info.quince.com / links.quince.com).
+ *
+ * Each purchased line item is a details cell holding a product-name link plus
+ * stacked "Size: X" / "Color: Y" lines and an "Est. Delivery" line; the sticker
+ * price is in a "Price: $X x N" line (and again in a sibling "$X x N" cell).
+ * The generic image fallback mis-read the whole blob as the name and guessed the
+ * color from the photo. Recommendation tiles reuse images.quince.com but carry
+ * only a name (no Size:/Color:), so anchoring on the cell that has BOTH a
+ * "Size:" and a "Color:" label selects only the real order item.
+ */
+function extractFromQuinceLayout(doc: Document): ExtractedProduct[] {
+	const html = doc.body.innerHTML;
+	if (!/(info|links)\.quince\.com|onequince\.com/i.test(html)) return [];
+
+	const products: ExtractedProduct[] = [];
+	const seen = new Set<string>();
+
+	// Smallest cells that carry both a Size: and a Color: label are the item rows.
+	const cells = Array.from(doc.querySelectorAll("td, th")).filter((c) => {
+		const t = c.textContent ?? "";
+		if (!/Size\s*:/i.test(t) || !/Color\s*:/i.test(t)) return false;
+		// Prefer the innermost such cell (no descendant also qualifies).
+		return !Array.from(c.querySelectorAll("td, th")).some((d) => /Size\s*:/i.test(d.textContent ?? "") && /Color\s*:/i.test(d.textContent ?? ""));
+	});
+
+	const isLabelLine = (l: string): boolean => /^(Size|Color|Price|Est\.?\s*Delivery)\s*:/i.test(l) || /^\$/.test(l);
+
+	for (const cell of cells) {
+		// The Size:/Color: labels live in their own cell, separate from the product
+		// name link. Climb to the smallest ancestor that also holds the name link so
+		// we can read name + price + size + color from one scope.
+		let scope: Element = cell;
+		for (let i = 0; i < 6; i++) {
+			const parent = scope.parentElement;
+			if (!parent) break;
+			scope = parent;
+			const link = Array.from(scope.querySelectorAll("a")).find((a) => {
+				const t = (a.textContent ?? "").replace(/\s+/g, " ").trim();
+				return t.length > 3 && !isLabelLine(t);
+			});
+			if (link) break;
+		}
+
+		const lines = getTextLines(scope);
+
+		const sizeLine = lines.find((l) => /^Size\s*:/i.test(l)) ?? "";
+		const colorLine = lines.find((l) => /^Color\s*:/i.test(l)) ?? "";
+		const size = sizeLine.replace(/^Size\s*:\s*/i, "").trim();
+		const color = colorLine.replace(/^Color\s*:\s*/i, "").trim();
+
+		// Name: first line that isn't a Size/Color/Price/Delivery/amount line.
+		const name = (lines.find((l) => !isLabelLine(l)) ?? "").trim();
+		if (!name) continue;
+
+		// Price: "Price: $50.00 x 1" (hidden) or a "$50.00 x 1" line.
+		const priceLine = lines.find((l) => /^Price\s*:/i.test(l)) ?? lines.find((l) => /^\$[\d,]+\.\d{2}/.test(l)) ?? "";
+		const priceM = priceLine.match(/\$\s*([\d,]+\.\d{2})/);
+		const price = priceM ? `$${priceM[1].replace(/,/g, "")}` : "";
+
+		const dedupeKey = `${name}|${color}|${size}`.toLowerCase();
+		if (seen.has(dedupeKey)) continue;
+		seen.add(dedupeKey);
+
+		// The product photo lives in a sibling <td> of the OUTER row (image cell +
+		// spacer cell + this details cell), several levels further out than the
+		// name/price/size scope — climb from scope until an ancestor contains it.
+		let img: Element | null = null;
+		let imgScope: Element | null = scope;
+		for (let i = 0; i < 8 && imgScope && !img; i++) {
+			img = imgScope.querySelector('img[src*="images.quince.com"]');
+			if (img) break;
+			imgScope = imgScope.parentElement;
+		}
+
+		products.push({
+			imageUrl: img?.getAttribute("src") ?? "",
+			name,
+			brand: "Quince",
+			price,
+			color,
+			size,
+			itemNumber: "",
+			material: "",
+			onSale: false,
+		});
+	}
+
+	return products;
+}
+
 /**
  * Strategy: HOKA order confirmations (emails.hoka.com / Deckers Cordial).
  *
@@ -4340,6 +4571,8 @@ export function parseProductsFromEmail(html: string): ExtractedProduct[] {
 		extractFromEbayLayout, // eBay: only the Order number:/Item ID:/Seller: block, excludes sponsored "complement your purchase" items — guarded by ebay.com, must run before generic table/image strategies which would otherwise match eBay's plain image+link+price rows (real item AND sponsored alike)
 		extractFromHokaLayout, // HOKA: dms.deckers.com/hoka product photos + Quantity/Size/$ block; excludes emltrk tracking-pixel preheader blob (guarded)
 		extractFromByltLayout, // BYLT Basics: <h3> name + "Total: $" cell (name in <h3>, not <p>, so paragraph strategy misses it) (guarded)
+		extractFromLeviLayout, // Levi's: scene7 product photo + bold name/Color:/size/Style:/Price:/Total: detail cell; excludes barcode/logo/review banner, uses per-item Total as sale price (guarded)
+		extractFromQuinceLayout, // Quince: details cell with Size:/Color: labels + name link; excludes "recommended for you" tiles that reuse the CDN (guarded)
 		extractFromNestedTables,
 		extractFromLabeledFieldLayout,
 		extractFromReactEmailLayout,
