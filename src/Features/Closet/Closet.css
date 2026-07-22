@@ -66,8 +66,20 @@
       height: var(--Card-height);
 }
 
+/* Sits over the walk-in-closet hero image, so the bare text washed out against
+   the busy midtones. Give it the same floating-white-surface treatment as the
+   category cards / "Show more" button in this view: a self-sizing pill that
+   guarantees contrast regardless of what's behind it. */
 p.no-results {
+  display: inline-block;
+  margin: var(--spacing-200) auto 0;
+  padding: var(--spacing-100) var(--spacing-300);
+  border: 1px solid var(--border-hairline);
+  border-radius: 999px;
+  background: var(--bg-surface-primary);
+  box-shadow: var(--elevation-low);
   color: var(--text-primary);
+  font-weight: 500;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
