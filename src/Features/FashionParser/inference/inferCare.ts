@@ -23,7 +23,7 @@ const NAME_CARE_RULES: [RegExp, string[]][] = [
 	[/\b(shoes?|sneakers?|boots?|heels?|flats?|loafers?|pumps?|sandals?)\b/i, ["Wipe with damp cloth"]],
 	[/\bjeans?\b/i, ["Wash inside out"]],
 	[/\b(fleece|sherpa)\b/i, ["Wash inside out", "Air dry"]],
-	[/\b(beaded|sequins?|sequined|embroidered)\b/i, ["Wash in a mesh laundry bag", "Hand wash only"]],
+	[/\b(beaded|sequins?|sequined|embroidered)\b/i, ["Use mesh laundry bag", "Hand wash only"]],
 	[/\b(raw[- ]?hem|distressed)\b/i, ["Wash in a laundry bag"]],
 	[/\b(zippers?|buckles?|stud(s|ded)?|hardware)\b/i, ["Close fasteners before washing"]],
 ];
@@ -145,6 +145,7 @@ export function inferCareFromMaterial(materials: MaterialBlend[], color?: string
 			for (const item of careGroup.items) {
 				if ((item.label === "Washing" || item.label === "Drying") && item.value) {
 					instructions.push(item.value);
+					console.log({ instructions });
 				}
 			}
 		}
