@@ -378,7 +378,7 @@ export default function GmailImport({
 					<button className="gmail-logout-btn" onClick={handleLogout} type="button">
 						Disconnect
 					</button>
-					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button" style={{ marginLeft: 8 }}>
+					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button">
 						Clear Emails
 					</button>
 				</div>

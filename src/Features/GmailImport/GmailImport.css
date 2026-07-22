@@ -534,7 +534,7 @@
 .gmail-preview {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-200);
+	gap: var(--spacing-100);
 }
 
 .gmail-preview-header {
@@ -853,9 +853,10 @@
   /* Wrap to multiple rows instead of cramming 3 buttons into one. */
   .gmail-header-actions button {
     height: 3rem;
-    min-width: 8rem;
     font-size: 0.8rem;
-    flex: 1 1 8rem;
+    margin: 8px 2px;
+    /* min-width: 8rem; */
+    /* flex: 1 1 8rem; */
   }
 
   /* Shorter email list on mobile since preview is below */
