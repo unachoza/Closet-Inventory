@@ -74,7 +74,7 @@
 
 .ssp-sidebar-sub {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
   margin: 2px 0 0;
 }
 
@@ -148,7 +148,7 @@
 
 .ssp-nav-desc {
   font-size: 10px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
 }
 
 .ssp-nav-badge {
@@ -177,7 +177,7 @@
 
 .ssp-clear-btn {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
   background: none;
   border: none;
   cursor: pointer;
@@ -213,7 +213,7 @@
 
 .ssp-topbar-hint {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
   margin: 0;
 }
 
