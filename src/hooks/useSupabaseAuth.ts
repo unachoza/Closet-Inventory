@@ -62,7 +62,14 @@ export function useSupabaseAuth(): SupabaseAuthState {
 
   const signIn = async () => {
     setError(null);
-    const { error: err } = await getSupabase().auth.signInWithOAuth({
+    let supabase;
+    try {
+      supabase = getSupabase();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Supabase is not configured");
+      return;
+    }
+    const { error: err } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         scopes: GMAIL_SCOPE,
@@ -74,7 +81,14 @@ export function useSupabaseAuth(): SupabaseAuthState {
 
   const signOut = async () => {
     setError(null);
-    const { error: err } = await getSupabase().auth.signOut();
+    let supabase;
+    try {
+      supabase = getSupabase();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Supabase is not configured");
+      return;
+    }
+    const { error: err } = await supabase.auth.signOut();
     if (err) setError(err.message);
   };
 
