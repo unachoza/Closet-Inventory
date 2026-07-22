@@ -69,7 +69,7 @@ describe("OnboardingFlow", () => {
 			await user.click(screen.getByRole("button", { name: isLast ? /get started/i : /^next$/i }));
 		}
 		expect(screen.getByRole("button", { name: /sign in with google/i })).toBeInTheDocument();
-		expect(screen.getByText(/hasn't verified this app/i)).toBeInTheDocument();
+		expect(screen.getByText(/Google will display an additional verification/i)).toBeInTheDocument();
 	});
 
 	it("hides Back on the first tour screen and shows it afterwards", async () => {

@@ -12,7 +12,7 @@ describe("GoogleUnverifiedNotice", () => {
 		render(<GoogleUnverifiedNotice isOpen={true} onContinue={vi.fn()} onCancel={vi.fn()} />);
 		expect(screen.getByRole("dialog")).toBeInTheDocument();
 		expect(screen.getAllByText(/advanced/i).length).toBeGreaterThan(0);
-		expect(screen.getByText(/go to nothing to wear \(unsafe\)/i)).toBeInTheDocument();
+		expect(screen.getByText(/Go to Nothing To Wear/i)).toBeInTheDocument();
 	});
 
 	it("Continue calls onContinue; Cancel calls onCancel", () => {

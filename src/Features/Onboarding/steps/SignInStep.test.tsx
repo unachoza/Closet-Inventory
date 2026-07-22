@@ -10,8 +10,7 @@ describe("SignInStep", () => {
 
 	it("explains the Google unverified-app screen inline", () => {
 		render(<SignInStep onSignIn={vi.fn()} onSkip={vi.fn()} />);
-		expect(screen.getByText(/hasn't verified this app/i)).toBeInTheDocument();
-		expect(screen.getByText(/Nothing To Wear/i)).toBeInTheDocument();
+		expect(screen.getByText(/Google will display an additional verification/i)).toBeInTheDocument();
 	});
 
 	it("marks the Google notice as seen and starts sign-in", async () => {

@@ -88,7 +88,7 @@
 
 .sw-subtitle {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
   margin: 0 0 var(--spacing-200);
 }
 
@@ -216,7 +216,7 @@
 
 .sw-panel-hint {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
   margin: 0 0 var(--spacing-200);
 }
 
@@ -266,7 +266,7 @@ input.sw-input {
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.7);
   margin-bottom: 6px;
 }
 

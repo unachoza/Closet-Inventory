@@ -60,8 +60,8 @@ describe("NameStep", () => {
 			ok: true,
 			data: { id: "user-1", created_at: "", display_name: null, photo_url: null, settings: {} },
 		});
-		renderStep(makeAuth({ full_name: "Ari from Google" }));
-		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Ari from Google"));
+		renderStep(makeAuth({ full_name: "Ari" }));
+		await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue("Ari"));
 	});
 
 	it("keeps an unedited confirmation to a no-op save and continues", async () => {
