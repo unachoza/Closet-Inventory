@@ -140,7 +140,7 @@ body {
       position: sticky;
       /* Sit below the app NavBar (sticky, height --header-height, z-index 100)
          instead of scrolling behind it. z-index kept under the NavBar's 100. */
-      top: var(--header-height, 56px);
+      top:0;
       z-index: 90;
       background: var(--warm-white);
       border-bottom: 1px solid var(--border);
