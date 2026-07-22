@@ -346,7 +346,7 @@ export default function GmailImport({
 					>
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
-					{/* <GoogleHeadsUpNotice variant="gmail-import" /> */}
+					<GoogleHeadsUpNotice variant="gmail-import" />
 					{friendlyError && <p className="gmail-error">{friendlyError.message}</p>}
 					<GoogleUnverifiedNotice
 						isOpen={googleNotice.isOpen}
