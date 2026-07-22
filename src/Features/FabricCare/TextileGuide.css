@@ -140,7 +140,7 @@ body {
       position: sticky;
       /* Sit below the app NavBar (sticky, height --header-height, z-index 100)
          instead of scrolling behind it. z-index kept under the NavBar's 100. */
-      top: var(--header-height, 56px);
+      top:0;
       z-index: 90;
       background: var(--warm-white);
       border-bottom: 1px solid var(--border);
@@ -553,9 +553,9 @@ button.toc-link:hover{
       display: flex;
       justify-content: center;
       align-items: center;
-         width: 30px;
-    height: 38px;
-    border: 1px solid rgb(28 26 23 / 24%);
+      width: 26px;
+      height: 38px;
+      border: 1px solid rgb(28 26 23 / 24%);
       border-radius: 50%;
       background: none;
       color: var(--ink-60);
@@ -837,64 +837,10 @@ thead th.sortable:hover { color: var(--gold-light); }
 
 thead th.sorted .sort-caret { opacity: 1; }
 
-/* ── COMPARE: pick-to-compare chips ── */
-.compare-controls {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      margin: 24px 0 8px;
-}
-
-.compare-controls__label {
-      color: var(--ink-60);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-right: 4px;
-}
-
-.compare-chip {
-      padding: 6px 14px;
-      border: 1px solid var(--border-strong);
-      border-radius: var(--border-radius-pill, 999px);
-      background: var(--warm-white);
-      color: var(--ink-60);
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.compare-chip:hover:not(:disabled) { border-color: var(--gold); color: var(--ink); }
-
-.compare-chip.selected {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--warm-white);
-}
-
-.compare-chip:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-}
-
-.compare-clear {
-      border: none;
-      background: none;
-      color: var(--gold);
-      font-size: 13px;
-      cursor: pointer;
-      text-decoration: underline;
-}
-
-/* ── COMPARE: mobile ── keep the table (comparison intent) but tighten so a
-   picked 2–3-column view fits without body horizontal scroll. */
 @media (--bp-sm) {
       thead th { padding: 10px 10px; font-size: 10px; letter-spacing: 0.04em; }
       tbody td { padding: 10px 10px; font-size: 12px; }
       .pill { padding: 2px 7px; font-size: 10px; }
-      .compare-controls__label { width: 100%; margin-bottom: 2px; }
 }
 
 /* ── FLOWCHART ── */

@@ -1,4 +1,4 @@
-import { Icon, User as UserIcon, type LucideProps } from "lucide-react";
+import { Icon, type LucideProps } from "lucide-react";
 import { coatHanger } from "@lucide/lab";
 import "./GoogleConsentCard.css";
 
@@ -19,12 +19,12 @@ function initialsFrom(name?: string): string {
 	if (!name) return "";
 	const parts = name.trim().split(/\s+/);
 	const first = parts[0]?.[0] ?? "";
-	const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? "" : "";
+	const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
 	return (first + last).toUpperCase();
 }
 
 const PERMISSIONS: Record<"sign-in" | "gmail-import", string[]> = {
-	"sign-in": ["Your name and email address", "A backup copy of your closet, synced to your account"],
+	"sign-in": ["Your name and email address", "Clothing order confirmations", "Your closet securely synced to your account"],
 	"gmail-import": ["Read-only access to your Gmail", "Used only to find purchase-confirmation emails to import"],
 };
 
@@ -44,8 +44,9 @@ export interface GoogleConsentCardProps {
  * requester before Google's still-unverified screen appears. It does not
  * change what Google itself shows.
  */
-export default function GoogleConsentCard({ variant, compact, userPhotoUrl, userName, className }: GoogleConsentCardProps) {
+export default function GoogleConsentCard({ variant, compact, userName, className }: GoogleConsentCardProps) {
 	const initials = initialsFrom(userName ?? undefined);
+	console.log(initials);
 
 	return (
 		<div className={`gconsent${compact ? " gconsent--compact" : ""}${className ? ` ${className}` : ""}`}>
@@ -58,8 +59,8 @@ export default function GoogleConsentCard({ variant, compact, userPhotoUrl, user
 					<GoogleMark size={compact ? 16 : 20} />
 				</span>
 			</div>
-
-			{!compact && (
+			{/* TODO: Decide, I'm not sure about this */}
+			{/* {!compact && (
 				<div className="gconsent__avatar" aria-hidden="true">
 					{userPhotoUrl ? (
 						<img className="gconsent__avatar-img" src={userPhotoUrl} alt="" />
@@ -69,7 +70,7 @@ export default function GoogleConsentCard({ variant, compact, userPhotoUrl, user
 						<UserIcon size={20} />
 					)}
 				</div>
-			)}
+			)} */}
 
 			<p className="gconsent__lead">
 				<strong>Nothing To Wear</strong> wants to {variant === "sign-in" ? "sign you in with Google" : "connect your Gmail"}.
@@ -84,8 +85,8 @@ export default function GoogleConsentCard({ variant, compact, userPhotoUrl, user
 			)}
 
 			<p className="gconsent__reassurance">
-				<strong>Heads up:</strong> Google will show a "hasn't verified this app" notice — that's expected during our small beta.
-				{!compact && " Tap Advanced, then Go to Nothing To Wear to continue safely."}
+				<strong>One quick note</strong> Google will display an additional verification screen while Nothing To Wear completes Google's
+				app verification.
 			</p>
 		</div>
 	);

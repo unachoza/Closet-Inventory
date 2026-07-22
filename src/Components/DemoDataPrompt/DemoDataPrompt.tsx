@@ -59,7 +59,7 @@ export default function DemoDataPrompt({ prompt, onKeep, onClear }: DemoDataProm
 						: "Your closet has grown. Those starter samples are still hanging around."}
 				</p>
 				<p className="demo-prompt__body">
-					We seeded a few <strong>sample pieces</strong> so your closet wasn't empty on day one. They stay on this device only — they're
+					We pre-loaded a few <strong>sample pieces</strong> so your closet wasn't empty on day one. They stay on this device only — they're
 					never saved to your account. Clear them whenever you like; you can always keep them a little longer.
 				</p>
 			</div>

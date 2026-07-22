@@ -9,17 +9,16 @@ import DetailModal from "../../Components/GuideComponents/Modal";
 import { Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { ViewType } from "../../utils/types";
-import { FIBER_ROWS, MAX_COMPARE, SortDir, SortKey, sortRows, togglePick } from "./fiberCompare";
+import { FIBER_ROWS, SortDir, SortKey, sortRows } from "./fiberCompare";
 
 const TextileGuildInteractive = () => {
 	const [selectedFiber, setSelectedFiber] = useState<Fiber | null>(null);
 	const [activeWeave, setActiveWeave] = useState<string>("plain");
 	const [activeNavId, setActiveNavId] = useState<string>("natural");
 
-	// Comparison table: sortable columns + pick-up-to-3 side-by-side.
+	// Comparison table: sortable columns.
 	const [sortKey, setSortKey] = useState<SortKey | null>(null);
 	const [sortDir, setSortDir] = useState<SortDir>("asc");
-	const [picked, setPicked] = useState<string[]>([]);
 
 	const tocRef = useRef<HTMLElement | null>(null);
 
@@ -60,11 +59,7 @@ const TextileGuildInteractive = () => {
 		active?.scrollIntoView({ inline: "nearest", block: "nearest" });
 	}, [activeNavId]);
 
-	// Comparison-table derived rows: filter to picked fibers (if any), then sort.
-	const compareRows = (() => {
-		const base = picked.length > 0 ? FIBER_ROWS.filter((r) => picked.includes(r.fiber)) : FIBER_ROWS;
-		return sortKey ? sortRows(base, sortKey, sortDir) : [...base];
-	})();
+	const compareRows = sortKey ? sortRows(FIBER_ROWS, sortKey, sortDir) : FIBER_ROWS;
 
 	const onSort = (key: SortKey) => {
 		if (sortKey === key) {
@@ -331,8 +326,8 @@ const TextileGuildInteractive = () => {
 						<p className="section-eyebrow">At a Glance</p>
 						<h2 className="section-title">Fiber Comparison</h2>
 						<p className="section-desc">
-							Key properties side by side. Tap a column to sort, or pick up to {MAX_COMPARE} fibers to compare them
-							on their own. Click any fiber card above for detailed care instructions.
+							Key properties side by side. Tap a column to sort. Click any fiber card above for detailed care
+							instructions.
 						</p>
 					</div>
 

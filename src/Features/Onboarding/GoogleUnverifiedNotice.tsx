@@ -30,7 +30,7 @@ export default function GoogleUnverifiedNotice({
 		<Modal
 			isOpen={isOpen}
 			onClose={onCancel}
-			title="One heads-up before you sign in"
+			title="What to expect before you sign in"
 			footer={
 				<>
 					<button className="btn btn--ghost" type="button" onClick={onCancel}>
@@ -43,19 +43,15 @@ export default function GoogleUnverifiedNotice({
 			}
 		>
 			<GoogleConsentCard variant={variant} userPhotoUrl={userPhotoUrl} userName={userName} className="gun-card" />
-			<p className="gun-lead">
-				Nothing To Wear is a small beta app, still going through Google's app-verification review. Until that finishes, Google shows
-				every visitor a warning screen — it isn't a sign that anything is wrong.
-			</p>
+			<p className="gun-lead">What happens next</p>
 			<ol className="gun-steps">
 				<li>
-					On the screen titled <strong>"Google hasn't verified this app"</strong>, click <strong>Advanced</strong> (bottom left).
+					Tap <strong>Advanced</strong> (bottom left)
 				</li>
 				<li>
-					Click <strong>Go to Nothing To Wear (unsafe)</strong> — that "(unsafe)" wording is Google's generic label for any
-					unverified app, not specific to this one.
+					Tap <strong>Go to Nothing To Wear</strong>
 				</li>
-				<li>Sign in with your Google account as normal.</li>
+				<li>Sign in with your Google account as normal</li>
 			</ol>
 		</Modal>
 	);

@@ -1,15 +1,22 @@
 .modal-overlay {
 	position: fixed;
-	z-index: 1000;
+	z-index: 1100;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	/* Pad the top past the sticky NavBar (z-index:100, --header-height tall) so a
+	   tall centered panel never tucks its header up under the nav — it read as
+	   "covered by the navbar". The centering region now starts below the header. */
+	padding: calc(var(--header-height, 56px) + var(--spacing-200, 1rem)) var(--spacing-200, 1rem) var(--spacing-200, 1rem);
+	box-sizing: border-box;
 	background: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(4px);
 	inset: 0;
 }
 
 .modal-panel {
+	display: flex;
+	flex-direction: column;
 	max-width: 430px;
 	width: 90%;
 	max-height: 80vh;
@@ -20,12 +27,17 @@
 	   fixed grey (#7b7777) left dark light-mode text nearly illegible. */
 	background: var(--bg-surface-primary);
 	box-shadow: var(--elevation-high);
-	overflow-y: auto;
+	/* The panel itself no longer scrolls — only .modal-body does (below).
+	   Previously overflow-y:auto lived here, so on tall content the whole
+	   panel scrolled as one block and the header (title/close) and footer
+	   (action buttons) scrolled out of view with no way back to them. */
+	overflow: hidden;
 }
 
 /* Header */
 .modal-header {
 	display: flex;
+	flex-shrink: 0;
 	justify-content: space-between;
 	align-items: center;
 	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
@@ -49,8 +61,8 @@
 	padding: 0;
 	border: 1px solid var(--border-strong);
 	border-radius: 50%;
-	/* background: var(--bg-surface-secondary); */
-	background: #898682;
+	background: var(--bg-surface-secondary);
+	/* background: #898682; */
 	color: var(--text-secondary);
 	font-size: 1.2rem;
 	line-height: 1;
@@ -67,14 +79,25 @@
 
 /* Body */
 .modal-body {
+	overflow-y: auto;
 	padding: var(--spacing-100, .5rem) var(--spacing-300, 1.5rem);
 }
 
 /* Footer */
 .modal-footer {
 	display: flex;
+	flex-shrink: 0;
 	justify-content: flex-end;
 	padding: var(--spacing-200, 1rem) var(--spacing-300, 1.5rem);
 	border-top: 1px solid var(--border-hairline);
 	gap: var(--spacing-100, 0.5rem);
+}
+
+
+@media (max-width: 480px) {
+	.modal-title{
+		letter-spacing: -.025rem;
+      	word-spacing: -1px;
+	}
+
 }

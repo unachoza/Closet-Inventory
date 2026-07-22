@@ -252,20 +252,16 @@
 
 .display-email-preview-panel{
 	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
 	/* border: solid 1px rgb(242, 237, 242); */
 	padding: 5px;
 	border-radius: 10px;
 }
 
-.display-email-preview-panel > .gmail-list-panel {
-	width: 40%;
-}
-
-.display-email-preview-panel > .gmail-preview-panel{
-	width: 59%;
+.gmail-labels-and-preview > .gmail-preview-panel {
 	border-radius: 10px;
-	 background: rgb(174 172 172 / 32%);
+	background: rgb(174 172 172 / 32%);
 }
 
 
@@ -296,6 +292,7 @@
 	font-size: 0.95rem;
 	font-weight: 500;
 	font-family: 'DM Sans';
+	line-height: 1.2;
 }
 
 .gmail-section-title span {
@@ -303,6 +300,18 @@
 	font-weight: 400;
 	margin-left: var(--spacing-50);
 	font-size: 1rem;
+}
+
+.gmail-labels-and-preview{
+	display: flex;
+	flex-direction: row;
+	gap: var(--spacing-200);
+	min-width: 0;
+}
+
+.gmail-list-panel {
+	flex: 1 1 50%;
+	min-width: 0;
 }
 
 /* Email list */
@@ -315,12 +324,14 @@
 	gap: var(--spacing-50);
 	list-style: none;
 	overflow-y: auto;
+	min-width: 0;
 }
 
 .gmail-email-item {
 	display: flex;
 	flex-direction: column;
 	border-radius: var(--border-radius-sm);
+	min-width: 0;
 }
 
 .gmail-email-label {
@@ -333,6 +344,7 @@
 	cursor: pointer;
 	transition: background 0.15s ease;
 	gap: var(--spacing-100);
+	min-width: 0;
 }
 
 .gmail-email-label:hover {
@@ -359,6 +371,7 @@
 
 .gmail-email-content {
 	width: 100%;
+	min-width: 0;
 }
 
 .gmail-email-header {
@@ -521,7 +534,7 @@
 .gmail-preview {
 	display: flex;
 	flex-direction: column;
-	gap: var(--spacing-200);
+	gap: var(--spacing-100);
 }
 
 .gmail-preview-header {
@@ -539,7 +552,7 @@
 	display: flex;
 	flex-direction: column;
 	margin: var(--spacing-50) 0 0;
-	color: rgba(255, 255, 255, 0.55);
+	color: rgba(255, 255, 255, 0.7);
 	font-size: 0.8rem;
 	gap: 2px;
 }
@@ -752,6 +765,8 @@
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;
+	flex: 1 1 50%;
+	min-width: 0;
 	max-height: 540px;
 	padding: var(--spacing-200);
 	gap: var(--spacing-200);
@@ -777,18 +792,27 @@
     backdrop-filter: none;
   }
 
+  .gmail-section-title {
+	margin-top: .25rem;
+	line-height: 1.5;
+  }
+
   /* The email list takes the full width... */
   .display-email-preview-panel {
     display: block;
   }
 
-  .display-email-preview-panel > .gmail-list-panel {
+  .gmail-labels-and-preview {
+    display: block;
+  }
+
+  .gmail-labels-and-preview > .gmail-list-panel {
     width: 100%;
   }
 
   /* ...and the preview opens as a focused full-screen overlay on top of it,
      rather than stacking below where it's easy to miss. */
-  .display-email-preview-panel > .gmail-preview-panel {
+  .gmail-labels-and-preview > .gmail-preview-panel {
     position: fixed;
     inset: 0;
     margin-top: 7vh;
@@ -831,12 +855,15 @@
     gap: var(--spacing-50);
   }
 
+  /* changed my mind I want to cram */
   /* Wrap to multiple rows instead of cramming 3 buttons into one. */
   .gmail-header-actions button {
     height: 3rem;
-    min-width: 8rem;
-    font-size: 0.8rem;
-    flex: 1 1 8rem;
+    font-size: 0.9rem;
+    margin: 8px 2px;
+    padding: 0.5rem .89rem;
+    /* min-width: 8rem; */
+    /* flex: 1 1 8rem; */
   }
 
   /* Shorter email list on mobile since preview is below */

@@ -28,7 +28,7 @@ export default function NameStep({ onContinue }: NameStepProps) {
 		const meta = (user?.user_metadata ?? {}) as { full_name?: string; name?: string };
 		const seeded = profile?.display_name ?? meta.full_name ?? meta.name ?? null;
 		if (seeded !== null) {
-			seededRef.current = seeded.trim();
+			seededRef.current = seeded.split(" ")[0];
 			setName(seeded);
 		} else if (profile) {
 			setName("");
@@ -73,7 +73,7 @@ export default function NameStep({ onContinue }: NameStepProps) {
 					type="text"
 					className="onb__name-input"
 					aria-label="Your name"
-					value={name ?? ""}
+					value={name?.split(" ")[0] ?? ""}
 					onChange={(event) => {
 						setName(event.target.value);
 						setError(null);

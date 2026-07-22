@@ -1,8 +1,8 @@
 /* ─────────────────────────────────────────────
    fiberCompare.ts
    Data + pure helpers for the Fiber Comparison table
-   (sortable columns + pick-up-to-3-to-compare). Kept
-   separate from the view so the logic is unit-testable.
+   (sortable columns). Kept separate from the view so
+   the logic is unit-testable.
    ─────────────────────────────────────────────*/
 
 export interface FiberRow {
@@ -17,9 +17,6 @@ export interface FiberRow {
 
 export type SortKey = keyof FiberRow;
 export type SortDir = "asc" | "desc";
-
-/** Max fibers a user can pin side-by-side in compare mode. */
-export const MAX_COMPARE = 3;
 
 export const FIBER_ROWS: readonly FiberRow[] = [
 	{ fiber: "Merino Wool", category: "Natural/Animal", source: "Merino sheep", breathability: "High", durability: "High", ecoRating: "Good", cost: "$$–$$$" },
@@ -81,18 +78,4 @@ export function sortRows(rows: readonly FiberRow[], key: SortKey, dir: SortDir):
 		return 0;
 	});
 	return dir === "desc" ? sorted.reverse() : sorted;
-}
-
-/**
- * Immutably toggle a fiber in the compare selection, capping at MAX_COMPARE.
- * Adding beyond the cap is a no-op (the current selection is returned unchanged).
- */
-export function togglePick(selected: readonly string[], fiber: string): string[] {
-	if (selected.includes(fiber)) {
-		return selected.filter((f) => f !== fiber);
-	}
-	if (selected.length >= MAX_COMPARE) {
-		return [...selected];
-	}
-	return [...selected, fiber];
 }

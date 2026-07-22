@@ -31,7 +31,7 @@ test.describe("onboarding — new user", () => {
 
 		// Sign-in screen with the unverified-app reassurance.
 		await expect(page.getByRole("button", { name: /sign in with google/i })).toBeVisible();
-		await expect(page.getByText(/hasn't verified this app/i)).toBeVisible();
+		await expect(page.getByText(/Google will display an additional verification/i)).toBeVisible();
 		await page.getByRole("button", { name: /skip for now/i }).click();
 
 		// Install card, then done.
@@ -64,7 +64,7 @@ test.describe("onboarding — new user", () => {
 		});
 		await page.goto("/");
 		await expect(page.getByRole("button", { name: /sign in with google/i })).toBeVisible();
-		await expect(page.getByText(/hasn't verified this app/i)).toBeVisible();
+		await expect(page.getByText(/Google will display an additional verification/i)).toBeVisible();
 	});
 
 	test("resumes at the install card after a reload during the final steps", async ({ page }) => {

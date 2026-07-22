@@ -577,6 +577,26 @@ button.filter-accordion__header:focus{
 		width: 100vw;
 		max-width: 100vw;
 	}
+
+	/* Each card here is wrapped in .filtered-card, which reserves a 3px
+	   border on every side (see below) — 6px of width per card that
+	   Closet.css's shared --Card-width doesn't know about. At the plain
+	   30vw/47vw values that 6px is enough to push a row's last card past
+	   the available width and drop it to the next line, leaving the row
+	   centered with a big empty gap on both sides instead of using the
+	   space. Size cards here to the actual per-row budget: the grid's
+	   content width (100vw minus its 0.25rem side padding and 0.5rem-per-gap
+	   inter-card gaps), split across the card count, minus the border — so
+	   density changes the count per row (like the Carousel/Closet grid: 2 up
+	   comfortable, 3 up compact) instead of just resizing cards in place. */
+	.filtered-items-parent .items-grid--compact {
+		--Card-width: calc(33.333vw - 14px);
+		--Card-height: 11rem;
+	}
+
+	.filtered-items-parent .items-grid:not(.items-grid--compact) .card {
+		width: calc(50vw - 14px);
+	}
 }
 
 /* ── Empty state ── */
