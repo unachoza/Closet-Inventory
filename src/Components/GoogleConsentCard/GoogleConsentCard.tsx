@@ -1,4 +1,4 @@
-import { Icon, User as UserIcon, type LucideProps } from "lucide-react";
+import { Icon, type LucideProps } from "lucide-react";
 import { coatHanger } from "@lucide/lab";
 import "./GoogleConsentCard.css";
 
@@ -44,7 +44,7 @@ export interface GoogleConsentCardProps {
  * requester before Google's still-unverified screen appears. It does not
  * change what Google itself shows.
  */
-export default function GoogleConsentCard({ variant, compact, userPhotoUrl, userName, className }: GoogleConsentCardProps) {
+export default function GoogleConsentCard({ variant, compact, userName, className }: GoogleConsentCardProps) {
 	const initials = initialsFrom(userName ?? undefined);
 	console.log(initials);
 
