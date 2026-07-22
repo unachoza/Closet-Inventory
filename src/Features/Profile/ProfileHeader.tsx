@@ -86,7 +86,6 @@ export default function ProfileHeader({ profile, user, onSaveName }: ProfileHead
 					</h1>
 					<p className="profile__meta">
 						{user.email}
-						{profile?.photo_url ? " · photo from Google" : ""}
 					</p>
 				</>
 			)}
