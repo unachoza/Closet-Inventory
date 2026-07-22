@@ -49,6 +49,7 @@
       font-size: 20px;
       font-weight: 600;
       white-space: nowrap;
+      line-height: 2;
 }
 
 .nav-right {
@@ -236,7 +237,7 @@ div.search-container > input {
       }
 
       .hamburger-btn{
-  padding: 0.6em .75rem;
+            padding: 0.6em .75rem;
       }
 
 
@@ -246,6 +247,7 @@ div.search-container > input {
             text-align: left;
             flex: 1;
             text-overflow: ellipsis;
+            line-height: 2;
       }
 
       /* The full sync/auth control (nowrap labels + "Sign in to sync" button,

@@ -792,6 +792,11 @@
     backdrop-filter: none;
   }
 
+  .gmail-section-title {
+	margin-top: .25rem;
+	line-height: 1.5;
+  }
+
   /* The email list takes the full width... */
   .display-email-preview-panel {
     display: block;
@@ -850,11 +855,13 @@
     gap: var(--spacing-50);
   }
 
+  /* changed my mind I want to cram */
   /* Wrap to multiple rows instead of cramming 3 buttons into one. */
   .gmail-header-actions button {
     height: 3rem;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     margin: 8px 2px;
+    padding: 0.5rem .89rem;
     /* min-width: 8rem; */
     /* flex: 1 1 8rem; */
   }

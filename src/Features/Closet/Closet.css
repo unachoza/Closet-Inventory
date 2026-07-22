@@ -104,7 +104,10 @@ p.no-results {
     padding: 0 0.5rem 0.5rem;
   }
 
-  /* ~3 cards per row on phones in compact mode (vs. the default 2 at 47vw). */
+  /* ~3 cards per row on phones in compact mode (vs. the default 2 at 47vw).
+     SearchCloset overrides this further — see .filtered-items-parent
+     .items-grid--compact in EntireCloset.css — because its .filtered-card
+     wrapper adds a border this plain grid doesn't have. */
   .items-grid--compact {
     --Card-width: 30vw;
     --Card-height: 11rem;
