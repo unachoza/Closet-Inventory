@@ -346,7 +346,7 @@ export default function GmailImport({
 					>
 						{authLoading ? "Connecting..." : "Connect Gmail Account"}
 					</button>
-					<GoogleHeadsUpNotice variant="gmail-import" />
+					{/* <GoogleHeadsUpNotice variant="gmail-import" /> */}
 					{friendlyError && <p className="gmail-error">{friendlyError.message}</p>}
 					<GoogleUnverifiedNotice
 						isOpen={googleNotice.isOpen}
@@ -355,6 +355,12 @@ export default function GmailImport({
 						variant="gmail-import"
 						userPhotoUrl={profile?.photo_url}
 						userName={profile?.display_name}
+					/>
+					{error && <p className="gmail-error">{error}</p>}
+					<GoogleUnverifiedNotice
+						isOpen={googleNotice.isOpen}
+						onContinue={googleNotice.confirm}
+						onCancel={googleNotice.dismiss}
 					/>
 				</div>
 			</div>
@@ -373,7 +379,7 @@ export default function GmailImport({
 						Disconnect
 					</button>
 					<button className="gmail-clear-cache-btn" onClick={handleClearCache} type="button" style={{ marginLeft: 8 }}>
-						Clear Email Cache
+						Clear Emails
 					</button>
 				</div>
 			</div>
@@ -423,96 +429,95 @@ export default function GmailImport({
 
 			{!isSearching && emails.length > 0 && (
 				<div className={selectedMeta ? "display-email-preview-panel" : "gmail-results"}>
-					<div className="gmail-list-panel">
-						<h3 className="gmail-section-title" data-testid="email-count">
-							<span>Found</span> {emails.length} email
-							{emails.length !== 1 ? "s" : ""}
-							{emailDateRange && (
-								<>
-									<br />
-									<span>Date range: </span>
-									{emailDateRange.newest} - {emailDateRange.oldest}
-								</>
-							)}
-							{cachedCount > 0 && emails.length !== cachedCount && (
-								<span className="gmail-cache-hint"> (of {cachedCount} cached)</span>
-							)}
-						</h3>
-						<EmailList
-							emails={emails}
-							selectedEmailId={selectedEmailId}
-							onToggleSelect={handleToggleSelect}
-							listRef={listRef}
-						/>
-						{isFetchingMore && (
+					<h3 className="gmail-section-title" data-testid="email-count">
+						<span>Found</span> {emails.length} email
+						{emails.length !== 1 ? "s" : ""}
+						{emailDateRange && (
 							<>
-								<div className="gmail-skeleton-row" aria-hidden="true" />
-								<div className="gmail-skeleton-row" aria-hidden="true" />
-								<div className="gmail-skeleton-row" aria-hidden="true" />
+								<br />
+								<span>Date range: </span>
+								{emailDateRange.newest} - {emailDateRange.oldest}
 							</>
 						)}
-						{hasNextPage && (
-							<button
-								className="gmail-search-btn"
-								onClick={handleNextPage}
-								disabled={isFetchingMore}
-								type="button"
-								style={{ marginTop: "var(--spacing-100)", width: "100%" }}
-							>
-								{isFetchingMore ? "Loading..." : "Load More"}
-							</button>
+						{cachedCount > 0 && emails.length !== cachedCount && (
+							<span className="gmail-cache-hint"> (of {cachedCount} cached)</span>
 						)}
-					</div>
-
-					{selectedMeta && (
-						<div className="gmail-preview-panel">
-							<button
-								className="gmail-preview-close"
-								onClick={handleClosePreview}
-								type="button"
-								aria-label="Back to email list"
-							>
-								← Back to list
-							</button>
-							{selectedEmail ? (
-								<EmailPreview
-									email={selectedEmail}
-									onImportProduct={handleImportProduct}
-									onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
-									unskippedIndices={
-										onUnskippedByEmailChange && selectedEmailId ? (unskippedByEmail?.[selectedEmailId] ?? []) : undefined
-									}
-									onUnskippedIndicesChange={
-										onUnskippedByEmailChange && selectedEmailId
-											? (indices) => onUnskippedByEmailChange(selectedEmailId, indices)
-											: undefined
-									}
-								/>
-							) : (
-								// Body still downloading — tapping an email must show
-								// feedback immediately, not dead air until the fetch lands.
-								<div className="gmail-preview-loading" role="status">
-									<span className="gmail-spinner" aria-hidden="true" />
-									<p>Opening email...</p>
-									{isFetchingBody && <div className="gmail-skeleton-row" aria-hidden="true" />}
-								</div>
+					</h3>
+					<div className="gmail-labels-and-preview">
+						<div className="gmail-list-panel">
+							<EmailList
+								emails={emails}
+								selectedEmailId={selectedEmailId}
+								onToggleSelect={handleToggleSelect}
+								listRef={listRef}
+							/>
+							{isFetchingMore && (
+								<>
+									<div className="gmail-skeleton-row" aria-hidden="true" />
+									<div className="gmail-skeleton-row" aria-hidden="true" />
+									<div className="gmail-skeleton-row" aria-hidden="true" />
+								</>
+							)}
+							{hasNextPage && (
+								<button
+									className="gmail-search-btn"
+									onClick={handleNextPage}
+									disabled={isFetchingMore}
+									type="button"
+									style={{ marginTop: "var(--spacing-100)", width: "100%" }}
+								>
+									{isFetchingMore ? "Loading..." : "Load More"}
+								</button>
 							)}
 						</div>
-					)}
+						{selectedMeta && (
+							<div className="gmail-preview-panel">
+								<button
+									className="gmail-preview-close"
+									onClick={handleClosePreview}
+									type="button"
+									aria-label="Back to email list"
+								>
+									← Back to list
+								</button>
+								{selectedEmail ? (
+									<EmailPreview
+										email={selectedEmail}
+										onImportProduct={handleImportProduct}
+										onImportAllProducts={onImportAll ? handleImportAllProducts : undefined}
+										unskippedIndices={
+											onUnskippedByEmailChange && selectedEmailId
+												? (unskippedByEmail?.[selectedEmailId] ?? [])
+												: undefined
+										}
+										onUnskippedIndicesChange={
+											onUnskippedByEmailChange && selectedEmailId
+												? (indices) => onUnskippedByEmailChange(selectedEmailId, indices)
+												: undefined
+										}
+									/>
+								) : (
+									// Body still downloading — tapping an email must show
+									// feedback immediately, not dead air until the fetch lands.
+									<div className="gmail-preview-loading" role="status">
+										<span className="gmail-spinner" aria-hidden="true" />
+										<p>Opening email...</p>
+										{isFetchingBody && <div className="gmail-skeleton-row" aria-hidden="true" />}
+									</div>
+								)}
+							</div>
+						)}
+					</div>
 				</div>
 			)}
 			{!isSearching && !friendlyError && emails.length < 1 && (
 				<div className="gmail-empty">
 					<p className="gmail-empty-title">No order emails found yet.</p>
 					<p className="gmail-empty-hint">
-						Every store words its emails differently — try searching for a specific sender (like orders@zara.com) or
-						widening the date range.
+						Every store words its emails differently — try searching for a specific sender (like orders@zara.com) or widening
+						the date range.
 					</p>
-					<button
-						className="gmail-empty-action"
-						onClick={() => setAdvancedExpandSignal((n) => n + 1)}
-						type="button"
-					>
+					<button className="gmail-empty-action" onClick={() => setAdvancedExpandSignal((n) => n + 1)} type="button">
 						Open Advanced Search
 					</button>
 				</div>

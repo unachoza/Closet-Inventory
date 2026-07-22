@@ -252,20 +252,16 @@
 
 .display-email-preview-panel{
 	display: flex;
+	flex-direction: column;
 	justify-content: space-between;
 	/* border: solid 1px rgb(242, 237, 242); */
 	padding: 5px;
 	border-radius: 10px;
 }
 
-.display-email-preview-panel > .gmail-list-panel {
-	width: 40%;
-}
-
-.display-email-preview-panel > .gmail-preview-panel{
-	width: 59%;
+.gmail-labels-and-preview > .gmail-preview-panel {
 	border-radius: 10px;
-	 background: rgb(174 172 172 / 32%);
+	background: rgb(174 172 172 / 32%);
 }
 
 
@@ -296,6 +292,7 @@
 	font-size: 0.95rem;
 	font-weight: 500;
 	font-family: 'DM Sans';
+	line-height: 1.2;
 }
 
 .gmail-section-title span {
@@ -303,6 +300,18 @@
 	font-weight: 400;
 	margin-left: var(--spacing-50);
 	font-size: 1rem;
+}
+
+.gmail-labels-and-preview{
+	display: flex;
+	flex-direction: row;
+	gap: var(--spacing-200);
+	min-width: 0;
+}
+
+.gmail-list-panel {
+	flex: 1 1 50%;
+	min-width: 0;
 }
 
 /* Email list */
@@ -315,12 +324,14 @@
 	gap: var(--spacing-50);
 	list-style: none;
 	overflow-y: auto;
+	min-width: 0;
 }
 
 .gmail-email-item {
 	display: flex;
 	flex-direction: column;
 	border-radius: var(--border-radius-sm);
+	min-width: 0;
 }
 
 .gmail-email-label {
@@ -333,6 +344,7 @@
 	cursor: pointer;
 	transition: background 0.15s ease;
 	gap: var(--spacing-100);
+	min-width: 0;
 }
 
 .gmail-email-label:hover {
@@ -359,6 +371,7 @@
 
 .gmail-email-content {
 	width: 100%;
+	min-width: 0;
 }
 
 .gmail-email-header {
@@ -752,6 +765,8 @@
 .gmail-preview-panel{
 	display: flex;
 	flex-direction: column;
+	flex: 1 1 50%;
+	min-width: 0;
 	max-height: 540px;
 	padding: var(--spacing-200);
 	gap: var(--spacing-200);
@@ -782,13 +797,17 @@
     display: block;
   }
 
-  .display-email-preview-panel > .gmail-list-panel {
+  .gmail-labels-and-preview {
+    display: block;
+  }
+
+  .gmail-labels-and-preview > .gmail-list-panel {
     width: 100%;
   }
 
   /* ...and the preview opens as a focused full-screen overlay on top of it,
      rather than stacking below where it's easy to miss. */
-  .display-email-preview-panel > .gmail-preview-panel {
+  .gmail-labels-and-preview > .gmail-preview-panel {
     position: fixed;
     inset: 0;
     margin-top: 7vh;
