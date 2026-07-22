@@ -552,7 +552,7 @@
 	display: flex;
 	flex-direction: column;
 	margin: var(--spacing-50) 0 0;
-	color: rgba(255, 255, 255, 0.55);
+	color: rgba(255, 255, 255, 0.7);
 	font-size: 0.8rem;
 	gap: 2px;
 }

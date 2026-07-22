@@ -41,7 +41,7 @@
 .import-option__radio {
       width: 18px;
     height: 18px;
-    border: 1px solid rgb(255 255 255 / 54%);
+    border: 1px solid rgb(255 255 255 / 70%);
     border-radius: 50%;
     flex-shrink: 0;
 }
