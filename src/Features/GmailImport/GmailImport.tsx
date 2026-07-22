@@ -357,11 +357,6 @@ export default function GmailImport({
 						userName={profile?.display_name}
 					/>
 					{error && <p className="gmail-error">{error}</p>}
-					<GoogleUnverifiedNotice
-						isOpen={googleNotice.isOpen}
-						onContinue={googleNotice.confirm}
-						onCancel={googleNotice.dismiss}
-					/>
 				</div>
 			</div>
 		);
