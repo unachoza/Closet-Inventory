@@ -317,6 +317,19 @@ button.submit:hover {
 	color: var(--text-on-brand);
 }
 
+/* ── Details step: name/price/purchased share one row, equal width ───────── */
+.details-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.details-row > .form-subsection,
+.details-row > .purchased-field {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
 /* ── Details step: plain text/number inputs ──────────────────────────────── */
 .details-text-input {
 	width: 100%;
@@ -383,6 +396,16 @@ button.submit:hover {
   }
 
   .age-datepicker input {
+    width: 100%;
+  }
+
+  .details-row {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .details-row > .form-subsection,
+  .details-row > .purchased-field {
     width: 100%;
   }
 }

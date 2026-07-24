@@ -38,39 +38,41 @@ const DetailsStep = ({ data, onChange, onToggle, careOptions, setCareOptions, di
 			<label className="step-label">Details</label>
 			<p className="step-hint">All optional — skip anything you don't know.</p>
 
-			<div className="form-subsection">
-				<label className="step-label" htmlFor="item-name">
-					Name
-				</label>
-				<input
-					id="item-name"
-					type="text"
-					className="details-text-input"
-					aria-label="Item name"
-					value={displayName}
-					onChange={(e) => onNameEdit(e.target.value)}
-				/>
-			</div>
+			<div className="details-row">
+				<div className="form-subsection">
+					<label className="step-label" htmlFor="item-name">
+						Name
+					</label>
+					<input
+						id="item-name"
+						type="text"
+						className="details-text-input"
+						aria-label="Item name"
+						value={displayName}
+						onChange={(e) => onNameEdit(e.target.value)}
+					/>
+				</div>
 
-			<div className="form-subsection">
-				<label className="step-label" htmlFor="item-price">
-					Price
-				</label>
-				<input
-					id="item-price"
-					type="number"
-					inputMode="decimal"
-					min="0"
-					step="0.01"
-					className="details-text-input details-price-input"
-					aria-label="Price"
-					placeholder="$"
-					value={data.price ?? ""}
-					onChange={handlePriceChange}
-				/>
-			</div>
+				<div className="form-subsection">
+					<label className="step-label" htmlFor="item-price">
+						Price
+					</label>
+					<input
+						id="item-price"
+						type="number"
+						inputMode="decimal"
+						min="0"
+						step="0.01"
+						className="details-text-input details-price-input"
+						aria-label="Price"
+						placeholder="$"
+						value={data.price ?? ""}
+						onChange={handlePriceChange}
+					/>
+				</div>
 
-			<PurchasedField selectedDate={purchasedDate} onSelectDate={(date) => onChange({ purchaseDate: date.toISOString() })} />
+				<PurchasedField selectedDate={purchasedDate} onSelectDate={(date) => onChange({ purchaseDate: date.toISOString() })} />
+			</div>
 
 			<PillGroup
 				label="Condition"
