@@ -118,6 +118,7 @@ export interface ItemFormData {
 	age: string;
 	condition?: string;
 	purchaseDate?: string;
+	price?: number;
 	care: string | string[];
 }
 
