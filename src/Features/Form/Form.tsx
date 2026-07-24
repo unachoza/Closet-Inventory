@@ -106,12 +106,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	};
 	return (
 		<div className="form" data-testid="multistep-form">
-			<button
-				type="button"
-				className="form-close-btn"
-				onClick={handleExit}
-				aria-label="Close and discard this item"
-			>
+			<button type="button" className="form-close-btn" onClick={handleExit} aria-label="Close and discard this item">
 				<X size={20} />
 			</button>
 			<motion.form
@@ -124,8 +119,31 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 				{/* <StepProgressTracker currentStep={step} onStepClick={setStep} /> */}
 				<StepTabsTracker currentStep={step} onStepClick={setStep} />
 
-				{/* STEP 1: BASICS — category (required), color, size, brand */}
+				{/* STEP 1: PHOTO */}
 				{step === 1 && (
+					<div className="form-step two-option-step">
+						<label className="step-label">Photo</label>
+						<div className="double-options">
+							<ImageUploaderInput
+								image={formData.imageURL}
+								onImageSelect={(base64) => setFormData((prev) => ({ ...prev, imageURL: base64 }))}
+								onImageRemove={() => setFormData((prev) => ({ ...prev, imageURL: "" }))}
+							/>
+							<div className="image-uploader">
+								<label className="step-label">or use default image?</label>
+								<div className="image-uploader-box">
+									<img
+										src={getStockPhoto(formData.category as CategoryType)}
+										className="image-preview"
+										alt="preview"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+				)}
+				{/* STEP 2: BASICS — category (required), color, size, brand */}
+				{step === 2 && (
 					<div className="form-step-group">
 						<div className="field-label">
 							<label>Clothing Category</label>
@@ -156,8 +174,8 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 					</div>
 				)}
 
-				{/* STEP 2: DETAILS — material, care, occasion, condition, purchase date (all optional) */}
-				{step === 2 && (
+				{/* STEP 3: DETAILS — material, care, occasion, condition, purchase date (all optional) */}
+				{step === 3 && (
 					<div className="form-step-group">
 						<div className="form-subsection">
 							<label className="step-label">Material Composition</label>
@@ -202,30 +220,6 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 							selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
 							onSelectDate={handleDateSelect}
 						/>
-					</div>
-				)}
-
-				{/* STEP 3: PHOTO */}
-				{step === 3 && (
-					<div className="form-step two-option-step">
-						<label className="step-label">Photo</label>
-						<div className="double-options">
-							<ImageUploaderInput
-								image={formData.imageURL}
-								onImageSelect={(base64) => setFormData((prev) => ({ ...prev, imageURL: base64 }))}
-								onImageRemove={() => setFormData((prev) => ({ ...prev, imageURL: "" }))}
-							/>
-							<div className="image-uploader">
-								<label className="step-label">or use default image?</label>
-								<div className="image-uploader-box">
-									<img
-										src={getStockPhoto(formData.category as CategoryType)}
-										className="image-preview"
-										alt="preview"
-									/>
-								</div>
-							</div>
-						</div>
 					</div>
 				)}
 
