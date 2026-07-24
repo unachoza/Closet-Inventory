@@ -56,6 +56,23 @@ form {
 	height: clamp(25rem, 50vh, 56.25rem);
 }
 
+/* Consolidated Basics/Details steps: several field groups stacked and scrolled
+   together, rather than one field per fixed-height step. */
+.form-step-group {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	max-height: clamp(25rem, 60vh, 56.25rem);
+	overflow-y: auto;
+	padding-bottom: 0.5rem;
+}
+
+.form-subsection {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
 .field-label {
 	text-align: left;
 	margin-bottom: 1rem;

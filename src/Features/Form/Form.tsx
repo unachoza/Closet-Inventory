@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import Modal from "../../Components/Modal/Modal";
 import DropDownSelect from "./DropDownSelect/DropDownSelect";
-import CheckboxCollection from "./CheckboxCollection/CheckboxCollection";
+import PillGroup from "./PillGroup/PillGroup";
 import TextPillField from "./TextInput/TextPillField";
 import MaterialBlendInput from "../../Components/MaterialBlendInput/MaterialBlendInput";
 import { CategoryType, ItemFormData, MaterialBlend, ViewType } from "../../utils/types";
@@ -17,18 +17,19 @@ import {
 	careExamples,
 	occasionExamples,
 } from "../../utils/constants";
+import { getColorSwatchFill } from "../../utils/colorSwatches";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { useCloset } from "../../context/ClosetContext";
 import { normalizeMaterial } from "../../utils/materialUtils";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
-import MonthYearPicker from "./DatePicker/MonthYearPicker";
+import PurchasedField from "./PurchasedField/PurchasedField";
 import ImageUploaderInput from "./ImageUploader/ImageUploader";
 import getStockPhoto from "../../utils/getStockPhoto";
 import { useToast } from "../../Components/Toast/Toast";
 
-// MULTI-STEP(9) FORM
+// MULTI-STEP(3) FORM: Basics (category/color/size/brand) → Details (material/care/occasion/condition/date) → Photo
 export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 	initialData?: Partial<ItemFormData>;
@@ -123,28 +124,25 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 				{/* <StepProgressTracker currentStep={step} onStepClick={setStep} /> */}
 				<StepTabsTracker currentStep={step} onStepClick={setStep} />
 
-				{/* STEP 1: CATEGORY */}
+				{/* STEP 1: BASICS — category (required), color, size, brand */}
 				{step === 1 && (
-					<div className="field-label">
-						<label>Clothing Category</label>
+					<div className="form-step-group">
+						<div className="field-label">
+							<label>Clothing Category</label>
+							<DropDownSelect options={categoryOptions} formField="category" setFormData={setFormData} />
+						</div>
 
-						<DropDownSelect options={categoryOptions} formField="category" setFormData={setFormData} />
-					</div>
-				)}
+						<PillGroup
+							label="Color"
+							fieldName="color"
+							options={colorOptions}
+							formData={formData}
+							onToggle={toggleValue}
+							getSwatch={getColorSwatchFill}
+						/>
 
-				{/* STEP 2: COLOR */}
-				{step === 2 && (
-					<CheckboxCollection label="color" detailOptions={colorOptions} onToggleDetail={toggleValue} formData={formData} />
-				)}
+						<PillGroup label="Size" fieldName="size" options={sizeOptions} formData={formData} onToggle={toggleValue} />
 
-				{/* STEP 3: SIZE */}
-				{step === 3 && (
-					<CheckboxCollection label="size" detailOptions={sizeOptions} onToggleDetail={toggleValue} formData={formData} />
-				)}
-
-				{/* STEP 4: BRAND */}
-				{step === 4 && (
-					<div className="form-step">
 						<TextPillField
 							label="brand"
 							name="brand"
@@ -158,75 +156,57 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 					</div>
 				)}
 
-				{/* STEP 5: MATERIAL */}
-				{step === 5 && (
-					<div className="form-step">
-						<label className="step-label">Material Composition</label>
-						<p className="step-hint">Add each fiber and its percentage. Total must equal 100%.</p>
-						<MaterialBlendInput
-							value={normalizeMaterial(formData.material)}
-							onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
-						/>
-					</div>
-				)}
-
-				{/* STEP 6: OCCASION */}
-				{step === 6 && (
-					<CheckboxCollection
-						label="occasion"
-						detailOptions={occasionExamples}
-						onToggleDetail={toggleValue}
-						formData={formData}
-					/>
-				)}
-
-				{/* STEP 7: AGE */}
-
-				{step === 7 && (
-					<div className="form-step two-option-step">
-						<label className="step-label">Condition & Purchase Date</label>
-						<div className="double-options">
-							{/* Left: condition */}
-							<div className="age-checkboxes">
-								<span className="option-label">Condition</span>
-								<CheckboxCollection
-									label="condition"
-									detailOptions={conditionOptions}
-									onToggleDetail={toggleValue}
-									formData={formData}
-								/>
-							</div>
-							{/* Right: purchase date (drives the factual age shown on the card) */}
-							<div className="age-datepicker">
-								<span className="option-label">Purchase date</span>
-								<MonthYearPicker
-									selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
-									onSelectDate={handleDateSelect}
-								/>
-							</div>
+				{/* STEP 2: DETAILS — material, care, occasion, condition, purchase date (all optional) */}
+				{step === 2 && (
+					<div className="form-step-group">
+						<div className="form-subsection">
+							<label className="step-label">Material Composition</label>
+							<p className="step-hint">Add each fiber and its percentage. Total must equal 100%.</p>
+							<MaterialBlendInput
+								value={normalizeMaterial(formData.material)}
+								onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
+							/>
 						</div>
-					</div>
-				)}
 
-				{/* STEP 8: CARE */}
-				{step === 8 && (
-					<div className="form-step">
-						<label>Care Instructions</label>
-						<TextPillField
-							label="care"
-							name="Care Instructions"
-							className="string"
-							placeholder="add more options"
-							pillArray={careOptions}
-							onPillsChange={setCareOptions}
-							handleFormUpdate={toggleValue}
+						<div className="form-subsection">
+							<TextPillField
+								label="care"
+								name="Care Instructions"
+								className="string"
+								placeholder="add more options"
+								pillArray={careOptions}
+								onPillsChange={setCareOptions}
+								handleFormUpdate={toggleValue}
+								formData={formData}
+								multiSelect={true}
+							/>
+						</div>
+
+						<PillGroup
+							label="Occasion"
+							fieldName="occasion"
+							options={occasionExamples}
 							formData={formData}
-							multiSelect={true}
+							onToggle={toggleValue}
+						/>
+
+						<PillGroup
+							label="Condition"
+							fieldName="condition"
+							options={conditionOptions}
+							formData={formData}
+							onToggle={toggleValue}
+						/>
+
+						<PurchasedField
+							selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
+							onSelectDate={handleDateSelect}
 						/>
 					</div>
 				)}
-				{/* STEP 8: IMAGE */}
-				{step === 9 && (
+
+				{/* STEP 3: PHOTO */}
+				{step === 3 && (
 					<div className="form-step two-option-step">
 						<label className="step-label">Photo</label>
 						<div className="double-options">
@@ -249,7 +229,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 					</div>
 				)}
 
-				{/* NAVIGATION bUTTONS */}
+				{/* NAVIGATION BUTTONS */}
 				<div className="form-controls">
 					{step > 1 && (
 						<button
@@ -262,7 +242,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 							Back
 						</button>
 					)}
-					{step < 9 && (
+					{step < 3 && (
 						<button
 							className="next-button"
 							onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -273,7 +253,7 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 							Next
 						</button>
 					)}
-					{step === 9 && (
+					{step === 3 && (
 						<button type="submit" className="submit">
 							Submit
 						</button>

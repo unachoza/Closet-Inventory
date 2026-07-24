@@ -26,7 +26,7 @@ vi.mock("./ImageUploader/ImageUploader", () => ({
 import MultiStepForm from "./Form";
 
 // Step labels from constants
-const STEP_LABELS = ["Category", "Color", "Size", "Brand", "Material", "Occasion", "Age", "Care", "Photo"];
+const STEP_LABELS = ["Basics", "Details", "Photo"];
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -49,7 +49,7 @@ function advanceToStep(n: number) {
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe("MultiStepForm — step navigation", () => {
-	it("starts on step 1 and shows the Category tab as active", () => {
+	it("starts on step 1 and shows the Basics tab as active", () => {
 		renderForm();
 		const tabs = screen.getAllByRole("listitem");
 		expect(tabs[0].className).toContain("active");
@@ -77,7 +77,7 @@ describe("MultiStepForm — step navigation", () => {
 		expect(screen.queryByRole("button", { name: /back/i })).not.toBeInTheDocument();
 	});
 
-	it("can navigate forward through all 9 steps", () => {
+	it("can navigate forward through all 3 steps", () => {
 		renderForm();
 		STEP_LABELS.forEach((_, i) => {
 			const tabs = screen.getAllByRole("listitem");
@@ -86,25 +86,25 @@ describe("MultiStepForm — step navigation", () => {
 		});
 	});
 
-	it("shows Submit button only on step 9, not Next", () => {
+	it("shows Submit button only on step 3, not Next", () => {
 		renderForm();
-		advanceToStep(9);
+		advanceToStep(3);
 		expect(screen.getByRole("button", { name: /submit/i })).toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: /next/i })).not.toBeInTheDocument();
 	});
 
 	it("clicking a step tab in the tracker jumps directly to that step", () => {
 		renderForm();
-		fireEvent.click(screen.getByText("Size")); // step 3
+		fireEvent.click(screen.getByText("Details")); // step 2
 		const tabs = screen.getAllByRole("listitem");
-		expect(tabs[2].className).toContain("active");
+		expect(tabs[1].className).toContain("active");
 	});
 });
 
 describe("MultiStepForm — submit", () => {
 	it("submit calls addItem and showToast", async () => {
 		renderForm();
-		advanceToStep(9);
+		advanceToStep(3);
 		const form = screen.getByTestId("multistep-form").querySelector("form")!;
 		fireEvent.submit(form);
 		expect(mockAddItem).toHaveBeenCalled();
@@ -113,7 +113,7 @@ describe("MultiStepForm — submit", () => {
 
 	it("after submit, form resets to step 1", async () => {
 		renderForm();
-		advanceToStep(9);
+		advanceToStep(3);
 		const form = screen.getByTestId("multistep-form").querySelector("form")!;
 		fireEvent.submit(form);
 		await waitFor(() => {
@@ -124,7 +124,7 @@ describe("MultiStepForm — submit", () => {
 
 	it("after submit, setView is called to navigate away", async () => {
 		renderForm();
-		advanceToStep(9);
+		advanceToStep(3);
 		const form = screen.getByTestId("multistep-form").querySelector("form")!;
 		fireEvent.submit(form);
 		await waitFor(() => expect(mockSetView).toHaveBeenCalled());
@@ -136,7 +136,7 @@ describe("MultiStepForm — submit", () => {
 	// preventDefault. Clicking the real button must add exactly one item.
 	it("clicking the Submit button adds exactly one item (no double-submit)", () => {
 		renderForm();
-		advanceToStep(9);
+		advanceToStep(3);
 		fireEvent.click(screen.getByRole("button", { name: /submit/i }));
 		expect(mockAddItem).toHaveBeenCalledTimes(1);
 	});

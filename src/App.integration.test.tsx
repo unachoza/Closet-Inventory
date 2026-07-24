@@ -80,12 +80,12 @@ describe("Add item end-to-end", () => {
 	it("submitting the form adds the item and it appears in the Closet grid", async () => {
 		render(<Providers><AddItemFlow /></Providers>);
 
-		// Navigate through all 9 steps by clicking Next 8 times
-		for (let i = 0; i < 8; i++) {
+		// Navigate through all 3 steps by clicking Next 2 times
+		for (let i = 0; i < 2; i++) {
 			fireEvent.click(screen.getByRole("button", { name: /next/i }));
 		}
 
-		// Step 9 — submit
+		// Step 3 — submit
 		const form = screen.getByTestId("multistep-form").querySelector("form")!;
 		fireEvent.submit(form);
 
@@ -99,7 +99,7 @@ describe("Add item end-to-end", () => {
 	it("toast notification appears after successful submit", async () => {
 		render(<Providers><AddItemFlow /></Providers>);
 
-		for (let i = 0; i < 8; i++) {
+		for (let i = 0; i < 2; i++) {
 			fireEvent.click(screen.getByRole("button", { name: /next/i }));
 		}
 

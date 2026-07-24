@@ -33,8 +33,7 @@ describe("MultiStepForm — exit", () => {
 	it("confirms before discarding once the user has entered something", () => {
 		render(<MultiStepForm setView={mockSetView} />);
 
-		// Make it dirty: go to the Color step and pick a color.
-		fireEvent.click(screen.getByRole("button", { name: /next/i })); // → color
+		// Make it dirty: color is on step 1 (Basics) now.
 		fireEvent.click(screen.getByText("red"));
 
 		// The ✕ now asks first instead of silently discarding.
