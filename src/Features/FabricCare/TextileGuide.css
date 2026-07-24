@@ -631,7 +631,7 @@ button.toc-link:hover{
    borrow .toc-nav's position:sticky/top:0/z-index:90 and collide with the
    real TOC at the same coordinate. */
 .weave-tabs {
-      position: static;
+      position: relative; /* positioning context for the sliding indicator */
       display: flex;
       flex-direction: column;
       align-items: stretch;
@@ -642,36 +642,60 @@ button.toc-link:hover{
       overflow: visible;
 }
 
+/* Single sliding bar instead of a per-button border: it's always drawn from
+   the active button's measured position, so it can never be out of alignment
+   with a neighbour, and it animates smoothly between tabs instead of jumping. */
+.weave-tab-indicator {
+      position: absolute;
+      top: 0;
+      right: -1px;
+      width: 2px;
+      height: var(--indicator-height, 0px);
+      background: var(--gold);
+      transform: translateY(var(--indicator-top, 0px));
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), height 0.25s ease;
+      pointer-events: none;
+}
+
 .weave-tab {
+      position: relative;
       padding: var(--spacing-100, 0.5rem) var(--spacing-200, 1rem);
       min-height: 44px;
       border: none;
-      border-right: 2px solid transparent;
-      border-radius: 0;
+      border-radius: 4px;
       background: none;
       color: var(--ink-60);
       font-size: 14px;
       font-weight: 500;
       text-align: left;
       cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
+      transition: color 0.2s, background-color 0.2s;
       white-space: nowrap;
 }
 
-.weave-tab:hover{
+.weave-tab:hover {
       transform: none;
       translate: none;
       box-shadow: none;
 }
 
+.weave-tab:hover:not(.active) {
+      color: var(--ink);
+      background: color-mix(in srgb, var(--ink) 4%, transparent);
+}
+
 .weave-tab.active {
       color: var(--ink);
-      border-right-color: var(--gold);
-      border-bottom-color: transparent;
       box-shadow: none;
 }
 
-.weave-tab:hover:not(.active) { color: var(--ink); }
+/* Deliberately subtle and distinct from hover/active so the three states
+   (focused, active tab, hovered) never look like the same thing. Replaces the
+   default outline, which was rendering as a stray clipped bar in this layout. */
+.weave-tab:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 30%, transparent);
+}
 
 .weave-panel { display: none; }
 .weave-panel.active { display: block; }
@@ -683,6 +707,17 @@ button.toc-link:hover{
       background: color-mix(in srgb, var(--warm-white) 70%, transparent);
       gap: 32px;
       grid-template-columns: 1fr 1fr;
+      animation: weave-content-in .8s ease;
+}
+
+@keyframes weave-content-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+      .weave-content { animation: none; }
+      .weave-tab-indicator { transition: none; }
 }
 
 .weave-note {
@@ -1148,10 +1183,19 @@ button.toc-link:hover{
       .weave-tab {
             flex: 0 0 auto;
             scroll-snap-align: start;
-            border-right: none;
-            border-bottom: 2px solid transparent;
       }
-      .weave-tab.active { border-bottom-color: var(--gold); border-right-color: transparent; }
+
+      /* Same sliding bar, rotated to an underline for the horizontal strip. */
+      .weave-tab-indicator {
+            top: auto;
+            right: auto;
+            bottom: -1px;
+            left: 0;
+            width: var(--indicator-width, 0px);
+            height: 2px;
+            transform: translateX(var(--indicator-left, 0px));
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.25s ease;
+      }
 
       .compare-table-wrap table { min-width: 620px; font-size: 13px; }
       .compare-table-wrap thead th:first-child,

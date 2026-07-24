@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import "./TextileGuide.css";
 import { FIBERS, WEAVE_TYPES, CARE_GROUPS, STAIN_GUIDE, Fiber } from "../../Content/Fabric&Fiber";
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
@@ -35,6 +35,30 @@ const InteractiveGuide = () => {
 
 	const tocRef = useRef<HTMLElement | null>(null);
 	const activeNavId = useScrollSpy(SECTION_IDS, tocRef);
+
+	// Sliding indicator for the weave-tab rail: measured off the active button so
+	// it's always pixel-perfectly aligned (a per-button border can't animate
+	// between positions), then animated to its new position via CSS transform.
+	const weaveTabsRef = useRef<HTMLDivElement | null>(null);
+	const [weaveIndicator, setWeaveIndicator] = useState({ top: 0, height: 0, left: 0, width: 0 });
+
+	useLayoutEffect(() => {
+		const measure = () => {
+			const activeBtn = weaveTabsRef.current?.querySelector<HTMLButtonElement>(".weave-tab.active");
+			if (!activeBtn) return;
+			setWeaveIndicator({
+				top: activeBtn.offsetTop,
+				height: activeBtn.offsetHeight,
+				left: activeBtn.offsetLeft,
+				width: activeBtn.offsetWidth,
+			});
+		};
+		measure();
+		// Vertical rail vs. horizontal strip swap at the --bp-md breakpoint, which
+		// changes offsetTop/offsetLeft for the same button — re-measure on resize.
+		window.addEventListener("resize", measure);
+		return () => window.removeEventListener("resize", measure);
+	}, [activeWeave]);
 
 	const { setView } = useView();
 
@@ -258,7 +282,19 @@ const InteractiveGuide = () => {
 					</div>
 
 					<div className="weave-layout">
-						<div className="weave-tabs" role="tablist" aria-label="Weave structures">
+						<div className="weave-tabs" ref={weaveTabsRef} role="tablist" aria-label="Weave structures">
+							<span
+								className="weave-tab-indicator"
+								aria-hidden="true"
+								style={
+									{
+										"--indicator-top": `${weaveIndicator.top}px`,
+										"--indicator-height": `${weaveIndicator.height}px`,
+										"--indicator-left": `${weaveIndicator.left}px`,
+										"--indicator-width": `${weaveIndicator.width}px`,
+									} as React.CSSProperties
+								}
+							/>
 							{WEAVE_TYPES.map((w) => (
 								<button
 									key={w.id}
@@ -273,7 +309,7 @@ const InteractiveGuide = () => {
 						</div>
 
 						{activeWeaveData && (
-							<div className="weave-content">
+							<div className="weave-content" key={activeWeave}>
 								<div className="weave-diagram">
 									<WeaveDiagram weaveId={activeWeave} />
 								</div>
