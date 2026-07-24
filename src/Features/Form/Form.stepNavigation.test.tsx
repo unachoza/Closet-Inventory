@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { ItemFormData } from "../../utils/types";
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 const mockAddItem = vi.fn();
@@ -18,126 +19,170 @@ vi.mock("../../hooks/useLocalStorage", () => ({
 	useLocalStorage: (_key: string, init: unknown) => [init, vi.fn()],
 }));
 
-// ImageUploader uses FileReader — stub it
+// ImageUploader uses FileReader — stub it with a button that "uploads" a photo
 vi.mock("./ImageUploader/ImageUploader", () => ({
-	default: () => <div data-testid="image-uploader">ImageUploader</div>,
+	default: ({ onImageSelect }: { onImageSelect: (src: string) => void }) => (
+		<button type="button" data-testid="mock-upload" onClick={() => onImageSelect("data:image/jpeg;base64,abc")}>
+			upload
+		</button>
+	),
 }));
 
 import MultiStepForm from "./Form";
 
-// Step labels from constants
-const STEP_LABELS = ["Category", "Color", "Size", "Brand", "Material", "Occasion", "Age", "Care", "Photo"];
+// New tight flow: Photo → Category → Basics → Details
+const STEP_LABELS = ["Photo", "Category", "Basics", "Details"];
 
 beforeEach(() => vi.clearAllMocks());
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function renderForm() {
-	return render(<MultiStepForm setView={mockSetView} />);
+function renderForm(initialData?: Partial<ItemFormData>) {
+	return render(<MultiStepForm setView={mockSetView} initialData={initialData} />);
+}
+
+function activeTabIndex() {
+	const tabs = screen.getAllByRole("listitem");
+	return tabs.findIndex((tab) => tab.className.includes("active"));
 }
 
 function clickNext() {
 	fireEvent.click(screen.getByRole("button", { name: /next/i }));
 }
 
-function clickBack() {
-	fireEvent.click(screen.getByRole("button", { name: /back/i }));
+function providePhoto() {
+	fireEvent.click(screen.getByTestId("mock-upload"));
 }
 
-function advanceToStep(n: number) {
-	for (let i = 1; i < n; i++) clickNext();
+function pickCategory(label = "Tops") {
+	fireEvent.click(screen.getByRole("button", { name: label }));
+}
+
+/** Photo → Category → Basics with the two required gates satisfied. */
+function advanceToBasics() {
+	providePhoto();
+	clickNext();
+	pickCategory();
+	clickNext();
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 describe("MultiStepForm — step navigation", () => {
-	it("starts on step 1 and shows the Category tab as active", () => {
+	it("renders exactly the 4 tight steps", () => {
 		renderForm();
 		const tabs = screen.getAllByRole("listitem");
-		expect(tabs[0].className).toContain("active");
+		expect(tabs.map((tab) => tab.textContent)).toEqual(STEP_LABELS);
 	});
 
-	it("does not show a Back button on step 1", () => {
+	it("starts on the Photo step with no Back button", () => {
 		renderForm();
+		expect(activeTabIndex()).toBe(0);
 		expect(screen.queryByRole("button", { name: /back/i })).not.toBeInTheDocument();
 	});
 
-	it("Next advances to step 2 and shows Back", () => {
+	it("blocks Next until a photo is provided", () => {
 		renderForm();
+		expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
+		providePhoto();
+		expect(screen.getByRole("button", { name: /next/i })).toBeEnabled();
 		clickNext();
-		const tabs = screen.getAllByRole("listitem");
-		expect(tabs[1].className).toContain("active");
-		expect(screen.getByRole("button", { name: /back/i })).toBeInTheDocument();
+		expect(activeTabIndex()).toBe(1);
 	});
 
-	it("Back returns from step 2 to step 1", () => {
+	it("the explicit stock-photo choice also satisfies the photo gate", () => {
 		renderForm();
+		fireEvent.click(screen.getByRole("button", { name: /use a stock photo/i }));
+		expect(screen.getByRole("button", { name: /next/i })).toBeEnabled();
+	});
+
+	it("blocks Next on Category until one is picked", () => {
+		renderForm();
+		providePhoto();
 		clickNext();
-		clickBack();
-		const tabs = screen.getAllByRole("listitem");
-		expect(tabs[0].className).toContain("active");
-		expect(screen.queryByRole("button", { name: /back/i })).not.toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /next/i })).toBeDisabled();
+		pickCategory();
+		expect(screen.getByRole("button", { name: /next/i })).toBeEnabled();
 	});
 
-	it("can navigate forward through all 9 steps", () => {
+	it("tab tracker cannot jump past an unmet required step", () => {
 		renderForm();
-		STEP_LABELS.forEach((_, i) => {
-			const tabs = screen.getAllByRole("listitem");
-			expect(tabs[i].className).toContain("active");
-			if (i < STEP_LABELS.length - 1) clickNext();
-		});
+		fireEvent.click(screen.getByText("Details"));
+		expect(activeTabIndex()).toBe(0); // photo gate not met — clamped
+
+		providePhoto();
+		fireEvent.click(screen.getByText("Details"));
+		expect(activeTabIndex()).toBe(1); // clamped at category gate
 	});
 
-	it("shows Submit button only on step 9, not Next", () => {
+	it("Back returns from Category to Photo", () => {
 		renderForm();
-		advanceToStep(9);
-		expect(screen.getByRole("button", { name: /submit/i })).toBeInTheDocument();
+		providePhoto();
+		clickNext();
+		fireEvent.click(screen.getByRole("button", { name: /back/i }));
+		expect(activeTabIndex()).toBe(0);
+	});
+
+	it("Basics is optional — Next passes straight through to Details", () => {
+		renderForm();
+		advanceToBasics();
+		expect(activeTabIndex()).toBe(2);
+		clickNext();
+		expect(activeTabIndex()).toBe(3);
+		expect(screen.getByRole("button", { name: /add to closet/i })).toBeInTheDocument();
 		expect(screen.queryByRole("button", { name: /next/i })).not.toBeInTheDocument();
-	});
-
-	it("clicking a step tab in the tracker jumps directly to that step", () => {
-		renderForm();
-		fireEvent.click(screen.getByText("Size")); // step 3
-		const tabs = screen.getAllByRole("listitem");
-		expect(tabs[2].className).toContain("active");
 	});
 });
 
-describe("MultiStepForm — submit", () => {
-	it("submit calls addItem and showToast", async () => {
+describe("MultiStepForm — skip & submit", () => {
+	it("Skip & add on Basics submits immediately with just photo + category", () => {
 		renderForm();
-		advanceToStep(9);
-		const form = screen.getByTestId("multistep-form").querySelector("form")!;
-		fireEvent.submit(form);
-		expect(mockAddItem).toHaveBeenCalled();
-		expect(mockShowToast).toHaveBeenCalled();
-	});
-
-	it("after submit, form resets to step 1", async () => {
-		renderForm();
-		advanceToStep(9);
-		const form = screen.getByTestId("multistep-form").querySelector("form")!;
-		fireEvent.submit(form);
-		await waitFor(() => {
-			const tabs = screen.getAllByRole("listitem");
-			expect(tabs[0].className).toContain("active");
-		});
-	});
-
-	it("after submit, setView is called to navigate away", async () => {
-		renderForm();
-		advanceToStep(9);
-		const form = screen.getByTestId("multistep-form").querySelector("form")!;
-		fireEvent.submit(form);
-		await waitFor(() => expect(mockSetView).toHaveBeenCalled());
-	});
-
-	// Regression: the submit button must NOT wire both onClick={handleSubmit} and
-	// live inside <form onSubmit={handleSubmit}> — that double-fires addItem (and
-	// creates duplicate items) the moment the click handler stops calling
-	// preventDefault. Clicking the real button must add exactly one item.
-	it("clicking the Submit button adds exactly one item (no double-submit)", () => {
-		renderForm();
-		advanceToStep(9);
-		fireEvent.click(screen.getByRole("button", { name: /submit/i }));
+		advanceToBasics();
+		fireEvent.click(screen.getByRole("button", { name: /skip & add/i }));
 		expect(mockAddItem).toHaveBeenCalledTimes(1);
+		expect(mockAddItem.mock.calls[0][0]).toMatchObject({ category: "tops", imageURL: "data:image/jpeg;base64,abc" });
+	});
+
+	it("submit auto-generates the item name from color/brand/category", () => {
+		renderForm();
+		advanceToBasics();
+		fireEvent.click(screen.getByRole("button", { name: "blue" })); // color swatch
+		clickNext();
+		fireEvent.click(screen.getByRole("button", { name: /add to closet/i }));
+		expect(mockAddItem.mock.calls[0][0].name).toBe("Blue Tops");
+	});
+
+	it("a user-edited name is kept as typed, not regenerated", () => {
+		renderForm();
+		advanceToBasics();
+		clickNext();
+		fireEvent.change(screen.getByLabelText("Item name"), { target: { value: "Favorite tee" } });
+		fireEvent.click(screen.getByRole("button", { name: /add to closet/i }));
+		expect(mockAddItem.mock.calls[0][0].name).toBe("Favorite tee");
+	});
+
+	it("price entered in Details is submitted as a number", () => {
+		renderForm();
+		advanceToBasics();
+		clickNext();
+		fireEvent.change(screen.getByLabelText("Price"), { target: { value: "49.99" } });
+		fireEvent.click(screen.getByRole("button", { name: /add to closet/i }));
+		expect(mockAddItem.mock.calls[0][0].price).toBe(49.99);
+	});
+
+	it("submit calls addItem + showToast exactly once and resets to step 1", async () => {
+		renderForm();
+		advanceToBasics();
+		clickNext();
+		fireEvent.click(screen.getByRole("button", { name: /add to closet/i }));
+		expect(mockAddItem).toHaveBeenCalledTimes(1);
+		expect(mockShowToast).toHaveBeenCalledTimes(1);
+		await waitFor(() => expect(mockSetView).toHaveBeenCalledWith("overview"));
+		expect(activeTabIndex()).toBe(0);
+	});
+
+	it("Gmail-prefilled photo + category satisfy the gates immediately", () => {
+		renderForm({ imageURL: "https://img", category: "tops" });
+		expect(screen.getByRole("button", { name: /next/i })).toBeEnabled();
+		fireEvent.click(screen.getByText("Details"));
+		expect(activeTabIndex()).toBe(3);
 	});
 });

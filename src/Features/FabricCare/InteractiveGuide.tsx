@@ -330,6 +330,32 @@ const TextileGuildInteractive = () => {
 							instructions.
 						</p>
 					</div>
+
+					{/* Pick-to-compare chips */}
+					<div className="compare-controls">
+						<span className="compare-controls__label">Compare</span>
+						{FIBER_ROWS.map((r) => {
+							const isSelected = picked.includes(r.fiber);
+							const capReached = picked.length >= MAX_COMPARE;
+							return (
+								<button
+									key={r.fiber}
+									className={`compare-chip${isSelected ? " selected" : ""}`}
+									aria-pressed={isSelected}
+									disabled={!isSelected && capReached}
+									onClick={() => setPicked((p) => togglePick(p, r.fiber))}
+								>
+									{r.fiber}
+								</button>
+							);
+						})}
+						{picked.length > 0 && (
+							<button className="compare-clear" onClick={() => setPicked([])}>
+								Clear
+							</button>
+						)}
+					</div>
+
 					<div className="compare-table-wrap">
 						<table>
 							<thead>

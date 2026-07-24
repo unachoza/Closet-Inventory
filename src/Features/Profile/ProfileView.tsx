@@ -93,11 +93,7 @@ export default function ProfileView() {
 					sub="Tell us what's confusing"
 					onClick={() => setFeedbackOpen(true)}
 				/>
-				<ProfileRowButton
-					icon={<LogOut size={17} aria-hidden="true" />}
-					label="Sign out"
-					onClick={() => void handleSignOut()}
-				/>
+				<ProfileRowButton icon={<LogOut size={17} aria-hidden="true" />} label="Sign out" onClick={() => void handleSignOut()} />
 			</div>
 
 			<AccountDataModal isOpen={accountModalOpen} onClose={() => setAccountModalOpen(false)} />

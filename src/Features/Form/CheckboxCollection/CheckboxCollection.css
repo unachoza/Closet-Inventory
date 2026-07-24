@@ -1,16 +1,12 @@
 @import "../../../styles/breakpoints.css";
 
+/* Wrapping row of checkbox pills — no fixed height, so a long option list
+   grows downward inside the scrollable step instead of colliding with the
+   footer buttons (the old 18.75rem column-wrap hack). */
 .options-container {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
   flex-wrap: wrap;
-  height: 18.75rem;
-}
-
-@media (--bp-xs) {
- .options-container {
-    height: fit-content;
-    padding-bottom: 1rem;
-  }
+  align-items: flex-start;
+  column-gap: 1rem;
 }

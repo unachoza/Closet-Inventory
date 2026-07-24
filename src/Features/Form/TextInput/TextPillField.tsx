@@ -42,6 +42,7 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 				label="Missing Something?"
 				name={name}
 				type="text"
+				required={false}
 				className={className}
 				value={inputValue}
 				handleFormUpdate={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => { if (typeof e !== "string") setInputValue(e.target.value); }}

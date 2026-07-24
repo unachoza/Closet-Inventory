@@ -7,23 +7,44 @@
 	--Submit-Green: #127f5a;
 }
 
-form {
-	height: clamp(25rem, 50vh, 56.25rem);
-}
-
 .form {
 	position: relative;
-	overflow: hidden; /* important for max-height animations */
+	overflow: hidden;
 	height: 95%;
 	max-width: var(--Form-width);
 	margin: .5rem auto;
 	padding: 1rem 1.5rem .8rem 1.5rem;
 	border: 1px solid var(--border-hairline);
 	border-radius: var(--layout-radius-card);
+	/* solid fallback first — iOS Safari <16.2 drops color-mix() */
+	background: var(--bg-surface-primary);
 	background: color-mix(in srgb, var(--bg-surface-primary), transparent 15%);
 	backdrop-filter: var(--effect-blur-glass);
 	box-shadow: var(--elevation-high);
+}
 
+/* Wizard exit — the intended way out of the 9-step Add flow. */
+.form-close-btn {
+	position: absolute;
+	top: .6rem;
+	right: .6rem;
+	z-index: 5;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: none;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--text-secondary, inherit);
+	cursor: pointer;
+}
+
+.form-close-btn:hover {
+	background: color-mix(in srgb, currentColor 12%, transparent);
+	color: var(--text-primary, inherit);
 }
 
 /* Wizard exit — the intended way out of the 9-step Add flow. */
@@ -53,45 +74,87 @@ form {
 .form-step{
 	display: flex;
 	flex-direction: column;
-	height: clamp(25rem, 50vh, 56.25rem);
+	height: clamp(25rem, 62vh, 56.25rem);
 }
 
-.field-label {
+.form-step-content {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+	padding-bottom: 0.5rem;
+}
+
+/* Wizard exit — the intended way out of the Add flow. */
+.form-close-btn {
+	position: absolute;
+	top: .6rem;
+	right: .6rem;
+	z-index: 5;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	padding: 0;
+	border: none;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--text-secondary, inherit);
+	cursor: pointer;
+}
+
+.form-close-btn:hover {
+	background: var(--bg-surface-secondary);
+	background: color-mix(in srgb, currentColor 12%, transparent);
+	color: var(--text-primary, inherit);
+}
+
+.form-step {
+	display: flex;
+	flex-direction: column;
 	text-align: left;
-	margin-bottom: 1rem;
 }
 
-.field-label label {
-	color: var(--text-secondary);
+.step-label {
+	color: var(--text-primary);
+	font-weight: 600;
+	margin-bottom: 0.25rem;
 }
 
+/* Static footer — Back left, Skip center, Next/Submit right. */
 .form-controls {
-	display: flex; 
-	justify-content: space-around;
-	margin-top: 1rem;
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	margin-top: 0.75rem;
+	padding-top: 0.5rem;
+	padding-bottom: env(safe-area-inset-bottom);
+	border-top: 1px solid var(--border-hairline);
 }
 
 .next-button,
 button.submit {
-	position: absolute;
-	right: 1.25rem;
-	bottom: 1.25rem;
+	margin-left: auto;
 	border: 1px solid var(--bg-surface-brand);
 	border-radius: var(--layout-radius-button);
 	background-color: var(--bg-surface-brand);
 	color: var(--text-on-brand);
 }
 
-.next-button:hover,
+.next-button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.next-button:not(:disabled):hover,
 button.submit:hover {
 	background-color: var(--primitive-brand-deep-umber);
 	border-color: var(--primitive-brand-deep-umber);
 }
 
 .back-button {
-	position: absolute;
-	bottom: 1.25rem;
-	left: 1.25rem;
 	border: 1px solid var(--border-strong);
 	border-radius: var(--layout-radius-button);
 	background-color: transparent;
@@ -102,26 +165,17 @@ button.submit:hover {
 	border-color: var(--text-primary);
 	background-color: var(--bg-surface-secondary);
 }
-  
 
-
-.two-option-step {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
+.skip-button {
+	border: none;
+	background: transparent;
+	color: var(--text-secondary);
+	text-decoration: underline;
+	cursor: pointer;
 }
 
-.double-options {
-	display: flex;
-	justify-content: space-evenly;
-}
-
-.age-checkboxes,
-.age-datepicker {
-	display: flex;
-	flex-direction: column;
-	flex: 1 1 200px;
-	gap: 0.5rem;
+.skip-button:hover {
+	color: var(--text-primary);
 }
 
 .option-label {
@@ -129,79 +183,113 @@ button.submit:hover {
 	text-align: left;
 }
 
-/* DatePicker styles */
-.age-datepicker .datepicker-container {
-	position: relative;
+.step-hint {
+	margin: -0.25rem 0 0.5rem;
+	color: var(--text-muted);
+	font-size: 0.78rem;
 }
 
-.age-datepicker input {
-	width: 200px;
-	padding: 6px .5rem;
+/* ── Photo step ─────────────────────────────────────────────────────────────── */
+
+.photo-step {
+	align-items: center;
+	text-align: center;
+	gap: 0.5rem;
+}
+
+.stock-photo-toggle {
+	margin-top: 0.5rem;
+	padding: 0.5rem 0.9rem;
+	border: 1px dashed var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: transparent;
+	color: var(--text-secondary);
+	cursor: pointer;
+}
+
+.stock-photo-toggle--on {
+	border-style: solid;
+	border-color: var(--bg-surface-brand);
+	color: var(--text-primary);
+}
+
+/* ── Category / size chips ──────────────────────────────────────────────────── */
+
+.category-chip-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+}
+
+.size-chip-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.category-chip {
+	min-height: 44px;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: transparent;
+	color: var(--text-primary);
+	cursor: pointer;
+	text-transform: capitalize;
+}
+
+.size-chip {
+	min-width: 44px;
+	text-transform: uppercase;
+}
+
+.category-chip--selected {
+	border-color: var(--bg-surface-brand);
+	background: var(--bg-surface-brand);
+	color: var(--text-on-brand);
+}
+
+/* ── Basics / Details sections ──────────────────────────────────────────────── */
+
+.basics-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	margin-bottom: 1rem;
+	text-align: left;
+}
+
+.details-text-input,
+.purchased-month-input,
+.purchased-selects select {
+	width: 100%;
+	max-width: 20rem;
+	padding: 8px .6rem;
 	border: 1px solid var(--border-strong);
 	border-radius: var(--layout-radius-button);
 	background: var(--bg-surface-primary);
 	color: var(--text-primary);
-	font-size: 0.9rem;
+	font-size: 0.95rem;
 }
 
-.age-datepicker input:focus {
+.details-text-input:focus,
+.purchased-month-input:focus,
+.purchased-selects select:focus {
 	box-shadow: 0 0 0 2px rgba(178, 134, 117, 0.2);
 	border-color: var(--primitive-brand-rose-terracotta);
 	outline: none;
 }
 
-/* Checkbox collection label styling */
-.age-checkboxes .checkbox-label span {
-	cursor: pointer;
+.details-price-input {
+	max-width: 8rem;
 }
 
-/* Popover / calendar styling */
-.age-datepicker .datepicker-popover {
-	position: absolute;
-	top: 2.25rem;
-	left: 0;
-	z-index: 50;
-	padding: 0.5rem;
-	border: 1px solid var(--border-hairline);
-	border-radius: var(--layout-radius-button);
-	background: var(--bg-surface-primary);
-	box-shadow: var(--elevation-high);
-}
-
-/* --- POPOVER TRANSITION --- */
-.datepicker-popover[data-state='open'] {
-	animation: popoverFadeIn 0.5s ease forwards;
-}
-
-.datepicker-popover[data-state='closed'] {
-	animation: popoverFadeOut 0.5s ease forwards;
-}
-
-@keyframes popoverFadeIn {
-	from {
-		opacity: 0;
-		transform: translateY(-6px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-@keyframes popoverFadeOut {
-	from {
-		opacity: 1;
-		transform: translateY(0);
-	}
-	to {
-		opacity: 0;
-		transform: translateY(-6px);
-	}
-}
-.step-hint {
-	margin: -0.25rem 0 0.5rem;
-	color: var(--text-muted);
-	font-size: 0.78rem;
+/* Native selects side by side; no custom popover, nothing to bleed. */
+.purchased-selects {
+	display: flex;
+	gap: 0.5rem;
+	max-width: 20rem;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
@@ -218,34 +306,13 @@ button.submit:hover {
     border-radius: var(--border-radius-sm);
   }
 
-  .double-options {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .age-checkboxes,
-  .age-datepicker {
-    width: 100%;
-    flex: unset;
-  }
-
-  .age-datepicker input {
-    width: 100%;
+  .form form {
+	height: 100%;
   }
 }
 
 @media (--bp-xs) {
   :root {
     --Form-padding: 0.75rem;
-  }
-
-  form {
-	height: 95%;
-    height: clamp(28rem, 70vh, 56.25rem);
-  }
-
-  .form-step {
-    /* height: clamp(28rem, 70vh, 56.25rem); */
-    height: fit-content;
   }
 }

@@ -1,7 +1,7 @@
 import ContentCard from "../../Components/ContentCard/ContentCard";
 import { AnimatePresence, motion } from "framer-motion";
 import { moreFeatures } from "../../utils/constants";
-import TextileGuildInteractive from "./TextileGuildInteractive";
+// import TextileGuildInteractive from "./TextileGuildInteractive";
 import { useState } from "react";
 
 import "./FabricCare.css";
@@ -27,7 +27,7 @@ const FabricCare = ({ care }: FabricCareProps) => {
 				transition={{ duration: 0.3 }}
 			>
 				<button onClick={() => setShowGuide(true)}>Open Textile Guide</button>
-				{showGuide && <TextileGuildInteractive />}
+				{/* {showGuide && <TextileGuildInteractive />} */}
 				{!showGuide &&
 					moreFeatures.map((feature) => (
 						<ContentCard key={feature.title} title={feature.title}>
