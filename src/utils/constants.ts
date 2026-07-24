@@ -30,7 +30,7 @@ export const formItem = {
 	imageURL: "",
 };
 
-export const steps = ["Photo", "Basics", "Details"];
+export const steps = ["Photo", "Category", "Basics", "Details"];
 
 export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green", "orange", "yellow", "pink", "purple"];
 

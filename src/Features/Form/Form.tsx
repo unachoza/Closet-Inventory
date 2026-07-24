@@ -1,35 +1,23 @@
-import React, { useState, useMemo, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
+import React, { useState, useMemo, useEffect, useRef, FormEvent, Dispatch, SetStateAction, MouseEvent } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import Modal from "../../Components/Modal/Modal";
-import DropDownSelect from "./DropDownSelect/DropDownSelect";
-import PillGroup from "./PillGroup/PillGroup";
-import TextPillField from "./TextInput/TextPillField";
-import MaterialBlendInput from "../../Components/MaterialBlendInput/MaterialBlendInput";
-import { CategoryType, ItemFormData, MaterialBlend, ViewType } from "../../utils/types";
-import {
-	colorOptions,
-	sizeOptions,
-	categoryOptions,
-	conditionOptions,
-	formItem,
-	brandExamples,
-	careExamples,
-	occasionExamples,
-} from "../../utils/constants";
-import { getColorSwatchFill } from "../../utils/colorSwatches";
+import PhotoStep from "./steps/PhotoStep";
+import CategoryStep from "./steps/CategoryStep";
+import BasicsStep from "./steps/BasicsStep";
+import DetailsStep from "./steps/DetailsStep";
+import { ItemFormData, ViewType } from "../../utils/types";
+import { formItem, brandExamples, careExamples } from "../../utils/constants";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { useCloset } from "../../context/ClosetContext";
-import { normalizeMaterial } from "../../utils/materialUtils";
+import { useSetNavGuard } from "../../context/ViewContext";
+import { generateItemName } from "./generateItemName";
 import "./Form.css";
 import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
-import PurchasedField from "./PurchasedField/PurchasedField";
-import ImageUploaderInput from "./ImageUploader/ImageUploader";
-import getStockPhoto from "../../utils/getStockPhoto";
 import { useToast } from "../../Components/Toast/Toast";
 
-// MULTI-STEP(3) FORM: Basics (category/color/size/brand) → Details (material/care/occasion/condition/date) → Photo
+// MULTI-STEP(4) FORM: Photo → Category → Basics → Details
 export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 	initialData?: Partial<ItemFormData>;
@@ -38,12 +26,23 @@ export interface FormProps {
 const BRAND_OPTIONS_KEY = "my_brands_key";
 const CARE_OPTIONS_KEY = "my_care_key";
 
+const STEP_PHOTO = 1;
+const STEP_CATEGORY = 2;
+const STEP_BASICS = 3;
+const STEP_DETAILS = 4;
+const TOTAL_STEPS = 4;
+
 const MultiStepForm = ({ setView, initialData }: FormProps) => {
-	const [step, setStep] = useState(1);
+	const [step, setStep] = useState(STEP_PHOTO);
 	const [formData, setFormData] = useState<ItemFormData>({
 		...formItem,
 		...initialData,
 	});
+	// Explicit "no photo — use a stock image" choice; satisfies the photo
+	// requirement, the actual image resolves from category at submit (addItem).
+	const [useStockPhoto, setUseStockPhoto] = useState(false);
+	// Once the user edits the name themselves, stop auto-generating it.
+	const [nameTouched, setNameTouched] = useState(Boolean(initialData?.name));
 
 	const [brandOptions, setBrandOptions] = useLocalStorage(BRAND_OPTIONS_KEY, brandExamples);
 	const [careOptions, setCareOptions] = useLocalStorage(CARE_OPTIONS_KEY, careExamples);
@@ -51,61 +50,106 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	const { addItem } = useCloset();
 	const { showToast } = useToast();
 
-	// The wizard's one true dead end was the nav bar: tapping any tab discarded
-	// all steps with no warning. The ✕ below is the intended exit; it only asks
-	// for confirmation when there's actual progress to lose (dirty check against
-	// the initial/prefilled baseline).
+	// The wizard's dead ends: the ✕ below asks for confirmation when there's
+	// progress to lose, and the same dirty state is registered as a nav guard so
+	// bottom-nav / drawer taps can't silently discard the wizard either.
 	const initialData_json = useMemo(() => JSON.stringify({ ...formItem, ...initialData }), [initialData]);
 	const isDirty = JSON.stringify(formData) !== initialData_json;
 	const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
+
+	const setNavGuard = useSetNavGuard();
+	useEffect(() => {
+		setNavGuard(() => isDirty);
+		return () => setNavGuard(null);
+	}, [setNavGuard, isDirty]);
+
+	// `.form` clips with overflow:hidden, but mobile browsers still shift its
+	// scrollTop to bring a newly-focused input into view (e.g. the Price field
+	// on Details). Because it has no scrollbar to undo that, the shift sticks
+	// and silently clips the top of the next step. Snap it back on every
+	// step change so a stray focus-scroll from the previous step can't bleed in.
+	const formRef = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (formRef.current) formRef.current.scrollTop = 0;
+	}, [step]);
 
 	const handleExit = () => {
 		if (isDirty) {
 			setShowDiscardConfirm(true);
 			return;
 		}
-		setView("overview");
+		leaveTo("overview");
+	};
+
+	// Intentional navigation must clear the guard first, or the guard would
+	// re-prompt over a discard/submit the user just confirmed.
+	const leaveTo = (view: ViewType) => {
+		setNavGuard(null);
+		setView(view);
 	};
 
 	const discardAndLeave = () => {
 		setShowDiscardConfirm(false);
-		setView("overview");
+		leaveTo("overview");
 	};
 
+	const applyPatch = (patch: Partial<ItemFormData>) => {
+		setFormData((prev) => ({ ...prev, ...patch }));
+	};
+
+	// String-or-event setter used by the pill/text fields (field name in `label`).
 	const toggleValue = (value: string | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => {
 		const str = typeof value === "string" ? value : value.target.value;
 		if (!label) return;
 		setFormData((prev) => ({ ...prev, [label]: str }));
 	};
 
-	// Capture only the purchase date — factual age is derived from it at display time
-	// (see formatItemAge / the Card), so we no longer write a frozen age string here.
-	const handleDateSelect = (date: Date) => {
-		setFormData((prev) => ({ ...prev, purchaseDate: date.toISOString() }));
+	// Only the first two steps gate progress; Basics and Details are optional.
+	const isStepComplete = (n: number): boolean => {
+		if (n === STEP_PHOTO) return Boolean(formData.imageURL) || useStockPhoto;
+		if (n === STEP_CATEGORY) return Boolean(formData.category);
+		return true;
 	};
 
-	const handleNext = () => {
-		setStep((prev) => prev + 1);
+	// Furthest step the user may jump to: right after the first incomplete
+	// required step. Keeps the tab tracker from skipping past the photo/category gates.
+	const maxReachableStep = (() => {
+		for (let n = 1; n < TOTAL_STEPS; n++) {
+			if (!isStepComplete(n)) return n;
+		}
+		return TOTAL_STEPS;
+	})();
+
+	const goToStep = (n: number) => {
+		setStep(Math.min(Math.max(n, 1), maxReachableStep));
 	};
 
-	const handleBack = () => {
-		setStep((prev) => prev - 1);
+	const currentStepComplete = isStepComplete(step);
+	const displayName = nameTouched ? (formData.name ?? "") : generateItemName(formData);
+
+	const handleNameEdit = (name: string) => {
+		setNameTouched(true);
+		applyPatch({ name });
 	};
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 
-		addItem(formData);
+		addItem({ ...formData, name: displayName });
 		showToast(`${formData.category} added to your closet!`);
 
+		setNavGuard(null);
 		setFormData(formItem);
-		setStep(1);
+		setUseStockPhoto(false);
+		setNameTouched(false);
+		setStep(STEP_PHOTO);
 		setTimeout(() => {
 			setView("overview");
 		}, 0);
 	};
+
 	return (
-		<div className="form" data-testid="multistep-form">
+		<div className="form" data-testid="multistep-form" ref={formRef}>
 			<button type="button" className="form-close-btn" onClick={handleExit} aria-label="Close and discard this item">
 				<X size={20} />
 			</button>
@@ -116,112 +160,44 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				{/* <StepProgressTracker currentStep={step} onStepClick={setStep} /> */}
-				<StepTabsTracker currentStep={step} onStepClick={setStep} />
+				<StepTabsTracker currentStep={step} onStepClick={goToStep} />
 
-				{/* STEP 1: PHOTO */}
-				{step === 1 && (
-					<div className="form-step two-option-step">
-						<label className="step-label">Photo</label>
-						<div className="double-options">
-							<ImageUploaderInput
-								image={formData.imageURL}
-								onImageSelect={(base64) => setFormData((prev) => ({ ...prev, imageURL: base64 }))}
-								onImageRemove={() => setFormData((prev) => ({ ...prev, imageURL: "" }))}
-							/>
-							<div className="image-uploader">
-								<label className="step-label">or use default image?</label>
-								<div className="image-uploader-box">
-									<img
-										src={getStockPhoto(formData.category as CategoryType)}
-										className="image-preview"
-										alt="preview"
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
-				)}
-				{/* STEP 2: BASICS — category (required), color, size, brand */}
-				{step === 2 && (
-					<div className="form-step-group">
-						<div className="field-label">
-							<label>Clothing Category</label>
-							<DropDownSelect options={categoryOptions} formField="category" setFormData={setFormData} />
-						</div>
+				<div className="form-step-content">
+					{step === STEP_PHOTO && (
+						<PhotoStep
+							imageURL={formData.imageURL}
+							useStockPhoto={useStockPhoto}
+							onImageSelect={(src) => applyPatch({ imageURL: src })}
+							onImageRemove={() => applyPatch({ imageURL: "" })}
+							onUseStockPhoto={setUseStockPhoto}
+						/>
+					)}
 
-						<PillGroup
-							label="Color"
-							fieldName="color"
-							options={colorOptions}
-							formData={formData}
+					{step === STEP_CATEGORY && (
+						<CategoryStep selected={formData.category} onSelect={(category) => applyPatch({ category })} />
+					)}
+
+					{step === STEP_BASICS && (
+						<BasicsStep
+							data={formData}
 							onToggle={toggleValue}
-							getSwatch={getColorSwatchFill}
+							brandOptions={brandOptions}
+							setBrandOptions={setBrandOptions}
 						/>
+					)}
 
-						<PillGroup label="Size" fieldName="size" options={sizeOptions} formData={formData} onToggle={toggleValue} />
-
-						<TextPillField
-							label="brand"
-							name="brand"
-							className="string"
-							placeholder="add more options"
-							pillArray={brandOptions}
-							onPillsChange={setBrandOptions}
-							handleFormUpdate={toggleValue}
-							formData={formData}
-						/>
-					</div>
-				)}
-
-				{/* STEP 3: DETAILS — material, care, occasion, condition, purchase date (all optional) */}
-				{step === 3 && (
-					<div className="form-step-group">
-						<div className="form-subsection">
-							<label className="step-label">Material Composition</label>
-							<p className="step-hint">Add each fiber and its percentage. Total must equal 100%.</p>
-							<MaterialBlendInput
-								value={normalizeMaterial(formData.material)}
-								onChange={(blend: MaterialBlend[]) => setFormData((prev) => ({ ...prev, material: blend }))}
-							/>
-						</div>
-
-						<div className="form-subsection">
-							<TextPillField
-								label="care"
-								name="Care Instructions"
-								className="string"
-								placeholder="add more options"
-								pillArray={careOptions}
-								onPillsChange={setCareOptions}
-								handleFormUpdate={toggleValue}
-								formData={formData}
-								multiSelect={true}
-							/>
-						</div>
-
-						<PillGroup
-							label="Occasion"
-							fieldName="occasion"
-							options={occasionExamples}
-							formData={formData}
+					{step === STEP_DETAILS && (
+						<DetailsStep
+							data={formData}
+							onChange={applyPatch}
 							onToggle={toggleValue}
+							careOptions={careOptions}
+							setCareOptions={setCareOptions}
+							displayName={displayName}
+							onNameEdit={handleNameEdit}
 						/>
-
-						<PillGroup
-							label="Condition"
-							fieldName="condition"
-							options={conditionOptions}
-							formData={formData}
-							onToggle={toggleValue}
-						/>
-
-						<PurchasedField
-							selectedDate={formData.purchaseDate ? new Date(formData.purchaseDate) : undefined}
-							onSelectDate={handleDateSelect}
-						/>
-					</div>
-				)}
+					)}
+				</div>
 
 				{/* NAVIGATION BUTTONS */}
 				<div className="form-controls">
@@ -230,26 +206,32 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 							className="back-button"
 							onClick={(e: MouseEvent<HTMLButtonElement>) => {
 								e.preventDefault();
-								handleBack();
+								setStep((prev) => prev - 1);
 							}}
 						>
 							Back
 						</button>
 					)}
-					{step < 3 && (
+					{step === STEP_BASICS && (
+						<button type="submit" className="skip-button">
+							Skip &amp; add
+						</button>
+					)}
+					{step < TOTAL_STEPS && (
 						<button
 							className="next-button"
+							disabled={!currentStepComplete}
 							onClick={(e: MouseEvent<HTMLButtonElement>) => {
 								e.preventDefault();
-								handleNext();
+								if (isStepComplete(step)) setStep((prev) => prev + 1);
 							}}
 						>
 							Next
 						</button>
 					)}
-					{step === 3 && (
+					{step === STEP_DETAILS && (
 						<button type="submit" className="submit">
-							Submit
+							Add to closet
 						</button>
 					)}
 				</div>
@@ -278,8 +260,3 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 };
 
 export default MultiStepForm;
-
-// https://examples.motion.dev/react/modal
-// https://examples.motion.dev/react/warp-overlay
-// https://examples.motion.dev/react/shared-layout-animation
-// https://examples.motion.dev/react/exit-animation
