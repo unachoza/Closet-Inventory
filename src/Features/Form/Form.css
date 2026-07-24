@@ -56,6 +56,23 @@ form {
 	height: clamp(25rem, 50vh, 56.25rem);
 }
 
+/* Consolidated Basics/Details steps: several field groups stacked and scrolled
+   together, rather than one field per fixed-height step. */
+.form-step-group {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	max-height: clamp(25rem, 60vh, 56.25rem);
+	overflow-y: auto;
+	padding-bottom: 0.5rem;
+}
+
+.form-subsection {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
 .field-label {
 	text-align: left;
 	margin-bottom: 1rem;
@@ -204,6 +221,159 @@ button.submit:hover {
 	font-size: 0.78rem;
 }
 
+/* ── 4-step wizard: shared scroll region ─────────────────────────────────────
+   Each step renders inside this container; it scrolls independently so the
+   Back/Next controls stay pinned and the tab tracker never gets pushed away. */
+.form-step-content {
+	display: flex;
+	flex-direction: column;
+	max-height: clamp(22rem, 58vh, 52rem);
+	overflow-y: auto;
+	padding-bottom: 4rem; /* clear the absolutely-positioned nav buttons */
+}
+
+.form-step-content .form-step {
+	height: auto;
+	gap: 1.25rem;
+}
+
+p.step-hint {
+	text-align: left;
+}
+
+/* Steps that stack several field groups (Basics, Details). */
+.basics-step,
+.details-step {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+/* ── Photo step ──────────────────────────────────────────────────────────── */
+.photo-step {
+	align-items: stretch;
+	gap: 0.75rem;
+}
+
+.photo-step label.step-label {
+	align-items: center;
+	font-weight: 600;
+}
+
+.stock-photo-toggle {
+	align-self: center;
+	min-height: 44px;
+	padding: 0.55rem 1.1rem;
+	border: 1px dashed var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: transparent;
+	color: var(--text-secondary);
+	font-size: 0.9rem;
+	cursor: pointer;
+	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.stock-photo-toggle:hover {
+	border-color: var(--text-primary);
+	color: var(--text-primary);
+}
+
+.stock-photo-toggle--on {
+	border-style: solid;
+	border-color: var(--bg-surface-brand);
+	background: color-mix(in srgb, var(--bg-surface-brand), transparent 85%);
+	color: var(--text-primary);
+}
+
+/* ── Category step: large tappable chips (same visual language as pills) ──── */
+.category-chip-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+	gap: 0.6rem;
+}
+
+.size-chip-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+}
+
+.category-chip {
+	min-height: 48px;
+	padding: 0.6rem 1rem;
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--layout-radius-button);
+	background-color: var(--bg-surface-secondary);
+	color: var(--text-secondary);
+	font-size: 0.95rem;
+	text-transform: capitalize;
+	cursor: pointer;
+	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.category-chip:hover {
+	border-color: var(--text-primary);
+}
+
+.category-chip--selected {
+	background-color: var(--bg-surface-brand);
+	border-color: var(--bg-surface-brand);
+	color: var(--text-on-brand);
+}
+
+/* ── Details step: name/price/purchased share one row, equal width ───────── */
+.details-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+}
+
+.details-row > .form-subsection,
+.details-row > .purchased-field {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
+/* ── Details step: plain text/number inputs ──────────────────────────────── */
+.details-text-input {
+	width: 100%;
+	min-height: 44px;
+	padding: 0.55rem 0.75rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+	font-size: 0.95rem;
+}
+
+.details-text-input:focus {
+	outline: none;
+	border-color: var(--primitive-brand-rose-terracotta);
+	box-shadow: 0 0 0 2px rgba(178, 134, 117, 0.2);
+}
+
+/* ── Nav controls: disabled + skip ───────────────────────────────────────── */
+.next-button:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.skip-button {
+	position: absolute;
+	bottom: 1.25rem;
+	left: 50%;
+	transform: translateX(-50%);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: transparent;
+	color: var(--text-secondary);
+}
+
+.skip-button:hover {
+	border-color: var(--text-primary);
+	color: var(--text-primary);
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (--bp-md) {
@@ -230,6 +400,16 @@ button.submit:hover {
   }
 
   .age-datepicker input {
+    width: 100%;
+  }
+
+  .details-row {
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .details-row > .form-subsection,
+  .details-row > .purchased-field {
     width: 100%;
   }
 }

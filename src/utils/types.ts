@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, KeyboardEvent } from "react";
-import { ProductAttributes } from "../Features/FashionParser/types"
+import { ProductAttributes } from "../Features/FashionParser/types";
 
 export interface MaterialBlend {
 	material: string;
@@ -7,12 +7,12 @@ export interface MaterialBlend {
 }
 
 /** E2 US-2.8: does this item fit the user right now? Distinct from style.fit (a style descriptor). */
-export type ItemFit = 'fits' | 'tailored' | 'too_big' | 'too_small' | 'unknown';
+export type ItemFit = "fits" | "tailored" | "too_big" | "too_small" | "unknown";
 
 /** E2 US-2.8: a single body measurement stored with its unit for in↔cm conversion. */
 export interface Measurement {
 	value: number;
-	unit: 'in' | 'cm';
+	unit: "in" | "cm";
 }
 
 export interface ItemMeasurements {
@@ -23,14 +23,7 @@ export interface ItemMeasurements {
 }
 
 /** E2 US-2.11 */
-export type AcquisitionType =
-	| 'bought'
-	| 'gifted'
-	| 'inherited'
-	| 'hand_me_down'
-	| 'thrifted'
-	| 'resale'
-	| 'borrowed';
+export type AcquisitionType = "bought" | "gifted" | "inherited" | "hand_me_down" | "thrifted" | "resale" | "borrowed";
 
 /**
  * E2 US-2.5: free-text loan record (localStorage-first).
@@ -38,21 +31,14 @@ export type AcquisitionType =
  */
 export interface LoanRecord {
 	borrowerName: string;
-	since: string;       // ISO date
-	dueBack?: string;    // ISO date
+	since: string; // ISO date
+	dueBack?: string; // ISO date
 }
 
 /** E1 + E2: combined item status enum. E11 owns clean/dirty; E2 owns the rest. */
-export type ItemStatus =
-	| 'clean'
-	| 'dirty'
-	| 'at_cleaner'
-	| 'in_repair'
-	| 'traveling'
-	| 'on_loan'
-	| 'archived_seasonal'
+export type ItemStatus = "clean" | "dirty" | "at_cleaner" | "in_repair" | "traveling" | "on_loan" | "archived_seasonal";
 
-export type WearState = 'new' | 'like_new' | 'good' | 'fair' | 'poor' | 'needs_repair';
+export type WearState = "new" | "like_new" | "good" | "fair" | "poor" | "needs_repair";
 
 export type ClothingItem = {
 	id: string;
@@ -106,10 +92,10 @@ export type ClothingItem = {
 
 	// ── E11 cached rollup (E11 owns the write path) ───────────────────────────
 	wornCount?: number;
-	lastWornAt?: string;   // ISO date
+	lastWornAt?: string; // ISO date
 
 	// ── sync metadata (set by SyncedClosetRepository; used for last-write-wins) ─
-	updatedAt?: string;    // ISO datetime
+	updatedAt?: string; // ISO datetime
 
 	// ── demo-seed marker (BUG-2) ──────────────────────────────────────────────
 	// True only for the starter closet (MY_CLOSET_DATA). Demo items are shown
@@ -121,6 +107,7 @@ export type ClothingItem = {
 
 export interface ItemFormData {
 	id: string;
+	name?: string;
 	imageURL?: string;
 	category: string;
 	color: string; // single color
@@ -131,6 +118,7 @@ export interface ItemFormData {
 	age: string;
 	condition?: string;
 	purchaseDate?: string;
+	price?: number;
 	care: string | string[];
 }
 

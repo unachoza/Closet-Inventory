@@ -1,0 +1,13 @@
+.pill-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+}
+
+.pill-group + .pill-group {
+	margin-top: 0.6rem;
+}
+
+.pill-group button{
+	margin: .2rem;
+}
