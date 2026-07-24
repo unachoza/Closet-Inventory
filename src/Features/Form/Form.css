@@ -251,6 +251,11 @@ button.submit:hover {
 	gap: 0.75rem;
 }
 
+.photo-step label.step-label {
+	align-items: center;
+	font-weight: 600;
+}
+
 .stock-photo-toggle {
 	align-self: center;
 	min-height: 44px;

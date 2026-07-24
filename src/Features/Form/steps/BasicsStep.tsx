@@ -2,6 +2,10 @@ import { Dispatch, SetStateAction } from "react";
 import PillGroup from "../PillGroup/PillGroup";
 import TextPillField from "../TextInput/TextPillField";
 import { colorOptions, sizeOptions } from "../../../utils/constants";
+
+// Two tappable rows: letter sizes, then numeric sizes.
+const LETTER_SIZES = sizeOptions.filter((s) => Number.isNaN(Number(s)));
+const NUMERIC_SIZES = sizeOptions.filter((s) => !Number.isNaN(Number(s)));
 import { getColorSwatchFill } from "../../../utils/colorSwatches";
 import type { ItemFormData } from "../../../utils/types";
 
@@ -26,7 +30,14 @@ const BasicsStep = ({ data, onToggle, brandOptions, setBrandOptions }: BasicsSte
 				getSwatch={getColorSwatchFill}
 			/>
 
-			<PillGroup label="Size" fieldName="size" options={sizeOptions} formData={data} onToggle={onToggle} />
+			<PillGroup
+				label="Size"
+				fieldName="size"
+				options={sizeOptions}
+				rows={[LETTER_SIZES, NUMERIC_SIZES]}
+				formData={data}
+				onToggle={onToggle}
+			/>
 
 			<TextPillField
 				label="brand"
