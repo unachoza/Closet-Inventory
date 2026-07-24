@@ -237,6 +237,10 @@ button.submit:hover {
 	gap: 1.25rem;
 }
 
+p.step-hint {
+	text-align: left;
+}
+
 /* Steps that stack several field groups (Basics, Details). */
 .basics-step,
 .details-step {

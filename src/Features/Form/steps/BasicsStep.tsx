@@ -1,17 +1,18 @@
-import { Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import PillGroup from "../PillGroup/PillGroup";
 import TextPillField from "../TextInput/TextPillField";
 import { colorOptions, sizeOptions } from "../../../utils/constants";
+import { getColorSwatchFill } from "../../../utils/colorSwatches";
+import type { ItemFormData } from "../../../utils/types";
 
 // Two tappable rows: letter sizes, then numeric sizes.
 const LETTER_SIZES = sizeOptions.filter((s) => Number.isNaN(Number(s)));
 const NUMERIC_SIZES = sizeOptions.filter((s) => !Number.isNaN(Number(s)));
-import { getColorSwatchFill } from "../../../utils/colorSwatches";
-import type { ItemFormData } from "../../../utils/types";
 
 interface BasicsStepProps {
 	data: ItemFormData;
-	onToggle: (value: string, field: keyof ItemFormData) => void;
+	/** Matches TextPillField's handleFormUpdate so the same handler covers pills and text inputs. */
+	onToggle: (value: string | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
 	brandOptions: string[];
 	setBrandOptions: Dispatch<SetStateAction<string[]>>;
 }

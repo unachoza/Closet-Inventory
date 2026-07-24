@@ -11,7 +11,8 @@ import type { ItemFormData, MaterialBlend } from "../../../utils/types";
 interface DetailsStepProps {
 	data: ItemFormData;
 	onChange: (patch: Partial<ItemFormData>) => void;
-	onToggle: (value: string, field: keyof ItemFormData) => void;
+	/** Matches TextPillField's handleFormUpdate so the same handler covers pills and text inputs. */
+	onToggle: (value: string | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, label?: string) => void;
 	careOptions: string[];
 	setCareOptions: Dispatch<SetStateAction<string[]>>;
 	/** Auto-generated suggestion shown until the user edits the name themselves. */
