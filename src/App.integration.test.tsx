@@ -77,15 +77,22 @@ describe("Add item end-to-end", () => {
 		);
 	}
 
+	// Photo + Category gate the first two of the 4 steps; satisfy both, then
+	// clear Basics with Next to land on Details where submit lives.
+	function advanceToDetails() {
+		fireEvent.click(screen.getByRole("button", { name: /use a stock photo/i }));
+		fireEvent.click(screen.getByRole("button", { name: /next/i }));
+		fireEvent.click(screen.getByRole("button", { name: "Tops" }));
+		fireEvent.click(screen.getByRole("button", { name: /next/i }));
+		fireEvent.click(screen.getByRole("button", { name: /next/i }));
+	}
+
 	it("submitting the form adds the item and it appears in the Closet grid", async () => {
 		render(<Providers><AddItemFlow /></Providers>);
 
-		// Navigate through all 9 steps by clicking Next 8 times
-		for (let i = 0; i < 8; i++) {
-			fireEvent.click(screen.getByRole("button", { name: /next/i }));
-		}
+		advanceToDetails();
 
-		// Step 9 — submit
+		// Details step — submit
 		const form = screen.getByTestId("multistep-form").querySelector("form")!;
 		fireEvent.submit(form);
 
@@ -99,9 +106,7 @@ describe("Add item end-to-end", () => {
 	it("toast notification appears after successful submit", async () => {
 		render(<Providers><AddItemFlow /></Providers>);
 
-		for (let i = 0; i < 8; i++) {
-			fireEvent.click(screen.getByRole("button", { name: /next/i }));
-		}
+		advanceToDetails();
 
 		const form = screen.getByTestId("multistep-form").querySelector("form")!;
 		fireEvent.submit(form);

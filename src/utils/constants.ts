@@ -1,4 +1,4 @@
-import { Option, Step, MaterialBlend, ItemStatus, WearState } from "./types.ts";
+import { Option, MaterialBlend, ItemStatus, WearState } from "./types.ts";
 import { MY_CLOSET_DATA } from "./demoClosetData";
 import TopIcon from "../assets/clothes-icons/blouse.svg";
 import BottomIcon from "../assets/clothes-icons/trousers.svg";
@@ -30,22 +30,11 @@ export const formItem = {
 	imageURL: "",
 };
 
-export const stepsLabels: Step[] = [
-	{ step: 1, label: "Category" },
-	{ step: 2, label: "Color" },
-	{ step: 3, label: "Size" },
-	{ step: 4, label: "Brand" },
-	{ step: 5, label: "Material" },
-	{ step: 6, label: "Occasion" },
-	{ step: 7, label: "Age" },
-	{ step: 8, label: "Care" },
-];
-
-export const steps = ["Category", "Color", "Size", "Brand", "Material", "Occasion", "Age", "Care", "Photo"];
+export const steps = ["Photo", "Category", "Basics", "Details"];
 
 export const colorOptions = ["red", "brown", "black", "grey", "white", "floral", "blue", "gold", "green", "orange", "yellow", "pink", "purple"];
 
-export const sizeOptions = ["xs", "s", "m", "l", "0", "2", "4", "6", "8"];
+export const sizeOptions = ["xs", "s", "m", "l", "xl" ,"0", "2", "4", "6", "8", "10", "12", "14"];
 
 export const clothesAgesOptions = ["new", "3 months", "6 months", "1 year", "18 months", "3 years", "vintage", "unknown"];
 

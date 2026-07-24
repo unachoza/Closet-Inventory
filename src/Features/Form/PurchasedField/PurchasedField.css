@@ -1,0 +1,25 @@
+.purchased-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.purchased-field__input,
+.purchased-field__select {
+	min-height: 44px;
+	padding: 0.55rem 0.75rem;
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--layout-radius-button);
+	background-color: var(--bg-surface-secondary);
+	color: var(--text-primary);
+	font-size: 0.95rem;
+}
+
+.purchased-field__fallback {
+	display: flex;
+	gap: 0.6rem;
+}
+
+.purchased-field__select {
+	flex: 1;
+}

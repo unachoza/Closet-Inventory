@@ -15,7 +15,11 @@ vi.mock("../../hooks/useLocalStorage", () => ({
 	useLocalStorage: (_key: string, init: unknown) => [init, vi.fn()],
 }));
 vi.mock("./ImageUploader/ImageUploader", () => ({
-	default: () => <div data-testid="image-uploader">ImageUploader</div>,
+	default: ({ onImageSelect }: { onImageSelect: (src: string) => void }) => (
+		<button type="button" data-testid="mock-upload" onClick={() => onImageSelect("data:image/jpeg;base64,abc")}>
+			upload
+		</button>
+	),
 }));
 
 import MultiStepForm from "./Form";
@@ -33,9 +37,8 @@ describe("MultiStepForm — exit", () => {
 	it("confirms before discarding once the user has entered something", () => {
 		render(<MultiStepForm setView={mockSetView} />);
 
-		// Make it dirty: go to the Color step and pick a color.
-		fireEvent.click(screen.getByRole("button", { name: /next/i })); // → color
-		fireEvent.click(screen.getByText("red"));
+		// Make it dirty: add a photo on step 1.
+		fireEvent.click(screen.getByTestId("mock-upload"));
 
 		// The ✕ now asks first instead of silently discarding.
 		fireEvent.click(screen.getByRole("button", { name: /close and discard/i }));

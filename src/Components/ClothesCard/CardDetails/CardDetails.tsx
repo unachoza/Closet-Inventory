@@ -38,7 +38,16 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 
 	const blend = normalizeMaterial(item.material);
 	const careItems = parseCareItems(item.care);
-	const occasions = Array.isArray(item.occasion) ? item.occasion : item.occasion ? [item.occasion] : [];
+	// Occasion is stored either as an array or a comma-joined string (the manual-add
+	// wizard writes multiple picks comma-joined) — normalize to one pill per value.
+	const occasions = Array.isArray(item.occasion)
+		? item.occasion
+		: item.occasion
+			? item.occasion
+					.split(",")
+					.map((o) => o.trim())
+					.filter(Boolean)
+			: [];
 	const normalizedNotesItems = item.notes === undefined ? [] : Array.isArray(item.notes) ? item.notes : [item.notes];
 	// const notesItems: string[] = Array.isArray(notes) ? notes : [notes]
 
