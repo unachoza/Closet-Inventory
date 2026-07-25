@@ -83,7 +83,7 @@
 	--blur: blur(.6rem);
 	--box-shadow: .5rem .75rem 2rem .75rem rgba(0, 0, 0, 0.875);
 	
-
+	--border-radius-x-ty: .125rem;
 	--border-radius-ty: .25rem;
 	--border-radius-sm: .5rem;
 	--border-radius-md: 1rem;

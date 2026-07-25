@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Modal from "../../Modal/Modal";
 import type { SkippedImportRow } from "../../../utils/importCloset";
-// import { ImagePlaceholder } from "../../../Features/GmailImport/ProductCard/ProductCard";
 import { ImagePlaceholder } from "../../ImagePlaceholder/ImagePlaceholder";
 import "../ExportModal/ExportClosetModal.css";
 import "./ImportClosetModal.css";
@@ -111,7 +110,9 @@ export default function ImportClosetModal({
 											value={skippedNameFixes[row.index] ?? ""}
 											onChange={(e) => handleNameInput(row.index, e.target.value)}
 										/>
-										{savedRows[row.index] && <span className="ecm-skipped-row__saved">✓ item name updated</span>}
+										{savedRows[row.index] && (
+											<span className="ecm-skipped-row__saved">✓ item name updated</span>
+										)}
 									</div>
 								</li>
 							);
@@ -119,16 +120,20 @@ export default function ImportClosetModal({
 					</ul>
 				</div>
 			)}
-			<div className="ecm-count-badge-container">
-				<div className="ecm-count-badge">
-					Found {totalItemCount} item{totalItemCount !== 1 ? "s" : ""} in this file
+
+			<div className="ecm-import-summary">
+				<div className="ecm-import-summary__item">
+					<span className="ecm-import-summary__value">{totalItemCount}</span>
+					<span className="ecm-import-summary__label">Items in this file</span>
 				</div>
-				<div className="ecm-count-badge">
-					Current closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
+
+				<div className="ecm-import-summary__item">
+					<span className="ecm-import-summary__value">{currentItemCount}</span>
+					<span className="ecm-import-summary__label">Current closet</span>
 				</div>
 			</div>
 			<div className="ecm-description">
-				<label className="import-option">
+				<label className={`import-option ${importMode === "replace" ? "import-option--selected" : ""}`}>
 					<input
 						type="radio"
 						name="importMode"
@@ -136,14 +141,25 @@ export default function ImportClosetModal({
 						checked={importMode === "replace"}
 						onChange={() => onModeChange("replace")}
 					/>
-					<span className="import-option__radio" />
-					<div className="import-option__label">
-						<strong>Replace my current closet</strong>
 
-						<div className="import-option__details">Final closet: {totalItemCount} items</div>
+					<span className="import-option__check" aria-hidden="true">
+						<svg viewBox="0 0 16 16">
+							<path pathLength="1" d="M3.5 8.5L6.5 11.5L12.5 4.5" />
+						</svg>
+					</span>
+
+					<div className="import-option__label">
+						<strong>Replace my closet</strong>
+
+						<div className="import-option__details">
+							Final closet
+							<br></br> {totalItemCount} item
+							{totalItemCount !== 1 ? "s" : ""}
+						</div>
 					</div>
 				</label>
-				<label className="import-option">
+
+				<label className={`import-option ${importMode === "merge" ? "import-option--selected" : ""}`}>
 					<input
 						type="radio"
 						name="importMode"
@@ -151,12 +167,19 @@ export default function ImportClosetModal({
 						checked={importMode === "merge"}
 						onChange={() => onModeChange("merge")}
 					/>
-					<span className="import-option__radio" />
+
+					<span className="import-option__check" aria-hidden="true">
+						<svg viewBox="0 0 16 16">
+							<path pathLength="1" d="M3.5 8.5L6.5 11.5L12.5 4.5" />
+						</svg>
+					</span>
+
 					<div className="import-option__label">
 						<strong>Add to my current closet</strong>
 
 						<div className="import-option__details">
-							Final closet: {currentItemCount + totalItemCount} item
+							Final closet
+							<br></br> {currentItemCount + totalItemCount} item
 							{currentItemCount + totalItemCount !== 1 ? "s" : ""}
 						</div>
 					</div>
