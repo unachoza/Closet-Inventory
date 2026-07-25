@@ -1,11 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
+import "./DetailModal.css";
 
-function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => void }) {
-      
-	// Close on Escape
+interface DetailModalProps {
+	fiber: Fiber | null;
+	onClose: () => void;
+	scrollToSection?: string;
+	onOpenGuide?: () => void;
+}
+
+function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailModalProps) {
+	const bodyRef = useRef<HTMLDivElement>(null);
+
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === "Escape") onClose();
@@ -14,7 +22,6 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 		return () => document.removeEventListener("keydown", handler);
 	}, [onClose]);
 
-	// Lock body scroll
 	useEffect(() => {
 		if (fiber) {
 			document.body.style.overflow = "hidden";
@@ -24,15 +31,18 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 		};
 	}, [fiber]);
 
+	useEffect(() => {
+		if (!fiber || !scrollToSection || !bodyRef.current) return;
+		const heading = Array.from(bodyRef.current.querySelectorAll("h4")).find(
+			(h) => h.textContent?.toLowerCase() === scrollToSection.toLowerCase(),
+		);
+		if (heading) {
+			requestAnimationFrame(() => heading.scrollIntoView({ behavior: "smooth", block: "start" }));
+		}
+	}, [fiber, scrollToSection]);
+
 	if (!fiber) return null;
 
-	// Rendered via a portal directly under <body>: this modal is otherwise
-	// mounted inside .app-content, which has its own `z-index: 1` (needed to
-	// sit above the background scrim) and therefore establishes a stacking
-	// context. That traps this modal's z-index underneath the sticky NavBar
-	// (`z-index: 100`, a sibling of .app-content) no matter how high the
-	// modal's own z-index is set. Escaping to document.body sidesteps that
-	// entirely so the modal reliably renders above the header.
 	return createPortal(
 		<div
 			className="detail-overlay open"
@@ -57,7 +67,7 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 						✕
 					</button>
 				</div>
-				<div className="detail-body">
+				<div className="detail-body" ref={bodyRef}>
 					{fiber.detail.map((section) => (
 						<div key={section.title} className="detail-section">
 							<h4>{section.title}</h4>
@@ -72,6 +82,11 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 						</div>
 					))}
 				</div>
+				{onOpenGuide && (
+					<button className="detail-footer-link" onClick={() => { onClose(); onOpenGuide(); }}>
+						More on fabrics in the Guide →
+					</button>
+				)}
 			</div>
 		</div>,
 		document.body,

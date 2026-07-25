@@ -68,6 +68,35 @@
 	/* color: var(--text-muted, #9ca3af); */
 }
 
+/* Tappable segments */
+button.mcb__segment--tappable {
+	cursor: pointer;
+	padding: 0;
+	opacity: 1;
+	transition: width 0.3s ease, opacity 0.15s;
+}
+
+button.mcb__segment--tappable:hover {
+	opacity: 0.75;
+}
+
+.mcb__legend-button {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0;
+	border: none;
+	background: none;
+	cursor: pointer;
+	text-decoration: underline;
+	text-decoration-color: transparent;
+	transition: text-decoration-color 0.15s;
+}
+
+.mcb__legend-button:hover {
+	text-decoration-color: currentColor;
+}
+
 /* Compact: hide the text legend (bar only) */
 .mcb--compact .mcb__legend {
 	display: none;

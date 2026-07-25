@@ -1,10 +1,12 @@
 import { useState } from "react";
 import type { ClothingItem } from "../../../utils/types";
-import { normalizeMaterial } from "../../../utils/materialUtils";
+import { normalizeMaterial, primaryMaterial, resolveFiber } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
+import DetailModal from "../../GuideComponents/Modal";
 import { parseCareItems } from "../../../utils/careUtils";
 import { humanizeCondition } from "../../../utils/condition";
 import { toAbsoluteDate } from "../../../utils/dateUtils";
+import { useViewOptional } from "../../../context/ViewContext";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
 
@@ -19,13 +21,7 @@ function SectionTitle({ label }: { label: string }) {
 
 interface CardDetailsProps {
 	item: ClothingItem;
-	/**
-	 * "compact" (default): summary shown on the flipped card, with a
-	 * "See all details" button that calls onExpand to open the modal.
-	 * "full": the modal view — every section + Edit/Remove are shown inline.
-	 */
 	variant?: "compact" | "full";
-	/** Invoked by the compact "See all details" button to grow into the modal. */
 	onExpand?: () => void;
 	onEdit?: () => void;
 	onRemove?: () => void;
@@ -34,12 +30,13 @@ interface CardDetailsProps {
 
 export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
+	const [fiberModalMaterial, setFiberModalMaterial] = useState<string | null>(null);
+	const [fiberModalScrollTo, setFiberModalScrollTo] = useState<string | undefined>(undefined);
+	const viewCtx = useViewOptional();
 	const isFull = variant === "full";
 
 	const blend = normalizeMaterial(item.material);
 	const careItems = parseCareItems(item.care);
-	// Occasion is stored either as an array or a comma-joined string (the manual-add
-	// wizard writes multiple picks comma-joined) — normalize to one pill per value.
 	const occasions = Array.isArray(item.occasion)
 		? item.occasion
 		: item.occasion
@@ -49,21 +46,13 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					.filter(Boolean)
 			: [];
 	const normalizedNotesItems = item.notes === undefined ? [] : Array.isArray(item.notes) ? item.notes : [item.notes];
-	// const notesItems: string[] = Array.isArray(notes) ? notes : [notes]
 
-	// Inferred style attributes live on the nested `style` object (from
-	// inferProductAttributes — populated during email import), NOT as flat
-	// fields on the item. Deduped + joined so empty fields collapse gracefully.
 	const style = item.style;
 	const { hasStretch, hasPockets, accents, ...otherStyles } = style ?? {};
 	const hasStyle = Object.keys(otherStyles).length > 0;
 
-	// accents is `string | string[]` — normalize to an array so each accent
-	// (e.g. "buttons", "zipper") renders as its own pill, and an empty array
-	// contributes nothing (no ghost pill).
 	const accentTags = Array.isArray(style?.accents) ? style.accents : style?.accents ? [style.accents] : [];
 	const featureTags = [style?.hasStretch && "Stretch", style?.hasPockets && "Pockets", ...accentTags].filter((t): t is string => !!t);
-	// Identity: factual age (from purchaseDate), price, condition, season.
 	const purchasedLabel = toAbsoluteDate(item.purchaseDate);
 	const ageLabel = formatItemAge(item.purchaseDate);
 	const identityParts = [style?.season, item.condition && humanizeCondition(item.condition), item.price].filter(Boolean);
@@ -71,11 +60,31 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 
 	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!item.notes;
 
+	const openFiberModal = (material: string, scrollTo?: string) => {
+		setFiberModalMaterial(material);
+		setFiberModalScrollTo(scrollTo);
+	};
+
+	const closeFiberModal = () => {
+		setFiberModalMaterial(null);
+		setFiberModalScrollTo(undefined);
+	};
+
+	const activeFiber = fiberModalMaterial ? resolveFiber(fiberModalMaterial) : null;
+
+	const handleCarePillClick = () => {
+		const top = primaryMaterial(blend);
+		if (top && resolveFiber(top)) {
+			openFiberModal(top, "Care");
+		}
+	};
+
+	console.log({ item });
+	const carePillsAreTappable = blend.length > 0 && !!resolveFiber(primaryMaterial(blend));
+
 	return (
 		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
-			{/* Scrollable content area */}
 			<div className="card-details__scrollable">
-				{/* Name + category badge + close button */}
 				{onClose && (
 					<button className="card-details__close" onClick={onClose} aria-label="Close">
 						✕
@@ -88,7 +97,6 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					</div>
 				</div>
 
-				{/* Color + size */}
 				<div className="card-details__color-size">
 					<SectionTitle label="Size & Color - Category" />
 					<div className="card-details__color-display">
@@ -98,31 +106,37 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					</div>
 				</div>
 
-				{/* Composition bar — proportional segments + dot legend. Compact on the
-				    flipped card-back (no legend text) since the card is only ~47vw wide
-				    on phones; full legend shows in the expanded modal. */}
 				{blend.length > 0 && (
 					<div className="card-details__composition">
 						<SectionTitle label="Composition" />
-						<MaterialCompositionBar blend={blend} compact={!isFull} />
+						<MaterialCompositionBar blend={blend} compact={!isFull} onMaterialClick={(m) => openFiberModal(m)} />
 					</div>
 				)}
 
-				{/* Care pills */}
 				{careItems.length > 0 && (
 					<div className="card-details__care">
 						<SectionTitle label="Care" />
 						<div className="card-details__care-pills">
-							{careItems.map((c) => (
-								<span key={c.label} className="card-details__care-pill  pill">
-									{c.emoji} {c.label}
-								</span>
-							))}
+							{careItems.map((c) =>
+								carePillsAreTappable ? (
+									<button
+										key={c.label}
+										type="button"
+										className="card-details__care-pill card-details__care-pill--tappable pill"
+										onClick={handleCarePillClick}
+									>
+										{c.emoji} {c.label}
+									</button>
+								) : (
+									<span key={c.label} className="card-details__care-pill  pill">
+										{c.emoji} {c.label}
+									</span>
+								),
+							)}
 						</div>
 					</div>
 				)}
 
-				{/* Full view only: extra details + action buttons */}
 				{isFull && (
 					<div className="card-details__expanded">
 						{hasStyle && (
@@ -200,7 +214,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 											{ageLabel ? ` - ${ageLabel} ago` : ""}
 										</p>
 									)}
-									{item.condition && <p className="card-details__identity-text">Condition: {humanizeCondition(item.condition)}</p>}
+									{item.condition && (
+										<p className="card-details__identity-text">
+											Condition: {humanizeCondition(item.condition)}
+										</p>
+									)}
 									{item.price != null && <p className="card-details__identity-text">Price: ${item.price}</p>}
 								</div>
 							</div>
@@ -234,7 +252,6 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 				)}
 			</div>
 
-			{/* Compact view only: button to grow into the full modal */}
 			{!isFull && hasExpandedContent && (
 				<div className="card-details__footer">
 					<button onClick={onExpand} className="card-details__toggle-details">
@@ -243,8 +260,6 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 				</div>
 			)}
 
-			{/* Full view only: action buttons pinned in their own footer, outside the
-			    scrollable content area, so they never scroll out of reach / get clipped. */}
 			{isFull && (
 				<div className="card-details__footer card-details__footer--actions">
 					{confirming ? (
@@ -273,16 +288,20 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 							<button onClick={onEdit} className="card-details__button">
 								Edit
 							</button>
-							<button
-								onClick={() => setConfirming(true)}
-								className="card-details__button card-details__button--remove"
-							>
+							<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
 								Remove
 							</button>
 						</div>
 					)}
 				</div>
 			)}
+
+			<DetailModal
+				fiber={activeFiber}
+				onClose={closeFiberModal}
+				scrollToSection={fiberModalScrollTo}
+				onOpenGuide={viewCtx ? () => viewCtx.setView("fabric") : undefined}
+			/>
 		</div>
 	);
 };
