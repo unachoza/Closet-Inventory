@@ -1,9 +1,12 @@
+import { useEffect, useRef, useState } from "react";
 import Modal from "../../Modal/Modal";
 import type { SkippedImportRow } from "../../../utils/importCloset";
 // import { ImagePlaceholder } from "../../../Features/GmailImport/ProductCard/ProductCard";
 import { ImagePlaceholder } from "../../ImagePlaceholder/ImagePlaceholder";
 import "../ExportModal/ExportClosetModal.css";
 import "./ImportClosetModal.css";
+
+const NAME_SAVED_DEBOUNCE_MS = 600;
 
 interface ImportClosetModalProps {
 	readonly isOpen: boolean;
@@ -39,6 +42,29 @@ export default function ImportClosetModal({
 }: ImportClosetModalProps) {
 	const fixedCount = skippedItems.filter((row) => (skippedNameFixes[row.index] ?? "").trim().length > 0).length;
 	const totalItemCount = importItemCount + fixedCount;
+
+	const [savedRows, setSavedRows] = useState<Record<number, boolean>>({});
+	const debounceTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+
+	// Clear any pending timers on unmount so they don't fire after the modal's gone.
+	useEffect(() => {
+		const timers = debounceTimers.current;
+		return () => {
+			Object.values(timers).forEach(clearTimeout);
+		};
+	}, []);
+
+	const handleNameInput = (index: number, value: string) => {
+		onSkippedNameChange?.(index, value);
+		setSavedRows((prev) => (prev[index] ? { ...prev, [index]: false } : prev));
+
+		clearTimeout(debounceTimers.current[index]);
+		if (!value.trim()) return;
+
+		debounceTimers.current[index] = setTimeout(() => {
+			setSavedRows((prev) => ({ ...prev, [index]: true }));
+		}, NAME_SAVED_DEBOUNCE_MS);
+	};
 
 	return (
 		<Modal
@@ -83,8 +109,9 @@ export default function ImportClosetModal({
 											className="ecm-skipped-row__input"
 											placeholder="Item name"
 											value={skippedNameFixes[row.index] ?? ""}
-											onChange={(e) => onSkippedNameChange?.(row.index, e.target.value)}
+											onChange={(e) => handleNameInput(row.index, e.target.value)}
 										/>
+										{savedRows[row.index] && <span className="ecm-skipped-row__saved">✓ item name updated</span>}
 									</div>
 								</li>
 							);

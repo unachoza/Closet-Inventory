@@ -34,7 +34,7 @@
 .ecm-skipped-row {
 	display: grid;
 	grid-template-columns: 56px minmax(0, 1fr);
-	grid-template-rows: auto 56px;
+	/* grid-template-rows: auto 56px auto; */
 	column-gap: 0px;
 	row-gap: 4px;
 	align-items: start;
@@ -102,6 +102,24 @@
 	color: inherit;
 }
 
+.ecm-skipped-row__saved {
+	grid-column: 2;
+	grid-row: 3;
+
+	font-size: 0.72rem;
+	color: var(--primitive-status-success-sage, #6e7a68);
+	animation: ecm-skipped-row-saved-fade-in 0.3s ease-out;
+}
+
+@keyframes ecm-skipped-row-saved-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
 .import-option {
 	display: flex;
       flex-direction: row;
@@ -136,6 +154,7 @@
 .import-option__details {
 	margin-top: 4px;
 	font-size: 0.75rem;
+	letter-spacing: 1px;
 	/* color: var(--Lightest-Grey, #bcbcbc); */
 }
 

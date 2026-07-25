@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import ImportClosetModal from "./ImportClosetModal";
 import { importClosetFromCSV, importClosetFromJSON, importClosetFromFile } from "../../../utils/importCloset";
@@ -177,6 +177,53 @@ describe("ImportClosetModal", () => {
 				/>,
 			);
 			expect(screen.getByText(/found 3 items/i)).toBeInTheDocument();
+		});
+
+		it("shows a debounced confirmation after typing a name, and hides it again on further edits", () => {
+			vi.useFakeTimers();
+			try {
+				const skippedItems = [{ index: 5, reason: "missing a required 'name' field", record: {} }];
+				const renderWith = (value: string) => (
+					<ImportClosetModal
+						{...baseProps}
+						skippedItems={skippedItems}
+						skippedNameFixes={{ 5: value }}
+						onSkippedNameChange={() => {}}
+					/>
+				);
+
+				const { rerender } = render(renderWith(""));
+				const getInput = () => screen.getByPlaceholderText(/item name/i);
+
+				fireEvent.change(getInput(), { target: { value: "Fixed Name" } });
+				rerender(renderWith("Fixed Name"));
+				expect(screen.queryByText(/item name updated/i)).not.toBeInTheDocument();
+
+				act(() => {
+					vi.advanceTimersByTime(600);
+				});
+				expect(screen.getByText(/✓ item name updated/i)).toBeInTheDocument();
+
+				// Editing again hides the confirmation until the debounce fires again.
+				fireEvent.change(getInput(), { target: { value: "Fixed Name 2" } });
+				rerender(renderWith("Fixed Name 2"));
+				expect(screen.queryByText(/item name updated/i)).not.toBeInTheDocument();
+
+				act(() => {
+					vi.advanceTimersByTime(600);
+				});
+				expect(screen.getByText(/✓ item name updated/i)).toBeInTheDocument();
+
+				// Clearing the field back to blank hides the confirmation and doesn't re-show it.
+				fireEvent.change(getInput(), { target: { value: "" } });
+				rerender(renderWith(""));
+				act(() => {
+					vi.advanceTimersByTime(600);
+				});
+				expect(screen.queryByText(/item name updated/i)).not.toBeInTheDocument();
+			} finally {
+				vi.useRealTimers();
+			}
 		});
 	});
 });
