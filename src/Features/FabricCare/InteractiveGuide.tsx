@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import "./TextileGuide.css";
 import { FIBERS, WEAVE_TYPES, CARE_GROUPS, STAIN_GUIDE, Fiber } from "../../Content/Fabric&Fiber";
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
@@ -10,53 +10,71 @@ import { Route } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { ViewType } from "../../utils/types";
 import { FIBER_ROWS, SortDir, SortKey, sortRows } from "./fiberCompare";
+import { useScrollSpy } from "../../hooks/useScrollSpy";
 
-const TextileGuildInteractive = () => {
+// Single source of truth: TOC order === document order === scrollspy order.
+const TOC_SECTIONS = [
+	{ id: "natural", label: "Natural Fibers", dot: "#5A7A60" },
+	{ id: "semi", label: "Semi-Synthetic", dot: "#4A6B8A" },
+	{ id: "synthetic", label: "Synthetic", dot: "#8B5A7A" },
+	{ id: "weaves", label: "Weave Structures", dot: undefined },
+	{ id: "compare", label: "Comparison", dot: undefined },
+	{ id: "flowchart", label: "Fiber Journey", dot: undefined },
+	{ id: "care", label: "Care Guide", dot: undefined },
+	{ id: "stains", label: "Stain Removal", dot: undefined },
+] as const;
+const SECTION_IDS = TOC_SECTIONS.map((s) => s.id);
+
+const InteractiveGuide = () => {
 	const [selectedFiber, setSelectedFiber] = useState<Fiber | null>(null);
 	const [activeWeave, setActiveWeave] = useState<string>("plain");
-	const [activeNavId, setActiveNavId] = useState<string>("natural");
 
 	// Comparison table: sortable columns.
 	const [sortKey, setSortKey] = useState<SortKey | null>(null);
 	const [sortDir, setSortDir] = useState<SortDir>("asc");
 
 	const tocRef = useRef<HTMLElement | null>(null);
+	const activeNavId = useScrollSpy(SECTION_IDS, tocRef);
+
+	// Sliding indicator for the weave-tab rail: measured off the active button so
+	// it's always pixel-perfectly aligned (a per-button border can't animate
+	// between positions), then animated to its new position via CSS transform.
+	const weaveTabsRef = useRef<HTMLDivElement | null>(null);
+	const [weaveIndicator, setWeaveIndicator] = useState({ top: 0, height: 0, left: 0, width: 0 });
+
+	useLayoutEffect(() => {
+		const measure = () => {
+			const activeBtn = weaveTabsRef.current?.querySelector<HTMLButtonElement>(".weave-tab.active");
+			if (!activeBtn) return;
+			setWeaveIndicator({
+				top: activeBtn.offsetTop,
+				height: activeBtn.offsetHeight,
+				left: activeBtn.offsetLeft,
+				width: activeBtn.offsetWidth,
+			});
+		};
+		measure();
+		// Vertical rail vs. horizontal strip swap at the --bp-md breakpoint, which
+		// changes offsetTop/offsetLeft for the same button — re-measure on resize.
+		window.addEventListener("resize", measure);
+		return () => window.removeEventListener("resize", measure);
+	}, [activeWeave]);
 
 	const { setView } = useView();
-
-	// Section headings for IntersectionObserver nav highlight
-	const sectionIds = ["natural", "semi", "synthetic", "weaves", "compare", "flowchart", "care", "stains"];
-	const observeRef = useRef<IntersectionObserver | null>(null);
-
-	useEffect(() => {
-		observeRef.current = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) setActiveNavId(entry.target.id);
-				});
-			},
-			{ threshold: 0.25 },
-		);
-
-		sectionIds.forEach((id) => {
-			const elem = document.getElementById(id);
-			if (elem) observeRef.current?.observe(elem);
-		});
-
-		return () => {
-			observeRef.current?.disconnect();
-		};
-	}, []);
 
 	const scrollToSection = useCallback((id: string) => {
 		document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 	}, []);
 
-	// Keep the highlighted TOC tab in view as the user scrolls through sections
-	// (the strip scrolls horizontally on narrow screens).
+	// Keep the active tab visible in the horizontally-scrolling strip. Deliberately
+	// not scrollIntoView: that can also move the page vertically, which would kick
+	// the scrollspy back and forth.
 	useEffect(() => {
-		const active = tocRef.current?.querySelector<HTMLButtonElement>(`.toc-link[data-nav-id="${activeNavId}"]`);
-		active?.scrollIntoView({ inline: "nearest", block: "nearest" });
+		const strip = tocRef.current?.querySelector<HTMLElement>(".toc-inner");
+		const active = strip?.querySelector<HTMLElement>(`.toc-link[data-nav-id="${activeNavId}"]`);
+		if (!strip || !active || typeof strip.scrollTo !== "function") return;
+		const target = active.offsetLeft - (strip.clientWidth - active.offsetWidth) / 2;
+		strip.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
 	}, [activeNavId]);
 
 	const compareRows = sortKey ? sortRows(FIBER_ROWS, sortKey, sortDir) : FIBER_ROWS;
@@ -82,7 +100,7 @@ const TextileGuildInteractive = () => {
 	}
 
 	return (
-		<div>
+		<div className="textile-guide">
 			{/* ── HERO ── */}
 			<section className="hero">
 				<div className="hero-inner">
@@ -121,16 +139,7 @@ const TextileGuildInteractive = () => {
 			{/* ── STICKY NAV ── */}
 			<nav className="toc-nav" ref={tocRef}>
 				<div className="toc-inner">
-					{[
-						{ id: "natural", label: "Natural Fibers", dot: "#5A7A60" },
-						{ id: "semi", label: "Semi-Synthetic", dot: "#4A6B8A" },
-						{ id: "synthetic", label: "Synthetic", dot: "#8B5A7A" },
-						{ id: "weaves", label: "Weave Structures", dot: undefined },
-						{ id: "compare", label: "Comparison", dot: undefined },
-						{ id: "flowchart", label: "Fiber Journey", dot: undefined },
-						{ id: "care", label: "Care Guide", dot: undefined },
-						{ id: "stains", label: "Stain Removal", dot: undefined },
-					].map(({ id, label, dot }) => (
+					{TOC_SECTIONS.map(({ id, label, dot }) => (
 						<button
 							key={id}
 							data-nav-id={id}
@@ -272,50 +281,66 @@ const TextileGuildInteractive = () => {
 						</p>
 					</div>
 
-					<div className="weave-tabs toc-nav">
-						{WEAVE_TYPES.map((w) => (
-							<button
-								key={w.id}
-								className={`weave-tab${activeWeave === w.id ? " active" : ""}`}
-								onClick={() => setActiveWeave(w.id)}
-							>
-								{w.name}
-							</button>
-						))}
-					</div>
-
-					{activeWeaveData && (
-						<div className="weave-content">
-							<div className="weave-diagram">
-								<WeaveDiagram weaveId={activeWeave} />
-							</div>
-							<div className="weave-info">
-								<h3>{activeWeaveData.name}</h3>
-								<p className="weave-desc">{activeWeaveData.description}</p>
-								<div className="weave-chips">
-									{activeWeaveData.chips.map((c) => (
-										<span key={c} className="weave-chip">
-											{c}
-										</span>
-									))}
-								</div>
-								<div className="weave-fabrics">
-									<h5>Fabrics produced</h5>
-									<ul>
-										{activeWeaveData.fabrics.map((f) => (
-											<li key={f}>{f}</li>
-										))}
-									</ul>
-								</div>
-								<div style={{ marginTop: 16, padding: 14, background: "var(--sage-pale)", borderRadius: 10 }}>
-									<p style={{ fontSize: 13, color: "var(--sage)", margin: 0 }}>
-										<strong>Note: </strong>
-										{activeWeaveData.compatibleFibers}
-									</p>
-								</div>
-							</div>
+					<div className="weave-layout">
+						<div className="weave-tabs" ref={weaveTabsRef} role="tablist" aria-label="Weave structures">
+							<span
+								className="weave-tab-indicator"
+								aria-hidden="true"
+								style={
+									{
+										"--indicator-top": `${weaveIndicator.top}px`,
+										"--indicator-height": `${weaveIndicator.height}px`,
+										"--indicator-left": `${weaveIndicator.left}px`,
+										"--indicator-width": `${weaveIndicator.width}px`,
+									} as React.CSSProperties
+								}
+							/>
+							{WEAVE_TYPES.map((w) => (
+								<button
+									key={w.id}
+									role="tab"
+									aria-selected={activeWeave === w.id}
+									className={`weave-tab${activeWeave === w.id ? " active" : ""}`}
+									onClick={() => setActiveWeave(w.id)}
+								>
+									{w.name}
+								</button>
+							))}
 						</div>
-					)}
+
+						{activeWeaveData && (
+							<div className="weave-content" key={activeWeave}>
+								<div className="weave-diagram">
+									<WeaveDiagram weaveId={activeWeave} />
+								</div>
+								<div className="weave-info">
+									<h3>{activeWeaveData.name}</h3>
+									<p className="weave-desc">{activeWeaveData.description}</p>
+									<div className="weave-chips">
+										{activeWeaveData.chips.map((c) => (
+											<span key={c} className="weave-chip">
+												{c}
+											</span>
+										))}
+									</div>
+									<div className="weave-fabrics">
+										<h5>Fabrics produced</h5>
+										<ul>
+											{activeWeaveData.fabrics.map((f) => (
+												<li key={f}>{f}</li>
+											))}
+										</ul>
+									</div>
+									<div className="weave-note">
+										<p>
+											<strong>Note: </strong>
+											{activeWeaveData.compatibleFibers}
+										</p>
+									</div>
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
 			</section>
 
@@ -404,7 +429,7 @@ const TextileGuildInteractive = () => {
 								From raw source to finished garment — how each category of fiber travels to become textile.
 							</p>
 						</div>
-						<div>
+						<div className="journey-cta">
 							<button className="action-btn secondary" onClick={() => goTo("journey")}>
 								<Route size={16} /> Fiber Journey
 							</button>
@@ -520,4 +545,4 @@ const TextileGuildInteractive = () => {
 	);
 };
 
-export default TextileGuildInteractive;
+export default InteractiveGuide;
