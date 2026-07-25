@@ -1,3 +1,29 @@
+.ecm-skipped-banner {
+	margin-bottom: 12px;
+	padding: 10px 12px;
+	border: 1px solid var(--status-warning, #d9a441);
+	border-radius: var(--border-radius-ty, 4px);
+	background: rgba(217, 164, 65, 0.08);
+	font-size: 0.85rem;
+}
+
+.ecm-skipped-banner strong {
+	display: block;
+	margin-bottom: 4px;
+}
+
+.ecm-skipped-list {
+	margin: 4px 0;
+	padding-left: 18px;
+	max-height: 100px;
+	overflow-y: auto;
+}
+
+.ecm-skipped-banner p {
+	margin: 4px 0 0;
+	opacity: 0.85;
+}
+
 .import-option {
 	display: flex;
       flex-direction: row;

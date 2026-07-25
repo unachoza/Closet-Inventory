@@ -1,4 +1,5 @@
 import Modal from "../../Modal/Modal";
+import type { SkippedImportRow } from "../../../utils/importCloset";
 import "../ExportModal/ExportClosetModal.css";
 import "./ImportClosetModal.css";
 
@@ -6,6 +7,7 @@ interface ImportClosetModalProps {
 	readonly isOpen: boolean;
 	readonly currentItemCount: number;
 	readonly importItemCount: number;
+	readonly skippedItems?: SkippedImportRow[];
 	readonly importMode: "replace" | "merge";
 	readonly onModeChange: (mode: "replace" | "merge") => void;
 	readonly onConfirm: () => void;
@@ -16,6 +18,7 @@ export default function ImportClosetModal({
 	isOpen,
 	currentItemCount,
 	importItemCount,
+	skippedItems = [],
 	importMode,
 	onModeChange,
 	onConfirm,
@@ -39,6 +42,22 @@ export default function ImportClosetModal({
 			}
 		>
 			<p className="ecm-description">Choose how you'd like to import this closet file.</p>
+			{skippedItems.length > 0 && (
+				<div className="ecm-skipped-banner" role="alert">
+					<strong>
+						Skipped {skippedItems.length} item{skippedItems.length !== 1 ? "s" : ""} missing a name
+					</strong>
+					<ul className="ecm-skipped-list">
+						{skippedItems.map((row) => (
+							<li key={`${row.index}-${row.id ?? ""}`}>
+								Row {row.index}
+								{row.id ? ` (id: ${row.id})` : ""} — {row.reason}
+							</li>
+						))}
+					</ul>
+					<p>Fix these in your source file and re-import them separately. Everything else below imported fine.</p>
+				</div>
+			)}
 			<div className="ecm-count-badge-container">
 
 			<div className="ecm-count-badge">

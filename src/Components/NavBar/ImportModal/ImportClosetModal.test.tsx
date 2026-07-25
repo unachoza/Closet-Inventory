@@ -24,7 +24,7 @@ describe("ImportClosetModal", () => {
 	describe("CSV parsing (importCloset.ts)", () => {
 		it("maps headers to fields", async () => {
 			const csv = `${CSV_HEADER}\nTee,Acme,tops,blue,M,20,cotton,casual,good,2024-01-01,cold wash,false,nice`;
-			const [item] = await importClosetFromCSV(csvFile(csv));
+			const { items: [item] } = await importClosetFromCSV(csvFile(csv));
 
 			expect(item.name).toBe("Tee");
 			expect(item.brand).toBe("Acme");
@@ -33,7 +33,7 @@ describe("ImportClosetModal", () => {
 
 		it("generates a unique id for every imported item", async () => {
 			const csv = `${CSV_HEADER}\nTee,Acme,tops,blue,M,20,cotton,casual,good,2024-01-01,cold,false,a\nHat,Acme,tops,red,S,10,wool,casual,good,2024-01-01,cold,false,b`;
-			const items = await importClosetFromCSV(csvFile(csv));
+			const { items } = await importClosetFromCSV(csvFile(csv));
 
 			expect(items[0].id).toBeTruthy();
 			expect(items[1].id).toBeTruthy();
@@ -42,7 +42,7 @@ describe("ImportClosetModal", () => {
 
 		it("coerces the On Sale column into a real boolean", async () => {
 			const csv = `${CSV_HEADER}\nTee,Acme,tops,blue,M,20,cotton,casual,good,2024-01-01,cold,true,a\nHat,Acme,tops,red,S,10,wool,casual,good,2024-01-01,cold,false,b`;
-			const items = await importClosetFromCSV(csvFile(csv));
+			const { items } = await importClosetFromCSV(csvFile(csv));
 
 			expect(items[0].onSale).toBe(true);
 			expect(items[1].onSale).toBe(false);
@@ -50,7 +50,7 @@ describe("ImportClosetModal", () => {
 
 		it("handles quoted cells containing commas", async () => {
 			const csv = `${CSV_HEADER}\n"Tee, v2",Acme,tops,blue,M,20,cotton,casual,good,2024-01-01,cold,false,a`;
-			const [item] = await importClosetFromCSV(csvFile(csv));
+			const { items: [item] } = await importClosetFromCSV(csvFile(csv));
 
 			expect(item.name).toBe("Tee, v2");
 		});
@@ -63,7 +63,7 @@ describe("ImportClosetModal", () => {
 	describe("JSON parsing + file dispatch", () => {
 		it("parses a JSON array and preserves types", async () => {
 			const json = JSON.stringify([{ id: "x1", name: "Tee", onSale: true, price: "20" }]);
-			const [item] = await importClosetFromJSON(jsonFile(json));
+			const { items: [item] } = await importClosetFromJSON(jsonFile(json));
 
 			expect(item.id).toBe("x1");
 			expect(item.onSale).toBe(true);
@@ -79,9 +79,18 @@ describe("ImportClosetModal", () => {
 
 		it("dispatches by extension", async () => {
 			const fromJson = await importClosetFromFile(jsonFile('[{"name":"A"}]'));
-			expect(fromJson[0].name).toBe("A");
+			expect(fromJson.items[0].name).toBe("A");
 
 			await expect(importClosetFromFile(csvFile("x", "closet.txt"))).rejects.toThrow(/unsupported/i);
+		});
+
+		it("skips rows missing a name and imports the rest", async () => {
+			const json = JSON.stringify([{ id: "bad-1", category: "tops" }, { name: "Good Item" }]);
+			const { items, skipped } = await importClosetFromJSON(jsonFile(json));
+
+			expect(items).toHaveLength(1);
+			expect(items[0].name).toBe("Good Item");
+			expect(skipped).toEqual([{ index: 1, id: "bad-1", reason: expect.stringMatching(/name/i) }]);
 		});
 	});
 
@@ -121,6 +130,22 @@ describe("ImportClosetModal", () => {
 			const replaceRadio = document.querySelector('input[name="importMode"][value="replace"]') as HTMLInputElement;
 			fireEvent.click(replaceRadio);
 			expect(onModeChange).toHaveBeenCalledWith("replace");
+		});
+
+		it("shows a banner listing skipped rows when present", () => {
+			render(
+				<ImportClosetModal
+					{...baseProps}
+					skippedItems={[{ index: 5, id: "abc-1", reason: "missing a required 'name' field" }]}
+				/>,
+			);
+			expect(screen.getByText(/skipped 1 item/i)).toBeInTheDocument();
+			expect(screen.getByText(/row 5 \(id: abc-1\)/i)).toBeInTheDocument();
+		});
+
+		it("shows no skipped banner when skippedItems is empty", () => {
+			render(<ImportClosetModal {...baseProps} />);
+			expect(screen.queryByText(/skipped/i)).not.toBeInTheDocument();
 		});
 	});
 });

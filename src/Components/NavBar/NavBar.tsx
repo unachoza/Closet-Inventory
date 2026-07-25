@@ -6,7 +6,7 @@ import ExportClosetModal from "./ExportModal/ExportClosetModal";
 import type { ExportFormat } from "../../utils/exportCloset";
 import "./NavBar.css";
 import { appVersion } from "../../lib/monitoring";
-import { importClosetFromFile } from "../../utils/importCloset";
+import { importClosetFromFile, type SkippedImportRow } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 import ClearClosetModal from "./ClearModal/ClearClosetModal";
 import AccountDataModal from "./AccountDataModal/AccountDataModal";
@@ -40,6 +40,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 
 	const [importModalOpen, setImportModalOpen] = useState(false);
 	const [pendingImportItems, setPendingImportItems] = useState<ClothingItem[]>([]);
+	const [pendingImportSkipped, setPendingImportSkipped] = useState<SkippedImportRow[]>([]);
 	const [importMode, setImportMode] = useState<"replace" | "merge">("merge");
 	const [importError, setImportError] = useState<string | null>(null);
 
@@ -89,9 +90,10 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 		setImportError(null);
 
 		try {
-			const items = await importClosetFromFile(file);
+			const { items, skipped } = await importClosetFromFile(file);
 
 			setPendingImportItems(items);
+			setPendingImportSkipped(skipped);
 			setImportMode("merge");
 			setImportModalOpen(true);
 
@@ -103,6 +105,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 
 	const handleImportCancel = () => {
 		setPendingImportItems([]);
+		setPendingImportSkipped([]);
 		setImportModalOpen(false);
 	};
 
@@ -110,6 +113,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 		onImportCloset?.(pendingImportItems, importMode);
 
 		setPendingImportItems([]);
+		setPendingImportSkipped([]);
 		setImportModalOpen(false);
 	};
 
@@ -251,6 +255,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 					isOpen={importModalOpen}
 					currentItemCount={closetItemCount}
 					importItemCount={pendingImportItems.length}
+					skippedItems={pendingImportSkipped}
 					importMode={importMode}
 					onModeChange={setImportMode}
 					onConfirm={handleImportConfirm}
