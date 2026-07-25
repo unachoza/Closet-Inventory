@@ -81,7 +81,8 @@ button.mcb__segment--tappable {
 }
 
 button.mcb__segment--tappable:hover {
-	opacity: 0.75;
+	/* opacity: 0.75; */
+
 }
 
 .mcb__legend-button {
@@ -101,7 +102,10 @@ button.mcb__segment--tappable:hover {
 }
 
 .mcb__legend-button:hover {
-	text-decoration-color: currentColor;
+	text-decoration-color: none;
+	box-shadow:none;
+    	transition: none;
+    	transform: none;
 }
 
 /* Compact: hide the text legend (bar only) */

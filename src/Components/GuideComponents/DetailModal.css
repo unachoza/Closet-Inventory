@@ -128,3 +128,14 @@
 .detail-footer-link:hover {
       color: var(--ink);
 }
+
+button.detail-footer-link{
+      margin-left: 0;
+      border-radius: 0;
+}
+
+button.detail-footer-link:hover{
+      box-shadow: none;
+      transition: none;
+      transform: none;
+}

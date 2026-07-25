@@ -156,7 +156,12 @@ button.card-details__care-pill--tappable {
 }
 
 button.card-details__care-pill--tappable:hover {
-	background: var(--cream);
+	transform: none;
+	background-color: var(--bg-surface-secondary);
+	box-shadow: none;
+      transition: all 0.2s;
+    /* transform: translateY(-3px); */
+	
 }
 
 /* Divider */
