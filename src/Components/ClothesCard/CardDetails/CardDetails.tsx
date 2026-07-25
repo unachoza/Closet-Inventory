@@ -1,10 +1,12 @@
 import { useState } from "react";
 import type { ClothingItem } from "../../../utils/types";
-import { normalizeMaterial } from "../../../utils/materialUtils";
+import { normalizeMaterial, primaryMaterial, resolveFiber } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
+import DetailModal from "../../GuideComponents/Modal";
 import { parseCareItems } from "../../../utils/careUtils";
 import { humanizeCondition } from "../../../utils/condition";
 import { toAbsoluteDate } from "../../../utils/dateUtils";
+import { useViewOptional } from "../../../context/ViewContext";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
 
@@ -34,6 +36,9 @@ interface CardDetailsProps {
 
 export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
+	const [fiberModalMaterial, setFiberModalMaterial] = useState<string | null>(null);
+	const [fiberModalScrollTo, setFiberModalScrollTo] = useState<string | undefined>(undefined);
+	const viewCtx = useViewOptional();
 	const isFull = variant === "full";
 
 	const blend = normalizeMaterial(item.material);
@@ -71,6 +76,27 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 
 	const hasExpandedContent = hasStyle || featureTags.length > 0 || hasIdentity || occasions.length > 0 || !!item.notes;
 
+	const openFiberModal = (material: string, scrollTo?: string) => {
+		setFiberModalMaterial(material);
+		setFiberModalScrollTo(scrollTo);
+	};
+
+	const closeFiberModal = () => {
+		setFiberModalMaterial(null);
+		setFiberModalScrollTo(undefined);
+	};
+
+	const activeFiber = fiberModalMaterial ? resolveFiber(fiberModalMaterial) : null;
+
+	const handleCarePillClick = () => {
+		const top = primaryMaterial(blend);
+		if (top && resolveFiber(top)) {
+			openFiberModal(top, "Care");
+		}
+	};
+
+	const carePillsAreTappable = blend.length > 0 && !!resolveFiber(primaryMaterial(blend));
+
 	return (
 		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
 			{/* Scrollable content area */}
@@ -104,7 +130,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 				{blend.length > 0 && (
 					<div className="card-details__composition">
 						<SectionTitle label="Composition" />
-						<MaterialCompositionBar blend={blend} compact={!isFull} />
+						<MaterialCompositionBar blend={blend} compact={!isFull} onMaterialClick={(m) => openFiberModal(m)} />
 					</div>
 				)}
 
@@ -113,11 +139,22 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 					<div className="card-details__care">
 						<SectionTitle label="Care" />
 						<div className="card-details__care-pills">
-							{careItems.map((c) => (
-								<span key={c.label} className="card-details__care-pill  pill">
-									{c.emoji} {c.label}
-								</span>
-							))}
+							{careItems.map((c) =>
+								carePillsAreTappable ? (
+									<button
+										key={c.label}
+										type="button"
+										className="card-details__care-pill card-details__care-pill--tappable pill"
+										onClick={handleCarePillClick}
+									>
+										{c.emoji} {c.label}
+									</button>
+								) : (
+									<span key={c.label} className="card-details__care-pill  pill">
+										{c.emoji} {c.label}
+									</span>
+								),
+							)}
 						</div>
 					</div>
 				)}
@@ -200,7 +237,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 											{ageLabel ? ` - ${ageLabel} ago` : ""}
 										</p>
 									)}
-									{item.condition && <p className="card-details__identity-text">Condition: {humanizeCondition(item.condition)}</p>}
+									{item.condition && (
+										<p className="card-details__identity-text">
+											Condition: {humanizeCondition(item.condition)}
+										</p>
+									)}
 									{item.price != null && <p className="card-details__identity-text">Price: ${item.price}</p>}
 								</div>
 							</div>
@@ -273,16 +314,20 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 							<button onClick={onEdit} className="card-details__button">
 								Edit
 							</button>
-							<button
-								onClick={() => setConfirming(true)}
-								className="card-details__button card-details__button--remove"
-							>
+							<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
 								Remove
 							</button>
 						</div>
 					)}
 				</div>
 			)}
+
+			<DetailModal
+				fiber={activeFiber}
+				onClose={closeFiberModal}
+				scrollToSection={fiberModalScrollTo}
+				onOpenGuide={viewCtx ? () => viewCtx.setView("fabric") : undefined}
+			/>
 		</div>
 	);
 };

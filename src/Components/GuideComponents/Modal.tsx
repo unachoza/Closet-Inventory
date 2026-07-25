@@ -1,10 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
+import "./DetailModal.css";
 
-function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => void }) {
-      
+interface DetailModalProps {
+	fiber: Fiber | null;
+	onClose: () => void;
+	scrollToSection?: string;
+	onOpenGuide?: () => void;
+}
+
+function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailModalProps) {
+	const bodyRef = useRef<HTMLDivElement>(null);
+
 	// Close on Escape
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
@@ -23,6 +32,16 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 			document.body.style.overflow = "";
 		};
 	}, [fiber]);
+
+	useEffect(() => {
+		if (!fiber || !scrollToSection || !bodyRef.current) return;
+		const heading = Array.from(bodyRef.current.querySelectorAll("h4")).find(
+			(h) => h.textContent?.toLowerCase() === scrollToSection.toLowerCase(),
+		);
+		if (heading) {
+			requestAnimationFrame(() => heading.scrollIntoView({ behavior: "smooth", block: "start" }));
+		}
+	}, [fiber, scrollToSection]);
 
 	if (!fiber) return null;
 
@@ -57,7 +76,7 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 						✕
 					</button>
 				</div>
-				<div className="detail-body">
+				<div className="detail-body" ref={bodyRef}>
 					{fiber.detail.map((section) => (
 						<div key={section.title} className="detail-section">
 							<h4>{section.title}</h4>
@@ -72,6 +91,11 @@ function DetailModal({ fiber, onClose }: { fiber: Fiber | null; onClose: () => v
 						</div>
 					))}
 				</div>
+				{onOpenGuide && (
+					<button className="detail-footer-link" onClick={() => { onClose(); onOpenGuide(); }}>
+						More on fabrics in the Guide →
+					</button>
+				)}
 			</div>
 		</div>,
 		document.body,

@@ -1,4 +1,5 @@
 import type { MaterialBlend } from "./types";
+import { FIBERS } from "../Content/Fabric&Fiber";
 
 // ── Color palette for composition bar segments ────────────────────────────────
 // Each common material gets a distinct, accessible color. Unknown materials
@@ -193,6 +194,23 @@ export function canonicalizeMaterial(name: string): string {
 		if (key.includes(sub)) return canonical;
 	}
 	return capitalize(name.trim());
+}
+
+// ── Fiber lookup ─────────────────────────────────────────────────────────────
+// Resolve a raw material name to a FIBERS entry, returning null for materials
+// that have no fiber (leather, denim, velvet, jersey, etc.).
+
+const FIBER_SYNONYMS: Record<string, string> = {
+	elastane: "spandex",
+	lycra: "spandex",
+	rayon: "viscose",
+	lyocell: "tencel",
+};
+
+export function resolveFiber(material: string) {
+	const key = canonicalizeMaterial(material).toLowerCase();
+	const resolved = FIBER_SYNONYMS[key] ?? key;
+	return FIBERS.find((f) => f.id === resolved) ?? null;
 }
 
 function capitalize(s: string): string {

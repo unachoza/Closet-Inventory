@@ -148,6 +148,22 @@
 	margin-top: 2px;
 }
 
+button.card-details__care-pill--tappable {
+	cursor: pointer;
+	border: 1px solid var(--border);
+	background: var(--warm-white);
+	transition: background 0.15s;
+}
+
+button.card-details__care-pill--tappable:hover {
+	transform: none;
+	background-color: var(--bg-surface-secondary);
+	box-shadow: none;
+      transition: all 0.2s;
+    /* transform: translateY(-3px); */
+	
+}
+
 /* Divider */
 .card-details__divider {
 	height: 1px;

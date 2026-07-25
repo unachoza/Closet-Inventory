@@ -1,0 +1,159 @@
+/* DetailModal.css — extracted from TextileGuide.css so the modal is self-styled
+   regardless of which parent renders it (Guide or Closet). */
+
+/* ── DETAIL PANEL (modal) ──
+   Rendered via a portal at document.body (see Modal.tsx), so this no longer
+   fights the sticky NavBar's stacking context — z-index just needs to clear
+   ordinary page content. Top padding is tied to the same --header-height
+   token the NavBar itself uses (defined in :root, src/index.css) so the
+   panel's top edge always clears the real nav height instead of a guessed
+   constant — with align-items:center below, a tall panel gets clamped by
+   max-height and its top lands exactly at this padding, so an insufficient
+   value here reproduces the "hidden under header" bug even though the panel
+   nominally has "more space". Bottom padding gives the same breathing room
+   at the bottom; the panel itself now scrolls its own body instead of the
+   whole overlay, so the header + close button stay put and the card never
+   grows taller than the viewport. */
+.detail-overlay {
+      position: fixed;
+      z-index: 2000;
+      display: none;
+      padding: calc(var(--header-height, 56px) + 16px) 20px max(24px, env(safe-area-inset-bottom) + 16px);
+      background: rgba(28, 26, 23, 0.55);
+      inset: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+}
+
+.detail-overlay.open {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+}
+
+.detail-panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      max-width: 700px;
+      /* `max-height: 100%` here (a cross-axis percentage inside .detail-overlay's
+         row-direction flex box) resolved inconsistently across browsers —
+         WebKit honored it, Chrome did not, letting the panel overflow the
+         viewport bottom. Computed explicitly instead (mirrors .card-grow-modal's
+         proven max-height pattern), independent of flex percentage resolution. */
+      max-height: calc(100dvh - var(--header-height, 56px) - 16px - max(24px, env(safe-area-inset-bottom) + 16px));
+      margin: auto;
+      border-radius: 20px;
+      background: var(--warm-white);
+      box-shadow: var(--shadow-lg);
+}
+
+.detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-shrink: 0;
+      padding: 32px 36px 24px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+}
+
+.detail-close {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 26px;
+      height: 38px;
+      border: 1px solid rgb(28 26 23 / 24%);
+      border-radius: 50%;
+      background: none;
+      color: var(--ink-60);
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+      flex-shrink: 0;
+}
+
+.detail-close:hover { background: var(--cream); }
+
+.detail-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 32px 36px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+}
+
+.detail-section { margin-bottom: 28px; text-align: left; }
+
+.detail-section h4 {
+      color: var(--ink-60);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+}
+
+.detail-section p {
+      color: var(--ink-60);
+      font-size: 15px;
+      line-height: 1.7;
+      text-align: left;
+}
+
+.detail-section ul {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      list-style: none;
+      text-align: left;
+}
+
+.detail-section li {
+      position: relative;
+      color: var(--ink-60);
+      font-size: 14px;
+      line-height: 1.55;
+      padding-left: 18px;
+}
+
+.detail-section li::before {
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+      content: '→';
+}
+
+.detail-footer-link {
+      display: block;
+      padding: 16px 36px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 14px;
+      color: var(--ink-60);
+      cursor: pointer;
+      background: none;
+      border-left: none;
+      border-right: none;
+      border-bottom: none;
+      width: 100%;
+      transition: color 0.2s;
+}
+
+.detail-footer-link:hover {
+      color: var(--ink);
+}
+
+button.detail-footer-link{
+      margin-left: 0;
+      border-radius: 0;
+}
+
+button.detail-footer-link:hover{
+      box-shadow: none;
+      transition: none;
+      transform: none;
+}

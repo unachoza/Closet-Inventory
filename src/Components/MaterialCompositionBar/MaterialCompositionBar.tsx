@@ -1,5 +1,5 @@
 import type { MaterialBlend } from "../../utils/types";
-import { getMaterialColor, blendTotal } from "../../utils/materialUtils";
+import { getMaterialColor, blendTotal, resolveFiber } from "../../utils/materialUtils";
 import "./MaterialCompositionBar.css";
 
 interface MaterialCompositionBarProps {
@@ -9,9 +9,10 @@ interface MaterialCompositionBarProps {
 	showLegend?: boolean;
 	/** Compact mode: smaller bar height, no legend label text */
 	compact?: boolean;
+	onMaterialClick?: (material: string) => void;
 }
 
-const MaterialCompositionBar = ({ blend, showLegend = true, compact = false }: MaterialCompositionBarProps) => {
+const MaterialCompositionBar = ({ blend, showLegend = true, compact = false, onMaterialClick }: MaterialCompositionBarProps) => {
 	const safeBlend = Array.isArray(blend) ? blend : [];
 	if (safeBlend.length === 0) return null;
 
@@ -27,13 +28,16 @@ const MaterialCompositionBar = ({ blend, showLegend = true, compact = false }: M
 				{safeBlend.map((b, i) => {
 					const color = getMaterialColor(b.material);
 					const width = b.percentage * scale;
+					const fiber = onMaterialClick ? resolveFiber(b.material) : null;
+					const Tag = fiber ? "button" as const : "div" as const;
 					return (
-						<div
+						<Tag
 							key={i}
 							data-testid="material-segment"
-							className="mcb__segment"
+							className={`mcb__segment${fiber ? " mcb__segment--tappable" : ""}`}
 							style={{ width: `${width}%`, background: color }}
 							title={`${b.material}: ${b.percentage}%`}
+							{...(fiber ? { onClick: () => onMaterialClick!(b.material), type: "button" } : {})}
 						/>
 					);
 				})}
@@ -44,12 +48,28 @@ const MaterialCompositionBar = ({ blend, showLegend = true, compact = false }: M
 				<ul className="mcb__legend">
 					{safeBlend.map((b, i) => {
 						const color = getMaterialColor(b.material);
-						return (
-							<li key={i} className="mcb__legend-item">
+						const fiber = onMaterialClick ? resolveFiber(b.material) : null;
+						const content = (
+							<>
 								<span className="mcb__legend-swatch" style={{ background: color }} aria-hidden="true" />
 								<span className="mcb__legend-label">
 									{b.percentage}%&nbsp;{capitalize(b.material)}
 								</span>
+							</>
+						);
+						return (
+							<li key={i} className="mcb__legend-item">
+								{fiber ? (
+									<button
+										type="button"
+										className="mcb__legend-button"
+										onClick={() => onMaterialClick!(b.material)}
+									>
+										{content}
+									</button>
+								) : (
+									content
+								)}
 							</li>
 						);
 					})}

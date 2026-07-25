@@ -112,6 +112,10 @@ export const useView = (): ViewContextType => {
 	return ctx;
 };
 
+export const useViewOptional = (): ViewContextType | null => {
+	return useContext(ViewContext) ?? null;
+};
+
 const noopSetNavGuard = () => {};
 
 /** Safe outside a ViewProvider (unit tests render the wizard bare) — no-op there. */

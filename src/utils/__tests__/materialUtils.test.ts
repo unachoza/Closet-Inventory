@@ -6,6 +6,7 @@ import {
 	blendTotal,
 	getMaterialColor,
 	MATERIAL_COLORS,
+	resolveFiber,
 } from "../materialUtils";
 import type { MaterialBlend } from "../types";
 
@@ -179,5 +180,32 @@ describe("getMaterialColor", () => {
 
 	it("returns the same color every time for the same unknown material", () => {
 		expect(getMaterialColor("tencel™")).toBe(getMaterialColor("tencel™"));
+	});
+});
+
+describe("resolveFiber", () => {
+	it("resolves a plain material with a matching fiber entry", () => {
+		expect(resolveFiber("cotton")?.id).toBe("cotton");
+	});
+
+	it("resolves synonyms onto their canonical fiber", () => {
+		expect(resolveFiber("elastane")?.id).toBe("spandex");
+		expect(resolveFiber("lycra")?.id).toBe("spandex");
+		expect(resolveFiber("rayon")?.id).toBe("viscose");
+		expect(resolveFiber("lyocell")?.id).toBe("tencel");
+	});
+
+	it("is case-insensitive", () => {
+		expect(resolveFiber("COTTON")?.id).toBe("cotton");
+	});
+
+	// ── Regression: unmapped materials must degrade to null, never a
+	// mis-resolved fiber (e.g. weave-structure ids like "satin" leaking in) ──
+	it("returns null for materials with no fiber entry", () => {
+		expect(resolveFiber("leather")).toBeNull();
+		expect(resolveFiber("denim")).toBeNull();
+		expect(resolveFiber("satin")).toBeNull();
+		expect(resolveFiber("velvet")).toBeNull();
+		expect(resolveFiber("jersey")).toBeNull();
 	});
 });
