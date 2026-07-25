@@ -68,8 +68,12 @@
 	/* color: var(--text-muted, #9ca3af); */
 }
 
-/* Tappable segments */
+/* Tappable segments — the app's global `button {}` reset (index.css) sets
+   margin/color/width that must be neutralized here, or the segment gets
+   clipped by .mcb__bar's overflow:hidden (margin) and legend text goes
+   invisible-white-on-white (inherited color). */
 button.mcb__segment--tappable {
+	margin: 0;
 	cursor: pointer;
 	padding: 0;
 	opacity: 1;
@@ -84,9 +88,12 @@ button.mcb__segment--tappable:hover {
 	display: flex;
 	align-items: center;
 	gap: 0.35rem;
+	margin: 0;
 	padding: 0;
 	border: none;
 	background: none;
+	color: inherit;
+	width: auto;
 	cursor: pointer;
 	text-decoration: underline;
 	text-decoration-color: transparent;
