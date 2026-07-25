@@ -13,14 +13,18 @@ interface ProductCardProps {
  * CORS-blocked CDN images from ThredUp). The user can add a photo later
  * in the EditItemView form.
  */
-function ImagePlaceholder() {
+interface ImagePlaceholderProps {
+	color?: string;
+}
+
+export function ImagePlaceholder({ color = "rgba(255,255,255,0.3)" }: ImagePlaceholderProps) {
 	return (
 		<div className="product-card-image product-card-placeholder">
 			<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="No image available">
 				<rect width="60" height="60" rx="6" fill="rgba(255,255,255,0.08)" />
 				<path
 					d="M20 40V22a2 2 0 012-2h16a2 2 0 012 2v18M18 40h24M24 20v-2a6 6 0 0112 0v2"
-					stroke="rgba(255,255,255,0.3)"
+					stroke={color}
 					strokeWidth="1.5"
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -42,10 +46,7 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 	const handleImgError = useCallback(() => setImgFailed(true), []);
 
 	const showPlaceholder = !product.imageUrl || imgFailed;
-	const discountPercent =
-		product.price && product.originalPrice
-			? computeDiscountPercent(String(product.price), product.originalPrice)
-			: null;
+	const discountPercent = product.price && product.originalPrice ? computeDiscountPercent(String(product.price), product.originalPrice) : null;
 
 	return (
 		<div className="product-card">
@@ -53,12 +54,7 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 				<ImagePlaceholder />
 			) : (
 				<div className="product-card-image">
-					<img
-						src={product.imageUrl}
-						alt={product.name}
-						loading="lazy"
-						onError={handleImgError}
-					/>
+					<img src={product.imageUrl} alt={product.name} loading="lazy" onError={handleImgError} />
 				</div>
 			)}
 			<div className="product-card-details">
@@ -67,16 +63,10 @@ const ProductCard = memo(function ProductCard({ product, onImport }: ProductCard
 				<div className="product-card-meta">
 					<span className="product-card-price-group">
 						{product.price && <span className="product-card-price">{product.price}</span>}
-						{product.originalPrice && (
-							<s className="product-card-original-price">{product.originalPrice}</s>
-						)}
-						{discountPercent !== null && (
-							<span className="product-card-discount">-{discountPercent}%</span>
-						)}
+						{product.originalPrice && <s className="product-card-original-price">{product.originalPrice}</s>}
+						{discountPercent !== null && <span className="product-card-discount">-{discountPercent}%</span>}
 					</span>
-					{product.onSale && !discountPercent && (
-						<span className="product-card-tag product-card-sale">Sale</span>
-					)}
+					{product.onSale && !discountPercent && <span className="product-card-tag product-card-sale">Sale</span>}
 					{product.size && <span className="product-card-tag">Size: {product.size}</span>}
 					{product.color && <span className="product-card-tag">Color: {product.color}</span>}
 					{product.material && <span className="product-card-tag">Material: {product.material}</span>}

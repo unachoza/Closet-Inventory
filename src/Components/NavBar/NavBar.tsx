@@ -6,7 +6,7 @@ import ExportClosetModal from "./ExportModal/ExportClosetModal";
 import type { ExportFormat } from "../../utils/exportCloset";
 import "./NavBar.css";
 import { appVersion } from "../../lib/monitoring";
-import { importClosetFromFile } from "../../utils/importCloset";
+import { importClosetFromFile, finalizeSkippedRow, type SkippedImportRow } from "../../utils/importCloset";
 import ImportClosetModal from "./ImportModal/ImportClosetModal";
 import ClearClosetModal from "./ClearModal/ClearClosetModal";
 import AccountDataModal from "./AccountDataModal/AccountDataModal";
@@ -40,6 +40,8 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 
 	const [importModalOpen, setImportModalOpen] = useState(false);
 	const [pendingImportItems, setPendingImportItems] = useState<ClothingItem[]>([]);
+	const [pendingImportSkipped, setPendingImportSkipped] = useState<SkippedImportRow[]>([]);
+	const [skippedNameFixes, setSkippedNameFixes] = useState<Record<number, string>>({});
 	const [importMode, setImportMode] = useState<"replace" | "merge">("merge");
 	const [importError, setImportError] = useState<string | null>(null);
 
@@ -89,9 +91,10 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 		setImportError(null);
 
 		try {
-			const items = await importClosetFromFile(file);
+			const { items, skipped } = await importClosetFromFile(file);
 
 			setPendingImportItems(items);
+			setPendingImportSkipped(skipped);
 			setImportMode("merge");
 			setImportModalOpen(true);
 
@@ -103,13 +106,25 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 
 	const handleImportCancel = () => {
 		setPendingImportItems([]);
+		setPendingImportSkipped([]);
+		setSkippedNameFixes({});
 		setImportModalOpen(false);
 	};
 
+	const handleSkippedNameChange = (index: number, value: string) => {
+		setSkippedNameFixes((prev) => ({ ...prev, [index]: value }));
+	};
+
 	const handleImportConfirm = () => {
-		onImportCloset?.(pendingImportItems, importMode);
+		const fixedItems = pendingImportSkipped
+			.map((row) => finalizeSkippedRow(row, skippedNameFixes[row.index] ?? ""))
+			.filter((item): item is ClothingItem => item !== null);
+
+		onImportCloset?.([...pendingImportItems, ...fixedItems], importMode);
 
 		setPendingImportItems([]);
+		setPendingImportSkipped([]);
+		setSkippedNameFixes({});
 		setImportModalOpen(false);
 	};
 
@@ -251,6 +266,9 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 					isOpen={importModalOpen}
 					currentItemCount={closetItemCount}
 					importItemCount={pendingImportItems.length}
+					skippedItems={pendingImportSkipped}
+					skippedNameFixes={skippedNameFixes}
+					onSkippedNameChange={handleSkippedNameChange}
 					importMode={importMode}
 					onModeChange={setImportMode}
 					onConfirm={handleImportConfirm}

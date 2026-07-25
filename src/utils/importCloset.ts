@@ -1,5 +1,19 @@
 import type { ClothingItem } from "./types";
 
+export interface SkippedImportRow {
+	/** 1-based position of the row in the source file (JSON array index / CSV line number). */
+	index: number;
+	id?: string;
+	reason: string;
+	/** The raw parsed row, kept so it can be re-normalized once the user supplies a name. */
+	record: Record<string, unknown>;
+}
+
+export interface ImportResult {
+	items: ClothingItem[];
+	skipped: SkippedImportRow[];
+}
+
 const HEADER_TO_FIELD = {
 	Name: "name",
 	Brand: "brand",
@@ -60,15 +74,16 @@ function coerceOnSale(raw: unknown): boolean {
 /**
  * Validate a parsed record before it's cast to a ClothingItem.
  * `name` is the one field the app can't sanely default (it's the item's identity
- * and display key everywhere), so a row without it is rejected with a clear
- * message rather than silently producing a nameless, un-editable item. Structural
- * fields that would otherwise crash rendering (`material`, `notes` — iterated with
- * `.map`) are coerced to safe arrays below.
+ * and display key everywhere), so a row without it is reported rather than
+ * silently producing a nameless, un-editable item. Structural fields that would
+ * otherwise crash rendering (`material`, `notes` — iterated with `.map`) are
+ * coerced to safe arrays below.
  */
-function validateImportedItem(raw: Record<string, unknown>): void {
+function validateImportedItem(raw: Record<string, unknown>): string | null {
 	if (typeof raw.name !== "string" || !raw.name.trim()) {
-		throw new Error("Import row is missing a required 'name' field.");
+		return "missing a required 'name' field";
 	}
+	return null;
 }
 
 /**
@@ -77,7 +92,6 @@ function validateImportedItem(raw: Record<string, unknown>): void {
  * the fields that CSV would otherwise leave as raw strings.
  */
 function normalizeImportedItem(raw: Record<string, unknown>): ClothingItem {
-	validateImportedItem(raw);
 	const existingId = typeof raw.id === "string" && raw.id.trim() ? raw.id : crypto.randomUUID();
 
 	return {
@@ -107,7 +121,72 @@ function assertItemArray(parsed: unknown): Record<string, unknown>[] {
 	return records;
 }
 
-export async function importClosetFromCSV(file: File): Promise<ClothingItem[]> {
+const NON_EMPTY_STRING_ID_FIELDS = ["color", "size", "brand", "imageURL"] as const;
+
+/**
+ * Whether a record missing `name` still has enough on it for a human to
+ * recognize the item and give it a name in the UI. `category` alone isn't
+ * enough (too generic — "tops" could be anything); it needs at least one
+ * more identifying field. `id`, `condition`/`age`, and `purchaseDate` don't
+ * count — they identify nothing about what the item actually is.
+ */
+function isIdentifiable(record: Record<string, unknown>): boolean {
+	const hasCategory = typeof record.category === "string" && record.category.trim().length > 0;
+	if (!hasCategory) return false;
+
+	const hasIdentifyingString = NON_EMPTY_STRING_ID_FIELDS.some(
+		(field) => typeof record[field] === "string" && (record[field] as string).trim().length > 0,
+	);
+	const hasMaterial = Array.isArray(record.material) && record.material.length > 0;
+
+	return hasIdentifyingString || hasMaterial;
+}
+
+/**
+ * Split parsed records into normalized items and skipped rows, instead of
+ * failing the whole import over a handful of bad rows. `index` is 1-based
+ * and matches the row's position among the data rows (so it lines up with
+ * what the user sees when they open the source file). Rows that fail
+ * validation but have nothing identifying about them (no category + one
+ * more clue) are dropped without a trace — surfacing "Row 79, no info" in
+ * the UI would only confuse the user, not help them.
+ */
+function buildImportResult(records: Record<string, unknown>[]): ImportResult {
+	const items: ClothingItem[] = [];
+	const skipped: SkippedImportRow[] = [];
+
+	records.forEach((record, i) => {
+		const reason = validateImportedItem(record);
+		if (reason) {
+			if (isIdentifiable(record)) {
+				const id = typeof record.id === "string" && record.id.trim() ? record.id : undefined;
+				skipped.push({ index: i + 1, id, reason, record });
+			}
+			return;
+		}
+		items.push(normalizeImportedItem(record));
+	});
+
+	if (items.length === 0) {
+		throw new Error("No valid closet items found in this file.");
+	}
+
+	return { items, skipped };
+}
+
+/**
+ * Re-normalize a skipped row once the user has supplied a name for it in the
+ * UI. Returns `null` if the name is still blank (row stays skipped/excluded).
+ * Reuses `normalizeImportedItem` so the fixed row gets the same coercion
+ * (material/notes arrays, onSale, id) as every other imported item.
+ */
+export function finalizeSkippedRow(row: SkippedImportRow, name: string): ClothingItem | null {
+	const trimmed = name.trim();
+	if (!trimmed) return null;
+	return normalizeImportedItem({ ...row.record, name: trimmed });
+}
+
+export async function importClosetFromCSV(file: File): Promise<ImportResult> {
 	const text = await file.text();
 
 	const lines = text.split(/\r?\n/).filter(Boolean);
@@ -132,10 +211,10 @@ export async function importClosetFromCSV(file: File): Promise<ClothingItem[]> {
 		return record;
 	});
 
-	return assertItemArray(records).map(normalizeImportedItem);
+	return buildImportResult(assertItemArray(records));
 }
 
-export async function importClosetFromJSON(file: File): Promise<ClothingItem[]> {
+export async function importClosetFromJSON(file: File): Promise<ImportResult> {
 	const text = await file.text();
 
 	let parsed: unknown;
@@ -145,11 +224,11 @@ export async function importClosetFromJSON(file: File): Promise<ClothingItem[]> 
 		throw new Error("File is not valid JSON.");
 	}
 
-	return assertItemArray(parsed).map(normalizeImportedItem);
+	return buildImportResult(assertItemArray(parsed));
 }
 
 /** Dispatch to the right parser based on file extension. */
-export async function importClosetFromFile(file: File): Promise<ClothingItem[]> {
+export async function importClosetFromFile(file: File): Promise<ImportResult> {
 	const name = file.name.toLowerCase();
 
 	if (name.endsWith(".json")) return importClosetFromJSON(file);
