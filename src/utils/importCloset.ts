@@ -5,6 +5,8 @@ export interface SkippedImportRow {
 	index: number;
 	id?: string;
 	reason: string;
+	/** The raw parsed row, kept so it can be re-normalized once the user supplies a name. */
+	record: Record<string, unknown>;
 }
 
 export interface ImportResult {
@@ -133,7 +135,7 @@ function buildImportResult(records: Record<string, unknown>[]): ImportResult {
 		const reason = validateImportedItem(record);
 		if (reason) {
 			const id = typeof record.id === "string" && record.id.trim() ? record.id : undefined;
-			skipped.push({ index: i + 1, id, reason });
+			skipped.push({ index: i + 1, id, reason, record });
 			return;
 		}
 		items.push(normalizeImportedItem(record));
@@ -144,6 +146,18 @@ function buildImportResult(records: Record<string, unknown>[]): ImportResult {
 	}
 
 	return { items, skipped };
+}
+
+/**
+ * Re-normalize a skipped row once the user has supplied a name for it in the
+ * UI. Returns `null` if the name is still blank (row stays skipped/excluded).
+ * Reuses `normalizeImportedItem` so the fixed row gets the same coercion
+ * (material/notes arrays, onSale, id) as every other imported item.
+ */
+export function finalizeSkippedRow(row: SkippedImportRow, name: string): ClothingItem | null {
+	const trimmed = name.trim();
+	if (!trimmed) return null;
+	return normalizeImportedItem({ ...row.record, name: trimmed });
 }
 
 export async function importClosetFromCSV(file: File): Promise<ImportResult> {

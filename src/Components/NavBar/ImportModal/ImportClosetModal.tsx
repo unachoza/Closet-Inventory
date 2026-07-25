@@ -8,10 +8,19 @@ interface ImportClosetModalProps {
 	readonly currentItemCount: number;
 	readonly importItemCount: number;
 	readonly skippedItems?: SkippedImportRow[];
+	readonly skippedNameFixes?: Record<number, string>;
+	readonly onSkippedNameChange?: (index: number, value: string) => void;
 	readonly importMode: "replace" | "merge";
 	readonly onModeChange: (mode: "replace" | "merge") => void;
 	readonly onConfirm: () => void;
 	readonly onCancel: () => void;
+}
+
+/** Best-effort human label for a skipped row, using whatever fields survived validation. */
+function describeSkippedRow(row: SkippedImportRow): string {
+	const { record } = row;
+	const parts = [record.brand, record.category, record.color].filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+	return parts.length > 0 ? parts.join(" · ") : `Row ${row.index}`;
 }
 
 export default function ImportClosetModal({
@@ -19,11 +28,16 @@ export default function ImportClosetModal({
 	currentItemCount,
 	importItemCount,
 	skippedItems = [],
+	skippedNameFixes = {},
+	onSkippedNameChange,
 	importMode,
 	onModeChange,
 	onConfirm,
 	onCancel,
 }: ImportClosetModalProps) {
+	const fixedCount = skippedItems.filter((row) => (skippedNameFixes[row.index] ?? "").trim().length > 0).length;
+	const totalItemCount = importItemCount + fixedCount;
+
 	return (
 		<Modal
 			isOpen={isOpen}
@@ -45,23 +59,39 @@ export default function ImportClosetModal({
 			{skippedItems.length > 0 && (
 				<div className="ecm-skipped-banner" role="alert">
 					<strong>
-						Skipped {skippedItems.length} item{skippedItems.length !== 1 ? "s" : ""} missing a name
+						{skippedItems.length} item{skippedItems.length !== 1 ? "s" : ""} missing a name
 					</strong>
+					<p>Give them a name to include them, or leave blank to skip.</p>
 					<ul className="ecm-skipped-list">
-						{skippedItems.map((row) => (
-							<li key={`${row.index}-${row.id ?? ""}`}>
-								Row {row.index}
-								{row.id ? ` (id: ${row.id})` : ""} — {row.reason}
-							</li>
-						))}
+						{skippedItems.map((row) => {
+							const imageURL = typeof row.record.imageURL === "string" ? row.record.imageURL : "";
+							return (
+								<li key={`${row.index}-${row.id ?? ""}`} className="ecm-skipped-row">
+									{imageURL ? (
+										<img className="ecm-skipped-row__thumb" src={imageURL} alt="" />
+									) : (
+										<div className="ecm-skipped-row__thumb ecm-skipped-row__thumb--empty" />
+									)}
+									<div className="ecm-skipped-row__meta">
+										<span className="ecm-skipped-row__label">{describeSkippedRow(row)}</span>
+										<input
+											type="text"
+											className="ecm-skipped-row__input"
+											placeholder="Item name"
+											value={skippedNameFixes[row.index] ?? ""}
+											onChange={(e) => onSkippedNameChange?.(row.index, e.target.value)}
+										/>
+									</div>
+								</li>
+							);
+						})}
 					</ul>
-					<p>Fix these in your source file and re-import them separately. Everything else below imported fine.</p>
 				</div>
 			)}
 			<div className="ecm-count-badge-container">
 
 			<div className="ecm-count-badge">
-				Found {importItemCount} item{importItemCount !== 1 ? "s" : ""} in this file
+				Found {totalItemCount} item{totalItemCount !== 1 ? "s" : ""} in this file
 			</div>
 			<div className="ecm-count-badge">
 				Current closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
@@ -80,7 +110,7 @@ export default function ImportClosetModal({
 					<div className="import-option__label">
 						<strong>Replace my current closet</strong>
 
-						<div className="import-option__details">Final closet: {importItemCount} items</div>
+						<div className="import-option__details">Final closet: {totalItemCount} items</div>
 					</div>
 				</label>
 				<label className="import-option">
@@ -96,8 +126,8 @@ export default function ImportClosetModal({
 						<strong>Add to my current closet</strong>
 
 						<div className="import-option__details">
-							Final closet: {currentItemCount + importItemCount} item
-							{currentItemCount + importItemCount !== 1 ? "s" : ""}
+							Final closet: {currentItemCount + totalItemCount} item
+							{currentItemCount + totalItemCount !== 1 ? "s" : ""}
 						</div>
 					</div>
 				</label>

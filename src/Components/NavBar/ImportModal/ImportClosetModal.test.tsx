@@ -90,7 +90,9 @@ describe("ImportClosetModal", () => {
 
 			expect(items).toHaveLength(1);
 			expect(items[0].name).toBe("Good Item");
-			expect(skipped).toEqual([{ index: 1, id: "bad-1", reason: expect.stringMatching(/name/i) }]);
+			expect(skipped).toEqual([
+				{ index: 1, id: "bad-1", reason: expect.stringMatching(/name/i), record: { id: "bad-1", category: "tops" } },
+			]);
 		});
 	});
 
@@ -132,20 +134,49 @@ describe("ImportClosetModal", () => {
 			expect(onModeChange).toHaveBeenCalledWith("replace");
 		});
 
-		it("shows a banner listing skipped rows when present", () => {
+		it("shows a name input per skipped row when present", () => {
 			render(
 				<ImportClosetModal
 					{...baseProps}
-					skippedItems={[{ index: 5, id: "abc-1", reason: "missing a required 'name' field" }]}
+					skippedItems={[
+						{ index: 5, id: "abc-1", reason: "missing a required 'name' field", record: { id: "abc-1", brand: "Acme", category: "tops" } },
+					]}
 				/>,
 			);
-			expect(screen.getByText(/skipped 1 item/i)).toBeInTheDocument();
-			expect(screen.getByText(/row 5 \(id: abc-1\)/i)).toBeInTheDocument();
+			expect(screen.getByText(/1 item missing a name/i)).toBeInTheDocument();
+			expect(screen.getByPlaceholderText(/item name/i)).toBeInTheDocument();
+			expect(screen.getByText(/acme · tops/i)).toBeInTheDocument();
 		});
 
-		it("shows no skipped banner when skippedItems is empty", () => {
+		it("shows no skipped section when skippedItems is empty", () => {
 			render(<ImportClosetModal {...baseProps} />);
-			expect(screen.queryByText(/skipped/i)).not.toBeInTheDocument();
+			expect(screen.queryByText(/missing a name/i)).not.toBeInTheDocument();
+		});
+
+		it("typing a name for a skipped row fires onSkippedNameChange and updates the live count", () => {
+			const onSkippedNameChange = vi.fn();
+			const { rerender } = render(
+				<ImportClosetModal
+					{...baseProps}
+					skippedItems={[{ index: 5, reason: "missing a required 'name' field", record: {} }]}
+					skippedNameFixes={{}}
+					onSkippedNameChange={onSkippedNameChange}
+				/>,
+			);
+			expect(screen.getByText(/found 2 items/i)).toBeInTheDocument();
+
+			fireEvent.change(screen.getByPlaceholderText(/item name/i), { target: { value: "Fixed Name" } });
+			expect(onSkippedNameChange).toHaveBeenCalledWith(5, "Fixed Name");
+
+			rerender(
+				<ImportClosetModal
+					{...baseProps}
+					skippedItems={[{ index: 5, reason: "missing a required 'name' field", record: {} }]}
+					skippedNameFixes={{ 5: "Fixed Name" }}
+					onSkippedNameChange={onSkippedNameChange}
+				/>,
+			);
+			expect(screen.getByText(/found 3 items/i)).toBeInTheDocument();
 		});
 	});
 });

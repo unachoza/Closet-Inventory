@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { importClosetFromJSON } from "../importCloset";
+import { importClosetFromJSON, finalizeSkippedRow } from "../importCloset";
 
 /**
  * Regression test suite for bug #6 (no import validation).
@@ -85,8 +85,39 @@ describe("importCloset — validation", () => {
 		const { items, skipped } = await importClosetFromJSON(await jsonFile(json));
 		expect(items).toHaveLength(2);
 		expect(skipped).toEqual([
-			{ index: 2, id: "bad-1", reason: expect.stringMatching(/name/i) },
-			{ index: 4, id: "bad-2", reason: expect.stringMatching(/name/i) },
+			{ index: 2, id: "bad-1", reason: expect.stringMatching(/name/i), record: { id: "bad-1", category: "tops" } },
+			{ index: 4, id: "bad-2", reason: expect.stringMatching(/name/i), record: { id: "bad-2" } },
 		]);
+	});
+});
+
+describe("finalizeSkippedRow", () => {
+	it("returns null when the supplied name is blank or whitespace", () => {
+		const row = { index: 1, id: "bad-1", reason: "missing a required 'name' field", record: { id: "bad-1", category: "tops" } };
+		expect(finalizeSkippedRow(row, "")).toBeNull();
+		expect(finalizeSkippedRow(row, "   ")).toBeNull();
+	});
+
+	it("normalizes the row into a ClothingItem once given a name", () => {
+		const row = {
+			index: 1,
+			id: "bad-1",
+			reason: "missing a required 'name' field",
+			record: { id: "bad-1", category: "tops", material: "not an array", notes: "single note" },
+		};
+		const item = finalizeSkippedRow(row, "  Fixed Name  ");
+		expect(item).not.toBeNull();
+		expect(item!.name).toBe("Fixed Name");
+		expect(item!.id).toBe("bad-1");
+		expect(item!.category).toBe("tops");
+		// Reuses the same coercion as normal imports.
+		expect(item!.material).toEqual([]);
+		expect(item!.notes).toEqual(["single note"]);
+	});
+
+	it("generates an id when the raw record had none", () => {
+		const row = { index: 1, reason: "missing a required 'name' field", record: {} };
+		const item = finalizeSkippedRow(row, "New Item");
+		expect(item!.id).toBeTruthy();
 	});
 });
