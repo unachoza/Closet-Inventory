@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import ImportClosetModal from "./ImportClosetModal";
 import { importClosetFromCSV, importClosetFromJSON, importClosetFromFile } from "../../../utils/importCloset";
@@ -107,10 +109,14 @@ describe("ImportClosetModal", () => {
 			onCancel: vi.fn(),
 		};
 
-		it("shows the found and current counts", () => {
+		function getModeRadio(mode: "replace" | "merge") {
+			return document.querySelector(`input[name="importMode"][value="${mode}"]`) as HTMLInputElement;
+		}
+
+		it("shows the item counts in the summary", () => {
 			render(<ImportClosetModal {...baseProps} />);
-			expect(screen.getByText(/found 2 items/i)).toBeInTheDocument();
-			expect(screen.getByText(/current closet: 3 items/i)).toBeInTheDocument();
+			const values = Array.from(document.querySelectorAll(".ecm-import-summary__value")).map((el) => el.textContent);
+			expect(values).toEqual(["2", "3"]);
 		});
 
 		it("calls onConfirm and onCancel", () => {
@@ -129,9 +135,55 @@ describe("ImportClosetModal", () => {
 			const onModeChange = vi.fn();
 			render(<ImportClosetModal {...baseProps} onModeChange={onModeChange} />);
 
-			const replaceRadio = document.querySelector('input[name="importMode"][value="replace"]') as HTMLInputElement;
-			fireEvent.click(replaceRadio);
+			fireEvent.click(getModeRadio("replace"));
 			expect(onModeChange).toHaveBeenCalledWith("replace");
+		});
+
+		it("marks the current import mode as selected", () => {
+			render(<ImportClosetModal {...baseProps} importMode="merge" />);
+
+			const mergeRadio = getModeRadio("merge");
+			const replaceRadio = getModeRadio("replace");
+
+			expect(mergeRadio).toBeChecked();
+			expect(replaceRadio).not.toBeChecked();
+
+			expect(mergeRadio.closest(".import-option")).toHaveClass("import-option--selected");
+			expect(replaceRadio.closest(".import-option")).not.toHaveClass("import-option--selected");
+		});
+
+		it("keeps the decorative checkmark hidden from assistive technology", () => {
+			render(<ImportClosetModal {...baseProps} />);
+
+			const checkmarks = document.querySelectorAll(".import-option__check");
+			expect(checkmarks).toHaveLength(2);
+			for (const checkmark of checkmarks) {
+				expect(checkmark).toHaveAttribute("aria-hidden", "true");
+			}
+		});
+
+		it("moves the selected class and animated checkmark when the controlled mode changes", async () => {
+			const user = userEvent.setup();
+
+			function TestHarness() {
+				const [mode, setMode] = useState<"replace" | "merge">("merge");
+				return <ImportClosetModal {...baseProps} importMode={mode} onModeChange={setMode} />;
+			}
+
+			render(<TestHarness />);
+
+			const mergeRadio = getModeRadio("merge");
+			const replaceRadio = getModeRadio("replace");
+
+			expect(mergeRadio.closest(".import-option")).toHaveClass("import-option--selected");
+			expect(replaceRadio.closest(".import-option")).not.toHaveClass("import-option--selected");
+
+			await user.click(replaceRadio);
+
+			expect(replaceRadio).toBeChecked();
+			expect(mergeRadio).not.toBeChecked();
+			expect(replaceRadio.closest(".import-option")).toHaveClass("import-option--selected");
+			expect(mergeRadio.closest(".import-option")).not.toHaveClass("import-option--selected");
 		});
 
 		it("shows a name input per skipped row when present", () => {
@@ -163,7 +215,7 @@ describe("ImportClosetModal", () => {
 					onSkippedNameChange={onSkippedNameChange}
 				/>,
 			);
-			expect(screen.getByText(/found 2 items/i)).toBeInTheDocument();
+			expect(document.querySelector(".ecm-import-summary__value")?.textContent).toBe("2");
 
 			fireEvent.change(screen.getByPlaceholderText(/item name/i), { target: { value: "Fixed Name" } });
 			expect(onSkippedNameChange).toHaveBeenCalledWith(5, "Fixed Name");
@@ -176,7 +228,7 @@ describe("ImportClosetModal", () => {
 					onSkippedNameChange={onSkippedNameChange}
 				/>,
 			);
-			expect(screen.getByText(/found 3 items/i)).toBeInTheDocument();
+			expect(document.querySelector(".ecm-import-summary__value")?.textContent).toBe("3");
 		});
 
 		it("shows a debounced confirmation after typing a name, and hides it again on further edits", () => {
