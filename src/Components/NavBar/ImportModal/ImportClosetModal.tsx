@@ -1,5 +1,7 @@
 import Modal from "../../Modal/Modal";
 import type { SkippedImportRow } from "../../../utils/importCloset";
+// import { ImagePlaceholder } from "../../../Features/GmailImport/ProductCard/ProductCard";
+import { ImagePlaceholder } from "../../ImagePlaceholder/ImagePlaceholder";
 import "../ExportModal/ExportClosetModal.css";
 import "./ImportClosetModal.css";
 
@@ -59,9 +61,9 @@ export default function ImportClosetModal({
 			{skippedItems.length > 0 && (
 				<div className="ecm-skipped-banner" role="alert">
 					<strong>
-						{skippedItems.length} item{skippedItems.length !== 1 ? "s" : ""} missing a name
+						{skippedItems.length} Item{skippedItems.length !== 1 ? "s" : ""} missing a name
 					</strong>
-					<p>Give them a name to include them, or leave blank to skip.</p>
+					<p>Add a name to include them, or leave blank to skip.</p>
 					<ul className="ecm-skipped-list">
 						{skippedItems.map((row) => {
 							const imageURL = typeof row.record.imageURL === "string" ? row.record.imageURL : "";
@@ -70,7 +72,9 @@ export default function ImportClosetModal({
 									{imageURL ? (
 										<img className="ecm-skipped-row__thumb" src={imageURL} alt="" />
 									) : (
-										<div className="ecm-skipped-row__thumb ecm-skipped-row__thumb--empty" />
+										<div className="ecm-skipped-row__thumb ecm-skipped-row__thumb--empty">
+											<ImagePlaceholder color="var(--text-primary)" size="100%" />
+										</div>
 									)}
 									<div className="ecm-skipped-row__meta">
 										<span className="ecm-skipped-row__label">{describeSkippedRow(row)}</span>
@@ -89,13 +93,12 @@ export default function ImportClosetModal({
 				</div>
 			)}
 			<div className="ecm-count-badge-container">
-
-			<div className="ecm-count-badge">
-				Found {totalItemCount} item{totalItemCount !== 1 ? "s" : ""} in this file
-			</div>
-			<div className="ecm-count-badge">
-				Current closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
-			</div>
+				<div className="ecm-count-badge">
+					Found {totalItemCount} item{totalItemCount !== 1 ? "s" : ""} in this file
+				</div>
+				<div className="ecm-count-badge">
+					Current closet: {currentItemCount} item{currentItemCount !== 1 ? "s" : ""}
+				</div>
 			</div>
 			<div className="ecm-description">
 				<label className="import-option">

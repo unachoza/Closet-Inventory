@@ -5,6 +5,7 @@
 	border-radius: var(--border-radius-ty, 4px);
 	background: rgba(217, 164, 65, 0.08);
 	font-size: 0.85rem;
+	text-align: left;
 }
 
 .ecm-skipped-banner strong {
@@ -21,50 +22,80 @@
 	margin: 0;
 	padding: 0;
 	list-style: none;
+
 	max-height: 220px;
 	overflow-y: auto;
+
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
 }
 
 .ecm-skipped-row {
-	display: flex;
-	align-items: center;
-	gap: 8px;
+	display: grid;
+	grid-template-columns: 56px minmax(0, 1fr);
+	grid-template-rows: auto 56px;
+	column-gap: 0px;
+	row-gap: 4px;
+	align-items: start;
 }
 
 .ecm-skipped-row__thumb {
-	width: 36px;
-	height: 36px;
+	grid-column: 1;
+	grid-row: 2;
+
+	width: 40px;
+	height: 40px;
+	box-sizing: border-box;
+
 	border-radius: var(--border-radius-ty, 4px);
 	object-fit: cover;
-	flex-shrink: 0;
+	overflow: hidden;
 }
 
 .ecm-skipped-row__thumb--empty {
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px dashed rgba(255, 255, 255, 0.2);
+	background: var(--pill-backdrop-pastel-terrocata);
+	border: 1px dashed var(--text-primary);
+	/* border: 1px dashed rgba(204, 61, 61, 0.2); */
+}
+
+.ecm-skipped-row__thumb--empty .product-card-image {
+	width: 100%;
+	height: 100%;
+}
+
+.ecm-skipped-row__thumb--empty svg {
+	display: block;
+	width: 100%;
+	height: 100%;
 }
 
 .ecm-skipped-row__meta {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	flex: 1;
-	min-width: 0;
+	display: contents;
 }
 
 .ecm-skipped-row__label {
+	grid-column: 2;
+	grid-row: 1;
+
 	font-size: 0.72rem;
+	line-height: 1.2;
 	opacity: 0.75;
 	text-transform: capitalize;
+	text-align: left;
 }
 
 .ecm-skipped-row__input {
+	grid-column: 2;
+	grid-row: 2;
+
 	width: 100%;
-	padding: 6px 8px;
+	height: 56px;
+	box-sizing: border-box;
+
+	padding: 6px 12px;
 	font-size: 0.85rem;
+
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	border-radius: var(--border-radius-ty, 4px);
 	background: rgba(255, 255, 255, 0.04);
@@ -99,6 +130,7 @@
 	font-weight: 600;
 	/* color: var(--contrast-white-against-grey-backdrop); */
       text-transform: capitalize;
+	letter-spacing: 1px;
 }
 
 .import-option__details {
