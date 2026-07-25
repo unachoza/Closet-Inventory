@@ -3,8 +3,11 @@ import { getMaterialColor, blendTotal, resolveFiber } from "../../utils/material
 import "./MaterialCompositionBar.css";
 
 interface MaterialCompositionBarProps {
+	/** Material blend; tolerates undefined (renders an empty bar). */
 	blend: MaterialBlend[] | undefined;
+	/** Show the legend below the bar (default true) */
 	showLegend?: boolean;
+	/** Compact mode: smaller bar height, no legend label text */
 	compact?: boolean;
 	onMaterialClick?: (material: string) => void;
 }
@@ -14,10 +17,13 @@ const MaterialCompositionBar = ({ blend, showLegend = true, compact = false, onM
 	if (safeBlend.length === 0) return null;
 
 	const total = blendTotal(safeBlend);
+	// Normalize widths so they always fill 100% of the bar,
+	// even if percentages don't add up perfectly.
 	const scale = total > 0 ? 100 / total : 1;
 
 	return (
 		<div className={`mcb${compact ? " mcb--compact" : ""}`}>
+			{/* Segmented bar */}
 			<div className="mcb__bar" role="img" aria-label="Material composition">
 				{safeBlend.map((b, i) => {
 					const color = getMaterialColor(b.material);
@@ -37,6 +43,7 @@ const MaterialCompositionBar = ({ blend, showLegend = true, compact = false, onM
 				})}
 			</div>
 
+			{/* Legend */}
 			{showLegend && (
 				<ul className="mcb__legend">
 					{safeBlend.map((b, i) => {

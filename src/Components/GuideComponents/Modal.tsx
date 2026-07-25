@@ -14,6 +14,7 @@ interface DetailModalProps {
 function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailModalProps) {
 	const bodyRef = useRef<HTMLDivElement>(null);
 
+	// Close on Escape
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === "Escape") onClose();
@@ -22,6 +23,7 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 		return () => document.removeEventListener("keydown", handler);
 	}, [onClose]);
 
+	// Lock body scroll
 	useEffect(() => {
 		if (fiber) {
 			document.body.style.overflow = "hidden";
@@ -43,6 +45,13 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 
 	if (!fiber) return null;
 
+	// Rendered via a portal directly under <body>: this modal is otherwise
+	// mounted inside .app-content, which has its own `z-index: 1` (needed to
+	// sit above the background scrim) and therefore establishes a stacking
+	// context. That traps this modal's z-index underneath the sticky NavBar
+	// (`z-index: 100`, a sibling of .app-content) no matter how high the
+	// modal's own z-index is set. Escaping to document.body sidesteps that
+	// entirely so the modal reliably renders above the header.
 	return createPortal(
 		<div
 			className="detail-overlay open"
