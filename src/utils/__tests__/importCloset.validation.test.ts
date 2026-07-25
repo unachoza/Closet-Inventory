@@ -26,7 +26,7 @@ describe("importCloset — validation", () => {
 	});
 
 	it("skips a row where name is an empty string", async () => {
-		const json = JSON.stringify([{ name: "  ", category: "tops" }, { name: "Good Item" }]);
+		const json = JSON.stringify([{ name: "  ", category: "tops", brand: "Acme" }, { name: "Good Item" }]);
 		const { items, skipped } = await importClosetFromJSON(await jsonFile(json));
 		expect(items).toHaveLength(1);
 		expect(skipped).toHaveLength(1);
@@ -80,14 +80,45 @@ describe("importCloset — validation", () => {
 		await expect(importClosetFromJSON(await jsonFile(json))).rejects.toThrow(/no valid closet items/i);
 	});
 
-	it("reports the row index and id for each skipped row", async () => {
-		const json = JSON.stringify([{ name: "Good" }, { id: "bad-1", category: "tops" }, { name: "Also Good" }, { id: "bad-2" }]);
+	it("reports the row index and id for each identifiable skipped row", async () => {
+		const json = JSON.stringify([
+			{ name: "Good" },
+			{ id: "bad-1", category: "tops", brand: "Acme" },
+			{ name: "Also Good" },
+			{ id: "bad-2", category: "dress", color: "blue" },
+		]);
 		const { items, skipped } = await importClosetFromJSON(await jsonFile(json));
 		expect(items).toHaveLength(2);
 		expect(skipped).toEqual([
-			{ index: 2, id: "bad-1", reason: expect.stringMatching(/name/i), record: { id: "bad-1", category: "tops" } },
-			{ index: 4, id: "bad-2", reason: expect.stringMatching(/name/i), record: { id: "bad-2" } },
+			{ index: 2, id: "bad-1", reason: expect.stringMatching(/name/i), record: { id: "bad-1", category: "tops", brand: "Acme" } },
+			{ index: 4, id: "bad-2", reason: expect.stringMatching(/name/i), record: { id: "bad-2", category: "dress", color: "blue" } },
 		]);
+	});
+
+	it("silently drops rows with only id/condition/purchaseDate — nothing to identify them by", async () => {
+		const json = JSON.stringify([
+			{ name: "Good Item" },
+			{ id: "bad-1" },
+			{ condition: "good", purchaseDate: "2024-01-01" },
+			{ category: "tops" }, // category alone still isn't enough to identify the item
+		]);
+		const { items, skipped } = await importClosetFromJSON(await jsonFile(json));
+		expect(items).toHaveLength(1);
+		expect(skipped).toHaveLength(0);
+	});
+
+	it("shows a row with category + one identifying field (color/size/material/brand/imageURL)", async () => {
+		const json = JSON.stringify([
+			{ category: "tops", color: "red" },
+			{ category: "bottoms", size: "M" },
+			{ category: "dress", material: [{ material: "cotton", percentage: 100 }] },
+			{ category: "shoes", brand: "Zara" },
+			{ category: "coat", imageURL: "http://example.com/a.jpg" },
+			{ name: "Good Item" },
+		]);
+		const { items, skipped } = await importClosetFromJSON(await jsonFile(json));
+		expect(items).toHaveLength(1);
+		expect(skipped).toHaveLength(5);
 	});
 });
 

@@ -85,13 +85,13 @@ describe("ImportClosetModal", () => {
 		});
 
 		it("skips rows missing a name and imports the rest", async () => {
-			const json = JSON.stringify([{ id: "bad-1", category: "tops" }, { name: "Good Item" }]);
+			const json = JSON.stringify([{ id: "bad-1", category: "tops", brand: "Acme" }, { name: "Good Item" }]);
 			const { items, skipped } = await importClosetFromJSON(jsonFile(json));
 
 			expect(items).toHaveLength(1);
 			expect(items[0].name).toBe("Good Item");
 			expect(skipped).toEqual([
-				{ index: 1, id: "bad-1", reason: expect.stringMatching(/name/i), record: { id: "bad-1", category: "tops" } },
+				{ index: 1, id: "bad-1", reason: expect.stringMatching(/name/i), record: { id: "bad-1", category: "tops", brand: "Acme" } },
 			]);
 		});
 	});

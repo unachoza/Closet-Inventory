@@ -121,11 +121,35 @@ function assertItemArray(parsed: unknown): Record<string, unknown>[] {
 	return records;
 }
 
+const NON_EMPTY_STRING_ID_FIELDS = ["color", "size", "brand", "imageURL"] as const;
+
+/**
+ * Whether a record missing `name` still has enough on it for a human to
+ * recognize the item and give it a name in the UI. `category` alone isn't
+ * enough (too generic — "tops" could be anything); it needs at least one
+ * more identifying field. `id`, `condition`/`age`, and `purchaseDate` don't
+ * count — they identify nothing about what the item actually is.
+ */
+function isIdentifiable(record: Record<string, unknown>): boolean {
+	const hasCategory = typeof record.category === "string" && record.category.trim().length > 0;
+	if (!hasCategory) return false;
+
+	const hasIdentifyingString = NON_EMPTY_STRING_ID_FIELDS.some(
+		(field) => typeof record[field] === "string" && (record[field] as string).trim().length > 0,
+	);
+	const hasMaterial = Array.isArray(record.material) && record.material.length > 0;
+
+	return hasIdentifyingString || hasMaterial;
+}
+
 /**
  * Split parsed records into normalized items and skipped rows, instead of
  * failing the whole import over a handful of bad rows. `index` is 1-based
  * and matches the row's position among the data rows (so it lines up with
- * what the user sees when they open the source file).
+ * what the user sees when they open the source file). Rows that fail
+ * validation but have nothing identifying about them (no category + one
+ * more clue) are dropped without a trace — surfacing "Row 79, no info" in
+ * the UI would only confuse the user, not help them.
  */
 function buildImportResult(records: Record<string, unknown>[]): ImportResult {
 	const items: ClothingItem[] = [];
@@ -134,8 +158,10 @@ function buildImportResult(records: Record<string, unknown>[]): ImportResult {
 	records.forEach((record, i) => {
 		const reason = validateImportedItem(record);
 		if (reason) {
-			const id = typeof record.id === "string" && record.id.trim() ? record.id : undefined;
-			skipped.push({ index: i + 1, id, reason, record });
+			if (isIdentifiable(record)) {
+				const id = typeof record.id === "string" && record.id.trim() ? record.id : undefined;
+				skipped.push({ index: i + 1, id, reason, record });
+			}
 			return;
 		}
 		items.push(normalizeImportedItem(record));
