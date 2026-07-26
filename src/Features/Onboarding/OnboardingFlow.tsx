@@ -57,7 +57,8 @@ const TOUR_CONTENT: Record<TourStepId, TourScreenContent> = {
 		subtitle: (
 			<>
 				Add gifts, thrifted finds, <Break />
-				and hand-me-downs by hand <Break />— in a few quick taps.
+				and hand-me-downs by hand <Break />
+				in a few quick taps.
 			</>
 		),
 		illustration: <AddItemIllustration />,
@@ -71,8 +72,8 @@ const TOUR_CONTENT: Record<TourStepId, TourScreenContent> = {
 		),
 		subtitle: (
 			<>
-				Wash, dry, and fabric guidance <Break />
-				for every piece <Break />— so your favorites last.
+				Guidance for every fabric, <Break />
+				so your favorites last.
 			</>
 		),
 		illustration: <CareIllustration />,
