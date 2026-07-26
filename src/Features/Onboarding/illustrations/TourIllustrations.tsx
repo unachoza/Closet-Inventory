@@ -78,21 +78,22 @@ export function AddItemIllustration() {
 				{/* Center bag — front facing */}
 				<path d="M41 24H84L81 70H44Z" fill="var(--Light-hover-highlight)" />
 				{/* Center bag handle */}
-				<path d="M52 24C52 15 58 11 63 11C69 11 75 16 75 24" />
+				<path d="M52 29C52 38 58 42 63 42C69 42 75 37 75 29"></path>
 				{/* Right bag — turned slightly toward center */}
 				<path d="M82 43L91 39L110 44L108 71L84 68Z" fill="var(--Light-hover-highlight)" />
 				{/* Right bag side gusset */}
 				<path d="M82 43L91 39L91 65L84 68Z" fill="var(--pill-backdrop-pastel-terrocata)" />
 				{/* Right bag handle */}
-				<path d="M90 40C91 33 95 30 99 31C104 32 107 37 107 44" />
+				<path d="M90 40C91 33 95 30 99 31C104 32 107 37 107 43" />
 				{/* Subtle construction lines */}
 				<path
 					className="onb-ill-accent"
 					strokeWidth={1.2}
 					d="
+						
 						M13 49L35 45
-						M86 48L107 52
-						M47 64H78"
+						M90 64L106 67
+						M47 64H79"
 				/>
 			</svg>
 		</svg>
