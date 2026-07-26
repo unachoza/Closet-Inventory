@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { ClothingItem } from "../../../utils/types";
 import { useCloset } from "../../../context/ClosetContext";
 import { useLocations } from "../../../context/LocationsContext";
@@ -64,6 +64,18 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 
 	// 3. Sort the search results
 	const { sortKey, setSortKey, sortedItems } = useClosetSort();
+
+	// Default to relevance order the moment a search starts, and back to
+	// dateAdded once it's cleared — but only on that empty↔non-empty edge, so a
+	// sort the user picks mid-search isn't clobbered on every keystroke.
+	const wasQueryActive = useRef(false);
+	useEffect(() => {
+		const isQueryActive = debouncedQuery.trim().length > 0;
+		if (isQueryActive !== wasQueryActive.current) {
+			setSortKey(isQueryActive ? "relevance" : "dateAdded");
+			wasQueryActive.current = isQueryActive;
+		}
+	}, [debouncedQuery, setSortKey]);
 
 	// Pipeline: closet → filter → search → sort. The material-% sort (E0-2.3)
 	// ranks by the selected material's blend percentage, so it needs the active

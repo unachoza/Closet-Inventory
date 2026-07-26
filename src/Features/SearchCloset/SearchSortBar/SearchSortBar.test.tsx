@@ -33,11 +33,21 @@ function renderBar(props: Partial<typeof baseProps> = {}, children?: ReactNode) 
 }
 
 describe("SearchSortBar", () => {
-	it("renders all sort options in the select", () => {
+	it("renders all sort options except relevance when no query is active", () => {
 		renderBar();
-		Object.values(SORT_LABELS).forEach((label) => {
-			expect(screen.getByRole("option", { name: label })).toBeInTheDocument();
+		Object.entries(SORT_LABELS).forEach(([key, label]) => {
+			if (key === "relevance") {
+				expect(screen.queryByRole("option", { name: label })).not.toBeInTheDocument();
+			} else {
+				expect(screen.getByRole("option", { name: label })).toBeInTheDocument();
+			}
 		});
+	});
+
+	it("shows relevance as a sort option once a query is active", () => {
+		renderBar({}, <SearchProbe />);
+		fireEvent.change(screen.getByRole("textbox", { name: /search closet/i }), { target: { value: "wool" } });
+		expect(screen.getByRole("option", { name: SORT_LABELS.relevance })).toBeInTheDocument();
 	});
 
 	it("changing the sort select calls onSortChange with the selected key", () => {
