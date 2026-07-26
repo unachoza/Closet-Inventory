@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import OnboardingShell from "../OnboardingShell";
+import Break from "../Break";
 import { useProfile } from "../../../hooks/useProfile";
 import { useSupabaseAuthContext } from "../../../context/SupabaseAuthContext";
 import { validateDisplayName } from "../../../services/profileService";
@@ -67,7 +68,8 @@ export default function NameStep({ onContinue }: NameStepProps) {
 		>
 			<div className="onb-step">
 				<h1 className="onb-step__title">
-					What should <em>we call you?</em>
+					What should <Break />
+					<em>we call you?</em>
 				</h1>
 				<input
 					type="text"

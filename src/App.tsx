@@ -93,9 +93,10 @@ function AppShell() {
 		setIsLoading(false);
 	}, []);
 
-	const handleComplete = () => {
+	const handleComplete = (options?: { goToGmail?: boolean }) => {
 		localStorage.setItem(ONBOARDING_KEY, "true");
 		setShowOnboarding(false);
+		if (options?.goToGmail) setView("gmail");
 	};
 
 	const handleEditItem = (item: ClothingItem) => {

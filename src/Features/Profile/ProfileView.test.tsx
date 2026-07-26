@@ -27,6 +27,18 @@ vi.mock("../../Components/NavBar/AccountDataModal/AccountDataModal", () => ({
 	default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div role="dialog" aria-label="Account and data" /> : null),
 }));
 
+const mockGmailLogout = vi.fn();
+vi.mock("../../context/GmailAuthContext", () => ({
+	useGmailAuthContext: () => ({
+		accessToken: null,
+		isAuthenticated: false,
+		error: null,
+		isLoading: false,
+		login: vi.fn(),
+		logout: mockGmailLogout,
+	}),
+}));
+
 import ProfileView from "./ProfileView";
 
 function makeAuth(overrides: Partial<SupabaseAuthState> = {}): SupabaseAuthState {

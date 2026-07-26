@@ -1,6 +1,8 @@
 /* First-run onboarding flow. Built entirely on src/tokens.css semantic vars so
    light + dark both resolve; Picky-style structure, Nothing To Wear voice. */
 
+@import "../../styles/breakpoints.css";
+
 .onb {
 	min-height: 100dvh;
 	display: flex;
@@ -91,6 +93,7 @@
 	width: min(220px, 55vw);
 	color: var(--text-secondary);
 	margin-bottom: var(--primitive-spacing-xl);
+	height: 140px;
 }
 
 .onb-step__ill svg {
@@ -105,7 +108,7 @@
 .onb-step__title {
 	font-family: var(--primitive-font-family-serif);
 	font-weight: 500;
-	font-size: clamp(26px, 7vw, 32px);
+	font-size: var(--onboarding-font-size-heading);
 	line-height: var(--primitive-line-height-tight);
 	color: var(--text-primary);
 	margin: 0;
@@ -127,11 +130,40 @@
 }
 
 .onb-step__sub {
-	font-size: var(--primitive-font-size-sm);
+	font-size: var(--onboarding-font-size-body);
 	line-height: var(--primitive-line-height-normal);
 	color: var(--text-muted);
 	max-width: 34ch;
 	margin: var(--primitive-spacing-md) 0 0;
+}
+
+/* Manually placed breaks for mobile-width line control (title/subtitle copy).
+   Desktop wraps naturally instead — see --bp-md-up in styles/breakpoints.css.
+   The 34ch cap above exists for desktop's natural wrap; on mobile it fights
+   with the manual breaks, wrapping mid-line before a <Break> is reached, so
+   widen it there and let the breaks be the only line-control mechanism. */
+@media (--bp-md) {
+	.onb-step__sub {
+		max-width: 92vw;
+	}
+}
+
+@media (--bp-md-up) {
+	.onb-br--mobile {
+		display: none;
+	}
+}
+
+/* Inverse of .onb-br--mobile: a break that only applies at desktop widths,
+   for the rare heading whose natural desktop wrap lands in the wrong place. */
+.onb-br--desktop {
+	display: none;
+}
+
+@media (--bp-md-up) {
+	.onb-br--desktop {
+		display: inline;
+	}
 }
 
 .onb__footer {
@@ -142,6 +174,27 @@
 	max-width: 430px;
 	margin: 0 auto;
 	padding: 0 var(--primitive-spacing-lg) var(--primitive-spacing-lg);
+}
+
+/* Desktop gets a wider column than the 430px mobile-matched default, so
+   longer headings (see .onb-br--desktop) have room to land on the intended
+   line instead of wrapping at mobile-narrow widths. Placed after the base
+   rules above so it wins the cascade despite equal specificity. */
+@media (--bp-md-up) {
+	.onb__top,
+	.onb__body,
+	.onb__footer {
+		max-width: 550px;
+	}
+
+	.onb-step__title {
+		font-size: 42px;
+	}
+}
+
+button.onb__cta{
+	font-size: var(--onboarding-font-size-button);
+	font-weight: 700;
 }
 
 .onb__cta {
@@ -184,6 +237,11 @@
 	padding: var(--primitive-spacing-md) var(--primitive-spacing-sm) 2px;
 	cursor: pointer;
 	align-self: center;
+}
+
+.onb__skip:hover{
+	transform: none;
+	box-shadow: none;
 }
 
 [data-theme="dark"] .onb__skip {
@@ -229,16 +287,24 @@
 }
 
 .onb-navstrip__fab {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+	flex: none;
+	font-size: 10px;
+	color: var(--text-muted);
+}
+
+.onb-navstrip__fab-icon {
 	width: 34px;
 	height: 34px;
-	flex: none;
 	border-radius: 50%;
 	background: var(--bg-surface-brand);
 	color: var(--text-on-brand);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 4px;
 }
 
 /* Sign-in step */
@@ -292,6 +358,35 @@
 	color: var(--text-muted);
 	max-width: 34ch;
 	margin: var(--primitive-spacing-md) 0 0;
+}
+
+/* Install step */
+
+.onb__secondary-cta {
+	border: 1px solid var(--border-strong);
+	border-radius: 999px;
+	background: transparent;
+	color: var(--primitive-brand-deep-umber);
+	font-family: var(--primitive-font-family-sans);
+	font-size: var(--primitive-font-size-sm);
+	font-weight: 500;
+	padding: 10px 18px;
+	margin-top: var(--primitive-spacing-lg);
+	cursor: pointer;
+}
+
+.onb__secondary-cta:hover {
+	background: var(--bg-surface-secondary);
+}
+
+[data-theme="dark"] .onb__secondary-cta {
+	color: var(--primitive-brand-rose-terracotta);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .onb__secondary-cta {
+		color: var(--primitive-brand-rose-terracotta);
+	}
 }
 
 .onb__error {

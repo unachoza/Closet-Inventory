@@ -17,7 +17,7 @@ export interface OnboardingFlowApi {
 	beginSignIn: () => Promise<void>;
 	skipSignIn: () => void;
 	advanceFromName: () => void;
-	finish: (options?: { installed?: boolean }) => void;
+	finish: (options?: { installed?: boolean; goToGmail?: boolean }) => void;
 }
 
 function persistStage(stage: OnboardingStage): void {
@@ -37,7 +37,11 @@ function resolveInitialStep(isAuthenticated: boolean): FlowStep {
  * Survives the full-page Google OAuth redirect by persisting a stage marker
  * (see flowSteps.ts) and re-deriving the step once auth finishes restoring.
  */
-export function useOnboardingFlow({ onComplete }: { onComplete: () => void }): OnboardingFlowApi {
+export function useOnboardingFlow({
+	onComplete,
+}: {
+	onComplete: (options?: { goToGmail?: boolean }) => void;
+}): OnboardingFlowApi {
 	const auth = useSupabaseAuthContext();
 	const [step, setStep] = useState<FlowStep | null>(null);
 	const lastViewedRef = useRef<FlowStep | null>(null);
@@ -100,13 +104,13 @@ export function useOnboardingFlow({ onComplete }: { onComplete: () => void }): O
 	}, []);
 
 	const finish = useCallback(
-		(options?: { installed?: boolean }) => {
+		(options?: { installed?: boolean; goToGmail?: boolean }) => {
 			localStorage.removeItem(ONBOARDING_STAGE_KEY);
 			track("onboarding_completed", {
 				signed_in: auth.isAuthenticated,
 				installed: options?.installed ?? false,
 			});
-			onComplete();
+			onComplete({ goToGmail: options?.goToGmail });
 		},
 		[auth.isAuthenticated, onComplete],
 	);

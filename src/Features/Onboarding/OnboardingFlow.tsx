@@ -4,12 +4,14 @@ import type { TourStep as TourStepId } from "./flowSteps";
 import TourStep from "./steps/TourStep";
 import type { TourScreenContent } from "./steps/TourStep";
 import NavPreviewStrip from "./steps/NavPreviewStrip";
+import Break from "./Break";
 import SignInStep from "./steps/SignInStep";
 import NameStep from "./steps/NameStep";
 import InstallStep from "./steps/InstallStep";
 import {
 	WelcomeIllustration,
 	EmailImportIllustration,
+	AddItemIllustration,
 	CareIllustration,
 	SearchIllustration,
 } from "./illustrations/TourIllustrations";
@@ -19,44 +21,77 @@ const TOUR_CONTENT: Record<TourStepId, TourScreenContent> = {
 	welcome: {
 		title: (
 			<>
-				Your closet, <em>in your pocket</em>
+				Your closet, <Break />
+				<em>in your pocket</em>
 			</>
 		),
-		subtitle: "Every piece you own, in one calm place.",
+		subtitle: "Every piece you own, beautifully organized and easy to see.",
 		illustration: <WelcomeIllustration />,
 	},
 	email: {
 		title: (
 			<>
-				Your inbox already <em>knows your wardrobe</em>
+				Your inbox already <Break />
+				<em>
+					knows <Break desktop />
+					your wardrobe
+				</em>
 			</>
 		),
-		subtitle: "Connect Gmail and we'll build your closet from your order emails. No typing.",
+		subtitle: (
+			<>
+				Connect to Gmail and we'll find <Break />
+				your order confirmations and <Break />
+				turn them into closet items. No typing.
+			</>
+		),
 		illustration: <EmailImportIllustration />,
+	},
+	add: {
+		title: (
+			<>
+				Didn't come by <Break />
+				<em>email?</em>
+			</>
+		),
+		subtitle: (
+			<>
+				Add gifts, thrifted finds, <Break />
+				and hand-me-downs by hand <Break />— in a few quick taps.
+			</>
+		),
+		illustration: <AddItemIllustration />,
 	},
 	care: {
 		title: (
 			<>
-				Care for what <em>you love</em>
+				Care for what <Break />
+				<em>you love</em>
 			</>
 		),
-		subtitle: "Wash, dry, and fabric guidance for every piece — so your favorites last.",
+		subtitle: (
+			<>
+				Wash, dry, and fabric guidance <Break />
+				for every piece <Break />— so your favorites last.
+			</>
+		),
 		illustration: <CareIllustration />,
 	},
 	search: {
 		title: (
 			<>
-				Find anything <em>in seconds</em>
+				See everything <Break />
+				<em>Find anything</em>
 			</>
 		),
-		subtitle: "Everything lives one tap away, right here:",
+		subtitle: "One search. Your entire wardrobe.",
 		illustration: <SearchIllustration />,
 		extra: <NavPreviewStrip />,
 	},
 };
 
 export interface OnboardingFlowProps {
-	onComplete: () => void;
+	onComplete: (options?: { goToGmail?: boolean }) => void;
 }
 
 /**

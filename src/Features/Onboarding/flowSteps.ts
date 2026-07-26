@@ -2,7 +2,7 @@
  * The onboarding flow's step vocabulary. Four value-tour screens, then the
  * account steps: sign-in (skippable to local mode), name confirm, install card.
  */
-export const TOUR_STEPS = ["welcome", "email", "care", "search"] as const;
+export const TOUR_STEPS = ["welcome", "email", "add", "care", "search"] as const;
 
 export const FLOW_STEPS = [...TOUR_STEPS, "signin", "name", "install"] as const;
 

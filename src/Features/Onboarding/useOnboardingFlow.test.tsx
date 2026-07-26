@@ -112,10 +112,9 @@ describe("useOnboardingFlow", () => {
 
 		it("skips sign-in and goes to the name step when already authenticated", () => {
 			const { result } = renderFlow(authedAuth());
-			act(() => result.current.next());
-			act(() => result.current.next());
-			act(() => result.current.next());
-			act(() => result.current.next());
+			for (let i = 0; i < TOUR_STEPS.length; i++) {
+				act(() => result.current.next());
+			}
 			expect(result.current.step).toBe("name");
 		});
 
