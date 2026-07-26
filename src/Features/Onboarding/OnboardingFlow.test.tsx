@@ -41,7 +41,7 @@ function renderFlow(auth: SupabaseAuthState, onComplete = vi.fn()) {
 	return { onComplete, auth };
 }
 
-const TOUR_HEADINGS = [/your closet/i, /your inbox already knows/i, /care for what you love/i, /find anything in seconds/i];
+const TOUR_HEADINGS = [/your closet/i, /your inbox already knows/i, /didn.t come by email/i, /care for what you love/i, /see everything/i];
 
 describe("OnboardingFlow", () => {
 	beforeEach(() => {

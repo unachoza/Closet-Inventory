@@ -143,6 +143,9 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --primitive-font-size-base: 16px;
   --primitive-font-size-lg: 20px;
   --primitive-font-size-xl: 28px;
+  --onboarding-font-size-heading: 46px;
+  --onboarding-font-size-body: 18px;
+  --onboarding-font-size-button: 18px;
 
   --primitive-font-weight-regular: 400;
   --primitive-font-weight-medium: 500;

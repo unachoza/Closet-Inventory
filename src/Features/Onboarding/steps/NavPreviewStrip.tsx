@@ -19,7 +19,10 @@ export default function NavPreviewStrip() {
 				Care
 			</span>
 			<span className="onb-navstrip__fab">
-				<Plus size={18} />
+				<span className="onb-navstrip__fab-icon">
+					<Plus size={18} />
+				</span>
+				Add
 			</span>
 			<span className="onb-navstrip__tab">
 				<Search size={18} />

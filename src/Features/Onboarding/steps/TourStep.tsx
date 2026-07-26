@@ -3,7 +3,7 @@ import OnboardingShell from "../OnboardingShell";
 
 export interface TourScreenContent {
 	title: ReactNode;
-	subtitle: string;
+	subtitle: string | ReactNode;
 	illustration: ReactNode;
 	/** Optional extra block under the subtitle (e.g. the nav teaching strip). */
 	extra?: ReactNode;
