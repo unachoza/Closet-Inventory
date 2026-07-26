@@ -39,8 +39,8 @@ export default function SignInStep({ onSignIn, onSkip }: SignInStepProps) {
 					<em>to your account</em>
 				</h1>
 				<p className="onb-step__sub">
-					Sign in to keep your closet backed up. <Break />
-					You'll connect Gmail separately when you're ready to import.
+					Sign in to save your closet securely. <Break />
+					You'll connect Gmail when it's time to import your wardrobe.
 				</p>
 				<button type="button" className="onb__gbtn" onClick={handleSignIn}>
 					<GoogleMark />
