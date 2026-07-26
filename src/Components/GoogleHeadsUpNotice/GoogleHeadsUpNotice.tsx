@@ -3,8 +3,10 @@ import GoogleConsentCard from "../GoogleConsentCard/GoogleConsentCard";
 interface GoogleHeadsUpNoticeProps {
 	/** Extra class for surface-specific spacing (onboarding vs. connect cards). */
 	readonly className?: string;
-	/** Which OAuth flow this sits under — changes nothing here yet but keeps the API ready for per-flow copy. */
+	/** Which OAuth flow this sits under — changes the scope list and lead copy. */
 	readonly variant?: "sign-in" | "gmail-import";
+	/** Full mode shows the scope permission list; compact drops it for inline placement below a button. Defaults to compact. */
+	readonly compact?: boolean;
 }
 
 /**
@@ -16,6 +18,6 @@ interface GoogleHeadsUpNoticeProps {
  * Google entry point means the warning always arrives *before* the fear does,
  * and the wording only has to be maintained once (P1-7).
  */
-export default function GoogleHeadsUpNotice({ className, variant = "sign-in" }: GoogleHeadsUpNoticeProps) {
-	return <GoogleConsentCard variant={variant} compact className={className} />;
+export default function GoogleHeadsUpNotice({ className, variant = "sign-in", compact = true }: GoogleHeadsUpNoticeProps) {
+	return <GoogleConsentCard variant={variant} compact={compact} className={className} />;
 }
