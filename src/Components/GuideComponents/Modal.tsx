@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
 import "./DetailModal.css";
@@ -45,6 +46,18 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 
 	if (!fiber) return null;
 
+	// Ties the panel's accent color to the same category palette as the card
+	// grid's FiberTag (terracotta/sage/dusty-blue/mauve), so opening a fiber
+	// carries its color-coding through instead of flattening to plain gray.
+	const categoryClass =
+		fiber.category === "animal"
+			? "detail-panel--animal"
+			: fiber.category === "plant"
+				? "detail-panel--plant"
+				: fiber.category === "semi"
+					? "detail-panel--semi"
+					: "detail-panel--synth";
+
 	// Rendered via a portal directly under <body>: this modal is otherwise
 	// mounted inside .app-content, which has its own `z-index: 1` (needed to
 	// sit above the background scrim) and therefore establishes a stacking
@@ -60,20 +73,17 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 			aria-modal="true"
 			aria-labelledby="modal-title"
 		>
-			<div className="detail-panel">
+			<div className={`detail-panel ${categoryClass}`}>
 				<div className="detail-header">
-					<div>
+					<div className="detail-header-text">
 						<FiberTag category={fiber.category} label={fiber.tagLabel} />
-						<h2
-							id="modal-title"
-							style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, fontWeight: 700, marginTop: 8 }}
-						>
+						<h2 id="modal-title" className="detail-title">
 							{fiber.name}
 						</h2>
-						<p style={{ fontSize: 14, color: "var(--ink-60)", fontStyle: "italic", marginTop: 4 }}>{fiber.source}</p>
+						<p className="detail-source">{fiber.source}</p>
 					</div>
 					<button className="detail-close" onClick={onClose} aria-label="Close detail panel">
-						✕
+						<X size={16} aria-hidden="true" />
 					</button>
 				</div>
 				<div className="detail-body" ref={bodyRef}>

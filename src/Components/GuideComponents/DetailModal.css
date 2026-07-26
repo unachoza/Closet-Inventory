@@ -31,6 +31,13 @@
       align-items: center;
 }
 
+/* Category accent — mirrors the FiberTag palette used on the card grid so a
+   fiber keeps its color-coding when opened. --accent-pale tints the header. */
+.detail-panel--animal { --detail-accent: var(--terracotta);  --detail-accent-pale: var(--terra-pale); }
+.detail-panel--plant  { --detail-accent: var(--sage);        --detail-accent-pale: var(--sage-pale); }
+.detail-panel--semi   { --detail-accent: var(--dusty-blue);  --detail-accent-pale: var(--blue-pale); }
+.detail-panel--synth  { --detail-accent: var(--mauve);       --detail-accent-pale: var(--mauve-pale); }
+
 .detail-panel {
       display: flex;
       flex-direction: column;
@@ -49,67 +56,126 @@
       box-shadow: var(--shadow-lg);
 }
 
+/* Tinted header band — gives the panel a colored "masthead" instead of a flat
+   white block, and anchors the eye before the body copy starts. */
 .detail-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      gap: 20px;
       flex-shrink: 0;
-      padding: 32px 36px 24px;
+      padding: 28px 36px 24px;
+      background: var(--detail-accent-pale, var(--cream));
       border-bottom: 1px solid var(--border);
       text-align: left;
+}
+
+.detail-header-text { min-width: 0; }
+
+/* The header band now carries the category's pale tint, so the FiberTag's own
+   pale background would disappear into it. Swap to a solid surface and keep
+   only the accent text color, so the tag still reads as a distinct chip. */
+.detail-header .fiber-tag {
+      background: var(--warm-white);
+      color: var(--detail-accent, var(--ink-60));
+      margin-bottom: 0;
+}
+
+.detail-title {
+      font-family: var(--font-display, 'Playfair Display', serif);
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 10px 0 0;
+}
+
+.detail-source {
+      font-size: 13px;
+      color: var(--ink-60);
+      font-style: italic;
+      line-height: 1.5;
+      margin: 6px 0 0;
 }
 
 .detail-close {
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 26px;
-      height: 38px;
-      border: 1px solid rgb(28 26 23 / 24%);
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border-strong);
       border-radius: 50%;
-      background: none;
+      background: var(--warm-white);
       color: var(--ink-60);
-      font-size: 18px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, color 0.2s;
       flex-shrink: 0;
+      padding: 0;
 }
 
-.detail-close:hover { background: var(--cream); }
+.detail-close:hover { background: var(--cream); color: var(--ink); }
 
 .detail-body {
       flex: 1 1 auto;
       min-height: 0;
-      padding: 32px 36px;
+      padding: 28px 36px 32px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
 }
 
-.detail-section { margin-bottom: 28px; text-align: left; }
+.detail-section { margin-bottom: 26px; text-align: left; }
 
+.detail-section:last-child { margin-bottom: 0; }
+
+/* Section heading — accent-colored eyebrow with a short accent rule rather than
+   a full-width hairline, so headings read as labels instead of table borders. */
 .detail-section h4 {
-      color: var(--ink-60);
-      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--detail-accent, var(--gold));
+      font-size: 10px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.14em;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 12px;
-      padding-bottom: 6px;
+      letter-spacing: 0.16em;
+      border-bottom: none;
+      margin: 0 0 10px;
+      padding-bottom: 0;
+}
+
+.detail-section h4::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
 }
 
 .detail-section p {
       color: var(--ink-60);
       font-size: 15px;
-      line-height: 1.7;
+      line-height: 1.75;
       text-align: left;
+      margin: 0;
+      /* Caps the measure so long paragraphs don't run the full 700px panel
+         width — keeps line length in a readable 60–75ch range on desktop. */
+      max-width: 62ch;
 }
 
+/* Key-facts list — two columns once the panel is wide enough, so short facts
+   stop leaving a large empty right-hand gutter. */
 .detail-section ul {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px 28px;
       list-style: none;
       text-align: left;
+      margin: 0;
+      padding: 0;
+}
+
+@media (min-width: 34rem) {
+      .detail-section ul { grid-template-columns: 1fr 1fr; }
 }
 
 .detail-section li {
@@ -123,28 +189,30 @@
 .detail-section li::before {
       position: absolute;
       left: 0;
-      color: var(--gold);
+      color: var(--detail-accent, var(--gold));
       content: '→';
 }
 
 .detail-footer-link {
       display: block;
-      padding: 16px 36px;
+      padding: 15px 36px;
       border-top: 1px solid var(--border);
       text-align: center;
-      font-size: 14px;
-      color: var(--ink-60);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--detail-accent, var(--gold));
       cursor: pointer;
       background: none;
       border-left: none;
       border-right: none;
       border-bottom: none;
       width: 100%;
-      transition: color 0.2s;
+      transition: background 0.2s, color 0.2s;
 }
 
 .detail-footer-link:hover {
-      color: var(--ink);
+      background: var(--detail-accent-pale, var(--cream));
 }
 
 button.detail-footer-link{
@@ -156,4 +224,13 @@ button.detail-footer-link:hover{
       box-shadow: none;
       transition: none;
       transform: none;
+}
+
+/* Phones: reclaim the generous desktop gutters so copy isn't squeezed into a
+   narrow column between two wide margins. */
+@media (max-width: 33.9375rem) {
+      .detail-header { padding: 22px 20px 20px; }
+      .detail-body { padding: 22px 20px 26px; }
+      .detail-title { font-size: 28px; }
+      .detail-footer-link { padding: 14px 20px; }
 }
