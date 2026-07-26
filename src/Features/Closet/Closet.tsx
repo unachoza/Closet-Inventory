@@ -154,7 +154,14 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 					<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
 				)}
 			</div>
-			<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
+			<PaginationControls
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onNext={handleNextPage}
+				onPrev={handlePrevPage}
+				onGoToPage={goToPage}
+				totalItems={filteredItems.length}
+			/>
 		</>
 	);
 };
