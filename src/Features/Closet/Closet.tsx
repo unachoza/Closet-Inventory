@@ -4,6 +4,7 @@ import { LayoutGrid, Grid3x3 } from "lucide-react";
 import ClothingCard from "../../Components/ClothesCard/Card/Card";
 import PaginationControls from "../../Components/PaginationControls/PaginationControls";
 import DemoBanner from "../../Components/DemoBanner/DemoBanner";
+import ClosetEmptyState from "./ClosetEmptyState";
 import { useCloset } from "../../context/ClosetContext";
 import usePagination from "../../hooks/usePagination";
 import { ClothingItem } from "../../utils/types";
@@ -12,6 +13,8 @@ import "./Closet.css";
 interface ClosetProps {
 	selectedCategory: string | null;
 	onEditItem?: (item: ClothingItem) => void;
+	/** Opens the add-item flow; wired to the empty-state "Add your first piece" CTA. */
+	onAddItem?: () => void;
 }
 
 // Static — no need to recreate on every render
@@ -45,7 +48,7 @@ const ITEMS_PER_PAGE = 6;
 const COMPACT_ITEMS_PER_PAGE = 15;
 const DENSITY_KEY = "closet_density";
 
-const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
+const Closet = ({ selectedCategory, onEditItem, onAddItem }: ClosetProps) => {
 	const { closet, removeItem, clearDemoItems } = useCloset();
 
 	// Count seeded sample items still present, so the "these are samples" banner
@@ -108,7 +111,9 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 	}, [selectedCategory, compact, goToPage]);
 
 	const hasItems = paginatedItems.length > 0;
-	const emptyLabel = selectedCategory?.trim() ? selectedCategory : "your closet";
+	// Distinguish a genuinely empty closet (offer the add CTA) from a category
+	// filter that simply matched nothing (guide the user to change the filter).
+	const isFiltered = closet.length > 0;
 
 	return (
 		<>
@@ -151,7 +156,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 						</AnimatePresence>
 					</motion.div>
 				) : (
-					<p className="no-results">{`No items found for "${emptyLabel}"`}</p>
+					<ClosetEmptyState isFiltered={isFiltered} categoryLabel={selectedCategory ?? undefined} onAddItem={onAddItem} />
 				)}
 			</div>
 			<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />

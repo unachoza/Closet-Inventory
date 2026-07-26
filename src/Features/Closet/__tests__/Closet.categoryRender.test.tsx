@@ -24,11 +24,11 @@ vi.mock("../../../context/ClosetContext", () => ({
 const carouselLabels = ["Tops", "Bottoms", "Dresses", "Coats", "Sweaters", "Athleisure", "Intimates", "Socks", "Underwear", "body", "Shoes", "Sleep"];
 
 describe("Closet — carousel category clicks never blank the screen", () => {
-	it.each(carouselLabels)("renders cards or a no-items message for '%s'", (label) => {
+	it.each(carouselLabels)("renders cards or an empty-state for '%s'", (label) => {
 		render(<Closet selectedCategory={label} />);
 		const cards = screen.queryAllByTestId("clothes-card");
-		const noResults = screen.queryByText(/No items found/);
-		expect(cards.length > 0 || noResults !== null).toBe(true);
+		const emptyState = screen.queryByTestId("closet-empty");
+		expect(cards.length > 0 || emptyState !== null).toBe(true);
 	});
 
 	it("shows coat items for 'Coats' (singular/plural mismatch handled)", () => {
@@ -44,7 +44,8 @@ describe("Closet — carousel category clicks never blank the screen", () => {
 	it("shows an explicit empty-state for a category with no items ('Sleep')", () => {
 		render(<Closet selectedCategory="Sleep" />);
 		expect(screen.queryAllByTestId("clothes-card")).toHaveLength(0);
-		expect(screen.getByText(/No items found for "Sleep"/)).toBeInTheDocument();
+		expect(screen.getByTestId("closet-empty")).toBeInTheDocument();
+		expect(screen.getByText(/Sleep/)).toBeInTheDocument();
 	});
 
 	// The REAL carousel scenario is a transition, not a fresh mount.
@@ -58,7 +59,7 @@ describe("Closet — carousel category clicks never blank the screen", () => {
 		const { rerender } = render(<Closet selectedCategory="Tops" />);
 		rerender(<Closet selectedCategory="Sweaters" />);
 		const cards = screen.queryAllByTestId("clothes-card");
-		const noResults = screen.queryByText(/No items found/);
-		expect(cards.length > 0 || noResults !== null).toBe(true);
+		const emptyState = screen.queryByTestId("closet-empty");
+		expect(cards.length > 0 || emptyState !== null).toBe(true);
 	});
 });

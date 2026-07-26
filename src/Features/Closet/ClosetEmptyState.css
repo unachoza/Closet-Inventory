@@ -1,0 +1,64 @@
+/* Empty-state block shown when the closet (or an active category filter) has no
+   items. Sits over the walk-in-closet hero, so it gets the same floating white
+   surface as the "no-results" pill it replaces, sized to hold an icon + CTA. */
+.closet-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	gap: var(--spacing-100, 0.5rem);
+	max-width: 22rem;
+	margin: var(--spacing-300, 1.5rem) auto 0;
+	padding: var(--spacing-400, 2rem) var(--spacing-300, 1.5rem);
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--border-radius-md, 12px);
+	background: var(--bg-surface-primary);
+	box-shadow: var(--elevation-low);
+}
+
+.closet-empty__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 4rem;
+	height: 4rem;
+	margin-bottom: var(--spacing-050, 0.25rem);
+	border-radius: 50%;
+	color: var(--primitive-brand-rose-terracotta, var(--text-primary));
+	background: var(--bg-surface-secondary);
+}
+
+.closet-empty__title {
+	margin: 0;
+	color: var(--text-primary);
+	font-size: 1.05rem;
+	font-weight: 600;
+}
+
+.closet-empty__subtitle {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.9rem;
+	line-height: 1.4;
+}
+
+.closet-empty__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	min-height: 44px;
+	margin-top: var(--spacing-150, 0.75rem);
+	padding: 0.55rem 1.1rem;
+	border: none;
+	border-radius: 999px;
+	background: var(--primitive-brand-rose-terracotta, var(--text-primary));
+	color: var(--text-on-brand, #fff);
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: filter 0.15s ease;
+}
+
+.closet-empty__cta:hover {
+	filter: brightness(0.92);
+}

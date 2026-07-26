@@ -188,7 +188,15 @@ button.card-details__care-pill--tappable:hover {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	overflow-x: clip;
+	/* Was `clip`, which hid size/color/category pills that ran past the narrow
+	   flipped card-back. Scroll horizontally instead so every pill stays
+	   reachable. */
+	overflow-x: auto;
+	scrollbar-width: none; /* Firefox — hide the scrollbar, keep the scroll */
+}
+
+.card-details__color-display::-webkit-scrollbar {
+	display: none;
 }
 
 .card-details__color-circle {
@@ -231,6 +239,7 @@ button.card-details__care-pill--tappable:hover {
 	align-items: center;
 	gap: 8px;
 	margin-bottom: 8px;
+	min-width: 0; /* allow the label to shrink within the flex row */
 }
 
 .card-details__section-title-label {
@@ -239,7 +248,13 @@ button.card-details__care-pill--tappable:hover {
 	color: var(--text-muted);
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	flex-shrink: 0;
+	/* Was `flex-shrink: 0`, which forced the full label width and let long
+	   headings (e.g. "Size & Color - Category") overflow and clip mid-word on
+	   narrow card-backs. Let it shrink with a clean ellipsis instead. */
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .card-details__section-title-divider {
