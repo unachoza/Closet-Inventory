@@ -9,18 +9,17 @@ interface FilterPillsRowProps {
 	onClearAll: () => void;
 }
 
-// Abbreviated for the compact pill row — deliberately distinct from
+// Full words for the compact pill row — deliberately distinct from
 // FILTER_DIMENSION_LABELS (used for full accordion headers).
-// TODO: Consider renaming to FILTER_PILL_DIM_LABELS for clarity.
 const PILL_DIM_LABELS: Record<FilterDimension, string> = {
-	category: "type",
-	color: "color",
-	brand: "brand",
-	material: "mat",
-	occasion: "scene",
-	care: "care",
-	status: "status",
-	location: "site",
+	category: "Type",
+	color: "Color",
+	brand: "Brand",
+	material: "Material",
+	occasion: "Occasion",
+	care: "Care",
+	status: "Status",
+	location: "Location",
 };
 
 const FilterPillsRow = ({ filters, activeFilterCount, onRemove, onClearAll }: FilterPillsRowProps) => {

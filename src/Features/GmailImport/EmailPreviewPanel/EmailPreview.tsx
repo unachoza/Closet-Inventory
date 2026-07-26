@@ -71,13 +71,7 @@ async function enrichProductColors(products: readonly ExtractedProduct[]): Promi
 	return enriched;
 }
 
-export default function EmailPreview({
-	email,
-	onImportProduct,
-	onImportAllProducts,
-	unskippedIndices,
-	onUnskippedIndicesChange,
-}: EmailPreviewProps) {
+export default function EmailPreview({ email, onImportProduct, onImportAllProducts, unskippedIndices, onUnskippedIndicesChange }: EmailPreviewProps) {
 	const htmlContent = isHtml(email.body);
 
 	// Step 1: synchronous parse
@@ -121,14 +115,8 @@ export default function EmailPreview({
 		if (!isControlled) setInternalUnskipped(new Set());
 	}, [email.id, isControlled]);
 
-	const unskippedProducts = useMemo(
-		() => initialSkipped.filter((_, i) => unskippedIdx.has(i)),
-		[initialSkipped, unskippedIdx],
-	);
-	const skippedProducts = useMemo(
-		() => initialSkipped.filter((_, i) => !unskippedIdx.has(i)),
-		[initialSkipped, unskippedIdx],
-	);
+	const unskippedProducts = useMemo(() => initialSkipped.filter((_, i) => unskippedIdx.has(i)), [initialSkipped, unskippedIdx]);
+	const skippedProducts = useMemo(() => initialSkipped.filter((_, i) => !unskippedIdx.has(i)), [initialSkipped, unskippedIdx]);
 	const effectiveProducts = useMemo(() => [...initialClothing, ...unskippedProducts], [initialClothing, unskippedProducts]);
 
 	const handleUnskip = (index: number) => {
@@ -175,9 +163,7 @@ export default function EmailPreview({
 			{imageBasedRetailer && (
 				<div className="gmail-preview-image-notice">
 					<p>
-						<strong>{imageBasedRetailer}</strong> renders product details as images, so items can&apos;t be auto-detected. Use{" "}
-						<strong>Import Entire Email</strong> below to start a blank item with the brand pre-filled, then add details
-						manually.
+						<strong>{imageBasedRetailer}</strong> renders product details as images, so items can&apos;t be auto-detected.
 					</p>
 				</div>
 			)}
@@ -257,7 +243,6 @@ export default function EmailPreview({
 					<pre className="gmail-preview-text">{email.body}</pre>
 				)}
 			</div>
-
 		</div>
 	);
 }
