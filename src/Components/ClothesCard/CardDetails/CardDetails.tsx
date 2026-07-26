@@ -147,11 +147,11 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 										className="card-details__care-pill card-details__care-pill--tappable pill"
 										onClick={handleCarePillClick}
 									>
-										<c.icon size={13} className="card-details__care-pill-icon" aria-hidden="true" /> {c.label}
+										<c.icon size={15} className="card-details__care-pill-icon" aria-hidden="true" /> {c.label}
 									</button>
 								) : (
 									<span key={c.label} className="card-details__care-pill  pill">
-										<c.icon size={13} className="card-details__care-pill-icon" aria-hidden="true" /> {c.label}
+										<c.icon size={15} className="card-details__care-pill-icon" aria-hidden="true" /> {c.label}
 									</span>
 								),
 							)}
