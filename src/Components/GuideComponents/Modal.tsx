@@ -87,19 +87,47 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 					</button>
 				</div>
 				<div className="detail-body" ref={bodyRef}>
-					{fiber.detail.map((section) => (
-						<div key={section.title} className="detail-section">
-							<h4>{section.title}</h4>
-							{section.content && <p>{section.content}</p>}
-							{section.list && (
-								<ul>
-									{section.list.map((item) => (
-										<li key={item}>{item}</li>
-									))}
-								</ul>
-							)}
-						</div>
-					))}
+					{fiber.detail.map((section) => {
+						const isCare = section.title.trim().toLowerCase() === "care";
+						const sectionBody = (
+							<>
+								<h4>{section.title}</h4>
+								{section.content && <p>{section.content}</p>}
+								{section.list && (
+									<ul>
+										{section.list.map((item) => (
+											<li key={item}>{item}</li>
+										))}
+									</ul>
+								)}
+							</>
+						);
+						if (!isCare) {
+							return (
+								<div key={section.title} className="detail-section">
+									{sectionBody}
+								</div>
+							);
+						}
+						return (
+							<div key={section.title} className="detail-section">
+								<div className="detail-care-card">
+									<svg className="detail-care-icon" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+										<g stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+											<path d="M14 48h68l-6 31H20L14 48Z" />
+											<path d="M19 56c5-4 10 4 15 0s10 4 15 0 10 4 15 0 10 4 15 0" />
+											<path d="M39 45V27c0-2 1-4 3-4s3 2 3 4v13" />
+											<path d="M45 39V22c0-2 1-4 3-4s3 2 3 4v17" />
+											<path d="M51 39V24c0-2 1-4 3-4s3 2 3 4v18" />
+											<path d="M57 42V30c0-2 1-4 3-4s3 2 3 4v20" />
+											<path d="M39 35 33 31c-2-1-4 0-5 2-1 2 0 4 2 6l11 10c4 4 7 5 13 5h6c7 0 12-5 12-12v-7" />
+										</g>
+									</svg>
+									<div className="detail-care-body">{sectionBody}</div>
+								</div>
+							</div>
+						);
+					})}
 				</div>
 				{onOpenGuide && (
 					<button className="detail-footer-link" onClick={() => { onClose(); onOpenGuide(); }}>
