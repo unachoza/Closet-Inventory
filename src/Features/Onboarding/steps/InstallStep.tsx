@@ -3,9 +3,10 @@ import { Share, SquarePlus, Smartphone } from "lucide-react";
 import OnboardingShell from "../OnboardingShell";
 import { useInstallPrompt } from "../../../hooks/useInstallPrompt";
 import { track } from "../../../lib/analytics";
+import Break from "../Break";
 
 export interface InstallStepProps {
-	onFinish: (options?: { installed?: boolean }) => void;
+	onFinish: (options?: { installed?: boolean; goToGmail?: boolean }) => void;
 }
 
 /**
@@ -43,9 +44,13 @@ export default function InstallStep({ onFinish }: InstallStepProps) {
 		>
 			<div className="onb-step">
 				<h1 className="onb-step__title">
-					Keep it <em>one tap away</em>
+					Keep it <Break />
+					<em>one tap away</em>
 				</h1>
-				<p className="onb-step__sub">Add Nothing To Wear to your home screen — it works like a regular app.</p>
+				<p className="onb-step__sub">
+					Add Nothing To Wear <Break />
+					to your home screen <Break />— it works like a regular app.
+				</p>
 				{isIOS ? (
 					<div className="onb-install-steps">
 						<div className="onb-install-step">
@@ -64,6 +69,9 @@ export default function InstallStep({ onFinish }: InstallStepProps) {
 				) : (
 					!canPrompt && <p className="onb__hint">You can also install it anytime from your browser's menu.</p>
 				)}
+				<button type="button" className="onb__secondary-cta" onClick={() => onFinish({ goToGmail: true })}>
+					Import from Gmail now
+				</button>
 			</div>
 		</OnboardingShell>
 	);

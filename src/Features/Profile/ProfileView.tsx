@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Database, LogOut, MessageCircle, User as UserIcon, ChevronRight } from "lucide-react";
+import { Database, LogOut, Mail, MailX, MessageCircle, User as UserIcon, ChevronRight } from "lucide-react";
 import { useSupabaseAuthContext } from "../../context/SupabaseAuthContext";
+import { useGmailAuthContext } from "../../context/GmailAuthContext";
 import { useProfile } from "../../hooks/useProfile";
 import { useView } from "../../context/ViewContext";
 import { useGoogleUnverifiedNotice } from "../Onboarding/useGoogleUnverifiedNotice";
@@ -40,6 +41,7 @@ function ProfileRowButton({ icon, label, sub, onClick }: ProfileRowButtonProps) 
  */
 export default function ProfileView() {
 	const { user, isAuthenticated, signIn, signOut, isLoading } = useSupabaseAuthContext();
+	const { isAuthenticated: gmailConnected, logout: disconnectGmail } = useGmailAuthContext();
 	const { profile, updateDisplayName } = useProfile();
 	const { setView } = useView();
 	const googleNotice = useGoogleUnverifiedNotice();
@@ -59,7 +61,7 @@ export default function ProfileView() {
 						<UserIcon size={24} />
 					</div>
 					<h1 className="profile__name">Your profile</h1>
-					<p className="profile__meta">Sign in to sync your closet and import from Gmail.</p>
+					<p className="profile__meta">Sign in to sync your closet. Connect Gmail separately to import.</p>
 					<button
 						type="button"
 						className="profile__signin-btn"
@@ -81,6 +83,21 @@ export default function ProfileView() {
 			<ProfileHeader profile={profile} user={user} onSaveName={updateDisplayName} />
 
 			<div className="profile__rows">
+				{gmailConnected ? (
+					<ProfileRowButton
+						icon={<Mail size={17} aria-hidden="true" />}
+						label="Gmail connected"
+						sub="Read-only, resets each visit — disconnect"
+						onClick={() => disconnectGmail()}
+					/>
+				) : (
+					<ProfileRowButton
+						icon={<MailX size={17} aria-hidden="true" />}
+						label="Gmail not connected"
+						sub="Connect to import order confirmations"
+						onClick={() => setView("gmail")}
+					/>
+				)}
 				<ProfileRowButton
 					icon={<Database size={17} aria-hidden="true" />}
 					label="Account and data"
@@ -93,11 +110,7 @@ export default function ProfileView() {
 					sub="Tell us what's confusing"
 					onClick={() => setFeedbackOpen(true)}
 				/>
-				<ProfileRowButton
-					icon={<LogOut size={17} aria-hidden="true" />}
-					label="Sign out"
-					onClick={() => void handleSignOut()}
-				/>
+				<ProfileRowButton icon={<LogOut size={17} aria-hidden="true" />} label="Sign out" onClick={() => void handleSignOut()} />
 			</div>
 
 			<AccountDataModal isOpen={accountModalOpen} onClose={() => setAccountModalOpen(false)} />
