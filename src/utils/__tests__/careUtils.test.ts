@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { parseCareItems, parseCareLabels } from "../careUtils";
+import { parseCareItems, parseCareLabels, CARE_MAP } from "../careUtils";
+import { WashingMachine, Tag } from "lucide-react";
 
 describe("careUtils", () => {
 	describe("parseCareItems (display)", () => {
-		it("maps a known instruction to its emoji + label", () => {
-			expect(parseCareItems("machine wash")).toEqual([{ emoji: "🧼", label: "Machine wash" }]);
+		it("maps a known instruction to its icon + label", () => {
+			expect(parseCareItems("machine wash")).toEqual([{ icon: WashingMachine, label: "Machine wash" }]);
 		});
 
 		it("first keyword wins per entry and order is preserved", () => {
@@ -12,13 +13,19 @@ describe("careUtils", () => {
 			expect(result.map((c) => c.label)).toEqual(["Dry clean", "Hang dry"]);
 		});
 
-		it("falls back to raw text for unknown instructions", () => {
-			expect(parseCareItems("steam only")).toEqual([{ emoji: "🏷️", label: "steam only" }]);
+		it("falls back to a generic tag icon for unknown instructions", () => {
+			expect(parseCareItems("steam only")).toEqual([{ icon: Tag, label: "steam only" }]);
 		});
 
 		it("handles empty / missing care", () => {
 			expect(parseCareItems("")).toEqual([]);
 			expect(parseCareItems([])).toEqual([]);
+		});
+
+		it("uses a Lucide icon component, not an emoji string, for every mapped entry", () => {
+			CARE_MAP.forEach(([, icon]) => {
+				expect(typeof icon).not.toBe("string");
+			});
 		});
 	});
 

@@ -143,6 +143,11 @@
 	font-size: 10px;
 }
 
+.card-details__care-pill-icon {
+	flex-shrink: 0;
+	margin-right: 3px;
+}
+
 .card-details__category-tag {
 	margin-left: 8px;
 	margin-top: 2px;
