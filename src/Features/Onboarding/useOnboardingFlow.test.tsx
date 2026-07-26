@@ -116,6 +116,7 @@ describe("useOnboardingFlow", () => {
 			act(() => result.current.next());
 			act(() => result.current.next());
 			act(() => result.current.next());
+			act(() => result.current.next());
 			expect(result.current.step).toBe("name");
 		});
 
