@@ -25,6 +25,14 @@ describe("CardDetails", () => {
 		expect(screen.getByText("Nike")).toBeInTheDocument();
 	});
 
+	it("renders care instructions as Lucide icons, not emoji", () => {
+		render(<CardDetails item={item} />);
+		const carePill = screen.getByText("Machine wash").closest(".card-details__care-pill");
+		expect(carePill).not.toBeNull();
+		expect(carePill!.querySelector("svg.card-details__care-pill-icon")).toBeInTheDocument();
+		expect(carePill!.textContent).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u);
+	});
+
 	it("compact variant shows 'See all details' and calls onExpand instead of Edit/Remove", () => {
 		const onExpand = vi.fn();
 		render(<CardDetails item={item} variant="compact" onExpand={onExpand} />);
