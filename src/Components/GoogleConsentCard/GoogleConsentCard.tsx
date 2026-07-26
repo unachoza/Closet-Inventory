@@ -24,7 +24,7 @@ function initialsFrom(name?: string): string {
 }
 
 const PERMISSIONS: Record<"sign-in" | "gmail-import", string[]> = {
-	"sign-in": ["Your name and email address", "Clothing order confirmations", "Your closet securely synced to your account"],
+	"sign-in": ["Your name and email address", "Your closet securely synced to your account"],
 	"gmail-import": ["Read-only access to your Gmail", "Used only to find purchase-confirmation emails to import"],
 };
 

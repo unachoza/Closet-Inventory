@@ -1,6 +1,7 @@
 import OnboardingShell from "../OnboardingShell";
 import GoogleHeadsUpNotice from "../../../Components/GoogleHeadsUpNotice/GoogleHeadsUpNotice";
 import { markGoogleNoticeSeen } from "../useGoogleUnverifiedNotice";
+import Break from "../Break";
 
 export interface SignInStepProps {
 	onSignIn: () => void;
@@ -34,14 +35,18 @@ export default function SignInStep({ onSignIn, onSkip }: SignInStepProps) {
 		<OnboardingShell skip={{ label: "Skip for now — keep my closet on this device", onClick: onSkip }}>
 			<div className="onb-step">
 				<h1 className="onb-step__title">
-					Save your closet <em>to your account</em>
+					Save your closet <Break />
+					<em>to your account</em>
 				</h1>
-				<p className="onb-step__sub">Sign in to keep your closet backed up and import from Gmail.</p>
+				<p className="onb-step__sub">
+					Sign in to save your closet securely. <Break />
+					You'll connect Gmail when it's time to import your wardrobe.
+				</p>
 				<button type="button" className="onb__gbtn" onClick={handleSignIn}>
 					<GoogleMark />
 					Sign in with Google
 				</button>
-				<GoogleHeadsUpNotice />
+				<GoogleHeadsUpNotice compact={false} />
 			</div>
 		</OnboardingShell>
 	);

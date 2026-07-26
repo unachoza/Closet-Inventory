@@ -93,9 +93,10 @@ function AppShell() {
 		setIsLoading(false);
 	}, []);
 
-	const handleComplete = () => {
+	const handleComplete = (options?: { goToGmail?: boolean }) => {
 		localStorage.setItem(ONBOARDING_KEY, "true");
 		setShowOnboarding(false);
+		if (options?.goToGmail) setView("gmail");
 	};
 
 	const handleEditItem = (item: ClothingItem) => {
@@ -231,7 +232,7 @@ function AppShell() {
 						{view === "fabric" && <InteractiveGuide />}
 						{view === "journey" && <JourneyC />}
 						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
-							{view === "profile" && <ProfileView />}
+						{view === "profile" && <ProfileView />}
 						{view === "carousel" && (
 							<>
 								<div data-testid="carousel">
@@ -278,24 +279,24 @@ function App() {
 	return (
 		<>
 			<SupabaseAuthProvider>
-			{/* Single cloud-backed closet instance shared by all consumers (E1-1.4).
+				{/* Single cloud-backed closet instance shared by all consumers (E1-1.4).
 			    Inside SupabaseAuthProvider so it can read the signed-in userId. */}
-			<ClosetProvider>
-				{/* Single per-user locations store (E12-3.2) — same rationale as
+				<ClosetProvider>
+					{/* Single per-user locations store (E12-3.2) — same rationale as
 				    ClosetProvider: one live list, not one fetch per consumer. */}
-				<LocationsProvider>
-					<ViewProvider initialView="carousel">
-						<SearchProvider>
-							{/* Session-scoped Gmail auth — mounted above the view switch so the
+					<LocationsProvider>
+						<ViewProvider initialView="carousel">
+							<SearchProvider>
+								{/* Session-scoped Gmail auth — mounted above the view switch so the
 							    in-memory token survives gmail → edit → "Back to email" (E3-bug.2). */}
-							<GmailAuthProvider>
-								<AppShell />
-							</GmailAuthProvider>
-						</SearchProvider>
-					</ViewProvider>
-				</LocationsProvider>
-			</ClosetProvider>
-		</SupabaseAuthProvider>
+								<GmailAuthProvider>
+									<AppShell />
+								</GmailAuthProvider>
+							</SearchProvider>
+						</ViewProvider>
+					</LocationsProvider>
+				</ClosetProvider>
+			</SupabaseAuthProvider>
 		</>
 	);
 }
