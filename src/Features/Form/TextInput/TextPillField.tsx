@@ -10,9 +10,12 @@ interface TextPillFieldProps extends Omit<InputProps, "value"> {
 	formData: ItemFormData;
 	multiSelect?: boolean;
 	label: keyof ItemFormData;
+	/** Optional helper text shown above the custom-entry input, clarifying that
+	 *  the preset pills above are just suggestions and typing a new value is fine. */
+	hint?: string;
 }
 
-const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData }: TextPillFieldProps) => {
+const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData, hint }: TextPillFieldProps) => {
 	const [pills, setPills] = useState<string[]>(pillArray);
 	const [inputValue, setInputValue] = useState<string>("");
 
@@ -38,6 +41,7 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 					return <CheckPill key={value} id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
 				})}
 			</div>
+			{hint && <p className="pill-field-hint">{hint}</p>}
 			<TextInput
 				label="Missing Something?"
 				name={name}
@@ -47,6 +51,7 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 				handleFormUpdate={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string) => { if (typeof e !== "string") setInputValue(e.target.value); }}
 				placeholder={placeholder}
 				onKeyDown={handleKeyDown}
+				required={false}
 			/>
 		</div>
 	);

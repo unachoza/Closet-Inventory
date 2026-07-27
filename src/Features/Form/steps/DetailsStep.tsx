@@ -113,6 +113,7 @@ const DetailsStep = ({ data, onChange, onToggle, careOptions, setCareOptions, di
 					handleFormUpdate={onToggle}
 					formData={data}
 					multiSelect={true}
+					hint="Tap any that apply, or type your own below."
 				/>
 			</div>
 		</div>
