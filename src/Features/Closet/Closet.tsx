@@ -161,6 +161,7 @@ const Closet = ({ selectedCategory, onEditItem }: ClosetProps) => {
 				onPrev={handlePrevPage}
 				onGoToPage={goToPage}
 				totalItems={filteredItems.length}
+				itemsPerPage={itemsPerPage}
 			/>
 		</>
 	);
