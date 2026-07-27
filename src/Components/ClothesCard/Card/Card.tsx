@@ -2,6 +2,7 @@ import "./Card.css";
 import { ClothingItem } from "../../../utils/types";
 import { CardDetails } from "../CardDetails/CardDetails";
 import { CardQuickActions } from "../CardQuickActions/CardQuickActions";
+import { ImagePlaceholder } from "../../ImagePlaceholder/ImagePlaceholder";
 import { useSignedImageUrl } from "../../../hooks/useSignedImageUrl";
 import { useLongPress } from "../../../hooks/useLongPress";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -162,7 +163,7 @@ const ClothingCard = ({ item, onEditItem, onRemoveItem }: CardProps) => {
 						    isn't empty; the chip answers "whose clothes are these?" before
 						    the demo-clear prompt (which only fires after the first real item). */}
 						{item.isDemo && <span className="card-sample-chip">Sample</span>}
-						<div className="card-image">{imageSrc ? <img src={imageSrc} alt={item?.name} /> : null}</div>
+						<div className="card-image">{imageSrc ? <img src={imageSrc} alt={item?.name} /> : <ImagePlaceholder />}</div>
 						<div className="card-name-overlay">
 							<span className="card-name-label">{item.name || item.brand || item.category}</span>
 						</div>

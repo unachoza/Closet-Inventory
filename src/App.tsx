@@ -217,7 +217,7 @@ function AppShell() {
 					{/* Keyed by view so a crash in one screen resets when navigating away.
 				     "Try again" sends the user back to the overview (closet) screen. */}
 					<ErrorBoundary key={view} onReset={() => setView("overview")}>
-						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />}
+						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />}
 						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
 						{view === "gmail" && (
 							<GmailImport
@@ -239,7 +239,7 @@ function AppShell() {
 									<Carousel setCategory={setSelectedCategory} />
 								</div>
 								<div data-testid="closet-container">
-									<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} />
+									<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />
 								</div>
 							</>
 						)}
