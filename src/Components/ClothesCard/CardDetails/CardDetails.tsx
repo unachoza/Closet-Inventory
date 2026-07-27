@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { JSX, useLayoutEffect, useRef, useState } from "react";
 import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial, primaryMaterial, resolveFiber } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
@@ -103,7 +103,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 	// swipes into rubber-banding the whole card), the lowest-priority pills
 	// are dropped one at a time until the row actually fits. The full modal
 	// always has room, so it renders every pill.
-	const colorSizePills: ReactNode[] = [
+	const colorSizePills = [
 		item.size ? (
 			<span key="size" className="card-details__size-pill  pill">
 				{item.size}
@@ -115,7 +115,7 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 		<span key="category" className="card-details__size-pill  pill">
 			{item.category}
 		</span>,
-	].filter((p): p is ReactNode => p !== null);
+	].filter((p): p is JSX.Element => p !== null);
 
 	const colorDisplayRef = useRef<HTMLDivElement>(null);
 	const [visiblePillCount, setVisiblePillCount] = useState(colorSizePills.length);
