@@ -159,7 +159,15 @@ const Closet = ({ selectedCategory, onEditItem, onAddItem }: ClosetProps) => {
 					<ClosetEmptyState isFiltered={isFiltered} categoryLabel={selectedCategory ?? undefined} onAddItem={onAddItem} />
 				)}
 			</div>
-			<PaginationControls currentPage={currentPage} totalPages={totalPages} onNext={handleNextPage} onPrev={handlePrevPage} />
+			<PaginationControls
+				currentPage={currentPage}
+				totalPages={totalPages}
+				onNext={handleNextPage}
+				onPrev={handlePrevPage}
+				onGoToPage={goToPage}
+				totalItems={filteredItems.length}
+				itemsPerPage={itemsPerPage}
+			/>
 		</>
 	);
 };
