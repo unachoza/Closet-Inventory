@@ -28,9 +28,9 @@ import "./MobileAdvancedSearchFlow.css";
 /* ─── Steps config ─── */
 const STEPS = [
 	{ id: 0, label: "Sender", Icon: User },
-	{ id: 1, label: "Subject", Icon: Tag },
-	{ id: 2, label: "Keywords", Icon: SlidersHorizontal },
-	{ id: 3, label: "Exclude", Icon: EyeOff },
+	{ id: 1, label: "Order Emails", Icon: Tag },
+	{ id: 2, label: "Contents", Icon: SlidersHorizontal },
+	{ id: 3, label: "Skip Senders", Icon: EyeOff },
 ];
 
 /* ─── Tag chip ─── */
@@ -167,16 +167,19 @@ export function MobileSearchWizard({
 		onFromSenderChange("");
 		onDateAfterChange("");
 		onDateBeforeChange("");
-		// Clear subjects, keywords, excluded by removing all
-		subjects.forEach(onRemoveSubject);
-		keywords.forEach(onRemoveKeyword);
+		// Subject patterns and body keywords are no longer user-editable (see the
+		// Order Emails / Contents steps below) — they stay applied automatically,
+		// so "Reset" must not wipe them out from under the user. Only clear the
+		// fields that are still visibly editable.
 		excluded.forEach(onRemoveExcluded);
 		setShowSummary(false);
 		setDir("right");
 		setStep(0);
 	};
 
-	const stepCounts = [(fromSender ? 1 : 0) + (dateAfter ? 1 : 0) + (dateBefore ? 1 : 0), subjects.length, keywords.length, excluded.length];
+	// Subject/keyword steps are informational now (no chips shown), so they
+	// never carry a step count — only the still-editable steps do.
+	const stepCounts = [(fromSender ? 1 : 0) + (dateAfter ? 1 : 0) + (dateBefore ? 1 : 0), 0, 0, excluded.length];
 
 	const totalActive = stepCounts.reduce((a, b) => a + b, 0);
 	const progressPct = showSummary ? 100 : Math.round((step / (STEPS.length - 1)) * 100);
@@ -257,14 +260,10 @@ export function MobileSearchWizard({
 								v: dateAfter || dateBefore ? `${dateAfter || "–"} → ${dateBefore || "–"}` : "Any time",
 								dim: !dateAfter && !dateBefore,
 							},
+							{ k: "Order emails", v: "Matched automatically", dim: false },
+							{ k: "Email contents", v: "Scanned automatically", dim: false },
 							{
-								k: "Subject patterns",
-								v: subjects.length ? `${subjects.length} patterns` : "None",
-								dim: !subjects.length,
-							},
-							{ k: "Body keywords", v: keywords.length ? `${keywords.length} keywords` : "None", dim: !keywords.length },
-							{
-								k: "Excluded senders",
+								k: "Senders to skip",
 								v: excluded.length ? `${excluded.length} senders` : "None",
 								dim: !excluded.length,
 							},
@@ -317,31 +316,43 @@ export function MobileSearchWizard({
 					</div>
 				)}
 
-				{/* Step 1 — Subject */}
+				{/* Steps 1 & 2 — subject-pattern and body-keyword editing are hidden for
+				    now: engineer-speak to shoppers, and the pre-seeded ~16-entry chip
+				    list isn't something a user created or expects to manage. `subjects`/
+				    `keywords` still flow into buildApiQuery exactly as before via
+				    AdvancedSearchUI's seeded state, so hiding this UI does not change
+				    what actually gets searched. Revisit with a more thoughtful
+				    (shopper-facing) way to expose this later — see the commented
+				    TagInput below for the prior editable UI. */}
 				{!showSummary && step === 1 && (
 					<div key={`1-${panelKey}`} className={panelClass}>
-						<p className="sw-panel-hint">What should the subject line contain?</p>
-						<TagInput
+						<p className="sw-panel-hint">
+							We automatically look for common order-confirmation subject lines, like "Order Confirmation" or
+							"Your order has shipped" — no setup needed here.
+						</p>
+						{/* <TagInput
 							tags={subjects}
 							onAdd={onAddSubject}
 							onRemove={onRemoveSubject}
 							placeholder="Add subject pattern…"
 							variant="sky"
-						/>
+						/> */}
 					</div>
 				)}
 
-				{/* Step 2 — Keywords */}
 				{!showSummary && step === 2 && (
 					<div key={`2-${panelKey}`} className={panelClass}>
-						<p className="sw-panel-hint">What should the email body contain?</p>
-						<TagInput
+						<p className="sw-panel-hint">
+							We also scan each email for purchase details, like receipts, invoices, and order summaries — this
+							happens automatically too.
+						</p>
+						{/* <TagInput
 							tags={keywords}
 							onAdd={onAddKeyword}
 							onRemove={onRemoveKeyword}
 							placeholder="Add body keyword…"
 							variant="violet"
-						/>
+						/> */}
 					</div>
 				)}
 
@@ -364,6 +375,12 @@ export function MobileSearchWizard({
 			<div className="sw-footer">
 				{showSummary ? (
 					<>
+						{/* "New Search" vs "Filter Existing" was a fetch-vs-filter implementation
+						    detail no shopper can reason about. A single Search button now picks
+						    the mode automatically: filter the already-cached results when we have
+						    them (faster, no API call), otherwise run a fresh Gmail search — the
+						    same choice a savvy user would make manually. Old two-button UI kept
+						    below, commented, in case a more explicit choice is wanted later. */}
 						<div className="sw-footer-row">
 							<button
 								className="sw-btn sw-btn--icon"
@@ -375,11 +392,16 @@ export function MobileSearchWizard({
 							>
 								<ArrowLeft size={16} />
 							</button>
-							<button className="sw-btn sw-btn--success" onClick={() => onSearch("fetch")} disabled={loading}>
+							<button
+								className="sw-btn sw-btn--success"
+								onClick={() => onSearch(cachedCount > 0 ? "filter" : "fetch")}
+								disabled={loading}
+							>
 								<Search size={14} />
-								{loading ? "Searching..." : "New Search"}
+								{loading ? "Searching..." : "Search"}
 							</button>
 						</div>
+						{/*
 						<button
 							className="sw-btn sw-btn--ghost sw-btn--full"
 							onClick={() => onSearch("filter")}
@@ -387,6 +409,7 @@ export function MobileSearchWizard({
 						>
 							{loading ? "Filtering..." : `Filter Existing (${cachedCount})`}
 						</button>
+						*/}
 					</>
 				) : (
 					<div className="sw-footer-row">

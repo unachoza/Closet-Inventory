@@ -25,9 +25,9 @@ import "./DesktopAdvancedSearchFlow.css";
 
 const STEPS = [
 	{ id: 0, label: "Sender & Dates", desc: "Who sent it and when", Icon: User },
-	{ id: 1, label: "Subject Patterns", desc: "Subject line keywords", Icon: Tag },
-	{ id: 2, label: "Body Keywords", desc: "Words in the email body", Icon: SlidersHorizontal },
-	{ id: 3, label: "Exclude Senders", desc: "Senders to skip", Icon: EyeOff },
+	{ id: 1, label: "Order Emails", desc: "How we spot order confirmations", Icon: Tag },
+	{ id: 2, label: "Email Contents", desc: "What we look for inside", Icon: SlidersHorizontal },
+	{ id: 3, label: "Skip These Senders", desc: "Senders to ignore", Icon: EyeOff },
 ];
 
 function TagChip({ label, onRemove, variant }: { label: string; onRemove: () => void; variant: "sky" | "violet" | "rose" }) {
@@ -154,14 +154,18 @@ export function DesktopSearchSplitPanel({
 		onFromSenderChange("");
 		onDateAfterChange("");
 		onDateBeforeChange("");
-		subjects.forEach(onRemoveSubject);
-		keywords.forEach(onRemoveKeyword);
+		// Subject patterns and body keywords are no longer user-editable (see the
+		// Order Emails / Email Contents steps below) — they stay applied
+		// automatically, so "Clear all" must not wipe them out from under the
+		// user. Only clear the fields that are still visibly editable.
 		excluded.forEach(onRemoveExcluded);
 		setShowSummary(false);
 		setStep(0);
 	};
 
-	const stepCounts = [(fromSender ? 1 : 0) + (dateAfter ? 1 : 0) + (dateBefore ? 1 : 0), subjects.length, keywords.length, excluded.length];
+	// Subject/keyword steps are informational now (no chips shown), so they
+	// never carry a nav badge — only the still-editable steps do.
+	const stepCounts = [(fromSender ? 1 : 0) + (dateAfter ? 1 : 0) + (dateBefore ? 1 : 0), 0, 0, excluded.length];
 
 	const panelClass = `sw-step-panel sw-step-panel--in-${dir}`;
 
@@ -251,18 +255,10 @@ export function DesktopSearchSplitPanel({
 									v: dateAfter || dateBefore ? `${dateAfter || "–"} → ${dateBefore || "–"}` : "Any time",
 									dim: !dateAfter && !dateBefore,
 								},
+								{ k: "Order emails", v: "Matched automatically", dim: false },
+								{ k: "Email contents", v: "Scanned automatically", dim: false },
 								{
-									k: "Subject patterns",
-									v: subjects.length ? `${subjects.length} patterns` : "None",
-									dim: !subjects.length,
-								},
-								{
-									k: "Body keywords",
-									v: keywords.length ? `${keywords.length} keywords` : "None",
-									dim: !keywords.length,
-								},
-								{
-									k: "Excluded senders",
+									k: "Senders to skip",
 									v: excluded.length ? `${excluded.length} senders` : "None",
 									dim: !excluded.length,
 								},
@@ -314,27 +310,43 @@ export function DesktopSearchSplitPanel({
 						</div>
 					)}
 
+					{/* Subject-pattern and body-keyword editing are hidden for now — these
+					    read as engineer-speak to shoppers, and the pre-seeded chip list
+					    (~16 entries) isn't something a user created or expects to manage.
+					    `subjects`/`keywords` still flow into buildApiQuery exactly as
+					    before via AdvancedSearchUI's seeded state, so hiding this UI does
+					    not change what actually gets searched. Revisit with a more
+					    thoughtful (shopper-facing) way to expose this later — see the
+					    commented TagInput below for the prior editable UI. */}
 					{!showSummary && step === 1 && (
 						<div key={`1-${panelKey}`} className={panelClass}>
-							<TagInput
+							<p className="sw-panel-hint">
+								We automatically look for common order-confirmation subject lines, like "Order Confirmation" or
+								"Your order has shipped" — no setup needed here.
+							</p>
+							{/* <TagInput
 								tags={subjects}
 								onAdd={onAddSubject}
 								onRemove={onRemoveSubject}
 								placeholder="Add subject pattern…"
 								variant="sky"
-							/>
+							/> */}
 						</div>
 					)}
 
 					{!showSummary && step === 2 && (
 						<div key={`2-${panelKey}`} className={panelClass}>
-							<TagInput
+							<p className="sw-panel-hint">
+								We also scan each email for purchase details, like receipts, invoices, and order summaries — this
+								happens automatically too.
+							</p>
+							{/* <TagInput
 								tags={keywords}
 								onAdd={onAddKeyword}
 								onRemove={onRemoveKeyword}
 								placeholder="Add body keyword…"
 								variant="violet"
-							/>
+							/> */}
 						</div>
 					)}
 
@@ -365,6 +377,22 @@ export function DesktopSearchSplitPanel({
 							>
 								<ArrowLeft size={14} /> Back
 							</button>
+							{/* "New Search" vs "Filter Existing" was a fetch-vs-filter implementation
+							    detail no shopper can reason about. A single Search button now picks
+							    the mode automatically: filter the already-cached results when we
+							    have them (faster, no API call), otherwise run a fresh Gmail search —
+							    the same choice a savvy user would make manually. Old two-button UI
+							    kept below, commented, in case a more explicit choice is wanted later. */}
+							<div style={{ display: "flex", gap: 8, flex: 1, justifyContent: "flex-end" }}>
+								<button
+									className="ssp-btn ssp-btn--primary"
+									onClick={() => onSearch(cachedCount > 0 ? "filter" : "fetch")}
+									disabled={loading}
+								>
+									<Search size={14} /> {loading ? "Searching..." : "Search"}
+								</button>
+							</div>
+							{/*
 							<div style={{ display: "flex", gap: 8, flex: 1, justifyContent: "flex-end" }}>
 								<button
 									className="ssp-btn ssp-btn--secondary"
@@ -377,6 +405,7 @@ export function DesktopSearchSplitPanel({
 									<Search size={14} /> {loading ? "Searching..." : "New Search"}
 								</button>
 							</div>
+							*/}
 						</>
 					) : (
 						<>
