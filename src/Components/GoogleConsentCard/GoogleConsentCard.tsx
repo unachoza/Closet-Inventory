@@ -15,14 +15,6 @@ function GoogleMark({ size = 20 }: { size?: number }) {
 	);
 }
 
-function initialsFrom(name?: string): string {
-	if (!name) return "";
-	const parts = name.trim().split(/\s+/);
-	const first = parts[0]?.[0] ?? "";
-	const last = parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : "";
-	return (first + last).toUpperCase();
-}
-
 const PERMISSIONS: Record<"sign-in" | "gmail-import", string[]> = {
 	"sign-in": ["Your name and email address", "Your closet securely synced to your account"],
 	"gmail-import": ["Read-only access to your Gmail", "Used only to find purchase-confirmation emails to import"],
@@ -45,9 +37,6 @@ export interface GoogleConsentCardProps {
  * change what Google itself shows.
  */
 export default function GoogleConsentCard({ variant, compact, userName, className }: GoogleConsentCardProps) {
-	const initials = initialsFrom(userName ?? undefined);
-	console.log(initials);
-
 	return (
 		<div className={`gconsent${compact ? " gconsent--compact" : ""}${className ? ` ${className}` : ""}`}>
 			<div className="gconsent__marks">
@@ -59,18 +48,6 @@ export default function GoogleConsentCard({ variant, compact, userName, classNam
 					<GoogleMark size={compact ? 16 : 20} />
 				</span>
 			</div>
-			{/* TODO: Decide, I'm not sure about this */}
-			{/* {!compact && (
-				<div className="gconsent__avatar" aria-hidden="true">
-					{userPhotoUrl ? (
-						<img className="gconsent__avatar-img" src={userPhotoUrl} alt="" />
-					) : initials ? (
-						<span className="gconsent__avatar-initials">{initials}</span>
-					) : (
-						<UserIcon size={20} />
-					)}
-				</div>
-			)} */}
 
 			<p className="gconsent__lead">
 				<strong>Nothing To Wear</strong> wants to {variant === "sign-in" ? "sign you in with Google" : "connect your Gmail"}.
