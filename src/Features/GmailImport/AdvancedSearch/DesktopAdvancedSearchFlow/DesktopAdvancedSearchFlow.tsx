@@ -321,8 +321,8 @@ export function DesktopSearchSplitPanel({
 					{!showSummary && step === 1 && (
 						<div key={`1-${panelKey}`} className={panelClass}>
 							<p className="sw-panel-hint">
-								We automatically look for common order-confirmation subject lines, like "Order Confirmation" or
-								"Your order has shipped" — no setup needed here.
+								We automatically look for common order-confirmation subject lines, like "Order Confirmation" or "Your
+								order has shipped" — no setup needed here.
 							</p>
 							{/* <TagInput
 								tags={subjects}
