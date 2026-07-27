@@ -117,7 +117,7 @@
 .pagination-page {
 	display: grid;
 	place-items: center;
-
+	justify-content: center;	
 	width: 40px;
 	height: 40px;
 	padding: 0;
@@ -141,10 +141,16 @@
 		transform 0.2s ease;
 }
 
+.pagination-page:hover{
+	box-shadow: none;
+   	 transform: none;
+   	 border: none;
+}
+
 .pagination-page:hover:not([aria-disabled="true"]) {
-	background: var(--bg-surface-secondary);
-	border-color: var(--border-hairline);
-	transform: translateY(-1px);
+	background:  none;
+   	 border-color:  none;
+   	 transform:  none;
 }
 
 .pagination-page--current {
@@ -153,6 +159,7 @@
 	color: var(--text-on-brand, #fff);
 	font-weight: 600;
 	cursor: default;
+	justify-content: center;
 }
 
 .pagination-ellipsis {
