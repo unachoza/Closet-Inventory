@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial, primaryMaterial, resolveFiber } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
@@ -97,18 +97,76 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 
 	const carePillsAreTappable = blend.length > 0 && !!resolveFiber(primaryMaterial(blend));
 
+	// Size/Color/Category pills, in priority order (highest first). On the
+	// compact card-back there isn't always room for all three — rather than
+	// letting them overflow into a scrollable row (which chained horizontal
+	// swipes into rubber-banding the whole card), the lowest-priority pills
+	// are dropped one at a time until the row actually fits. The full modal
+	// always has room, so it renders every pill.
+	const colorSizePills: ReactNode[] = [
+		item.size ? (
+			<span key="size" className="card-details__size-pill  pill">
+				{item.size}
+			</span>
+		) : null,
+		<span key="color" className="pill">
+			{item.color || "—"}
+		</span>,
+		<span key="category" className="card-details__size-pill  pill">
+			{item.category}
+		</span>,
+	].filter((p): p is ReactNode => p !== null);
+
+	const colorDisplayRef = useRef<HTMLDivElement>(null);
+	const [visiblePillCount, setVisiblePillCount] = useState(colorSizePills.length);
+
+	// Data changed (e.g. a different card) — start from "show everything" and
+	// let the measurement effect below trim it back down if needed.
+	useLayoutEffect(() => {
+		setVisiblePillCount(colorSizePills.length);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [item.size, item.color, item.category, isFull]);
+
+	// Re-measure whenever the visible count changes: if the row still overflows
+	// its own box, drop one more trailing pill and let this effect fire again.
+	useLayoutEffect(() => {
+		if (isFull) return;
+		const el = colorDisplayRef.current;
+		if (!el) return;
+		if (el.scrollWidth > el.clientWidth + 1 && visiblePillCount > 1) {
+			setVisiblePillCount((count) => count - 1);
+		}
+	}, [visiblePillCount, isFull]);
+
+	// Viewport/card resize (rotation, density toggle) can change how much room
+	// the row has — reset to "everything" so the shrink effect re-measures.
+	useLayoutEffect(() => {
+		if (isFull) return;
+		const el = colorDisplayRef.current;
+		if (!el) return;
+		const observer = new ResizeObserver(() => setVisiblePillCount(colorSizePills.length));
+		observer.observe(el);
+		return () => observer.disconnect();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isFull]);
+
+	const visiblePills = isFull ? colorSizePills : colorSizePills.slice(0, visiblePillCount);
+
 	return (
 		<div className={`card-details ${isFull ? "card-details--full" : ""}`} onClick={(e) => e.stopPropagation()}>
 			{/* Scrollable content area */}
 			<div className="card-details__scrollable">
-				{/* Name + category badge + close button */}
-				{onClose && (
-					<button className="card-details__close" onClick={onClose} aria-label="Close">
-						✕
-					</button>
-				)}
+				{/* Name + category badge + close button. The close button floats within
+				    the header text so it only claims space on the line(s) it actually
+				    overlaps — a short name gets no wasted gutter, a long/wrapping name
+				    never overlaps it. */}
 				<div className="card-details__header">
 					<div className="card-details__header-text">
+						{onClose && (
+							<button className="card-details__close" onClick={onClose} aria-label="Close">
+								✕
+							</button>
+						)}
 						<p className="card-details__name">{item.name || item.brand || item.category}</p>
 						{item.brand && <p className="card-details__brand">{item.brand}</p>}
 					</div>
@@ -117,10 +175,8 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 				{/* Color + size */}
 				<div className="card-details__color-size">
 					<SectionTitle label="Size & Color - Category" />
-					<div className="card-details__color-display">
-						{item.size && <span className="card-details__size-pill  pill">{item.size}</span>}
-						<span className="pill">{item.color || "—"}</span>
-						<span className="card-details__size-pill  pill">{item.category}</span>
+					<div className="card-details__color-display" ref={colorDisplayRef}>
+						{visiblePills}
 					</div>
 				</div>
 

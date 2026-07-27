@@ -50,20 +50,22 @@
 	padding-top: 14px;
 }
 
-/* Header: name + category badge. padding-right reserves a gutter so the
-   absolutely-positioned close button (below) never overlaps the title text,
-   however narrow the card is. */
+/* Header: name + category badge. */
 .card-details__header {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	box-sizing: border-box;
 	width: 100%;
-	padding-right: 36px;
 }
 
+/* Plain block flow (not flex) so the floated close button below wraps the
+   name/brand text around it instead of reserving a fixed-width gutter down
+   the whole header — a short name loses no space, a long/wrapping name
+   never overlaps the button. */
 .card-details__header-text {
 	flex: 1;
+	overflow: hidden; /* establish a BFC so floats stay contained to this box */
 }
 
 .card-details__header-right {
@@ -77,9 +79,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	position: absolute;
-	top: .5rem;
-	right: .35rem;
+	float: right;
+	margin: 2px 0 6px 10px;
 	width: 24px;
 	height: 24px;
 	border-radius: 50%;
@@ -188,15 +189,27 @@ button.card-details__care-pill--tappable:hover {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	/* Was `clip`, which hid size/color/category pills that ran past the narrow
-	   flipped card-back. Scroll horizontally instead so every pill stays
-	   reachable. */
+	/* CardDetails now measures this row and drops trailing pills (compact
+	   variant only) so the visible set always fits — scroll here is only a
+	   defensive fallback for the rare case even one pill can't fit.
+	   `contain` stops a swipe that hits this row's edge from chaining into a
+	   rubber-band scroll of the whole card/page. */
 	overflow-x: auto;
+	overscroll-behavior-x: contain;
 	scrollbar-width: none; /* Firefox — hide the scrollbar, keep the scroll */
 }
 
 .card-details__color-display::-webkit-scrollbar {
 	display: none;
+}
+
+/* Full modal view: always show every pill (CardDetails skips the trimming
+   logic for this variant) — wrap instead of scroll since there's no swipe
+   gesture to fight with here and the modal is wide enough that wrapping
+   rarely triggers. */
+.card-details--full .card-details__color-display {
+	flex-wrap: wrap;
+	overflow-x: visible;
 }
 
 .card-details__color-circle {
@@ -409,8 +422,7 @@ button.card-details__care-pill--tappable:hover {
 
 @media (--bp-xs) {
   .card-details__close {
-    top: 4px;
-    right: 4px;
+    margin: 1px 0 4px 8px;
   }
   .card-details__name {
     font-size: 1.05rem;
@@ -431,12 +443,5 @@ button.card-details__care-pill--tappable:hover {
     /* Re-assert padding-top: the shorthand above (same specificity, later in
        source) would otherwise clobber it back down to 5px. */
     padding-top: 14px;
-  }
-  .card-details__header {
-    /* Narrower gutter at this size (close button is smaller/closer to the
-       edge here) — was a hardcoded width that ignored the close button and
-       caused the title to render underneath it; now flows naturally within
-       the padded, gutter-reserving header (see base rule above). */
-    padding-right: 32px;
   }
 }
