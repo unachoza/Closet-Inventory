@@ -87,3 +87,14 @@ input:user-invalid ~ .error-message {
       flex-wrap: wrap;
       margin-bottom: 2rem;
 }
+
+/* Clarifies the pills above are just suggestions — matches .step-hint's
+   muted, small-text treatment used elsewhere in the wizard steps. */
+.pill-field-hint {
+      margin: -1.5rem 0 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-align: left;
+      text-transform: none;
+      letter-spacing: normal;
+}

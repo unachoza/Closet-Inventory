@@ -49,6 +49,7 @@ const BasicsStep = ({ data, onToggle, brandOptions, setBrandOptions }: BasicsSte
 				onPillsChange={setBrandOptions}
 				handleFormUpdate={onToggle}
 				formData={data}
+				hint="These are common brands — tap to select, or type your own below."
 			/>
 		</div>
 	);
