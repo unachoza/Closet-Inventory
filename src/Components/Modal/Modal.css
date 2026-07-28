@@ -52,6 +52,7 @@
 }
 
 .modal-close-btn {
+	position: relative;
 	display: inline-flex;
 	justify-content: center;
 	align-items: center;
@@ -68,6 +69,18 @@
 	line-height: 1;
 	cursor: pointer;
 	transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Invisible 44x44 tap target (Apple/Material minimum) — the visible 28px
+   circle stays put; this just widens what registers as a hit. */
+.modal-close-btn::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 44px;
+	height: 44px;
 }
 
 .modal-close-btn:hover {

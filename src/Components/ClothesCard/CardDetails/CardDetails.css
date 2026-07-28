@@ -76,6 +76,7 @@
 }
 
 .card-details__close {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -92,6 +93,17 @@
 	line-height: 1;
 	padding: 0;
 	transition: background 0.15s ease;
+}
+
+/* Invisible 44x44 tap target — visible 24px circle is unchanged. */
+.card-details__close::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 44px;
+	height: 44px;
 }
 
 .card-details__close:hover {
@@ -404,7 +416,7 @@ button.card-details__care-pill--tappable:hover {
 	padding: 11px 16px;
 	border-radius: 8px;
 	border: 1px solid var(--border-brand);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink);
 	color: var(--text-on-brand);
 	font-size: 13px;
 	font-weight: 600;

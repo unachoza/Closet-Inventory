@@ -1,7 +1,9 @@
 /* //Colors//
 
 ├── Brand Terracotta (Focal / 10%)
-│   ├── #b28675 (Rose Terracotta)
+│   ├── #8b695b (Rose Terracotta, darkened for AA 4.5:1 body-text contrast)
+    |-- #b28675 ORIGINAL PINK (terracota)
+    |-- #987162 darker terracotta
 │   ├── #ab7a68 (Muted Clay)
 │   └── #8f6256 (Deep Umber)
 │
@@ -24,7 +26,7 @@ These tokens map the raw colors to their actual utility across your user interfa
 bg-canvas: #faf8f5 (The main editorial backdrop; clean, high-end, gallery-like)
 bg-surface-primary: #ffffff (Card containers, analytical data blocks)
 bg-surface-secondary: #f3eee7 (Table headers, sidebar navigation, subtle separation)
-bg-surface-brand: #b28675 (Primary action items, luxe highlights)
+bg-surface-brand: #8b695b (Primary action items, luxe highlights)
 bg-surface-dark: #492f28 (High-contrast footer or premium interactive zones)
 
 ✍️ Text & Typography Tokens
@@ -97,8 +99,15 @@ border-brand: #ab7a68 (Focus indicators, premium components)
      ------------------------------------------------------------------------ */
   
   /* Brand Terracotta & Clays */
-  --primitive-brand-rose-terracotta: #b28675;
+  /* Darkened from #b28675 (~3.2:1 on white, fails AA body text) to meet
+     WCAG AA 4.5:1 while staying in the same rose-terracotta family. */
+  --primitive-brand-rose-terracotta: #8b695b;
   --primitive-brand-muted-clay: #ab7a68;
+  /* Lighter tint of muted-clay reserved for dark-mode --text-secondary —
+     muted-clay itself only hits ~3.4-4:1 against the dark surfaces, below
+     AA; this variant clears 4.5:1 on both dark surface tones. Not used for
+     borders/backgrounds, which only need 3:1 and keep the original clay. */
+  --primitive-brand-muted-clay-light: #c09b8e;
   /* #987264 */
   --primitive-brand-deep-umber: #8f6256;
 
@@ -126,7 +135,7 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --primitive-status-info-slate: #5a6b7c;
 
   /* Action Colors */
-  --Brand-hover-highlight: #b2867552;
+  --Brand-hover-highlight: #8b695b52;
   --Light-hover-highlight: #f3eee7;
 
   /* Danger / Destructive */
@@ -213,7 +222,7 @@ border-brand: #ab7a68 (Focus indicators, premium components)
     --bg-surface-brand: var(--primitive-brand-rose-terracotta);
 
     --text-primary: var(--primitive-neutral-light-sand);
-    --text-secondary: var(--primitive-brand-muted-clay);
+    --text-secondary: var(--primitive-brand-muted-clay-light);
     --text-muted: var(--primitive-neutral-dark-taupe);
     --text-on-brand: var(--primitive-neutral-light-white);
 
@@ -230,7 +239,7 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --bg-surface-brand: var(--primitive-brand-rose-terracotta);
 
   --text-primary: var(--primitive-neutral-light-sand);
-  --text-secondary: var(--primitive-brand-muted-clay);
+  --text-secondary: var(--primitive-brand-muted-clay-light);
   --text-muted: var(--primitive-neutral-dark-taupe);
   --text-on-brand: var(--primitive-neutral-light-white);
 
