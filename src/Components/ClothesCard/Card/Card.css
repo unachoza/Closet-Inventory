@@ -147,7 +147,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding: 0.6rem 1rem;
+	padding: 0.6rem 1rem .7rem;
 	background: linear-gradient(to top, rgba(0, 0, 0, 0.72) 0%, transparent 100%);
 	border-radius: 0 0 var(--border-radius-sm) var(--border-radius-sm);
 	transform: translateY(100%);
@@ -157,10 +157,20 @@
 }
 
 .card:hover .card-name-overlay {
-	transform: translateY(-8px);
+	transform: translateY(-7px);
 	opacity: 1;
 	background: color-mix(in srgb, var(--bg-surface-secondary), transparent 30%);
       backdrop-filter: var(--effect-blur-glass);
+}
+
+/* Touch devices have no hover state, so show the name unconditionally. */
+@media (hover: none) {
+	.card-name-overlay {
+		transform: translateY(-2px);
+		opacity: 1;
+            background: color-mix(in srgb, var(--bg-surface-secondary), transparent 30%);
+            backdrop-filter: var(--effect-blur-glass);
+	}
 }
 
 .card-name-label {
