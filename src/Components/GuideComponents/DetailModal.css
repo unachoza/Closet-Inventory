@@ -112,7 +112,7 @@
       align-items: flex-start;
       gap: 20px;
       flex-shrink: 0;
-      padding: 44px 44px 34px;
+      padding: 20px 44px;
       background: var(--detail-accent-pale, var(--cream));
       border-bottom: 1px solid var(--border);
       text-align: left;
@@ -142,13 +142,29 @@
 }
 
 .detail-source {
-      font-family: "Cormorant Garamond", "Playfair Display", serif;
-      font-size: 1.5rem;
-      font-style: italic;
-      font-weight: 400;
-      color: var(--ink);
-      line-height: 1.3;
-      margin: 14px 0 0;
+  font-family: "Cormorant Garamond", "Playfair Display", serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.3;
+    margin: 14px 0 5px;
+}
+
+.detail-header-text ul {
+      display: flex;
+}
+
+.detail-header-text ul li {
+      list-style-type: none;
+      font-size: .8rem;
+}
+
+li:not(:first-child)::before {
+      content: " • ";
+      margin-left: 2px;
+      color: #C1622A;
+
 }
 
 .detail-close {
@@ -178,8 +194,8 @@
 }
 
 .detail-section {
-      margin-bottom: 32px;
-      padding-top: 32px;
+      margin-bottom: 2rem;
+      padding-top: 2rem;
       border-top: 1px solid var(--border);
       text-align: left;
 }
@@ -205,7 +221,7 @@
 
 .detail-section h4::after {
       content: '';
-      width: 32px;
+      width: 2rem;
       height: 1px;
       background: var(--detail-accent, var(--gold));
       flex-shrink: 0;
@@ -228,7 +244,6 @@
 .detail-section ul {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 14px 32px;
       list-style: none;
       text-align: left;
       margin: 0;
@@ -264,7 +279,7 @@
       grid-template-columns: 56px minmax(0, 1fr);
       gap: 22px;
       align-items: start;
-      padding: 26px 28px;
+      padding: 1.5rem;
       border-radius: 18px;
       background: var(--detail-accent-pale, var(--cream));
 }

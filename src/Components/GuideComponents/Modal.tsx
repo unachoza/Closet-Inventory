@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
+import handwashtransparent from '../../assets/handwash-transparent.svg'
 import "./DetailModal.css";
 
 interface DetailModalProps {
@@ -46,6 +47,10 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 
 	if (!fiber) return null;
 
+	//country of origin 
+	const sources: string[] = fiber.source.split('·').map(item => item.trim());
+	const name = sources[0]
+	const countryOfOrigin: string = sources[1]
 	// Ties the panel's accent color to the same category palette as the card
 	// grid's FiberTag (terracotta/sage/dusty-blue/mauve), so opening a fiber
 	// carries its color-coding through instead of flattening to plain gray.
@@ -80,7 +85,8 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 						<h2 id="modal-title" className="detail-title">
 							{fiber.name}
 						</h2>
-						<p className="detail-source">{fiber.source}</p>
+						<p className="detail-source">{name}</p>
+						<ul>{countryOfOrigin.split(',').map(country => <li>{country}</li>)}</ul>
 					</div>
 					<button className="detail-close" onClick={onClose} aria-label="Close detail panel">
 						<X size={16} aria-hidden="true" />
@@ -112,17 +118,7 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 						return (
 							<div key={section.title} className="detail-section">
 								<div className="detail-care-card">
-									<svg className="detail-care-icon" viewBox="0 0 96 96" fill="none" aria-hidden="true">
-										<g stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
-											<path d="M14 48h68l-6 31H20L14 48Z" />
-											<path d="M19 56c5-4 10 4 15 0s10 4 15 0 10 4 15 0 10 4 15 0" />
-											<path d="M39 45V27c0-2 1-4 3-4s3 2 3 4v13" />
-											<path d="M45 39V22c0-2 1-4 3-4s3 2 3 4v17" />
-											<path d="M51 39V24c0-2 1-4 3-4s3 2 3 4v18" />
-											<path d="M57 42V30c0-2 1-4 3-4s3 2 3 4v20" />
-											<path d="M39 35 33 31c-2-1-4 0-5 2-1 2 0 4 2 6l11 10c4 4 7 5 13 5h6c7 0 12-5 12-12v-7" />
-										</g>
-									</svg>
+									<img className="detail-care-icon" src={handwashtransparent} alt="hand washing icon" />
 									<div className="detail-care-body">{sectionBody}</div>
 								</div>
 							</div>
