@@ -736,9 +736,9 @@
 }
 
 .gmail-skipped-include-btn:hover {
-	background: var(--bg-surface-brand, #b28675);
+	background: var(--bg-surface-brand, #8b695b);
 	color: #fff;
-	border-color: var(--bg-surface-brand, #b28675);
+	border-color: var(--bg-surface-brand, #8b695b);
 }
 
 /* Batch "Include all" row — sits below the individual items, spans full width
@@ -751,9 +751,9 @@
 }
 
 .gmail-skipped-include-btn--all {
-	background: var(--bg-surface-brand, #b28675);
+	background: var(--bg-surface-brand, #8b695b);
 	color: #fff;
-	border-color: var(--bg-surface-brand, #b28675);
+	border-color: var(--bg-surface-brand, #8b695b);
 	font-weight: 600;
 }
 
