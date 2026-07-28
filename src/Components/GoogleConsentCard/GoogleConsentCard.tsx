@@ -36,7 +36,7 @@ export interface GoogleConsentCardProps {
  * requester before Google's still-unverified screen appears. It does not
  * change what Google itself shows.
  */
-export default function GoogleConsentCard({ variant, compact, userName, className }: GoogleConsentCardProps) {
+export default function GoogleConsentCard({ variant, compact, className }: GoogleConsentCardProps) {
 	return (
 		<div className={`gconsent${compact ? " gconsent--compact" : ""}${className ? ` ${className}` : ""}`}>
 			<div className="gconsent__marks">

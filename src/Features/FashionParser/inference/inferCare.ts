@@ -145,7 +145,6 @@ export function inferCareFromMaterial(materials: MaterialBlend[], color?: string
 			for (const item of careGroup.items) {
 				if ((item.label === "Washing" || item.label === "Drying") && item.value) {
 					instructions.push(item.value);
-					console.log({ instructions });
 				}
 			}
 		}

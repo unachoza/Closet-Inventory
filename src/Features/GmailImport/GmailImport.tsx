@@ -356,7 +356,6 @@ export default function GmailImport({
 						userPhotoUrl={profile?.photo_url}
 						userName={profile?.display_name}
 					/>
-					{error && <p className="gmail-error">{error}</p>}
 				</div>
 			</div>
 		);

@@ -3,7 +3,7 @@ import { BorderMode } from "../../../utils/borderMode";
 import FilteredCard from "../FilteredCard/FilteredCard";
 import "../EntireCloset.css";
 import { AnimatePresence, motion, Variants } from "framer-motion";
-import { LayoutGrid, Grid3x3 } from "lucide-react";
+import { LayoutGrid, Grid3x3, Eye, EyeOff } from "lucide-react";
 
 interface FilteredItemGridProps {
 	items: ClothingItem[];
@@ -16,6 +16,8 @@ interface FilteredItemGridProps {
 	gridKey: string;
 	compact?: boolean;
 	onToggleDensity?: () => void;
+	showNames?: boolean;
+	onToggleShowNames?: () => void;
 	onEditItem?: (item: ClothingItem) => void;
 	onRemoveItem?: (id: string) => void;
 	borderMode?: BorderMode;
@@ -45,13 +47,31 @@ const cardVariants: Variants = {
 	exit: { opacity: 0, y: -8, transition: { duration: 0.2 } },
 };
 
-const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, compact, onToggleDensity, onEditItem, onRemoveItem, borderMode = "off" }: FilteredItemGridProps) => {
+const FilteredItemGrid = ({
+	items,
+	matchKeysById,
+	totalCount,
+	gridKey,
+	compact,
+	onToggleDensity,
+	showNames = true,
+	onToggleShowNames,
+	onEditItem,
+	onRemoveItem,
+	borderMode = "off",
+}: FilteredItemGridProps) => {
 	return (
 		<>
 			<div className="entire-closet__meta-row">
 				<p className="entire-closet__meta">
 					Showing <strong>{items.length}</strong> of {totalCount} items
 				</p>
+				{onToggleShowNames && (
+					<button className="density-toggle" onClick={onToggleShowNames} aria-label="Toggle item names">
+						{showNames ? <Eye size={15} /> : <EyeOff size={15} />}
+						{showNames ? "Names on" : "Names off"}
+					</button>
+				)}
 				{onToggleDensity && (
 					<button className="density-toggle" onClick={onToggleDensity} aria-label="Toggle density">
 						{compact ? <LayoutGrid size={15} /> : <Grid3x3 size={15} />}
@@ -65,7 +85,11 @@ const FilteredItemGrid = ({ items, matchKeysById, totalCount, gridKey, compact, 
 				    mounts fresh and replays the staggered entrance. The inner
 				    AnimatePresence owns removal: a single delete animates out (exit) and
 				    the rest reflow (popLayout + layout) without re-staggering the grid. */}
-				<motion.div key={gridKey} className={`items-grid${compact ? " items-grid--compact" : ""}`} layout>
+				<motion.div
+					key={gridKey}
+					className={`items-grid${compact ? " items-grid--compact" : ""}${showNames ? "" : " items-grid--hide-names"}`}
+					layout
+				>
 					<AnimatePresence mode="popLayout">
 						{items.map((item, i) => (
 							<motion.div

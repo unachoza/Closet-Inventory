@@ -173,6 +173,12 @@
 	}
 }
 
+/* "Names off" toggle — user opt-out of the name overlay entirely, overriding
+   both the hover reveal and the touch-device fallback above. */
+.items-grid--hide-names .card-name-overlay {
+	display: none !important;
+}
+
 .card-name-label {
       color: var(--text-primary);
       display: block;
