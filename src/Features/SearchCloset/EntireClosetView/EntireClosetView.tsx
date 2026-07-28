@@ -17,6 +17,7 @@ interface EntireClosetViewProps {
 
 const DENSITY_KEY = "closet_density";
 const BORDER_MODE_KEY = "closet_border_mode";
+const SHOW_NAMES_KEY = "closet_show_names";
 
 const readBorderMode = (): BorderMode => {
 	const stored = localStorage.getItem(BORDER_MODE_KEY);
@@ -31,6 +32,15 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 		setCompact((prev) => {
 			const next = !prev;
 			localStorage.setItem(DENSITY_KEY, next ? "compact" : "comfortable");
+			return next;
+		});
+	}, []);
+
+	const [showNames, setShowNames] = useState(() => localStorage.getItem(SHOW_NAMES_KEY) !== "hidden");
+	const toggleShowNames = useCallback(() => {
+		setShowNames((prev) => {
+			const next = !prev;
+			localStorage.setItem(SHOW_NAMES_KEY, next ? "shown" : "hidden");
 			return next;
 		});
 	}, []);
@@ -116,6 +126,8 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				gridKey={gridKey}
 				compact={compact}
 				onToggleDensity={toggleDensity}
+				showNames={showNames}
+				onToggleShowNames={toggleShowNames}
 				onEditItem={onEditItem}
 				onRemoveItem={removeItem}
 				borderMode={effectiveBorderMode}
