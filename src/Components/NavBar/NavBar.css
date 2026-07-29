@@ -94,7 +94,7 @@
     margin: 0;
     border: 1px solid var(--bg-surface-brand);
     border-radius: var(--layout-radius-button);
-    background-color: var(--bg-surface-brand);
+    background-color: var(--Primary-Pink-Darker);
     color: var(--text-on-brand);
     font-size: 12px;
     cursor: pointer;
@@ -104,6 +104,7 @@
 
 .action-btn:hover {
       background-color: var(--primitive-brand-deep-umber);
+      filter: brightness(1.1);
       border-color: var(--primitive-brand-deep-umber);
       color: var(--text-on-brand);
 }
@@ -170,7 +171,7 @@ div.search-container > input {
       z-index: 201;
       display: flex;
       flex-direction: column;
-      width: 260px;
+      width: 240px;
       max-width: 80vw;
       padding: 16px;
       padding-top: max(16px, env(safe-area-inset-top));
@@ -205,6 +206,8 @@ div.search-container > input {
       color: var(--text-primary);
       cursor: pointer;
       align-self: flex-end;
+      margin: 8px 0px;
+      margin-right: -8px;
 }
 
 .nav-drawer__actions {
@@ -216,8 +219,18 @@ div.search-container > input {
 .nav-drawer__actions .action-btn {
       justify-content: flex-start;
       width: 100%;
+      display: flex;
+      flex-direction: row;
+      font-size: 14px;
 }
 
+button.action-btn.secondary svg  {
+      margin: .5rem;
+}
+
+button.action-btn svg {
+       margin: .5rem;
+}
 /* -------------------------------------------------------------------------
  * Mobile / narrow screens
  * ---------------------------------------------------------------------- */

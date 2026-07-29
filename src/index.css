@@ -177,7 +177,7 @@ button {
 button:hover {
 	box-shadow: 0 1rem 2rem var(--Trans-Black);
 	transition: all 0.2s;
-	transform: translateY(-3px);
+	transform: translateY(-2px);
 	border-color: var(--Outline-Blue)
 }
 

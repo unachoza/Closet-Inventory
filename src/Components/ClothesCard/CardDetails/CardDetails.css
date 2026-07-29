@@ -425,6 +425,7 @@ button.card-details__care-pill--tappable:hover {
 	transition: all 0.2s ease;
 	margin: 0;
 	justify-content: center;
+	font-size: 14px;
 }
 
 .card-details__toggle-details:hover {
