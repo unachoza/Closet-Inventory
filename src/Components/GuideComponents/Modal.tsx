@@ -149,8 +149,6 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 												</span>
 
 												<p>{mainFact}</p>
-
-												{/* <span className="key-facts-callout__rule" aria-hidden="true" /> */}
 											</aside>
 										)}
 									</div>
@@ -158,57 +156,26 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 							</>
 						);
 
-						// const keyFactsSection = (
-						// 	<>
-						// 		<h4>{section.title}</h4>
-						// 		{section.content && <p>{section.content}</p>}
-						// 		{section.list && (
-						// 			const mainFact = section.list.unshift()
-						// 			<div className="key-facts-grid-container">
-						// 				<>
-						// 					<ul>
-						// 						{(section.list.splice(0, 1)).map((item) => (
-						// 							<li key={item}>{item}</li>
-						// 						))}
-						// 					</ul>
-						// 					<div>
-						// 						<p>{mainFact}</p>
-						// 					</div>
-						// 				</>
-						// 			</div>
-						// 		)}
-						// 	</>
-						// );
-						// if (!isCare && !isKeyFacts) {
-						// 	return (
-						// 		<div key={section.title} className="detail-section">
-						// 			{sectionBody}
-						// 		</div>
-						// 	);
-						// }
-						// if (isKeyFacts) {
-						// 	return (
-						// 		<div key={section.title} className="detail-section">
-						// 			{keyFactsSection}
-						// 		</div>
-						// 	);
-						// }
-						// if (isCare) {
-						// 	return (
-						// 		<div key={section.title} className="detail-section">
-						// 			<div className="detail-care-card">
-						// 				<img className="detail-care-icon" src={handwashtransparent} alt="hand washing icon" />
-						// 				<div className="detail-care-body">{sectionBody}</div>
-						// 			</div>
-						// 		</div>
-						// 	);
-						// }
-
 						if (isCare) {
 							return (
 								<div key={section.title} className="detail-section">
 									<div className="detail-care-card">
-										<img className="detail-care-icon" src={handwashtransparent} alt="" aria-hidden="true" />
+										{/* <svg
+											className="custom-icon" // Add a class name to target in CSS
+											viewBox="0 0 234 188"
+											width="234"
+											height="188"
+										>
+											<path
+												d="M160.25 33.23C162.84 31.63..." // truncated for length
+												fill="currentColor" // Inherits the text color variable
+												stroke="currentColor" // Inherits the text color variable
+												fillRule="evenodd" // CamelCase required for JSX
+												strokeWidth="0.25"
+												strokeLinejoin="round" // CamelCase required for JSX
+											/>
+										</svg> */}
+										<img  className={`detail-care-icon ${categoryClass}`}  src={handwashtransparent} alt="" aria-hidden="true" />
 
 										<div className="detail-care-body">{sectionBody}</div>
 									</div>

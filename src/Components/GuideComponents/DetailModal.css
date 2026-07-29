@@ -53,6 +53,45 @@
   font-style: normal;
 }
 
+:root {
+  /* Hex Color Reference Tokens */
+  --color-terracotta: #C1622A;
+  --color-sage: #5A7A60;
+  --color-dusty-blue: #4A6B8A;
+  --color-mauve: #8B5A7A;
+
+  /* Target Matrix Filter Strings (Pre-calibrated to hit your exact Hex codes) */
+  --filter-terracotta: brightness(0) saturate(100%) invert(46%) sepia(59%) saturate(1478%) hue-rotate(345deg) brightness(88%) contrast(92%);
+  --filter-sage: brightness(0) saturate(100%) invert(48%) sepia(9%) saturate(1312%) hue-rotate(85deg) brightness(94%) contrast(85%);
+  --filter-dusty-blue: brightness(0) saturate(100%) invert(43%) sepia(13%) saturate(1872%) hue-rotate(170deg) brightness(91%) contrast(87%);
+  --filter-mauve: brightness(0) saturate(100%) invert(41%) sepia(14%) saturate(1915%) hue-rotate(274deg) brightness(95%) contrast(87%);
+}
+
+/* Base Styles for your Image Asset */
+.detail-care-icon {
+  width: 234px;  /* Matches your SVG template layout */
+  height: 188px;
+  transition: filter 0.25s ease-in-out; /* Smooth transition when changing states */
+}
+
+/* Dynamic State Modifier Classes */
+.detail-care-icon.detail-panel--animal {
+  filter: var(--filter-terracotta) !important;
+}
+
+.detail-care-icon.detail-panel--plant {
+  filter: var(--filter-sage) !important;
+}
+
+.detail-care-icon.detail-panel--semi {
+  filter: var(--filter-dusty-blue) !important;
+}
+
+.detail-care-icon.detail-panel--synth {
+  filter: var(--filter-mauve) !important;
+}
+
+
 /* ── DETAIL PANEL (modal) ──
    Rendered via a portal at document.body (see Modal.tsx), so this no longer
    fights the sticky NavBar's stacking context — z-index just needs to clear
@@ -172,7 +211,7 @@
 li:not(:first-child)::before {
       content: " • ";
       margin-left: 2px;
-      color: #C1622A;
+      color: var(--detail-accent);
 
 }
 
@@ -293,7 +332,7 @@ li:not(:first-child)::before {
 	height: 26px;
 	margin-bottom: 10px;
 
-	color: var(--terracotta);
+	color: var(--detail-accent);
 	font-family: "Cormorant Garamond", Georgia, serif;
 	font-size: 3.5rem;
 	font-weight: 600;
@@ -303,8 +342,8 @@ li:not(:first-child)::before {
 .key-facts-callout p {
 	max-width: 290px;
 	margin: 0;
-
-	color: var(--terracotta);
+      color: inherit;
+      color: var(--detail-accent);
 	font-family: cormorant-garamond-italic-bold;
 	font-size: clamp(1.5rem, 2vw, 2rem);
 	font-style: italic;
@@ -360,8 +399,8 @@ li:not(:first-child)::before {
 /* Care — lifted into a tinted card with a hand-wash glyph, mirroring the
    fabric-care-card treatment from the reference design. */
 .detail-care-card {
-      display: grid;
-      grid-template-columns: 56px minmax(0, 1fr);
+      display: flex;
+      justify-content: space-around;
       gap: 22px;
       align-items: start;
       padding: 1.5rem;
@@ -370,10 +409,14 @@ li:not(:first-child)::before {
 }
 
 .detail-care-icon {
-      width: 42px;
-      height: 42px;
+      width: 80px;
+      height: 160px;
       margin-top: 2px;
-      color: var(--detail-accent, var(--gold));
+      filter: invert(57%) sepia(30%) saturate(839%) hue-rotate(344deg) brightness(87%) contrast(85%) !important;
+}
+
+.custom-icon{
+      color: var(--detail-accent); 
 }
 
 .detail-care-body h4 { margin-bottom: 14px; }
