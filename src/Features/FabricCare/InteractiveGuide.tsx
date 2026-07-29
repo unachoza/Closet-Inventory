@@ -1,4 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
 import "./TextileGuide.css";
 import { FIBERS, WEAVE_TYPES, CARE_GROUPS, STAIN_GUIDE, Fiber } from "../../Content/Fabric&Fiber";
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
@@ -148,6 +149,13 @@ const InteractiveGuide = () => {
 						>
 							{dot && <span className="toc-dot" style={{ background: dot }} />}
 							{label}
+							{activeNavId === id && (
+								<motion.div
+									className="toc-link-underline"
+									layoutId="tocActiveUnderline"
+									transition={{ type: "spring", stiffness: 500, damping: 30 }}
+								/>
+							)}
 						</button>
 					))}
 				</div>

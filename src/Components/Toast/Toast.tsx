@@ -1,6 +1,6 @@
 import * as RadixToast from "@radix-ui/react-toast";
 import { ReactNode, createContext, useContext, useState } from "react";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import { CheckCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import "./Toast.css";
 
 const ToastContext = createContext<{ showToast: (text: string) => void }>({
@@ -39,6 +39,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 					className="toast-root"
 				>
 					<div className="toast-item">
+						<CheckCircleIcon className="toast-check" aria-hidden="true" />
 						<RadixToast.Description className="toast-text">{toast.text}</RadixToast.Description>
 						<RadixToast.Close className="toast-close" aria-label="Dismiss">
 							<XMarkIcon className="x" />

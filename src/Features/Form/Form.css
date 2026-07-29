@@ -105,7 +105,7 @@ button.submit:hover {
 	border-color: var(--primitive-brand-deep-umber);
 }
 
-.back-button {
+.form-controls  button.back-button {
 	position: absolute;
 	bottom: 1.25rem;
 	left: 1.25rem;
@@ -115,13 +115,13 @@ button.submit:hover {
 	color: var(--text-primary);
 }
 
-.back-button:hover {
+.form-controls  button.back-button:hover {
 	border-color: var(--text-primary);
-	background-color: var(--bg-surface-secondary);
+	filter: brightness(1.1);
+	background-color: var(--Medium-Grey);
+	color: var(--White);
 }
   
-
-
 .two-option-step {
 	display: flex;
 	flex-direction: column;
@@ -237,6 +237,10 @@ button.submit:hover {
 	gap: 1.25rem;
 }
 
+.photo-step p.step-hint {
+	text-align: center;
+}
+
 p.step-hint {
 	text-align: left;
 }
@@ -270,6 +274,7 @@ p.step-hint {
 	color: var(--text-secondary);
 	font-size: 0.9rem;
 	cursor: pointer;
+	overflow: hidden;
 	transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
@@ -319,6 +324,25 @@ p.step-hint {
 	background-color: var(--bg-surface-brand);
 	border-color: var(--bg-surface-brand);
 	color: var(--text-on-brand);
+	animation: chip-select-pulse 0.25s ease;
+}
+
+@keyframes chip-select-pulse {
+	0% {
+		transform: scale(1);
+	}
+	40% {
+		transform: scale(1.08);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.category-chip--selected {
+		animation: none;
+	}
 }
 
 /* ── Details step: name/price/purchased share one row, equal width ───────── */

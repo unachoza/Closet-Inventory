@@ -68,7 +68,7 @@
 
 .onb__dot--on {
 	width: 20px;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 }
 
 .onb__body {
@@ -80,6 +80,12 @@
 	max-width: 430px;
 	margin: 0 auto;
 	padding: var(--primitive-spacing-lg);
+	overflow-x: hidden;
+}
+
+.onb-step-viewport {
+	position: relative;
+	width: 100%;
 }
 
 .onb-step {
@@ -87,6 +93,9 @@
 	flex-direction: column;
 	align-items: center;
 	text-align: center;
+	width: 100%;
+	top: 0;
+	left: 0;
 }
 
 .onb-step__ill {
@@ -207,7 +216,7 @@ button.onb__cta{
 	text-align: center;
 	border: none;
 	border-radius: 999px;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	font-family: var(--primitive-font-family-sans);
 	font-size: var(--primitive-font-size-base);
@@ -300,7 +309,7 @@ button.onb__cta{
 	width: 34px;
 	height: 34px;
 	border-radius: 50%;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	display: flex;
 	align-items: center;

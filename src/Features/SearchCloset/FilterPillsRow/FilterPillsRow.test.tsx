@@ -12,6 +12,7 @@ const emptyFilters: FilterState = {
 	care: [],
 	status: [],
 	location: [],
+	season: [],
 };
 
 const activeFilters: FilterState = {

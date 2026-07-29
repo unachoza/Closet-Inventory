@@ -154,7 +154,7 @@
 }
 
 .pagination-page--current {
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	border-color: var(--border-brand);
 	color: var(--text-on-brand, #fff);
 	font-weight: 600;

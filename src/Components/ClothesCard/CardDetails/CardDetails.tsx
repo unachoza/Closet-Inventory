@@ -1,4 +1,5 @@
 import { JSX, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial, primaryMaterial, resolveFiber } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
@@ -9,6 +10,16 @@ import { toAbsoluteDate } from "../../../utils/dateUtils";
 import { useViewOptional } from "../../../context/ViewContext";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
+
+// Clerk conditional-field reveal (motion.dev/examples/react-clerk-conditional-field),
+// same pattern as MaterialBlendInput's row reveal: the outer wrapper animates
+// height 0 → auto (clipped by overflow:hidden) so the footer resizes in step,
+// while the inner wrapper independently fades + slides its content. Sharing one
+// spring for both means the resize and the fade never drift out of sync — a
+// mismatched pair (e.g. spring layout + eased opacity) is what reads as a "snap"
+// once the faster one finishes and the other is still catching up.
+const CONFIRM_SWAP_TRANSITION = { type: "spring", bounce: 0.3, visualDuration: 0.5 } as const;
+const CONFIRM_SWAP_TRANSITION_REDUCED = { duration: 0.2 } as const;
 
 function SectionTitle({ label }: { label: string }) {
 	return (
@@ -36,6 +47,8 @@ interface CardDetailsProps {
 
 export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
+	const prefersReducedMotion = useReducedMotion();
+	const confirmSwapTransition = prefersReducedMotion ? CONFIRM_SWAP_TRANSITION_REDUCED : CONFIRM_SWAP_TRANSITION;
 	const [fiberModalMaterial, setFiberModalMaterial] = useState<string | null>(null);
 	const [fiberModalScrollTo, setFiberModalScrollTo] = useState<string | undefined>(undefined);
 	const viewCtx = useViewOptional();
@@ -344,37 +357,81 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 			    scrollable content area, so they never scroll out of reach / get clipped. */}
 			{isFull && (
 				<div className="card-details__footer card-details__footer--actions">
-					{confirming ? (
-						<div className="card-details__confirm-section">
-							<p className="card-details__confirm-text">Remove this item?</p>
-							<div className="card-details__buttons">
-								<button
-									onClick={() => setConfirming(false)}
-									className="card-details__button card-details__button--cancel"
+					<AnimatePresence initial={false}>
+						{confirming ? (
+							// Outer wrapper owns the height reveal (overflow-clipped); the
+							// inner wrapper does the content's own fade + slide — same
+							// two-layer structure as MaterialBlendInput's row reveal.
+							<motion.div
+								key="confirm"
+								className="card-details__actions-reveal"
+								initial={prefersReducedMotion ? false : { height: 0 }}
+								animate={prefersReducedMotion ? {} : { height: "auto" }}
+								exit={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
+								transition={confirmSwapTransition}
+								style={{ overflow: "hidden" }}
+							>
+								<motion.div
+									className="card-details__actions-inner"
+									initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 0 }}
+									transition={confirmSwapTransition}
 								>
-									Cancel
-								</button>
-								<button
-									onClick={() => {
-										setConfirming(false);
-										onRemove?.();
-									}}
-									className="card-details__button card-details__button--confirm"
+									<div className="card-details__confirm-section">
+										<p className="card-details__confirm-text">Remove this item?</p>
+										<div className="card-details__buttons">
+											<button
+												onClick={() => setConfirming(false)}
+												className="card-details__button card-details__button--cancel"
+											>
+												Cancel
+											</button>
+											<button
+												onClick={() => {
+													setConfirming(false);
+													onRemove?.();
+												}}
+												className="card-details__button card-details__button--confirm"
+											>
+												Yes, remove
+											</button>
+										</div>
+									</div>
+								</motion.div>
+							</motion.div>
+						) : (
+							<motion.div
+								key="actions"
+								className="card-details__actions-reveal"
+								initial={prefersReducedMotion ? false : { height: 0 }}
+								animate={prefersReducedMotion ? {} : { height: "auto" }}
+								exit={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
+								transition={confirmSwapTransition}
+								style={{ overflow: "hidden" }}
+							>
+								<motion.div
+									className="card-details__actions-inner"
+									initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 0 }}
+									transition={confirmSwapTransition}
 								>
-									Yes, remove
-								</button>
-							</div>
-						</div>
-					) : (
-						<div className="card-details__buttons">
-							<button onClick={onEdit} className="card-details__button">
-								Edit
-							</button>
-							<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
-								Remove
-							</button>
-						</div>
-					)}
+									<div className="card-details__buttons">
+										<button onClick={onEdit} className="card-details__button">
+											Edit
+										</button>
+										<button
+											onClick={() => setConfirming(true)}
+											className="card-details__button card-details__button--remove"
+										>
+											Remove
+										</button>
+									</div>
+								</motion.div>
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</div>
 			)}
 

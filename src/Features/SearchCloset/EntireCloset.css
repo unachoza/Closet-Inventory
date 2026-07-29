@@ -148,7 +148,7 @@
 	min-width: 18px;
 	padding: 0 4px;
 	border-radius: var(--layout-radius-card);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	font-size: 0.72rem;
 	font-weight: var(--primitive-font-weight-bold);
@@ -209,7 +209,7 @@
 	padding: 0;
 	border: none;
 	border-radius: 50%;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	font-size: 0.7rem;
 	line-height: 1;
@@ -371,7 +371,7 @@
 	padding: 0.55rem 1rem;
 	border: none;
 	border-radius: var(--layout-radius-button);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	font-size: 0.88rem;
 	font-weight: var(--primitive-font-weight-medium);
@@ -423,7 +423,7 @@
 	min-width: 18px;
 	padding: 0 5px;
 	border-radius: var(--layout-radius-card);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	font-size: 0.7rem;
 	font-weight: var(--primitive-font-weight-bold);
@@ -492,7 +492,7 @@
 }
 
 .filter-accordion__option input[type="checkbox"]:checked {
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	border-color: var(--bg-surface-brand);
 }
 

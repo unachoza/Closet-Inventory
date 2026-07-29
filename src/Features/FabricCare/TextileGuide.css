@@ -187,8 +187,12 @@ button.toc-link:hover{
       box-shadow: none;
 }
 
+button.toc-link:focus {
+      box-shadow: none;
+}
 
 .toc-link {
+      position: relative;
       display: flex;
       align-items: center;
       padding: 16px 20px;
@@ -196,7 +200,7 @@ button.toc-link:hover{
       font-size: 13px;
       font-weight: 500;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: color 0.2s;
       border-bottom: 2px solid transparent;
       gap: 6px;
       white-space: nowrap;
@@ -204,12 +208,25 @@ button.toc-link:hover{
 
 .toc-link:hover {
       color: var(--ink);
-      border-bottom-color: var(--gold);
 }
 
 .toc-link.active {
       color: var(--gold);
-      border-bottom-color: var(--gold);
+}
+
+.toc-link-underline {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2px;
+      height: 2px;
+      background: var(--gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+      .toc-link-underline {
+            transition: none;
+      }
 }
 
 /* Single accessible focus style: no ring on mouse click, clear ring on keyboard. */
@@ -296,7 +313,7 @@ button.toc-link:hover{
 
 .fiber-card:hover {
       box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
 }
 
 .fiber-card-img {
@@ -976,8 +993,11 @@ button.toc-link:hover{
 }
 
 .footer-inner {
-      max-width: 960px;
-      margin: 0 auto;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .footer-title {
@@ -989,7 +1009,7 @@ button.toc-link:hover{
 }
 
 .footer-sub {
-      max-width: 480px;
+      max-width: 500px;
       color: rgba(250, 247, 242, 0.55);
       font-size: 14px;
       line-height: 1.6;

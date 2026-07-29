@@ -24,7 +24,7 @@ const extractMaterialNames = (raw: unknown): string[] => {
 	return [];
 };
 
-export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care" | "status" | "location";
+export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care" | "status" | "location" | "season";
 export type FilterState = Record<FilterDimension, string[]>;
 export type FilterOption = { value: string; count: number };
 export type FilterOptions = Record<FilterDimension, FilterOption[]>;
@@ -33,7 +33,17 @@ export type FilterOptions = Record<FilterDimension, FilterOption[]>;
 // FilterPillsRow import this (not their own copy) specifically to close the
 // hardcoded-list gotcha: a dimension added only here used to silently not
 // appear in the UI, since tsc can't catch a missing array entry.
-export const FILTER_DIMENSIONS: FilterDimension[] = ["category", "color", "brand", "material", "occasion", "care", "status", "location"];
+export const FILTER_DIMENSIONS: FilterDimension[] = [
+	"category",
+	"color",
+	"brand",
+	"material",
+	"occasion",
+	"care",
+	"status",
+	"location",
+	"season",
+];
 
 // Status & Location are E2 features, dark for the beta (see config/features.ts).
 // The filter UI renders only the *visible* dimensions; the full list above still
@@ -56,6 +66,7 @@ export const FILTER_DIMENSION_LABELS: Record<FilterDimension, string> = {
 	care: "Care",
 	status: "Status",
 	location: "Location",
+	season: "Season",
 };
 
 const INITIAL_FILTERS: FilterState = {
@@ -67,7 +78,12 @@ const INITIAL_FILTERS: FilterState = {
 	care: [],
 	status: [],
 	location: [],
+	season: [],
 };
+
+/** "winter" → "Winter". Season lives at item.style.season (ProductAttributes), not
+ *  a top-level ClothingItem field, so it needs its own accessor like status/location. */
+const humanizeSeason = (season?: string): string[] => (season ? [season.charAt(0).toUpperCase() + season.slice(1)] : []);
 
 /** "at_cleaner" → "At cleaner". Absent status defaults to "clean", matching statusTransitions.ts. */
 const humanizeStatus = (status?: string): string => {
@@ -135,7 +151,7 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 		for (const dim of FILTER_DIMENSIONS) {
 			const counts = new Map<string, { value: string; count: number }>();
 			for (const item of closet) {
-				// Material/care/status/location use their own extractors; other dims use the generic path.
+				// Material/care/status/location/season use their own extractors; other dims use the generic path.
 				const displayList =
 					dim === "material"
 						? extractMaterialNames(item[dim])
@@ -145,7 +161,9 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 								? [humanizeStatus(item.status)]
 								: dim === "location"
 									? [resolveLocationLabel(item.locationId)]
-									: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
+									: dim === "season"
+										? humanizeSeason(item.style?.season)
+										: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
 
 				for (const display of displayList) {
 					const key = display.toLowerCase();
@@ -170,7 +188,7 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 				const selected = filters[dim];
 				if (selected.length === 0) continue;
 
-				// Material/care/status/location use their own extractors; other dims use the generic path.
+				// Material/care/status/location/season use their own extractors; other dims use the generic path.
 				const itemKeys =
 					dim === "material"
 						? extractMaterialNames(item[dim]).map((n) => n.toLowerCase())
@@ -180,7 +198,11 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 								? [resolveLocationLabel(item.locationId).toLowerCase()]
 								: dim === "care"
 									? parseCareLabels(item.care).map((l) => l.toLowerCase())
-									: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+									: dim === "season"
+										? humanizeSeason(item.style?.season).map((s) => s.toLowerCase())
+										: extractValues(item[dim]).flatMap((v) =>
+												displayValues(dim, v).map((d) => d.toLowerCase()),
+											);
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
 				if (!matches) return false;
 			}
