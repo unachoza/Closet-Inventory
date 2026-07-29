@@ -46,6 +46,13 @@
 	font-display: swap;
 }
 
+.cormorant-garamond-italic-bold{
+  font-family: "Cormorant Garamond", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
 /* ── DETAIL PANEL (modal) ──
    Rendered via a portal at document.body (see Modal.tsx), so this no longer
    fights the sticky NavBar's stacking context — z-index just needs to clear
@@ -112,13 +119,15 @@
       align-items: flex-start;
       gap: 20px;
       flex-shrink: 0;
-      padding: 20px 44px;
+      padding: 20px 40px;
       background: var(--detail-accent-pale, var(--cream));
       border-bottom: 1px solid var(--border);
       text-align: left;
 }
 
-.detail-header-text { min-width: 0; max-width: 420px; }
+/* I wanted the syntheic source value to sit on one line */
+/* open to changing it back to 480px if something changes */
+.detail-header-text { min-width: 0; max-width: 550px; }
 
 /* The header band now carries the category's pale tint, so the FiberTag's own
    pale background would disappear into it. Swap to a solid surface and keep
@@ -188,14 +197,14 @@ li:not(:first-child)::before {
 .detail-body {
       flex: 1 1 auto;
       min-height: 0;
-      padding: 34px 44px 40px;
+      padding: 30px 40px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
 }
 
 .detail-section {
-      margin-bottom: 2rem;
-      padding-top: 2rem;
+      margin-bottom: 1.75rem;
+      padding-top: 1.75rem;
       border-top: 1px solid var(--border);
       text-align: left;
 }
@@ -242,14 +251,90 @@ li:not(:first-child)::before {
 /* Key-facts list — two columns once the panel is wide enough, sparkle marks
    instead of arrows so it reads closer to the editorial reference. */
 .detail-section ul {
-      display: grid;
-      grid-template-columns: 1fr;
+      display: flex;
+      flex-direction: column;
+      /* grid-template-columns: 1fr; */
       list-style: none;
       text-align: left;
       margin: 0;
       padding: 0;
 }
 
+.key-facts-grid-container {
+	display: block;
+}
+
+ aside .key-facts-grid-container{
+      margin-top: -20px;
+ }
+
+.key-facts-grid-container--featured {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(260px, 0.8fr);
+	gap: 40px;
+	align-items: stretch;
+}
+
+.key-facts-callout {
+	box-sizing: border-box;
+	min-width: 0;
+	height: 100%;
+	padding: 18px 28px 18px 38px;
+	border-left: 1px solid rgba(13, 26, 43, 0.14);
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+}
+
+.key-facts-callout__quote {
+	display: block;
+	height: 26px;
+	margin-bottom: 10px;
+
+	color: var(--terracotta);
+	font-family: "Cormorant Garamond", Georgia, serif;
+	font-size: 3.5rem;
+	font-weight: 600;
+	line-height: 0.8;
+}
+
+.key-facts-callout p {
+	max-width: 290px;
+	margin: 0;
+
+	color: var(--terracotta);
+	font-family: cormorant-garamond-italic-bold;
+	font-size: clamp(1.5rem, 2vw, 2rem);
+	font-style: italic;
+	font-weight: 500;
+	line-height: 1.1;
+}
+
+.key-facts-callout__rule {
+	display: block;
+	width: 64px;
+	height: 2px;
+	margin-top: 20px;
+	background: var(--terracotta);
+}
+
+
+@media (max-width: 650px) {
+	.key-facts-grid-container--featured {
+		grid-template-columns: 1fr;
+		gap: 28px;
+	}
+
+	.key-facts-callout {
+		padding: 28px 20px 12px 30px;
+	}
+
+	.key-facts-callout p {
+		max-width: 100%;
+	}
+}
 @media (min-width: 34rem) {
       .detail-section ul { grid-template-columns: 1fr 1fr; }
 }
@@ -337,7 +422,7 @@ button.detail-footer-link:hover{
 @media (max-width: 33.9375rem) {
       .detail-header { padding: 34px 22px 26px; }
       .detail-body { padding: 26px 22px 30px; }
-      .detail-title { font-size: clamp(2.8rem, 16vw, 3.6rem); }
+      .detail-title { font-size: 45px; }
       .detail-source { font-size: 1.2rem; }
       .detail-footer-link { padding: 14px 22px; }
 }

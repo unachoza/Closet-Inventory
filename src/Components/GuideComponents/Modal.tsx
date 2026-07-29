@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Fiber } from "../../Content/Fabric&Fiber";
 import { FiberTag } from "./FiberCard";
-import handwashtransparent from '../../assets/handwash-transparent.svg'
+import handwashtransparent from "../../assets/handwash-transparent.svg";
 import "./DetailModal.css";
 
 interface DetailModalProps {
@@ -47,10 +47,10 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 
 	if (!fiber) return null;
 
-	//country of origin 
-	const sources: string[] = fiber.source.split('·').map(item => item.trim());
-	const name = sources[0]
-	const countryOfOrigin: string = sources[1]
+	//country of origin
+	const sources: string[] = fiber.source.split("·").map((item) => item.trim());
+	const name = sources[0];
+	const countryOfOrigin: string = sources[1];
 	// Ties the panel's accent color to the same category palette as the card
 	// grid's FiberTag (terracotta/sage/dusty-blue/mauve), so opening a fiber
 	// carries its color-coding through instead of flattening to plain gray.
@@ -86,7 +86,13 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 							{fiber.name}
 						</h2>
 						<p className="detail-source">{name}</p>
-						<ul>{countryOfOrigin.split(',').map(country => <li>{country}</li>)}</ul>
+						{countryOfOrigin && (
+							<ul>
+								{countryOfOrigin.split(",").map((country) => (
+									<li>{country}</li>
+								))}
+							</ul>
+						)}
 					</div>
 					<button className="detail-close" onClick={onClose} aria-label="Close detail panel">
 						<X size={16} aria-hidden="true" />
@@ -94,12 +100,19 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 				</div>
 				<div className="detail-body" ref={bodyRef}>
 					{fiber.detail.map((section) => {
-						const isCare = section.title.trim().toLowerCase() === "care";
+						const normalizedTitle = section.title.trim().toLowerCase();
+						const isCare = normalizedTitle === "care";
+						const isKeyFacts = normalizedTitle === "key facts";
+						const hasFeaturedFact = isKeyFacts && section.list?.length === 5;
+						const mainFact = hasFeaturedFact ? section.list?.[0] : null;
+						const displayedFacts = hasFeaturedFact ? section.list?.slice(1) : section.list;
 						const sectionBody = (
 							<>
 								<h4>{section.title}</h4>
+
 								{section.content && <p>{section.content}</p>}
-								{section.list && (
+
+								{section.list && section.list.length > 0 && (
 									<ul>
 										{section.list.map((item) => (
 											<li key={item}>{item}</li>
@@ -108,25 +121,124 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 								)}
 							</>
 						);
-						if (!isCare) {
+
+						const keyFactsSection = (
+							<>
+								<h4>{section.title}</h4>
+
+								{section.content && <p>{section.content}</p>}
+
+								{displayedFacts && displayedFacts.length > 0 && (
+									<div
+										className={
+											hasFeaturedFact
+												? "key-facts-grid-container key-facts-grid-container--featured"
+												: "key-facts-grid-container"
+										}
+									>
+										<ul className="key-facts-list">
+											{displayedFacts.map((item) => (
+												<li key={item}>{item}</li>
+											))}
+										</ul>
+
+										{mainFact && (
+											<aside className="key-facts-callout">
+												<span className="key-facts-callout__quote" aria-hidden="true">
+													“
+												</span>
+
+												<p>{mainFact}</p>
+
+												{/* <span className="key-facts-callout__rule" aria-hidden="true" /> */}
+											</aside>
+										)}
+									</div>
+								)}
+							</>
+						);
+
+						// const keyFactsSection = (
+						// 	<>
+						// 		<h4>{section.title}</h4>
+						// 		{section.content && <p>{section.content}</p>}
+						// 		{section.list && (
+						// 			const mainFact = section.list.unshift()
+						// 			<div className="key-facts-grid-container">
+						// 				<>
+						// 					<ul>
+						// 						{(section.list.splice(0, 1)).map((item) => (
+						// 							<li key={item}>{item}</li>
+						// 						))}
+						// 					</ul>
+						// 					<div>
+						// 						<p>{mainFact}</p>
+						// 					</div>
+						// 				</>
+						// 			</div>
+						// 		)}
+						// 	</>
+						// );
+						// if (!isCare && !isKeyFacts) {
+						// 	return (
+						// 		<div key={section.title} className="detail-section">
+						// 			{sectionBody}
+						// 		</div>
+						// 	);
+						// }
+						// if (isKeyFacts) {
+						// 	return (
+						// 		<div key={section.title} className="detail-section">
+						// 			{keyFactsSection}
+						// 		</div>
+						// 	);
+						// }
+						// if (isCare) {
+						// 	return (
+						// 		<div key={section.title} className="detail-section">
+						// 			<div className="detail-care-card">
+						// 				<img className="detail-care-icon" src={handwashtransparent} alt="hand washing icon" />
+						// 				<div className="detail-care-body">{sectionBody}</div>
+						// 			</div>
+						// 		</div>
+						// 	);
+						// }
+
+						if (isCare) {
 							return (
 								<div key={section.title} className="detail-section">
-									{sectionBody}
+									<div className="detail-care-card">
+										<img className="detail-care-icon" src={handwashtransparent} alt="" aria-hidden="true" />
+
+										<div className="detail-care-body">{sectionBody}</div>
+									</div>
 								</div>
 							);
 						}
+
+						if (isKeyFacts) {
+							return (
+								<div key={section.title} className="detail-section">
+									{keyFactsSection}
+								</div>
+							);
+						}
+
 						return (
 							<div key={section.title} className="detail-section">
-								<div className="detail-care-card">
-									<img className="detail-care-icon" src={handwashtransparent} alt="hand washing icon" />
-									<div className="detail-care-body">{sectionBody}</div>
-								</div>
+								{sectionBody}
 							</div>
 						);
 					})}
 				</div>
 				{onOpenGuide && (
-					<button className="detail-footer-link" onClick={() => { onClose(); onOpenGuide(); }}>
+					<button
+						className="detail-footer-link"
+						onClick={() => {
+							onClose();
+							onOpenGuide();
+						}}
+					>
 						More on fabrics in the Guide →
 					</button>
 				)}

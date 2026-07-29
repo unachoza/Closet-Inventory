@@ -67,7 +67,7 @@ export const FIBERS: Fiber[] = [
 		name: "Merino Wool",
 		category: "animal",
 		tagLabel: "Animal · Sheep",
-		source: "Merino sheep · Primarily Australia & New Zealand",
+		source: "Merino sheep · Primarily Australia , New Zealand",
 		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596871/Merino_sheep_gv05q2.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Grey merino wool knit texture close-up",
 		description:
@@ -177,9 +177,9 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Highly resilient — can be bent 20,000 times without breaking",
 					"South Africa produces ~50% of the world's mohair supply",
 					"Kid mohair: 23–29 microns; adult: 30–40 microns",
-					"Highly resilient — can be bent 20,000 times without breaking",
 					"Often blended with wool or silk for combined properties",
 					"MOHAIR SA and IAMAB certify responsible production",
 				],
@@ -220,8 +220,8 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
-					"China produces ~80% of world silk (sericiculture = silk farming)",
 					"5,000+ years of cultivation history in China",
+					"China produces ~80% of world silk (sericiculture = silk farming)",
 					"Weakens by ~20% when wet — handle very gently",
 					"UV rays degrade silk — avoid prolonged sunlight storage",
 					"Momme weight (mm) measures silk density: 12mm = light, 22mm = heavy",
@@ -264,8 +264,8 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
-					"Two breeds: Huacaya (fluffy, most common) and Suri (silky, less common)",
 					"Hypoallergenic — no lanolin means no common wool allergy trigger",
+					"Two breeds: Huacaya (fluffy, most common) and Suri (silky, less common)",
 					"One alpaca yields 2–4 kg fiber per year",
 					"Fiber grades: Baby (<22µm), Fine (22–25.5µm), Medium (25.5–32µm)",
 					"Sustainable: low water use, soft hooves don't damage land",
@@ -321,7 +321,8 @@ export const FIBERS: Fiber[] = [
 		name: "Vicuña",
 		category: "animal",
 		tagLabel: "Animal · Vicuña",
-		source: "Vicugna vicugna · Andes (Argentina, Bolivia, Chile, Peru) — protected",
+		source: "Vicugna vicugna · The Andean region of Argentina, Bolivia, Chile, Peru",
+		// protected
 		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596870/Vicun%CC%83a_kltt03.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Luxury camel natural fine fiber",
 		description:
@@ -363,7 +364,7 @@ export const FIBERS: Fiber[] = [
 		name: "Qiviut",
 		category: "animal",
 		tagLabel: "Animal · Musk Ox",
-		source: "Ovibos moschatus · Arctic Alaska & Canada",
+		source: "Ovibos moschatus · Arctic Alaska , Canada",
 		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780596870/Musk_Ox_qtiphf.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Dark textured qiviut musk ox wool",
 		description:
@@ -422,8 +423,8 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
-					"Conventional cotton uses ~16% of world's insecticides on 2.5% of farmland",
 					"Organic cotton uses ~71% less water than conventional",
+					"Conventional cotton uses ~16% of world's insecticides on 2.5% of farmland",
 					"Wicks moisture but holds it (stays wet longer than synthetics)",
 					"Wrinkles easily — blending with polyester reduces wrinkling",
 				],
@@ -460,9 +461,9 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Becomes softer, stronger, and more lustrous with each wash",
 					"Belgium and Northern France: world's finest flax growing regions",
 					"Naturally antibacterial and antifungal",
-					"Becomes softer, stronger, and more lustrous with each wash",
 					"Temperature regulation: cool in summer, warm in winter",
 					"The oldest linen cloth dates to ~6500 BC in Turkey (Çatalhöyük)",
 				],
@@ -499,9 +500,9 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Naturally UV-resistant — blocks more UV rays than cotton",
 					"Grows to harvestable height in 70–110 days",
 					"Sequesters more CO₂ than trees acre-for-acre",
-					"Naturally UV-resistant — blocks more UV rays than cotton",
 					"Retains heat better than cotton — natural insulation",
 					"Contains no THC in the fiber — hemp and marijuana are different cultivars",
 				],
@@ -537,8 +538,8 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
-					"One of the oldest fiber crops — cultivated in China for 6,000+ years",
 					"Does not shrink — dimensionally very stable",
+					"One of the oldest fiber crops — cultivated in China for 6,000+ years",
 					"Naturally white — reduces dyeing requirements",
 					"Harvested 3–6 times per year from the same plant",
 					"Difficult to process — requires degumming to remove gummy resin",
@@ -575,8 +576,8 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Completely biodegradable. It decomposes in 1–2 seasons",
 					"Bangladesh produces ~70% of world's raw jute",
-					"Completely biodegradable — decomposes in 1–2 seasons",
 					"Often used in eco-packaging as plastic alternative",
 					'Can be blended with silk for a "jute silk" blend — softer and shiny',
 					"Low moisture retention — suitable for dry goods packaging",
@@ -633,7 +634,8 @@ export const FIBERS: Fiber[] = [
 		name: "Modal",
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Beech Tree",
-		source: "Fagus sylvatica (beech) · Primarily Austria and Central Europe (Lenzing)",
+		source: "Fagus sylvatica (beech) · Primarily Austria , Central Europe",
+		// (Lenzing)
 		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600353/Illustration-of-the-modal-fabric-production-process-from-beech-tree-pulp-c_dttffr.webp?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Soft modal beech fabric loungewear",
 		description:
@@ -648,11 +650,11 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Stronger wet than dry unlike standard viscose",
+					"MicroModal is an even finer, more luxurious variant (half the diameter of silk)",
 					"50% more water-absorbent than cotton",
 					"Maintains softness and shape through many washes",
-					"Stronger wet than dry unlike standard viscose",
 					"Biodegradable and made from renewable beech forests",
-					"MicroModal is an even finer, more luxurious variant (half the diameter of silk)",
 				],
 			},
 			{
@@ -672,7 +674,9 @@ export const FIBERS: Fiber[] = [
 		name: "TENCEL™ / Lyocell",
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Eucalyptus & Beech",
-		source: "Eucalyptus globulus · Lenzing AG, Austria (TENCEL™ brand name)",
+		source: "Eucalyptus globulus · Austria ",
+		// Lenzing AG headquarters in austria
+		// TENCEL™ brand name
 		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600700/Lyocell-Yarn-from-Eucalyptus-Wood-Pulp_pleide.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "TENCEL lyocell eucalyptus fabric",
 		description:
@@ -738,7 +742,8 @@ export const FIBERS: Fiber[] = [
 		name: "Cupro (Bemberg™)",
 		category: "semi",
 		tagLabel: "Semi-Synthetic · Cotton Linters",
-		source: "Short cotton linters (cottonseed) · Asahi Kasei (Japan) — Bemberg™",
+		source: "Short cotton linters (cottonseed) · Japan",
+		// Asahi Kasei (Japan) — Bemberg™
 		imageUrl: "https://res.cloudinary.com/dh41vh9dx/image/upload/v1780600715/NLHuM1n9TkyJ_QfEvzBDUEsxBEcp2fVSGIXOtlYcu_rv6QlA6OuhGr98HCNcoa8QTM4-YstpyM7DWxTm5XUUAQT86c_PjuzCdsOtXi282VzhJIl2DYOwmm7puRBXqVBoLsCUDo8p_mUTcj6i6gCAec8_pvfu28.jpg?w=400&h=180&fit=crop&q=80",
 		imageAlt: "Cupro Bemberg silk-like fabric lining",
 		description:
@@ -753,11 +758,11 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Used by major luxury fashion houses as preferred lining",
 					"Uses a waste product (cotton linters) — relatively sustainable raw material",
 					"Antistatic — unlike most lining materials",
 					"Biodegradable, unlike polyester lining (the common alternative)",
 					"OEKO-TEX Standard 100 certified in responsible production",
-					"Used by major luxury fashion houses as preferred lining",
 				],
 			},
 			{
@@ -827,8 +832,8 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Excellent abrasion resistance. It outlasts polyester in high-wear applications",
 					"UV radiation degrades nylon over time — fades and weakens outdoors",
-					"Excellent abrasion resistance — outlasts polyester in high-wear applications",
 					"Static electricity — attracts dust and lint",
 					"Lower melting point than polyester — iron with more care",
 					"ECONYL® recycled nylon from ocean plastic is a sustainable alternative",
@@ -866,7 +871,7 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
-					'DuPont created spandex in 1958 — originally called "Fiber K"',
+					'DuPont created spandex in 1958. Originally called "Fiber K"',
 					'"Spandex" is the US term; "elastane" is used in Europe; Lycra™ is a DuPont brand',
 					"Degrades with chlorine (pool water) and repeated heat exposure",
 					"Can stretch 500–600% and recover — compared to rubber at 100%",
@@ -904,10 +909,10 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
-					"Lightweight — can be 10–15% lighter than equivalent wool",
+					"Lightweight — Can be 10–15% lighter than equivalent wool",
 					"Holds dye exceptionally well — prints and colors stay vivid",
 					"Moth and mildew resistant — advantage over wool for storage",
-					"Microplastic shedder — similar environmental concerns to polyester",
+					"Microplastic shedder; it has similar environmental concerns to polyester",
 				],
 			},
 			{
