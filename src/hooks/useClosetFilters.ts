@@ -24,7 +24,7 @@ const extractMaterialNames = (raw: unknown): string[] => {
 	return [];
 };
 
-export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care" | "status" | "location";
+export type FilterDimension = "category" | "color" | "brand" | "material" | "occasion" | "care" | "status" | "location" | "season";
 export type FilterState = Record<FilterDimension, string[]>;
 export type FilterOption = { value: string; count: number };
 export type FilterOptions = Record<FilterDimension, FilterOption[]>;
@@ -56,6 +56,8 @@ export const FILTER_DIMENSION_LABELS: Record<FilterDimension, string> = {
 	care: "Care",
 	status: "Status",
 	location: "Location",
+	//TODO: add season
+	season: "Season",
 };
 
 const INITIAL_FILTERS: FilterState = {
@@ -67,6 +69,8 @@ const INITIAL_FILTERS: FilterState = {
 	care: [],
 	status: [],
 	location: [],
+	//TODO: add season
+	season: [],
 };
 
 /** "at_cleaner" → "At cleaner". Absent status defaults to "clean", matching statusTransitions.ts. */
@@ -145,7 +149,8 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 								? [humanizeStatus(item.status)]
 								: dim === "location"
 									? [resolveLocationLabel(item.locationId)]
-									: extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
+									: //TODO: add season
+										extractValues(item[dim]).flatMap((trimmed) => displayValues(dim, trimmed));
 
 				for (const display of displayList) {
 					const key = display.toLowerCase();
@@ -180,7 +185,10 @@ export const useClosetFilters = (closet: ClothingItem[], resolveLocationLabel: (
 								? [resolveLocationLabel(item.locationId).toLowerCase()]
 								: dim === "care"
 									? parseCareLabels(item.care).map((l) => l.toLowerCase())
-									: extractValues(item[dim]).flatMap((v) => displayValues(dim, v).map((d) => d.toLowerCase()));
+									: //TODO: add season
+										extractValues(item[dim]).flatMap((v) =>
+											displayValues(dim, v).map((d) => d.toLowerCase()),
+										);
 				const matches = selected.some((term) => itemKeys.includes(canonicalValue(dim, term)));
 				if (!matches) return false;
 			}
