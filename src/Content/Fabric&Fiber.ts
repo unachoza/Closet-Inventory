@@ -423,6 +423,7 @@ export const FIBERS: Fiber[] = [
 			{
 				title: "Key facts",
 				list: [
+					"Cotton gets ~25% stronger when wet",
 					"Organic cotton uses ~71% less water than conventional",
 					"Conventional cotton uses ~16% of world's insecticides on 2.5% of farmland",
 					"Wicks moisture but holds it (stays wet longer than synthetics)",
