@@ -181,6 +181,13 @@ button:hover {
 	border-color: var(--Outline-Blue)
 }
 
+button:not(.no-outline):hover {
+  transform: translateY(-1px);
+  /* background-color: var(--button-hover-bg); */
+  box-shadow: none
+  /* Add all your other standard hover styles here */
+}
+
 button::after {
 	opacity: 0;
 	transition: all 0.2s;
