@@ -1,4 +1,5 @@
 import { JSX, useLayoutEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { ClothingItem } from "../../../utils/types";
 import { normalizeMaterial, primaryMaterial, resolveFiber } from "../../../utils/materialUtils";
 import MaterialCompositionBar from "../../MaterialCompositionBar/MaterialCompositionBar";
@@ -9,6 +10,13 @@ import { toAbsoluteDate } from "../../../utils/dateUtils";
 import { useViewOptional } from "../../../context/ViewContext";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
+
+// Shared by the footer container, the exiting content, and the entering content
+// so the box resize (layout) and the fade/slide (opacity/y) stay perfectly in
+// sync — a mismatched pair (e.g. spring layout + eased opacity) is what reads
+// as a "snap" once the faster one finishes and the other is still catching up.
+const CONFIRM_SWAP_TRANSITION = { duration: 0.55, ease: [0.4, 0, 0.2, 1] as const };
+const CONFIRM_SWAP_TRANSITION_REDUCED = { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const };
 
 function SectionTitle({ label }: { label: string }) {
 	return (
@@ -36,6 +44,8 @@ interface CardDetailsProps {
 
 export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRemove, onClose }: CardDetailsProps) => {
 	const [confirming, setConfirming] = useState(false);
+	const prefersReducedMotion = useReducedMotion();
+	const confirmSwapTransition = prefersReducedMotion ? CONFIRM_SWAP_TRANSITION_REDUCED : CONFIRM_SWAP_TRANSITION;
 	const [fiberModalMaterial, setFiberModalMaterial] = useState<string | null>(null);
 	const [fiberModalScrollTo, setFiberModalScrollTo] = useState<string | undefined>(undefined);
 	const viewCtx = useViewOptional();
@@ -343,39 +353,64 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 			{/* Full view only: action buttons pinned in their own footer, outside the
 			    scrollable content area, so they never scroll out of reach / get clipped. */}
 			{isFull && (
-				<div className="card-details__footer card-details__footer--actions">
-					{confirming ? (
-						<div className="card-details__confirm-section">
-							<p className="card-details__confirm-text">Remove this item?</p>
-							<div className="card-details__buttons">
-								<button
-									onClick={() => setConfirming(false)}
-									className="card-details__button card-details__button--cancel"
-								>
-									Cancel
+				<motion.div
+					layout
+					transition={confirmSwapTransition}
+					className="card-details__footer card-details__footer--actions"
+				>
+					<AnimatePresence mode="popLayout" initial={false}>
+						{confirming ? (
+							<motion.div
+								key="confirm"
+								layout
+								className="card-details__confirm-section"
+								initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+								transition={confirmSwapTransition}
+							>
+								<p className="card-details__confirm-text">Remove this item?</p>
+								<div className="card-details__buttons">
+									<button
+										onClick={() => setConfirming(false)}
+										className="card-details__button card-details__button--cancel"
+									>
+										Cancel
+									</button>
+									<button
+										onClick={() => {
+											setConfirming(false);
+											onRemove?.();
+										}}
+										className="card-details__button card-details__button--confirm"
+									>
+										Yes, remove
+									</button>
+								</div>
+							</motion.div>
+						) : (
+							<motion.div
+								key="actions"
+								layout
+								className="card-details__buttons"
+								initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+								transition={confirmSwapTransition}
+							>
+								<button onClick={onEdit} className="card-details__button">
+									Edit
 								</button>
 								<button
-									onClick={() => {
-										setConfirming(false);
-										onRemove?.();
-									}}
-									className="card-details__button card-details__button--confirm"
+									onClick={() => setConfirming(true)}
+									className="card-details__button card-details__button--remove"
 								>
-									Yes, remove
+									Remove
 								</button>
-							</div>
-						</div>
-					) : (
-						<div className="card-details__buttons">
-							<button onClick={onEdit} className="card-details__button">
-								Edit
-							</button>
-							<button onClick={() => setConfirming(true)} className="card-details__button card-details__button--remove">
-								Remove
-							</button>
-						</div>
-					)}
-				</div>
+							</motion.div>
+						)}
+					</AnimatePresence>
+				</motion.div>
 			)}
 
 			<DetailModal
