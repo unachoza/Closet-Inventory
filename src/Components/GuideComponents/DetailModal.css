@@ -142,7 +142,7 @@
          proven max-height pattern), independent of flex percentage resolution. */
       max-height: calc(100dvh - var(--header-height, 56px) - 16px - max(24px, env(safe-area-inset-bottom) + 16px));
       margin: auto;
-      border-radius: 28px;
+      border-radius: 20px;
       background: var(--warm-white);
       box-shadow: var(--shadow-lg);
       color: var(--ink-60);

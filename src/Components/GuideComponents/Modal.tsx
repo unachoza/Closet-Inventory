@@ -160,22 +160,12 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 							return (
 								<div key={section.title} className="detail-section">
 									<div className="detail-care-card">
-										{/* <svg
-											className="custom-icon" // Add a class name to target in CSS
-											viewBox="0 0 234 188"
-											width="234"
-											height="188"
-										>
-											<path
-												d="M160.25 33.23C162.84 31.63..." // truncated for length
-												fill="currentColor" // Inherits the text color variable
-												stroke="currentColor" // Inherits the text color variable
-												fillRule="evenodd" // CamelCase required for JSX
-												strokeWidth="0.25"
-												strokeLinejoin="round" // CamelCase required for JSX
-											/>
-										</svg> */}
-										<img  className={`detail-care-icon ${categoryClass}`}  src={handwashtransparent} alt="" aria-hidden="true" />
+										<img
+											className={`detail-care-icon ${categoryClass}`}
+											src={handwashtransparent}
+											alt=""
+											aria-hidden="true"
+										/>
 
 										<div className="detail-care-body">{sectionBody}</div>
 									</div>
