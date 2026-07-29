@@ -50,7 +50,7 @@
 	padding: 0.75rem 2rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: #fff;
 	font-size: 1rem;
 	font-weight: 500;
@@ -60,6 +60,7 @@
 
 .gmail-login-btn:hover {
 	background: var(--primitive-brand-deep-umber);
+	filter: brightness(1.1);
 }
 
 .gmail-login-btn:disabled {
@@ -84,7 +85,7 @@
 	padding: 0.5rem 1.25rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: #fff;
 	font-size: 0.9rem;
 	cursor: pointer;
@@ -603,7 +604,7 @@
 	padding: 0.5rem 1.25rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	font-size: 0.9rem;
 	cursor: pointer;
 	color: #fff;
@@ -622,7 +623,7 @@
 	padding: 0.6rem 1.5rem;
 	border: none;
 	border-radius: var(--border-radius-sm);
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: #fff;
 	font-size: 0.9rem;
 	font-weight: 500;
@@ -736,7 +737,7 @@
 }
 
 .gmail-skipped-include-btn:hover {
-	background: var(--bg-surface-brand, #8b695b);
+	background: var(--Primary-Pink-Darker, #8b695b);
 	color: #fff;
 	border-color: var(--bg-surface-brand, #8b695b);
 }
@@ -751,7 +752,7 @@
 }
 
 .gmail-skipped-include-btn--all {
-	background: var(--bg-surface-brand, #8b695b);
+	background: var(--Primary-Pink-Darker, #8b695b);
 	color: #fff;
 	border-color: var(--bg-surface-brand, #8b695b);
 	font-weight: 600;

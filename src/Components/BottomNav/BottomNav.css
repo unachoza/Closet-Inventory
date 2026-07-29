@@ -91,7 +91,7 @@
 	padding: 0;
 	border: 1px solid var(--border-brand);
 	border-radius: 50%;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	box-shadow: var(--elevation-high);
 	color: var(--text-on-brand);
 	cursor: pointer;
@@ -100,6 +100,7 @@
 
 .bottom-nav__fab:hover {
 	background: var(--primitive-brand-deep-umber);
+	filter: brightness(1.1);
 }
 
 .bottom-nav__fab:active {

@@ -68,7 +68,7 @@
 
 .onb__dot--on {
 	width: 20px;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 }
 
 .onb__body {
@@ -207,7 +207,7 @@ button.onb__cta{
 	text-align: center;
 	border: none;
 	border-radius: 999px;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	font-family: var(--primitive-font-family-sans);
 	font-size: var(--primitive-font-size-base);
@@ -300,7 +300,7 @@ button.onb__cta{
 	width: 34px;
 	height: 34px;
 	border-radius: 50%;
-	background: var(--bg-surface-brand);
+	background: var(--Primary-Pink-Darker);
 	color: var(--text-on-brand);
 	display: flex;
 	align-items: center;
