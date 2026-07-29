@@ -39,7 +39,7 @@
 
 .step-tab:hover {
       color: var(--text-primary);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
 }
 
 .step-tab.active {

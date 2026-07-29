@@ -177,7 +177,7 @@ button {
 button:hover {
 	box-shadow: 0 1rem 2rem var(--Trans-Black);
 	transition: all 0.2s;
-	transform: translateY(-2px);
+	transform: translateY(-1px);
 	border-color: var(--Outline-Blue)
 }
 
@@ -193,6 +193,20 @@ button:focus {
 	transition: all 0.2s;
 	transform: translateY(-1px);
 	outline: none;
+}
+
+/* Tactile press feedback: a quick scale-down so a tap/click reads as an
+   actual press, not just the hover lift holding steady. Scoped to :active
+   only (not :focus) so keyboard focus doesn't shrink the button. */
+button:active {
+	transform: translateY(-1px) scale(0.97);
+	transition: transform 0.1s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	button:active {
+		transform: translateY(-1px);
+	}
 }
 
 button:focus,

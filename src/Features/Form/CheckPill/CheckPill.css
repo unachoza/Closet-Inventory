@@ -23,6 +23,25 @@
   background-color: var(--active-color, var(--bg-surface-brand));
   color: var(--text-on-brand);
   border-color: var(--active-color, var(--bg-surface-brand));
+  animation: pill-select-pulse 0.25s ease;
+}
+
+@keyframes pill-select-pulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-box.active {
+    animation: none;
+  }
 }
 
 .pill-swatch {

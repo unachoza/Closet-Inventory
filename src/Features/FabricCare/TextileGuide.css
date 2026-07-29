@@ -313,7 +313,7 @@ button.toc-link:focus {
 
 .fiber-card:hover {
       box-shadow: var(--shadow-lg);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
 }
 
 .fiber-card-img {

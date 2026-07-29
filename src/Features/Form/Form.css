@@ -324,6 +324,25 @@ p.step-hint {
 	background-color: var(--bg-surface-brand);
 	border-color: var(--bg-surface-brand);
 	color: var(--text-on-brand);
+	animation: chip-select-pulse 0.25s ease;
+}
+
+@keyframes chip-select-pulse {
+	0% {
+		transform: scale(1);
+	}
+	40% {
+		transform: scale(1.08);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.category-chip--selected {
+		animation: none;
+	}
 }
 
 /* ── Details step: name/price/purchased share one row, equal width ───────── */
