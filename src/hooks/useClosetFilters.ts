@@ -8,7 +8,7 @@ import { getLocation } from "../utils/locations";
 import { track } from "../lib/analytics";
 import { showStatusLocation } from "../config/features";
 
-const MATERIAL_MIN_PCT = 6;
+const MATERIAL_MIN_PCT = 9;
 
 // Extract canonical material names from a raw material field.
 // Skips minor fibers (≤ 6%) so "95% Cotton, 5% Elastane" → ["Cotton"] not ["Cotton", "Elastane"].
