@@ -20,6 +20,7 @@ const emptyFilters: FilterState = {
 	care: [],
 	status: [],
 	location: [],
+	season: [],
 };
 
 const filterOptions: FilterOptions = {
@@ -49,6 +50,7 @@ const filterOptions: FilterOptions = {
 	care: [],
 	status: [],
 	location: [],
+	season: [],
 };
 
 const baseProps = {

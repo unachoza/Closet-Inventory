@@ -20,6 +20,7 @@ const PILL_DIM_LABELS: Record<FilterDimension, string> = {
 	care: "Care",
 	status: "Status",
 	location: "Location",
+	season: "Season",
 };
 
 const FilterPillsRow = ({ filters, activeFilterCount, onRemove, onClearAll }: FilterPillsRowProps) => {
