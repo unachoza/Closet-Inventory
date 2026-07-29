@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { ClothingItem } from "../../../utils/types";
 import { useCloset } from "../../../context/ClosetContext";
 import { useLocations } from "../../../context/LocationsContext";
@@ -17,6 +17,7 @@ interface EntireClosetViewProps {
 
 const DENSITY_KEY = "closet_density";
 const BORDER_MODE_KEY = "closet_border_mode";
+const SHOW_NAMES_KEY = "closet_show_names";
 
 const readBorderMode = (): BorderMode => {
 	const stored = localStorage.getItem(BORDER_MODE_KEY);
@@ -31,6 +32,15 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 		setCompact((prev) => {
 			const next = !prev;
 			localStorage.setItem(DENSITY_KEY, next ? "compact" : "comfortable");
+			return next;
+		});
+	}, []);
+
+	const [showNames, setShowNames] = useState(() => localStorage.getItem(SHOW_NAMES_KEY) !== "hidden");
+	const toggleShowNames = useCallback(() => {
+		setShowNames((prev) => {
+			const next = !prev;
+			localStorage.setItem(SHOW_NAMES_KEY, next ? "shown" : "hidden");
 			return next;
 		});
 	}, []);
@@ -64,6 +74,18 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 
 	// 3. Sort the search results
 	const { sortKey, setSortKey, sortedItems } = useClosetSort();
+
+	// Default to relevance order the moment a search starts, and back to
+	// dateAdded once it's cleared — but only on that empty↔non-empty edge, so a
+	// sort the user picks mid-search isn't clobbered on every keystroke.
+	const wasQueryActive = useRef(false);
+	useEffect(() => {
+		const isQueryActive = debouncedQuery.trim().length > 0;
+		if (isQueryActive !== wasQueryActive.current) {
+			setSortKey(isQueryActive ? "relevance" : "dateAdded");
+			wasQueryActive.current = isQueryActive;
+		}
+	}, [debouncedQuery, setSortKey]);
 
 	// Pipeline: closet → filter → search → sort. The material-% sort (E0-2.3)
 	// ranks by the selected material's blend percentage, so it needs the active
@@ -104,6 +126,8 @@ const EntireClosetView = ({ onEditItem }: EntireClosetViewProps) => {
 				gridKey={gridKey}
 				compact={compact}
 				onToggleDensity={toggleDensity}
+				showNames={showNames}
+				onToggleShowNames={toggleShowNames}
 				onEditItem={onEditItem}
 				onRemoveItem={removeItem}
 				borderMode={effectiveBorderMode}

@@ -3,6 +3,7 @@ import { ClothingItem } from "../utils/types";
 import { canonicalizeMaterial, normalizeMaterial } from "../utils/materialUtils";
 
 export type SortKey =
+	| "relevance"
 	| "dateAdded"
 	| "priceAsc"
 	| "priceDesc"
@@ -15,6 +16,7 @@ export type SortKey =
 	| "materialPct";
 
 export const SORT_LABELS: Record<SortKey, string> = {
+	relevance: "Relevance",
 	dateAdded: "Date Added",
 	priceAsc: "Price: Low → High",
 	priceDesc: "Price: High → Low",
@@ -119,8 +121,11 @@ export const useClosetSort = (defaultSort: SortKey = "dateAdded") => {
 						const selected = new Set(selectedMaterials.map((m) => canonicalizeMaterial(m).toLowerCase()));
 						return copy.sort((a, b) => materialPercentage(b, selected) - materialPercentage(a, selected));
 					}
+					case "relevance":
 					case "dateAdded":
 					default:
+						// No-op: preserves incoming order, which is already relevance-ranked
+						// by Fuse when a search query is active (search runs before sort).
 						return copy;
 				}
 			},

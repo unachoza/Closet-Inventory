@@ -50,11 +50,13 @@ export const brandExamples = [
 	"banana republic",
 	"zara",
 	"gap",
-	"everland",
+	"everlane",
+	"madewell",
 	"express",
 	"forever 21",
-	"fenty",
-	"lulu lemon",
+	"Quince",
+	"lululemon",
+	"nordstrom"
 ];
 
 export const materialExamples = ["cotton", "silk", "wool", "linen", "modal", "lace", "chiffon", "cashmere", "polyester", "rayon", "nylon", "spandex"];

@@ -197,8 +197,6 @@
 .filter-pill__dim {
 	color: var(--text-muted);
 	font-size: 0.72rem;
-	text-transform: uppercase;
-	letter-spacing: 0.3px;
 }
 
 .filter-pill__remove {

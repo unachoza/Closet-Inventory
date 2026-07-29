@@ -17,6 +17,7 @@ interface SearchSortBarProps {
 }
 
 const SORT_OPTIONS: SortKey[] = [
+	"relevance",
 	"dateAdded",
 	"priceAsc",
 	"priceDesc",
@@ -40,6 +41,7 @@ const SearchSortBar = ({
 	showBorderToggle = true,
 }: SearchSortBarProps) => {
 	const { searchQuery, setSearchQuery } = useSearch();
+	const sortOptions = searchQuery.trim() ? SORT_OPTIONS : SORT_OPTIONS.filter((key) => key !== "relevance");
 
 	return (
 		<div className="search-sort-bar">
@@ -102,7 +104,7 @@ const SearchSortBar = ({
 				onChange={(e) => onSortChange(e.target.value as SortKey)}
 				aria-label="Sort items"
 			>
-				{SORT_OPTIONS.map((key) => (
+				{sortOptions.map((key) => (
 					<option key={key} value={key}>
 						{SORT_LABELS[key]}
 					</option>

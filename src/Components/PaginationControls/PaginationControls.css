@@ -1,59 +1,333 @@
 @import "../../styles/breakpoints.css";
 
-.pagination-controls {
+.pagination {
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
 	align-items: center;
-	color: var(--text-primary);
-	gap: 1rem;
-	margin-top: 1.5rem;
+	width: 100%;
 }
 
-.pagination-controls button {
+/* ── Item count ───────────────────────────────────────────────────────────── */
+
+.pagination-count {
+	margin: 1rem 0 0;
+	color: var(--text-muted);
+	font-size: 0.85rem;
+	font-weight: 500;
+	line-height: 1.5;
+	text-align: center;
+}
+
+.pagination-count strong {
+	color: var(--text-primary);
+	font-weight: 600;
+}
+
+/* ── Main pagination surface ──────────────────────────────────────────────── */
+
+/*
+ * Three columns on desktop: previous | page numbers | next. The jump field is
+ * a mobile affordance and is pulled out of the flow here — the numbered
+ * buttons already do the same job, and duplicating them cost a whole column.
+ */
+.pagination-controls {
+	display: grid;
+	grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
+	align-items: center;
+	gap: 1rem;
+
+	width: min(100%, 72rem);
+	margin-top: 1rem;
+	padding: 0.85rem 1rem;
+
+	color: var(--text-primary);
+	background: var(--bg-surface-glass);
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--border-radius-ty);
+
+	backdrop-filter: var(--effect-blur-glass);
+	-webkit-backdrop-filter: var(--effect-blur-glass);
+}
+
+/* ── Previous / next ──────────────────────────────────────────────────────── */
+
+.pagination-nav {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.55rem;
+
+	min-height: 44px;
 	padding: var(--padding-rectangle-sm);
+
 	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-ty);
 	background: var(--bg-surface-primary);
 	color: var(--text-primary);
+
+	font: inherit;
+	font-size: 0.95rem;
+	font-weight: 500;
+	white-space: nowrap;
+
 	cursor: pointer;
-	transition: background 0.2s ease, border-color 0.2s ease;
+
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		box-shadow 0.2s ease,
+		transform 0.2s ease;
 }
 
-.pagination-controls button:hover:not(:disabled) {
+.pagination-nav--previous {
+	grid-column: 1;
+	justify-self: start;
+}
+
+.pagination-nav--next {
+	grid-column: 3;
+	justify-self: end;
+}
+
+.pagination-nav:hover:not(:disabled) {
 	background: var(--bg-surface-secondary);
 	border-color: var(--border-brand);
+	transform: translateY(-1px);
 }
 
-.pagination-controls button:disabled {
+.pagination-nav:active:not(:disabled) {
+	transform: translateY(0);
+}
+
+.pagination-nav:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
 
-/* ── Responsive ────────────────────────────────────────────────────────────── */
+/* ── Page-number controls ─────────────────────────────────────────────────── */
+
+.pagination-pages {
+	display: flex;
+	grid-column: 2;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25rem;
+}
+
+.pagination-page {
+	display: grid;
+	place-items: center;
+	justify-content: center;	
+	width: 40px;
+	height: 40px;
+	padding: 0;
+
+	border: 1px solid transparent;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--text-primary);
+
+	font: inherit;
+	font-size: 0.9rem;
+	font-weight: 500;
+	font-variant-numeric: tabular-nums;
+
+	cursor: pointer;
+
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease,
+		transform 0.2s ease;
+}
+
+.pagination-page:hover{
+	box-shadow: none;
+   	 transform: none;
+   	 border: none;
+}
+
+.pagination-page:hover:not([aria-disabled="true"]) {
+	background:  none;
+   	 border-color:  none;
+   	 transform:  none;
+}
+
+.pagination-page--current {
+	background: var(--bg-surface-brand);
+	border-color: var(--border-brand);
+	color: var(--text-on-brand, #fff);
+	font-weight: 600;
+	cursor: default;
+	justify-content: center;
+}
+
+.pagination-ellipsis {
+	display: grid;
+	place-items: center;
+	width: 32px;
+	color: var(--text-muted);
+	font-size: 0.75rem;
+	letter-spacing: 0.08em;
+}
+
+/* ── Jump-to-page control ─────────────────────────────────────────────────── */
+
+/*
+ * Hidden on desktop, where the numbered buttons cover the same ground. It
+ * becomes the only page-position indicator below --bp-xs.
+ */
+.pagination-jump {
+	display: none;
+	grid-column: 2;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	height: 45px;
+}
+
+.pagination-jump__label,
+.pagination-jump__total {
+	color: var(--text-muted);
+	font-size: 0.8rem;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.pagination-jump__input {
+	width: 3.5rem;
+	min-height: 44px;
+	padding: 0.5rem 0.4rem;
+
+	border: 1px solid var(--border-strong);
+	border-radius: var(--border-radius-ty);
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+
+	font: inherit;
+	font-size: 0.9rem;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+
+	transition:
+		background 0.2s ease,
+		border-color 0.2s ease;
+}
+
+.pagination-jump__input:hover {
+	border-color: var(--border-brand);
+}
+
+/* The spinners are redundant next to previous/next and squeeze the digits. */
+.pagination-jump__input::-webkit-outer-spin-button,
+.pagination-jump__input::-webkit-inner-spin-button {
+	margin: 0;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.pagination-jump__input {
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+/*
+ * Visually hidden: the field submits on Enter or blur. It exists only so
+ * jsdom/older browsers treat Enter-in-a-lone-input as an implicit submit.
+ */
+.pagination-jump__submit {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* ── Focus states ─────────────────────────────────────────────────────────── */
+
+.pagination button:focus-visible,
+.pagination input:focus-visible {
+	outline: 2px solid var(--border-brand);
+	outline-offset: 3px;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (--bp-md) {
-  /* Pagination sits OUTSIDE .items-overview as a full-width sibling, so its bar
-     bleeds to both screen edges instead of being inset by the overview's
-     max-width/padding. Pin it to the bottom of the viewport while scrolling so
-     the buttons stay reachable; safe-area padding clears the iOS home indicator. */
-  .pagination-controls {
-    position: sticky;
-    bottom: 0;
-    z-index: 5;
-    width: 100%;
-    margin: 0;
-    padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom, 0px));
-    background: var(--bg-surface-glass);
-    backdrop-filter: var(--effect-blur-glass);
-    border-top: 1px solid var(--border-hairline);
-  }
+	/*
+	 * Pagination sits outside .items-overview as a full-width sibling.
+	 * Keep the navigation reachable while the user scrolls.
+	 */
+	.pagination-controls {
+		position: sticky;
+		bottom: 0;
+		z-index: 5;
+
+		grid-template-columns: auto 1fr auto;
+		gap: 0.75rem;
+
+		width: 100%;
+		margin: 0;
+		padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+
+		border-right: 0;
+		border-bottom: 0;
+		border-left: 0;
+		border-radius: 0;
+	}
 }
 
 @media (--bp-xs) {
-  .pagination-controls button {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.95rem;
-  }
+	.pagination-count {
+		margin: 0.75rem 0;
+		padding-inline: 1rem;
+	}
+
+	.pagination-controls {
+		gap: 0.6rem;
+	}
+
+	.pagination-nav {
+		min-width: 44px;
+		min-height: 44px;
+		padding: 0.6rem 0.85rem;
+		font-size: 0.95rem;
+	}
+
+	/* Replace the full number sequence with the compact “Page 9 of 20” field. */
+	.pagination-pages {
+		display: none;
+	}
+
+	.pagination-jump {
+		display: flex;
+	}
+}
+
+@media (max-width: 390px) {
+	.pagination-nav__label {
+		display: none;
+	}
+
+	.pagination-nav {
+		width: 44px;
+		padding: 0;
+	}
+
+	.pagination-jump__label {
+		/* “of 20” alone still reads as a page position at this width. */
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
 }
