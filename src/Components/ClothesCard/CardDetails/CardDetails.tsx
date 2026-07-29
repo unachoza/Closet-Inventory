@@ -11,12 +11,15 @@ import { useViewOptional } from "../../../context/ViewContext";
 import "./CardDetails.css";
 import { formatItemAge } from "../../../utils/itemAge";
 
-// Shared by the footer container, the exiting content, and the entering content
-// so the box resize (layout) and the fade/slide (opacity/y) stay perfectly in
-// sync — a mismatched pair (e.g. spring layout + eased opacity) is what reads
-// as a "snap" once the faster one finishes and the other is still catching up.
-const CONFIRM_SWAP_TRANSITION = { duration: 0.55, ease: [0.4, 0, 0.2, 1] as const };
-const CONFIRM_SWAP_TRANSITION_REDUCED = { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const };
+// Clerk conditional-field reveal (motion.dev/examples/react-clerk-conditional-field),
+// same pattern as MaterialBlendInput's row reveal: the outer wrapper animates
+// height 0 → auto (clipped by overflow:hidden) so the footer resizes in step,
+// while the inner wrapper independently fades + slides its content. Sharing one
+// spring for both means the resize and the fade never drift out of sync — a
+// mismatched pair (e.g. spring layout + eased opacity) is what reads as a "snap"
+// once the faster one finishes and the other is still catching up.
+const CONFIRM_SWAP_TRANSITION = { type: "spring", bounce: 0.3, visualDuration: 0.5 } as const;
+const CONFIRM_SWAP_TRANSITION_REDUCED = { duration: 0.2 } as const;
 
 function SectionTitle({ label }: { label: string }) {
 	return (
@@ -353,64 +356,83 @@ export const CardDetails = ({ item, variant = "compact", onExpand, onEdit, onRem
 			{/* Full view only: action buttons pinned in their own footer, outside the
 			    scrollable content area, so they never scroll out of reach / get clipped. */}
 			{isFull && (
-				<motion.div
-					layout
-					transition={confirmSwapTransition}
-					className="card-details__footer card-details__footer--actions"
-				>
-					<AnimatePresence mode="popLayout" initial={false}>
+				<div className="card-details__footer card-details__footer--actions">
+					<AnimatePresence initial={false}>
 						{confirming ? (
+							// Outer wrapper owns the height reveal (overflow-clipped); the
+							// inner wrapper does the content's own fade + slide — same
+							// two-layer structure as MaterialBlendInput's row reveal.
 							<motion.div
 								key="confirm"
-								layout
-								className="card-details__confirm-section"
-								initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+								className="card-details__actions-reveal"
+								initial={prefersReducedMotion ? false : { height: 0 }}
+								animate={prefersReducedMotion ? {} : { height: "auto" }}
+								exit={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
 								transition={confirmSwapTransition}
+								style={{ overflow: "hidden" }}
 							>
-								<p className="card-details__confirm-text">Remove this item?</p>
-								<div className="card-details__buttons">
-									<button
-										onClick={() => setConfirming(false)}
-										className="card-details__button card-details__button--cancel"
-									>
-										Cancel
-									</button>
-									<button
-										onClick={() => {
-											setConfirming(false);
-											onRemove?.();
-										}}
-										className="card-details__button card-details__button--confirm"
-									>
-										Yes, remove
-									</button>
-								</div>
+								<motion.div
+									className="card-details__actions-inner"
+									initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 0 }}
+									transition={confirmSwapTransition}
+								>
+									<div className="card-details__confirm-section">
+										<p className="card-details__confirm-text">Remove this item?</p>
+										<div className="card-details__buttons">
+											<button
+												onClick={() => setConfirming(false)}
+												className="card-details__button card-details__button--cancel"
+											>
+												Cancel
+											</button>
+											<button
+												onClick={() => {
+													setConfirming(false);
+													onRemove?.();
+												}}
+												className="card-details__button card-details__button--confirm"
+											>
+												Yes, remove
+											</button>
+										</div>
+									</div>
+								</motion.div>
 							</motion.div>
 						) : (
 							<motion.div
 								key="actions"
-								layout
-								className="card-details__buttons"
-								initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+								className="card-details__actions-reveal"
+								initial={prefersReducedMotion ? false : { height: 0 }}
+								animate={prefersReducedMotion ? {} : { height: "auto" }}
+								exit={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
 								transition={confirmSwapTransition}
+								style={{ overflow: "hidden" }}
 							>
-								<button onClick={onEdit} className="card-details__button">
-									Edit
-								</button>
-								<button
-									onClick={() => setConfirming(true)}
-									className="card-details__button card-details__button--remove"
+								<motion.div
+									className="card-details__actions-inner"
+									initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 0 }}
+									transition={confirmSwapTransition}
 								>
-									Remove
-								</button>
+									<div className="card-details__buttons">
+										<button onClick={onEdit} className="card-details__button">
+											Edit
+										</button>
+										<button
+											onClick={() => setConfirming(true)}
+											className="card-details__button card-details__button--remove"
+										>
+											Remove
+										</button>
+									</div>
+								</motion.div>
 							</motion.div>
 						)}
 					</AnimatePresence>
-				</motion.div>
+				</div>
 			)}
 
 			<DetailModal

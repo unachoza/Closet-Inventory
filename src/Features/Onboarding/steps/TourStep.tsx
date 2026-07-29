@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useRef } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import OnboardingShell from "../OnboardingShell";
 
@@ -27,11 +27,17 @@ const PAGE_OFFSET = 125;
 export default function TourStep({ content, index, length, isLast, onNext, onBack, onSkip }: TourStepProps) {
 	const prefersReducedMotion = useReducedMotion();
 	// Tracks whether the index moved forward or backward so the page-turn can
-	// exit/enter from the correct side; ref survives across renders without
-	// re-triggering the effect that would be needed for state.
-	const prevIndexRef = useRef(index);
-	const direction = index >= prevIndexRef.current ? 1 : -1;
-	prevIndexRef.current = index;
+	// exit/enter from the correct side. Reading/writing a ref during render is
+	// unsafe (react-hooks/refs) — this uses React's sanctioned "adjust state
+	// during render" idiom instead: comparing against state (not a ref) during
+	// render is fine, and the setState calls below bail out once state catches
+	// up to the prop, so this doesn't loop.
+	const [renderedIndex, setRenderedIndex] = useState(index);
+	const [direction, setDirection] = useState(1);
+	if (index !== renderedIndex) {
+		setDirection(index > renderedIndex ? 1 : -1);
+		setRenderedIndex(index);
+	}
 
 	return (
 		<OnboardingShell

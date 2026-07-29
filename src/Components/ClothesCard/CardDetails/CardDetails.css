@@ -394,6 +394,13 @@ button.card-details__care-pill--tappable:hover {
 	background: color-mix(in srgb, var(--status-error) 75%, transparent);
 }
 
+/* Clerk conditional-field reveal wrapper — clips the height animation between
+   the Edit/Remove row and the confirm prompt. Layout/padding stay on the
+   inner content (.card-details__buttons / .card-details__confirm-section). */
+.card-details__actions-reveal {
+	width: 100%;
+}
+
 /* Confirm section */
 .card-details__confirm-section {
 	display: flex;
