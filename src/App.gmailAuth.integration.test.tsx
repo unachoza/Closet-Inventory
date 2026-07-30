@@ -56,6 +56,21 @@ vi.mock("./hooks/useAdvancedSearch", () => ({
 }));
 
 // ── Stub sibling views (NOT GmailImport — that's the component under test) ─────
+// This test is about the Gmail token surviving a view round trip (E3-bug.2), so
+// the user must be past ImportAccountGate — Gmail import now requires an account.
+vi.mock("./hooks/useSupabaseAuth", () => ({
+	useSupabaseAuth: () => ({
+		session: {},
+		user: { id: "test-user" },
+		gmailAccessToken: null,
+		isAuthenticated: true,
+		isLoading: false,
+		error: null,
+		signIn: vi.fn(),
+		signOut: vi.fn(),
+	}),
+}));
+
 vi.mock("./Features/Carousel/Carousel", () => ({ default: () => <div data-testid="view-carousel">Carousel</div> }));
 vi.mock("./Features/Closet/Closet", () => ({ default: () => <div data-testid="view-closet">Closet</div> }));
 vi.mock("./Features/Form/Form", () => ({ default: () => <div data-testid="view-form">Form</div> }));

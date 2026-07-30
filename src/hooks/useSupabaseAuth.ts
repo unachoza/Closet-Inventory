@@ -35,11 +35,21 @@ export function useSupabaseAuth(): SupabaseAuthState {
       return;
     }
 
-    supabase.auth.getSession().then(({ data, error: err }) => {
-      if (err) setError(err.message);
-      setSession(data.session);
-      setIsLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data, error: err }) => {
+        if (err) setError(err.message);
+        setSession(data.session);
+        setIsLoading(false);
+      })
+      .catch((e: unknown) => {
+        // A rejected getSession (offline, Supabase unreachable) previously left
+        // isLoading true forever, which renders auth-gated views permanently
+        // blank. Resolve to signed-out-with-an-error so the UI can explain.
+        setError(e instanceof Error ? e.message : "Could not check your sign-in status.");
+        setSession(null);
+        setIsLoading(false);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);

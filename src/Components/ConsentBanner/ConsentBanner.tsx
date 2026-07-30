@@ -2,9 +2,16 @@ import { useConsent } from "./useConsent";
 import "./ConsentBanner.css";
 
 /**
- * Bottom banner offering opt-in to error tracking + analytics (Sentry +
- * PostHog). No privacy-policy link yet — LEGAL-1 hasn't shipped — so the copy
- * stays generic and factual rather than promising a policy that isn't live.
+ * Bottom banner offering opt-in to **product analytics** (PostHog).
+ *
+ * Crash reporting (Sentry) is deliberately NOT covered by this banner — it runs
+ * regardless, started in `main.tsx` via `initErrorTracking`. The copy therefore
+ * says "how you use the app" and does not claim consent gates error tracking:
+ * asking permission for something that happens either way would be misleading.
+ * The second sentence discloses the crash reporting plainly instead.
+ *
+ * No privacy-policy link yet — LEGAL-1 hasn't shipped — so the copy stays
+ * factual rather than promising a policy that isn't live.
  */
 export default function ConsentBanner() {
 	const { showBanner, accept, decline } = useConsent();
@@ -12,9 +19,10 @@ export default function ConsentBanner() {
 	if (!showBanner) return null;
 
 	return (
-		<div className="consent-banner" role="dialog" aria-label="Analytics and error-tracking consent">
+		<div className="consent-banner" role="dialog" aria-label="Analytics consent">
 			<p className="consent-banner__text">
-				We'd like to use analytics and error tracking to see what's broken and what's useful. No data is sold or shared with
+				We'd like to use analytics to see how you use the app and what's worth building next. Separately, we always record
+				crash reports so we can fix what breaks — those contain no personal details. No data is sold or shared with
 				advertisers.
 			</p>
 			<div className="consent-banner__actions">

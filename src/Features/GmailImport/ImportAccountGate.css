@@ -1,0 +1,45 @@
+/* Gate shown in place of Gmail import when there's no account (see the
+   component doc for why import specifically requires one). Uses the canonical
+   tokens from tokens.css so it themes with everything else. */
+
+.import-gate {
+	max-width: 34rem;
+	margin: 0 auto;
+	padding: var(--space-6, 1.5rem);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4, 1rem);
+	text-align: center;
+}
+
+.import-gate__heading {
+	margin: 0;
+	font-size: var(--font-size-xl, 1.375rem);
+	line-height: 1.25;
+	color: var(--color-text, inherit);
+}
+
+.import-gate__body {
+	margin: 0;
+	color: var(--color-text-muted, inherit);
+	line-height: 1.55;
+	text-wrap: pretty;
+}
+
+.import-gate__cta {
+	align-self: center;
+	/* Comfortably above the 44px minimum touch target. */
+	min-height: 2.875rem;
+	padding-inline: var(--space-6, 1.5rem);
+}
+
+.import-gate__error {
+	margin: 0;
+	color: var(--color-danger, #b3261e);
+}
+
+.import-gate__aside {
+	margin: 0;
+	font-size: var(--font-size-sm, 0.875rem);
+	color: var(--color-text-muted, inherit);
+}

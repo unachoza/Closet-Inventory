@@ -7,6 +7,7 @@ import { computeUpdatePatch } from "./computeUpdatePatch";
 import { safeSetItem } from "../utils/safeStorage";
 import { SupabaseAuthContext } from "../context/SupabaseAuthContext";
 import { SyncedClosetRepository } from "../services/syncedClosetRepository";
+import { markSynced } from "../services/cloudSyncFlag";
 import { track } from "../lib/analytics";
 
 export type SyncStatus = "synced" | "syncing" | "offline" | "error";
@@ -61,6 +62,9 @@ export function useCloudCloset() {
 			.then((items) => {
 				setCloset(items);
 				setSyncStatus("synced");
+				// This closet now exists server-side; the local-only capacity cap
+				// must not apply to it again, even after the session ends.
+				markSynced();
 			})
 			.catch(() => {
 				setSyncStatus("offline");
