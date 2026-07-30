@@ -40,15 +40,17 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 	};
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" || e.key === "Tab") {
-			e.preventDefault();
+		// Tab must keep moving focus to the next field — only Enter is "commit
+		// and stay put". Previously both preventDefault()'d, which silently
+		// trapped keyboard focus in this input with no way to Tab past it.
+		if (e.key !== "Enter" && e.key !== "Tab") return;
+		if (e.key === "Enter") e.preventDefault();
 
-			if (inputValue.trim() && !pills.includes(inputValue.trim())) {
-				const newPills = [...pills, inputValue.trim()];
-				setPills(newPills);
-				onPillsChange?.(newPills);
-				setInputValue("");
-			}
+		if (inputValue.trim() && !pills.includes(inputValue.trim())) {
+			const newPills = [...pills, inputValue.trim()];
+			setPills(newPills);
+			onPillsChange?.(newPills);
+			setInputValue("");
 		}
 	};
 
