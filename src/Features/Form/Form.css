@@ -102,17 +102,16 @@ button.submit {
 	border-radius: var(--layout-radius-button);
 	background-color: var(--bg-surface-brand);
 	color: var(--text-on-brand);
+	/* bg is --bg-surface-brand — use the on-brand focus-ring bucket (see
+	   tokens.css) instead of the global default, which fails contrast here. */
+	--focus-ring-default: var(--focus-ring-on-brand);
+	--focus-ring-default-offset: var(--focus-ring-on-brand-offset);
 }
 
 .next-button:hover,
 button.submit:hover {
 	background-color: var(--primitive-brand-deep-umber);
 	border-color: var(--primitive-brand-deep-umber);
-}
-
-.next-button:focus-visible{
-	outline: .125rem solid #4a2e24;
-    	outline-offset: 2px;
 }
 
 .form-controls  button.back-button {

@@ -216,10 +216,15 @@ button:active {
 	}
 }
 
-button:focus,
+/* Global focus-visible ring — keyboard nav only (mouse-click :focus stays
+   outline:none, set above). Token-driven so a single rule covers every
+   button by default; a button on a non-default background overrides the two
+   custom properties at its own selector rather than re-writing the outline.
+   See the "Focus-visible ring system" comment in tokens.css for the three
+   buckets and the contrast math behind each. */
 button:focus-visible {
-	outline:  .125rem auto -webkit-focus-ring-color;
-
+	outline: 2px solid var(--focus-ring-default);
+	outline-offset: var(--focus-ring-default-offset);
 }
 
 @media (prefers-color-scheme: light) {

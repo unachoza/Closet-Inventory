@@ -80,11 +80,18 @@
 .ecm-btn--confirm {
 	background: var(--button-backround-blue, var(--primitive-brand-deep-umber));
 	color: var(--text-on-brand, #fff);
+	/* deep-umber bg is the same tone family as --bg-surface-brand — on-brand bucket. */
+	--focus-ring-default: var(--focus-ring-on-brand);
+	--focus-ring-default-offset: var(--focus-ring-on-brand-offset);
 }
 
 .ecm-btn--danger {
 	background: var(--color-danger);
 	color: var(--text-on-brand);
+	/* Neither the default nor the on-brand ring hits 3:1 against danger red —
+	   see tokens.css. Use the on-danger (white) bucket instead. */
+	--focus-ring-default: var(--focus-ring-on-danger);
+	--focus-ring-default-offset: var(--focus-ring-on-danger-offset);
 }
 
 .ecm-btn--cancel {
