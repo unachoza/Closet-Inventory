@@ -1,13 +1,7 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import {
-	FilterDimension,
-	FilterOptions,
-	FilterState,
-	visibleFilterDimensions,
-	FILTER_DIMENSION_LABELS,
-} from "../../../hooks/useClosetFilters";
+import { FilterDimension, FilterOptions, FilterState, visibleFilterDimensions, FILTER_DIMENSION_LABELS } from "../../../hooks/useClosetFilters";
 import FilterAccordion from "../FilterAccordion/FilterAccordion";
 import "../EntireCloset.css";
 
@@ -21,15 +15,7 @@ interface FilterSidePanelProps {
 	onClearAll: () => void;
 }
 
-const FilterSidePanel = ({
-	open,
-	onClose,
-	filters,
-	filterOptions,
-	activeFilterCount,
-	onToggle,
-	onClearAll,
-}: FilterSidePanelProps) => {
+const FilterSidePanel = ({ open, onClose, filters, filterOptions, activeFilterCount, onToggle, onClearAll }: FilterSidePanelProps) => {
 	// Close on Escape key while open
 	useEffect(() => {
 		if (!open) return;
@@ -43,11 +29,7 @@ const FilterSidePanel = ({
 	return createPortal(
 		<>
 			{/* Backdrop — click to close */}
-			<div
-				className={`filter-panel-backdrop${open ? " filter-panel-backdrop--open" : ""}`}
-				onClick={onClose}
-				aria-hidden="true"
-			/>
+			<div className={`filter-panel-backdrop${open ? " filter-panel-backdrop--open" : ""}`} onClick={onClose} aria-hidden="true" />
 
 			{/* Slide-in panel from the left */}
 			<aside
@@ -59,12 +41,7 @@ const FilterSidePanel = ({
 			>
 				<div className="filter-side-panel__header">
 					<h2 className="filter-side-panel__title">Filters</h2>
-					<button
-						type="button"
-						className="filter-side-panel__close"
-						onClick={onClose}
-						aria-label="Close filters"
-					>
+					<button type="button" className="filter-side-panel__close" onClick={onClose} aria-label="Close filters">
 						<X size={18} />
 					</button>
 				</div>
@@ -82,19 +59,10 @@ const FilterSidePanel = ({
 				</div>
 
 				<div className="filter-side-panel__footer">
-					<button
-						type="button"
-						className="filter-side-panel__clear"
-						onClick={onClearAll}
-						disabled={activeFilterCount === 0}
-					>
+					<button type="button" className="filter-side-panel__clear" onClick={onClearAll} disabled={activeFilterCount === 0}>
 						Clear all{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
 					</button>
-					<button
-						type="button"
-						className="filter-side-panel__apply"
-						onClick={onClose}
-					>
+					<button type="button" className="filter-side-panel__apply" onClick={onClose}>
 						Done
 					</button>
 				</div>

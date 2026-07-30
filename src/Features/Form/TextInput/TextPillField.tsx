@@ -15,9 +15,29 @@ interface TextPillFieldProps extends Omit<InputProps, "value"> {
 	hint?: string;
 }
 
-const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData, hint }: TextPillFieldProps) => {
+/** Split a comma-joined field value into trimmed, non-empty parts. */
+const splitValues = (raw: unknown): string[] =>
+	typeof raw === "string"
+		? raw
+				.split(",")
+				.map((part) => part.trim())
+				.filter(Boolean)
+		: [];
+
+const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData, multiSelect = false, hint }: TextPillFieldProps) => {
 	const [pills, setPills] = useState<string[]>(pillArray);
 	const [inputValue, setInputValue] = useState<string>("");
+
+	const selected = multiSelect ? splitValues(formData[label]) : [String(formData[label] ?? "")].filter(Boolean);
+
+	const handleToggle = (value: string, field: keyof ItemFormData) => {
+		if (multiSelect) {
+			const next = selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value];
+			handleFormUpdate(next.join(", "), field);
+			return;
+		}
+		handleFormUpdate(selected.includes(value) ? "" : value, field);
+	};
 
 	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === "Enter" || e.key === "Tab") {
@@ -37,8 +57,8 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 			<label className="label-text">{label}</label>
 			<div className="pill-container">
 				{pillArray.map((value) => {
-					const isActive = formData[label] === value;
-					return <CheckPill key={value} id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
+					const isActive = selected.includes(value);
+					return <CheckPill key={value} id={value} label={label} value={value} onToggle={handleToggle} checked={isActive} />;
 				})}
 			</div>
 			{hint && <p className="pill-field-hint">{hint}</p>}

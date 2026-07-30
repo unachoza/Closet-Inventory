@@ -12,7 +12,7 @@ interface FilterPillsRowProps {
 // Full words for the compact pill row — deliberately distinct from
 // FILTER_DIMENSION_LABELS (used for full accordion headers).
 const PILL_DIM_LABELS: Record<FilterDimension, string> = {
-	category: "Type",
+	category: "Category",
 	color: "Color",
 	brand: "Brand",
 	material: "Material",
