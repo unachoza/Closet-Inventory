@@ -412,6 +412,22 @@ button.stock-photo-toggle:focus-visible{
 	color: var(--text-primary);
 }
 
+/* The global button:hover/:focus/:active rules (index.css) set `transform`
+   directly, which — since transform isn't additive across rules — wipes out
+   the translateX(-50%) this button depends on for centering (position:
+   absolute + left:50%). Without it, the button's left edge sits at 50% of
+   its container and the whole thing jumps right by half its own width.
+   Re-combine both transforms here; .skip-button:hover/:focus/:active (0,2,0)
+   outranks button:hover/:focus (0,1,1) so this wins. */
+.skip-button:hover,
+.skip-button:focus {
+	transform: translateX(-50%) translateY(-1px);
+}
+
+.skip-button:active {
+	transform: translateX(-50%) translateY(-1px) scale(0.97);
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 
 @media (--bp-md) {
