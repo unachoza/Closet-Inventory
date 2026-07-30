@@ -401,6 +401,10 @@ button.card-details__care-pill--tappable:hover {
 	width: 100%;
 }
 
+.card-details__actions-inner{
+	margin: 4px;
+}
+
 /* Confirm section */
 .card-details__confirm-section {
 	display: flex;

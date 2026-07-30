@@ -18,8 +18,8 @@ import { showStatusLocation } from "../../../config/features";
 import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "../../../Components/Toast/Toast";
-import close from "../../../assets/close.svg";
 import { toAbsoluteDate } from "../../../utils/dateUtils";
+import { X } from "lucide-react";
 
 /** Fields the user may leave blank when adding/editing an item **/
 const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
@@ -291,8 +291,14 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 
 	return (
 		<div className="edit-form form">
-			<button type="button" className="close-icon" onClick={() => setView("carousel")} aria-label="Close" data-testid="close-icon">
-				<img src={close} alt="close icon" aria-hidden="true" />
+			<button
+				type="button"
+				className="detail-close close-icon"
+				onClick={() => setView("carousel")}
+				aria-label="Close edit form"
+				data-testid="close-icon"
+			>
+				<X size={16} aria-hidden="true" />
 			</button>
 			<motion.form
 				layout
