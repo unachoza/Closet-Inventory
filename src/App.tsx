@@ -16,6 +16,9 @@ import MultiStepForm from "./Features/Form/Form";
 import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
 import GmailImport from "./Features/GmailImport/GmailImport";
+import ImportAccountGate from "./Features/GmailImport/ImportAccountGate";
+import LocalCapacityNotice from "./Components/LocalCapacityNotice/LocalCapacityNotice";
+import { useLocalCapacity } from "./hooks/useLocalCapacity";
 import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
 import EntireClosetView from "./Features/SearchCloset/EntireClosetView/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
@@ -63,6 +66,7 @@ const ONBOARDING_KEY = "closetly-onboarding-complete";
 function AppShell() {
 	const { view, setView } = useView();
 	const { closet, getCloset, importItems, clearCloset } = useCloset();
+	const { isAtCapacity } = useLocalCapacity();
 	const demoLifecycle = useDemoLifecycle();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
@@ -182,10 +186,15 @@ function AppShell() {
 	}, []);
 
 	const handleAddItem = useCallback(() => {
+		// At the local ceiling, adding would produce an item that cannot be
+		// persisted (localStorage is full and safeSetItem fails silently), so the
+		// add is refused rather than accepted-then-lost. LocalCapacityNotice is
+		// rendered in the blocked state alongside this, and explains why.
+		if (isAtCapacity) return;
 		setPrefilledFormData(undefined);
 		setGmailSourceEmailId(null);
 		setView("form");
-	}, [setView]);
+	}, [setView, isAtCapacity]);
 
 	const handleExportCloset = useCallback(
 		(format: ExportFormat) => {
@@ -214,20 +223,25 @@ function AppShell() {
 			/>
 			<ToastProvider>
 				<div className="app-content">
+					{/* Local-only capacity nudges, escalating to a hard stop. Renders
+					    nothing for signed-in users and nothing below the first tier. */}
+					<LocalCapacityNotice />
 					{/* Keyed by view so a crash in one screen resets when navigating away.
 				     "Try again" sends the user back to the overview (closet) screen. */}
 					<ErrorBoundary key={view} onReset={() => setView("overview")}>
 						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />}
 						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
 						{view === "gmail" && (
-							<GmailImport
-								onImport={handleGmailImport}
-								onImportAll={handleGmailImportAll}
-								initialSelectedEmailId={gmailSourceEmailId}
-								onSourceEmailChange={handleSourceEmailChange}
-								unskippedByEmail={unskippedByEmail}
-								onUnskippedByEmailChange={handleUnskippedByEmailChange}
-							/>
+							<ImportAccountGate>
+								<GmailImport
+									onImport={handleGmailImport}
+									onImportAll={handleGmailImportAll}
+									initialSelectedEmailId={gmailSourceEmailId}
+									onSourceEmailChange={handleSourceEmailChange}
+									unskippedByEmail={unskippedByEmail}
+									onUnskippedByEmailChange={handleUnskippedByEmailChange}
+								/>
+							</ImportAccountGate>
 						)}
 						{view === "fabric" && <InteractiveGuide />}
 						{view === "journey" && <JourneyC />}

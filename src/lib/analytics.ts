@@ -19,6 +19,18 @@ export type AnalyticsEvent =
 	| "import_results_shown"
 	| "import_finished"
 	| "import_failed"
+	// Every Gmail search that actually hits the API, described by
+	// `searchQueryShape.ts`. `repeat_index` counts how many times the *same*
+	// query has been run unchanged this session: a rising number is the signal
+	// that the advanced-search syntax is too opaque to iterate on.
+	| "gmail_search_run"
+	// Import blocked because there's no account (ImportAccountGate). Makes the
+	// signed-out bounce visible instead of a silent funnel dead end.
+	| "import_gate_shown"
+	| "import_gate_signin_clicked"
+	// Local-only capacity: nudges shown as the closet grows, and the hard stop.
+	| "local_capacity_nudge_shown"
+	| "local_capacity_blocked"
 	// Inventory
 	| "item_added"
 	| "item_edited"

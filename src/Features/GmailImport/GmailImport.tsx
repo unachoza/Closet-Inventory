@@ -4,7 +4,7 @@ import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem, WearState } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
-import { AdvancedSearchParams, AdvancedSearchUI, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
+import { AdvancedSearchParams, AdvancedSearchUI, DEFAULT_SEARCH_PARAMS, SearchMode } from "./AdvancedSearch/AdvancedSearchUI";
 import { parseEmailToFormData, extractForwardedSender, extractForwardedPurchaseDate } from "../../utils/parseEmailToFormData";
 import { inferCare, inferProductAttributes, normalizeColor } from "../FashionParser";
 import { normalizeMaterial } from "../../utils/materialUtils";
@@ -20,6 +20,7 @@ import { toTitleCase } from "../../utils/toTitleCase";
 import { condenseName } from "../../utils/condenseName";
 import { track } from "../../lib/analytics";
 import { describeGmailError } from "./gmailErrorMessages";
+import { describeSearchQuery } from "./searchQueryShape";
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -129,6 +130,33 @@ export default function GmailImport({
 		return () => cancelAnimationFrame(raf);
 	}, [selectedEmail, selectedEmailId]);
 
+	// How many times each distinct query has been run, keyed by the
+	// privacy-preserving hash from `searchQueryShape`. Re-running an identical
+	// query is the signal that someone can't tell which parameter to change —
+	// which is the question this tracking exists to answer.
+	//
+	// Scoped to this mount: a gmail → edit → "Back to email" round trip unmounts
+	// the component and resets the counts. That errs toward UNDER-counting
+	// repeats (the second visit restarts at 1) rather than inventing them, which
+	// is the right direction — a false repeat would misreport the syntax as
+	// harder than it is.
+	const runsByQuery = useRef<Map<string, number>>(new Map());
+
+	/** Report a search that actually hits the Gmail API. */
+	const trackSearchRun = useCallback((params: AdvancedSearchParams, mode: "auto" | "advanced" | "default") => {
+		const shape = describeSearchQuery(params);
+		const repeatIndex = (runsByQuery.current.get(shape.query_hash) ?? 0) + 1;
+		runsByQuery.current.set(shape.query_hash, repeatIndex);
+
+		track("gmail_search_run", {
+			...shape,
+			mode,
+			// 1 on first run; 2+ means the same query was re-submitted unchanged.
+			repeat_index: repeatIndex,
+			is_repeat: repeatIndex > 1,
+		});
+	}, []);
+
 	// Auto-search with defaults on first login. The on-connect search is most
 	// testers' FIRST import, so it must open the funnel: fire import_started
 	// when there's no cache to restore (a real fetch), once per mount.
@@ -138,6 +166,8 @@ export default function GmailImport({
 			if (!autoStartTracked.current && cachedCount === 0) {
 				autoStartTracked.current = true;
 				track("import_started", { mode: "auto" });
+				// The on-connect search always runs the shipped defaults.
+				trackSearchRun(DEFAULT_SEARCH_PARAMS, "auto");
 			}
 			searchEmails(accessToken);
 		}
@@ -176,12 +206,13 @@ export default function GmailImport({
 			if (mode === "fetch" && accessToken) {
 				lastSearchParams.current = params;
 				track("import_started", { mode: "advanced" });
+				trackSearchRun(params, "advanced");
 				searchEmails(accessToken, params, true);
 			} else {
 				filterCachedEmails(params);
 			}
 		},
-		[accessToken, searchEmails, filterCachedEmails],
+		[accessToken, searchEmails, filterCachedEmails, trackSearchRun],
 	);
 
 	const emailDateRange = useMemo(() => {
@@ -210,9 +241,10 @@ export default function GmailImport({
 			setSelectedEmailId(null);
 			lastSearchParams.current = undefined;
 			track("import_started", { mode: "default" });
+			trackSearchRun(DEFAULT_SEARCH_PARAMS, "default");
 			searchEmails(accessToken, undefined, true);
 		}
-	}, [accessToken, searchEmails]);
+	}, [accessToken, searchEmails, trackSearchRun]);
 
 	const handleToggleSelect = useCallback((emailId: string) => {
 		setSelectedEmailId((prev) => (prev === emailId ? null : emailId));

@@ -11,25 +11,47 @@ import { getConsent } from "./consent";
  * `trackEvent()` here directly, so event names stay a closed, greppable set.
  */
 
-let initialized = false;
+let errorTrackingInitialized = false;
+let analyticsInitialized = false;
 
 /** Build-time version, tagged into both SDKs so reports name the exact build. */
 const APP_VERSION = typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "dev";
 
-/** True once the user has opted in — every export below no-ops otherwise. */
+/**
+ * True once the user has opted in. Gates **product analytics only** — see
+ * `initErrorTracking` for why crash reporting is treated differently.
+ */
 function consented(): boolean {
 	return getConsent() === "granted";
 }
 
-export async function initMonitoring(): Promise<void> {
-	if (initialized || !consented()) return;
-	initialized = true;
-
+/**
+ * Crash reporting, started regardless of analytics consent.
+ *
+ * Consent defaults to "undecided", so gating Sentry behind it meant the app
+ * reported nothing until someone actively opted in — and nobody did. A real
+ * tester was blocked at sign-in for over a month and it produced zero
+ * telemetry; that gap is the reason this is split out.
+ *
+ * Scope is deliberately narrow: `sendDefaultPii: false` (already the case),
+ * no session replay, no identify() call. This captures stack traces and build
+ * versions, not who the person is or what they did. Behavioural analytics —
+ * which *is* about the person — stays opt-in below.
+ */
+export async function initErrorTracking(): Promise<void> {
+	if (errorTrackingInitialized) return;
 	const dsn = import.meta.env.VITE_SENTRY_DSN;
-	if (dsn) {
-		const Sentry = await import("@sentry/react");
-		Sentry.init({ dsn, sendDefaultPii: false, release: APP_VERSION });
-	}
+	if (!dsn) return;
+	errorTrackingInitialized = true;
+
+	const Sentry = await import("@sentry/react");
+	Sentry.init({ dsn, sendDefaultPii: false, release: APP_VERSION });
+}
+
+/** Product analytics (PostHog). Requires explicit consent. */
+export async function initMonitoring(): Promise<void> {
+	if (analyticsInitialized || !consented()) return;
+	analyticsInitialized = true;
 
 	const posthogKey = import.meta.env.VITE_POSTHOG_KEY;
 	if (posthogKey) {
@@ -73,9 +95,16 @@ export async function trackEvent(event: string, properties?: Record<string, unkn
 	posthog.capture(event, properties);
 }
 
-/** Report a caught error to Sentry. No-ops without consent or a configured DSN. */
+/**
+ * Report a caught error to Sentry. Not consent-gated — see `initErrorTracking`.
+ * No-ops without a configured DSN.
+ */
 export async function captureException(error: unknown): Promise<void> {
-	if (!consented() || !import.meta.env.VITE_SENTRY_DSN) return;
+	if (!import.meta.env.VITE_SENTRY_DSN) return;
+	// A caller may report an error before anything triggered init (e.g. a failure
+	// during startup); initializing here means the first crash isn't the one that
+	// gets dropped.
+	await initErrorTracking();
 	const Sentry = await import("@sentry/react");
 	Sentry.captureException(error);
 }

@@ -3,6 +3,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { getSupabase } from "../lib/supabaseClient";
 import { identify, resetIdentity } from "../lib/monitoring";
 import { track } from "../lib/analytics";
+import { ensureUserBootstrap } from "../services/profileService";
 
 const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
 
@@ -34,11 +35,21 @@ export function useSupabaseAuth(): SupabaseAuthState {
       return;
     }
 
-    supabase.auth.getSession().then(({ data, error: err }) => {
-      if (err) setError(err.message);
-      setSession(data.session);
-      setIsLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data, error: err }) => {
+        if (err) setError(err.message);
+        setSession(data.session);
+        setIsLoading(false);
+      })
+      .catch((e: unknown) => {
+        // A rejected getSession (offline, Supabase unreachable) previously left
+        // isLoading true forever, which renders auth-gated views permanently
+        // blank. Resolve to signed-out-with-an-error so the UI can explain.
+        setError(e instanceof Error ? e.message : "Could not check your sign-in status.");
+        setSession(null);
+        setIsLoading(false);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
@@ -49,6 +60,14 @@ export function useSupabaseAuth(): SupabaseAuthState {
         return;
       }
       if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        // Repair accounts missing their profile/closet/membership rows (e.g.
+        // signups that predate the handle_new_user trigger). No-op for everyone
+        // else, and deliberately non-blocking: a failure here must not stop a
+        // sign-in that otherwise succeeded.
+        void ensureUserBootstrap().then((r) => {
+          if (!r.ok) console.error("ensureUserBootstrap failed:", r.error);
+        });
+
         void identify(s.user.id, { email: s.user.email });
         // A brand-new account: user created within the last 2 minutes.
         const createdAt = s.user.created_at ? Date.parse(s.user.created_at) : NaN;

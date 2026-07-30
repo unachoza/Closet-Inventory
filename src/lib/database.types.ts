@@ -533,6 +533,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_user_bootstrap: { Args: Record<string, never>; Returns: undefined }
       is_closet_member: { Args: { _closet_id: string }; Returns: boolean }
     }
     Enums: {

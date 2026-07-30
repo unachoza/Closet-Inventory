@@ -22,6 +22,22 @@ vi.mock("./hooks/useGmailAuth", () => ({
 	}),
 }));
 
+// Gmail import sits behind ImportAccountGate, which requires a Supabase account.
+// These are navigation tests, so treat the user as signed in — the gate's own
+// behaviour is covered in ImportAccountGate.test.tsx.
+vi.mock("./hooks/useSupabaseAuth", () => ({
+	useSupabaseAuth: () => ({
+		session: {},
+		user: { id: "test-user" },
+		gmailAccessToken: null,
+		isAuthenticated: true,
+		isLoading: false,
+		error: null,
+		signIn: vi.fn(),
+		signOut: vi.fn(),
+	}),
+}));
+
 // ── Stub all view components ──────────────────────────────────────────────────
 vi.mock("./Features/Carousel/Carousel", () => ({
 	default: () => <div data-testid="view-carousel">Carousel</div>,

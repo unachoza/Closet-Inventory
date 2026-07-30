@@ -1,0 +1,63 @@
+/* Escalating local-only capacity notice. Tone ramps with the tier so "close to
+   the limit" reads differently from "saved on this device". */
+
+.capacity-notice {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3, 0.75rem);
+	padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+	margin: 0 auto var(--space-4, 1rem);
+	max-width: 60rem;
+	border: 1px solid var(--color-border, currentColor);
+	border-radius: var(--radius-md, 0.5rem);
+	/* Solid fallback first: older Safari (<16.2) drops color-mix() declarations,
+	   and a dropped background here would leave text on a transparent panel. */
+	background: var(--color-surface, #fff);
+	color: var(--color-text, inherit);
+}
+
+.capacity-notice__message {
+	margin: 0;
+	flex: 1 1 18rem;
+	line-height: 1.45;
+	text-wrap: pretty;
+}
+
+.capacity-notice__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2, 0.5rem);
+}
+
+/* Touch targets stay above 44px on phones, where this notice matters most. */
+.capacity-notice__cta,
+.capacity-notice__dismiss {
+	min-height: 2.75rem;
+	padding-inline: var(--space-4, 1rem);
+}
+
+.capacity-notice--info {
+	border-color: var(--color-border, currentColor);
+}
+
+.capacity-notice--warn {
+	border-color: var(--color-warning, #b26a00);
+}
+
+.capacity-notice--urgent {
+	border-color: var(--color-warning, #b26a00);
+	border-width: 2px;
+}
+
+.capacity-notice--blocked {
+	border-color: var(--color-danger, #b3261e);
+	border-width: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.capacity-notice {
+		transition: border-color 150ms ease;
+	}
+}

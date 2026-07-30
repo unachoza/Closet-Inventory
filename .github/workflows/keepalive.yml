@@ -1,0 +1,66 @@
+name: Supabase keepalive
+
+on:
+  schedule:
+    # Daily. Supabase pauses Free-plan projects after ~7 days of low activity,
+    # and the docs note "a few user requests to the database each day" is enough
+    # to stay active. Pre-launch this project has effectively zero real traffic,
+    # so without this it is a prime pause candidate. Restoring is possible for
+    # 90 days after a pause, but it means downtime the first tester hits.
+    - cron: "17 9 * * *"
+  # Manual trigger, so the job can be proven working without waiting a day.
+  workflow_dispatch:
+
+# Read-only: this workflow only issues SELECTs against PostgREST.
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: Ping ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      # Don't let a paused/broken dev project mask the status of prod.
+      fail-fast: false
+      matrix:
+        include:
+          - project: prod
+            url_secret: SUPABASE_URL
+            key_secret: SUPABASE_ANON_KEY
+          - project: dev
+            url_secret: SUPABASE_DEV_URL
+            key_secret: SUPABASE_DEV_ANON_KEY
+    steps:
+      - name: Query PostgREST
+        env:
+          SUPABASE_URL: ${{ secrets[matrix.url_secret] }}
+          SUPABASE_ANON_KEY: ${{ secrets[matrix.key_secret] }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ]; then
+            echo "::error::Missing secrets for '${{ matrix.project }}'. A keepalive that silently does nothing is worse than none."
+            exit 1
+          fi
+
+          # `profiles` is RLS-protected, so an anon caller legitimately gets an
+          # empty array — the point is the round-trip to Postgres, not the rows.
+          # `limit=1` keeps it trivial.
+          status=$(curl --silent --show-error --fail-with-body \
+            --max-time 30 --retry 3 --retry-delay 10 --retry-all-errors \
+            --output /tmp/body.txt --write-out '%{http_code}' \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL}/rest/v1/profiles?select=id&limit=1")
+
+          echo "HTTP ${status}"
+          cat /tmp/body.txt
+
+          # `--fail-with-body` already exits non-zero on 4xx/5xx; this guards the
+          # case where a paused project returns a 2xx maintenance page.
+          if [ "${status}" != "200" ]; then
+            echo "::error::Expected 200 from ${{ matrix.project }}, got ${status}. The project may be paused."
+            exit 1
+          fi
+
+          echo "${{ matrix.project }} is awake."
