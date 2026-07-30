@@ -208,7 +208,7 @@
       font-size: .8rem;
 }
 
-li:not(:first-child)::before {
+ul.country-of-origin-list li:not(:first-child)::before {
       content: " • ";
       margin-left: 2px;
       color: var(--detail-accent);
