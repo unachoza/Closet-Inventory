@@ -305,6 +305,27 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   --border-brand: var(--primitive-brand-muted-clay);
   /* Subtle white border for use on dark/modal surfaces */
   --border-on-dark: rgba(255, 255, 255, 0.2);
+
+  /* ── Focus-visible ring system ────────────────────────────────────────
+     A button's focus ring must hit ≥3:1 contrast (WCAG 2.4.11) against its
+     OWN background, not just the page background — one ring color can't
+     serve every button. Three buckets, verified by contrast math:
+       - default   (white / transparent / --bg-surface-secondary bg):
+         --focus-ring-default against those bgs ≈ 3.7–4.3:1 in both themes.
+       - on-brand  (bg == --bg-surface-brand, or the near-identical
+         --Primary-Pink-Darker / --primitive-brand-deep-umber, #8f6256):
+         --focus-ring-default only hits ~1.3:1 there — use --focus-ring-on-brand
+         instead (≈3.3–3.5:1).
+       - on-danger (bg == --color-danger, #b3261e): NEITHER of the above
+         passes (2.7:1 / 1.8:1) — use --focus-ring-on-danger (white; ≈6.5:1).
+     Apply via the two custom properties below at whatever selector sets
+     the background (see the button:focus-visible rule in index.css). */
+  --focus-ring-default: var(--border-brand);
+  --focus-ring-default-offset: 2px;
+  --focus-ring-on-brand: #1c1a17;
+  --focus-ring-on-brand-offset: 3px;
+  --focus-ring-on-danger: var(--text-on-brand);
+  --focus-ring-on-danger-offset: 2px;
 }
 
 @media (prefers-color-scheme: dark) {

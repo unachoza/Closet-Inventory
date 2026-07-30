@@ -28,6 +28,11 @@
       transition: all 0.2s ease;
 }
 
+.image-uploader-box:focus-visible {
+      outline: .125rem solid var(--border-brand);
+      outline-offset: 2px;
+}
+
 .image-uploader-box:hover {
       background-color: var(--bg-surface-secondary);
       border-color: var(--border-brand);

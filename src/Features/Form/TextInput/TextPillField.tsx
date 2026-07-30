@@ -15,20 +15,42 @@ interface TextPillFieldProps extends Omit<InputProps, "value"> {
 	hint?: string;
 }
 
-const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData, hint }: TextPillFieldProps) => {
+/** Split a comma-joined field value into trimmed, non-empty parts. */
+const splitValues = (raw: unknown): string[] =>
+	typeof raw === "string"
+		? raw
+				.split(",")
+				.map((part) => part.trim())
+				.filter(Boolean)
+		: [];
+
+const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, pillArray, onPillsChange, formData, multiSelect = false, hint }: TextPillFieldProps) => {
 	const [pills, setPills] = useState<string[]>(pillArray);
 	const [inputValue, setInputValue] = useState<string>("");
 
-	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" || e.key === "Tab") {
-			e.preventDefault();
+	const selected = multiSelect ? splitValues(formData[label]) : [String(formData[label] ?? "")].filter(Boolean);
 
-			if (inputValue.trim() && !pills.includes(inputValue.trim())) {
-				const newPills = [...pills, inputValue.trim()];
-				setPills(newPills);
-				onPillsChange?.(newPills);
-				setInputValue("");
-			}
+	const handleToggle = (value: string, field: keyof ItemFormData) => {
+		if (multiSelect) {
+			const next = selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value];
+			handleFormUpdate(next.join(", "), field);
+			return;
+		}
+		handleFormUpdate(selected.includes(value) ? "" : value, field);
+	};
+
+	const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+		// Tab must keep moving focus to the next field — only Enter is "commit
+		// and stay put". Previously both preventDefault()'d, which silently
+		// trapped keyboard focus in this input with no way to Tab past it.
+		if (e.key !== "Enter" && e.key !== "Tab") return;
+		if (e.key === "Enter") e.preventDefault();
+
+		if (inputValue.trim() && !pills.includes(inputValue.trim())) {
+			const newPills = [...pills, inputValue.trim()];
+			setPills(newPills);
+			onPillsChange?.(newPills);
+			setInputValue("");
 		}
 	};
 
@@ -37,8 +59,8 @@ const TextPillField = ({ label, name, className, placeholder, handleFormUpdate, 
 			<label className="label-text">{label}</label>
 			<div className="pill-container">
 				{pillArray.map((value) => {
-					const isActive = formData[label] === value;
-					return <CheckPill key={value} id={value} label={label} value={value} onToggle={handleFormUpdate} checked={isActive} />;
+					const isActive = selected.includes(value);
+					return <CheckPill key={value} id={value} label={label} value={value} onToggle={handleToggle} checked={isActive} />;
 				})}
 			</div>
 			{hint && <p className="pill-field-hint">{hint}</p>}

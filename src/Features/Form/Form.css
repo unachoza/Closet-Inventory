@@ -50,6 +50,11 @@ form {
 	color: var(--text-primary, inherit);
 }
 
+.form-close-btn:focus-visible{
+	outline: .125rem solid var(--border-brand);
+      outline-offset: 2px;
+}
+
 .form-step{
 	display: flex;
 	flex-direction: column;
@@ -97,6 +102,10 @@ button.submit {
 	border-radius: var(--layout-radius-button);
 	background-color: var(--bg-surface-brand);
 	color: var(--text-on-brand);
+	/* bg is --bg-surface-brand — use the on-brand focus-ring bucket (see
+	   tokens.css) instead of the global default, which fails contrast here. */
+	--focus-ring-default: var(--focus-ring-on-brand);
+	--focus-ring-default-offset: var(--focus-ring-on-brand-offset);
 }
 
 .next-button:hover,
@@ -283,6 +292,11 @@ p.step-hint {
 	color: var(--text-primary);
 }
 
+button.stock-photo-toggle:focus-visible{
+	outline: .125rem solid var(--border-brand);
+    	outline-offset: 2px;
+}
+
 .stock-photo-toggle--on {
 	border-style: solid;
 	border-color: var(--bg-surface-brand);
@@ -396,6 +410,22 @@ p.step-hint {
 .skip-button:hover {
 	border-color: var(--text-primary);
 	color: var(--text-primary);
+}
+
+/* The global button:hover/:focus/:active rules (index.css) set `transform`
+   directly, which — since transform isn't additive across rules — wipes out
+   the translateX(-50%) this button depends on for centering (position:
+   absolute + left:50%). Without it, the button's left edge sits at 50% of
+   its container and the whole thing jumps right by half its own width.
+   Re-combine both transforms here; .skip-button:hover/:focus/:active (0,2,0)
+   outranks button:hover/:focus (0,1,1) so this wins. */
+.skip-button:hover,
+.skip-button:focus {
+	transform: translateX(-50%) translateY(-1px);
+}
+
+.skip-button:active {
+	transform: translateX(-50%) translateY(-1px) scale(0.97);
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */

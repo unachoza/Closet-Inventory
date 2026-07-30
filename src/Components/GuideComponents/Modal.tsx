@@ -87,7 +87,7 @@ function DetailModal({ fiber, onClose, scrollToSection, onOpenGuide }: DetailMod
 						</h2>
 						<p className="detail-source">{name}</p>
 						{countryOfOrigin && (
-							<ul>
+							<ul className="country-of-origin-list">
 								{countryOfOrigin.split(",").map((country) => (
 									<li>{country}</li>
 								))}

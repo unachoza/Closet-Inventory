@@ -70,7 +70,19 @@ const ImageUploaderInput = ({ image, onImageRemove, onImageSelect }: ImageUpload
 	return (
 		<div className="image-uploader">
 			<label>Upload Item Photo</label>
-			<div className="image-uploader-box" onClick={() => fileInputRef.current?.click()}>
+			<div
+				className="image-uploader-box"
+				role="button"
+				tabIndex={0}
+				aria-label="Upload item photo"
+				onClick={() => fileInputRef.current?.click()}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						fileInputRef.current?.click();
+					}
+				}}
+			>
 				{isProcessing ? (
 					<div className="image-placeholder">Processing photo…</div>
 				) : preview ? (

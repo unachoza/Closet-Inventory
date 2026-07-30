@@ -232,7 +232,7 @@ button.toc-link:focus {
 /* Single accessible focus style: no ring on mouse click, clear ring on keyboard. */
 .toc-link:focus { outline: none; }
 .toc-link:focus-visible {
-      outline: 2px solid var(--gold);
+      outline: .125rem solid var(--border-brand);
       outline-offset: -2px;
 }
 .toc-dot {

@@ -220,13 +220,23 @@ button.submit.ingestion-edit-form {
       top: 15px;
       right: 15px;
       float: right;
-      height: 35px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
       margin: -18px;
       padding: 3px;
       border: 1px solid var(--border-strong);
       border-radius: 50%;
+      background: transparent;
       color: var(--text-primary);
       cursor: pointer;
+}
+
+.close-icon img {
+      width: 20px;
+      height: 20px;
 }
 
 /* ── Material blend section ──────────────────────────────────────────── */
