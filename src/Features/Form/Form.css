@@ -50,6 +50,11 @@ form {
 	color: var(--text-primary, inherit);
 }
 
+.form-close-btn:focus-visible{
+	outline: .125rem solid var(--border-brand);
+      outline-offset: 2px;
+}
+
 .form-step{
 	display: flex;
 	flex-direction: column;
@@ -103,6 +108,11 @@ button.submit {
 button.submit:hover {
 	background-color: var(--primitive-brand-deep-umber);
 	border-color: var(--primitive-brand-deep-umber);
+}
+
+.next-button:focus-visible{
+	outline: .125rem solid #4a2e24;
+    	outline-offset: 2px;
 }
 
 .form-controls  button.back-button {
@@ -281,6 +291,11 @@ p.step-hint {
 .stock-photo-toggle:hover {
 	border-color: var(--text-primary);
 	color: var(--text-primary);
+}
+
+button.stock-photo-toggle:focus-visible{
+	outline: .125rem solid var(--border-brand);
+    	outline-offset: 2px;
 }
 
 .stock-photo-toggle--on {

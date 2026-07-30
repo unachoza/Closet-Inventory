@@ -291,7 +291,9 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 
 	return (
 		<div className="edit-form form">
-			<img src={close} className="close-icon" onClick={() => setView("carousel")} alt="close icon" data-testid="close-icon" />
+			<button type="button" className="close-icon" onClick={() => setView("carousel")} aria-label="Close" data-testid="close-icon">
+				<img src={close} alt="close icon" aria-hidden="true" />
+			</button>
 			<motion.form
 				layout
 				onSubmit={handleSubmit}
