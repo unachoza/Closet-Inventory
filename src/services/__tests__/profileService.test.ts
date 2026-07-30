@@ -1,17 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getProfile, updateDisplayName, validateDisplayName, DISPLAY_NAME_MAX_LENGTH } from "../profileService";
+import {
+	getProfile,
+	updateDisplayName,
+	validateDisplayName,
+	ensureUserBootstrap,
+	DISPLAY_NAME_MAX_LENGTH,
+} from "../profileService";
 
-const { single, selectEq, select, updateEq, update, from } = vi.hoisted(() => {
+const { single, selectEq, select, updateEq, update, from, rpc } = vi.hoisted(() => {
 	const single = vi.fn();
 	const selectEq = vi.fn(() => ({ single }));
 	const select = vi.fn(() => ({ eq: selectEq }));
 	const updateEq = vi.fn();
 	const update = vi.fn(() => ({ eq: updateEq }));
 	const from = vi.fn(() => ({ select, update }));
-	return { single, selectEq, select, updateEq, update, from };
+	const rpc = vi.fn();
+	return { single, selectEq, select, updateEq, update, from, rpc };
 });
 
-vi.mock("../../lib/supabaseClient", () => ({ getSupabase: () => ({ from }) }));
+vi.mock("../../lib/supabaseClient", () => ({ getSupabase: () => ({ from, rpc }) }));
 
 const PROFILE_ROW = {
 	id: "user-1",
@@ -25,9 +32,30 @@ describe("profileService", () => {
 	beforeEach(() => {
 		single.mockReset().mockResolvedValue({ data: PROFILE_ROW, error: null });
 		updateEq.mockReset().mockResolvedValue({ error: null });
+		rpc.mockReset().mockResolvedValue({ error: null });
 		from.mockClear();
 		select.mockClear();
 		update.mockClear();
+	});
+
+	describe("ensureUserBootstrap", () => {
+		it("calls the RPC with no arguments — the server derives the user from auth.uid()", async () => {
+			const result = await ensureUserBootstrap();
+			expect(result).toEqual({ ok: true, data: null });
+			// Passing a user id would let a caller bootstrap someone else's rows.
+			expect(rpc).toHaveBeenCalledWith("ensure_user_bootstrap");
+			expect(rpc).toHaveBeenCalledTimes(1);
+		});
+
+		it("reports the error instead of throwing, so a failure cannot block sign-in", async () => {
+			rpc.mockResolvedValue({ error: { message: "permission denied" } });
+			await expect(ensureUserBootstrap()).resolves.toEqual({ ok: false, error: "permission denied" });
+		});
+
+		it("surfaces a thrown client error as a result", async () => {
+			rpc.mockRejectedValue(new Error("network down"));
+			await expect(ensureUserBootstrap()).resolves.toEqual({ ok: false, error: "network down" });
+		});
 	});
 
 	describe("getProfile", () => {
