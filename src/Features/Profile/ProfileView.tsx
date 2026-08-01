@@ -11,6 +11,7 @@ import GoogleHeadsUpNotice from "../../Components/GoogleHeadsUpNotice/GoogleHead
 import FeedbackPanel from "../../Components/FeedbackButton/FeedbackPanel";
 import ProfileHeader from "./ProfileHeader";
 import FabricProfileCard from "./FabricProfileCard";
+import { showFabricProfile } from "../../config/features";
 import { appVersion } from "../../lib/monitoring";
 import "./ProfileView.css";
 
@@ -83,7 +84,7 @@ export default function ProfileView() {
 		<div className="profile">
 			<ProfileHeader profile={profile} user={user} onSaveName={updateDisplayName} />
 
-			<FabricProfileCard />
+			{showFabricProfile() && <FabricProfileCard />}
 
 			<div className="profile__rows">
 				{gmailConnected ? (

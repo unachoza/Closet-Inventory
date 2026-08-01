@@ -83,9 +83,24 @@ describe("ProfileView", () => {
 		});
 		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Ari" });
 		mockUseCloset.mockReturnValue({ closet: [] });
+		vi.stubEnv("VITE_SHOW_FABRIC_PROFILE", "");
 	});
 
-	it("hides the fabric profile card for a closet with under 3 resolvable fabrics", async () => {
+	it("hides the fabric profile card behind its feature flag even with 3+ resolvable fabrics", async () => {
+		mockUseCloset.mockReturnValue({
+			closet: [
+				{ id: "1", material: [{ material: "cotton", percentage: 100 }] },
+				{ id: "2", material: [{ material: "wool", percentage: 100 }] },
+				{ id: "3", material: [{ material: "silk", percentage: 100 }] },
+			] as unknown as ClothingItem[],
+		});
+		renderView();
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
+		expect(screen.queryByText("Fabric profile")).not.toBeInTheDocument();
+	});
+
+	it("hides the fabric profile card for a closet with under 3 resolvable fabrics, flag on", async () => {
+		vi.stubEnv("VITE_SHOW_FABRIC_PROFILE", "true");
 		mockUseCloset.mockReturnValue({
 			closet: [{ id: "1", material: [{ material: "cotton", percentage: 100 }] } as unknown as ClothingItem],
 		});
@@ -94,7 +109,8 @@ describe("ProfileView", () => {
 		expect(screen.queryByText("Fabric profile")).not.toBeInTheDocument();
 	});
 
-	it("shows the fabric profile card with a link to Your Fabrics once 3+ fabrics resolve", async () => {
+	it("shows the fabric profile card with a link to Your Fabrics once flag is on and 3+ fabrics resolve", async () => {
+		vi.stubEnv("VITE_SHOW_FABRIC_PROFILE", "true");
 		mockUseCloset.mockReturnValue({
 			closet: [
 				{ id: "1", material: [{ material: "cotton", percentage: 100 }] },

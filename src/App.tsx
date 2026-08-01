@@ -29,6 +29,8 @@ import ProfileView from "./Features/Profile/ProfileView";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
 import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
 import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
+import { useRetentionLifecycle } from "./hooks/useRetentionLifecycle";
+import RevealScreen from "./Features/Retention/RevealScreen";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -68,6 +70,7 @@ function AppShell() {
 	const { closet, getCloset, importItems, clearCloset } = useCloset();
 	const { isAtCapacity } = useLocalCapacity();
 	const demoLifecycle = useDemoLifecycle();
+	const { showReveal, dismissReveal } = useRetentionLifecycle();
 	const [selectedCategory, setSelectedCategory] = useState<CategoryType>(null);
 	const [editItem, setEditItem] = useState<ClothingItem | null>(null);
 	const [editMode, setEditMode] = useState<"edit" | "create">("edit");
@@ -211,6 +214,10 @@ function AppShell() {
 
 	if (showOnboarding) {
 		return <OnboardingFlow onComplete={handleComplete} />;
+	}
+
+	if (showReveal) {
+		return <RevealScreen onContinue={dismissReveal} />;
 	}
 	return (
 		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>

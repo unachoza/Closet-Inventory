@@ -19,3 +19,15 @@
 export function showStatusLocation(): boolean {
 	return import.meta.env.VITE_SHOW_STATUS_LOCATION === "true";
 }
+
+/**
+ * Profile's "Fabric profile" echo card (retention Phase 1, secondary discovery
+ * path to Care → Your Fabrics). Gated separately from the Care tab itself so
+ * it can be dark-launched or A/B'd independently while Your Fabrics ships live.
+ *
+ * Default OFF. Flip with `VITE_SHOW_FABRIC_PROFILE="true"`. Same
+ * function-not-const rationale as `showStatusLocation` above.
+ */
+export function showFabricProfile(): boolean {
+	return import.meta.env.VITE_SHOW_FABRIC_PROFILE === "true";
+}
