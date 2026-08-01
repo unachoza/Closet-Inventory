@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ViewProvider } from "../../../context/ViewContext";
+import { ClosetProvider } from "../../../context/ClosetContext";
 import InteractiveGuide from "../InteractiveGuide";
 
 // ── Environment mocks ─────────────────────────────────────────────────────────
@@ -19,9 +20,11 @@ beforeEach(() => {
 
 function renderGuide() {
 	return render(
-		<ViewProvider>
-			<InteractiveGuide />
-		</ViewProvider>,
+		<ClosetProvider>
+			<ViewProvider>
+				<InteractiveGuide />
+			</ViewProvider>
+		</ClosetProvider>,
 	);
 }
 

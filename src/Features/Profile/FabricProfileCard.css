@@ -1,0 +1,56 @@
+.fabric-profile-card {
+	background: var(--bg-surface-primary);
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--primitive-radius-md);
+	padding: 14px 15px;
+	margin-bottom: var(--primitive-spacing-md);
+}
+
+.fabric-profile-card__title {
+	font-family: var(--primitive-font-family-serif);
+	font-size: 15px;
+	font-weight: 600;
+	margin: 0 0 10px;
+	color: var(--text-primary);
+}
+
+.fabric-profile-card__bars {
+	display: flex;
+	gap: 3px;
+	height: 8px;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+
+.fabric-profile-card__bars span {
+	display: block;
+	height: 100%;
+}
+
+.fabric-profile-card__legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	font-size: 11px;
+	color: var(--text-secondary);
+	margin-bottom: 10px;
+}
+
+.fabric-profile-card__dot {
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	margin-right: 4px;
+}
+
+.fabric-profile-card__link {
+	border: none;
+	background: none;
+	padding: 0;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--primitive-brand-rose-terracotta);
+	cursor: pointer;
+}

@@ -1186,3 +1186,30 @@ button.toc-link:focus {
 	.stain-row { grid-template-columns: 1fr; gap: 3px; }
 	.stain-row__type { color: var(--sage, #5A7A60); }
 }
+
+/* ══════════ CARE TABS ══════════ */
+.care-tabs {
+	display: inline-flex;
+	gap: 4px;
+	margin: 16px 24px;
+	background: var(--bg-surface-secondary);
+	padding: 3px;
+	border-radius: 8px;
+}
+
+.care-tab {
+	border: none;
+	background: none;
+	padding: 9px 22px;
+	font-size: 13.5px;
+	font-weight: 600;
+	border-radius: 6px;
+	color: var(--text-secondary);
+	cursor: pointer;
+}
+
+.care-tab--active {
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+	box-shadow: var(--elevation-low);
+}

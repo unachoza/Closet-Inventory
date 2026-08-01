@@ -12,7 +12,7 @@ const MATERIAL_MIN_PCT = 6;
 
 // Extract canonical material names from a raw material field.
 // Skips minor fibers (≤ 6%) so "95% Cotton, 5% Elastane" → ["Cotton"] not ["Cotton", "Elastane"].
-const extractMaterialNames = (raw: unknown): string[] => {
+export const extractMaterialNames = (raw: unknown): string[] => {
 	if (typeof raw === "string") {
 		return raw.trim() ? [canonicalizeMaterial(raw.trim())] : [];
 	}

@@ -12,6 +12,14 @@ import { useView } from "../../context/ViewContext";
 import { ViewType } from "../../utils/types";
 import { FIBER_ROWS, SortDir, SortKey, sortRows } from "./fiberCompare";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
+import YourFabrics from "./YourFabrics";
+import { useClosetFabrics } from "../../hooks/useClosetFabrics";
+
+// Below this many resolvable fabrics, "Your Fabrics" would show a near-empty
+// screen where the encyclopedia is populated — default to Encyclopedia instead.
+const MIN_RESOLVABLE_FABRICS_FOR_DEFAULT = 3;
+
+type CareTab = "fabrics" | "encyclopedia";
 
 // Single source of truth: TOC order === document order === scrollspy order.
 const TOC_SECTIONS = [
@@ -29,6 +37,10 @@ const SECTION_IDS = TOC_SECTIONS.map((s) => s.id);
 const InteractiveGuide = () => {
 	const [selectedFiber, setSelectedFiber] = useState<Fiber | null>(null);
 	const [activeWeave, setActiveWeave] = useState<string>("plain");
+	const { resolvableCount } = useClosetFabrics();
+	const [activeTab, setActiveTab] = useState<CareTab>(() =>
+		resolvableCount >= MIN_RESOLVABLE_FABRICS_FOR_DEFAULT ? "fabrics" : "encyclopedia",
+	);
 
 	// Comparison table: sortable columns.
 	const [sortKey, setSortKey] = useState<SortKey | null>(null);
@@ -101,7 +113,29 @@ const InteractiveGuide = () => {
 	}
 
 	return (
-		<div className="textile-guide">
+		<div>
+			<div className="care-tabs">
+				<button
+					type="button"
+					className={`care-tab${activeTab === "fabrics" ? " care-tab--active" : ""}`}
+					onClick={() => setActiveTab("fabrics")}
+				>
+					Your Fabrics
+				</button>
+				<button
+					type="button"
+					className={`care-tab${activeTab === "encyclopedia" ? " care-tab--active" : ""}`}
+					onClick={() => setActiveTab("encyclopedia")}
+				>
+					Encyclopedia
+				</button>
+			</div>
+
+			<div style={{ display: activeTab === "fabrics" ? "block" : "none" }}>
+				<YourFabrics onOpenEncyclopedia={() => setActiveTab("encyclopedia")} />
+			</div>
+
+			<div className="textile-guide" style={{ display: activeTab === "encyclopedia" ? "block" : "none" }}>
 			{/* ── HERO ── */}
 			<section className="hero">
 				<div className="hero-inner">
@@ -547,6 +581,8 @@ const InteractiveGuide = () => {
 					</p>
 				</div>
 			</footer>
+			</div>
+
 			{/* ══════════ DETAIL MODAL ══════════ */}
 			<DetailModal fiber={selectedFiber} onClose={() => setSelectedFiber(null)} />
 		</div>

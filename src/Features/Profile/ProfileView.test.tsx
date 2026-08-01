@@ -6,6 +6,13 @@ import type { User } from "@supabase/supabase-js";
 import { SupabaseAuthContext } from "../../context/SupabaseAuthContext";
 import type { SupabaseAuthState } from "../../hooks/useSupabaseAuth";
 import { ViewProvider } from "../../context/ViewContext";
+import type { ClothingItem } from "../../utils/types";
+
+const mockUseCloset = vi.fn(() => ({ closet: [] as ClothingItem[] }));
+vi.mock("../../context/ClosetContext", () => ({
+	ClosetProvider: ({ children }: { children: ReactNode }) => children,
+	useCloset: () => mockUseCloset(),
+}));
 
 vi.mock("../../lib/analytics", () => ({ track: vi.fn() }));
 vi.mock("../../lib/monitoring", async (importOriginal) => ({
@@ -39,6 +46,7 @@ vi.mock("../../context/GmailAuthContext", () => ({
 	}),
 }));
 
+import { ClosetProvider } from "../../context/ClosetContext";
 import ProfileView from "./ProfileView";
 
 function makeAuth(overrides: Partial<SupabaseAuthState> = {}): SupabaseAuthState {
@@ -58,7 +66,9 @@ function makeAuth(overrides: Partial<SupabaseAuthState> = {}): SupabaseAuthState
 function renderView(auth = makeAuth()) {
 	const wrapper = ({ children }: { children: ReactNode }) => (
 		<SupabaseAuthContext.Provider value={auth}>
-			<ViewProvider initialView="profile">{children}</ViewProvider>
+			<ClosetProvider>
+				<ViewProvider initialView="profile">{children}</ViewProvider>
+			</ClosetProvider>
 		</SupabaseAuthContext.Provider>
 	);
 	render(<ProfileView />, { wrapper });
@@ -72,6 +82,30 @@ describe("ProfileView", () => {
 			data: { id: "user-1", created_at: "", display_name: "Susan", photo_url: null, settings: {} },
 		});
 		mockUpdateDisplayName.mockReset().mockResolvedValue({ ok: true, data: "Ari" });
+		mockUseCloset.mockReturnValue({ closet: [] });
+	});
+
+	it("hides the fabric profile card for a closet with under 3 resolvable fabrics", async () => {
+		mockUseCloset.mockReturnValue({
+			closet: [{ id: "1", material: [{ material: "cotton", percentage: 100 }] } as unknown as ClothingItem],
+		});
+		renderView();
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
+		expect(screen.queryByText("Fabric profile")).not.toBeInTheDocument();
+	});
+
+	it("shows the fabric profile card with a link to Your Fabrics once 3+ fabrics resolve", async () => {
+		mockUseCloset.mockReturnValue({
+			closet: [
+				{ id: "1", material: [{ material: "cotton", percentage: 100 }] },
+				{ id: "2", material: [{ material: "wool", percentage: 100 }] },
+				{ id: "3", material: [{ material: "silk", percentage: 100 }] },
+			] as unknown as ClothingItem[],
+		});
+		renderView();
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
+		expect(screen.getByText("Fabric profile")).toBeInTheDocument();
+		expect(screen.getByRole("button", { name: /open your fabrics/i })).toBeInTheDocument();
 	});
 
 	it("shows the display name, email, and app version", async () => {

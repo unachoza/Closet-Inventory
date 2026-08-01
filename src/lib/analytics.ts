@@ -39,6 +39,8 @@ export type AnalyticsEvent =
 	| "search_used"
 	| "filter_used"
 	| "care_guide_opened"
+	// Retention
+	| "closet_fabrics_viewed"
 	// Navigation
 	| "screen_viewed"
 	// Onboarding funnel

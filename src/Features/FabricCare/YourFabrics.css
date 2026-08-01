@@ -1,0 +1,140 @@
+.your-fabrics {
+	padding: 24px;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.your-fabrics__header h2 {
+	font-family: var(--primitive-font-family-serif, "Lora", serif);
+	font-size: 26px;
+	font-weight: 600;
+	margin: 0 0 4px;
+	color: var(--text-primary);
+}
+
+.your-fabrics__header p {
+	font-size: 14px;
+	color: var(--text-muted);
+	margin: 0 0 20px;
+}
+
+.your-fabrics__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 16px;
+}
+
+.fabric-card {
+	background: var(--bg-surface-glass, var(--bg-surface-primary));
+	backdrop-filter: blur(18px) saturate(115%);
+	-webkit-backdrop-filter: blur(18px) saturate(115%);
+	border: 1px solid var(--border-hairline);
+	border-radius: var(--layout-radius-card);
+	padding: 18px;
+	box-shadow: var(--elevation-low);
+}
+
+.fabric-card__swatch {
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	margin-bottom: 12px;
+	background: linear-gradient(135deg, var(--primitive-brand-muted-clay), var(--primitive-brand-deep-umber));
+}
+
+.fabric-card__name {
+	font-family: var(--primitive-font-family-serif, "Lora", serif);
+	font-size: 17px;
+	font-weight: 600;
+	color: var(--text-primary);
+	margin-bottom: 2px;
+}
+
+.fabric-card__count {
+	font-size: 12.5px;
+	color: var(--text-muted);
+	margin-bottom: 10px;
+}
+
+.fabric-card__pill {
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 3px 9px;
+	border-radius: 12px;
+}
+
+.fabric-card__pill--warn {
+	background: rgba(186, 146, 89, 0.16);
+	color: #8a5f26;
+}
+
+.fabric-card__pill--ok {
+	background: rgba(110, 122, 104, 0.15);
+	color: var(--status-success);
+}
+
+.fabric-card__tip {
+	font-size: 12px;
+	color: var(--text-secondary);
+	line-height: 1.5;
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 1px solid var(--border-hairline);
+}
+
+.your-fabrics--empty {
+	text-align: center;
+	padding: 64px 24px;
+	color: var(--text-secondary);
+}
+
+.your-fabrics__link {
+	background: none;
+	border: none;
+	color: var(--primitive-brand-rose-terracotta);
+	font-weight: 600;
+	font-size: 13px;
+	cursor: pointer;
+	margin-top: 12px;
+	padding: 0;
+}
+
+@media (max-width: 640px) {
+	.your-fabrics {
+		padding: 16px;
+	}
+
+	.your-fabrics__grid {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+
+	.fabric-card {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 14px;
+	}
+
+	.fabric-card__swatch {
+		width: 36px;
+		height: 36px;
+		margin-bottom: 0;
+		flex-shrink: 0;
+	}
+
+	.fabric-card__info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.fabric-card__tip {
+		display: none;
+	}
+
+	.fabric-card__pill {
+		margin-left: auto;
+		flex-shrink: 0;
+	}
+}
