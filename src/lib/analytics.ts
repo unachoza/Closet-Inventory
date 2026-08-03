@@ -52,7 +52,18 @@ export type AnalyticsEvent =
 	// Profile
 	| "profile_name_confirmed"
 	// Feedback
-	| "feedback_submitted";
+	| "feedback_submitted"
+	// Release comms — is the "what's changed" card worth keeping, and is anyone
+	// actually using the update-available prompt? shown minus dismissed/clicked
+	// is the read on both.
+	| "whats_changed_shown"
+	| "whats_changed_dismissed"
+	| "app_update_prompt_shown"
+	| "app_update_refresh_clicked"
+	// A real "this became an installed PWA" signal — install_prompt_result only
+	// records that a prompt was shown/dismissed, not that install completed.
+	// Chrome/Android only; appinstalled never fires on iOS Safari.
+	| "pwa_installed";
 
 /** Typed event capture. Delegates to the consent-gated PostHog plumbing. */
 export function track(event: AnalyticsEvent, properties?: Record<string, unknown>): void {
