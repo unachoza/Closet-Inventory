@@ -1,13 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { setConsent } from "../consent";
 
-const { sentryInit, sentryCaptureException, posthogInit, posthogCapture, posthogIdentify } = vi.hoisted(() => ({
-	sentryInit: vi.fn(),
-	sentryCaptureException: vi.fn(),
-	posthogInit: vi.fn(),
-	posthogCapture: vi.fn(),
-	posthogIdentify: vi.fn(),
-}));
+const { sentryInit, sentryCaptureException, posthogInit, posthogCapture, posthogIdentify, posthogRegister, detectStandalone, showStatusLocation, showWhatsChanged } =
+	vi.hoisted(() => ({
+		sentryInit: vi.fn(),
+		sentryCaptureException: vi.fn(),
+		posthogInit: vi.fn(),
+		posthogCapture: vi.fn(),
+		posthogIdentify: vi.fn(),
+		posthogRegister: vi.fn(),
+		detectStandalone: vi.fn(() => false),
+		showStatusLocation: vi.fn(() => false),
+		showWhatsChanged: vi.fn(() => true),
+	}));
 
 vi.mock("@sentry/react", () => ({
 	init: sentryInit,
@@ -15,8 +20,11 @@ vi.mock("@sentry/react", () => ({
 }));
 
 vi.mock("posthog-js", () => ({
-	default: { init: posthogInit, register: vi.fn(), identify: posthogIdentify, reset: vi.fn(), capture: posthogCapture },
+	default: { init: posthogInit, register: posthogRegister, identify: posthogIdentify, reset: vi.fn(), capture: posthogCapture },
 }));
+
+vi.mock("../../hooks/useInstallPrompt", () => ({ detectStandalone }));
+vi.mock("../../config/features", () => ({ showStatusLocation, showWhatsChanged }));
 
 describe("monitoring", () => {
 	beforeEach(() => {
@@ -26,6 +34,10 @@ describe("monitoring", () => {
 		posthogInit.mockClear();
 		posthogCapture.mockClear();
 		posthogIdentify.mockClear();
+		posthogRegister.mockClear();
+		detectStandalone.mockClear().mockReturnValue(false);
+		showStatusLocation.mockClear().mockReturnValue(false);
+		showWhatsChanged.mockClear().mockReturnValue(true);
 		vi.resetModules();
 	});
 
@@ -54,6 +66,25 @@ describe("monitoring", () => {
 		await initMonitoring();
 
 		expect(posthogInit).toHaveBeenCalled();
+	});
+
+	it("initMonitoring: registers is_standalone and the current feature-flag states as super-properties", async () => {
+		setConsent("granted");
+		vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+		detectStandalone.mockReturnValue(true);
+		showStatusLocation.mockReturnValue(true);
+		showWhatsChanged.mockReturnValue(false);
+		const { initMonitoring } = await import("../monitoring");
+
+		await initMonitoring();
+
+		expect(posthogRegister).toHaveBeenCalledWith(
+			expect.objectContaining({
+				is_standalone: true,
+				flag_status_location: true,
+				flag_whats_changed: false,
+			}),
+		);
 	});
 
 	it("initMonitoring: is a no-op the second time it's called", async () => {
