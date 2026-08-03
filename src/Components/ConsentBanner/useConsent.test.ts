@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 
-const { initMonitoring } = vi.hoisted(() => ({ initMonitoring: vi.fn() }));
-vi.mock("../../lib/monitoring", () => ({ initMonitoring }));
+const { initMonitoring, discardPendingEvents } = vi.hoisted(() => ({ initMonitoring: vi.fn(), discardPendingEvents: vi.fn() }));
+vi.mock("../../lib/monitoring", () => ({ initMonitoring, discardPendingEvents }));
 
 import { useConsent } from "./useConsent";
 

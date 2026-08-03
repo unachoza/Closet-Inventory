@@ -50,7 +50,10 @@ supabase/.branches/
 supabase/.temp/
 
 # Planning, design, research, legal documents, and user personas
-planning/
+planning/*
+!planning/launch/
+planning/launch/*
+!planning/launch/POST_BETA_BACKLOG.md
 docs/
 
 # Specific documentation files
