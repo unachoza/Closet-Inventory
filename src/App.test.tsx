@@ -76,6 +76,9 @@ beforeEach(() => {
 	localStorage.clear();
 	// Skip the first-launch onboarding so these tests exercise the app views.
 	localStorage.setItem("closetly-onboarding-complete", "true");
+	// Skip the "what's changed" card too — otherwise a returning user (set
+	// above) with no last-seen-version reads as due for it, per useWhatsChanged.
+	localStorage.setItem("closetly-last-seen-version", __APP_SEMVER__);
 });
 
 describe("App — view transitions", () => {

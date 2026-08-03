@@ -94,6 +94,8 @@ beforeEach(() => {
 	localStorage.clear();
 	sessionStorage.clear();
 	localStorage.setItem("closetly-onboarding-complete", "true");
+	// Skip the "what's changed" card too — see App.test.tsx for why.
+	localStorage.setItem("closetly-last-seen-version", __APP_SEMVER__);
 	capturedOnSuccess = undefined;
 });
 
