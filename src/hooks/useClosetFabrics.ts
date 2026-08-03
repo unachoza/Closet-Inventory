@@ -3,7 +3,7 @@ import { useCloset } from "../context/ClosetContext";
 import { extractMaterialNames } from "./useClosetFilters";
 import { resolveFiber } from "../utils/materialUtils";
 import { inferCareFromMaterial } from "../Features/FashionParser/inference/inferCare";
-import type { Fiber } from "../Content/Fabric&Fiber";
+import type { Fiber } from "../Content/Fabrics&Fibers/textileTypes";
 
 export type CareTone = "warn" | "ok";
 
@@ -39,7 +39,7 @@ function summarizeCare(name: string): { label: string; tone: CareTone; tip: stri
 
 /**
  * Aggregates the signed-in user's own (non-demo) items by fabric, joining each
- * counted material to its Fabric&Fiber.ts encyclopedia entry and care guidance.
+ * counted material to its fibers.ts encyclopedia entry and care guidance.
  * Reuses the counting rules already validated in useClosetFilters (material
  * dimension) rather than re-implementing them.
  */

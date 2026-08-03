@@ -1,4 +1,4 @@
-import { WEAVE_TYPES } from "../../Content/Fabric&Fiber";
+import { WEAVE_TYPES } from "../../Content/Fabrics&Fibers/weaveTypes";
 import "../../Features/FabricCare/TextileGuide.css";
 
 /** Weave diagram SVGs — inline for performance */

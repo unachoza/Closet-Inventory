@@ -1,5 +1,5 @@
 import type { MaterialBlend } from "./types";
-import { FIBERS } from "../Content/Fabric&Fiber";
+import { FIBERS } from "../Content/Fabrics&Fibers/fibers";
 
 // ── Color palette for composition bar segments ────────────────────────────────
 // Each common material gets a distinct, accessible color. Unknown materials
