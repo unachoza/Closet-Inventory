@@ -25,6 +25,10 @@ function resolveAppVersion(): string {
 export default defineConfig(() => ({
 	define: {
 		__APP_VERSION__: JSON.stringify(resolveAppVersion()),
+		// Semver only (no git sha) — the git sha changes on every commit, which
+		// would make the "what's changed" screen (WhatsChanged/) re-show on every
+		// deploy instead of once per actual release.
+		__APP_SEMVER__: JSON.stringify(pkg.version),
 	},
 	build: {
 		// Emit CSS that older mobile Safari can parse. Without this, esbuild

@@ -19,3 +19,5 @@ interface ImportMeta {
 
 /** Build-time app version (e.g. "v0.9.0-a1b2c3d"), injected by vite `define`. */
 declare const __APP_VERSION__: string;
+/** Build-time semver only (e.g. "0.9.0"), no git sha — see WhatsChanged/. */
+declare const __APP_SEMVER__: string;
