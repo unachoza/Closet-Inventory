@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 
-const { initMonitoring } = vi.hoisted(() => ({ initMonitoring: vi.fn() }));
-vi.mock("../../lib/monitoring", () => ({ initMonitoring }));
+const { initMonitoring, discardPendingEvents } = vi.hoisted(() => ({ initMonitoring: vi.fn(), discardPendingEvents: vi.fn() }));
+vi.mock("../../lib/monitoring", () => ({ initMonitoring, discardPendingEvents }));
 
 import ConsentBanner from "./ConsentBanner";
 
@@ -10,6 +10,13 @@ describe("ConsentBanner", () => {
 	beforeEach(() => {
 		localStorage.clear();
 		initMonitoring.mockClear();
+		discardPendingEvents.mockClear();
+	});
+
+	it("declining destroys the events buffered before consent was answered", () => {
+		render(<ConsentBanner />);
+		fireEvent.click(screen.getByRole("button", { name: /decline/i }));
+		expect(discardPendingEvents).toHaveBeenCalled();
 	});
 
 	it("shows on first visit", () => {

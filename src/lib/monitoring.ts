@@ -14,6 +14,34 @@ import { getConsent } from "./consent";
 let errorTrackingInitialized = false;
 let analyticsInitialized = false;
 
+/**
+ * Buffered pre-consent telemetry.
+ *
+ * The onboarding funnel runs entirely before the consent banner can appear —
+ * `ConsentBanner` mounts past the `OnboardingFlow` early-return in `App.tsx`, a
+ * deliberate fix for the banner overlapping the tour's CTA. The side effect was
+ * that `onboarding_step_viewed`, `onboarding_completed`, `install_prompt_result`
+ * and `signin_skipped` could never fire: by the time consent existed, the events
+ * were long gone. The entire first-run funnel was dark.
+ *
+ * So events are held **in memory only** while consent is undecided, then either
+ * replayed on grant or dropped on decline. Nothing leaves the device before the
+ * user opts in — no network call, no localStorage, no persistence across a
+ * reload — so the privacy posture is unchanged and the funnel survives.
+ */
+type PendingEvent = {
+	readonly event: string;
+	readonly properties?: Record<string, unknown>;
+	/** When it actually happened, so replay doesn't stamp everything at flush time. */
+	readonly timestamp: Date;
+};
+
+/** Ceiling on the in-memory buffer — an undecided session must not grow forever. */
+export const MAX_PENDING_EVENTS = 100;
+
+let pendingEvents: readonly PendingEvent[] = [];
+let pendingIdentity: { readonly userId: string; readonly traits?: Record<string, unknown> } | null = null;
+
 /** Build-time version, tagged into both SDKs so reports name the exact build. */
 const APP_VERSION = typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "dev";
 
@@ -65,7 +93,38 @@ export async function initMonitoring(): Promise<void> {
 			disable_session_recording: false,
 		});
 		posthog.register({ app_version: APP_VERSION });
+		await flushPendingEvents();
 	}
+}
+
+/**
+ * Replay everything captured before the user opted in. Called only from
+ * `initMonitoring`, i.e. only after consent was granted and PostHog started.
+ */
+async function flushPendingEvents(): Promise<void> {
+	const events = pendingEvents;
+	const identity = pendingIdentity;
+	// Cleared before the await so a concurrent flush can't double-send.
+	pendingEvents = [];
+	pendingIdentity = null;
+	if (events.length === 0 && !identity) return;
+
+	const { default: posthog } = await import("posthog-js");
+	// Identity first — otherwise the replayed funnel attaches to an anonymous
+	// person and can't be followed through to the same user's later activity.
+	if (identity) posthog.identify(identity.userId, identity.traits);
+	events.forEach(({ event, properties, timestamp }) => {
+		posthog.capture(event, properties, { timestamp });
+	});
+}
+
+/**
+ * Drop everything held pre-consent. Called when the user declines, so a "no"
+ * means the buffered events are destroyed rather than merely unsent.
+ */
+export function discardPendingEvents(): void {
+	pendingEvents = [];
+	pendingIdentity = null;
 }
 
 /**
@@ -73,7 +132,15 @@ export async function initMonitoring(): Promise<void> {
  * consent or a configured key. `traits` are optional person properties.
  */
 export async function identify(userId: string, traits?: Record<string, unknown>): Promise<void> {
-	if (!consented() || !import.meta.env.VITE_POSTHOG_KEY) return;
+	if (!import.meta.env.VITE_POSTHOG_KEY) return;
+	const consent = getConsent();
+	if (consent === "declined") return;
+	// Sign-in happens during onboarding, before consent is answerable. Hold the
+	// identity so a later grant can attribute the replayed funnel to this user.
+	if (consent === "undecided") {
+		pendingIdentity = { userId, traits };
+		return;
+	}
 	const { default: posthog } = await import("posthog-js");
 	posthog.identify(userId, traits);
 }
@@ -90,7 +157,17 @@ export async function resetIdentity(): Promise<void> {
  * No-ops without consent or a configured key.
  */
 export async function trackEvent(event: string, properties?: Record<string, unknown>): Promise<void> {
-	if (!consented() || !import.meta.env.VITE_POSTHOG_KEY) return;
+	// No key means the event could never be sent, so there's nothing worth holding.
+	if (!import.meta.env.VITE_POSTHOG_KEY) return;
+	const consent = getConsent();
+	if (consent === "declined") return;
+	if (consent === "undecided") {
+		// Oldest-wins: the first-run funnel is the reason this buffer exists, so a
+		// long undecided session drops its late noise rather than its beginning.
+		if (pendingEvents.length >= MAX_PENDING_EVENTS) return;
+		pendingEvents = [...pendingEvents, { event, properties, timestamp: new Date() }];
+		return;
+	}
 	const { default: posthog } = await import("posthog-js");
 	posthog.capture(event, properties);
 }

@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { setConsent } from "../consent";
 
-const { sentryInit, sentryCaptureException, posthogInit } = vi.hoisted(() => ({
+const { sentryInit, sentryCaptureException, posthogInit, posthogCapture, posthogIdentify } = vi.hoisted(() => ({
 	sentryInit: vi.fn(),
 	sentryCaptureException: vi.fn(),
 	posthogInit: vi.fn(),
+	posthogCapture: vi.fn(),
+	posthogIdentify: vi.fn(),
 }));
 
 vi.mock("@sentry/react", () => ({
@@ -13,7 +15,7 @@ vi.mock("@sentry/react", () => ({
 }));
 
 vi.mock("posthog-js", () => ({
-	default: { init: posthogInit, register: vi.fn(), identify: vi.fn(), reset: vi.fn(), capture: vi.fn() },
+	default: { init: posthogInit, register: vi.fn(), identify: posthogIdentify, reset: vi.fn(), capture: posthogCapture },
 }));
 
 describe("monitoring", () => {
@@ -22,6 +24,8 @@ describe("monitoring", () => {
 		sentryInit.mockClear();
 		sentryCaptureException.mockClear();
 		posthogInit.mockClear();
+		posthogCapture.mockClear();
+		posthogIdentify.mockClear();
 		vi.resetModules();
 	});
 
@@ -133,5 +137,128 @@ describe("monitoring", () => {
 		await captureException(new Error("boom"));
 
 		expect(sentryCaptureException).not.toHaveBeenCalled();
+	});
+
+	// The onboarding funnel runs entirely before the consent banner can be shown
+	// (ConsentBanner mounts past the OnboardingFlow early-return in App.tsx), so
+	// without buffering every first-run event is structurally unreachable.
+	describe("pre-consent event buffer", () => {
+		it("sends nothing to PostHog while consent is undecided", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent } = await import("../monitoring");
+
+			await trackEvent("onboarding_step_viewed", { step: "welcome" });
+
+			expect(posthogCapture).not.toHaveBeenCalled();
+		});
+
+		it("flushes buffered events once consent is granted", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent, initMonitoring } = await import("../monitoring");
+			await trackEvent("onboarding_step_viewed", { step: "welcome" });
+			await trackEvent("install_prompt_result", { outcome: "accepted" });
+
+			setConsent("granted");
+			await initMonitoring();
+
+			expect(posthogCapture).toHaveBeenCalledTimes(2);
+			expect(posthogCapture).toHaveBeenNthCalledWith(1, "onboarding_step_viewed", { step: "welcome" }, expect.anything());
+			expect(posthogCapture).toHaveBeenNthCalledWith(2, "install_prompt_result", { outcome: "accepted" }, expect.anything());
+		});
+
+		it("replays each event with the time it actually happened, not the flush time", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent, initMonitoring } = await import("../monitoring");
+			const before = new Date();
+			await trackEvent("onboarding_step_viewed", { step: "welcome" });
+
+			setConsent("granted");
+			await initMonitoring();
+
+			const options = posthogCapture.mock.calls[0][2] as { timestamp: Date };
+			expect(options.timestamp).toBeInstanceOf(Date);
+			expect(options.timestamp.getTime()).toBeGreaterThanOrEqual(before.getTime());
+			expect(options.timestamp.getTime()).toBeLessThanOrEqual(Date.now());
+		});
+
+		it("attributes flushed events to a user identified before consent", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent, identify, initMonitoring } = await import("../monitoring");
+			await identify("user-123", { name: "Tester" });
+			await trackEvent("onboarding_completed");
+
+			setConsent("granted");
+			await initMonitoring();
+
+			// identify must land before the replayed events, or they attach to an
+			// anonymous person and the funnel can't be followed per-user.
+			expect(posthogIdentify).toHaveBeenCalledWith("user-123", { name: "Tester" });
+			expect(posthogIdentify.mock.invocationCallOrder[0]).toBeLessThan(posthogCapture.mock.invocationCallOrder[0]);
+		});
+
+		it("discards the buffer when consent is declined — nothing is ever sent", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent, discardPendingEvents, initMonitoring } = await import("../monitoring");
+			await trackEvent("onboarding_step_viewed", { step: "welcome" });
+
+			setConsent("declined");
+			discardPendingEvents();
+			// Even if analytics were somehow started later, the declined events are gone.
+			setConsent("granted");
+			await initMonitoring();
+
+			expect(posthogCapture).not.toHaveBeenCalled();
+		});
+
+		it("drops new events outright once consent is declined", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			setConsent("declined");
+			const { trackEvent, initMonitoring } = await import("../monitoring");
+
+			await trackEvent("item_added");
+			setConsent("granted");
+			await initMonitoring();
+
+			expect(posthogCapture).not.toHaveBeenCalled();
+		});
+
+		it("caps the buffer so an undecided session can't grow without bound", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent, MAX_PENDING_EVENTS, initMonitoring } = await import("../monitoring");
+
+			for (let i = 0; i < MAX_PENDING_EVENTS + 10; i++) {
+				await trackEvent("screen_viewed", { index: i });
+			}
+			setConsent("granted");
+			await initMonitoring();
+
+			expect(posthogCapture).toHaveBeenCalledTimes(MAX_PENDING_EVENTS);
+			// The cap keeps the OLDEST events — the first-run funnel is the reason
+			// this buffer exists, so late noise is what gets dropped.
+			expect(posthogCapture).toHaveBeenNthCalledWith(1, "screen_viewed", { index: 0 }, expect.anything());
+		});
+
+		it("does not buffer when no PostHog key is configured", async () => {
+			vi.stubEnv("VITE_POSTHOG_KEY", "");
+			const { trackEvent, initMonitoring } = await import("../monitoring");
+			await trackEvent("onboarding_completed");
+
+			setConsent("granted");
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			await initMonitoring();
+
+			expect(posthogCapture).not.toHaveBeenCalled();
+		});
+
+		it("sends events immediately once consent is granted — no buffering after that", async () => {
+			setConsent("granted");
+			vi.stubEnv("VITE_POSTHOG_KEY", "phc_test");
+			const { trackEvent, initMonitoring } = await import("../monitoring");
+			await initMonitoring();
+
+			await trackEvent("item_added", { source: "manual" });
+
+			expect(posthogCapture).toHaveBeenCalledWith("item_added", { source: "manual" });
+		});
 	});
 });
