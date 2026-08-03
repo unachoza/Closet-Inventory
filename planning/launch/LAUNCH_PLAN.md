@@ -72,3 +72,17 @@ this push.
 - PWA update check on `visibilitychange` (src/lib/pwaUpdate.ts) — a
   backgrounded-then-reopened install now force-checks for a new build instead
   of waiting on a stray navigation
+- PR #193 (fix/pwa-update-visibilitycheck): fixed a regression the above
+  introduced — an update landing mid-session used to force-reload the page
+  with no warning, which could've wiped an in-progress Gmail import queue.
+  Now shows a Refresh banner instead; reload only happens on that click.
+  Also: "What's changed" screen now actually fires (existing testers were
+  silently baselining and would never have seen it), with shown/dismissed
+  analytics so the keep-or-kill call is data-driven; real `pwa_installed`
+  event on Chrome/Android install (was previously unanswerable — feeds
+  directly into the still-open "PostHog funnel run-through" item below);
+  `is_standalone` + both feature-flag states now on every event as
+  super-properties; self-hosted fonts (removes a render-blocking Google
+  Fonts `@import` that was ahead of `<meta charset>`, fixes the white PWA
+  splash flash — distinct from the Day 3 post-sign-in white screen, still
+  open below).
