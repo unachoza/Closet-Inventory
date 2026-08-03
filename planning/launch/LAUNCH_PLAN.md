@@ -98,3 +98,12 @@ this push.
   `materialUtils.ts` — used by the closet's own filter/sort hooks and card
   display — imports from it; lazy-loading the `fabric` view only shed
   `InteractiveGuide.tsx`/`WeaveDiagram.tsx` themselves, not that content file.
+- Content split (Fabrics&Fibers folder): Split the monolithic
+  `Fabric&Fiber.ts` (1,535 lines) into 6 focused modules by export type
+  in `src/Content/Fabrics&Fibers/`. Follows the "many small files"
+  principle (200-400 lines typical). Tree-shakes WEAVE_TYPES,
+  STAIN_GUIDE, and SOURCES out of the eager bundle (~6 KB gzip savings);
+  FIBERS stays eager (used by `materialUtils.resolveFiber` on the closet
+  path), and CARE_GROUPS stays eager because it's shared between multiple
+  lazy views (Rollup hoists shared deps). Win for maintainability
+  (each file has one purpose) more than perf, but both matter.

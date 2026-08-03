@@ -101,6 +101,20 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
     probably the existing `InstallStep` onboarding screen — rather than relying
     on static instructions.
 
+## Performance & bundle optimization
+
+20. **Defer Supabase realtime + storage from boot.** The eager `x` chunk
+    (80 KB gzip) is mostly the Supabase client (auth/realtime/storage). Auth is
+    needed at startup, but realtime (live presence, real-time feeds) and storage
+    (file uploads) may not be. Investigate lazy-loading them or shimming on first
+    use. Risk: any code that unconditionally imports
+    `{ createClient } from '@supabase/supabase-js'` at the module level will
+    fail. Scope: grep for the pattern, audit import sites, and measure the
+    savings. Current blocker: Rollup's chunking decision (hoisting
+    `inferCare.ts` because it's shared between multiple lazy views) keeps
+    CARE_GROUPS in the eager bundle even though it's logically lazy. May need
+    `manualChunks` config to split further, or accept the 80 KB as a fixed cost.
+
 ---
 
 ## Added after launch
