@@ -11,6 +11,10 @@ interface ImportMetaEnv {
   readonly VITE_POSTHOG_KEY?: string;
   /** PostHog ingestion host, e.g. https://us.i.posthog.com */
   readonly VITE_POSTHOG_HOST?: string;
+  /** Beta feature gate — see src/config/features.ts for the default and rationale. */
+  readonly VITE_SHOW_STATUS_LOCATION?: "true" | "false";
+  /** Beta feature gate — see src/config/features.ts for the default and rationale. */
+  readonly VITE_SHOW_WHATS_CHANGED?: "true" | "false";
 }
 
 interface ImportMeta {

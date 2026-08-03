@@ -203,3 +203,4 @@ export async function captureException(error: unknown): Promise<void> {
 export function appVersion(): string {
 	return APP_VERSION;
 }
+
