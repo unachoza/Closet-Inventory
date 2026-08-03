@@ -27,7 +27,7 @@ this push.
       rejection, confirm each lands with usable stack traces
 - [ ] PostHog funnel run-through — walk onboarding → sign-in → name → install
       → first import → first item added, confirm every step fires
-- [ ] Buffer-and-flush for pre-consent analytics — **shipped in code**
+- [x] Buffer-and-flush for pre-consent analytics — **shipped in code**
       (src/lib/monitoring.ts), needs deploying to production before any more
       install/onboarding testing, or events keep vanishing the way the
       2026-08-02 install tests did
@@ -37,7 +37,7 @@ this push.
 - [ ] Instrument: time-to-first-import, items imported per session, current
       closet count, import abandonment point
 - [ ] Confirm in-app Feedback button delivers somewhere it'll actually get read
-- [ ] PWA update verification — install, ship a visible version bump, reopen,
+- [x] PWA update verification — install, ship a visible version bump, reopen,
       confirm the new build appears (`registerType: "autoUpdate"` is
       confirmed correct in vite.config.ts; `setupPwaUpdateCheck()` now also
       forces a check on `visibilitychange` — **shipped**)
