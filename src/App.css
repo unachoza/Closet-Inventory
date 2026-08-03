@@ -48,6 +48,15 @@
   width: 100%;
 
 }
+
+/* React.lazy Suspense fallback for the non-default views (form, gmail,
+   fabric, journey, entireCloset, profile, edit). Cream, not white — matches
+   the cold-start splash color so a slow chunk fetch never flashes white. */
+.view-loading {
+  min-height: 60vh;
+  width: 100%;
+  background: var(--bg-canvas);
+}
 /* Button color tokens now live centrally in index.css (:root).
    The legacy --button-backround-* names are aliased there for compatibility. */
 
