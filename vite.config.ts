@@ -45,6 +45,10 @@ export default defineConfig(() => ({
 		// caching auth/REST responses risks stale rows and leaked sessions.
 		VitePWA({
 			registerType: "autoUpdate",
+			// Registered manually from `main.tsx` (not the auto-injected script) so we
+			// get a handle on the ServiceWorkerRegistration and can force an update
+			// check on `visibilitychange` — see `src/lib/pwaUpdate.ts`.
+			injectRegister: false,
 			// SW only in `build`/`preview` (default) — dev + Playwright (which
 			// runs against the dev server) stay SW-free and deterministic.
 			devOptions: { enabled: false },

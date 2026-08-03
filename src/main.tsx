@@ -8,11 +8,17 @@ import "./styles/typography.css"; // editorial type adoption — loads AFTER ind
 import App from "./App.tsx";
 import { setupInstallPromptCapture } from "./hooks/useInstallPrompt";
 import { initErrorTracking } from "./lib/monitoring";
+import { setupPwaUpdateCheck } from "./lib/pwaUpdate";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? "";
 
 // beforeinstallprompt fires before React mounts — capture it at module scope.
 setupInstallPromptCapture();
+
+// Registers the service worker and forces a re-check on visibilitychange, so a
+// backgrounded-then-reopened install picks up a new build without needing a
+// fresh navigation (see pwaUpdate.ts). No-ops harmlessly outside a built PWA.
+setupPwaUpdateCheck();
 
 // Crash reporting starts before React mounts so a failure during the very first
 // render is reported rather than lost. Analytics stays consent-gated and is

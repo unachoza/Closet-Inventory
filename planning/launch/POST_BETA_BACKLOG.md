@@ -87,6 +87,20 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
     Needs: an inventory of current emoji use, a shared `<Icon>` component, and
     consistent sizing/color tokens so icons inherit theme like text does.
 
+## PWA polish
+
+18. **"What's new while you were away" screen.** On reopen, if
+    `setupPwaUpdateCheck()` (src/lib/pwaUpdate.ts) picked up a fresh build since
+    last session, show a small one-time card: 1–3 bullet points, plain language,
+    no changelog dump. Needs a way to tag each release with its own short bullet
+    list (probably a small JSON/markdown keyed by `APP_VERSION`) and a
+    last-seen-version marker in localStorage to decide whether to show it.
+19. **"Add to Home Screen" walkthrough animation.** Low-tech users likely don't
+    know PWA install is a feature at all. A short animated explainer (share
+    sheet → Add to Home Screen → icon appears) surfaced at the right moment —
+    probably the existing `InstallStep` onboarding screen — rather than relying
+    on static instructions.
+
 ---
 
 ## Added after launch
