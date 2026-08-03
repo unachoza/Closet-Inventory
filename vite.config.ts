@@ -63,8 +63,12 @@ export default defineConfig(() => ({
 				description: "Your closet, inventoried — track, import, and rediscover what you own.",
 				start_url: "/",
 				display: "standalone",
-				theme_color: "#ffffff",
-				background_color: "#ffffff",
+				// Matches --bg-canvas (tokens.css) — the app's actual canvas color,
+				// not white. background_color is read at install time and used for
+				// the OS launch splash, so a mismatch here means every install shows
+				// a white flash before the app's own cream background ever paints.
+				theme_color: "#faf8f5",
+				background_color: "#faf8f5",
 				icons: [
 					{ src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
 					{ src: "pwa-512x512.png", sizes: "512x512", type: "image/png" },
