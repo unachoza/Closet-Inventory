@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/client" />
 
 interface ImportMetaEnv {
   readonly VITE_GOOGLE_CLIENT_ID: string;
@@ -10,6 +11,10 @@ interface ImportMetaEnv {
   readonly VITE_POSTHOG_KEY?: string;
   /** PostHog ingestion host, e.g. https://us.i.posthog.com */
   readonly VITE_POSTHOG_HOST?: string;
+  /** Beta feature gate — see src/config/features.ts for the default and rationale. */
+  readonly VITE_SHOW_STATUS_LOCATION?: "true" | "false";
+  /** Beta feature gate — see src/config/features.ts for the default and rationale. */
+  readonly VITE_SHOW_WHATS_CHANGED?: "true" | "false";
 }
 
 interface ImportMeta {
@@ -18,3 +23,5 @@ interface ImportMeta {
 
 /** Build-time app version (e.g. "v0.9.0-a1b2c3d"), injected by vite `define`. */
 declare const __APP_VERSION__: string;
+/** Build-time semver only (e.g. "0.9.0"), no git sha — see WhatsChanged/. */
+declare const __APP_SEMVER__: string;

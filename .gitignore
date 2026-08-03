@@ -54,6 +54,7 @@ planning/*
 !planning/launch/
 planning/launch/*
 !planning/launch/POST_BETA_BACKLOG.md
+!planning/launch/LAUNCH_PLAN.md
 docs/
 
 # Specific documentation files

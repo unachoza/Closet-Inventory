@@ -1,4 +1,6 @@
 import { getConsent } from "./consent";
+import { detectStandalone } from "../hooks/useInstallPrompt";
+import { showStatusLocation, showWhatsChanged } from "../config/features";
 
 /**
  * Error tracking (Sentry) + product analytics (PostHog) init, gated behind
@@ -92,7 +94,18 @@ export async function initMonitoring(): Promise<void> {
 			// personal data. Only records for consented, identified users.
 			disable_session_recording: false,
 		});
-		posthog.register({ app_version: APP_VERSION });
+		// `register` (not `register_once`) so these stay current across a session
+		// rather than freezing whatever was true at first init — e.g. installing
+		// mid-session should make later events read is_standalone: true, even
+		// though earlier ones in that same session were captured before install.
+		// None of these are person properties: a sticky per-person flag value
+		// would misrepresent every session after the flag or install state changes.
+		posthog.register({
+			app_version: APP_VERSION,
+			is_standalone: detectStandalone(window, navigator),
+			flag_status_location: showStatusLocation(),
+			flag_whats_changed: showWhatsChanged(),
+		});
 		await flushPendingEvents();
 	}
 }
@@ -190,3 +203,4 @@ export async function captureException(error: unknown): Promise<void> {
 export function appVersion(): string {
 	return APP_VERSION;
 }
+

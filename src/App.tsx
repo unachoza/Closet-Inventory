@@ -29,6 +29,9 @@ import ProfileView from "./Features/Profile/ProfileView";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
 import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
 import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
+import { useWhatsChanged } from "./Features/WhatsChanged/useWhatsChanged";
+import WhatsChangedScreen from "./Features/WhatsChanged/WhatsChangedScreen";
+import UpdateBanner from "./Components/UpdateBanner/UpdateBanner";
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -85,6 +88,7 @@ function AppShell() {
 
 	const [showOnboarding, setShowOnboarding] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
+	const whatsChanged = useWhatsChanged();
 
 	useEffect(() => {
 		// Purge any sensitive data left over by pre-PR#76 builds on first load,
@@ -212,6 +216,12 @@ function AppShell() {
 	if (showOnboarding) {
 		return <OnboardingFlow onComplete={handleComplete} />;
 	}
+
+	// Shown once per release to a returning user — see useWhatsChanged.ts for
+	// why a brand-new install never hits this (onboarding owns that moment).
+	if (whatsChanged.show) {
+		return <WhatsChangedScreen bullets={whatsChanged.bullets} version={whatsChanged.version} onDismiss={whatsChanged.dismiss} />;
+	}
 	return (
 		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>
 			<NavBar
@@ -285,6 +295,9 @@ function AppShell() {
 			    Next CTA on the first screen at phone width — the tour owns the screen
 			    until it's done, then the banner appears. */}
 			<ConsentBanner />
+			{/* Shown once a new build has activated in the background; reload only
+			    ever happens on the user's own click (see UpdateBanner.tsx). */}
+			<UpdateBanner />
 		</div>
 	);
 }

@@ -25,6 +25,10 @@ function resolveAppVersion(): string {
 export default defineConfig(() => ({
 	define: {
 		__APP_VERSION__: JSON.stringify(resolveAppVersion()),
+		// Semver only (no git sha) — the git sha changes on every commit, which
+		// would make the "what's changed" screen (WhatsChanged/) re-show on every
+		// deploy instead of once per actual release.
+		__APP_SEMVER__: JSON.stringify(pkg.version),
 	},
 	build: {
 		// Emit CSS that older mobile Safari can parse. Without this, esbuild
@@ -45,6 +49,10 @@ export default defineConfig(() => ({
 		// caching auth/REST responses risks stale rows and leaked sessions.
 		VitePWA({
 			registerType: "autoUpdate",
+			// Registered manually from `main.tsx` (not the auto-injected script) so we
+			// get a handle on the ServiceWorkerRegistration and can force an update
+			// check on `visibilitychange` — see `src/lib/pwaUpdate.ts`.
+			injectRegister: false,
 			// SW only in `build`/`preview` (default) — dev + Playwright (which
 			// runs against the dev server) stay SW-free and deterministic.
 			devOptions: { enabled: false },
@@ -55,8 +63,12 @@ export default defineConfig(() => ({
 				description: "Your closet, inventoried — track, import, and rediscover what you own.",
 				start_url: "/",
 				display: "standalone",
-				theme_color: "#ffffff",
-				background_color: "#ffffff",
+				// Matches --bg-canvas (tokens.css) — the app's actual canvas color,
+				// not white. background_color is read at install time and used for
+				// the OS launch splash, so a mismatch here means every install shows
+				// a white flash before the app's own cream background ever paints.
+				theme_color: "#faf8f5",
+				background_color: "#faf8f5",
 				icons: [
 					{ src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
 					{ src: "pwa-512x512.png", sizes: "512x512", type: "image/png" },

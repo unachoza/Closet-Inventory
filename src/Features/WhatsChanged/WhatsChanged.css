@@ -1,0 +1,33 @@
+/* Bullet list for the "what's changed" card. Built on the same onboarding
+   tokens (OnboardingFlow.css) so it reads as one continuous flow, not a
+   bolted-on screen. */
+
+.whats-changed__bullets {
+	display: flex;
+	flex-direction: column;
+	max-width: 34ch;
+	margin: var(--primitive-spacing-lg) 0 0;
+	padding: 0;
+	text-align: left;
+	gap: var(--primitive-spacing-md);
+	list-style: none;
+}
+
+.whats-changed__bullets li {
+	position: relative;
+	color: var(--text-muted);
+	font-size: var(--onboarding-font-size-body);
+	line-height: var(--primitive-line-height-normal);
+	padding-left: 1.25em;
+}
+
+.whats-changed__bullets li::before {
+	position: absolute;
+	top: 0.55em;
+	left: 0;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--primitive-brand-rose-terracotta);
+	content: "";
+}

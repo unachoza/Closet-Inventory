@@ -1,17 +1,28 @@
 <!doctype html>
 <html lang="en" data-theme="light">
 	<head>
-		<style>
-			@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
-		</style>
+		<!-- charset must be in the first 1024 bytes, or the parser can restart —
+		     keep this the very first thing in <head>. -->
 		<meta charset="UTF-8" />
+		<!-- Fonts are self-hosted (src/styles/fonts.css) — no external font host,
+		     no @import, no render-blocking cross-origin round trip. This inline
+		     background is the only thing painted before the app's own CSS loads,
+		     so the pre-hydration flash is cream (--bg-canvas) instead of white.
+		     data-theme is hardcoded "light" above and nothing in src/ ever
+		     changes it at runtime, so dark mode can never apply here — no
+		     cream-then-dark flash risk. -->
+		<style>
+			html {
+				background: #faf8f5;
+			}
+		</style>
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 		<meta name="description" content="Nothing To Wear — your closet, inventoried. Track, import, and rediscover what you own." />
 		<!-- E5-2.3: PWA / iOS add-to-home-screen. theme-color matches the app's
 		     light header surface; apple-mobile-web-app-capable makes the installed
 		     app launch full-screen without Safari chrome. -->
-		<meta name="theme-color" content="#ffffff" />
+		<meta name="theme-color" content="#faf8f5" />
 		<meta name="mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
