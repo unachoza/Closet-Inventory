@@ -307,7 +307,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	}
 
 	return (
-		<div className="edit-form form">
+		<div className="edit-form">
 			<button
 				type="button"
 				className="detail-close close-icon"

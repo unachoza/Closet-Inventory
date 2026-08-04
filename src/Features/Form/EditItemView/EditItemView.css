@@ -1,18 +1,26 @@
 @import "../../../styles/breakpoints.css";
 
+/* Self-contained: does not rely on the Add wizard's .form class. EditItemView
+   ships in its own lazy chunk (#194) and previously borrowed .form from
+   Form.css for its shell styling — including padding, which .edit-form never
+   declared itself. That silently depended on load order: if Form.css hadn't
+   loaded yet (e.g. editing an item without visiting the Add wizard first, or
+   the email-import path, which never loads it), the content rendered flush
+   against the card edges with no padding. */
 .edit-form {
       position: relative;
       overflow: hidden; /* important for max-height animations */
       height: 100%;
       max-width: var(--Form-width);
       margin: .2rem auto;
+      padding: 1rem 1.5rem .8rem 1.5rem;
       border: 1px solid var(--border-hairline);
       border-radius: var(--layout-radius-card);
       background: var(--bg-surface-primary);
       box-shadow: var(--elevation-high);
 }
 
-.edit-form.form > form {
+.edit-form > form {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -41,7 +49,7 @@
       gap: 0.5rem 1rem;
 }
 
-.edit-form.form label{
+.edit-form label{
       margin: 0;
       gap: var(--spacing-50, 0.25rem);
       color: var(--text-secondary);
@@ -106,7 +114,7 @@ textarea::placeholder{
       color: var(--text-muted);
 }
 
-.edit-form.form label >span {
+.edit-form label >span {
       color: var(--text-secondary);
       font-size: .8rem;
       font-weight: 600;
@@ -123,7 +131,7 @@ form > div > label.animated-checkbox  .checkbox-label {
       align-items: flex-start;
 }
 
-.edit-form.form span.checkbox-label {
+.edit-form span.checkbox-label {
       color: black !important;
       paint-order: normal;
       -webkit-text-stroke: 0px;
@@ -269,7 +277,6 @@ button.submit.ingestion-edit-form {
 /* Tablet — form is 45rem wide, so use container query breakpoints not viewport */
 @media (--bp-md) {
   .edit-form {
-    border-radius: 0;
     border-width: 2px;
   }
 
