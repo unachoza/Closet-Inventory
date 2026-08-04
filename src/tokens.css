@@ -301,7 +301,7 @@ border-brand: #ab7a68 (Focus indicators, premium components)
   /* Frosted surface tint + blur. "Solid glass" = opaque enough to read on. */
   --bg-surface-glass: rgba(250, 248, 245, 0.72); /* alabaster @ 72% */
   --effect-blur-glass: blur(18px) saturate(115%);
-  --border-hairline: rgba(132, 112, 87, 0.22); /* taupe @ 22% */
+  --border-hairline: rgba(132, 112, 87, 0.35); /* taupe @ 35% */
   /* Stronger borders for inputs / focus (semantic, used by form controls). */
   --border-strong: var(--primitive-neutral-dark-walnut);
   --border-brand: var(--primitive-brand-muted-clay);
