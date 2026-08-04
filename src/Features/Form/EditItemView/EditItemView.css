@@ -19,8 +19,16 @@
       height: 100%;
 }
 
-.edit-form  .card-title{
-      color: var(--text-primary)
+.edit-form .card-title{
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-50, 0.25rem);
+}
+
+.card-title__editing {
+      color: var(--text-color);
+	font-style: italic;
+      font-weight: 500;
+      font-size: 15px;
 }
 
 .form-fields{
@@ -30,8 +38,6 @@
       overflow-y: auto;
       height: 100%;
       padding: 10px;
-      border: 1px solid var(--border-hairline);
-      border-radius: var(--layout-radius-card);
       gap: 0.5rem 1rem;
 }
 
@@ -227,7 +233,7 @@ button.submit.ingestion-edit-form {
       height: 44px;
       margin: -18px;
       padding: 3px;
-      border: 1px solid var(--border-strong);
+      border: 1px solid var(--text-primary);
       border-radius: 50%;
       background: transparent;
       color: var(--text-primary);
@@ -263,7 +269,6 @@ button.submit.ingestion-edit-form {
 /* Tablet — form is 45rem wide, so use container query breakpoints not viewport */
 @media (--bp-md) {
   .edit-form {
-    margin: 0;
     border-radius: 0;
     border-width: 2px;
   }

@@ -432,14 +432,13 @@ button.stock-photo-toggle:focus-visible{
 
 @media (--bp-md) {
   :root {
-    --Form-width: calc(100vw - 1rem);
+    --Form-width: calc(100vw - 2rem);
     --Form-padding: 1rem;
   }
 
   .form {
 	height: 95%;
-    margin: 0.25rem;
-    border-radius: var(--border-radius-sm);
+   	border-radius: var(--border-radius-sm);
   }
 
   .double-options {

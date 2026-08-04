@@ -22,7 +22,7 @@ import { toAbsoluteDate } from "../../../utils/dateUtils";
 import { X } from "lucide-react";
 
 /** Fields the user may leave blank when adding/editing an item **/
-const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
+const OPTIONAL_FIELDS = new Set(["occasion", "care", "price", "retailer"]);
 
 /**
  * The item fields that render as generic text inputs, as an explicit ALLOWLIST.
@@ -155,7 +155,12 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	}, []);
 
 	const handleOccasionRemove = useCallback((value: string) => {
-		setFormData((prev) => ({ ...prev, occasion: splitValues(prev.occasion ?? "").filter((o) => o !== value).join(", ") }));
+		setFormData((prev) => ({
+			...prev,
+			occasion: splitValues(prev.occasion ?? "")
+				.filter((o) => o !== value)
+				.join(", "),
+		}));
 	}, []);
 
 	const handleCareAdd = useCallback((value: string) => {
@@ -319,7 +324,15 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h2 className="card-title">{isCreateMode ? "Import Item" : item.name}</h2>
+				<h2 className="card-title">
+					{isCreateMode ? (
+						"Import Item"
+					) : (
+						<>
+							<span className="card-title__editing">Editing</span> {item.name}
+						</>
+					)}
+				</h2>
 
 				{isInBatchMode && (
 					<div className="edit-form-queue-progress">
