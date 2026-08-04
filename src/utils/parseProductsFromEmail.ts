@@ -4507,6 +4507,12 @@ function enrichProduct(p: ExtractedProduct): ExtractedProduct {
 
 	// A material the strategy read from the email wins over the name-inferred one;
 	// otherwise fall back to inference (e.g. "Smartwool"/"Merino" → wool).
+	// NOTE: this is a single best-guess string (matchFirst — first keyword hit
+	// only), kept for callers that just want a display string. Callers needing
+	// the fuller multi-material blend (e.g. GmailImport, for a name like
+	// "Cotton Modal Tank Top") should prefer inferMaterialFromName's array over
+	// this field when it isn't an explicit "X% material" composition — see the
+	// material-resolution comment in GmailImport.tsx.
 	const { material: inferredMaterial, ...restAttrs } = attrs;
 	const material = p.material || inferredMaterial || "";
 
