@@ -1,4 +1,5 @@
 import "./EditItemView.css";
+import { ArrowLeft } from "lucide-react";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useCloset } from "../../../context/ClosetContext";
 import { useLocations } from "../../../context/LocationsContext";
@@ -348,7 +349,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						onClick={() => onReturnToEmail({ ...formData, notes: parseTextToNotesArray(textAreaNotes) })}
 						type="button"
 					>
-						&larr; Back to Email
+						<ArrowLeft size={14} className="edit-form-return-btn__icon" aria-hidden="true" />
+						<span>Back to Email</span>
 					</button>
 				)}
 

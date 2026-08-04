@@ -187,10 +187,20 @@ label.animated-checkbox button.checkbox-root {
     color: var(--text-primary);
     font-size: 0.82rem;
     font-weight: 500;
+    line-height: 1.2;
     cursor: pointer;
     transition: background 0.15s ease;
     gap: 0.3rem;
     margin-bottom: var(--spacing-200, 1rem);
+    text-align: left;
+}
+
+/* Icon centers against the full block, including when the label wraps to two
+   lines — align-items: center on the button alone isn't enough, since the
+   icon and text used to be one inline run and the icon rode along with
+   whichever line it happened to sit on. */
+.edit-form-return-btn__icon {
+    flex-shrink: 0;
 }
 
 .edit-form-return-btn:hover {
