@@ -28,7 +28,7 @@
       color: var(--text-color);
 	font-style: italic;
       font-weight: 500;
-      font-size: 15px;
+      font-size: 1rem;
 }
 
 .form-fields{
@@ -332,6 +332,22 @@ button.submit.ingestion-edit-form {
   .edit-form-actions{
       /* margin-bottom: 5rem; */
   }
+
+  .close-icon {
+      top: 8px;
+      right: 0px;
+      border: none;
+      outline: 1px solid var(--text-primary);
+      outline-offset: -5px;
+  }
+}
+
+@media (--bp-xxs) {
+       .close-icon {
+            top: 2px;
+            right: -6px;
+            outline-offset: -8px;
+  }   
 }
 
 /* Condition selector + purchase-date display (item age feature) */

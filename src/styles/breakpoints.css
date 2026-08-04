@@ -20,6 +20,7 @@
    layout width (see planning/launch/epics/E5-mobile-pwa.md). Do not add a
    breakpoint narrower than --bp-xs for that reason. */
 
+@custom-media --bp-xxs (max-width: 380px);
 @custom-media --bp-xs (max-width: 480px);
 @custom-media --bp-sm (max-width: 600px);
 @custom-media --bp-md (max-width: 768px);
