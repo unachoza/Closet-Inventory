@@ -1,12 +1,13 @@
 import type { LucideIcon } from "lucide-react";
 import { WashingMachine, Hand, Ban, Wind, Square, Thermometer, RotateCw, Flame, Tag } from "lucide-react";
+import DryCleanIcon from "../Components/CareIcons/DryCleanIcon";
 
 // Canonical care instructions, keyed by substring. Shared by the card detail
 // display (parseCareItems) and the closet care filter (parseCareLabels).
 // Lucide icons (not emoji) so care badges match the rest of the chrome and
 // render consistently across devices.
 export const CARE_MAP: [keyword: string, icon: LucideIcon, label: string][] = [
-	["dry clean", WashingMachine, "Dry clean"],
+	["dry clean", DryCleanIcon, "Dry clean"],
 	["hand wash", Hand, "Hand wash"],
 	["cold water", WashingMachine, "Cold wash"],
 	["cold wash", WashingMachine, "Cold wash"],
@@ -21,7 +22,7 @@ export const CARE_MAP: [keyword: string, icon: LucideIcon, label: string][] = [
 ];
 
 export const BRAND_CARE_MAP: [keyword: string, icon: LucideIcon, label: string][] = [
-	["dry clean", WashingMachine, "Dry clean"],
+	["dry clean", DryCleanIcon, "Dry clean"],
 	["hand wash", Hand, "Hand wash"],
 	["cold water", WashingMachine, "Cold wash"],
 	["cold wash", WashingMachine, "Cold wash"],
