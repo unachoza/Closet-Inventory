@@ -59,3 +59,5 @@ docs/
 
 # Specific documentation files
 documentation/CHANGELOG.md
+.vercel
+.env*
