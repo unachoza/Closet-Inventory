@@ -1,8 +1,9 @@
 @import "../../styles/breakpoints.css";
 
+/* `--Form-width` lives in tokens.css — it is shared with EditItemView, which
+   ships in a different lazy chunk and cannot see tokens defined here. */
 :root {
 	--background-form: #31341c59;
-	--Form-width: 45rem;
 	--Form-padding: 1.5rem;
 	--Submit-Green: #127f5a;
 }
@@ -12,6 +13,9 @@ form {
 }
 
 .form {
+	/* Consumed by ProgressionTracker, which is otherwise standalone. Set here
+	   so the tracker tracks this form's width without depending on it. */
+	--tracker-max-width: calc(var(--Form-width) + 2rem);
 	position: relative;
 	overflow: hidden; /* important for max-height animations */
 	height: 95%;
@@ -432,7 +436,6 @@ button.stock-photo-toggle:focus-visible{
 
 @media (--bp-md) {
   :root {
-    --Form-width: calc(100vw - 2rem);
     --Form-padding: 1rem;
   }
 

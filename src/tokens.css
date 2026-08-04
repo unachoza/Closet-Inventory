@@ -1,3 +1,5 @@
+@import "./styles/breakpoints.css";
+
 /* //Colors//
 
 ├── Brand Terracotta (Focal / 10%)
@@ -355,5 +357,25 @@ border-brand: #ab7a68 (Focus indicators, premium components)
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass-canvas {
     background-color: var(--bg-surface-primary);
+  }
+}
+
+/* ── Layout: form shell ────────────────────────────────────────────────────
+   `--Form-width` caps the Add wizard (`.form`, Form.css) and the edit/import
+   form (`.edit-form`, EditItemView.css). It lives here rather than in Form.css
+   because both views are lazy-loaded route chunks (#194) with their own CSS
+   files: a token defined in the Add wizard's chunk simply doesn't exist until
+   that chunk loads, so the email-import form — which never renders the wizard —
+   resolved `max-width: var(--Form-width)` to `none` and stretched to the full
+   viewport. Tokens consumed by more than one chunk belong in this file, which
+   main.tsx loads eagerly. */
+
+:root {
+  --Form-width: 45rem;
+}
+
+@media (--bp-md) {
+  :root {
+    --Form-width: calc(100vw - 2rem);
   }
 }
