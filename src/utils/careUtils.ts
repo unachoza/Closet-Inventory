@@ -17,6 +17,7 @@ export const CARE_MAP: [keyword: string, icon: LucideIcon, label: string][] = [
 	["low heat", Thermometer, "Low heat"],
 	["tumble", RotateCw, "Tumble dry"],
 	["hot water", Flame, "Warm wash"],
+	["fabric softener", Ban, "No fabric softener"],
 ];
 
 export const BRAND_CARE_MAP: [keyword: string, icon: LucideIcon, label: string][] = [
@@ -31,7 +32,9 @@ export const BRAND_CARE_MAP: [keyword: string, icon: LucideIcon, label: string][
 	["low heat", Thermometer, "Low heat"],
 	["tumble", RotateCw, "Tumble dry"],
 	["hot water", Flame, "Warm wash"],
+	["fabric softener", Ban, "No fabric softener"],
 ];
+
 export interface CareItem {
 	icon: LucideIcon;
 	label: string;

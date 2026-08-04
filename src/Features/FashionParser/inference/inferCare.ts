@@ -132,9 +132,9 @@ const MATERIAL_TO_CARE_GROUP: Record<string, string> = {
 const CARE_GROUP_TAGS: Record<string, string[]> = {
 	"Wool, Cashmere & Mohair": ["Hand wash", "Lay flat"],
 	Silk: ["Hand wash", "Hang dry"],
-	"Cotton & Linen": ["Machine wash", "Tumble dry"],
+	"Cotton & Linen": ["Machine wash", "Tumble dry low"],
 	"Viscose, Rayon, Modal & TENCEL™": ["Hand wash", "Lay flat"],
-	"Polyester, Nylon & Synthetics": ["Machine wash", "Low heat"],
+	"Polyester, Nylon & Synthetics": ["Machine wash cold", "Low heat", "No fabric softener"],
 };
 
 function isWhite(color?: string): boolean {
