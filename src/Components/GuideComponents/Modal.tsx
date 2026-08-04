@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import { Fiber } from "../../Content/Fabric&Fiber";
+import type { Fiber } from "../../Content/Fabrics&Fibers/textileTypes";
 import { FiberTag } from "./FiberCard";
 import handwashtransparent from "../../assets/handwash-transparent.svg";
 import "./DetailModal.css";

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { lazy, Suspense, useState, useCallback, useEffect } from "react";
 import { ViewProvider, useView } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
@@ -11,27 +11,38 @@ import FeedbackButton from "./Components/FeedbackButton/FeedbackButton";
 import { exportCloset, type ExportFormat } from "./utils/exportCloset";
 import ErrorBoundary from "./Components/ErrorBoundary/ErrorBoundary";
 import { ToastProvider } from "./Components/Toast/Toast";
-import EditItemView from "./Features/Form/EditItemView/EditItemView";
-import MultiStepForm from "./Features/Form/Form";
 import Carousel from "./Features/Carousel/Carousel";
 import Closet from "./Features/Closet/Closet";
-import GmailImport from "./Features/GmailImport/GmailImport";
 import ImportAccountGate from "./Features/GmailImport/ImportAccountGate";
 import LocalCapacityNotice from "./Components/LocalCapacityNotice/LocalCapacityNotice";
 import { useLocalCapacity } from "./hooks/useLocalCapacity";
-import InteractiveGuide from "./Features/FabricCare/InteractiveGuide";
-import EntireClosetView from "./Features/SearchCloset/EntireClosetView/EntireClosetView";
 import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
-import JourneyC from "./Components/GuideComponents/FiberJourney/JourneyC";
 import OnboardingFlow from "./Features/Onboarding/OnboardingFlow";
-import ProfileView from "./Features/Profile/ProfileView";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
 import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
 import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
 import { useWhatsChanged } from "./Features/WhatsChanged/useWhatsChanged";
 import WhatsChangedScreen from "./Features/WhatsChanged/WhatsChangedScreen";
 import UpdateBanner from "./Components/UpdateBanner/UpdateBanner";
+
+// Route-level code splitting: everything below is off the first-paint path
+// (default view is "carousel", handled by the eager Carousel/Closet imports
+// above). Each of these becomes its own chunk, fetched only on navigation.
+const EditItemView = lazy(() => import("./Features/Form/EditItemView/EditItemView"));
+const MultiStepForm = lazy(() => import("./Features/Form/Form"));
+const GmailImport = lazy(() => import("./Features/GmailImport/GmailImport"));
+const InteractiveGuide = lazy(() => import("./Features/FabricCare/InteractiveGuide"));
+const EntireClosetView = lazy(() => import("./Features/SearchCloset/EntireClosetView/EntireClosetView"));
+const JourneyC = lazy(() => import("./Components/GuideComponents/FiberJourney/JourneyC"));
+const ProfileView = lazy(() => import("./Features/Profile/ProfileView"));
+
+// Shown while a lazy view's chunk is in flight. Cream, not white/null — the
+// whole point of self-hosting fonts + the inline splash color (PR #193) was
+// killing the white flash; a blank Suspense fallback would reintroduce it.
+function ViewLoadingFallback() {
+	return <div className="view-loading" aria-hidden="true" />;
+}
 
 function buildClothingItem(prefilled: Partial<ClothingItem>): ClothingItem {
 	return {
@@ -239,47 +250,52 @@ function AppShell() {
 					{/* Keyed by view so a crash in one screen resets when navigating away.
 				     "Try again" sends the user back to the overview (closet) screen. */}
 					<ErrorBoundary key={view} onReset={() => setView("overview")}>
-						{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />}
-						{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
-						{view === "gmail" && (
-							<ImportAccountGate>
-								<GmailImport
-									onImport={handleGmailImport}
-									onImportAll={handleGmailImportAll}
-									initialSelectedEmailId={gmailSourceEmailId}
-									onSourceEmailChange={handleSourceEmailChange}
-									unskippedByEmail={unskippedByEmail}
-									onUnskippedByEmailChange={handleUnskippedByEmailChange}
+						{/* A failed dynamic import (e.g. a stale chunk after a deploy —
+						    see pwaUpdate.ts) throws here and is caught by the ErrorBoundary
+						    above, which resets to the overview on retry. */}
+						<Suspense fallback={<ViewLoadingFallback />}>
+							{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />}
+							{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
+							{view === "gmail" && (
+								<ImportAccountGate>
+									<GmailImport
+										onImport={handleGmailImport}
+										onImportAll={handleGmailImportAll}
+										initialSelectedEmailId={gmailSourceEmailId}
+										onSourceEmailChange={handleSourceEmailChange}
+										unskippedByEmail={unskippedByEmail}
+										onUnskippedByEmailChange={handleUnskippedByEmailChange}
+									/>
+								</ImportAccountGate>
+							)}
+							{view === "fabric" && <InteractiveGuide />}
+							{view === "journey" && <JourneyC />}
+							{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
+							{view === "profile" && <ProfileView />}
+							{view === "carousel" && (
+								<>
+									<div data-testid="carousel">
+										<Carousel setCategory={setSelectedCategory} />
+									</div>
+									<div data-testid="closet-container">
+										<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />
+									</div>
+								</>
+							)}
+							{view === "edit" && editItem && (
+								<EditItemView
+									key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
+									item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
+									mode={editMode}
+									setView={setView}
+									onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
+									onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
+									onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+									queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
+									queueTotal={isInBatchMode ? importQueue.length : undefined}
 								/>
-							</ImportAccountGate>
-						)}
-						{view === "fabric" && <InteractiveGuide />}
-						{view === "journey" && <JourneyC />}
-						{view === "entireCloset" && <EntireClosetView onEditItem={handleEditItem} />}
-						{view === "profile" && <ProfileView />}
-						{view === "carousel" && (
-							<>
-								<div data-testid="carousel">
-									<Carousel setCategory={setSelectedCategory} />
-								</div>
-								<div data-testid="closet-container">
-									<Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />
-								</div>
-							</>
-						)}
-						{view === "edit" && editItem && (
-							<EditItemView
-								key={(isInBatchMode ? importQueue[importQueueIndex] : editItem).id}
-								item={isInBatchMode ? importQueue[importQueueIndex] : editItem}
-								mode={editMode}
-								setView={setView}
-								onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
-								onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
-								onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
-								queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
-								queueTotal={isInBatchMode ? importQueue.length : undefined}
-							/>
-						)}
+							)}
+						</Suspense>
 					</ErrorBoundary>
 				</div>
 			</ToastProvider>

@@ -86,3 +86,24 @@ this push.
   Fonts `@import` that was ahead of `<meta charset>`, fixes the white PWA
   splash flash — distinct from the Day 3 post-sign-in white screen, still
   open below).
+- Route-level code splitting (perf/route-level-lazy-loading): `React.lazy` on
+  the 7 non-default views (form, gmail, fabric, journey, entireCloset,
+  profile, edit) — Carousel/Closet stay eager since carousel is the initial
+  view. Eager first-paint JS+CSS dropped from ~597 KB to ~281 KB gzipped
+  (~53%). Biggest single contributor: `GmailImport` and its Google API client
+  dependency were previously bundled eagerly even though only reachable from
+  the Gmail view — now a 45 KB gzip chunk fetched only on navigation. One
+  caveat found during the trace: `Fabric&Fiber.ts` (the 1,535-line care
+  content file) stays anchored in the eager bundle regardless, since
+  `materialUtils.ts` — used by the closet's own filter/sort hooks and card
+  display — imports from it; lazy-loading the `fabric` view only shed
+  `InteractiveGuide.tsx`/`WeaveDiagram.tsx` themselves, not that content file.
+- Content split (Fabrics&Fibers folder): Split the monolithic
+  `Fabric&Fiber.ts` (1,535 lines) into 6 focused modules by export type
+  in `src/Content/Fabrics&Fibers/`. Follows the "many small files"
+  principle (200-400 lines typical). Tree-shakes WEAVE_TYPES,
+  STAIN_GUIDE, and SOURCES out of the eager bundle (~6 KB gzip savings);
+  FIBERS stays eager (used by `materialUtils.resolveFiber` on the closet
+  path), and CARE_GROUPS stays eager because it's shared between multiple
+  lazy views (Rollup hoists shared deps). Win for maintainability
+  (each file has one purpose) more than perf, but both matter.

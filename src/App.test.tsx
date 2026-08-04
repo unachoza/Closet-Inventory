@@ -96,53 +96,54 @@ describe("App — view transitions", () => {
 		fireEvent.click(within(drawer).getByRole("button", { name: /add item/i }));
 	};
 
-	it("Add Item navigates to form view", () => {
+	it("Add Item navigates to form view", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		clickDrawerAddItem();
-		expect(screen.getByTestId("view-form")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-form")).toBeInTheDocument();
 		expect(screen.queryByTestId("view-carousel")).not.toBeInTheDocument();
 	});
 
-	it("from form view, Back to Carousel returns to carousel", () => {
+	it("from form view, Back to Carousel returns to carousel", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		clickDrawerAddItem();
-		expect(screen.getByTestId("view-form")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-form")).toBeInTheDocument();
 		// The form stub has a "Back to Carousel" button — click it by test id
 		fireEvent.click(screen.getByTestId("view-form").querySelector("button")!);
-		expect(screen.getByTestId("view-carousel")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-carousel")).toBeInTheDocument();
 		expect(screen.queryByTestId("view-form")).not.toBeInTheDocument();
 	});
 
-	it("Import Gmail navigates to gmail view", () => {
+	it("Import Gmail navigates to gmail view", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /import gmail/i }));
-		expect(screen.getByTestId("view-gmail")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-gmail")).toBeInTheDocument();
 		expect(screen.queryByTestId("view-carousel")).not.toBeInTheDocument();
 	});
 
-	it("Back to Carousel from gmail returns to carousel", () => {
+	it("Back to Carousel from gmail returns to carousel", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /import gmail/i }));
+		await screen.findByTestId("view-gmail");
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /back to carousel/i }));
-		expect(screen.getByTestId("view-carousel")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-carousel")).toBeInTheDocument();
 	});
 
-	it("Fabric Guide navigates to fabric view", () => {
+	it("Fabric Guide navigates to fabric view", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /fabric guide/i }));
-		expect(screen.getByTestId("view-fabric")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-fabric")).toBeInTheDocument();
 	});
 
-	it("View All navigates to entire closet view", () => {
+	it("View All navigates to entire closet view", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 		fireEvent.click(screen.getByRole("button", { name: /view all/i }));
-		expect(screen.getByTestId("view-entire-closet")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-entire-closet")).toBeInTheDocument();
 	});
 });

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, afterEach } from "vitest";
 import DetailModal from "./Modal";
-import type { Fiber } from "../../Content/Fabric&Fiber";
+import type { Fiber } from "../../Content/Fabrics&Fibers/textileTypes";
 
 const fiber: Fiber = {
 	id: "tencel",

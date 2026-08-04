@@ -100,13 +100,14 @@ beforeEach(() => {
 });
 
 describe("E3-bug.2 — Gmail auth survives leaving and returning to the Gmail view", () => {
-	it("stays authenticated after gmail → another view → back to gmail (no re-auth)", () => {
+	it("stays authenticated after gmail → another view → back to gmail (no re-auth)", async () => {
 		render(<App />);
 
 		// Navigate to the Gmail view — starts unauthenticated (Connect screen).
+		// GmailImport is a lazy-loaded chunk, so its first appearance is async.
 		openMenu();
 		clickMenuItem(/import gmail/i);
-		expect(screen.getByRole("button", { name: /connect gmail account/i })).toBeInTheDocument();
+		expect(await screen.findByRole("button", { name: /connect gmail account/i })).toBeInTheDocument();
 
 		// Authenticate through the REAL useGmailAuth via the captured Google onSuccess.
 		act(() => capturedOnSuccess?.({ access_token: "tok-xyz", expires_in: 3600 }));
@@ -116,7 +117,7 @@ describe("E3-bug.2 — Gmail auth survives leaving and returning to the Gmail vi
 		// Leave the Gmail view → this UNMOUNTS GmailImport (same as importing an item).
 		openMenu();
 		clickMenuItem(/add item/i);
-		expect(screen.getByTestId("view-form")).toBeInTheDocument();
+		expect(await screen.findByTestId("view-form")).toBeInTheDocument();
 
 		// Return to Gmail ("Back to email") → GmailImport REMOUNTS.
 		openMenu();
@@ -124,8 +125,7 @@ describe("E3-bug.2 — Gmail auth survives leaving and returning to the Gmail vi
 
 		// THE GUARD: the session-scoped provider kept the token alive, so the user
 		// lands back on their email list — NOT the re-auth screen.
-		// expect(screen.getByText(/Found 1 email/i)).toBeInTheDocument();
-		expect(screen.getByTestId('email-count')).toHaveTextContent(/found 1 email/i);
+		expect(await screen.findByTestId("email-count")).toHaveTextContent(/found 1 email/i);
 		expect(screen.queryByRole("button", { name: /connect gmail account/i })).not.toBeInTheDocument();
 	});
 });

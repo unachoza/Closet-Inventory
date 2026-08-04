@@ -1,7 +1,11 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import "./TextileGuide.css";
-import { FIBERS, WEAVE_TYPES, CARE_GROUPS, STAIN_GUIDE, Fiber } from "../../Content/Fabric&Fiber";
+import { FIBERS } from "../../Content/Fabrics&Fibers/fibers";
+import { WEAVE_TYPES } from "../../Content/Fabrics&Fibers/weaveTypes";
+import { CARE_GROUPS } from "../../Content/Fabrics&Fibers/careGroups";
+import { STAIN_GUIDE } from "../../Content/Fabrics&Fibers/stainGuide";
+import type { Fiber } from "../../Content/Fabrics&Fibers/textileTypes";
 import { FiberCard } from "../../Components/GuideComponents/FiberCard";
 import WeaveDiagram from "../../Components/GuideComponents/WeaveDiagram";
 import FiberFlowchart from "../../Components/GuideComponents/FiberFlowChart";

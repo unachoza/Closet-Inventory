@@ -73,7 +73,7 @@ export function inferCareFromAttributes(name?: string, color?: string, materials
 	return [...new Set(tags)];
 }
 
-import { CARE_GROUPS } from "../../../Content/Fabric&Fiber";
+import { CARE_GROUPS } from "../../../Content/Fabrics&Fibers/careGroups";
 
 // Material → Care group title mapping. Handles synonyms and cross-references.
 const MATERIAL_TO_CARE_GROUP: Record<string, string> = {
