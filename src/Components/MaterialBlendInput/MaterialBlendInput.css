@@ -34,13 +34,12 @@
 	display: flex;
 	align-items: center;
 	padding: 0.4rem 0.6rem;
-	border: 1px solid rgb(21 20 20 / 60%);
 	border-radius: 0.5rem;
-	/* background: rgb(149 143 143); */
 	gap: 0.5rem;
 	border: none;
 	/* Replaces the old .mbi__rows `gap`; sits inside the reveal wrapper so it
 	   collapses with the row's height. */
+	/* I don't want this margin botton; but i can't tell if I need it for the reveal */
 	margin-bottom: 0.5rem;
 }
 

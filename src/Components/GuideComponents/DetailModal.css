@@ -231,7 +231,7 @@ ul.country-of-origin-list li:not(:first-child)::before {
       padding: 0;
 }
 
-.detail-close:hover { background: var(--cream); color: var(--ink); transform: translateY(-1px); }
+.detail-close:hover { background: var(--bg-surface-secondary); color: var(--ink); transform: translateY(-1px); }
 
 .detail-body {
       flex: 1 1 auto;

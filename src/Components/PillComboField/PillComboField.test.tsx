@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import PillComboField from "./PillComboField";
 
@@ -52,12 +52,14 @@ describe("PillComboField", () => {
 		expect(onRemove).toHaveBeenCalledWith("casual");
 	});
 
-	it("closes the panel when Done is clicked", () => {
+	// The panel plays an exit animation (AnimatePresence), so it stays mounted
+	// for a beat after Done — assert on eventual removal, not synchronously.
+	it("closes the panel when Done is clicked", async () => {
 		render(<PillComboField label="occasion" options={options} selected={[]} onAdd={vi.fn()} onRemove={vi.fn()} />);
 		fireEvent.click(screen.getByRole("button", { name: /occasion selector/i }));
 		expect(screen.getByRole("button", { name: "formal" })).toBeInTheDocument();
 		fireEvent.click(screen.getByRole("button", { name: "Done" }));
-		expect(screen.queryByRole("button", { name: "formal" })).not.toBeInTheDocument();
+		await waitFor(() => expect(screen.queryByRole("button", { name: "formal" })).not.toBeInTheDocument());
 	});
 
 	it("shows Done even when every option is already selected", () => {

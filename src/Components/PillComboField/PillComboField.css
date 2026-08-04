@@ -9,6 +9,13 @@
 	flex-direction: column;
 	gap: var(--spacing-100, 0.4rem);
 	width: 100%;
+	/* Don't stretch to the grid row's height. `.pcf__panel` is positioned from
+	   this element's bottom (`top: calc(100% + 0.3rem)`), so when a taller
+	   row-mate — e.g. the material section in the edit form's `.form-fields`
+	   grid — stretches this box, the panel detaches and floats that far below
+	   the field. Sizing to content keeps `100%` equal to the box's bottom
+	   regardless of what shares the row. */
+	align-self: start;
 }
 
 .pcf__label {

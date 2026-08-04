@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { MaterialBlend } from "../../utils/types";
@@ -22,6 +23,13 @@ const ROW_REVEAL_TRANSITION_REDUCED = { duration: 0.15 } as const;
 const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 	const prefersReducedMotion = useReducedMotion();
 	const rowTransition = prefersReducedMotion ? ROW_REVEAL_TRANSITION_REDUCED : ROW_REVEAL_TRANSITION;
+	// Which row (if any) has its material dropdown open. The reveal wrapper below
+	// needs `overflow: hidden` to clip the height animation, but that also clips
+	// the dropdown — which is absolutely positioned inside the row — cutting the
+	// option list off a row's height below the input. Rows only animate on
+	// add/remove, and no dropdown is open at that moment, so lifting the clip for
+	// the one open row is safe and keeps the reveal intact everywhere else.
+	const [openDropdownRow, setOpenDropdownRow] = useState<number | null>(null);
 	const total = blendTotal(value);
 	const remaining = 100 - total;
 
@@ -80,7 +88,7 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 								animate={prefersReducedMotion ? {} : { height: "auto" }}
 								exit={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
 								transition={rowTransition}
-								style={{ overflow: "hidden" }}
+								style={{ overflow: openDropdownRow === index ? "visible" : "hidden" }}
 							>
 								<motion.div
 									className="mbi__row-inner"
@@ -103,6 +111,9 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 										onChange={(material) => handleMaterialChange(index, material)}
 										options={CANONICAL_MATERIALS}
 										ariaLabel={`Material ${index + 1} name`}
+										onOpenChange={(open) =>
+											setOpenDropdownRow((prev) => (open ? index : prev === index ? null : prev))
+										}
 									/>
 
 									{/* Percentage */}

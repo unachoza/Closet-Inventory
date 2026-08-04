@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { usePanelIntoView } from "../../hooks/usePanelIntoView";
+import { panelRevealProps } from "../../utils/panelMotion";
 import "./MaterialCombobox.css";
 
 interface MaterialComboboxProps {
@@ -10,6 +13,12 @@ interface MaterialComboboxProps {
 	onChange: (material: string) => void;
 	options: string[];
 	ariaLabel: string;
+	/**
+	 * Fires when the dropdown opens or closes. The parent needs this to lift the
+	 * `overflow: hidden` on its row-reveal wrapper, which would otherwise clip
+	 * this panel — see MaterialBlendInput.
+	 */
+	onOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -20,11 +29,16 @@ interface MaterialComboboxProps {
  * outside, or pressing Done are the only ways to commit — no commit-on-blur,
  * since blur fires before an option's click registers and would race it.
  */
-const MaterialCombobox = ({ value, onChange, options, ariaLabel }: MaterialComboboxProps) => {
+const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }: MaterialComboboxProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [query, setQuery] = useState(value);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const panelRef = useRef<HTMLDivElement>(null);
+	const prefersReducedMotion = useReducedMotion() ?? false;
+	// Re-checks as the query narrows the list, since the panel's height (and so
+	// how far it overhangs the clipping edge) changes with every keystroke.
+	const scrollPanelIntoView = usePanelIntoView(panelRef, isOpen, query);
 
 	// The row's value can change from outside (e.g. a sibling row's percentage
 	// steal on Add) — keep the search text in sync when this field isn't the
@@ -32,6 +46,13 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel }: MaterialCombo
 	useEffect(() => {
 		if (!isOpen) setQuery(value);
 	}, [value, isOpen]);
+
+	// Deliberately keyed on `isOpen` alone: `onOpenChange` is typically an inline
+	// arrow, so including it would re-fire on every parent render.
+	useEffect(() => {
+		onOpenChange?.(isOpen);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isOpen]);
 
 	const commit = (raw: string) => {
 		const next = raw.trim().toLowerCase();
@@ -95,28 +116,37 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel }: MaterialCombo
 				onKeyDown={handleKeyDown}
 			/>
 
-			{isOpen && (
-				<div className="mc__panel">
-					{filtered.length > 0 && (
-						<div className="mc__options">
-							{filtered.map((opt) => (
-								<button type="button" key={opt} className="mc__option" onClick={() => selectOption(opt)}>
-									{opt}
-								</button>
-							))}
-						</div>
-					)}
-					{filtered.length === 0 && <p className="mc__empty">No matches — use the custom value below.</p>}
-					{normalizedQuery && !hasExactMatch && (
-						<button type="button" className="mc__custom" onClick={() => selectOption(normalizedQuery)}>
-							Use "{query.trim()}"
+			<AnimatePresence initial={false}>
+				{isOpen && (
+					<motion.div
+						className="mc__panel"
+						ref={panelRef}
+						{...panelRevealProps(prefersReducedMotion)}
+						// Re-check once the reveal settles, in case the slide changed how
+						// far the panel overhangs the clipping edge.
+						onAnimationComplete={() => isOpen && scrollPanelIntoView()}
+					>
+						{filtered.length > 0 && (
+							<div className="mc__options">
+								{filtered.map((opt) => (
+									<button type="button" key={opt} className="mc__option" onClick={() => selectOption(opt)}>
+										{opt}
+									</button>
+								))}
+							</div>
+						)}
+						{filtered.length === 0 && <p className="mc__empty">No matches — use the custom value below.</p>}
+						{normalizedQuery && !hasExactMatch && (
+							<button type="button" className="mc__custom" onClick={() => selectOption(normalizedQuery)}>
+								Use "{query.trim()}"
+							</button>
+						)}
+						<button type="button" className="mc__done" onClick={() => selectOption(normalizedQuery || value)}>
+							Done
 						</button>
-					)}
-					<button type="button" className="mc__done" onClick={() => selectOption(normalizedQuery || value)}>
-						Done
-					</button>
-				</div>
-			)}
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 };
