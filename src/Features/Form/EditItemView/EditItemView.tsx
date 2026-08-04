@@ -34,6 +34,15 @@ const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
  */
 const EDITABLE_TEXT_FIELDS = new Set(["name", "category", "color", "size", "brand", "retailer", "price"]);
 
+/** Split a comma-joined field value into trimmed, non-empty parts — same
+ *  convention as PillGroup/TextPillField, since occasion is stored the same
+ *  way: a single `text` column, multi-select values comma-joined. */
+const splitValues = (raw: string): string[] =>
+	raw
+		.split(",")
+		.map((part) => part.trim())
+		.filter(Boolean);
+
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	return {
 		...item,
@@ -139,11 +148,14 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	}, []);
 
 	const handleOccasionAdd = useCallback((value: string) => {
-		setFormData((prev) => ({ ...prev, occasion: value }));
+		setFormData((prev) => {
+			const current = splitValues(prev.occasion ?? "");
+			return { ...prev, occasion: current.includes(value) ? current.join(", ") : [...current, value].join(", ") };
+		});
 	}, []);
 
-	const handleOccasionRemove = useCallback(() => {
-		setFormData((prev) => ({ ...prev, occasion: "" }));
+	const handleOccasionRemove = useCallback((value: string) => {
+		setFormData((prev) => ({ ...prev, occasion: splitValues(prev.occasion ?? "").filter((o) => o !== value).join(", ") }));
 	}, []);
 
 	const handleCareAdd = useCallback((value: string) => {
@@ -450,10 +462,10 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					<PillComboField
 						label="occasion"
 						options={occasionExamples}
-						selected={formData.occasion ? [formData.occasion] : []}
+						selected={splitValues(formData.occasion ?? "")}
 						onAdd={handleOccasionAdd}
 						onRemove={handleOccasionRemove}
-						multiSelect={false}
+						multiSelect={true}
 					/>
 
 					<PillComboField

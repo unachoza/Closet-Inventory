@@ -18,13 +18,15 @@ const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect
 
 	useEffect(() => {
 		if (!isOpen) return;
-		const handleClickOutside = (e: MouseEvent) => {
+		// pointerdown (not mousedown) so this closes reliably on iOS Safari, which
+		// doesn't always synthesize mousedown for a tap on a non-form element.
+		const handleClickOutside = (e: PointerEvent) => {
 			if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
 				setIsOpen(false);
 			}
 		};
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => document.removeEventListener("mousedown", handleClickOutside);
+		document.addEventListener("pointerdown", handleClickOutside);
+		return () => document.removeEventListener("pointerdown", handleClickOutside);
 	}, [isOpen]);
 
 	const availableOptions = options.filter((opt) => !selected.includes(opt));
@@ -75,18 +77,30 @@ const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect
 				<span className="pcf__add">+</span>
 			</div>
 
-			{isOpen && availableOptions.length > 0 && (
+			{isOpen && (
 				<div className="pcf__panel">
-					{availableOptions.map((opt) => (
-						<button
-							type="button"
-							key={opt}
-							className="pcf__option"
-							onClick={() => handleSelect(opt)}
-						>
-							{opt}
-						</button>
-					))}
+					{availableOptions.length > 0 ? (
+						<div className="pcf__options">
+							{availableOptions.map((opt) => (
+								<button
+									type="button"
+									key={opt}
+									className="pcf__option"
+									onClick={() => handleSelect(opt)}
+								>
+									{opt}
+								</button>
+							))}
+						</div>
+					) : (
+						<p className="pcf__empty">All options selected.</p>
+					)}
+					{/* Explicit dismiss — the panel sits absolutely positioned over
+					    whatever follows this field (e.g. Material Composition in the
+					    edit form), so outside-tap isn't the only way out. */}
+					<button type="button" className="pcf__done" onClick={() => setIsOpen(false)}>
+						Done
+					</button>
 				</div>
 			)}
 		</div>

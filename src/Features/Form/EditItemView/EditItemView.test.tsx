@@ -189,18 +189,31 @@ describe("EditItemView", () => {
 		expect(screen.getByText("Import Item")).toBeInTheDocument();
 	});
 
-	it("renders the pre-selected occasion as a chip and lets the user pick a new one", () => {
+	it("renders the pre-selected occasion as a chip and allows picking additional ones", () => {
 		render(<EditItemView item={mockItem} setView={mockSetView} />);
 		// Pre-selected value shows as a chip inside the combobox
 		expect(screen.getByText("casual")).toBeInTheDocument();
 
-		// Open the occasion selector and pick a new value
+		// Open the occasion selector and pick a second value
 		fireEvent.click(screen.getByRole("button", { name: /occasion selector/i }));
 		fireEvent.click(screen.getByRole("button", { name: "formal" }));
 
-		// Single-select: previous chip is replaced by the new one
+		// Multi-select (matches Care): the new chip is added, not swapped in
 		expect(screen.getByText("formal")).toBeInTheDocument();
+		expect(screen.getByText("casual")).toBeInTheDocument();
+	});
+
+	it("allows removing one occasion chip while keeping others", () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} />);
+		fireEvent.click(screen.getByRole("button", { name: /occasion selector/i }));
+		fireEvent.click(screen.getByRole("button", { name: "formal" }));
+		expect(screen.getByText("formal")).toBeInTheDocument();
+		expect(screen.getByText("casual")).toBeInTheDocument();
+
+		fireEvent.click(screen.getByRole("button", { name: /remove casual/i }));
+
 		expect(screen.queryByText("casual")).not.toBeInTheDocument();
+		expect(screen.getByText("formal")).toBeInTheDocument();
 	});
 
 	it("allows multiple care selections", () => {

@@ -5,6 +5,15 @@ import { FIBERS } from "../Content/Fabrics&Fibers/fibers";
 // Each common material gets a distinct, accessible color. Unknown materials
 // fall back to a deterministic hue derived from the material name.
 
+/** Canonical vocabulary for the Material Composition dropdown — every material
+ *  the app already knows how to color/swatch. Sorted for a scannable list;
+ *  anything typed that isn't on this list is still accepted as a custom
+ *  value (imported items commonly carry materials outside it, e.g. "merino
+ *  wool", "twill" — see MaterialCombobox.tsx). */
+export function canonicalMaterialList(): string[] {
+	return Object.keys(MATERIAL_COLORS).sort();
+}
+
 export const MATERIAL_COLORS: Record<string, string> = {
 	cotton: "#86efac", // green-300
 	silk: "#f9a8d4", // pink-300

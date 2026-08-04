@@ -1,0 +1,109 @@
+/* ── MaterialCombobox ────────────────────────────────────────────────────
+   Searchable material picker used inside each MaterialBlendInput row.
+   ──────────────────────────────────────────────────────────────────────── */
+
+.mc {
+	position: relative;
+	min-width: 0;
+	flex: 1;
+}
+
+.mc__input {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 0.4rem 0.5rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+	font-size: 0.85rem;
+	text-transform: lowercase;
+}
+
+.mc__input:focus {
+	box-shadow: 0 0 0 2px var(--border-hairline);
+	border-color: var(--border-brand);
+	outline: none;
+}
+
+.mc__panel {
+	position: absolute;
+	top: calc(100% + 0.3rem);
+	left: 0;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	width: max(100%, 12rem);
+	max-height: 16rem;
+	padding: 0.1rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--layout-radius-button);
+	background: var(--bg-surface-primary);
+	box-shadow: var(--elevation-high);
+}
+
+.mc__options {
+	display: flex;
+	flex-wrap: wrap;
+	max-height: 12rem;
+	padding: 0.1rem;
+	overflow-y: auto;
+}
+
+.mc__option {
+	margin: 0.1rem;
+	padding: 0.35rem 0.75rem;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--border-radius-ty, 4px);
+	background: var(--bg-surface-primary);
+	color: var(--text-primary);
+	font-size: 0.82rem;
+	font-weight: 500;
+	text-transform: capitalize;
+	cursor: pointer;
+	transition: filter 0.15s ease;
+}
+
+.mc__option:hover {
+	filter: brightness(0.9);
+}
+
+.mc__empty {
+	margin: 0.5rem 0.35rem;
+	color: var(--text-secondary);
+	font-size: 0.82rem;
+}
+
+.mc__custom {
+	margin: 0.1rem;
+	padding: 0.45rem 0.6rem;
+	border: 1px dashed var(--border-brand);
+	border-radius: var(--layout-radius-button);
+	background: transparent;
+	color: var(--text-primary);
+	font-size: 0.82rem;
+	font-weight: 500;
+	text-align: left;
+	cursor: pointer;
+}
+
+.mc__custom:hover {
+	background: var(--bg-surface-secondary);
+}
+
+.mc__done {
+	margin: 0.3rem 0.1rem 0.1rem;
+	padding: 0.45rem;
+	border: none;
+	border-radius: 0 0 var(--layout-radius-button) var(--layout-radius-button);
+	background: transparent;
+	color: var(--border-brand);
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+	border-top: 1px solid var(--border-hairline);
+}
+
+.mc__done:hover {
+	background: var(--bg-surface-secondary);
+}

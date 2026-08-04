@@ -15,9 +15,25 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
    keep as custom only on low confidence. Applies to manual entry *and* parsed
    import values. Open decision: silent correct vs. visible "→ Cotton, tap to
    undo" chip (preferred) vs. suggest-and-confirm.
-2. **Material Composition → dropdown** instead of free text. Canonical list,
-   searchable, "Other" escape hatch. Percentages stay numeric.
-3. **Occasion → multi-select pills** (currently single-select; should match Care).
+2. ~~**Material Composition → dropdown** instead of free text.~~ Done
+   2026-08-03: `MaterialCombobox` (searchable, canonical 27-material list from
+   `MATERIAL_COLORS`, free-typed "Other" values pass through unchanged).
+3. ~~**Occasion → multi-select pills**~~ Done 2026-08-03: `EditItemView`'s
+   occasion field now matches the add-flow (`PillComboField multiSelect`,
+   comma-joined string like `care`/`PillGroup`).
+4. **Occasion filter dimension doesn't split comma-joined values.**
+   `useClosetFilters.ts`'s `extractValues()` pushes a plain `string` field
+   as one literal value — for `occasion` (typed `string`, not `string[]`,
+   comma-joined for multi-select since item 3 above and already true for the
+   add-flow before that), an item tagged "casual, formal" filters as the
+   single glued option `"casual, formal"` instead of two selectable filters.
+   `care` doesn't have this problem because it's typed `string | string[]`
+   and `extractValues` already flattens arrays. Fix: either comma-split
+   plain-string values in `extractValues` (risk: a legitimate value
+   containing a literal comma, e.g. free-typed "date, dinner" style text,
+   would wrongly split — audit for that first) or change `occasion`'s type
+   to `string[]` to match `care` (bigger: touches the Supabase column,
+   `exportCloset`/`importCloset`, and every existing single-occasion item).
 
 ## Import flow
 

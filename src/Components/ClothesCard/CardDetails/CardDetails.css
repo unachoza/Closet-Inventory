@@ -156,6 +156,19 @@
 	font-size: 10px;
 }
 
+/* Layout guard: `white-space: nowrap` above means a pill never wraps its own
+   text, so an unusually long care string (legacy items saved before the
+   care-tag rewrite, a CSV import, or hand-typed text) would otherwise grow
+   the pill past the viewport and force the whole row into horizontal scroll.
+   Capping width + ellipsis makes that impossible regardless of the text's
+   source — the guard, not just the shorter labels, is what's load-bearing
+   for already-saved data. */
+.card-details__care-pill {
+	overflow: hidden;
+	max-width: min(11.25rem, 60vw);
+	text-overflow: ellipsis;
+}
+
 .card-details__care-pill-icon {
 	flex-shrink: 0;
 	margin-right: 3px;

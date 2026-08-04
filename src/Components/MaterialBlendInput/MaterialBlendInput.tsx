@@ -1,8 +1,8 @@
 import { Plus, Trash2 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { MaterialBlend } from "../../utils/types";
-import { blendTotal, getMaterialColor } from "../../utils/materialUtils";
-import { materialExamples } from "../../utils/constants";
+import { blendTotal, canonicalMaterialList, getMaterialColor } from "../../utils/materialUtils";
+import MaterialCombobox from "./MaterialCombobox";
 import "./MaterialBlendInput.css";
 
 interface MaterialBlendInputProps {
@@ -10,7 +10,7 @@ interface MaterialBlendInputProps {
 	onChange: (blend: MaterialBlend[]) => void;
 }
 
-const DATALIST_ID = "material-options-list";
+const CANONICAL_MATERIALS = canonicalMaterialList();
 // Clerk conditional-field reveal (motion.dev/examples/react-clerk-conditional-field):
 // the outer wrapper unrolls open by animating height 0 → auto (clipped by
 // overflow:hidden) so the fields below are pushed down, while the inner field
@@ -65,12 +65,6 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 
 	return (
 		<div className="mbi">
-			<datalist id={DATALIST_ID}>
-				{materialExamples.map((m) => (
-					<option key={m} value={m} />
-				))}
-			</datalist>
-
 			<div className="mbi__rows">
 				<AnimatePresence initial={false}>
 					{value.map((blend, index) => {
@@ -104,14 +98,11 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 									/>
 
 									{/* Material name */}
-									<input
-										className="mbi__material-input"
-										type="text"
-										list={DATALIST_ID}
-										placeholder="e.g. cotton"
+									<MaterialCombobox
 										value={blend.material}
-										onChange={(e) => handleMaterialChange(index, e.target.value.toLowerCase())}
-										aria-label={`Material ${index + 1} name`}
+										onChange={(material) => handleMaterialChange(index, material)}
+										options={CANONICAL_MATERIALS}
+										ariaLabel={`Material ${index + 1} name`}
 									/>
 
 									{/* Percentage */}
