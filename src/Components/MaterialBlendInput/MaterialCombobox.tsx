@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Fuse from "fuse.js";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { usePanelIntoView } from "../../hooks/usePanelIntoView";
 import { panelRevealProps } from "../../utils/panelMotion";
 import "./MaterialCombobox.css";
 
 interface MaterialComboboxProps {
-	/** Current material, lowercase. May be a canonical option, a custom value
-	 *  from a prior "Other" entry, or a material an import parsed that isn't on
-	 *  the canonical list at all (e.g. "merino wool") — always rendered as-is,
-	 *  never silently blanked. */
+	/** Current material, lowercase. Always a canonical option — see
+	 *  utils/materialUtils.ts's `MATERIAL_COLORS` for the full vocabulary. */
 	value: string;
 	onChange: (material: string) => void;
 	options: string[];
@@ -21,13 +20,24 @@ interface MaterialComboboxProps {
 	onOpenChange?: (open: boolean) => void;
 }
 
+// Live list while typing: only surfaces options that are a plausible match, so
+// unrelated results don't clutter the dropdown mid-keystroke.
+const LIST_FUSE_OPTIONS = { threshold: 0.4, ignoreLocation: true };
+// Commit resolution: no threshold cutoff, so every non-empty query resolves to
+// *some* canonical option — there is no free-text escape hatch (see the
+// component doc comment for why).
+const COMMIT_FUSE_OPTIONS = { threshold: 1, ignoreLocation: true };
+
 /**
- * Searchable material picker: typing filters the canonical list; anything
- * typed that isn't on the list is still a valid "Other" value, offered as an
- * explicit "Use "<text>"" row so picking it is a deliberate action rather
- * than an implicit fallback. Selecting an option, pressing Enter, tapping
- * outside, or pressing Done are the only ways to commit — no commit-on-blur,
- * since blur fires before an option's click registers and would race it.
+ * Searchable material picker. There is no custom/"Other" value: whatever is
+ * typed is force-matched to its closest canonical option on commit (Enter,
+ * tapping an option, tapping outside, or Done) — "cottton" becomes "cotton",
+ * "viscos" becomes "viscose". This only works because `options` (see
+ * `canonicalMaterialList` in materialUtils.ts) was reconciled to cover every
+ * material FashionParser's own material map actually produces; expand that
+ * list, not this component, if a real material starts getting mismatched.
+ * No commit-on-blur, since blur fires before an option's click registers and
+ * would race it.
  */
 const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }: MaterialComboboxProps) => {
 	const [isOpen, setIsOpen] = useState(false);
@@ -39,6 +49,11 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 	// Re-checks as the query narrows the list, since the panel's height (and so
 	// how far it overhangs the clipping edge) changes with every keystroke.
 	const scrollPanelIntoView = usePanelIntoView(panelRef, isOpen, query);
+
+	// Rebuilt only when the canonical vocabulary itself changes (never, in
+	// practice — it's a static list), not per keystroke.
+	const listFuse = useMemo(() => new Fuse(options, LIST_FUSE_OPTIONS), [options]);
+	const commitFuse = useMemo(() => new Fuse(options, COMMIT_FUSE_OPTIONS), [options]);
 
 	// The row's value can change from outside (e.g. a sibling row's percentage
 	// steal on Add) — keep the search text in sync when this field isn't the
@@ -54,8 +69,18 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isOpen]);
 
+	/** Nearest canonical option for arbitrary typed text. Empty input keeps the
+	 *  field's current value rather than force-matching a blank string. */
+	const resolveToCanonical = (raw: string): string => {
+		const q = raw.trim().toLowerCase();
+		if (!q) return value;
+		if (options.includes(q)) return q;
+		return commitFuse.search(q)[0]?.item ?? q;
+	};
+
 	const commit = (raw: string) => {
-		const next = raw.trim().toLowerCase();
+		const next = resolveToCanonical(raw);
+		setQuery(next);
 		if (next !== value) onChange(next);
 	};
 
@@ -75,8 +100,7 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 	}, [isOpen, query]);
 
 	const normalizedQuery = query.trim().toLowerCase();
-	const filtered = normalizedQuery ? options.filter((o) => o.includes(normalizedQuery)) : options;
-	const hasExactMatch = options.includes(normalizedQuery);
+	const filtered = normalizedQuery ? listFuse.search(normalizedQuery).map((r) => r.item) : options;
 
 	const selectOption = (opt: string) => {
 		setQuery(opt);
@@ -126,7 +150,7 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 						// far the panel overhangs the clipping edge.
 						onAnimationComplete={() => isOpen && scrollPanelIntoView()}
 					>
-						{filtered.length > 0 && (
+						{filtered.length > 0 ? (
 							<div className="mc__options">
 								{filtered.map((opt) => (
 									<button type="button" key={opt} className="mc__option" onClick={() => selectOption(opt)}>
@@ -134,14 +158,17 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 									</button>
 								))}
 							</div>
+						) : (
+							<p className="mc__empty">No close matches — Done will use the nearest option.</p>
 						)}
-						{filtered.length === 0 && <p className="mc__empty">No matches — use the custom value below.</p>}
-						{normalizedQuery && !hasExactMatch && (
-							<button type="button" className="mc__custom" onClick={() => selectOption(normalizedQuery)}>
-								Use "{query.trim()}"
-							</button>
-						)}
-						<button type="button" className="mc__done" onClick={() => selectOption(normalizedQuery || value)}>
+						<button
+							type="button"
+							className="mc__done"
+							onClick={() => {
+								commit(query);
+								setIsOpen(false);
+							}}
+						>
 							Done
 						</button>
 					</motion.div>

@@ -74,23 +74,6 @@
 	font-size: 0.82rem;
 }
 
-.mc__custom {
-	margin: 0.1rem;
-	padding: 0.45rem 0.6rem;
-	border: 1px dashed var(--border-brand);
-	border-radius: var(--layout-radius-button);
-	background: transparent;
-	color: var(--text-primary);
-	font-size: 0.82rem;
-	font-weight: 500;
-	text-align: left;
-	cursor: pointer;
-}
-
-.mc__custom:hover {
-	background: var(--bg-surface-secondary);
-}
-
 .mc__done {
 	margin: 0.3rem 0.1rem 0.1rem;
 	padding: 0.45rem;

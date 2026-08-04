@@ -29,31 +29,38 @@ describe("MaterialCombobox", () => {
 		expect(onChange).toHaveBeenCalledWith("silk");
 	});
 
-	it("offers a custom 'Use' option for text that isn't in the canonical list", () => {
-		const onChange = vi.fn();
-		render(<MaterialCombobox value="" onChange={onChange} options={options} ariaLabel="Material 1 name" />);
+	// No free-text escape hatch: whatever's typed is force-matched to its
+	// closest canonical option on commit, never kept as-is or offered as a
+	// separate "custom value" choice. This only holds because the real
+	// canonical list (materialUtils.ts) was reconciled to cover every material
+	// FashionParser's own map produces — see that file's comment.
+	it("has no 'use custom value' escape hatch", () => {
+		render(<MaterialCombobox value="" onChange={vi.fn()} options={options} ariaLabel="Material 1 name" />);
 		fireEvent.focus(screen.getByLabelText("Material 1 name"));
-		fireEvent.change(screen.getByLabelText("Material 1 name"), { target: { value: "merino wool" } });
-
-		fireEvent.click(screen.getByRole("button", { name: /use "merino wool"/i }));
-		expect(onChange).toHaveBeenCalledWith("merino wool");
+		fireEvent.change(screen.getByLabelText("Material 1 name"), { target: { value: "xyzzy" } });
+		expect(screen.queryByRole("button", { name: /use "/i })).not.toBeInTheDocument();
 	});
 
-	// The critical case: an imported item can carry a material outside the
-	// canonical list (FashionParser's MATERIAL_MAP has many the dropdown
-	// doesn't — "twill", "organza", "merino wool", etc). Opening the field to
-	// edit something else on the item must never blank an existing value the
-	// dropdown doesn't happen to recognize.
-	it("preserves a non-canonical existing value instead of blanking it", () => {
-		render(<MaterialCombobox value="merino wool" onChange={vi.fn()} options={options} ariaLabel="Material 1 name" />);
-		expect(screen.getByDisplayValue("merino wool")).toBeInTheDocument();
+	it("force-matches a typo to the closest canonical option on Enter", () => {
+		const onChange = vi.fn();
+		render(<MaterialCombobox value="" onChange={onChange} options={options} ariaLabel="Material 1 name" />);
+		const input = screen.getByLabelText("Material 1 name");
+		fireEvent.focus(input);
+		fireEvent.change(input, { target: { value: "cottton" } });
+		fireEvent.keyDown(input, { key: "Enter" });
+		expect(onChange).toHaveBeenCalledWith("cotton");
+	});
 
+	// Opening the field to look at (or edit something else near) an existing
+	// value must not mutate it if nothing was typed — dismissing without
+	// editing is a no-op, not an implicit re-commit.
+	it("leaves an untouched value alone when opened and dismissed without edits", () => {
+		const onChange = vi.fn();
+		render(<MaterialCombobox value="wool" onChange={onChange} options={options} ariaLabel="Material 1 name" />);
 		fireEvent.focus(screen.getByLabelText("Material 1 name"));
-		expect(screen.getByDisplayValue("merino wool")).toBeInTheDocument();
-		expect(screen.queryByRole("button", { name: "merino wool" })).not.toBeInTheDocument(); // not a canonical option
-
 		fireEvent.click(document.body);
-		expect(screen.getByDisplayValue("merino wool")).toBeInTheDocument();
+		expect(screen.getByDisplayValue("wool")).toBeInTheDocument();
+		expect(onChange).not.toHaveBeenCalled();
 	});
 
 	it("commits typed text lowercase on Enter and closes the panel", () => {
@@ -97,14 +104,14 @@ describe("MaterialCombobox", () => {
 		expect(screen.queryByRole("button", { name: "wool" })).not.toBeInTheDocument();
 	});
 
-	it("Done commits the current text and closes even without selecting a listed option", () => {
+	it("Done force-matches the current text and closes even without clicking a listed option", () => {
 		const onChange = vi.fn();
 		render(<MaterialCombobox value="" onChange={onChange} options={options} ariaLabel="Material 1 name" />);
 		fireEvent.focus(screen.getByLabelText("Material 1 name"));
-		fireEvent.change(screen.getByLabelText("Material 1 name"), { target: { value: "leather" } });
+		fireEvent.change(screen.getByLabelText("Material 1 name"), { target: { value: "silkk" } });
 		fireEvent.click(screen.getByRole("button", { name: "Done" }));
 
-		expect(onChange).toHaveBeenCalledWith("leather");
+		expect(onChange).toHaveBeenCalledWith("silk");
 		expect(screen.queryByRole("button", { name: "wool" })).not.toBeInTheDocument();
 	});
 });
