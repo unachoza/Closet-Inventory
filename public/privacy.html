@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Privacy Policy — Nothing To Wear</title>
+		<meta name="description" content="How Nothing To Wear collects, uses, and deletes your data." />
+		<!--
+			Deliberately a standalone static page in public/, not an in-app route:
+			the app has no router, and Google's OAuth consent screen needs a stable
+			URL that resolves without booting the SPA. Styling comes from
+			legal.css, which is self-contained and shared with terms.html.
+		-->
+		<link rel="stylesheet" href="/legal.css" />
+	</head>
+	<body>
+		<main>
+			<h1>Privacy Policy</h1>
+			<p class="updated">Nothing To Wear · Last updated 4 August 2026</p>
+
+			<p class="beta">
+				Nothing To Wear is in private beta. This policy describes what the app does today. If we change what we collect or who
+				we share it with, we will update this page and tell beta participants directly.
+			</p>
+
+			<h2>The short version</h2>
+			<ul>
+				<li>We store the closet you build: your items, their details, and the photos attached to them.</li>
+				<li>
+					If you connect Gmail, your email is read <strong>in your browser only</strong> to find order confirmations. Message
+					contents are never sent to us and never stored on our servers.
+				</li>
+				<li>Product analytics are opt-in. Crash reports are always on, and contain no personal details.</li>
+				<li>We do not sell your data, and we do not share it with advertisers.</li>
+				<li>You can export everything as a file, or permanently delete your account, from inside the app.</li>
+			</ul>
+
+			<h2>Who we are</h2>
+			<p>
+				Nothing To Wear ("we", "the app") is the operator of this service and the controller of the personal data described
+				below. You can reach us at <a href="mailto:[CONTACT_EMAIL]">[CONTACT_EMAIL]</a> with any privacy question or request.
+			</p>
+
+			<h2>What we collect</h2>
+
+			<h3>Account information</h3>
+			<p>
+				You sign in with Google. From that sign-in we receive and store your <strong>name</strong>, <strong>email
+				address</strong>, and <strong>profile photo URL</strong>. We never see or handle your Google password.
+			</p>
+			<p>
+				Account sign-in requests <strong>no access to your Gmail</strong>. Connecting Gmail is a separate, optional step with
+				its own permission prompt, described below.
+			</p>
+
+			<h3>Your closet</h3>
+			<p>Whatever you add to the app, whether typed in yourself or imported:</p>
+			<ul>
+				<li>Item details — name, category, brand, colour, size, material composition, condition, retailer</li>
+				<li>Purchase information — price, original price, whether it was on sale, purchase date</li>
+				<li>Photos you upload or that are imported from a retailer's email</li>
+				<li>Free-text notes you write, and wear history if you record it</li>
+				<li>Locations you define (for example "home", "storage"), and your in-app settings</li>
+			</ul>
+
+			<h3>Gmail (optional)</h3>
+			<p>
+				If you choose to import from email, we ask Google for <strong>read-only access to your Gmail</strong>
+				(<code>gmail.readonly</code>). This is what actually happens with it:
+			</p>
+			<ul>
+				<li>
+					Your browser talks to Google's Gmail API <strong>directly</strong>. Your email does not pass through our servers, and
+					we operate no proxy or backend that could see it.
+				</li>
+				<li>
+					We search only for messages that look like retailer order confirmations. Those messages are parsed in your browser to
+					pull out item details.
+				</li>
+				<li>
+					<strong>We never store the emails.</strong> Only the item fields you choose to import — name, brand, price and so on —
+					are saved to your closet.
+				</li>
+				<li>
+					The Gmail access token is held in memory only. It is never written to disk, and it is discarded when you reload or
+					close the app, which is why you may be asked to reconnect.
+				</li>
+			</ul>
+			<p>
+				Our use of information received from Google APIs adheres to the
+				<a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noreferrer">Google API Services User
+				Data Policy</a>, including its Limited Use requirements. We do not use Gmail data for advertising, we do not sell it, and
+				we do not allow humans to read it except where you explicitly ask us to for support, where it is required by law, or for
+				security purposes.
+			</p>
+			<p>You can revoke this access at any time at <a href="https://myaccount.google.com/permissions" rel="noreferrer">myaccount.google.com/permissions</a>.</p>
+
+			<h3>Product analytics — opt-in</h3>
+			<p>
+				When you first use the app we ask whether we may collect analytics. If you accept, we record which features you use and
+				how you move through the app, tied to your account, using PostHog.
+			</p>
+			<p>
+				<strong>This includes session replay.</strong> Session replay records your interactions with the app so we can see where
+				something broke rather than guess. <strong>Text you type is masked</strong> and is not captured in these recordings.
+				Replay only runs for users who have opted in.
+			</p>
+			<p>
+				If you decline, none of this is collected. Before you answer, a small number of first-run events are held
+				<strong>in your browser's memory only</strong> — never sent anywhere, never written to storage. If you accept, they are
+				sent. If you decline, they are destroyed.
+			</p>
+
+			<h3>Crash reports — always on</h3>
+			<p>
+				Separately from analytics, we always collect crash and error reports through Sentry so we can fix what breaks. These
+				contain the technical details of the failure — the error, where in the code it happened, and the app version. They are
+				deliberately configured to exclude personal information, they are not linked to your identity, and they include no
+				session recording. This runs whether or not you accept analytics, which is why the in-app banner discloses it
+				separately rather than asking permission for it.
+			</p>
+
+			<h3>Feedback</h3>
+			<p>
+				If you send feedback from inside the app, we store your message along with technical context to help us reproduce the
+				problem: app version, the screen you were on, the page address, your browser's user-agent string, and your screen size.
+			</p>
+
+			<h2>Why we use it</h2>
+			<div class="wrap">
+				<table>
+					<tr>
+						<th>Purpose</th>
+						<th>Data used</th>
+					</tr>
+					<tr>
+						<td>Providing the app — storing and syncing your closet across devices</td>
+						<td>Account information, closet contents</td>
+					</tr>
+					<tr>
+						<td>Importing items you asked us to import</td>
+						<td>Gmail messages, read in your browser and not retained</td>
+					</tr>
+					<tr>
+						<td>Keeping the app working — diagnosing crashes and failures</td>
+						<td>Crash reports, feedback</td>
+					</tr>
+					<tr>
+						<td>Improving the app — understanding which features are used</td>
+						<td>Analytics, only with your consent</td>
+					</tr>
+				</table>
+			</div>
+			<p>
+				We do not sell personal data. We do not share it with advertisers. We do not use it to build profiles for anyone other
+				than you, and we do not use your closet or your email to train machine-learning models.
+			</p>
+
+			<h2>Who else handles your data</h2>
+			<p>We use a small number of service providers. They process data on our behalf, under their own security commitments:</p>
+			<div class="wrap">
+				<table>
+					<tr>
+						<th>Provider</th>
+						<th>What they handle</th>
+					</tr>
+					<tr>
+						<td>Supabase</td>
+						<td>Sign-in, database, and photo storage — this is where your closet lives</td>
+					</tr>
+					<tr>
+						<td>Vercel</td>
+						<td>Hosting and delivery of the app itself</td>
+					</tr>
+					<tr>
+						<td>Google</td>
+						<td>Sign-in, and the Gmail API when you connect it</td>
+					</tr>
+					<tr>
+						<td>PostHog</td>
+						<td>Product analytics and session replay — only if you opt in</td>
+					</tr>
+					<tr>
+						<td>Sentry</td>
+						<td>Crash and error reports</td>
+					</tr>
+				</table>
+			</div>
+			<p>
+				We may also disclose data if we are legally required to, or where it is necessary to protect the safety and security of
+				the service.
+			</p>
+
+			<h2>How long we keep it</h2>
+			<ul>
+				<li><strong>Your closet and account:</strong> kept until you delete them, or until the beta ends and we wind the service down.</li>
+				<li><strong>Email messages:</strong> never stored, so there is nothing to retain.</li>
+				<li><strong>The Gmail access token:</strong> discarded when you reload or close the app.</li>
+				<li><strong>Analytics and crash reports:</strong> retained according to our providers' standard retention periods.</li>
+			</ul>
+
+			<h2>Your choices and rights</h2>
+			<ul>
+				<li>
+					<strong>Export everything.</strong> The app can download your full account — profile, closets, items and wear history —
+					as a single file, at any time, from your profile.
+				</li>
+				<li>
+					<strong>Delete your account.</strong> Deleting from inside the app removes your closet, your items, and your uploaded
+					photos, and erases your sign-in record itself. This is permanent and cannot be undone.
+				</li>
+				<li><strong>Change your mind about analytics</strong> at any time from the app.</li>
+				<li><strong>Disconnect Gmail</strong> at any time, in the app or from your Google account permissions page.</li>
+			</ul>
+			<p>
+				Depending on where you live, you may also have the right to access, correct, or restrict the processing of your data, to
+				object to it, or to complain to a data-protection authority. Write to
+				<a href="mailto:[CONTACT_EMAIL]">[CONTACT_EMAIL]</a> and we will help.
+			</p>
+
+			<h2>Security</h2>
+			<p>
+				Your data is transmitted over encrypted connections and stored with per-user access rules enforced at the database
+				level, so one account cannot read another's closet. The Gmail token is kept out of persistent storage specifically to
+				reduce the damage a compromised browser could do. No service is perfectly secure, and this is beta software — please
+				don't put anything in it you couldn't stand to lose.
+			</p>
+
+			<h2>Children</h2>
+			<p>Nothing To Wear is not intended for children under 13, and we do not knowingly collect their data.</p>
+
+			<h2>Changes to this policy</h2>
+			<p>
+				If this policy changes materially, we will update the date at the top of this page and notify beta participants by
+				email.
+			</p>
+
+			<h2>Contact</h2>
+			<p>Questions, requests, or complaints: <a href="mailto:[CONTACT_EMAIL]">[CONTACT_EMAIL]</a>.</p>
+
+			<footer><a href="/">← Back to Nothing To Wear</a> · <a href="/terms.html">Terms of Service</a></footer>
+		</main>
+	</body>
+</html>

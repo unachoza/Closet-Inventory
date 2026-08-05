@@ -16,7 +16,11 @@ function GoogleMark({ size = 20 }: { size?: number }) {
 }
 
 const PERMISSIONS: Record<"sign-in" | "gmail-import", string[]> = {
-	"sign-in": ["Your name and email address", "Your closet securely synced to your account"],
+	// Must stay in step with what sign-in actually requests (`useSupabaseAuth`)
+	// and with what /privacy.html discloses. Google returns the profile photo
+	// alongside name and email, and we store it — listing only two of the three
+	// understates the ask on an app Google hasn't verified yet.
+	"sign-in": ["Your name, email address, and profile photo", "Your closet securely synced to your account"],
 	"gmail-import": ["Read-only access to your Gmail", "Used only to find purchase-confirmation emails to import"],
 };
 

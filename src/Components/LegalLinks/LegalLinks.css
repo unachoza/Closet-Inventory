@@ -1,0 +1,16 @@
+.legal-links {
+	color: var(--text-muted);
+	font-size: var(--primitive-font-size-xs);
+	text-align: center;
+	margin-top: var(--primitive-spacing-xs);
+}
+
+.legal-links a {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.legal-links a:hover,
+.legal-links a:focus-visible {
+	color: var(--text-primary);
+}

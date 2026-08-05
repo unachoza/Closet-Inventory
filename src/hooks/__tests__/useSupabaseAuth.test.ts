@@ -101,16 +101,29 @@ describe("useSupabaseAuth", () => {
     expect(result.current.gmailAccessToken).toBeNull();
   });
 
-  it("signIn calls signInWithOAuth with google provider and gmail scope", async () => {
+  it("signIn calls signInWithOAuth with google provider and a redirect", async () => {
     const { result } = renderHook(() => useSupabaseAuth());
     await act(async () => {});
     await act(async () => { await result.current.signIn(); });
     expect(mockSignInWithOAuth).toHaveBeenCalledWith({
       provider: "google",
       options: expect.objectContaining({
-        scopes: "https://www.googleapis.com/auth/gmail.readonly",
+        redirectTo: expect.any(String),
       }),
     });
+  });
+
+  // Guard: plain account sign-in must NOT request any Gmail scope. Nothing reads
+  // the resulting provider_token (Gmail import runs its own GIS flow), so the
+  // scope only added a full-inbox-read ask to Google's unverified-app screen that
+  // our consent primer never promises. Re-adding `scopes` flips this red.
+  it("signIn does not request gmail.readonly", async () => {
+    const { result } = renderHook(() => useSupabaseAuth());
+    await act(async () => {});
+    await act(async () => { await result.current.signIn(); });
+    const options = mockSignInWithOAuth.mock.calls[0]?.[0]?.options ?? {};
+    expect(options).not.toHaveProperty("scopes");
+    expect(JSON.stringify(options)).not.toContain("gmail");
   });
 
   it("signOut calls supabase.auth.signOut", async () => {

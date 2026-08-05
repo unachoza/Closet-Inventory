@@ -90,9 +90,13 @@ export async function initMonitoring(): Promise<void> {
 			api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
 			person_profiles: "identified_only",
 			// Session replay — watch "the import froze" reports instead of guessing.
-			// Text inputs are masked by default; keep it that way for a closet's
-			// personal data. Only records for consented, identified users.
+			// Only records for consented, identified users.
 			disable_session_recording: false,
+			// `maskAllInputs` is already posthog-js's default, but /privacy.html
+			// publishes it as a promise to users ("text you type is masked and is
+			// not captured"). Set it explicitly so a library default change can't
+			// silently falsify a live privacy policy.
+			session_recording: { maskAllInputs: true },
 		});
 		// `register` (not `register_once`) so these stay current across a session
 		// rather than freezing whatever was true at first init — e.g. installing

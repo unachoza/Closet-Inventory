@@ -12,6 +12,7 @@ import FeedbackPanel from "../../Components/FeedbackButton/FeedbackPanel";
 import ProfileHeader from "./ProfileHeader";
 import FabricProfileCard from "./FabricProfileCard";
 import { appVersion } from "../../lib/monitoring";
+import LegalLinks from "../../Components/LegalLinks/LegalLinks";
 import "./ProfileView.css";
 
 interface ProfileRowButtonProps {
@@ -75,6 +76,7 @@ export default function ProfileView() {
 				</div>
 				<GoogleUnverifiedNotice isOpen={googleNotice.isOpen} onContinue={googleNotice.confirm} onCancel={googleNotice.dismiss} />
 				<p className="profile__version">Nothing To Wear · {appVersion()}</p>
+				<LegalLinks />
 			</div>
 		);
 	}

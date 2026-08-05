@@ -23,6 +23,17 @@
 	line-height: 1.4;
 }
 
+.consent-banner__link {
+	color: inherit;
+	text-decoration: underline;
+	white-space: nowrap;
+}
+
+.consent-banner__link:hover,
+.consent-banner__link:focus-visible {
+	color: var(--text-primary);
+}
+
 .consent-banner__actions {
 	display: flex;
 	gap: 0.5rem;
