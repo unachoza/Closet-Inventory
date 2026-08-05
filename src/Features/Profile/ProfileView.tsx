@@ -127,6 +127,7 @@ export default function ProfileView() {
 			)}
 
 			<p className="profile__version">Nothing To Wear · {appVersion()}</p>
+			<LegalLinks />
 		</div>
 	);
 }

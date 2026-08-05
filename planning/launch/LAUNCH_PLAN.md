@@ -35,7 +35,7 @@ this push.
 - [ ] Google OAuth consent screen matches policy URL, app name, and scopes —
       policy URL is now `https://<domain>/privacy.html` (and
       `/terms.html`). **Service-worker check done:** the SW's navigation
-      fallback was answering *every* navigation with `index.html`, so
+      fallback was answering _every_ navigation with `index.html`, so
       `/privacy.html` served the app shell. Fixed with
       `navigateFallbackDenylist` in `vite.config.ts`; verified against a
       production build with an active, controlling SW (page rendered the real
@@ -47,7 +47,7 @@ this push.
       re-add a Gmail line here: the primer is now accurate, and the fix for the
       mismatch was removing the scope (below), not restoring the copy.
 - [x] Scope audit (2026-08-04) — **the checklist's premise was inverted.**
-      Account sign-in *was* requesting `gmail.readonly`
+      Account sign-in _was_ requesting `gmail.readonly`
       (`useSupabaseAuth.ts`), and the resulting `session.provider_token` had
       **zero production consumers** (`grep -rn provider_token src` → only the
       hook itself, a log redaction regex, and tests). Gmail import runs its own
@@ -133,36 +133,36 @@ this push.
 
 - **PR #195 (ui-nits/material-care-occasion), 2026-08-04 — expanded well
   beyond its original scope after live testing surfaced real regressions:**
-  - Occasion field is a multi-select pill combo in `EditItemView` (was
-    single-select), matching the add-flow.
-  - Material Composition input is a searchable, typo-tolerant combobox
-    (`MaterialCombobox`, fuse.js) instead of free text. Typed input
-    force-matches to the nearest canonical material (`cottton`→`cotton`,
-    `viscos`→`viscose`) — no more silent "custom value" fallback. Safe only
-    because the canonical list (`MATERIAL_COLORS`, materialUtils.ts) was
-    expanded first to cover every term FashionParser's own material map
-    actually produces (merino wool, flannel, organza, scuba, tulle, twill,
-    crepe, mesh, knit, crochet, terry, faux leather) — otherwise a real,
-    already-correct imported value could get silently mangled.
-  - Fixed a real material-inference regression (not part of this PR's
-    original scope, caught by manual test): importing "Cotton Modal Tank
-    Top" from email only picked up one material instead of splitting
-    50/50 — `GmailImport`'s material resolver let a low-fidelity
-    single-keyword guess win over the richer name-inferred blend.
-  - Fixed a self-inflicted regression from earlier same-PR work: the
-    perf/route-level-lazy-loading split (below) made `.edit-form` depend on
-    the Add wizard's CSS chunk having loaded first, so editing an item
-    without visiting Add first rendered a full-viewport-width, unpadded
-    form. `.edit-form` is now fully self-contained.
-  - "Dry clean" care pill now shows a dedicated dry-cleaning icon instead
-    of a washing machine; added a distinct icon for "No fabric softener"
-    (was falling through to a generic tag icon).
-  - "Back to Email" button's arrow no longer rides only the first line
-    when the label wraps to two — real icon, vertically centered against
-    the full label.
-  - `ProgressionTracker` decoupled from the Add wizard (`steps`/`id` now
-    optional props) so it's reusable elsewhere without pulling in
-    wizard-specific CSS.
+     - Occasion field is a multi-select pill combo in `EditItemView` (was
+       single-select), matching the add-flow.
+     - Material Composition input is a searchable, typo-tolerant combobox
+       (`MaterialCombobox`, fuse.js) instead of free text. Typed input
+       force-matches to the nearest canonical material (`cottton`→`cotton`,
+       `viscos`→`viscose`) — no more silent "custom value" fallback. Safe only
+       because the canonical list (`MATERIAL_COLORS`, materialUtils.ts) was
+       expanded first to cover every term FashionParser's own material map
+       actually produces (merino wool, flannel, organza, scuba, tulle, twill,
+       crepe, mesh, knit, crochet, terry, faux leather) — otherwise a real,
+       already-correct imported value could get silently mangled.
+     - Fixed a real material-inference regression (not part of this PR's
+       original scope, caught by manual test): importing "Cotton Modal Tank
+       Top" from email only picked up one material instead of splitting
+       50/50 — `GmailImport`'s material resolver let a low-fidelity
+       single-keyword guess win over the richer name-inferred blend.
+     - Fixed a self-inflicted regression from earlier same-PR work: the
+       perf/route-level-lazy-loading split (below) made `.edit-form` depend on
+       the Add wizard's CSS chunk having loaded first, so editing an item
+       without visiting Add first rendered a full-viewport-width, unpadded
+       form. `.edit-form` is now fully self-contained.
+     - "Dry clean" care pill now shows a dedicated dry-cleaning icon instead
+       of a washing machine; added a distinct icon for "No fabric softener"
+       (was falling through to a generic tag icon).
+     - "Back to Email" button's arrow no longer rides only the first line
+       when the label wraps to two — real icon, vertically centered against
+       the full label.
+     - `ProgressionTracker` decoupled from the Add wizard (`steps`/`id` now
+       optional props) so it's reusable elsewhere without pulling in
+       wizard-specific CSS.
 - Pre-consent analytics buffer-and-flush (monitoring.ts) — queues events in
   memory while consent is undecided, replays on grant with original
   timestamps, discards on decline

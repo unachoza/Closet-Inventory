@@ -172,4 +172,19 @@ describe("ProfileView", () => {
 		expect(screen.queryByRole("button", { name: /sign out/i })).not.toBeInTheDocument();
 		expect(screen.getByText(/v-test-1\.2\.3/)).toBeInTheDocument();
 	});
+
+	// Regression: the signed-in branch silently lost its <LegalLinks /> at some
+	// point after it was added to both branches — most testers are signed in,
+	// so that's the copy nobody noticed was missing. One assertion per branch
+	// so a future edit to either return path can't drop it again unnoticed.
+	it("links to the privacy policy when signed in", async () => {
+		renderView();
+		await waitFor(() => expect(screen.getByText("Susan")).toBeInTheDocument());
+		expect(screen.getByRole("link", { name: /privacy/i })).toHaveAttribute("href", "/privacy.html");
+	});
+
+	it("links to the privacy policy when signed out", () => {
+		renderView(makeAuth({ user: null, isAuthenticated: false }));
+		expect(screen.getByRole("link", { name: /privacy/i })).toHaveAttribute("href", "/privacy.html");
+	});
 });
