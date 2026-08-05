@@ -30,6 +30,12 @@
  * a mobile affordance and is pulled out of the flow here — the numbered
  * buttons already do the same job, and duplicating them cost a whole column.
  */
+ .pagination-controls-container{
+	width: 100vw;
+	display: flex;
+	justify-content: center;
+ }
+
 .pagination-controls {
 	display: grid;
 	grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
