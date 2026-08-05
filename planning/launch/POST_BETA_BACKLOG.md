@@ -180,6 +180,41 @@ tables. **Not** verified with a real screen reader — see V2-MVP.md item.
     have caught the `alt` and aria-hidden-focus bugs above, though not the
     focus-management ones.
 
+## Navigation — tab-label↔view naming (2026-08-05)
+
+From `planning/audits/July29.html`'s "Label↔view mismatches ('Closet'→carousel)
+untouched" note. Every bottom-nav tab has a *third* name in the hamburger
+drawer too, and none of the three (nav label / drawer label / internal
+`ViewType` string) fully agree:
+
+| Nav tab | Internal `ViewType` | Drawer label (now) |
+|---|---|---|
+| Closet | `carousel` | "Back to Carousel" |
+| Care | `fabric` | "Care Guide" (was "Fabric Guide") |
+| Search | `entireCloset` | "Search" (was "View All") |
+| Email | `gmail` | "Import Gmail" |
+
+**Fixed 2026-08-05 — cosmetic only:** drawer labels for Care/Search now match
+their nav tab ("Care Guide", "Search"), decided with the user (Closet/Email
+kept as-is; Care/Search were "open to suggestions" — scissors→Care and the
+real search+filter UI inside the view were the deciding factors).
+
+26. **Full internal rename, deferred.** `ViewType`'s `fabric`→`care` and
+    `entireCloset`→`search` were explicitly *not* renamed — touches
+    `App.tsx`, `ViewContext.tsx`, `types.ts`, `NavBar.tsx`, `BottomNav.tsx`,
+    `CardDetails.tsx`, `FabricProfileCard.tsx` (fabric only) plus every test
+    asserting those strings. Invisible to users (they never see `ViewType`
+    literals), so deferred as a correctness-not-urgency item — do it in a
+    quiet week, not 2 days from launch.
+27. **`carousel`/`overview` are two different views for one nav tab.** The
+    "Closet" tab lands on `carousel` (the category-picker hero); tapping a
+    category switches to `overview` (the actual item grid, `<Closet>`).
+    Neither name is user-facing, so not urgent, but worth folding into the
+    item 26 rename rather than doing twice.
+28. **`GmailImport.tsx:427` header typo** — "Import from Gmail!!" (stray
+    double exclamation mark). One-character fix, noticed in passing during
+    the nav-label audit, not yet applied.
+
 ## Added after launch
 
 _(append new scope-creep ideas here with a date)_

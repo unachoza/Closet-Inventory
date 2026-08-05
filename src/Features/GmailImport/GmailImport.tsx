@@ -452,7 +452,7 @@ export default function GmailImport({
 				{liveStatusMessage}
 			</div>
 			<div className="gmail-header-bar">
-				<h2 className="gmail-title">Import from Gmail!!</h2>
+				<h2 className="gmail-title">Import from Gmail</h2>
 				<div className="gmail-header-actions">
 					<button className="gmail-search-btn" onClick={handleDefaultSearch} disabled={isSearching} type="button">
 						{isSearching ? "Searching..." : emails.length > 0 ? "Search Again" : "Search Emails"}
