@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Menu, Spool, Plus, LayoutGrid, Download, FileDown, FileUp, X, SkipBackIcon, Route, Trash2 } from "lucide-react";
+import { Menu, Plus, Download, FileDown, FileUp, X, SkipBackIcon, Route, Trash2, Search, Scissors } from "lucide-react";
 import { useView } from "../../context/ViewContext";
 import { ClothingItem, ViewType } from "../../utils/types";
 import ExportClosetModal from "./ExportModal/ExportClosetModal";
@@ -148,7 +148,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 			    (goTo("entireCloset")) — was "View All", which named a third
 			    thing for the destination the tab already calls "Search". */}
 			<button className="action-btn secondary" onClick={() => goTo("entireCloset")}>
-				<LayoutGrid size={16} /> Search
+				<Search size={16} /> Search
 			</button>
 			<button className="action-btn" onClick={handleAddItem}>
 				<Plus size={16} /> Add Item
@@ -192,7 +192,7 @@ const NavBar = ({ onAddItem, onExportCloset, onImportCloset, onClearCloset, clos
 			    (goTo("fabric")) — was "Fabric Guide", which named a third thing
 			    for the destination the tab already calls "Care". */}
 			<button className="action-btn secondary" onClick={() => goTo("fabric")}>
-				<Spool size={16} /> Care Guide
+				<Scissors size={16} /> Care Guide
 			</button>
 			<button className="action-btn secondary" onClick={() => goTo("journey")}>
 				<Route size={16} /> Fiber Journey
