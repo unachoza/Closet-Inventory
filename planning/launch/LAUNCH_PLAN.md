@@ -53,10 +53,20 @@ this push.
       throttled-network repro first to confirm bundle vs. blocking-query cause,
       then fix at the right layer (inline `index.html` splash if network;
       timeout + real failure state if a blocking await)
-- [ ] Care pills break mobile layout — rewrite material→care mapping to ≤3-word
+- [x] Care pills break mobile layout — rewrite material→care mapping to ≤3-word
       labels, add a layout guard so no pill can ever force horizontal scroll
-- [ ] Multiselect dropdown (Care) covers Material Composition — explicit Done
-      affordance + close-on-outside-tap
+      (`CARE_GROUP_TAGS` short-tag table, `.card-details__care-pill`
+      `max-width: min(11.25rem, 60vw)` + ellipsis guard — PR #195)
+- [x] Multiselect dropdown (Care) covers Material Composition — explicit Done
+      affordance + close-on-outside-tap (PR #195); the dropdown itself also
+      turned out to be genuinely clipped/mispositioned in three ways, fixed
+      2026-08-04: a ~200px gap under Care/Occasion when a taller sibling
+      stretched their shared grid row, the panel getting cut off past the
+      edit form's scrollable area with the Done button unreachable, and the
+      Material Composition panel getting clipped by its own row's reveal
+      animation wrapper. Panels now auto-scroll into view on open
+      (`usePanelIntoView`) and no longer inherit an unrelated ancestor's
+      clipping `overflow: hidden`.
 - [ ] "What do you want to do first?" onboarding step — Load sample closet /
       Import from Gmail / Add manually, so onboarding doesn't dead-end in an
       empty closet
@@ -66,6 +76,38 @@ this push.
 
 ## Shipped ahead of schedule
 
+- **PR #195 (ui-nits/material-care-occasion), 2026-08-04 — expanded well
+  beyond its original scope after live testing surfaced real regressions:**
+  - Occasion field is a multi-select pill combo in `EditItemView` (was
+    single-select), matching the add-flow.
+  - Material Composition input is a searchable, typo-tolerant combobox
+    (`MaterialCombobox`, fuse.js) instead of free text. Typed input
+    force-matches to the nearest canonical material (`cottton`→`cotton`,
+    `viscos`→`viscose`) — no more silent "custom value" fallback. Safe only
+    because the canonical list (`MATERIAL_COLORS`, materialUtils.ts) was
+    expanded first to cover every term FashionParser's own material map
+    actually produces (merino wool, flannel, organza, scuba, tulle, twill,
+    crepe, mesh, knit, crochet, terry, faux leather) — otherwise a real,
+    already-correct imported value could get silently mangled.
+  - Fixed a real material-inference regression (not part of this PR's
+    original scope, caught by manual test): importing "Cotton Modal Tank
+    Top" from email only picked up one material instead of splitting
+    50/50 — `GmailImport`'s material resolver let a low-fidelity
+    single-keyword guess win over the richer name-inferred blend.
+  - Fixed a self-inflicted regression from earlier same-PR work: the
+    perf/route-level-lazy-loading split (below) made `.edit-form` depend on
+    the Add wizard's CSS chunk having loaded first, so editing an item
+    without visiting Add first rendered a full-viewport-width, unpadded
+    form. `.edit-form` is now fully self-contained.
+  - "Dry clean" care pill now shows a dedicated dry-cleaning icon instead
+    of a washing machine; added a distinct icon for "No fabric softener"
+    (was falling through to a generic tag icon).
+  - "Back to Email" button's arrow no longer rides only the first line
+    when the label wraps to two — real icon, vertically centered against
+    the full label.
+  - `ProgressionTracker` decoupled from the Add wizard (`steps`/`id` now
+    optional props) so it's reusable elsewhere without pulling in
+    wizard-specific CSS.
 - Pre-consent analytics buffer-and-flush (monitoring.ts) — queues events in
   memory while consent is undecided, replays on grant with original
   timestamps, discards on decline

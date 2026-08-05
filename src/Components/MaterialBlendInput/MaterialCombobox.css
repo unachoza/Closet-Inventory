@@ -77,15 +77,16 @@
 .mc__done {
 	margin: 0.3rem 0.1rem 0.1rem;
 	padding: 0.45rem;
-	border: none;
-	border-radius: 0 0 var(--layout-radius-button) var(--layout-radius-button);
+	border: 1px solid var(--border-hairline);
 	background: transparent;
 	color: var(--border-brand);
 	font-size: 0.85rem;
 	font-weight: 600;
 	cursor: pointer;
-	border-top: 1px solid var(--border-hairline);
+	width: 100%;
+    	justify-content: center;
 }
+
 
 .mc__done:hover {
 	background: var(--bg-surface-secondary);

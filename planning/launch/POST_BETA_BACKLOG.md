@@ -10,14 +10,21 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
 
 ## Data integrity (free-text is leaking bad values)
 
-1. **Normalizer for all free-text fields** — material, category, brand, occasion.
-   One utility: trim → lowercase → alias map → fuzzy match to canonical vocab →
-   keep as custom only on low confidence. Applies to manual entry *and* parsed
-   import values. Open decision: silent correct vs. visible "→ Cotton, tap to
-   undo" chip (preferred) vs. suggest-and-confirm.
+1. **Normalizer for all free-text fields** — category, brand, occasion.
+   Material is effectively done (see item 2 below) — same shape needed for
+   the rest: trim → lowercase → alias map → fuzzy match to canonical vocab.
+   Applies to manual entry *and* parsed import values. Open decision for
+   these remaining fields: silent correct vs. visible "→ Cotton, tap to
+   undo" chip (preferred) vs. suggest-and-confirm — material settled on
+   silent force-match (see item 2), which may or may not be the right call
+   for category/brand/occasion.
 2. ~~**Material Composition → dropdown** instead of free text.~~ Done
-   2026-08-03: `MaterialCombobox` (searchable, canonical 27-material list from
-   `MATERIAL_COLORS`, free-typed "Other" values pass through unchanged).
+   2026-08-03, hardened 2026-08-04: `MaterialCombobox` (searchable,
+   canonical list from `MATERIAL_COLORS`, now 39 entries after reconciling
+   against FashionParser's own material map). No free-text fallback —
+   typed input always force-matches to its closest canonical option via
+   fuse.js (`cottton`→`cotton`, `viscos`→`viscose`), replacing the original
+   "Other" pass-through.
 3. ~~**Occasion → multi-select pills**~~ Done 2026-08-03: `EditItemView`'s
    occasion field now matches the add-flow (`PillComboField multiSelect`,
    comma-joined string like `care`/`PillGroup`).
