@@ -99,12 +99,16 @@ export default function ProfileHeader({ profile, user, onSaveName }: ProfileHead
 						</motion.div>
 					) : (
 						<motion.div key="view" layoutId={NAME_PANEL_LAYOUT_ID} className="profile__name-view">
-							<h1 className="profile__name">
+							{/* h2, not h1: NavBar's persistent "Nothing To Wear" masthead is
+							    already the page's h1 on every view. GmailImport/YourFabrics/
+							    FilterSidePanel all follow that with h2 section titles — this
+							    was the one view with a second, competing h1. */}
+							<h2 className="profile__name">
 								{displayName || "Add your name"}
 								<button type="button" className="profile__name-edit-btn" aria-label="Edit name" onClick={startEditing}>
 									<Pencil size={13} aria-hidden="true" />
 								</button>
-							</h1>
+							</h2>
 							<p className="profile__meta">{user.email}</p>
 						</motion.div>
 					)}

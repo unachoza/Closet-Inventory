@@ -136,7 +136,10 @@ describe("loading and progress states", () => {
 		searchState.progress = { fetched: 15, total: 34 };
 		renderImport();
 
-		const status = screen.getByRole("status");
+		// Two role="status" regions exist by design: this visible one for sighted
+		// users, plus a permanently-mounted hidden one for screen readers (see
+		// GmailImport.liveRegion.test.tsx) — query the visible block specifically.
+		const status = document.querySelector(".gmail-loading");
 		expect(status).toHaveTextContent(/34/);
 		expect(status).toHaveTextContent(/15/);
 	});
@@ -146,7 +149,7 @@ describe("loading and progress states", () => {
 		searchState.searchMode = "fetch";
 		renderImport();
 
-		expect(screen.getByRole("status")).toHaveTextContent(/searching your inbox/i);
+		expect(document.querySelector(".gmail-loading")).toHaveTextContent(/searching your inbox/i);
 	});
 
 	it("shows an opening indicator while an email body is being fetched", async () => {
@@ -158,8 +161,10 @@ describe("loading and progress states", () => {
 
 		fireEvent.click(screen.getByRole("checkbox", { name: /select email/i }));
 
+		// Same reason as above: the hidden live region also says "Opening
+		// email...", so scope to the visible preview block.
 		await waitFor(() => {
-			expect(screen.getByText(/opening email/i)).toBeInTheDocument();
+			expect(document.querySelector(".gmail-preview-loading")).toHaveTextContent(/opening email/i);
 		});
 	});
 });

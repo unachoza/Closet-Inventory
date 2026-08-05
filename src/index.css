@@ -227,6 +227,21 @@ button:focus-visible {
 	outline-offset: var(--focus-ring-default-offset);
 }
 
+/* Standard "visually hidden but present for assistive tech" pattern —
+   clips to 1px instead of `display:none`/`visibility:hidden`, which would
+   pull the element out of the accessibility tree along with the viewport. */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
 @media (prefers-color-scheme: light) {
 	:root {
 		background-color: var(--White);

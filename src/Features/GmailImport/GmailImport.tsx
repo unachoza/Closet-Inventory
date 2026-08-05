@@ -101,6 +101,27 @@ export default function GmailImport({
 
 	const listRef = useRef<HTMLUListElement>(null);
 
+	// Screen-reader announcement for search/preview progress.
+	//
+	// The visible `.gmail-loading`/`.gmail-preview-loading` blocks below are
+	// role="status" but only mounted while their condition holds — the whole
+	// subtree, announcement text included, appears in a single React commit.
+	// Live-region reliability across screen readers generally depends on the
+	// region already existing in the DOM before its content changes; inserting
+	// the node and its text together is inconsistently honored. This string
+	// feeds a second region, permanently mounted and visually hidden
+	// (`.gmail-live-status` below), whose *text* changes instead — that's the
+	// pattern that reliably announces.
+	const liveStatusMessage = isSearching
+		? searchMode === "filter"
+			? "Filtering cached emails..."
+			: progress && progress.total > 0
+				? `Found ${progress.total} email${progress.total !== 1 ? "s" : ""} — loading details (${progress.fetched}/${progress.total})...`
+				: "Searching your inbox for order confirmations..."
+		: selectedEmailId && !selectedEmail
+			? "Opening email..."
+			: "";
+
 	// Clear the in-memory + sessionStorage Gmail caches (metadata + bodies).
 	const handleClearCache = useCallback(() => {
 		clearCache();
@@ -423,6 +444,13 @@ export default function GmailImport({
 
 	return (
 		<div className="gmail-container">
+			{/* Permanently mounted so screen readers treat updates as text changes
+			    within an existing region, not a whole node appearing — see
+			    liveStatusMessage above. Sighted users still get the visible
+			    spinner blocks below; this exists only for assistive tech. */}
+			<div className="visually-hidden" role="status" aria-live="polite" data-testid="gmail-live-status">
+				{liveStatusMessage}
+			</div>
 			<div className="gmail-header-bar">
 				<h2 className="gmail-title">Import from Gmail!!</h2>
 				<div className="gmail-header-actions">
