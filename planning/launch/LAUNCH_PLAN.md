@@ -9,10 +9,15 @@ this push.
 
 ## Day 1 — Legal
 
-- [ ] Business/support email set up — **blocks two shipped items.** Both legal
-      pages carry the literal placeholder `[CONTACT_EMAIL]`
-      (`grep -rn "\[CONTACT_EMAIL\]" public/`). Deliberately not a plausible
-      address, so it can't survive to production unnoticed.
+- [ ] Business/support email set up — the literal `[CONTACT_EMAIL]` placeholder
+      that used to block this is now gone from both legal pages;
+      `nothingtowear.app@gmail.com` is live in `public/privacy.html` and
+      `public/terms.html` (verified 2026-08-05, `grep -rn
+      "nothingtowear.app@gmail.com" public/` → 4 hits, 0 for the old
+      placeholder). What's still open is the broader setup this checkbox is
+      really about — Google Workspace/DNS/inbox monitoring for that address —
+      which isn't verifiable from the repo. Don't flip this to `[x]` on the
+      grep alone.
 - [x] Privacy policy written (2026-08-04) — `public/privacy.html`, live at
       `/privacy.html`. Covers the Gmail scope and the fact that email is read
       **browser-side only and never stored**, everything in the Supabase schema,
@@ -131,6 +136,49 @@ this push.
 
 ## Shipped ahead of schedule
 
+- **Screen-reader accessibility pass, 2026-08-05 (commits `74e07eb`,
+  `6e545e7`, `35c430d`, `7bf772a`, `9681ff7`) — user-initiated, two rounds,
+  not on the original plan.** Scope: what's observable from the computed
+  a11y tree (names/roles/focus/tab-order) — **not** a real screen-reader
+  run; VoiceOver has still never actually been used to test this app.
+     - Round 1 (`74e07eb`): carousel `<img alt={icon}>` was dumping raw SVG
+       data-URIs into the accessible name (now `alt=""`); `FilterSidePanel`
+       kept 9 controls tabbable while visually closed (now `inert={!open}`);
+       `MaterialCombobox`/`PillComboField` dropped focus to `<body>` on
+       close/select (now refocus the trigger); Add-wizard step tabs got
+       `aria-current="step"`.
+     - Round 2 (`6e545e7`): `TextInput` error text wired to its input via
+       `aria-describedby`/`aria-invalid` (was visually adjacent only);
+       fixed a duplicate page `<h1>` on Profile (NavBar's masthead h1 vs.
+       ProfileHeader/ProfileView's own h1 — demoted the latter to `h2`,
+       matching the pattern already used by GmailImport/YourFabrics/
+       FilterSidePanel); Gmail import's search/preview status now announced
+       via a second, permanently-mounted, visually-hidden live region (the
+       existing visible ones only mount once `isSearching` flips true, which
+       is unreliable for screen-reader announcement timing). `<html
+       lang="en">` was already correct — no fix needed.
+     - Deliberately deferred, not fixed — logged as `POST_BETA_BACKLOG.md`
+       items 21–25: carousel category cards are keyboard-unreachable, no
+       modal focus trap anywhere (`aria-modal="true"` is set but focus never
+       enters/traps/restores), wizard step tabs still click-only, view
+       switches are silent (no title change, no focus move, no `<main>`
+       landmark), no automated a11y coverage (`@axe-core/playwright`
+       evaluated and rejected — its checks overlap grep-detectable issues,
+       not the focus/live-region issues actually found here).
+- **Nav-label consistency fix, 2026-08-05 (commits `35c430d`, `7bf772a`) —
+  user decision.** Every bottom-nav tab had a third, different name in the
+  hamburger drawer. User confirmed Closet/Email as fine as-is; for Care and
+  Search, converged the drawer label onto the nav-tab label ("Care Guide",
+  "Search"). Icon churn in the same window: first tried a new inlined
+  `SewingToolsIcon.tsx` for Care Guide, user rejected it on sight, reverted
+  to a scissors icon (`7bf772a`) and swapped Search to a magnifying glass.
+  The full internal `ViewType` string rename (`fabric`→`care`,
+  `entireCloset`→`search`) was explicitly **not** done — touches 7+
+  production files and every test asserting those literals, invisible to
+  users — deferred to `POST_BETA_BACKLOG.md` item 26.
+  `src/Components/CareIcons/SewingToolsIcon.tsx` is dead code left over from
+  the rejected icon (verified 2026-08-05: zero imports anywhere in `src/`) —
+  fine to delete whenever, not launch-blocking.
 - **PR #195 (ui-nits/material-care-occasion), 2026-08-04 — expanded well
   beyond its original scope after live testing surfaced real regressions:**
      - Occasion field is a multi-select pill combo in `EditItemView` (was
