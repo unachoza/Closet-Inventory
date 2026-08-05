@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { MaterialBlend } from "../../utils/types";
-import { blendTotal, getMaterialColor } from "../../utils/materialUtils";
-import { materialExamples } from "../../utils/constants";
+import { blendTotal, canonicalMaterialList, getMaterialColor } from "../../utils/materialUtils";
+import MaterialCombobox from "./MaterialCombobox";
 import "./MaterialBlendInput.css";
 
 interface MaterialBlendInputProps {
@@ -10,7 +11,7 @@ interface MaterialBlendInputProps {
 	onChange: (blend: MaterialBlend[]) => void;
 }
 
-const DATALIST_ID = "material-options-list";
+const CANONICAL_MATERIALS = canonicalMaterialList();
 // Clerk conditional-field reveal (motion.dev/examples/react-clerk-conditional-field):
 // the outer wrapper unrolls open by animating height 0 → auto (clipped by
 // overflow:hidden) so the fields below are pushed down, while the inner field
@@ -22,6 +23,13 @@ const ROW_REVEAL_TRANSITION_REDUCED = { duration: 0.15 } as const;
 const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 	const prefersReducedMotion = useReducedMotion();
 	const rowTransition = prefersReducedMotion ? ROW_REVEAL_TRANSITION_REDUCED : ROW_REVEAL_TRANSITION;
+	// Which row (if any) has its material dropdown open. The reveal wrapper below
+	// needs `overflow: hidden` to clip the height animation, but that also clips
+	// the dropdown — which is absolutely positioned inside the row — cutting the
+	// option list off a row's height below the input. Rows only animate on
+	// add/remove, and no dropdown is open at that moment, so lifting the clip for
+	// the one open row is safe and keeps the reveal intact everywhere else.
+	const [openDropdownRow, setOpenDropdownRow] = useState<number | null>(null);
 	const total = blendTotal(value);
 	const remaining = 100 - total;
 
@@ -65,12 +73,6 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 
 	return (
 		<div className="mbi">
-			<datalist id={DATALIST_ID}>
-				{materialExamples.map((m) => (
-					<option key={m} value={m} />
-				))}
-			</datalist>
-
 			<div className="mbi__rows">
 				<AnimatePresence initial={false}>
 					{value.map((blend, index) => {
@@ -86,7 +88,7 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 								animate={prefersReducedMotion ? {} : { height: "auto" }}
 								exit={prefersReducedMotion ? { opacity: 0 } : { height: 0 }}
 								transition={rowTransition}
-								style={{ overflow: "hidden" }}
+								style={{ overflow: openDropdownRow === index ? "visible" : "hidden" }}
 							>
 								<motion.div
 									className="mbi__row-inner"
@@ -104,14 +106,14 @@ const MaterialBlendInput = ({ value, onChange }: MaterialBlendInputProps) => {
 									/>
 
 									{/* Material name */}
-									<input
-										className="mbi__material-input"
-										type="text"
-										list={DATALIST_ID}
-										placeholder="e.g. cotton"
+									<MaterialCombobox
 										value={blend.material}
-										onChange={(e) => handleMaterialChange(index, e.target.value.toLowerCase())}
-										aria-label={`Material ${index + 1} name`}
+										onChange={(material) => handleMaterialChange(index, material)}
+										options={CANONICAL_MATERIALS}
+										ariaLabel={`Material ${index + 1} name`}
+										onOpenChange={(open) =>
+											setOpenDropdownRow((prev) => (open ? index : prev === index ? null : prev))
+										}
 									/>
 
 									{/* Percentage */}

@@ -13,7 +13,6 @@ import { useCloset } from "../../context/ClosetContext";
 import { useSetNavGuard } from "../../context/ViewContext";
 import { generateItemName } from "./generateItemName";
 import "./Form.css";
-import "../../Components/ProgressionTracker/ProgressionTracker.css";
 import StepTabsTracker from "../../Components/ProgressionTracker/ProgressionTracker";
 import { useToast } from "../../Components/Toast/Toast";
 

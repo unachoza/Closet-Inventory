@@ -1,9 +1,5 @@
 @import "../../styles/breakpoints.css";
 
-:root {
-      /* --FORM-WIDTH: 42rem */
-}
-
 .step-tabs-container {
       display: flex;
       justify-content: center;
@@ -17,7 +13,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: calc(var(--Form-width) + 2rem); /*// width of the form */
+      /* Host sets --tracker-max-width to match its own width (see `.form` in
+         Form.css). The fallback keeps the tracker usable standalone. */
+      max-width: var(--tracker-max-width, 47rem);
       margin: 0;
       padding: 0;
       text-transform: uppercase;

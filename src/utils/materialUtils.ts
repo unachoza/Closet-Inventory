@@ -5,6 +5,19 @@ import { FIBERS } from "../Content/Fabrics&Fibers/fibers";
 // Each common material gets a distinct, accessible color. Unknown materials
 // fall back to a deterministic hue derived from the material name.
 
+/** Canonical vocabulary for the Material Composition dropdown — every material
+ *  the app already knows how to color/swatch. Sorted for a scannable list.
+ *  MaterialCombobox force-matches typed input to the closest entry here (no
+ *  free-text fallback), so this list must cover every term the email parser
+ *  actually produces — see Features/FashionParser/maps/material.ts, which is
+ *  the source of truth this was last reconciled against. Adding a fiber to
+ *  that parser map without adding it here means an imported item's material
+ *  gets silently coerced to an unrelated canonical entry the first time
+ *  someone opens the field. */
+export function canonicalMaterialList(): string[] {
+	return Object.keys(MATERIAL_COLORS).sort();
+}
+
 export const MATERIAL_COLORS: Record<string, string> = {
 	cotton: "#86efac", // green-300
 	silk: "#f9a8d4", // pink-300
@@ -33,6 +46,20 @@ export const MATERIAL_COLORS: Record<string, string> = {
 	jersey: "#34d399", // emerald-400
 	cupro: "#e879f9", // fuchsia-400
 	bamboo: "#bef264", // lime-300
+	// Below: added to close the gap with FashionParser's MATERIAL_MAP, which
+	// produced these from real retailer emails but had no canonical home.
+	"merino wool": "#fcd34d", // amber-300 (same as wool — synonym, like lycra/elastane)
+	"faux leather": "#a8a29e", // stone-400 — distinct from leather's brown
+	flannel: "#cbd5e1", // slate-300
+	crochet: "#fda4af", // rose-300
+	organza: "#fef3c7", // amber-100 — sheer, pale
+	scuba: "#38bdf8", // sky-400
+	terry: "#fdba74", // orange-300
+	tulle: "#f0abfc", // fuchsia-300
+	twill: "#ca8a04", // yellow-600
+	crepe: "#fbcfe8", // pink-200
+	mesh: "#7dd3fc", // sky-300
+	knit: "#84cc16", // lime-500
 };
 
 export const BRAND_MATERIAL_COLORS: Record<string, string> = {

@@ -205,22 +205,22 @@ describe("parseEmailToFormData — attribute-driven care", () => {
 		expect(result.care).toContain("Wash inside out");
 	});
 
-	it("adds 'Wash with like colors' when the item is white", () => {
+	it("adds 'Like colors only' when the item is white", () => {
 		const result = parse("Cotton Tee in White", "", "");
 		expect(result.color).toBe("White");
-		expect(result.care).toContain("Wash with like colors");
+		expect(result.care).toContain("Like colors only");
 	});
 
 	it("adds both tags for white jeans", () => {
 		const result = parse("White Wide Leg Jeans", "", "");
 		expect(result.care).toContain("Wash inside out");
-		expect(result.care).toContain("Wash with like colors");
+		expect(result.care).toContain("Like colors only");
 	});
 
 	it("does not add attribute care tags for an unrelated item", () => {
 		const result = parse("Black Silk Cami", "", "");
 		expect(result.care).not.toContain("Wash inside out");
-		expect(result.care).not.toContain("Wash with like colors");
+		expect(result.care).not.toContain("Like colors only");
 	});
 });
 
@@ -440,12 +440,12 @@ describe("parseEmailToFormData — color-driven care", () => {
 	it("adds the like-colors tag when 'white' is in the product name, not the subject", () => {
 		const result = parse("Thanks for your purchase", "White Cotton Oxford Shirt", "sales@gap.com");
 		const care = Array.isArray(result.care) ? result.care : [result.care];
-		expect(care).toContain("Wash with like colors only");
+		expect(care).toContain("Like colors only");
 	});
 
 	it("does not add the like-colors tag for a non-white item", () => {
 		const result = parse("Thanks for your purchase", "Black Cotton Oxford Shirt", "sales@gap.com");
 		const care = Array.isArray(result.care) ? result.care : [result.care];
-		expect(care).not.toContain("Wash with like colors only");
+		expect(care).not.toContain("Like colors only");
 	});
 });

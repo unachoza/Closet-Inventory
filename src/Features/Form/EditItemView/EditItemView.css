@@ -1,26 +1,42 @@
 @import "../../../styles/breakpoints.css";
 
+/* Self-contained: does not rely on the Add wizard's .form class. EditItemView
+   ships in its own lazy chunk (#194) and previously borrowed .form from
+   Form.css for its shell styling — including padding, which .edit-form never
+   declared itself. That silently depended on load order: if Form.css hadn't
+   loaded yet (e.g. editing an item without visiting the Add wizard first, or
+   the email-import path, which never loads it), the content rendered flush
+   against the card edges with no padding. */
 .edit-form {
       position: relative;
       overflow: hidden; /* important for max-height animations */
       height: 100%;
       max-width: var(--Form-width);
       margin: .2rem auto;
+      padding: 1rem 1.5rem .8rem 1.5rem;
       border: 1px solid var(--border-hairline);
       border-radius: var(--layout-radius-card);
       background: var(--bg-surface-primary);
       box-shadow: var(--elevation-high);
 }
 
-.edit-form.form > form {
+.edit-form > form {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       height: 100%;
 }
 
-.edit-form  .card-title{
-      color: var(--text-primary)
+.edit-form .card-title{
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-50, 0.25rem);
+}
+
+.card-title__editing {
+      color: var(--text-color);
+	font-style: italic;
+      font-weight: 500;
+      font-size: 1rem;
 }
 
 .form-fields{
@@ -30,12 +46,10 @@
       overflow-y: auto;
       height: 100%;
       padding: 10px;
-      border: 1px solid var(--border-hairline);
-      border-radius: var(--layout-radius-card);
       gap: 0.5rem 1rem;
 }
 
-.edit-form.form label{
+.edit-form label{
       margin: 0;
       gap: var(--spacing-50, 0.25rem);
       color: var(--text-secondary);
@@ -100,7 +114,7 @@ textarea::placeholder{
       color: var(--text-muted);
 }
 
-.edit-form.form label >span {
+.edit-form label >span {
       color: var(--text-secondary);
       font-size: .8rem;
       font-weight: 600;
@@ -117,7 +131,7 @@ form > div > label.animated-checkbox  .checkbox-label {
       align-items: flex-start;
 }
 
-.edit-form.form span.checkbox-label {
+.edit-form span.checkbox-label {
       color: black !important;
       paint-order: normal;
       -webkit-text-stroke: 0px;
@@ -173,10 +187,20 @@ label.animated-checkbox button.checkbox-root {
     color: var(--text-primary);
     font-size: 0.82rem;
     font-weight: 500;
+    line-height: 1.2;
     cursor: pointer;
     transition: background 0.15s ease;
     gap: 0.3rem;
     margin-bottom: var(--spacing-200, 1rem);
+    text-align: left;
+}
+
+/* Icon centers against the full block, including when the label wraps to two
+   lines — align-items: center on the button alone isn't enough, since the
+   icon and text used to be one inline run and the icon rode along with
+   whichever line it happened to sit on. */
+.edit-form-return-btn__icon {
+    flex-shrink: 0;
 }
 
 .edit-form-return-btn:hover {
@@ -227,7 +251,7 @@ button.submit.ingestion-edit-form {
       height: 44px;
       margin: -18px;
       padding: 3px;
-      border: 1px solid var(--border-strong);
+      border: 1px solid var(--text-primary);
       border-radius: 50%;
       background: transparent;
       color: var(--text-primary);
@@ -263,8 +287,6 @@ button.submit.ingestion-edit-form {
 /* Tablet — form is 45rem wide, so use container query breakpoints not viewport */
 @media (--bp-md) {
   .edit-form {
-    margin: 0;
-    border-radius: 0;
     border-width: 2px;
   }
 
@@ -327,6 +349,22 @@ button.submit.ingestion-edit-form {
   .edit-form-actions{
       /* margin-bottom: 5rem; */
   }
+
+  .close-icon {
+      top: 8px;
+      right: 0px;
+      border: none;
+      outline: 1px solid var(--text-primary);
+      outline-offset: -5px;
+  }
+}
+
+@media (--bp-xxs) {
+       .close-icon {
+            top: 2px;
+            right: -6px;
+            outline-offset: -8px;
+  }   
 }
 
 /* Condition selector + purchase-date display (item age feature) */

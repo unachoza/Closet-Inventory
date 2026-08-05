@@ -17,23 +17,33 @@ export function inferCare(name: string, color: string, materials: MaterialBlend[
 // (see inferCareFromMaterial). Some care guidance depends on what the item is or
 // its color rather than its fiber content.
 
+// Every tag emitted anywhere in this file is capped at 3 words — these become
+// pill labels on the card, and a longer tag (previously some ran to full
+// sentences pulled from the Fabric Guide's prose) forces horizontal scroll on
+// mobile. See CARE_LIKE_COLORS_TAG below for the one tag two rule sets share.
+
 // Name-keyword → care tags. Order matters only for output ordering.
 const NAME_CARE_RULES: [RegExp, string[]][] = [
 	[/\blazers?\b/i, ["Dry clean"]],
-	[/\b(shoes?|sneakers?|boots?|heels?|flats?|loafers?|pumps?|sandals?)\b/i, ["Wipe with damp cloth"]],
+	[/\b(shoes?|sneakers?|boots?|heels?|flats?|loafers?|pumps?|sandals?)\b/i, ["Wipe clean"]],
 	[/\bjeans?\b/i, ["Wash inside out"]],
 	[/\b(fleece|sherpa)\b/i, ["Wash inside out", "Air dry"]],
-	[/\b(beaded|sequins?|sequined|embroidered)\b/i, ["Use mesh laundry bag", "Hand wash only"]],
-	[/\b(raw[- ]?hem|distressed)\b/i, ["Wash in a laundry bag"]],
-	[/\b(zippers?|buckles?|stud(s|ded)?|hardware)\b/i, ["Close fasteners before washing"]],
+	[/\b(beaded|sequins?|sequined|embroidered)\b/i, ["Mesh laundry bag", "Hand wash"]],
+	[/\b(raw[- ]?hem|distressed)\b/i, ["Use laundry bag"]],
+	[/\b(zippers?|buckles?|stud(s|ded)?|hardware)\b/i, ["Close fasteners"]],
 ];
+
+// Shared with WHITE_CARE_TAG below (inferCareFromMaterial) so a white item's
+// two independent rule paths emit the identical string — inferCare()'s Set
+// then dedupes them into one pill instead of two near-duplicates.
+const CARE_LIKE_COLORS_TAG = "Like colors only";
 
 // Color-keyword → care tags. Matched against the raw color text so navy/indigo
 // stay distinct from lighter blues (which a normalized "Blue" would flatten).
 const COLOR_CARE_RULES: [RegExp, string[]][] = [
-	[/\b(white|ivory|cream|ecru|off[- ]?white)\b/i, ["Wash with like colors"]],
-	[/\b(black|navy|indigo|charcoal)\b/i, ["Wash with dark colors"]],
-	[/\b(red|neon|bright[- ]?pink)\b/i, ["Wash separately before first use"]],
+	[/\b(white|ivory|cream|ecru|off[- ]?white)\b/i, [CARE_LIKE_COLORS_TAG]],
+	[/\b(black|navy|indigo|charcoal)\b/i, ["Wash with darks"]],
+	[/\b(red|neon|bright[- ]?pink)\b/i, ["Wash separately"]],
 ];
 
 /**
@@ -56,8 +66,8 @@ export function inferCareFromAttributes(name?: string, color?: string, materials
 	for (const [pattern, careTags] of NAME_CARE_RULES) {
 		if (pattern.test(nameText)) {
 			// Override default shoe care if it has leather
-			if (isShoe && hasLeather && careTags.includes("Wipe with damp cloth")) {
-				tags.push("Use soft Horsehair Brush");
+			if (isShoe && hasLeather && careTags.includes("Wipe clean")) {
+				tags.push("Brush gently");
 			} else {
 				tags.push(...careTags);
 			}
@@ -72,8 +82,6 @@ export function inferCareFromAttributes(name?: string, color?: string, materials
 
 	return [...new Set(tags)];
 }
-
-import { CARE_GROUPS } from "../../../Content/Fabrics&Fibers/careGroups";
 
 // Material → Care group title mapping. Handles synonyms and cross-references.
 const MATERIAL_TO_CARE_GROUP: Record<string, string> = {
@@ -112,8 +120,22 @@ const MATERIAL_TO_CARE_GROUP: Record<string, string> = {
 	polypropylene: "Polyester, Nylon & Synthetics",
 };
 
-// Care guidance that depends on color rather than material.
-const WHITE_CARE_TAG = "Wash with like colors only";
+// Short wash/dry tags per care group, independent of the Fabric Guide's prose
+// (src/Content/Fabrics&Fibers/careGroups.ts) — that prose is written for the
+// long-form guide and several entries run to full sentences, which as pill
+// text forces horizontal scroll on mobile. This table is the single place
+// responsible for keeping every auto-inferred tag at 3 words or fewer.
+// Also fixes a real coverage gap: the Viscose/Rayon/Modal/TENCEL group in
+// careGroups.ts uses "Viscose / Rayon" / "Modal & TENCEL™" item labels
+// instead of "Washing"/"Drying", so materials in that group previously
+// produced zero care instructions here.
+const CARE_GROUP_TAGS: Record<string, string[]> = {
+	"Wool, Cashmere & Mohair": ["Hand wash", "Lay flat"],
+	Silk: ["Hand wash", "Hang dry"],
+	"Cotton & Linen": ["Machine wash", "Tumble dry low"],
+	"Viscose, Rayon, Modal & TENCEL™": ["Hand wash", "Lay flat"],
+	"Polyester, Nylon & Synthetics": ["Machine wash cold", "Low heat", "No fabric softener"],
+};
 
 function isWhite(color?: string): boolean {
 	return color?.trim().toLowerCase() === "white";
@@ -123,13 +145,13 @@ function isWhite(color?: string): boolean {
 // the primary), layered on top of the care-group wash/dry guidance.
 const MATERIAL_TRAIT_RULES: [string[], string[]][] = [
 	[["linen", "rayon"], ["Line dry"]],
-	[["nylon", "polyester"], ["Do not use fabric softeners"]],
+	[["nylon", "polyester"], ["No fabric softener"]],
 ];
 
 /**
  * Maps a material blend to care instructions, optionally layering color-driven guidance.
- * - The primary (highest %) material contributes wash/dry guidance from CARE_GROUPS.
- * - White items get "Wash with like colors only" regardless of material.
+ * - The primary (highest %) material contributes wash/dry guidance from CARE_GROUP_TAGS.
+ * - White items get CARE_LIKE_COLORS_TAG regardless of material.
  * - Fiber-trait rules add extra guidance for any material in the blend.
  *
  * Pure: returns a deduped (possibly empty) list, never mutates the input.
@@ -140,14 +162,8 @@ export function inferCareFromMaterial(materials: MaterialBlend[], color?: string
 	if (materials.length > 0) {
 		const primary = [...materials].sort((a, b) => b.percentage - a.percentage)[0];
 		const careGroupTitle = MATERIAL_TO_CARE_GROUP[primary.material.toLowerCase().trim()];
-		const careGroup = careGroupTitle ? CARE_GROUPS.find((g) => g.title === careGroupTitle) : undefined;
-		if (careGroup) {
-			for (const item of careGroup.items) {
-				if ((item.label === "Washing" || item.label === "Drying") && item.value) {
-					instructions.push(item.value);
-				}
-			}
-		}
+		const tags = careGroupTitle ? CARE_GROUP_TAGS[careGroupTitle] : undefined;
+		if (tags) instructions.push(...tags);
 
 		// Fiber-trait rules across the whole blend.
 		const names = materials.map((m) => m.material.toLowerCase().trim());
@@ -158,7 +174,7 @@ export function inferCareFromMaterial(materials: MaterialBlend[], color?: string
 		}
 	}
 
-	if (isWhite(color)) instructions.push(WHITE_CARE_TAG);
+	if (isWhite(color)) instructions.push(CARE_LIKE_COLORS_TAG);
 
 	return [...new Set(instructions)];
 }

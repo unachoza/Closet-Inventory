@@ -8,6 +8,7 @@ import { AdvancedSearchParams, AdvancedSearchUI, DEFAULT_SEARCH_PARAMS, SearchMo
 import { parseEmailToFormData, extractForwardedSender, extractForwardedPurchaseDate } from "../../utils/parseEmailToFormData";
 import { inferCare, inferProductAttributes, normalizeColor } from "../FashionParser";
 import { normalizeMaterial } from "../../utils/materialUtils";
+import type { MaterialBlend } from "../../utils/types";
 import { extractColorFromName } from "../../utils/parseNameHelpers";
 import EmailList from "./EmailList";
 import EmailPreview from "./EmailPreviewPanel/EmailPreview";
@@ -21,6 +22,33 @@ import { condenseName } from "../../utils/condenseName";
 import { track } from "../../lib/analytics";
 import { describeGmailError } from "./gmailErrorMessages";
 import { describeSearchQuery } from "./searchQueryShape";
+
+/**
+ * Resolves the material blend for an imported product, reconciling two sources
+ * of differing fidelity:
+ *
+ * - `product.material` (from `enrichProduct` in parseProductsFromEmail.ts) is
+ *   either an explicit composition a parsing strategy read off the page (may
+ *   carry real percentages, e.g. "60% Cotton, 40% Modal"), or — when no
+ *   strategy found one — a single best-guess keyword (`matchFirst`: first
+ *   MATERIAL_MAP hit only, e.g. just "cotton" from "Cotton Modal Tank Top").
+ * - `emailData.material` (from parseEmailToFormData → inferMaterialFromName)
+ *   scans the full name for EVERY keyword hit and splits evenly, so it
+ *   correctly finds both "cotton" and "modal".
+ *
+ * Both are non-empty strings/arrays in the ambiguous case, so a plain
+ * `product.material || emailData.material` always preferred the single-guess
+ * string and silently dropped the second material. Trust `product.material`
+ * outright only when it looks like real parsed composition data (contains a
+ * `%`); otherwise prefer the richer name-inferred blend, falling back to the
+ * bare guess only if name inference found nothing.
+ */
+function resolveMaterial(productMaterial: string | undefined, nameInferred: MaterialBlend[] | string | undefined): MaterialBlend[] {
+	if (productMaterial && /%/.test(productMaterial)) return normalizeMaterial(productMaterial);
+	const nameInferredBlend = normalizeMaterial(nameInferred);
+	if (nameInferredBlend.length > 0) return nameInferredBlend;
+	return normalizeMaterial(productMaterial);
+}
 
 interface GmailImportProps {
 	onImport: (prefilled: Partial<ClothingItem>) => void;
@@ -270,7 +298,7 @@ export default function GmailImport({
 			// Color: prefer the structured value from the email HTML; otherwise
 			// scan the item name (e.g. "Babaton Deep Taupe ... Dress" → Brown).
 			const color = product.color || normalizeColor(extractColorFromName(product.name));
-			const material = normalizeMaterial(product.material || emailData.material);
+			const material = resolveMaterial(product.material, emailData.material);
 			onSourceEmailChange?.(selectedEmailId);
 			onImport({
 				...emailData,
@@ -312,7 +340,7 @@ export default function GmailImport({
 				const emailData = parseEmailToFormData(emailSubject, product.name, emailFrom, emailDate);
 				const style = inferProductAttributes(product.name);
 				const color = product.color || normalizeColor(extractColorFromName(product.name));
-				const material = normalizeMaterial(product.material || emailData.material);
+				const material = resolveMaterial(product.material, emailData.material);
 				return {
 					...emailData,
 					imageURL: product.imageUrl,
@@ -396,7 +424,7 @@ export default function GmailImport({
 	return (
 		<div className="gmail-container">
 			<div className="gmail-header-bar">
-				<h2 className="gmail-title">Import from Gmail</h2>
+				<h2 className="gmail-title">Import from Gmail!!</h2>
 				<div className="gmail-header-actions">
 					<button className="gmail-search-btn" onClick={handleDefaultSearch} disabled={isSearching} type="button">
 						{isSearching ? "Searching..." : emails.length > 0 ? "Search Again" : "Search Emails"}

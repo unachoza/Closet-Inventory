@@ -1,4 +1,5 @@
 import "./EditItemView.css";
+import { ArrowLeft } from "lucide-react";
 import type { ClothingItem, CategoryType, MaterialBlend, ViewType } from "../../../utils/types";
 import { useCloset } from "../../../context/ClosetContext";
 import { useLocations } from "../../../context/LocationsContext";
@@ -22,7 +23,7 @@ import { toAbsoluteDate } from "../../../utils/dateUtils";
 import { X } from "lucide-react";
 
 /** Fields the user may leave blank when adding/editing an item **/
-const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
+const OPTIONAL_FIELDS = new Set(["occasion", "care", "price", "retailer"]);
 
 /**
  * The item fields that render as generic text inputs, as an explicit ALLOWLIST.
@@ -33,6 +34,15 @@ const OPTIONAL_FIELDS = new Set(["occasion", "care", "price"]);
  * ClothingItem type never surface as an editable box unless deliberately added.
  */
 const EDITABLE_TEXT_FIELDS = new Set(["name", "category", "color", "size", "brand", "retailer", "price"]);
+
+/** Split a comma-joined field value into trimmed, non-empty parts — same
+ *  convention as PillGroup/TextPillField, since occasion is stored the same
+ *  way: a single `text` column, multi-select values comma-joined. */
+const splitValues = (raw: string): string[] =>
+	raw
+		.split(",")
+		.map((part) => part.trim())
+		.filter(Boolean);
 
 function buildFormDataFromItem(item: ClothingItem): Partial<ClothingItem> {
 	return {
@@ -139,11 +149,19 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	}, []);
 
 	const handleOccasionAdd = useCallback((value: string) => {
-		setFormData((prev) => ({ ...prev, occasion: value }));
+		setFormData((prev) => {
+			const current = splitValues(prev.occasion ?? "");
+			return { ...prev, occasion: current.includes(value) ? current.join(", ") : [...current, value].join(", ") };
+		});
 	}, []);
 
-	const handleOccasionRemove = useCallback(() => {
-		setFormData((prev) => ({ ...prev, occasion: "" }));
+	const handleOccasionRemove = useCallback((value: string) => {
+		setFormData((prev) => ({
+			...prev,
+			occasion: splitValues(prev.occasion ?? "")
+				.filter((o) => o !== value)
+				.join(", "),
+		}));
 	}, []);
 
 	const handleCareAdd = useCallback((value: string) => {
@@ -290,7 +308,7 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 	}
 
 	return (
-		<div className="edit-form form">
+		<div className="edit-form">
 			<button
 				type="button"
 				className="detail-close close-icon"
@@ -307,7 +325,15 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.5 }}
 			>
-				<h2 className="card-title">{isCreateMode ? "Import Item" : item.name}</h2>
+				<h2 className="card-title">
+					{isCreateMode ? (
+						"Import Item"
+					) : (
+						<>
+							<span className="card-title__editing">Editing</span> {item.name}
+						</>
+					)}
+				</h2>
 
 				{isInBatchMode && (
 					<div className="edit-form-queue-progress">
@@ -323,7 +349,8 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 						onClick={() => onReturnToEmail({ ...formData, notes: parseTextToNotesArray(textAreaNotes) })}
 						type="button"
 					>
-						&larr; Back to Email
+						<ArrowLeft size={14} className="edit-form-return-btn__icon" aria-hidden="true" />
+						<span>Back to Email</span>
 					</button>
 				)}
 
@@ -450,10 +477,10 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 					<PillComboField
 						label="occasion"
 						options={occasionExamples}
-						selected={formData.occasion ? [formData.occasion] : []}
+						selected={splitValues(formData.occasion ?? "")}
 						onAdd={handleOccasionAdd}
 						onRemove={handleOccasionRemove}
-						multiSelect={false}
+						multiSelect={true}
 					/>
 
 					<PillComboField

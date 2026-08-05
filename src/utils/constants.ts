@@ -78,7 +78,7 @@ export const occasionExamples = [
 	"elevated",
 ];
 
-export const careExamples = ["dry clean only", "hand wash", "cold water", "hot water", "low heat", "hang dry", "lay flat dry"];
+export const careExamples = ["dry clean only", "hand wash", "cold water", "hot water", "low heat", "hang dry", "lay flat dry", "tumble dry low", "machine wash cold", "do not bleach", "avoid fabric softener"];
 
 // Categories for the carousel
 export const carouselCategories = [
