@@ -195,6 +195,23 @@ describe("resolveFiber", () => {
 		expect(resolveFiber("lyocell")?.id).toBe("tencel");
 	});
 
+	// ── Regression: generic terms and real-world misspellings that were
+	// silently falling through to null (and, for the Profile fabric-category
+	// donut, landing in "other" even though they're a clear-cut fiber) ──
+	it("resolves generic 'wool' (no breed) onto the merino entry", () => {
+		expect(resolveFiber("wool")?.id).toBe("merino");
+		expect(resolveFiber("Wool")?.id).toBe("merino");
+	});
+
+	it("resolves 'polyamide' onto nylon", () => {
+		expect(resolveFiber("polyamide")?.id).toBe("nylon");
+	});
+
+	it("resolves the 'elastine' misspelling of elastane onto spandex", () => {
+		expect(resolveFiber("elastine")?.id).toBe("spandex");
+		expect(resolveFiber("Elastine")?.id).toBe("spandex");
+	});
+
 	it("is case-insensitive", () => {
 		expect(resolveFiber("COTTON")?.id).toBe("cotton");
 	});
