@@ -104,6 +104,26 @@ describe("MaterialCombobox", () => {
 		expect(screen.queryByRole("button", { name: "wool" })).not.toBeInTheDocument();
 	});
 
+	// Selecting or confirming unmounts the panel that focus was inside, so
+	// without an explicit hand-back the browser drops focus to <body> and a
+	// keyboard or screen-reader user lands at the top of the document
+	// mid-form. Focus belongs back on the field they were filling in.
+	it("returns focus to the input after picking an option", () => {
+		render(<MaterialCombobox value="" onChange={vi.fn()} options={options} ariaLabel="Material 1 name" />);
+		const input = screen.getByLabelText("Material 1 name");
+		fireEvent.focus(input);
+		fireEvent.click(screen.getByRole("button", { name: "wool" }));
+		expect(document.activeElement).toBe(input);
+	});
+
+	it("returns focus to the input after Done", () => {
+		render(<MaterialCombobox value="" onChange={vi.fn()} options={options} ariaLabel="Material 1 name" />);
+		const input = screen.getByLabelText("Material 1 name");
+		fireEvent.focus(input);
+		fireEvent.click(screen.getByRole("button", { name: "Done" }));
+		expect(document.activeElement).toBe(input);
+	});
+
 	it("Done force-matches the current text and closes even without clicking a listed option", () => {
 		const onChange = vi.fn();
 		render(<MaterialCombobox value="" onChange={onChange} options={options} ariaLabel="Material 1 name" />);
