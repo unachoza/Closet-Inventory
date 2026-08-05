@@ -14,27 +14,43 @@
 	color: var(--text-primary);
 }
 
-.fabric-profile-card__bars {
+.fabric-profile-card__body {
 	display: flex;
-	gap: 3px;
-	height: 8px;
-	border-radius: 4px;
-	overflow: hidden;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 16px;
 	margin-bottom: 10px;
+	width: 100%
+
 }
 
-.fabric-profile-card__bars span {
-	display: block;
-	height: 100%;
+.fabric-profile-card__donut {
+	/* flex: 0 0 auto; */
+}
+
+.fabric-profile-card__donut-track {
+	stroke: var(--border-hairline);
 }
 
 .fabric-profile-card__legend {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
+	flex-direction: column;
+	/* flex-wrap: wrap; */
+	gap: 6px 16px; 
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
 	font-size: 11px;
 	color: var(--text-secondary);
-	margin-bottom: 10px;
+	max-height: calc(4 * 17px);
+	max-height: 90px; /* Increased slightly to comfortably clear 4 lines of gap + text */
+  /* flex: 1 1 auto;  */
+}
+
+.fabric-profile-card__legend li {
+	display: flex;
+	align-items: center;
 }
 
 .fabric-profile-card__dot {
@@ -43,6 +59,7 @@
 	height: 7px;
 	border-radius: 50%;
 	margin-right: 4px;
+	/* flex: 0 0 auto;/ */
 }
 
 .fabric-profile-card__link {

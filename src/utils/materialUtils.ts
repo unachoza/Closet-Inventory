@@ -33,6 +33,7 @@ export const MATERIAL_COLORS: Record<string, string> = {
 	spandex: "#f87171", // red-400
 	elastane: "#fb923c", // orange-400
 	lycra: "#fb923c", // orange-400 (same as elastane — synonym)
+	elastine: "#fb923c", // orange-400 (common misspelling of elastane in retailer copy)
 	viscose: "#c4b5fd", // violet-300
 	acrylic: "#67e8f9", // cyan-300
 	fleece: "#a3e635", // lime-400
@@ -199,6 +200,11 @@ export function blendTotal(blend: MaterialBlend[]): number {
 const MATERIAL_EXACT: Record<string, string> = {
 	lycra: "Spandex",
 	elastane: "Spandex",
+	// Real retailer copy misspells "elastane" as "elastine" often enough that
+	// it shows up verbatim in imported blend strings (extractBlendString
+	// grabs the raw token, no keyword matching involved) — collapse it onto
+	// the same canonical label as its correctly-spelled synonyms.
+	elastine: "Spandex",
 	lyocell: "Tencel",
 	"cupro rayon": "Cupro",
 };
@@ -232,6 +238,14 @@ const FIBER_SYNONYMS: Record<string, string> = {
 	lycra: "spandex",
 	rayon: "viscose",
 	lyocell: "tencel",
+	// "Wool" alone (no breed) has no dedicated fibers.ts entry — merino is the
+	// closest generic wool page, and MATERIAL_COLORS already treats
+	// "merino wool" as a synonym of plain "wool" for the same reason.
+	wool: "merino",
+	// "Polyamide" is nylon's generic/chemical name — inferMaterialFromName
+	// keeps them as distinct keyword matches (some retailers use one term or
+	// the other), but they share one fiber entry.
+	polyamide: "nylon",
 };
 
 export function resolveFiber(material: string) {
