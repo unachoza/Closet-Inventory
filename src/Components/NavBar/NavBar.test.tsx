@@ -87,10 +87,10 @@ describe("NavBar", () => {
 	});
 
 	describe("navigation actions", () => {
-		it("View All navigates to the entire-closet view", () => {
+		it("Search navigates to the entire-closet view", () => {
 			renderNav({ initialView: "carousel" });
 			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
-			fireEvent.click(screen.getByRole("button", { name: /View All/i }));
+			fireEvent.click(screen.getByRole("button", { name: /^Search$/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("entireCloset");
 		});
 
@@ -101,10 +101,10 @@ describe("NavBar", () => {
 			expect(screen.getByTestId("current-view")).toHaveTextContent("gmail");
 		});
 
-		it("Fabric Guide navigates to the fabric view", () => {
+		it("Care Guide navigates to the fabric view", () => {
 			renderNav({ initialView: "carousel" });
 			fireEvent.click(screen.getByRole("button", { name: /Open menu/i }));
-			fireEvent.click(screen.getByRole("button", { name: /Fabric Guide/i }));
+			fireEvent.click(screen.getByRole("button", { name: /Care Guide/i }));
 			expect(screen.getByTestId("current-view")).toHaveTextContent("fabric");
 		});
 
@@ -198,7 +198,7 @@ describe("NavBar", () => {
 
 			const drawer = screen.getByRole("navigation", { name: /Navigation menu/i });
 			expect(drawer).toBeInTheDocument();
-			expect(screen.getByRole("button", { name: /View All/i })).toBeInTheDocument();
+			expect(screen.getByRole("button", { name: /^Search$/i })).toBeInTheDocument();
 		});
 
 		it("navigates and closes the drawer when a drawer action is clicked", () => {

@@ -69,7 +69,11 @@ const Carousel = ({ setCategory }: CarouselProps) => {
 									className="clothes-card"
 									onClick={() => setCategory(item.label as CategoryType)}
 								>
-									<img src={icon} alt={icon} className="carousel-icons" />
+									{/* alt="" on purpose: `icon` is an inline data-URI, so `alt={icon}`
+									    made a screen reader read out several thousand characters of
+									    encoded SVG per card. The category is already named by the
+									    .emoji-text label below, so the glyph is decorative. */}
+									<img src={icon} alt="" className="carousel-icons" />
 									{/* <div className="emoji">{item.icon}</div> */}
 									<div className="emoji-text">{item.label}</div>
 								</motion.div>

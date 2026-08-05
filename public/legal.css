@@ -1,0 +1,136 @@
+/*
+	Styles for the standalone legal pages (privacy.html, terms.html).
+
+	These pages live in public/ rather than inside the SPA: the app has no
+	router, and Google's OAuth consent screen needs policy URLs that resolve
+	without booting React. That means they inherit nothing from tokens.css, so
+	this file is deliberately self-contained and duplicates a few token values
+	rather than importing the design system.
+*/
+
+:root {
+	color-scheme: light dark;
+	--bg: #faf8f5;
+	--fg: #2b2724;
+	--muted: #6b625b;
+	--rule: #e3dcd4;
+	--accent: #a4553c;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #1a1816;
+		--fg: #ece7e1;
+		--muted: #a89e96;
+		--rule: #363130;
+		--accent: #d98b6f;
+	}
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 2.5rem 1.25rem 5rem;
+	background: var(--bg);
+	color: var(--fg);
+	font: 16px/1.65 -apple-system, blinkmacsystemfont, "Segoe UI", roboto, helvetica, arial, sans-serif;
+	-webkit-text-size-adjust: 100%;
+}
+
+main {
+	max-width: 42rem;
+	margin: 0 auto;
+}
+
+h1 {
+	margin: 0 0 0.25rem;
+	font-size: 1.75rem;
+	line-height: 1.2;
+}
+
+h2 {
+	margin: 2.5rem 0 0.75rem;
+	font-size: 1.15rem;
+	border-top: 1px solid var(--rule);
+	padding-top: 1.25rem;
+}
+
+h3 {
+	margin: 1.5rem 0 0.5rem;
+	font-size: 1rem;
+}
+
+.updated {
+	margin: 0 0 2rem;
+	color: var(--muted);
+	font-size: 0.875rem;
+}
+
+.beta {
+	margin: 0 0 2rem;
+	padding: 0.875rem 1rem;
+	border: 1px solid var(--rule);
+	border-radius: 0.25rem;
+	font-size: 0.9375rem;
+	border-left: 3px solid var(--accent);
+}
+
+ul {
+	padding-left: 1.25rem;
+}
+
+li {
+	margin-bottom: 0.4rem;
+}
+
+a {
+	color: var(--accent);
+}
+
+code {
+	padding: 0.1em 0.35em;
+	border-radius: 0.2em;
+	background: rgb(0 0 0 / 7%);
+	font-family: ui-monospace, sfmono-regular, menlo, monospace;
+	font-size: 0.9em;
+}
+
+@media (prefers-color-scheme: dark) {
+	code {
+		background: rgb(255 255 255 / 10%);
+	}
+}
+
+.wrap {
+	overflow-x: auto;
+}
+
+table {
+	width: 100%;
+	margin: 1rem 0;
+	font-size: 0.9375rem;
+	border-collapse: collapse;
+}
+
+th,
+td {
+	padding: 0.5rem 0.75rem 0.5rem 0;
+	text-align: left;
+	border-bottom: 1px solid var(--rule);
+	vertical-align: top;
+}
+
+th {
+	font-weight: 600;
+}
+
+footer {
+	color: var(--muted);
+	font-size: 0.875rem;
+	border-top: 1px solid var(--rule);
+	margin-top: 3rem;
+	padding-top: 1.25rem;
+}

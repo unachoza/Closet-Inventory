@@ -12,6 +12,7 @@ import FeedbackPanel from "../../Components/FeedbackButton/FeedbackPanel";
 import ProfileHeader from "./ProfileHeader";
 import FabricProfileCard from "./FabricProfileCard";
 import { appVersion } from "../../lib/monitoring";
+import LegalLinks from "../../Components/LegalLinks/LegalLinks";
 import "./ProfileView.css";
 
 interface ProfileRowButtonProps {
@@ -61,7 +62,8 @@ export default function ProfileView() {
 					<div className="profile__avatar profile__avatar--empty" aria-hidden="true">
 						<UserIcon size={24} />
 					</div>
-					<h1 className="profile__name">Your profile</h1>
+					{/* h2 to match ProfileHeader's signed-in state — see comment there. */}
+					<h2 className="profile__name">Your profile</h2>
 					<p className="profile__meta">Sign in to sync your closet. Connect Gmail separately to import.</p>
 					<button
 						type="button"
@@ -75,6 +77,7 @@ export default function ProfileView() {
 				</div>
 				<GoogleUnverifiedNotice isOpen={googleNotice.isOpen} onContinue={googleNotice.confirm} onCancel={googleNotice.dismiss} />
 				<p className="profile__version">Nothing To Wear · {appVersion()}</p>
+				<LegalLinks />
 			</div>
 		);
 	}

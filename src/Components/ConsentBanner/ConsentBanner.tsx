@@ -10,8 +10,8 @@ import "./ConsentBanner.css";
  * asking permission for something that happens either way would be misleading.
  * The second sentence discloses the crash reporting plainly instead.
  *
- * No privacy-policy link yet — LEGAL-1 hasn't shipped — so the copy stays
- * factual rather than promising a policy that isn't live.
+ * The privacy-policy link is live as of 2026-08-04 (LEGAL-1). It points at the
+ * static `/privacy.html`, not an in-app route — see `LegalLinks` for why.
  */
 export default function ConsentBanner() {
 	const { showBanner, accept, decline } = useConsent();
@@ -23,7 +23,10 @@ export default function ConsentBanner() {
 			<p className="consent-banner__text">
 				We'd like to use analytics to see how you use the app and what's worth building next. Separately, we always record
 				crash reports so we can fix what breaks — those contain no personal details. No data is sold or shared with
-				advertisers.
+				advertisers.{" "}
+				<a className="consent-banner__link" href="/privacy.html" target="_blank" rel="noreferrer">
+					Privacy policy
+				</a>
 			</p>
 			<div className="consent-banner__actions">
 				<button className="btn btn--ghost btn--sm" type="button" onClick={decline}>

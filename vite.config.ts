@@ -77,6 +77,13 @@ export default defineConfig(() => ({
 			},
 			workbox: {
 				globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+				// The legal pages are real static documents in public/, not SPA
+				// routes. Without this the SW's NavigationRoute answers EVERY
+				// navigation with index.html, so /privacy.html served the app shell
+				// instead of the policy — including for anyone tapping the footer
+				// link from the installed PWA. Google's OAuth consent screen points
+				// at these URLs, so they have to resolve to the actual documents.
+				navigateFallbackDenylist: [/^\/privacy\.html$/, /^\/terms\.html$/],
 				// The main JS chunk is ~1MB; default 2MB cap is fine today but
 				// set explicitly so a future chunk-size bump fails loudly here
 				// (in config review) rather than silently skipping precache.

@@ -38,6 +38,11 @@ const FilterSidePanel = ({ open, onClose, filters, filterOptions, activeFilterCo
 				aria-modal="true"
 				aria-label="Filter options"
 				aria-hidden={!open}
+				// Closed only means translated off-screen — the panel stays rendered
+				// and its ~9 controls stayed tabbable, so a keyboard user could tab
+				// into an invisible dialog, and focusing anything inside an
+				// aria-hidden subtree is undefined behaviour for a screen reader.
+				inert={!open}
 			>
 				<div className="filter-side-panel__header">
 					<h2 className="filter-side-panel__title">Filters</h2>

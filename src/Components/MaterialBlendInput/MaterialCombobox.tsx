@@ -45,6 +45,8 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 	const containerRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
+	/** Set while we hand focus back to the input, so onFocus doesn't re-open. */
+	const suppressReopen = useRef(false);
 	const prefersReducedMotion = useReducedMotion() ?? false;
 	// Re-checks as the query narrows the list, since the panel's height (and so
 	// how far it overhangs the clipping edge) changes with every keystroke.
@@ -102,10 +104,30 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 	const normalizedQuery = query.trim().toLowerCase();
 	const filtered = normalizedQuery ? listFuse.search(normalizedQuery).map((r) => r.item) : options;
 
+	/**
+	 * Close and hand focus back to the input.
+	 *
+	 * Closing unmounts the panel, taking whatever inside it had focus (the
+	 * option button just clicked, or Done) down with it — the browser then falls
+	 * back to <body>, dropping a keyboard or screen-reader user at the top of
+	 * the document mid-form. Enter/Escape are excluded on purpose: those blur
+	 * deliberately, to dismiss the mobile keyboard.
+	 *
+	 * `suppressReopen` matters in a real browser and not in jsdom: clicking an
+	 * option moves focus to that button, so focusing the input back fires
+	 * `onFocus` and would immediately re-open the panel the click just closed.
+	 */
+	const closeAndRefocus = () => {
+		setIsOpen(false);
+		suppressReopen.current = true;
+		inputRef.current?.focus();
+		suppressReopen.current = false;
+	};
+
 	const selectOption = (opt: string) => {
 		setQuery(opt);
 		onChange(opt);
-		setIsOpen(false);
+		closeAndRefocus();
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -132,7 +154,9 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 				aria-label={ariaLabel}
 				placeholder="Select or type a material"
 				value={query}
-				onFocus={() => setIsOpen(true)}
+				onFocus={() => {
+					if (!suppressReopen.current) setIsOpen(true);
+				}}
 				onChange={(e) => {
 					setQuery(e.target.value);
 					setIsOpen(true);
@@ -166,7 +190,7 @@ const MaterialCombobox = ({ value, onChange, options, ariaLabel, onOpenChange }:
 							className="mc__done"
 							onClick={() => {
 								commit(query);
-								setIsOpen(false);
+								closeAndRefocus();
 							}}
 						>
 							Done

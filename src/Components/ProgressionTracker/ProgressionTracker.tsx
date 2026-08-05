@@ -19,13 +19,21 @@ interface StepTabsTrackerProps {
 
 const StepTabsTracker = ({ currentStep, onStepClick, steps = addWizardSteps, id = "default" }: StepTabsTrackerProps) => {
 	return (
-		<nav className="step-tabs-container">
+		<nav className="step-tabs-container" aria-label="Steps">
 			<ul className="step-tabs-list">
 				{steps.map((label, index) => {
 					const isActive = currentStep === index + 1;
 
 					return (
-						<li key={label} className={`step-tab ${isActive ? "active" : ""}`} onClick={() => onStepClick(index + 1)}>
+						// aria-current carries what the underline conveys visually — without
+						// it a screen reader reads four step names with no indication of
+						// which one you're on.
+						<li
+							key={label}
+							className={`step-tab ${isActive ? "active" : ""}`}
+							aria-current={isActive ? "step" : undefined}
+							onClick={() => onStepClick(index + 1)}
+						>
 							<span>{label}</span>
 							{isActive && (
 								<motion.div

@@ -9,17 +9,72 @@ this push.
 
 ## Day 1 — Legal
 
-- [ ] Business/support email set up
-- [ ] Privacy policy updated — Gmail scope, what's stored in Supabase,
-      retention, the account-deletion path (`delete-user-account` Edge
-      Function is already deployed), **and PostHog session replay
-      disclosure** (`disable_session_recording: false` in monitoring.ts)
-- [ ] Terms of service, beta-appropriate
-- [ ] Google OAuth consent screen matches policy URL, app name, and scopes
-- [ ] Sign-in consent card's "Clothing order confirmations" claim verified —
-      drop it if account sign-in isn't actually requesting Gmail read scope
-- [ ] Scope audit: confirm account sign-in isn't requesting dead
-      `gmail.readonly`
+- [ ] Business/support email set up — **blocks two shipped items.** Both legal
+      pages carry the literal placeholder `[CONTACT_EMAIL]`
+      (`grep -rn "\[CONTACT_EMAIL\]" public/`). Deliberately not a plausible
+      address, so it can't survive to production unnoticed.
+- [x] Privacy policy written (2026-08-04) — `public/privacy.html`, live at
+      `/privacy.html`. Covers the Gmail scope and the fact that email is read
+      **browser-side only and never stored**, everything in the Supabase schema,
+      retention, the `delete-user-account` erasure path, named sub-processors
+      (Supabase/Vercel/Google/PostHog/Sentry), Google API Limited Use, and
+      **PostHog session replay disclosed explicitly** including that it is
+      opt-in and masks typed text. Also discloses that Sentry crash reporting
+      runs regardless of the analytics choice, matching `ConsentBanner`'s copy
+      rather than contradicting it. Linked from the consent banner and the
+      profile footer. Still needs: a real contact address, and a read-through
+      by whoever owns the legal risk.
+- [ ] Terms of service — **scaffold only, deliberately not finished.**
+      `public/terms.html` covers the factual parts (beta status, accounts, your
+      content, email import, acceptable use, termination, feedback). Sections
+      10–12 — **operating entity, governing law, warranty disclaimer,
+      limitation of liability** — are marked `[NOT DRAFTED]` in the page itself
+      and need a lawyer. They are not derivable from the codebase and a
+      plausible-looking draft would be worse than the visible gap. The page
+      carries a DO-NOT-PUBLISH-AS-IS banner until that happens.
+- [ ] Google OAuth consent screen matches policy URL, app name, and scopes —
+      policy URL is now `https://<domain>/privacy.html` (and
+      `/terms.html`). **Service-worker check done:** the SW's navigation
+      fallback was answering *every* navigation with `index.html`, so
+      `/privacy.html` served the app shell. Fixed with
+      `navigateFallbackDenylist` in `vite.config.ts`; verified against a
+      production build with an active, controlling SW (page rendered the real
+      policy, no `#root`). Scopes: sign-in now requests none — see below.
+- [x] Sign-in consent card's "Clothing order confirmations" claim verified
+      (2026-08-04) — **the string no longer exists in the codebase.**
+      `GoogleConsentCard`'s `sign-in` variant lists only "Your name and email
+      address" / "Your closet securely synced to your account". Do **not**
+      re-add a Gmail line here: the primer is now accurate, and the fix for the
+      mismatch was removing the scope (below), not restoring the copy.
+- [x] Scope audit (2026-08-04) — **the checklist's premise was inverted.**
+      Account sign-in *was* requesting `gmail.readonly`
+      (`useSupabaseAuth.ts`), and the resulting `session.provider_token` had
+      **zero production consumers** (`grep -rn provider_token src` → only the
+      hook itself, a log redaction regex, and tests). Gmail import runs its own
+      independent GIS token flow (`useGmailAuth.tsx`). Net effect: Google's
+      unverified-app screen asked first-time users for full inbox read during
+      plain sign-in, which our own consent primer never promised. **Scope
+      removed**; test at `useSupabaseAuth.test.ts` inverted into a red-on-revert
+      guard. `gmailAccessToken` left on `SupabaseAuthState` (now always null) —
+      post-beta cleanup, not worth churning 7 mock files pre-launch.
+- [ ] **BLOCKS PUBLISHING `privacy.html`** — confirm the Supabase dashboard's
+      Google provider **Scopes** field (Auth → Providers → Google) is empty on
+      **both** prod (`rawuntspvetfdtrqggen`) and dev. If `gmail.readonly` is
+      configured there, Supabase appends it server-side, the client-side
+      removal is a no-op, and the published policy's sentence "Account sign-in
+      requests no access to your Gmail" becomes **false** — an inaccurate live
+      privacy policy on an app Google hasn't verified. Dashboard-only: not in
+      `config.toml`, not reachable via MCP. One-minute check.
+- [x] Vercel routing checked (2026-08-04) — `vercel.json` has no `cleanUrls`
+      and no rewrites, only headers, so `/privacy.html` is served from the
+      filesystem rather than redirected to `/privacy` or swallowed by the SPA
+      fallback. (Had `cleanUrls` been on, the SW denylist regexes wouldn't have
+      matched the rewritten path either.)
+- [ ] Expect (and sanity-check) a **new** consent screen on first Gmail import.
+      Previously the import's GIS popup could be silent because sign-in had
+      already granted `gmail.readonly`; now it will show a real Gmail consent
+      prompt. This is correct, but it makes the "two Google sign-ins" confusion
+      more visible to testers.
 
 ## Day 2 — Observability + PWA updates
 

@@ -102,6 +102,23 @@ describe("FilterSidePanel", () => {
 		expect(onClose).toHaveBeenCalled();
 	});
 
+	// The closed panel is only slid off-screen (translateX), so it stays
+	// rendered and visible to the layout — its buttons and checkboxes were
+	// still in the tab order. A keyboard user tabbing past the results landed
+	// in an invisible panel, and focusing a control inside an aria-hidden
+	// subtree is an outright a11y violation. `inert` removes both at once.
+	it("is inert while closed so its controls leave the tab order", () => {
+		const { container } = render(<FilterSidePanel {...baseProps} open={false} onClose={vi.fn()} />);
+		const panel = container.ownerDocument.querySelector("[role=dialog][aria-label='Filter options']");
+		expect(panel).toHaveAttribute("inert");
+	});
+
+	it("is not inert once open", () => {
+		const { container } = render(<FilterSidePanel {...baseProps} open={true} onClose={vi.fn()} />);
+		const panel = container.ownerDocument.querySelector("[role=dialog][aria-label='Filter options']");
+		expect(panel).not.toHaveAttribute("inert");
+	});
+
 	it("Clear all button is disabled when no filters are active", () => {
 		render(<FilterSidePanel {...baseProps} open={true} onClose={vi.fn()} activeFilterCount={0} />);
 		expect(screen.getByRole("button", { name: /clear all/i })).toBeDisabled();

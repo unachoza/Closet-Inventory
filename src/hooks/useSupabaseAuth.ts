@@ -5,8 +5,6 @@ import { identify, resetIdentity } from "../lib/monitoring";
 import { track } from "../lib/analytics";
 import { ensureUserBootstrap } from "../services/profileService";
 
-const GMAIL_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
-
 export interface SupabaseAuthState {
   session: Session | null;
   user: User | null;
@@ -88,10 +86,14 @@ export function useSupabaseAuth(): SupabaseAuthState {
       setError(e instanceof Error ? e.message : "Supabase is not configured");
       return;
     }
+    // No `scopes` here on purpose. Account sign-in used to request
+    // gmail.readonly, but nothing ever read the resulting provider_token —
+    // Gmail import runs its own independent GIS token flow (useGmailAuth).
+    // The dead scope made Google's unverified-app screen ask for full inbox
+    // read at first sign-in, which our own consent primer doesn't promise.
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        scopes: GMAIL_SCOPE,
         redirectTo: window.location.origin,
       },
     });
@@ -114,9 +116,10 @@ export function useSupabaseAuth(): SupabaseAuthState {
   return {
     session,
     user: session?.user ?? null,
-    // provider_token is the Google access token — present immediately after
-    // sign-in redirect but NOT persisted across hard reloads by Supabase.
-    // E1-1.3 will handle refresh via provider_refresh_token + a server-side edge fn.
+    // Vestigial: sign-in no longer requests any Google API scope, so
+    // provider_token carries no usable Gmail grant and this is effectively
+    // always null. Kept only to avoid churning consumers/mocks before beta —
+    // remove post-beta along with the field on SupabaseAuthState.
     gmailAccessToken: session?.provider_token ?? null,
     isAuthenticated: session !== null,
     isLoading,

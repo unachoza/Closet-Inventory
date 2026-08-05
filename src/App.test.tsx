@@ -133,17 +133,21 @@ describe("App — view transitions", () => {
 		expect(await screen.findByTestId("view-carousel")).toBeInTheDocument();
 	});
 
-	it("Fabric Guide navigates to fabric view", async () => {
+	it("Care Guide navigates to fabric view", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
-		fireEvent.click(screen.getByRole("button", { name: /fabric guide/i }));
+		fireEvent.click(screen.getByRole("button", { name: /care guide/i }));
 		expect(await screen.findByTestId("view-fabric")).toBeInTheDocument();
 	});
 
-	it("View All navigates to entire closet view", async () => {
+	it("Search navigates to entire closet view", async () => {
 		render(<App />);
 		fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
-		fireEvent.click(screen.getByRole("button", { name: /view all/i }));
+		// The drawer's own "Search" button, not the bottom-nav tab of the same
+		// name — jsdom renders both regardless of the CSS breakpoint that hides
+		// the tab on desktop, so an unscoped query is ambiguous here.
+		const drawer = screen.getByRole("navigation", { name: /navigation menu/i });
+		fireEvent.click(within(drawer).getByRole("button", { name: /^search$/i }));
 		expect(await screen.findByTestId("view-entire-closet")).toBeInTheDocument();
 	});
 });

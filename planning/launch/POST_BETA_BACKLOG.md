@@ -140,6 +140,81 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
 
 ---
 
+## Accessibility — deferred from the 2026-08-04 screen-reader pass
+
+Fixed in that pass (not backlog, listed for context): carousel `alt` was the
+raw data-URI, filter panel controls stayed tabbable while closed, combobox
+panels dropped focus to `<body>` on close, `PillComboField`'s orphan `<label>`,
+missing `aria-current="step"` on the Add wizard, `scope="col"` on the legal
+tables. **Not** verified with a real screen reader — see V2-MVP.md item.
+
+21. **Carousel category cards are keyboard-unreachable.** `Carousel.tsx:51-75`
+    renders each card as a `motion.div` with `onClick` — no role, no tabIndex,
+    no key handler. There is already a TODO on line 50 saying they should be
+    buttons. Keyboard and screen-reader users cannot pick a category from the
+    home view at all; the only route to a filtered list is the Search tab.
+    Deferred from the 2026-08-04 pass because converting to `motion.button`
+    collides with the repo's global button CSS and needed more regression
+    surface than 2 days from launch allowed.
+22. **Add-wizard step tabs are click-only.** Same shape: `ProgressionTracker`
+    renders `<li onClick>`. `aria-current="step"` now announces *which* step
+    you're on, but you still can't jump between steps by keyboard. Lower
+    severity than 21 — Next/Back buttons work — so this is polish.
+23. **No focus management on modals.** `Components/Modal/Modal.tsx` sets
+    `role="dialog"` + `aria-modal="true"` and closes on Escape, but never moves
+    focus into the dialog, never traps Tab inside it, and never restores focus
+    to the trigger on close. Because `aria-modal="true"` tells a screen reader
+    to ignore everything outside the dialog, focus sitting outside it is worse
+    than the attribute being absent. Affects every consumer
+    (`AccountDataModal`, discard-confirm, etc.). Wants a shared
+    `useFocusTrap` hook rather than per-modal patches.
+24. **View switches are silent and don't move focus.** No router, so
+    `document.title` never changes and `document.activeElement` stays `<body>`
+    across a view change — verified live on 2026-08-04. A screen-reader user
+    tapping Search or Profile gets no signal anything happened. Cheap fix: a
+    visually-hidden `role="status"` announcing the new view, plus focusing that
+    view's heading. Also worth a real `<main>` landmark — the app currently
+    exposes `header` and two `nav`s and no main.
+25. **No automated a11y coverage.** Deliberately did not add
+    `@axe-core/playwright` two days from launch. Worth adding after: it would
+    have caught the `alt` and aria-hidden-focus bugs above, though not the
+    focus-management ones.
+
+## Navigation — tab-label↔view naming (2026-08-05)
+
+From `planning/audits/July29.html`'s "Label↔view mismatches ('Closet'→carousel)
+untouched" note. Every bottom-nav tab has a *third* name in the hamburger
+drawer too, and none of the three (nav label / drawer label / internal
+`ViewType` string) fully agree:
+
+| Nav tab | Internal `ViewType` | Drawer label (now) |
+|---|---|---|
+| Closet | `carousel` | "Back to Carousel" |
+| Care | `fabric` | "Care Guide" (was "Fabric Guide") |
+| Search | `entireCloset` | "Search" (was "View All") |
+| Email | `gmail` | "Import Gmail" |
+
+**Fixed 2026-08-05 — cosmetic only:** drawer labels for Care/Search now match
+their nav tab ("Care Guide", "Search"), decided with the user (Closet/Email
+kept as-is; Care/Search were "open to suggestions" — scissors→Care and the
+real search+filter UI inside the view were the deciding factors).
+
+26. **Full internal rename, deferred.** `ViewType`'s `fabric`→`care` and
+    `entireCloset`→`search` were explicitly *not* renamed — touches
+    `App.tsx`, `ViewContext.tsx`, `types.ts`, `NavBar.tsx`, `BottomNav.tsx`,
+    `CardDetails.tsx`, `FabricProfileCard.tsx` (fabric only) plus every test
+    asserting those strings. Invisible to users (they never see `ViewType`
+    literals), so deferred as a correctness-not-urgency item — do it in a
+    quiet week, not 2 days from launch.
+27. **`carousel`/`overview` are two different views for one nav tab.** The
+    "Closet" tab lands on `carousel` (the category-picker hero); tapping a
+    category switches to `overview` (the actual item grid, `<Closet>`).
+    Neither name is user-facing, so not urgent, but worth folding into the
+    item 26 rename rather than doing twice.
+28. **`GmailImport.tsx:427` header typo** — "Import from Gmail!!" (stray
+    double exclamation mark). One-character fix, noticed in passing during
+    the nav-label audit, not yet applied.
+
 ## Added after launch
 
 _(append new scope-creep ideas here with a date)_

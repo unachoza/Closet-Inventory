@@ -24,6 +24,15 @@ describe("ConsentBanner", () => {
 		expect(screen.getByRole("dialog", { name: /consent/i })).toBeInTheDocument();
 	});
 
+	// Consent is only meaningful if the policy it refers to is reachable from the
+	// same surface. The link must stay a real href to the static document, not an
+	// in-app route — the app has no router and the SW would swallow it.
+	it("links to the privacy policy", () => {
+		render(<ConsentBanner />);
+		const link = screen.getByRole("link", { name: /privacy policy/i });
+		expect(link).toHaveAttribute("href", "/privacy.html");
+	});
+
 	it("does not render once consent has already been decided", () => {
 		localStorage.setItem("closetly-analytics-consent", "declined");
 		render(<ConsentBanner />);

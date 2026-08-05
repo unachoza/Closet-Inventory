@@ -18,6 +18,7 @@ interface PillComboFieldProps {
 const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect = true }: PillComboFieldProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const boxRef = useRef<HTMLDivElement>(null);
 	const panelRef = useRef<HTMLDivElement>(null);
 	const prefersReducedMotion = useReducedMotion() ?? false;
 	// Re-checks on selection change too: adding a chip can grow the box and push
@@ -39,10 +40,24 @@ const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect
 
 	const availableOptions = options.filter((opt) => !selected.includes(opt));
 
+	/**
+	 * Close and hand focus back to the field.
+	 *
+	 * Closing unmounts the panel, so whatever inside it had focus (Done, or the
+	 * option button that just disappeared from the list) takes focus down with
+	 * it and the browser falls back to <body>. A keyboard or screen-reader user
+	 * ends up at the top of the document mid-form. Always route closes through
+	 * here rather than calling setIsOpen(false) directly.
+	 */
+	const close = () => {
+		setIsOpen(false);
+		boxRef.current?.focus();
+	};
+
 	const handleSelect = (value: string) => {
 		if (!multiSelect) {
 			selected.forEach((s) => onRemove(s));
-			setIsOpen(false);
+			close();
 		}
 		onAdd(value);
 	};
@@ -51,9 +66,14 @@ const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect
 
 	return (
 		<div className="pcf" ref={containerRef}>
-			<label className="pcf__label">{label}</label>
+			{/* A <span>, not a <label>: the control below is a div[role=button],
+			    and a <label> with no `for` and no form element under it names
+			    nothing — it just leaves a stray text node in the a11y tree. The
+			    field's name comes from aria-label on the box itself. */}
+			<span className="pcf__label">{label}</span>
 			<div
 				className="pcf__box"
+				ref={boxRef}
 				role="button"
 				tabIndex={0}
 				onClick={toggleOpen}
@@ -61,6 +81,9 @@ const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
 						toggleOpen();
+					} else if (e.key === "Escape" && isOpen) {
+						e.preventDefault();
+						close();
 					}
 				}}
 				aria-expanded={isOpen}
@@ -114,7 +137,7 @@ const PillComboField = ({ label, options, selected, onAdd, onRemove, multiSelect
 						{/* Explicit dismiss — the panel sits absolutely positioned over
 						    whatever follows this field (e.g. Material Composition in the
 						    edit form), so outside-tap isn't the only way out. */}
-						<button type="button" className="pcf__done" onClick={() => setIsOpen(false)}>
+						<button type="button" className="pcf__done" onClick={close}>
 							Done
 						</button>
 					</motion.div>
