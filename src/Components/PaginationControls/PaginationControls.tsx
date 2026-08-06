@@ -2,6 +2,26 @@ import { useEffect, useId, useState } from "react";
 import type { FormEvent } from "react";
 import "./PaginationControls.css";
 
+/* Unicode ←/→ glyphs render inconsistently across platforms (odd
+ * weight/baseline on iOS Safari especially) — a plain SVG chevron renders
+ * identically everywhere. Below --bp-xs the visible "Previous"/"Next" text is
+ * hidden and this becomes the button's only visual content, so it's worth
+ * fixing here even though each button also carries an aria-label. */
+function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+	return (
+		<svg
+			width="10"
+			height="10"
+			viewBox="0 0 10 10"
+			fill="none"
+			aria-hidden="true"
+			style={direction === "left" ? { transform: "rotate(180deg)" } : undefined}
+		>
+			<path d="M3.5 1.5L7 5L3.5 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+		</svg>
+	);
+}
+
 interface PaginationControlsProps {
 	currentPage: number;
 	totalPages: number;
@@ -170,7 +190,7 @@ const PaginationControls = ({
 							disabled={currentPage === 1}
 							aria-label="Go to previous page"
 						>
-							<span aria-hidden="true">←</span>
+							<ChevronIcon direction="left" />
 							<span className="pagination-nav__label">Previous</span>
 						</button>
 
@@ -269,7 +289,7 @@ const PaginationControls = ({
 							aria-label="Go to next page"
 						>
 							<span className="pagination-nav__label">Next</span>
-							<span aria-hidden="true">→</span>
+							<ChevronIcon direction="right" />
 						</button>
 					</div>
 				</div>
