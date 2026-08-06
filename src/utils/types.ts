@@ -96,6 +96,16 @@ export type ClothingItem = {
 
 	// ── sync metadata (set by SyncedClosetRepository; used for last-write-wins) ─
 	updatedAt?: string; // ISO datetime
+	/** ISO datetime the item was added to the closet — distinct from
+	 *  purchaseDate (when it was bought). Backs "N days since import"-style
+	 *  retention surfaces (Day 14/30). Local-only closets stamp this on add();
+	 *  Supabase items read it straight from the DB's own `created_at` column. */
+	createdAt?: string;
+
+	// ── acquisition source (Day 0 Reveal, stats filtering) ────────────────────
+	/** How this item entered the closet — 'gmail' for email imports, 'manual'
+	 *  for hand-added items. Session-only (not persisted to Supabase yet). */
+	source?: "gmail" | "manual";
 
 	// ── demo-seed marker (BUG-2) ──────────────────────────────────────────────
 	// True only for the starter closet (MY_CLOSET_DATA). Demo items are shown
@@ -120,6 +130,7 @@ export interface ItemFormData {
 	purchaseDate?: string;
 	price?: number;
 	care: string | string[];
+	source?: "gmail" | "manual";
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "shoes" | "swim" | null;

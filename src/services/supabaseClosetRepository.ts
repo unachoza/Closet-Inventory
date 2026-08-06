@@ -50,6 +50,7 @@ function rowToItem(row: ItemRow, locations: LocationIdMap): ClothingItem {
 		lastWornAt: row.last_worn_at ?? undefined,
 		loan: (row.loan as unknown as ClothingItem["loan"]) ?? undefined,
 		updatedAt: row.updated_at,
+		createdAt: row.created_at,
 	};
 }
 

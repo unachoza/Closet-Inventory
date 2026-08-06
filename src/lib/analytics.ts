@@ -41,6 +41,11 @@ export type AnalyticsEvent =
 	| "care_guide_opened"
 	// Retention
 	| "closet_fabrics_viewed"
+	| "reveal_shown"
+	// Which of the Reveal's two equally-real actions she picks — not a
+	// shown-minus-dismissed pair, since neither action is a "dismiss."
+	| "reveal_closet_clicked"
+	| "reveal_continue_hunting_clicked"
 	// Navigation
 	| "screen_viewed"
 	// Onboarding funnel

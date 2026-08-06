@@ -83,11 +83,29 @@ export interface EditItemViewProps {
 	onReturnToEmail?: (draft: Partial<ClothingItem>) => void;
 	onSkipItem?: () => void;
 	onItemAdded?: () => void;
+	/**
+	 * Day 0 Reveal — add-time signal, distinct from `onItemAdded` (which is
+	 * batch-only and drives queue advancement). Fires unconditionally, once,
+	 * whenever a create-mode add actually succeeds — single or batch alike —
+	 * so the Reveal guard has an accurate "an import really landed" flag
+	 * instead of one set on click (Bug B).
+	 */
+	onGmailItemAdded?: () => void;
 	queuePosition?: number;
 	queueTotal?: number;
 }
 
-const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
+const EditItemView = ({
+	item,
+	mode = "edit",
+	setView,
+	onReturnToEmail,
+	onSkipItem,
+	onItemAdded,
+	onGmailItemAdded,
+	queuePosition,
+	queueTotal,
+}: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
 
@@ -234,14 +252,30 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				material: normalizeMaterial(formData.material),
 				condition: formData.condition ?? "new",
 				notes: finalNotesArray, // Injected parsed string[]
+				// Preserve the source marker stamped by the import path (App.tsx).
+				source: item.source,
 			} as ClothingItem);
 
 			showToast(`${displayName} added to your closet!`);
+			onGmailItemAdded?.();
 
 			if (isInBatchMode && onItemAdded) {
 				setTimeout(() => onItemAdded());
 				return;
 			}
+
+			// Normalized 2026-08-06: a single-item Gmail import now returns to
+			// the email list, same as batch mode, instead of dumping straight to
+			// the closet. `isCreateMode` only ever comes from a Gmail import
+			// (App.tsx's editMode is "create" only inside
+			// handleGmailImport/handleGmailImportAll) — never from the manual-add
+			// wizard, which is a different component entirely. Consistency was
+			// the immediate goal; it also means the Reveal's guard (App.tsx)
+			// only ever gets a chance to intercept a navigation AWAY from Gmail,
+			// never fires seconds after a single import before she's seen
+			// anything else.
+			setTimeout(() => setView("gmail"));
+			return;
 		} else {
 			updateItem(item.id, {
 				...formData,

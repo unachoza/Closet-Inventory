@@ -1,5 +1,5 @@
-import { lazy, Suspense, useState, useCallback, useEffect } from "react";
-import { ViewProvider, useView } from "./context/ViewContext";
+import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from "react";
+import { ViewProvider, useView, useSetRevealGuard } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
@@ -16,7 +16,7 @@ import Closet from "./Features/Closet/Closet";
 import ImportAccountGate from "./Features/GmailImport/ImportAccountGate";
 import LocalCapacityNotice from "./Components/LocalCapacityNotice/LocalCapacityNotice";
 import { useLocalCapacity } from "./hooks/useLocalCapacity";
-import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
+import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
 import "./App.css";
 import OnboardingFlow from "./Features/Onboarding/OnboardingFlow";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
@@ -24,6 +24,8 @@ import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
 import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
 import { useWhatsChanged } from "./Features/WhatsChanged/useWhatsChanged";
 import WhatsChangedScreen from "./Features/WhatsChanged/WhatsChangedScreen";
+import { useReveal } from "./Features/Reveal/useReveal";
+import RevealScreen from "./Features/Reveal/RevealScreen";
 import UpdateBanner from "./Components/UpdateBanner/UpdateBanner";
 
 // Route-level code splitting: everything below is off the first-paint path
@@ -79,6 +81,7 @@ const ONBOARDING_KEY = "closetly-onboarding-complete";
 
 function AppShell() {
 	const { view, setView } = useView();
+	const setRevealGuard = useSetRevealGuard();
 	const { closet, getCloset, importItems, clearCloset } = useCloset();
 	const { isAtCapacity } = useLocalCapacity();
 	const demoLifecycle = useDemoLifecycle();
@@ -100,6 +103,43 @@ function AppShell() {
 	const [showOnboarding, setShowOnboarding] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const whatsChanged = useWhatsChanged();
+	const reveal = useReveal(closet);
+	// Day 0 Reveal — set true the moment a Gmail import actually SUCCEEDS
+	// (EditItemView's onGmailItemAdded, wired below), not on the click that
+	// starts editing it (Bug B: abandoning the edit used to still count).
+	const [hasImportedThisGmailSession, setHasImportedThisGmailSession] = useState(false);
+
+	// Views that represent genuinely "leaving" the Gmail flow. Deliberately an
+	// allowlist, not a denylist of "edit": a future view defaults to NOT
+	// firing the Reveal unless explicitly added here, which is the safer
+	// failure direction.
+	const REVEAL_DESTINATIONS: ReadonlySet<ViewType> = useMemo(
+		() => new Set<ViewType>(["carousel", "fabric", "entireCloset", "profile", "form", "overview"]),
+		[],
+	);
+
+	// Day 0 Reveal — primary trigger. Every one of the 6 ways to leave the
+	// Gmail flow (hamburger drawer items, the profile button, the Closet/
+	// Care/Search bottom-nav tabs, manual Add) routes through the same
+	// setView() in ViewContext, so intercepting there (rather than watching
+	// for a specific view transition after the fact) catches all of them in
+	// one place and actually PREVENTS the navigation instead of reacting to
+	// it. `reveal.handleTrigger()` both arms the Reveal and reports whether
+	// it did — false means it's already been shown, so the attempted
+	// navigation should proceed untouched.
+	//
+	// Destination-aware (Bug A fix): only fires for a genuine exit from Gmail
+	// (see REVEAL_DESTINATIONS above) — never for "edit", so a second import
+	// started while still on the email list is never swallowed.
+	useEffect(() => {
+		setRevealGuard((next) => {
+			if (view === "gmail" && hasImportedThisGmailSession && REVEAL_DESTINATIONS.has(next)) {
+				return reveal.handleTrigger("gmail");
+			}
+			return false;
+		});
+		return () => setRevealGuard(null);
+	}, [view, hasImportedThisGmailSession, reveal.handleTrigger, setRevealGuard, REVEAL_DESTINATIONS]);
 
 	useEffect(() => {
 		// Purge any sensitive data left over by pre-PR#76 builds on first load,
@@ -130,7 +170,7 @@ function AppShell() {
 			// stepped back to the email, restore that draft instead of a fresh item.
 			const signature = draftSignature(prefilled);
 			const savedDraft = draftBySignature[signature];
-			setEditItem(savedDraft ?? buildClothingItem(prefilled));
+			setEditItem(savedDraft ?? buildClothingItem({ ...prefilled, source: "gmail" }));
 			// Consume-once: a restored draft is removed so it can't reapply stale
 			// edits after the item is added (a later peek re-stashes it).
 			if (savedDraft) {
@@ -153,7 +193,7 @@ function AppShell() {
 	const handleGmailImportAll = useCallback(
 		(items: Partial<ClothingItem>[]) => {
 			if (items.length === 0) return;
-			const clothingItems = items.map(buildClothingItem);
+			const clothingItems = items.map((p) => buildClothingItem({ ...p, source: "gmail" }));
 			setImportQueue(clothingItems);
 			setImportQueueIndex(0);
 			setEditItem(clothingItems[0]);
@@ -211,6 +251,21 @@ function AppShell() {
 		setView("form");
 	}, [setView, isAtCapacity]);
 
+	// Day 0 Reveal — manual-add path (Journey 1 product hole: a user who never
+	// connects Gmail got no Day-0 payoff at all). Fires the instant the 3rd
+	// manual item is added — right after the qualifying add, not on a later
+	// navigation — since there's no natural "leaving a flow" moment to
+	// intercept the way there is for Gmail. `closet` here is still the
+	// pre-add snapshot (addItem's state update hasn't committed yet), so the
+	// new item is counted explicitly rather than re-reading `closet.length`.
+	const MANUAL_REVEAL_THRESHOLD = 3;
+	const handleManualItemAdded = useCallback(() => {
+		const manualCount = closet.filter((item) => item.source === "manual").length + 1;
+		if (manualCount === MANUAL_REVEAL_THRESHOLD) {
+			reveal.handleTrigger("manual");
+		}
+	}, [closet, reveal]);
+
 	const handleExportCloset = useCallback(
 		(format: ExportFormat) => {
 			exportCloset(getCloset(), format);
@@ -232,6 +287,30 @@ function AppShell() {
 	// why a brand-new install never hits this (onboarding owns that moment).
 	if (whatsChanged.show) {
 		return <WhatsChangedScreen bullets={whatsChanged.bullets} version={whatsChanged.version} onDismiss={whatsChanged.dismiss} />;
+	}
+
+	// Day 0 Reveal — fires once, either the instant she tries to leave Gmail
+	// after importing something (the reveal-guard above), or the instant her
+	// 3rd manual add lands (handleManualItemAdded). Whichever of its two
+	// actions she picks, the navigation attempt that triggered this (if any,
+	// for the Gmail path) is dropped — neither button resumes it, both go to
+	// a fixed destination. For the manual path there's no navigation to
+	// resume or cancel: "Add another item" just sends her back to the wizard.
+	if (reveal.show) {
+		return (
+			<RevealScreen
+				stats={reveal.stats}
+				source={reveal.source}
+				onGoToCloset={() => {
+					reveal.dismiss();
+					setView("carousel");
+				}}
+				onContinueHunting={() => {
+					reveal.dismiss();
+					if (reveal.source === "manual") setView("form");
+				}}
+			/>
+		);
 	}
 	return (
 		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>
@@ -255,7 +334,9 @@ function AppShell() {
 						    above, which resets to the overview on retry. */}
 						<Suspense fallback={<ViewLoadingFallback />}>
 							{view === "overview" && <Closet selectedCategory={selectedCategory} onEditItem={handleEditItem} onAddItem={handleAddItem} />}
-							{view === "form" && <MultiStepForm setView={setView} initialData={prefilledFormData} />}
+							{view === "form" && (
+								<MultiStepForm setView={setView} initialData={prefilledFormData} onManualItemAdded={handleManualItemAdded} />
+							)}
 							{view === "gmail" && (
 								<ImportAccountGate>
 									<GmailImport
@@ -291,6 +372,7 @@ function AppShell() {
 									onReturnToEmail={editMode === "create" ? handleReturnToEmail : undefined}
 									onSkipItem={isInBatchMode ? handleQueueAdvance : undefined}
 									onItemAdded={isInBatchMode ? handleQueueAdvance : undefined}
+									onGmailItemAdded={editMode === "create" ? () => setHasImportedThisGmailSession(true) : undefined}
 									queuePosition={isInBatchMode ? importQueueIndex + 1 : undefined}
 									queueTotal={isInBatchMode ? importQueue.length : undefined}
 								/>
