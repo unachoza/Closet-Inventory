@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState, useCallback, useEffect } from "react";
-import { ViewProvider, useView } from "./context/ViewContext";
+import { ViewProvider, useView, useSetRevealGuard } from "./context/ViewContext";
 import { SearchProvider } from "./context/SearchContext";
 import { GmailAuthProvider } from "./context/GmailAuthContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
@@ -16,7 +16,7 @@ import Closet from "./Features/Closet/Closet";
 import ImportAccountGate from "./Features/GmailImport/ImportAccountGate";
 import LocalCapacityNotice from "./Components/LocalCapacityNotice/LocalCapacityNotice";
 import { useLocalCapacity } from "./hooks/useLocalCapacity";
-import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
+import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
 import "./App.css";
 import OnboardingFlow from "./Features/Onboarding/OnboardingFlow";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
@@ -79,13 +79,9 @@ function draftSignature(prefilled: Partial<ClothingItem>): string {
 
 const ONBOARDING_KEY = "closetly-onboarding-complete";
 
-/** Bottom-nav/top-level destinations — used to tell "purposefully navigated
- *  away from Gmail" apart from the gmail → edit routing that's part of a
- *  normal single-item import (see the Day 0 Reveal effect below). */
-const TOP_LEVEL_VIEWS = new Set<ViewType>(["carousel", "fabric", "entireCloset", "profile"]);
-
 function AppShell() {
-	const { view, previousView, setView } = useView();
+	const { view, setView } = useView();
+	const setRevealGuard = useSetRevealGuard();
 	const { closet, getCloset, importItems, clearCloset } = useCloset();
 	const { isAtCapacity } = useLocalCapacity();
 	const demoLifecycle = useDemoLifecycle();
@@ -110,31 +106,28 @@ function AppShell() {
 	const reveal = useReveal(closet);
 	// Day 0 Reveal — set true the moment an import actually happens
 	// (handleGmailImport/handleGmailImportAll below), read by both triggers:
-	// the navigate-away effect just below, and the short-idle fallback passed
-	// into GmailImport as `hasImported`.
+	// the reveal-guard just below, and the short-idle fallback passed into
+	// GmailImport as `hasImported`.
 	const [hasImportedThisGmailSession, setHasImportedThisGmailSession] = useState(false);
 
-	// Day 0 Reveal — primary trigger. Fires the instant she lands on a
-	// bottom-nav/top-level tab having already imported something this
-	// session — the payoff for what she just watched happen, no wait
-	// required.
-	//
-	// NOT "previousView === gmail": the real single-item-import flow is
-	// gmail → edit (importing routes straight to the edit form) → carousel/
-	// wherever, so by the time she actually navigates to a top-level tab her
-	// immediately-previous view is "edit", not "gmail" — checking for
-	// "gmail" specifically would never fire in the common case. Instead:
-	// fire on any transition INTO a top-level view FROM a non-top-level one
-	// (edit, form, gmail, journey), which covers gmail → edit → carousel
-	// without also firing for someone bouncing between top-level tabs who
-	// never touched Gmail (hasImportedThisGmailSession stays false for them).
+	// Day 0 Reveal — primary trigger. Every one of the 6 ways to leave the
+	// Gmail flow (hamburger drawer items, the profile button, the Closet/
+	// Care/Search bottom-nav tabs, manual Add) routes through the same
+	// setView() in ViewContext, so intercepting there (rather than watching
+	// for a specific view transition after the fact) catches all of them in
+	// one place and actually PREVENTS the navigation instead of reacting to
+	// it. `reveal.handleTrigger()` both arms the Reveal and reports whether
+	// it did — false means it's already been shown, so the attempted
+	// navigation should proceed untouched.
 	useEffect(() => {
-		const cameFromNonTopLevel = previousView !== null && !TOP_LEVEL_VIEWS.has(previousView);
-		if (cameFromNonTopLevel && TOP_LEVEL_VIEWS.has(view) && hasImportedThisGmailSession) {
-			reveal.handleTrigger();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [view, previousView, hasImportedThisGmailSession]);
+		setRevealGuard(() => {
+			if (view === "gmail" && hasImportedThisGmailSession) {
+				return reveal.handleTrigger();
+			}
+			return false;
+		});
+		return () => setRevealGuard(null);
+	}, [view, hasImportedThisGmailSession, reveal.handleTrigger, setRevealGuard]);
 
 	useEffect(() => {
 		// Purge any sensitive data left over by pre-PR#76 builds on first load,
@@ -271,12 +264,23 @@ function AppShell() {
 		return <WhatsChangedScreen bullets={whatsChanged.bullets} version={whatsChanged.version} onDismiss={whatsChanged.dismiss} />;
 	}
 
-	// Day 0 Reveal — fires once, either the instant she navigates away from
-	// Gmail after importing something (the effect above) or, as a fallback,
+	// Day 0 Reveal — fires once, either the instant she tries to leave Gmail
+	// after importing something (the reveal-guard above) or, as a fallback,
 	// after a short idle spell on that screen with nothing left to page
-	// through (GmailImport's `onDone` prop).
+	// through (GmailImport's `onDone` prop). Whichever of its two actions she
+	// picks, the navigation attempt that triggered this (if any) is dropped —
+	// neither button resumes it, both go to a fixed destination.
 	if (reveal.show) {
-		return <RevealScreen stats={reveal.stats} onDismiss={reveal.dismiss} />;
+		return (
+			<RevealScreen
+				stats={reveal.stats}
+				onGoToCloset={() => {
+					reveal.dismiss();
+					setView("carousel");
+				}}
+				onContinueHunting={() => reveal.dismiss()}
+			/>
+		);
 	}
 	return (
 		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>

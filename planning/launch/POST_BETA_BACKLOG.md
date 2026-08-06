@@ -202,6 +202,224 @@ shipped; everything below is what remains, in dependency order.
 
 ---
 
+## Observability & database hardening (queued 2026-08-06)
+
+Sourced from the [July 27 Observability & Launch-Readiness Audit](https://app.notion.com/p/3aae67b4d3ca817ab35cfe9797cb2679)
+and its [July 31 Delta Check](https://app.notion.com/p/3afe67b4d3ca815fb464c6ddc09e1672),
+plus the 2026-08-04 env/Supabase/Vercel isolation handoff.
+
+**Verification discipline.** The July 27 audit's own failure mode was asserting
+state it couldn't see ("assume not started" for Sentry — it was installed all
+along, just consent-gated). So every item below is tagged with how it was
+established. Items marked **[live 2026-08-06]** were re-checked this session
+against the prod project (`rawuntspvetfdtrqggen`) via Supabase advisors /
+`list_migrations` / `list_tables`, or via `vercel env ls`. Items marked
+**[July 31, not re-verified]** are carried forward and should be re-confirmed
+before anyone acts on them.
+
+**Headline: the July 31 "Still Open" list is six days older and fully intact.**
+Nothing in it has moved. Two new findings this session (items 40 and 41) came
+out of the Vercel env check and were not in either audit.
+
+### Blocking-ish — do before or alongside the next tester wave
+
+36. **Two unapplied location migrations — one is a live bug on BOTH
+    projects.** **[live 2026-08-06]** The audits framed this as a single
+    dev→prod drift item. It is actually two separate migrations, and the
+    second was in *neither* project and in no audit. The repo has 13
+    migration files; prod has applied 11, dev 12.
+
+    **36a — `20260707000002_locations_client_kinds` (dev only, not prod).**
+    The drift the July 20/27/31 audits each flagged, now ~30 days old. It
+    rewrites `locations.kind`'s CHECK from the v1-spine vocabulary
+    (`primary_residence`/`secondary_residence`/`storage_unit`/`traveling`/
+    `other`) to the client's (`home`/`storage`/`suitcase`/`other`). Verified
+    live: dev's CHECK is the new vocabulary, **prod's is still the old
+    one**. Meanwhile `locationSync.ts:79` seeds starter rows using the
+    *client* kinds. So on prod, seeding a user's starter locations violates
+    the CHECK for 3 of the 4 rows (`home`, `storage`, `suitcase`); only
+    `other` satisfies it. Path in: `supabaseClosetRepository.resolveLocations()`
+    → `ensureUserLocations()`, hit when an item is saved with a location.
+
+    **36b — `20260708000001_locations_is_primary` (applied to NEITHER).**
+    New finding, in no prior audit. Adds `locations.is_primary` plus a
+    partial unique index. Verified live: the column is absent from prod
+    *and* dev. But `locationsRepository.ts` already queries it in
+    production code — `listLocations()` does
+    `.select("id, label, kind, is_primary")` (line 35), `addLocation()`
+    inserts `is_primary: false`, and `setPrimary()` updates it. Every one
+    of those fails with a PostgREST undefined-column error today.
+
+    **Why this is live and not gated.** `showStatusLocation()` only gates
+    *UI rendering*. It does not gate the data path. `LocationsProvider`
+    wraps the app unconditionally (`App.tsx:377`) → `useLocationsStore`
+    fires `refresh()` on mount for any signed-in user → `listLocations()`
+    → the failing query. Confirmed the flag is off in both Vercel
+    environments (`VITE_SHOW_STATUS_LOCATION` does not appear in
+    `vercel env ls` at all, and `features.ts:20` requires the literal
+    string `"true"`), and it makes no difference to this path.
+
+    **Blast radius is real but quiet.** `useLocationsStore` catches the
+    throw into `error` state rather than crashing, and `getLocation()`
+    falls back to the hardcoded `PRIMARY_LOCATION`, so the UI degrades
+    silently instead of breaking visibly. That is exactly why nobody
+    noticed. Net effect today: every signed-in user fires a guaranteed-
+    failing query on every app mount, and `primaryLocation` is `undefined`
+    for all of them.
+
+    **This is the `feedback`-table failure mode a third time** — a
+    well-formed migration sitting in the repo, never applied, with live
+    code calling against it. Worth fixing the *process* (a CI check that
+    diffs `supabase/migrations/` against both projects' applied lists)
+    alongside the migrations themselves, or this recurs.
+
+    **Sequencing note:** apply 36a before 36b. 36b's backfill promotes each
+    user's `kind = 'home'` row to primary, and on prod no row can be
+    `'home'` until 36a's CHECK is in place.
+
+    Unrelated but adjacent, for anyone chasing the original question:
+    **`createdAt` needs no migration** — `items.created_at` already exists
+    in prod and is mapped both directions (see item 13).
+37. **Error tracking is installed but the picture is incomplete.** **[July 31,
+    not re-verified]** Sentry starts unconditionally on app load as of the
+    July 31 window (`src/main.tsx`), independent of analytics consent — so a
+    repeat of the July 25 incident would now be visible. What's still absent
+    is anything watching from *outside* the app: see items 38 and 39.
+38. **Uptime / synthetic monitor on the prod URL + login flow.** **[July 31,
+    not re-verified]** Still not started. This plus item 37 is what would
+    have caught the `lventer06@gmail.com` case (item 42) at the time rather
+    than in a manual audit weeks later.
+39. **Automate the §7 nightly integrity check.** **[live 2026-08-06 —
+    partially blocked]** The July 27 audit's secondary finding was that the
+    audit itself went dark for a week and a live user-facing bug sat
+    undetected the whole time. The check wants both queries from that audit's
+    §7 addendum — orphaned profiles, and the higher-severity "orphaned *and*
+    signed back in" variant.
+
+    **Tooling gap found this session:** the `auth.users` join query is
+    blocked by the Claude Code permission classifier, so it could not be run
+    from this session at all. That means the July 31 doc's "current orphan
+    count in prod: 0" is **carried forward, not independently confirmed
+    today**. Whatever automates this needs to run somewhere with real
+    credentials — a Supabase scheduled function or a CI job — not from an
+    agent session.
+
+### New this session — found via `vercel env ls`
+
+40. **`VITE_POSTHOG_HOS` is a truncated variable name.** **[live 2026-08-06]**
+    Vercel has `VITE_POSTHOG_HOS` (Preview + Production, set 28d ago). The
+    code reads `VITE_POSTHOG_HOST` (`src/lib/monitoring.ts:90`,
+    `src/vite-env.d.ts:13`). The configured value has therefore never been
+    applied — PostHog has silently used the `https://us.i.posthog.com`
+    fallback since it was set. Not necessarily breaking (the fallback is the
+    normal US host), but nobody has been getting the host they configured.
+    Fix: add `VITE_POSTHOG_HOST` correctly, confirm ingestion still works,
+    then remove the typo'd var. **Do not** narrow it with
+    `vercel env rm NAME <env>` — per the 2026-08-04 handoff that command
+    ignores the environment argument and deletes from all environments.
+41. **Sentry + PostHog are single vars shared across Preview and Production.**
+    **[live 2026-08-06]** `VITE_SENTRY_DSN` and `VITE_POSTHOG_KEY` each
+    appear on one row reading `Preview, Production` — the same shape that was
+    wrong for the Supabase vars and got split on 2026-08-04. Consequence:
+    every PR-preview session writes errors and product analytics into the
+    same Sentry project and PostHog instance as real beta users. Beta funnel
+    numbers will include your own preview testing. Split them the same way
+    the Supabase vars were (dashboard: edit → uncheck environment), or at
+    minimum set a distinguishing `environment` tag so preview traffic can be
+    filtered out after the fact.
+
+### Carried forward — verify before acting
+
+42. **`lventer06@gmail.com` never reached Supabase.** **[July 31, not
+    re-verified]** Attempted signup 2026-07-20, no `auth.users` row in
+    *either* project — so the flow failed before it ever hit the backend.
+    Google's OAuth test-user allowlist was checked and does not explain it
+    (both known testers are on it). Leading unverified theory: an OAuth
+    redirect issue specific to signing in from an installed PWA on a phone
+    home screen. Not independently diagnosable until items 37–38 exist; this
+    case is the concrete justification for both, not a separate mystery.
+43. **Three anon-callable `SECURITY DEFINER` functions.** **[live 2026-08-06]**
+    `handle_new_user`, `is_closet_member`, `rls_auto_enable` — all still
+    callable by both `anon` and `authenticated` via `/rest/v1/rpc/…`.
+    Unchanged since July 18.
+
+    **Explicitly not in scope: `ensure_user_bootstrap`.** It now also appears
+    in this lint family (`authenticated_security_definer_function_executable`,
+    new since the July 27 audit). That is **expected and by design** — per
+    the July 31 delta it's scoped to `auth.uid()`, can never be called for
+    another user's id, and has `anon` revoked. Recorded here so a future
+    hardening pass doesn't "fix" it and break sign-in self-repair.
+44. **Three functions with mutable `search_path`.** **[live 2026-08-06]**
+    `set_updated_at`, `apply_sentimental_defaults`, `refresh_wear_rollup`.
+    Unchanged.
+45. **Leaked-password protection disabled.** **[live 2026-08-06]** Still off.
+    Worth noting this is close to moot in practice — the app is
+    Google-OAuth-only, no email/password path exists — so it's a
+    clean-advisor-dashboard item, not a real exposure. Deprioritize
+    accordingly rather than treating it as a peer of 43/44.
+46. **`product_enrichment_cache` — RLS enabled, zero policies.** **[live
+    2026-08-06]** Table still empty. Effect today is that nothing can read or
+    write it under RLS. Needs a decided intent (service-role-only? drop the
+    table?) written down, not just a policy bolted on.
+47. **`import_jobs` table does not exist.** **[live 2026-08-06]** Confirmed
+    absent from `list_tables`. Was specced alongside `items.import_job_id`
+    for import observability. Overlaps with item 18's email-search
+    date-range telemetry — decide whether client-side analytics covers the
+    need before building a table for it.
+48. **Three unindexed foreign keys.** **[live 2026-08-06]**
+    `closets.created_by`, `wear_events.occasion_tag_id`,
+    `wear_events.photo_id`. Pre-traffic, so not urgent.
+49. **RLS init-plan re-evaluation lints — now 9, not 7.** **[live
+    2026-08-06]** The July 27 audit recorded 7; today's advisor reports 9.
+    The two new ones are `feedback_insert_own` / `feedback_select_own`,
+    added when the `feedback` migration finally landed. Mechanical fix
+    (`auth.<fn>()` → `(select auth.<fn>())`) across `profiles`, `closets`,
+    `closet_members`, `locations`, `feedback`. Do not copy "identical 7"
+    forward again.
+50. **Unused indexes — baseline only.** **[live 2026-08-06]** Six now
+    (`enrichment_cache_retailer_idx`, `items_location_idx`,
+    `item_tags_tag_idx`, `wear_events_item_idx`, plus `feedback_user_id_idx`
+    and `feedback_created_at_idx`). Expected on pre-traffic tables. Re-check
+    after real beta usage; do not remove anything now.
+51. **Build the §3 journey events for the 5 P0 flows.** **[July 31, not
+    re-verified]** Per the July 18 spec. Overlaps directly with item 17's
+    five missing retention events — do them as one pass, working from the
+    July 18 event taxonomy as the source of truth.
+52. **Put the audit itself on a schedule.** **[live 2026-08-06]** The July 27
+    audit's own recommendation. There is a `nightly-audit` skill in this repo
+    already; it just isn't scheduled. Five-minute cron. Not beta-blocking,
+    but the last gap cost a week of blindness.
+
+### Verified healthy — no action, recorded so it isn't re-litigated
+
+- **Supabase env isolation held.** **[live 2026-08-06]** `vercel env ls`
+  shows `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` each on **two
+  separate rows** (one Preview, one Production), exactly the shape the
+  2026-08-04 handoff prescribed. Previews no longer read or write the live
+  beta database.
+- **The `feedback` table fix held.** **[live 2026-08-06]** Present in prod
+  with RLS enabled and 2 policies. It had been silently missing for 15 days
+  while `feedbackService.ts` wrote into the void; that is genuinely closed.
+- **`createdAt` needs no migration.** **[live 2026-08-06]** `items.created_at`
+  (timestamptz, defaults `now()`) exists in prod and is mapped in both
+  repositories. See item 13.
+
+### Open questions this session could not answer
+
+- **Does the dev Supabase project have its own Google OAuth client, or share
+  prod's?** Partial answer found: `VITE_GOOGLE_CLIENT_ID` is a **single
+  Vercel var scoped `Production, Preview`** — so the *frontend* uses one
+  Google client across both environments. What that does **not** settle is
+  whether the dev Supabase project's own Auth → Providers → Google config
+  points at that same client. Needs the dev dashboard; not exposed through
+  the Supabase MCP tools.
+- **Is `localhost:5173` in the dev project's Redirect URLs?** Not reachable
+  from the available tooling — check Authentication → URL Configuration in
+  the dev dashboard directly. Do not infer it from the prod Site URL fix
+  described in the July 31 delta; that was a separate project.
+
+---
+
 ## Accessibility — deferred from the 2026-08-04 screen-reader pass
 
 Fixed in that pass (not backlog, listed for context): carousel `alt` was the

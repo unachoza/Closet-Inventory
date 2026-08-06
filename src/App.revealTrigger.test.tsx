@@ -1,16 +1,30 @@
 /**
- * Day 0 Reveal — primary trigger (navigate away from Gmail after an import).
+ * Day 0 Reveal — primary trigger (intercepting an attempt to leave Gmail
+ * after an import).
  *
- * This lives in App.tsx itself (not GmailImport) because GmailImport unmounts
- * the instant an import happens (the app routes to the edit view), so it
- * can't watch for "she came back and then left" on its own. This test drives
- * the real App + the real navigation, stubbing GmailImport/EditItemView/etc.
- * as simple views (same pattern as App.gmailAuth.integration.test.tsx) so the
- * thing under test is the view-transition wiring, not Gmail's own parsing
- * pipeline.
+ * As of 2026-08-06 this is guard-based, not a reactive "watch the view
+ * change" effect: every one of the 6 ways to leave Gmail (hamburger drawer
+ * items, profile button, Closet/Care/Search bottom-nav tabs, manual Add)
+ * routes through the same setView() in ViewContext, so the reveal-guard
+ * registered there intercepts the attempt itself and PREVENTS the
+ * navigation — it doesn't let it complete and then react. This test drives
+ * the real App + real navigation, stubbing GmailImport/EditItemView/etc. as
+ * simple views (same pattern as App.gmailAuth.integration.test.tsx) so the
+ * thing under test is the interception wiring, not Gmail's own parsing
+ * pipeline or the edit form's own fields.
+ *
+ * The mocked EditItemView's "Simulate Add To Closet" button calls setView
+ * directly, mirroring the real EditItemView's now-normalized behavior
+ * (single-item Gmail imports return to "gmail", same as batch — see
+ * EditItemView.tsx's handleSubmit) — this is deliberately NOT re-testing
+ * that normalization itself (EditItemView.test.tsx owns that), just
+ * standing in for it so the reveal-guard has a realistic view to intercept
+ * a departure from.
  */
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Dispatch, SetStateAction } from "react";
+import type { ViewType } from "./utils/types";
 
 vi.mock("@react-oauth/google", () => ({
 	GoogleOAuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -38,12 +52,22 @@ vi.mock("./Components/GuideComponents/FiberJourney/JourneyC", () => ({ default: 
 vi.mock("./Features/SearchCloset/EntireClosetView/EntireClosetView", () => ({
 	default: () => <div data-testid="view-entire-closet">Entire Closet</div>,
 }));
-vi.mock("./Features/Form/EditItemView/EditItemView", () => ({ default: () => <div data-testid="view-edit">Edit Item</div> }));
+
+// Mimics EditItemView's real, now-normalized post-submit destination
+// (setView("gmail")) via a button, instead of driving the real form fields.
+vi.mock("./Features/Form/EditItemView/EditItemView", () => ({
+	default: ({ setView }: { setView: Dispatch<SetStateAction<ViewType>> }) => (
+		<div data-testid="view-edit">
+			<button type="button" onClick={() => setView("gmail")}>
+				Simulate Add To Closet
+			</button>
+		</div>
+	),
+}));
 
 // Minimal stand-in for GmailImport: a button that calls the real onImport
 // prop (so App's actual handleGmailImport / hasImportedThisGmailSession
-// wiring runs unmodified), plus the real onDone/hasImported props passed
-// through so a future test could exercise the idle fallback too.
+// wiring runs unmodified).
 vi.mock("./Features/GmailImport/GmailImport", () => ({
 	default: ({ onImport }: { onImport: (item: Partial<{ name: string; category: string }>) => void }) => (
 		<div data-testid="view-gmail">
@@ -63,6 +87,15 @@ const clickMenuItem = (name: RegExp) => {
 };
 const clickBottomNav = (name: RegExp) => fireEvent.click(within(screen.getByRole("navigation", { name: /primary/i })).getByRole("button", { name }));
 
+// Full round trip: open Gmail, import one item, "save" it (returns to gmail).
+async function importOneItem() {
+	openMenu();
+	clickMenuItem(/import gmail/i);
+	fireEvent.click(await screen.findByRole("button", { name: /simulate import/i }));
+	fireEvent.click(await screen.findByRole("button", { name: /simulate add to closet/i }));
+	await screen.findByTestId("view-gmail");
+}
+
 beforeEach(() => {
 	vi.clearAllMocks();
 	localStorage.clear();
@@ -71,55 +104,82 @@ beforeEach(() => {
 	localStorage.setItem("closetly-last-seen-version", __APP_SEMVER__);
 });
 
-describe("Day 0 Reveal — navigate-away trigger", () => {
-	it("shows the Reveal after importing, then navigating away from Gmail", async () => {
+describe("Day 0 Reveal — reveal-guard interception", () => {
+	it("intercepts leaving Gmail after an import: the attempted navigation does not complete", async () => {
 		render(<App />);
+		await importOneItem();
 
-		openMenu();
-		clickMenuItem(/import gmail/i);
-		expect(await screen.findByTestId("view-gmail")).toBeInTheDocument();
-
-		fireEvent.click(screen.getByRole("button", { name: /simulate import/i }));
-		expect(await screen.findByTestId("view-edit")).toBeInTheDocument();
-
-		// The gmail → edit transition above is part of the SAME import action —
-		// must not have fired the Reveal yet.
-		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
-
-		// Now leave the Gmail flow for a real top-level tab.
 		clickBottomNav(/^closet$/i);
 
+		// The Reveal shows INSTEAD of Closet — the click never lands there.
 		expect(await screen.findByText(/your closet, imported/i)).toBeInTheDocument();
+		expect(screen.queryByTestId("view-carousel")).not.toBeInTheDocument();
 	});
 
-	it("does not show the Reveal when navigating to Closet without ever importing", async () => {
+	it("'See your closet' completes the navigation the Reveal held", async () => {
 		render(<App />);
-
-		clickBottomNav(/^closet$/i);
-
-		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
-	});
-
-	it("only ever shows once, even across repeated gmail visits and navigations", async () => {
-		render(<App />);
-
-		openMenu();
-		clickMenuItem(/import gmail/i);
-		fireEvent.click(await screen.findByRole("button", { name: /simulate import/i }));
-		await screen.findByTestId("view-edit");
+		await importOneItem();
 		clickBottomNav(/^closet$/i);
 		await screen.findByText(/your closet, imported/i);
 
 		fireEvent.click(screen.getByRole("button", { name: /see your closet/i }));
-		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
 
-		// Import again and leave again — must not re-show.
-		openMenu();
-		clickMenuItem(/import gmail/i);
-		fireEvent.click(await screen.findByRole("button", { name: /simulate import/i }));
-		await screen.findByTestId("view-edit");
+		expect(await screen.findByTestId("view-carousel")).toBeInTheDocument();
+		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
+	});
+
+	it("'Continue hunting' drops the navigation and leaves her on the email list", async () => {
+		render(<App />);
+		await importOneItem();
+		clickBottomNav(/^closet$/i);
+		await screen.findByText(/your closet, imported/i);
+
+		fireEvent.click(screen.getByRole("button", { name: /keep searching emails/i }));
+
+		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
+		expect(await screen.findByTestId("view-gmail")).toBeInTheDocument();
+	});
+
+	it("does not intercept navigating to Closet without ever importing", async () => {
+		render(<App />);
+
 		clickBottomNav(/^closet$/i);
 
+		expect(await screen.findByTestId("view-carousel")).toBeInTheDocument();
 		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
+	});
+
+	it("only ever intercepts once — a later exit attempt navigates normally", async () => {
+		render(<App />);
+		await importOneItem();
+		clickBottomNav(/^closet$/i);
+		await screen.findByText(/your closet, imported/i);
+		fireEvent.click(screen.getByRole("button", { name: /see your closet/i }));
+		await screen.findByTestId("view-carousel");
+
+		// Import again, then try to leave again — must navigate normally now.
+		await importOneItem();
+		clickBottomNav(/^closet$/i);
+
+		expect(await screen.findByTestId("view-carousel")).toBeInTheDocument();
+		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
+	});
+
+	it("does not intercept manual Add before any import has happened", async () => {
+		render(<App />);
+
+		fireEvent.click(screen.getByRole("button", { name: /^add item$/i }));
+
+		expect(await screen.findByTestId("view-form")).toBeInTheDocument();
+	});
+
+	it("intercepts manual Add too, once she's imported something from Gmail", async () => {
+		render(<App />);
+		await importOneItem();
+
+		fireEvent.click(screen.getByRole("button", { name: /^add item$/i }));
+
+		expect(await screen.findByText(/your closet, imported/i)).toBeInTheDocument();
+		expect(screen.queryByTestId("view-form")).not.toBeInTheDocument();
 	});
 });
