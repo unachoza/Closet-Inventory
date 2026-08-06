@@ -136,6 +136,48 @@ this push.
 
 ## Shipped ahead of schedule
 
+- **UI polish pass, 2026-08-05/06 (branch `ui-polish/multiple-nits`, PR #200,
+  commits `a5f987d`, `871abcc`, `2bdd795`, `8356abd`, `41905aa`) — 4
+  independent fixes from a UI survey, plus a follow-on glyph sweep.**
+  Promotes backlog item 16 ("Safari default UI cleanup") into launch scope.
+     - **Toast covered the bottom nav** (`Toast.css`) — the success toast
+       (max z-index, no nav offset, unlike every other fixed element in the
+       app) rendered directly on top of the tab bar for its full 4s duration
+       after every Add. Now offset by `--bottom-nav-height` + safe-area-inset,
+       matching `UpdateBanner`/`FeedbackButton`'s existing convention.
+     - **`PaginationControls`'s glass surface only spanned ~72rem, never the
+       full viewport** — the background/border/blur lived on the inner,
+       72rem-capped content wrapper instead of the already-100vw outer
+       container, so the surface rendered as a centered box instead of
+       edge-to-edge. Moved the surface styling (and sticky positioning) to
+       the container; the inner element is now a pure content wrapper.
+       Verified live: 375px width, correct glass bg/blur/sticky.
+     - **iOS Safari `<select>` arrows** — none of the app's 6 `<select>`
+       usages (`PurchasedField` month/year, `EditItemView`
+       condition/status/location, `SearchSortBar` sort) had `appearance:
+       none`, so every one rendered the platform's default chevron against
+       the design system. Added a matching `currentColor` SVG chevron to all
+       3 underlying CSS classes.
+     - **Glyph sweep, same session:** while fixing the selects, found and
+       fixed 4 more raw Unicode arrow/caret glyphs (▼▶▲↕←→) that render
+       inconsistently across platforms — Gmail import's skipped-items toggle
+       chevron, the Fiber Comparison table's sort caret, and
+       `PaginationControls`'s prev/next arrows (the sole visible content of
+       those buttons below `--bp-xs`, where the text label hides). All
+       replaced with SVG chevrons rotated via CSS instead of glyph-swapped
+       per state. Left inline typographic arrows in prose/CTA text alone
+       ("Open Your Fabrics →") — different risk category, renders in the
+       surrounding font at normal weight, not an isolated control glyph.
+     - **Email tab rendered blank while auth resolved**
+       (`ImportAccountGate.tsx`) — `if (isLoading) return null` was
+       deliberate (avoid flashing the sign-in gate at a signed-in user) but
+       produced a genuinely blank screen on a cold-start tap. Now renders a
+       `role="status"` loading message instead of nothing, preserving the
+       original intent without the blank-screen impression.
+  Verified: `tsc` clean throughout; full suite at 1662 passing / 2
+  pre-existing failures (confirmed unrelated via git-stash comparison before
+  touching any files — an env-var flag test flaking around
+  `VITE_SHOW_STATUS_LOCATION`, not caused by this work).
 - **Screen-reader accessibility pass, 2026-08-05 (commits `74e07eb`,
   `6e545e7`, `35c430d`, `7bf772a`, `9681ff7`) — user-initiated, two rounds,
   not on the original plan.** Scope: what's observable from the computed

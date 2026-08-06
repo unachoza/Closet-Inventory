@@ -17,7 +17,7 @@
  * `vi.stubEnv("VITE_SHOW_STATUS_LOCATION", "true")` per case.
  */
 export function showStatusLocation(): boolean {
-	return import.meta.env.VITE_SHOW_STATUS_LOCATION === "false";
+	return import.meta.env.VITE_SHOW_STATUS_LOCATION === "true";
 }
 
 /**
