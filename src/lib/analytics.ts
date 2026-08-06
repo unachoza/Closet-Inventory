@@ -41,6 +41,7 @@ export type AnalyticsEvent =
 	| "care_guide_opened"
 	// Retention
 	| "closet_fabrics_viewed"
+	| "reveal_shown"
 	// Navigation
 	| "screen_viewed"
 	// Onboarding funnel

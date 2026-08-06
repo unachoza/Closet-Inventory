@@ -24,6 +24,8 @@ import DemoDataPrompt from "./Components/DemoDataPrompt/DemoDataPrompt";
 import { useDemoLifecycle } from "./hooks/useDemoLifecycle";
 import { useWhatsChanged } from "./Features/WhatsChanged/useWhatsChanged";
 import WhatsChangedScreen from "./Features/WhatsChanged/WhatsChangedScreen";
+import { useReveal } from "./Features/Reveal/useReveal";
+import RevealScreen from "./Features/Reveal/RevealScreen";
 import UpdateBanner from "./Components/UpdateBanner/UpdateBanner";
 
 // Route-level code splitting: everything below is off the first-paint path
@@ -100,6 +102,7 @@ function AppShell() {
 	const [showOnboarding, setShowOnboarding] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const whatsChanged = useWhatsChanged();
+	const reveal = useReveal(closet);
 
 	useEffect(() => {
 		// Purge any sensitive data left over by pre-PR#76 builds on first load,
@@ -233,6 +236,13 @@ function AppShell() {
 	if (whatsChanged.show) {
 		return <WhatsChangedScreen bullets={whatsChanged.bullets} version={whatsChanged.version} onDismiss={whatsChanged.dismiss} />;
 	}
+
+	// Day 0 Reveal — fires once, the first time the Gmail import screen goes
+	// idle after actually returning results. See useReveal.ts / GmailImport's
+	// onIdle prop for the trigger.
+	if (reveal.show) {
+		return <RevealScreen stats={reveal.stats} onDismiss={reveal.dismiss} />;
+	}
 	return (
 		<div className={`main ${view === "carousel" ? "view-hero" : "view-browse"}`}>
 			<NavBar
@@ -265,6 +275,7 @@ function AppShell() {
 										onSourceEmailChange={handleSourceEmailChange}
 										unskippedByEmail={unskippedByEmail}
 										onUnskippedByEmailChange={handleUnskippedByEmailChange}
+										onIdle={reveal.handleIdle}
 									/>
 								</ImportAccountGate>
 							)}

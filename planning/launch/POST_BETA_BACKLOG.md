@@ -44,62 +44,117 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
 
 ## Import flow
 
-4. **Consistent post-add destination.** Multi-item email returns to the email
+5. **Consistent post-add destination.** Multi-item email returns to the email
    preview; single-item dumps to the closet. Proposal: always return to the
    preview with the added item checked off, plus a persistent "Done — go to
    closet" button.
-5. **Visited-email state.** Faded / checked treatment on emails already scanned,
+6. **Visited-email state.** Faded / checked treatment on emails already scanned,
    persisted per-user, so users can see where they left off in a search.
-6. **Sticky scroll from email preview → detected-product cards on mobile.**
+7. **Sticky scroll from email preview → detected-product cards on mobile.**
    Likely nested scroll containers fighting or the preview capturing touch.
    Needs on-device diagnosis.
 
 ## Smarter forms (conditional logic)
 
-7. **Category-driven size options.** Shoes → 6, 6.5, 7…; pants → 24, 25, 26…;
+8. **Category-driven size options.** Shoes → 6, 6.5, 7…; pants → 24, 25, 26…;
    dresses → 0, 2, 4…; tops → XS–XXL. One `sizeScalesByCategory` map feeding a
    size control.
-8. **Source-driven condition prompt.** eBay / Poshmark / ThredUp / Depop /
+9. **Source-driven condition prompt.** eBay / Poshmark / ThredUp / Depop /
    Mercari → surface a condition field (NWT, excellent, good, fair). Skip for
    first-party retail (default: new).
 
 ## Care
 
-9. **"Your Care" vs. the reference library.** Sharpen the two competing care
-   stories — personalized care drawn from the user's real fabrics vs. the
-   general reference. Needs a friendlier word than "encyclopedia": candidates —
-   *Care Library*, *Care Basics*, *Fabric Guide*, *Look It Up*, *Care A–Z*.
-10. **Stain removal guide, conditional-logic version.** Ask what the stain is,
+10. **"Your Care" vs. the reference library.** Sharpen the two competing care
+    stories — personalized care drawn from the user's real fabrics vs. the
+    general reference. Needs a friendlier word than "encyclopedia": candidates —
+    *Care Library*, *Care Basics*, *Fabric Guide*, *Look It Up*, *Care A–Z*.
+11. **Stain removal guide, conditional-logic version.** Ask what the stain is,
     then route to the right chemistry:
     - **Enzymes** — break large biological molecules into smaller removable
       pieces (blood, grass, food, sweat)
     - **Surfactants** — lift oily soils and grease
     - **Solvents** — dissolve certain dyes, inks, and resinous residues
 
-## Retention (beyond the day-30 work)
+## Retention
 
-11. **Day-7 closet data-viz card.** Very basic: how many pieces, what the closet
-    cost, breakdown by category. Retention card, not a full dashboard.
-12. **Profile-driven pill presets.** Guided setup for most-worn brands, common
+**See [RETENTION_LOOP.md](../RETENTION_LOOP.md) for the full horizon spec**
+(Day 0/2-3/7/14/30 + Rediscovery) — this section is just the sequencing for
+what's left. Day 7 ("Your Fabrics") and the Profile echo have already
+shipped; everything below is what remains, in dependency order.
+
+12. ~~**`retentionLifecycle.ts` — keystone.**~~ Done 2026-08-06:
+    `src/hooks/retentionLifecycle.ts` (pure) + `useRetentionLifecycle.ts`
+    (localStorage persistence, key `ntw-retention-lifecycle`) — a
+    `{ day0, day2_3, day14, day30 }` show-once map, generalized from
+    `demoLifecycle.ts`'s pattern. `hasShown`/`markShown` per horizon.
+13. ~~**`createdAt` on `ClothingItem`.**~~ Done 2026-08-06: added to
+    `types.ts`; `supabaseClosetRepository.ts`'s `rowToItem()` now maps the
+    already-existing `row.created_at` (was read then discarded);
+    `localClosetRepository.ts`'s `add()` stamps it for local-only items,
+    same pattern as `updatedAt`. No migration needed — the DB column
+    already existed.
+14. ~~**Day 0 — The Reveal.**~~ Done 2026-08-06 (branch `feat/retention-loop`):
+    `src/Features/Reveal/` — `revealStats.ts` (piece/brand/value/date-range
+    aggregation, flags `hasCompleteValue` when a price is missing so the UI
+    can say "$X+" instead of presenting an undercount as fact),
+    `RevealScreen.tsx` (full-screen one-time card, `WhatsChangedScreen.tsx`
+    precedent), `useReveal.ts` (ties `retentionLifecycle` + stats
+    together). Trigger: idle-based via new generic `useIdleTimer.ts`, wired
+    into `GmailImport.tsx` (`onIdle` prop, 2.5 min, only armed once a search
+    has actually returned results) — not the existing `import_finished`
+    event, since that fires per session, not once ever. `reveal_shown`
+    added to the `AnalyticsEvent` union. 33 new tests (idle timer,
+    lifecycle, stats aggregation, screen rendering, integration). One real
+    bug caught by a test during this build: `RevealScreen`'s date
+    formatting used the browser's local timezone on a UTC midnight
+    timestamp, silently shifting the displayed month back by one for
+    anyone west of UTC — fixed by formatting in UTC explicitly.
+15. **A shared bottom-sheet primitive.** None exists in the codebase today —
+    needed by both Day 2–3 (Care Note) and Day 30 (Seasonal).
+16. **Day 2–3 (Care Note), Day 14 (Quiet Addition), Day 30 (Seasonal +
+    one-time hemisphere ask into `profiles.settings`, no migration
+    needed).** See `RETENTION_LOOP.md`'s horizon table for copy/data per
+    surface.
+17. **Five missing analytics events** — `reveal_shown`, `care_note_shown`,
+    `care_note_dismissed`, `care_note_actioned`, `hemisphere_prompt_answered`.
+    Only `closet_fabrics_viewed` exists today.
+18. **Email search date-range observability (P0, distinct from the
+    Reveal).** `GmailImport.tsx`'s `emailDateRange` already computes
+    oldest/newest email date across a search's results for the on-screen
+    header — today it's transient, UI-only, never leaves the client. Send it
+    to analytics (`{ oldestEmailDate, newestEmailDate, resultCount }` on
+    search completion) — shows how far back into a user's inbox a search
+    actually reaches, a proxy for how much history is even findable.
+    Browser/OS needs no new code — PostHog's default autocapture already
+    attaches `$browser`/`$os`/`$device_type` to every event.
+19. **Profile-driven pill presets.** Guided setup for most-worn brands, common
     materials, common occasions. Those become the top-of-list pills everywhere,
     so mobile entry is tapping instead of typing. Directly reduces the free-text
     problem in (1).
 
+    **Possible overlap, not resolved here:** item 14 (the Reveal) already
+    surfaces piece count, brand count, and closet value at import time — a
+    standalone "Day-7 closet data-viz card" (how many pieces, cost,
+    category breakdown) that used to be its own item here may now be
+    redundant with that. Flagging rather than silently dropping — worth a
+    product call before building either.
+
 ## Search
 
-13. **Collapse / rework Advanced Search.** Refactor and revise — currently too
+20. **Collapse / rework Advanced Search.** Refactor and revise — currently too
     heavy for the MVP surface area.
 
 ## Quality & cross-browser
 
-14. **E2E coverage for the critical flows.** Playwright is already installed and
+21. **E2E coverage for the critical flows.** Playwright is already installed and
     a PWA suite exists (`test:e2e:pwa`, port 4174). Missing: onboarding →
     sign-in → name → install, and the full Gmail import funnel end to end.
-15. **Cross-browser pass.** Safari (desktop + iOS), Chrome, Firefox. Testers are
+22. **Cross-browser pass.** Safari (desktop + iOS), Chrome, Firefox. Testers are
     disproportionately on iOS Safari, including versions below 16.4 — see
     the existing old-Safari CSS constraints (range-syntax media queries and
     `color-mix()` both need fallbacks).
-16. ~~**Safari default UI cleanup.**~~ Promoted into launch and done
+23. ~~**Safari default UI cleanup.**~~ Promoted into launch and done
     2026-08-06 (PR #200): `appearance: none` + a matching `currentColor` SVG
     chevron added to all 6 `<select>` usages (`PurchasedField` month/year,
     `EditItemView` condition/status/location, `SearchSortBar` sort). Widened
@@ -112,20 +167,20 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
     lift than a CSS fix, and inline typographic arrows in prose/CTA text
     (e.g. "Open Your Fabrics →"), a different risk category since they
     render in the surrounding font rather than as an isolated control glyph.
-17. **Emoji → Noun Project icons.** No emoji in the UI. Swap every one for an
+24. **Emoji → Noun Project icons.** No emoji in the UI. Swap every one for an
     icon from the Noun Project library already licensed for this project.
     Needs: an inventory of current emoji use, a shared `<Icon>` component, and
     consistent sizing/color tokens so icons inherit theme like text does.
 
 ## PWA polish
 
-18. **"What's new while you were away" screen.** On reopen, if
+25. **"What's new while you were away" screen.** On reopen, if
     `setupPwaUpdateCheck()` (src/lib/pwaUpdate.ts) picked up a fresh build since
     last session, show a small one-time card: 1–3 bullet points, plain language,
     no changelog dump. Needs a way to tag each release with its own short bullet
     list (probably a small JSON/markdown keyed by `APP_VERSION`) and a
     last-seen-version marker in localStorage to decide whether to show it.
-19. **"Add to Home Screen" walkthrough animation.** Low-tech users likely don't
+26. **"Add to Home Screen" walkthrough animation.** Low-tech users likely don't
     know PWA install is a feature at all. A short animated explainer (share
     sheet → Add to Home Screen → icon appears) surfaced at the right moment —
     probably the existing `InstallStep` onboarding screen — rather than relying
@@ -133,7 +188,7 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
 
 ## Performance & bundle optimization
 
-20. **Defer Supabase realtime + storage from boot.** The eager `x` chunk
+27. **Defer Supabase realtime + storage from boot.** The eager `x` chunk
     (80 KB gzip) is mostly the Supabase client (auth/realtime/storage). Auth is
     needed at startup, but realtime (live presence, real-time feeds) and storage
     (file uploads) may not be. Investigate lazy-loading them or shimming on first
@@ -155,7 +210,7 @@ panels dropped focus to `<body>` on close, `PillComboField`'s orphan `<label>`,
 missing `aria-current="step"` on the Add wizard, `scope="col"` on the legal
 tables. **Not** verified with a real screen reader — see V2-MVP.md item.
 
-21. **Carousel category cards are keyboard-unreachable.** `Carousel.tsx:51-75`
+28. **Carousel category cards are keyboard-unreachable.** `Carousel.tsx:51-75`
     renders each card as a `motion.div` with `onClick` — no role, no tabIndex,
     no key handler. There is already a TODO on line 50 saying they should be
     buttons. Keyboard and screen-reader users cannot pick a category from the
@@ -163,11 +218,11 @@ tables. **Not** verified with a real screen reader — see V2-MVP.md item.
     Deferred from the 2026-08-04 pass because converting to `motion.button`
     collides with the repo's global button CSS and needed more regression
     surface than 2 days from launch allowed.
-22. **Add-wizard step tabs are click-only.** Same shape: `ProgressionTracker`
+29. **Add-wizard step tabs are click-only.** Same shape: `ProgressionTracker`
     renders `<li onClick>`. `aria-current="step"` now announces *which* step
     you're on, but you still can't jump between steps by keyboard. Lower
-    severity than 21 — Next/Back buttons work — so this is polish.
-23. **No focus management on modals.** `Components/Modal/Modal.tsx` sets
+    severity than 28 — Next/Back buttons work — so this is polish.
+30. **No focus management on modals.** `Components/Modal/Modal.tsx` sets
     `role="dialog"` + `aria-modal="true"` and closes on Escape, but never moves
     focus into the dialog, never traps Tab inside it, and never restores focus
     to the trigger on close. Because `aria-modal="true"` tells a screen reader
@@ -175,14 +230,14 @@ tables. **Not** verified with a real screen reader — see V2-MVP.md item.
     than the attribute being absent. Affects every consumer
     (`AccountDataModal`, discard-confirm, etc.). Wants a shared
     `useFocusTrap` hook rather than per-modal patches.
-24. **View switches are silent and don't move focus.** No router, so
+31. **View switches are silent and don't move focus.** No router, so
     `document.title` never changes and `document.activeElement` stays `<body>`
     across a view change — verified live on 2026-08-04. A screen-reader user
     tapping Search or Profile gets no signal anything happened. Cheap fix: a
     visually-hidden `role="status"` announcing the new view, plus focusing that
     view's heading. Also worth a real `<main>` landmark — the app currently
     exposes `header` and two `nav`s and no main.
-25. **No automated a11y coverage.** Deliberately did not add
+32. **No automated a11y coverage.** Deliberately did not add
     `@axe-core/playwright` two days from launch. Worth adding after: it would
     have caught the `alt` and aria-hidden-focus bugs above, though not the
     focus-management ones.
@@ -206,19 +261,19 @@ their nav tab ("Care Guide", "Search"), decided with the user (Closet/Email
 kept as-is; Care/Search were "open to suggestions" — scissors→Care and the
 real search+filter UI inside the view were the deciding factors).
 
-26. **Full internal rename, deferred.** `ViewType`'s `fabric`→`care` and
+33. **Full internal rename, deferred.** `ViewType`'s `fabric`→`care` and
     `entireCloset`→`search` were explicitly *not* renamed — touches
     `App.tsx`, `ViewContext.tsx`, `types.ts`, `NavBar.tsx`, `BottomNav.tsx`,
     `CardDetails.tsx`, `FabricProfileCard.tsx` (fabric only) plus every test
     asserting those strings. Invisible to users (they never see `ViewType`
     literals), so deferred as a correctness-not-urgency item — do it in a
     quiet week, not 2 days from launch.
-27. **`carousel`/`overview` are two different views for one nav tab.** The
+34. **`carousel`/`overview` are two different views for one nav tab.** The
     "Closet" tab lands on `carousel` (the category-picker hero); tapping a
     category switches to `overview` (the actual item grid, `<Closet>`).
     Neither name is user-facing, so not urgent, but worth folding into the
-    item 26 rename rather than doing twice.
-28. **`GmailImport.tsx:427` header typo** — "Import from Gmail!!" (stray
+    item 33 rename rather than doing twice.
+35. **`GmailImport.tsx:427` header typo** — "Import from Gmail!!" (stray
     double exclamation mark). One-character fix, noticed in passing during
     the nav-label audit, not yet applied.
 

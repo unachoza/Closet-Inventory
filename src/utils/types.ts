@@ -96,6 +96,11 @@ export type ClothingItem = {
 
 	// ── sync metadata (set by SyncedClosetRepository; used for last-write-wins) ─
 	updatedAt?: string; // ISO datetime
+	/** ISO datetime the item was added to the closet — distinct from
+	 *  purchaseDate (when it was bought). Backs "N days since import"-style
+	 *  retention surfaces (Day 14/30). Local-only closets stamp this on add();
+	 *  Supabase items read it straight from the DB's own `created_at` column. */
+	createdAt?: string;
 
 	// ── demo-seed marker (BUG-2) ──────────────────────────────────────────────
 	// True only for the starter closet (MY_CLOSET_DATA). Demo items are shown

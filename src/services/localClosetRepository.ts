@@ -39,7 +39,13 @@ export class LocalClosetRepository implements ClosetRepository {
 	}
 
 	async add(item: ClothingItem): Promise<ClothingItem> {
-		const normalized = { ...item, material: normalizeMaterial(item.material), updatedAt: item.updatedAt ?? new Date().toISOString() };
+		const now = new Date().toISOString();
+		const normalized = {
+			...item,
+			material: normalizeMaterial(item.material),
+			updatedAt: item.updatedAt ?? now,
+			createdAt: item.createdAt ?? now,
+		};
 		write([...read(), normalized]);
 		return normalized;
 	}

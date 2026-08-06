@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useGmailAuthContext } from "../../context/GmailAuthContext";
 import { useAdvancedSearch } from "../../hooks/useAdvancedSearch";
+import { useIdleTimer } from "../../hooks/useIdleTimer";
 import type { GmailEmail } from "../../hooks/useAdvancedSearch";
 import type { ClothingItem, WearState } from "../../utils/types";
 import type { ExtractedProduct } from "../../utils/parseProductsFromEmail";
@@ -64,7 +65,16 @@ interface GmailImportProps {
 	 */
 	unskippedByEmail?: Record<string, number[]>;
 	onUnskippedByEmailChange?: (emailId: string, indices: number[]) => void;
+	/** Day 0 Reveal trigger: called once this screen has gone idle (no
+	 *  search/fetch/selection activity) for REVEAL_IDLE_TIMEOUT_MS, but only
+	 *  after at least one search has actually returned results — see the
+	 *  `enabled` condition below. */
+	onIdle?: () => void;
 }
+
+/** 2.5 minutes — a starting point for "she's stopped actively scanning the
+ *  inbox," not a tuned value; revisit once there's real usage to look at. */
+const REVEAL_IDLE_TIMEOUT_MS = 2.5 * 60 * 1000;
 
 export default function GmailImport({
 	onImport,
@@ -73,6 +83,7 @@ export default function GmailImport({
 	onSourceEmailChange,
 	unskippedByEmail,
 	onUnskippedByEmailChange,
+	onIdle,
 }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
 	const googleNotice = useGoogleUnverifiedNotice();
@@ -133,6 +144,15 @@ export default function GmailImport({
 		clearCache();
 		logout();
 	}, [clearCache, logout]);
+
+	// Day 0 Reveal trigger: resets whenever anything meaningful happens on this
+	// screen (a search runs/completes, more results load, an email is opened),
+	// fires `onIdle` once nothing has for REVEAL_IDLE_TIMEOUT_MS. Only armed
+	// once a search has actually returned something — someone who glances at a
+	// blank Gmail tab and leaves shouldn't get a "your closet" screen with
+	// nothing in it.
+	const idleActivitySignal = `${emails.length}:${isSearching}:${isFetchingMore}:${selectedEmailId}:${progress?.fetched ?? 0}`;
+	useIdleTimer(REVEAL_IDLE_TIMEOUT_MS, () => onIdle?.(), Boolean(onIdle) && emails.length > 0, idleActivitySignal);
 
 	useEffect(() => {
 		let isMounted = true;

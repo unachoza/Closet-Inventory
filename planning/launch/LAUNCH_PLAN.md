@@ -139,7 +139,7 @@ this push.
 - **UI polish pass, 2026-08-05/06 (branch `ui-polish/multiple-nits`, PR #200,
   commits `a5f987d`, `871abcc`, `2bdd795`, `8356abd`, `41905aa`) — 4
   independent fixes from a UI survey, plus a follow-on glyph sweep.**
-  Promotes backlog item 16 ("Safari default UI cleanup") into launch scope.
+  Promotes backlog item 23 ("Safari default UI cleanup") into launch scope.
      - **Toast covered the bottom nav** (`Toast.css`) — the success toast
        (max z-index, no nav offset, unlike every other fixed element in the
        app) rendered directly on top of the tab bar for its full 4s duration
@@ -200,7 +200,7 @@ this push.
        is unreliable for screen-reader announcement timing). `<html
        lang="en">` was already correct — no fix needed.
      - Deliberately deferred, not fixed — logged as `POST_BETA_BACKLOG.md`
-       items 21–25: carousel category cards are keyboard-unreachable, no
+       items 28–32: carousel category cards are keyboard-unreachable, no
        modal focus trap anywhere (`aria-modal="true"` is set but focus never
        enters/traps/restores), wizard step tabs still click-only, view
        switches are silent (no title change, no focus move, no `<main>`
@@ -217,7 +217,7 @@ this push.
   The full internal `ViewType` string rename (`fabric`→`care`,
   `entireCloset`→`search`) was explicitly **not** done — touches 7+
   production files and every test asserting those literals, invisible to
-  users — deferred to `POST_BETA_BACKLOG.md` item 26.
+  users — deferred to `POST_BETA_BACKLOG.md` item 33.
   `src/Components/CareIcons/SewingToolsIcon.tsx` is dead code left over from
   the rejected icon (verified 2026-08-05: zero imports anywhere in `src/`) —
   fine to delete whenever, not launch-blocking.

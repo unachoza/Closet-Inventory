@@ -41,10 +41,16 @@ function buildDonutSegments(groups: { group: string; count: number; color: strin
 }
 
 export default function FabricProfileCard() {
-	const { fabrics } = useClosetFabrics();
+	const { fabrics, resolvableCount } = useClosetFabrics();
 	const { setView } = useView();
 
-	if (fabrics.length < MIN_RESOLVABLE_FABRICS) return null;
+	// Same gate InteractiveGuide.tsx uses to decide the Care tab's default —
+	// resolvableCount (fabrics with a real fibers.ts entry), not fabrics.length
+	// (every distinct material, resolved or not). Using the wrong one let a
+	// closet with 3+ unresolvable materials show the donut here while Care
+	// still defaulted to the encyclopedia tab, contradicting this file's own
+	// "same rule as the Care tab default" claim.
+	if (resolvableCount < MIN_RESOLVABLE_FABRICS) return null;
 
 	const groups = groupFabricsByCategory(fabrics);
 	const total = groups.reduce((sum, g) => sum + g.count, 0);

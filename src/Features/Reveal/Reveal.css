@@ -1,0 +1,50 @@
+/* Day 0 Reveal — full-screen one-time card, built on the same onboarding
+   tokens as WhatsChangedScreen (OnboardingFlow.css) so it reads as one
+   continuous visual language, not a bolted-on screen. */
+
+.reveal-step {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	gap: var(--primitive-spacing-sm);
+}
+
+.reveal-step__eyebrow {
+	margin: 0;
+	font-size: 12px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.reveal-step__stat {
+	margin: var(--primitive-spacing-md) 0 0;
+	font-family: var(--primitive-font-family-serif);
+	font-size: 60px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text-primary);
+}
+
+.reveal-step__label {
+	margin: 0 0 var(--primitive-spacing-md);
+	font-size: 15px;
+	color: var(--text-secondary);
+}
+
+.reveal-step__line {
+	margin: 0;
+	max-width: 34ch;
+	font-family: var(--primitive-font-family-serif);
+	font-size: 20px;
+	font-style: italic;
+	line-height: 1.5;
+	color: var(--text-primary);
+}
+
+.reveal-step__range {
+	margin: var(--primitive-spacing-sm) 0 0;
+	font-size: 13px;
+	color: var(--text-muted);
+}
