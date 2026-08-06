@@ -17,7 +17,7 @@
  * `vi.stubEnv("VITE_SHOW_STATUS_LOCATION", "true")` per case.
  */
 export function showStatusLocation(): boolean {
-	return import.meta.env.VITE_SHOW_STATUS_LOCATION === "true";
+	return import.meta.env.VITE_SHOW_STATUS_LOCATION === "false";
 }
 
 /**
@@ -31,4 +31,15 @@ export function showStatusLocation(): boolean {
  */
 export function showWhatsChanged(): boolean {
 	return import.meta.env.VITE_SHOW_WHATS_CHANGED !== "false";
+}
+
+/**
+ * Floating feedback FAB (`.feedback__fab`, FeedbackButton/). Pulled from the
+ * default UI while we rework its placement/affordance; the flag exists so it
+ * can be flipped back on per-environment for testing without a code change.
+ *
+ * Default OFF. Flip with `VITE_SHOW_FEEDBACK_BUTTON="true"`.
+ */
+export function showFeedbackButton(): boolean {
+	return import.meta.env.VITE_SHOW_FEEDBACK_BUTTON === "false";
 }
