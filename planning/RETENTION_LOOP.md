@@ -64,7 +64,8 @@ Personalizing Care isn't an unrelated fourth feature bolted on for retention —
 |---|---|---|
 | Material → care content | ✅ Ready | `resolveFiber()` (`src/utils/materialUtils.ts:210`) and `MATERIAL_TO_CARE_GROUP` / `inferCareFromMaterial()` (`src/Features/FashionParser/inference/inferCare.ts`) already map an item's material to real `CARE_GROUPS` content. No new content to author. |
 | Counts, brands, value | ✅ Ready | `closet` array (brand, price, category) is fully in scope at the import queue's drain point. |
-| "Added N days ago" | ⚠️ Needs one field | `ClothingItem` has no `createdAt`. The DB column `items.created_at` already exists — this is a type + repository-mapping change, not a migration. |
+| `createdAt` plumbing | ✅ Shipped | `ClothingItem.createdAt` added; mapped from `items.created_at` on Supabase reads, stamped on add for local-only items (`localClosetRepository.ts`). No migration needed — the DB column already existed. |
+| "Added N days ago" (UI) | ❌ Not built | The plumbing above only makes the data available — nothing renders it yet. No component reads `createdAt` to display an "N days ago" string anywhere in the app. |
 | "You haven't worn 40% of this" | ❌ Blocked | `wear_events` + a working rollup trigger exist server-side, but no client code ever writes a wear event. Every item's `wornCount` is `undefined` today. This is [E11](epics/E11-laundry-forecasting.md)'s job, not this phase's. |
 | Push notification on Day 3 | ❌ No infra | VitePWA runs in `generateSW` mode, which cannot host `push`/`notificationclick` handlers. No transactional email exists either. See "On push" below. |
 
@@ -79,8 +80,8 @@ Delivery is **in-app, on open, once** — the `demoLifecycle.ts` show-once patte
 | **Day 0** | **The Reveal.** Trigger decided 2026-08-06: **idle/time-based** — no interaction on the Gmail import screen for N minutes (proposed 2–3, tune after real usage) — not the existing `import_finished` event alone, since that fires once per import session and doesn't mean she's actually done browsing. Copy also includes the date range of imported items (free from `ClothingItem.purchaseDate`, already stored per item) — e.g. *"You've imported 142 items from June 2026 to May 2024"* — with room to hint she may have more importable history if the range doesn't reach far back. Requires `retentionLifecycle.ts` (below) so it only ever fires once. | *"142 pieces. 11 brands. Tracked."* | ✅ |
 | **Day 2–3** | **The Care Note.** One sentence pulled from her own materials. Expands in place; a "View full Care guide" link at the bottom leads to the encyclopedia for anyone who wants it. | *"You own 11 wool pieces. Three shouldn't go in the dryer."* | ✅ |
 | **Day 7** | **Care becomes the habit surface.** Opens on *Your Fabrics* — her materials, ranked by how much of her closet they cover — with the encyclopedia demoted to a second tab. | — | ✅ |
-| **Day 14** | **The Quiet Addition.** A single line acknowledging growth since import. | *"6 pieces joined since you imported."* | ⚠️ `createdAt` |
-| **Day 30** | **Seasonal resurfacing.** Uses `item.style?.season` (`inferSeason.ts`) plus a one-time hemisphere answer. | *"It's cooling off — here are your 8 coats."* | ⚠️ `createdAt` + hemisphere |
+| **Day 14** | **The Quiet Addition.** A single line acknowledging growth since import. | *"6 pieces joined since you imported."* | ✅ `createdAt` plumbed — needs the copy/surface built |
+| **Day 30** | **Seasonal resurfacing.** Uses `item.style?.season` (`inferSeason.ts`) plus a one-time hemisphere answer. | *"It's cooling off — here are your 8 coats."* | ⚠️ hemisphere still unresolved |
 | *(later, not this phase)* | **Rediscovery.** *"You haven't worn 40% of this."* Depends entirely on E11's wear-log write path. | — | ❌ |
 
 ### Milestones worth calling out (counts, never streaks)
