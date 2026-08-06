@@ -65,16 +65,26 @@ interface GmailImportProps {
 	 */
 	unskippedByEmail?: Record<string, number[]>;
 	onUnskippedByEmailChange?: (emailId: string, indices: number[]) => void;
-	/** Day 0 Reveal trigger: called once this screen has gone idle (no
-	 *  search/fetch/selection activity) for REVEAL_IDLE_TIMEOUT_MS, but only
-	 *  after at least one search has actually returned results — see the
-	 *  `enabled` condition below. */
-	onIdle?: () => void;
+	/**
+	 * Day 0 Reveal — short-idle fallback trigger. The primary trigger
+	 * (navigating away from the Gmail view after an import) lives in App.tsx,
+	 * since this component unmounts on that exact transition and can't watch
+	 * for it itself. `onDone` here only catches someone who lingers on this
+	 * screen, having already imported something, with nothing left to page
+	 * through — see the `enabled` condition below for the exact gate.
+	 */
+	onDone?: () => void;
+	/** Whether an import has happened yet — set by the parent (App.tsx), not
+	 *  tracked locally, because this component remounts fresh on every
+	 *  gmail → edit → "Back to email" round trip and a local flag would reset
+	 *  each time. */
+	hasImported?: boolean;
 }
 
-/** 2.5 minutes — a starting point for "she's stopped actively scanning the
- *  inbox," not a tuned value; revisit once there's real usage to look at. */
-const REVEAL_IDLE_TIMEOUT_MS = 2.5 * 60 * 1000;
+/** 10 seconds — short on purpose. This only arms once she's already imported
+ *  something AND run out of new results to page through, so a short pause
+ *  really does mean "done," not a blind "no clicks" guess. */
+const REVEAL_IDLE_TIMEOUT_MS = 10 * 1000;
 
 export default function GmailImport({
 	onImport,
@@ -83,7 +93,8 @@ export default function GmailImport({
 	onSourceEmailChange,
 	unskippedByEmail,
 	onUnskippedByEmailChange,
-	onIdle,
+	onDone,
+	hasImported = false,
 }: GmailImportProps) {
 	const { accessToken, isAuthenticated, error: authError, isLoading: authLoading, login, logout } = useGmailAuthContext();
 	const googleNotice = useGoogleUnverifiedNotice();
@@ -145,14 +156,20 @@ export default function GmailImport({
 		logout();
 	}, [clearCache, logout]);
 
-	// Day 0 Reveal trigger: resets whenever anything meaningful happens on this
-	// screen (a search runs/completes, more results load, an email is opened),
-	// fires `onIdle` once nothing has for REVEAL_IDLE_TIMEOUT_MS. Only armed
-	// once a search has actually returned something — someone who glances at a
-	// blank Gmail tab and leaves shouldn't get a "your closet" screen with
-	// nothing in it.
+	// Day 0 Reveal — short-idle fallback (see the `onDone` doc comment above
+	// for why the primary trigger lives in App.tsx instead). Resets whenever
+	// anything meaningful happens here (a search runs/completes, more results
+	// load, an email is opened); fires `onDone` after REVEAL_IDLE_TIMEOUT_MS
+	// of none of that — but only once she's already imported something AND
+	// there's nothing left to page through (`hasNextPage` false), so a short
+	// pause is a real "done" signal rather than a guess.
 	const idleActivitySignal = `${emails.length}:${isSearching}:${isFetchingMore}:${selectedEmailId}:${progress?.fetched ?? 0}`;
-	useIdleTimer(REVEAL_IDLE_TIMEOUT_MS, () => onIdle?.(), Boolean(onIdle) && emails.length > 0, idleActivitySignal);
+	useIdleTimer(
+		REVEAL_IDLE_TIMEOUT_MS,
+		() => onDone?.(),
+		Boolean(onDone) && hasImported && !hasNextPage && emails.length > 0,
+		idleActivitySignal,
+	);
 
 	useEffect(() => {
 		let isMounted = true;

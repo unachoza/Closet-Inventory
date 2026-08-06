@@ -16,7 +16,7 @@ import Closet from "./Features/Closet/Closet";
 import ImportAccountGate from "./Features/GmailImport/ImportAccountGate";
 import LocalCapacityNotice from "./Components/LocalCapacityNotice/LocalCapacityNotice";
 import { useLocalCapacity } from "./hooks/useLocalCapacity";
-import { CategoryType, ClothingItem, ItemFormData } from "./utils/types";
+import { CategoryType, ClothingItem, ItemFormData, ViewType } from "./utils/types";
 import "./App.css";
 import OnboardingFlow from "./Features/Onboarding/OnboardingFlow";
 import ConsentBanner from "./Components/ConsentBanner/ConsentBanner";
@@ -79,8 +79,13 @@ function draftSignature(prefilled: Partial<ClothingItem>): string {
 
 const ONBOARDING_KEY = "closetly-onboarding-complete";
 
+/** Bottom-nav/top-level destinations — used to tell "purposefully navigated
+ *  away from Gmail" apart from the gmail → edit routing that's part of a
+ *  normal single-item import (see the Day 0 Reveal effect below). */
+const TOP_LEVEL_VIEWS = new Set<ViewType>(["carousel", "fabric", "entireCloset", "profile"]);
+
 function AppShell() {
-	const { view, setView } = useView();
+	const { view, previousView, setView } = useView();
 	const { closet, getCloset, importItems, clearCloset } = useCloset();
 	const { isAtCapacity } = useLocalCapacity();
 	const demoLifecycle = useDemoLifecycle();
@@ -103,6 +108,33 @@ function AppShell() {
 	const [isLoading, setIsLoading] = useState(true);
 	const whatsChanged = useWhatsChanged();
 	const reveal = useReveal(closet);
+	// Day 0 Reveal — set true the moment an import actually happens
+	// (handleGmailImport/handleGmailImportAll below), read by both triggers:
+	// the navigate-away effect just below, and the short-idle fallback passed
+	// into GmailImport as `hasImported`.
+	const [hasImportedThisGmailSession, setHasImportedThisGmailSession] = useState(false);
+
+	// Day 0 Reveal — primary trigger. Fires the instant she lands on a
+	// bottom-nav/top-level tab having already imported something this
+	// session — the payoff for what she just watched happen, no wait
+	// required.
+	//
+	// NOT "previousView === gmail": the real single-item-import flow is
+	// gmail → edit (importing routes straight to the edit form) → carousel/
+	// wherever, so by the time she actually navigates to a top-level tab her
+	// immediately-previous view is "edit", not "gmail" — checking for
+	// "gmail" specifically would never fire in the common case. Instead:
+	// fire on any transition INTO a top-level view FROM a non-top-level one
+	// (edit, form, gmail, journey), which covers gmail → edit → carousel
+	// without also firing for someone bouncing between top-level tabs who
+	// never touched Gmail (hasImportedThisGmailSession stays false for them).
+	useEffect(() => {
+		const cameFromNonTopLevel = previousView !== null && !TOP_LEVEL_VIEWS.has(previousView);
+		if (cameFromNonTopLevel && TOP_LEVEL_VIEWS.has(view) && hasImportedThisGmailSession) {
+			reveal.handleTrigger();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [view, previousView, hasImportedThisGmailSession]);
 
 	useEffect(() => {
 		// Purge any sensitive data left over by pre-PR#76 builds on first load,
@@ -147,6 +179,7 @@ function AppShell() {
 			setEditMode("create");
 			setImportQueue([]);
 			setImportQueueIndex(0);
+			setHasImportedThisGmailSession(true);
 			setView("edit");
 		},
 		[setView, draftBySignature],
@@ -161,6 +194,7 @@ function AppShell() {
 			setImportQueueIndex(0);
 			setEditItem(clothingItems[0]);
 			setEditMode("create");
+			setHasImportedThisGmailSession(true);
 			setView("edit");
 		},
 		[setView],
@@ -237,9 +271,10 @@ function AppShell() {
 		return <WhatsChangedScreen bullets={whatsChanged.bullets} version={whatsChanged.version} onDismiss={whatsChanged.dismiss} />;
 	}
 
-	// Day 0 Reveal — fires once, the first time the Gmail import screen goes
-	// idle after actually returning results. See useReveal.ts / GmailImport's
-	// onIdle prop for the trigger.
+	// Day 0 Reveal — fires once, either the instant she navigates away from
+	// Gmail after importing something (the effect above) or, as a fallback,
+	// after a short idle spell on that screen with nothing left to page
+	// through (GmailImport's `onDone` prop).
 	if (reveal.show) {
 		return <RevealScreen stats={reveal.stats} onDismiss={reveal.dismiss} />;
 	}
@@ -275,7 +310,8 @@ function AppShell() {
 										onSourceEmailChange={handleSourceEmailChange}
 										unskippedByEmail={unskippedByEmail}
 										onUnskippedByEmailChange={handleUnskippedByEmailChange}
-										onIdle={reveal.handleIdle}
+										onDone={reveal.handleTrigger}
+									hasImported={hasImportedThisGmailSession}
 									/>
 								</ImportAccountGate>
 							)}

@@ -6,20 +6,19 @@ import { computeRevealStats } from "./revealStats";
 const DAY0 = "day0" as const;
 
 /**
- * Drives the Day 0 Reveal: whether it should show right now, the stats to
- * show it with, and the idle-trigger handoff from the Gmail import screen.
- *
- * This hook doesn't own the idle timer itself (that lives in GmailImport.tsx,
- * where the activity signal actually is) — `handleIdle` is what the import
- * screen calls once its own timer fires. Gating on `hasShown`/`markShown`
- * here (not just inside GmailImport) means the Reveal still only ever fires
- * once even if `handleIdle` were somehow called more than once.
+ * Drives the Day 0 Reveal: whether it should show right now, and the stats
+ * to show it with. `handleTrigger` is called from two places in App.tsx —
+ * navigating away from the Gmail view after an import (the primary,
+ * near-instant signal) and a short idle fallback inside GmailImport.tsx for
+ * someone who lingers there without navigating. Either way, gating on
+ * `hasShown`/`markShown` here means the Reveal still only ever fires once,
+ * even if both callers somehow fired.
  */
 export function useReveal(closet: ClothingItem[]) {
 	const { hasShown, markShown } = useRetentionLifecycle();
 	const [show, setShow] = useState(false);
 
-	const handleIdle = useCallback(() => {
+	const handleTrigger = useCallback(() => {
 		if (hasShown(DAY0)) return;
 		markShown(DAY0);
 		setShow(true);
@@ -29,5 +28,5 @@ export function useReveal(closet: ClothingItem[]) {
 
 	const stats = useMemo(() => computeRevealStats(closet), [closet]);
 
-	return { show, stats, handleIdle, dismiss };
+	return { show, stats, handleTrigger, dismiss };
 }
