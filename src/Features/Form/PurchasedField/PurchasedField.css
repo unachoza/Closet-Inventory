@@ -7,12 +7,20 @@
 .purchased-field__input,
 .purchased-field__select {
 	min-height: 44px;
-	padding: 0.55rem 0.75rem;
+	padding: 0.55rem 2rem 0.55rem 0.75rem;
 	border: 1px solid var(--border-hairline);
 	border-radius: var(--layout-radius-button);
 	background-color: var(--bg-surface-secondary);
 	color: var(--text-primary);
 	font-size: 0.95rem;
+	/* iOS Safari (and other UA defaults) draw their own select chevron that
+	 * clashes with the design system — replace it with one matching chevron
+	 * everywhere a native <select> is used. */
+	appearance: none;
+	-webkit-appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
 }
 
 .purchased-field__fallback {

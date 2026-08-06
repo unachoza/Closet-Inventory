@@ -690,10 +690,17 @@
 
 .gmail-skipped-chevron {
 	display: inline-flex;
-	width: 12px;
+	width: 10px;
+	height: 10px;
 	flex-shrink: 0;
 	color: var(--text-muted, #847057);
 	transition: transform 0.2s;
+}
+
+/* Rotate the "closed" (pointing-right) chevron down to indicate open, instead
+ * of swapping glyphs per state. */
+.gmail-preview-skipped-notice.is-open .gmail-skipped-chevron {
+	transform: rotate(90deg);
 }
 
 .gmail-skipped-list {

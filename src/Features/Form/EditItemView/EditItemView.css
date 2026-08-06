@@ -379,13 +379,21 @@ button.submit.ingestion-edit-form {
 
 .edit-form-condition__select {
 	height: 2.3rem;
-	padding: 0 0.5rem;
+	padding: 0 2rem 0 0.5rem;
 	border: 1px solid var(--border-strong);
 	border-radius: var(--border-radius-ty, 4px);
 	text-transform: capitalize;
 	background-color: var(--bg-surface-primary);
 	color: var(--text-primary);
 	width: 100%;
+	/* iOS Safari (and other UA defaults) draw their own select chevron that
+	 * clashes with the design system — replace it with one matching chevron
+	 * everywhere a native <select> is used. */
+	appearance: none;
+	-webkit-appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 0.65rem center;
 }
 
 .edit-form-purchase-date__display:disabled {

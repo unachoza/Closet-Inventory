@@ -812,7 +812,7 @@ button.toc-link:focus {
 .sort-caret {
       display: inline-block;
       margin-left: 6px;
-      font-size: 9px;
+      vertical-align: middle;
       opacity: 0.5;
 }
 
