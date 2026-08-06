@@ -168,3 +168,36 @@ feat: retention keystone — retentionLifecycle scheduler, createdAt, Day 0 Reve
   month back one for anyone west of UTC -- caught by a test, fixed by
   formatting in UTC
 - docs: mark backlog items 12-14 done in POST_BETA_BACKLOG.md
+
+
+
+fix: Reveal trigger — replace blind 2.5min idle with navigate-away + short idle fallback
+
+The original idle-only trigger never fired in testing: GmailImport only
+mounts once signed in and once a search has results, so 2.5 minutes of
+total silence was both slow to verify and rarely reached in practice.
+
+- Primary trigger, instant: fires the moment she lands on a top-level tab
+  (Closet/Care/Search/Profile) having imported something this Gmail
+  session. Tracked via hasImportedThisGmailSession, set in
+  handleGmailImport/handleGmailImportAll in App.tsx.
+- Fallback trigger, 10s (down from 2.5min): still lives in GmailImport
+  itself, now gated on hasImported and not hasNextPage -- only arms once
+  something's been imported AND there's nothing left to page through, so a
+  short pause is a real done signal instead of a blind guess.
+- Renamed GmailImport's onIdle prop to onDone and useReveal's handleIdle to
+  handleTrigger, since neither is purely idle-driven anymore.
+Caught a real bug building the primary trigger, not just by inspection --
+by a test. First pass checked previousView === gmail, but the actual
+single-item-import flow is gmail -> edit -> (later) carousel, since
+importing routes straight to the edit form. By the time she navigates to a
+top-level tab, previousView is edit, not gmail -- that check would never
+have fired in the realistic case. Fixed to fire on any transition into a
+top-level view from any non-top-level one (edit, form, gmail, journey),
+which covers the real flow without also firing for someone bouncing
+between top-level tabs who never touched Gmail.
+
+Added 8 new tests: 3 end-to-end through the real App (primary trigger,
+including the only-fires-once and no-import-no-reveal cases), 5 isolated
+on GmailImport's idle-fallback gating. tsc -b --noEmit clean, full suite
+1707 passing.
