@@ -43,3 +43,15 @@
 	font-size: var(--font-size-sm, 0.875rem);
 	color: var(--color-text-muted, inherit);
 }
+
+/* Shown while auth is still resolving, in place of returning `null` — a cold
+ * start on the Email tab used to render nothing at all here, which read as a
+ * broken feature rather than a still-loading one. */
+.import-gate__loading {
+	max-width: 34rem;
+	margin: 0 auto;
+	padding: var(--space-6, 1.5rem);
+	text-align: center;
+	color: var(--color-text-muted, inherit);
+	font-size: var(--font-size-sm, 0.875rem);
+}
