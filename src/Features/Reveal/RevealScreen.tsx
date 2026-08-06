@@ -7,7 +7,13 @@ import "./Reveal.css";
 
 export interface RevealScreenProps {
 	stats: RevealStats;
-	onDismiss: () => void;
+	/** "See your closet" — the primary CTA, always lands on Closet regardless
+	 *  of which of the 6 exit points triggered the Reveal. */
+	onGoToCloset: () => void;
+	/** "Continue hunting for online purchase receipts" — cancels whatever
+	 *  navigation triggered the Reveal and leaves her exactly where she was
+	 *  (the Gmail email list), rather than resuming that original attempt. */
+	onContinueHunting: () => void;
 }
 
 function formatDateRange(stats: RevealStats): string | null {
@@ -32,13 +38,20 @@ function formatValue(stats: RevealStats): string | null {
 }
 
 /**
- * Day 0 — The Reveal. Full-screen, one-time takeover, fired once the Gmail
- * import screen has gone idle (see useReveal.ts) — the payoff for watching a
- * closet build itself. Not skippable-then-forgotten: it only ever shows once
+ * Day 0 — The Reveal. Full-screen, one-time takeover — the payoff for
+ * watching a closet build itself. Fires by intercepting the first attempt to
+ * leave the Gmail email flow (hamburger drawer, profile, Closet/Care/Search,
+ * manual add — see the reveal-guard registered in App.tsx) after she's
+ * imported something, with a short-idle fallback for someone who abandons
+ * the screen without navigating (see useReveal.ts). Only ever shows once
  * (retentionLifecycle.ts), so it can afford to be the loudest thing in the
  * app, same reasoning as WhatsChangedScreen's one-time card.
+ *
+ * Two equally-real choices, not a primary action + a dismiss: whichever
+ * button she picks, the navigation attempt that triggered this is dropped —
+ * neither button "resumes" it, both go to a fixed destination.
  */
-export default function RevealScreen({ stats, onDismiss }: RevealScreenProps) {
+export default function RevealScreen({ stats, onGoToCloset, onContinueHunting }: RevealScreenProps) {
 	// StrictMode double-mounts effects; guard so "shown" fires once per actual
 	// appearance, matching WhatsChangedScreen/InstallStep's pattern.
 	const trackedShown = useRef(false);
@@ -58,8 +71,21 @@ export default function RevealScreen({ stats, onDismiss }: RevealScreenProps) {
 	const valueLine = formatValue(stats);
 	const dateRangeLine = formatDateRange(stats);
 
+	const handleGoToCloset = () => {
+		track("reveal_closet_clicked");
+		onGoToCloset();
+	};
+
+	const handleContinueHunting = () => {
+		track("reveal_continue_hunting_clicked");
+		onContinueHunting();
+	};
+
 	return (
-		<OnboardingShell cta={{ label: "See your closet", onClick: onDismiss }}>
+		<OnboardingShell
+			cta={{ label: "See your closet", onClick: handleGoToCloset }}
+			skip={{ label: "Keep Searching Emails", onClick: handleContinueHunting }}
+		>
 			<div className="onb-step reveal-step">
 				<p className="reveal-step__eyebrow">Your closet, imported</p>
 				<p className="reveal-step__stat">{stats.pieceCount}</p>

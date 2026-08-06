@@ -63,4 +63,23 @@ describe("useReveal", () => {
 
 		expect(fresh.current.show).toBe(false);
 	});
+
+	// handleTrigger's return value is what the reveal-guard in App.tsx uses
+	// synchronously to decide whether to hold the navigation it just
+	// intercepted — it can't wait for a re-render to read `show`.
+	it("handleTrigger returns true when it arms, false when it's a no-op", () => {
+		const { result } = renderHook(() => useReveal([makeItem({})]));
+
+		let armed = false;
+		act(() => {
+			armed = result.current.handleTrigger();
+		});
+		expect(armed).toBe(true);
+
+		let armedAgain = true;
+		act(() => {
+			armedAgain = result.current.handleTrigger();
+		});
+		expect(armedAgain).toBe(false);
+	});
 });
