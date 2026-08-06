@@ -130,6 +130,7 @@ export interface ItemFormData {
 	purchaseDate?: string;
 	price?: number;
 	care: string | string[];
+	source?: "gmail" | "manual";
 }
 
 export type CategoryType = "tops" | "bottoms" | "dresses" | "coats" | "sweaters" | "intimates" | "athleisure" | "socks" | "shoes" | "swim" | null;

@@ -15,6 +15,7 @@ const makeItem = (overrides: Partial<ClothingItem>): ClothingItem => ({
 	occasion: "",
 	age: "new",
 	care: "",
+	source: "gmail",
 	...overrides,
 });
 
@@ -33,7 +34,7 @@ describe("useReveal", () => {
 		const closet = [makeItem({ brand: "Aritzia" }), makeItem({ brand: "Zara" })];
 		const { result } = renderHook(() => useReveal(closet));
 
-		act(() => result.current.handleTrigger());
+		act(() => result.current.handleTrigger("gmail"));
 
 		expect(result.current.show).toBe(true);
 		expect(result.current.stats.pieceCount).toBe(2);
@@ -43,7 +44,7 @@ describe("useReveal", () => {
 	it("dismiss hides it again", () => {
 		const { result } = renderHook(() => useReveal([makeItem({})]));
 
-		act(() => result.current.handleTrigger());
+		act(() => result.current.handleTrigger("gmail"));
 		expect(result.current.show).toBe(true);
 
 		act(() => result.current.dismiss());
@@ -52,14 +53,14 @@ describe("useReveal", () => {
 
 	it("never shows again once already shown, even across remounts", () => {
 		const { result, unmount } = renderHook(() => useReveal([makeItem({})]));
-		act(() => result.current.handleTrigger());
+		act(() => result.current.handleTrigger("gmail"));
 		act(() => result.current.dismiss());
 		unmount();
 
 		// A fresh mount (e.g. next session) — idle fires again, but the
 		// lifecycle already recorded day0 as shown, so it must not re-show.
 		const { result: fresh } = renderHook(() => useReveal([makeItem({})]));
-		act(() => fresh.current.handleTrigger());
+		act(() => fresh.current.handleTrigger("gmail"));
 
 		expect(fresh.current.show).toBe(false);
 	});
@@ -72,13 +73,13 @@ describe("useReveal", () => {
 
 		let armed = false;
 		act(() => {
-			armed = result.current.handleTrigger();
+			armed = result.current.handleTrigger("gmail");
 		});
 		expect(armed).toBe(true);
 
 		let armedAgain = true;
 		act(() => {
-			armedAgain = result.current.handleTrigger();
+			armedAgain = result.current.handleTrigger("gmail");
 		});
 		expect(armedAgain).toBe(false);
 	});
