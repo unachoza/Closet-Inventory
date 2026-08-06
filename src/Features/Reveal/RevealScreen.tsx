@@ -68,7 +68,7 @@ export default function RevealScreen({ stats, onDismiss }: RevealScreenProps) {
 					{stats.brandCount} brand{stats.brandCount === 1 ? "" : "s"}
 					{valueLine ? `. ${valueLine}` : ""}.
 				</p>
-				{dateRangeLine && <p className="reveal-step__range">Imported from {dateRangeLine}.</p>}
+				{dateRangeLine && <p className="reveal-step__range">Imported from email receipts between{dateRangeLine}.</p>}
 			</div>
 		</OnboardingShell>
 	);
