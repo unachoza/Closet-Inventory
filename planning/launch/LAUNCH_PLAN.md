@@ -40,15 +40,7 @@ this push.
 - [ ] Google OAuth consent screen matches policy URL, app name, and scopes —
       policy URL is now `https://<domain>/privacy.html` (and
       `/terms.html`). **Service-worker check done:** the SW's navigation
-<<<<<<< Updated upstream
-      fallback was answering *every* navigation with `index.html`, so
-=======
-<<<<<<< HEAD
       fallback was answering _every_ navigation with `index.html`, so
-=======
-      fallback was answering *every* navigation with `index.html`, so
->>>>>>> 66a4b62 (Admin (#198))
->>>>>>> Stashed changes
       `/privacy.html` served the app shell. Fixed with
       `navigateFallbackDenylist` in `vite.config.ts`; verified against a
       production build with an active, controlling SW (page rendered the real
@@ -60,15 +52,7 @@ this push.
       re-add a Gmail line here: the primer is now accurate, and the fix for the
       mismatch was removing the scope (below), not restoring the copy.
 - [x] Scope audit (2026-08-04) — **the checklist's premise was inverted.**
-<<<<<<< Updated upstream
-      Account sign-in *was* requesting `gmail.readonly`
-=======
-<<<<<<< HEAD
       Account sign-in _was_ requesting `gmail.readonly`
-=======
-      Account sign-in *was* requesting `gmail.readonly`
->>>>>>> 66a4b62 (Admin (#198))
->>>>>>> Stashed changes
       (`useSupabaseAuth.ts`), and the resulting `session.provider_token` had
       **zero production consumers** (`grep -rn provider_token src` → only the
       hook itself, a log redaction regex, and tests). Gmail import runs its own
