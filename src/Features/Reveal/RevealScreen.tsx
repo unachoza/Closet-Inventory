@@ -29,7 +29,7 @@ function formatDateRange(stats: RevealStats): string | null {
 	const fmt = (iso: string) => new Date(iso).toLocaleDateString(undefined, { month: "long", year: "numeric", timeZone: "UTC" });
 	const earliest = fmt(stats.dateRange.earliest);
 	const latest = fmt(stats.dateRange.latest);
-	return earliest === latest ? earliest : `${earliest} – ${latest}`;
+	return earliest === latest ? earliest : ` ${earliest} – ${latest}`;
 }
 
 function formatValue(stats: RevealStats): string | null {
@@ -89,8 +89,8 @@ export default function RevealScreen({ stats, source, onGoToCloset, onContinueHu
 
 	return (
 		<OnboardingShell
-			cta={{ label: "See your closet", onClick: handleGoToCloset }}
-			skip={{ label: skipLabel, onClick: handleContinueHunting }}
+			cta={{ label: skipLabel, onClick: handleContinueHunting }}
+			skip={{ label: "See your closet", onClick: handleGoToCloset }}
 		>
 			<div className="onb-step reveal-step reveal-step--slide-up">
 				<p className="reveal-step__eyebrow">{eyebrow}</p>
@@ -101,7 +101,10 @@ export default function RevealScreen({ stats, source, onGoToCloset, onContinueHu
 					{valueLine ? `. ${valueLine}` : ""}.
 				</p>
 				{dateRangeLine && source === "gmail" && (
-					<p className="reveal-step__range">Imported from email receipts between {dateRangeLine}.</p>
+					<p className="reveal-step__range">
+						Imported from email receipts between <br />
+						{dateRangeLine}
+					</p>
 				)}
 			</div>
 		</OnboardingShell>
