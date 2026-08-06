@@ -3,7 +3,11 @@
       --viewport-padding: 1rem;
       position: fixed;
       right: 0;
-      bottom: 1rem;
+      /* Clear the mobile bottom nav the same way UpdateBanner/FeedbackButton
+       * do — otherwise a max-z-index toast renders directly on top of the
+       * tab bar for its whole duration. BottomNav hides itself via
+       * `display: none` at --bp-md-up, so this offset is harmless on desktop. */
+      bottom: calc(var(--bottom-nav-height, 60px) + 1rem + env(safe-area-inset-bottom, 0px));
       z-index: 2147483647;
       display: flex;
       flex-direction: column;

@@ -2,6 +2,26 @@ import { useEffect, useId, useState } from "react";
 import type { FormEvent } from "react";
 import "./PaginationControls.css";
 
+/* Unicode ←/→ glyphs render inconsistently across platforms (odd
+ * weight/baseline on iOS Safari especially) — a plain SVG chevron renders
+ * identically everywhere. Below --bp-xs the visible "Previous"/"Next" text is
+ * hidden and this becomes the button's only visual content, so it's worth
+ * fixing here even though each button also carries an aria-label. */
+function ChevronIcon({ direction }: { direction: "left" | "right" }) {
+	return (
+		<svg
+			width="10"
+			height="10"
+			viewBox="0 0 10 10"
+			fill="none"
+			aria-hidden="true"
+			style={direction === "left" ? { transform: "rotate(180deg)" } : undefined}
+		>
+			<path d="M3.5 1.5L7 5L3.5 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+		</svg>
+	);
+}
+
 interface PaginationControlsProps {
 	currentPage: number;
 	totalPages: number;
@@ -161,115 +181,117 @@ const PaginationControls = ({
 			)}
 
 			{showNav && (
-				<div className="pagination-controls">
-					<button
-						className="pagination-nav pagination-nav--previous"
-						type="button"
-						onClick={onPrev}
-						disabled={currentPage === 1}
-						aria-label="Go to previous page"
-					>
-						<span aria-hidden="true">←</span>
-						<span className="pagination-nav__label">Previous</span>
-					</button>
+				<div className="pagination-controls-container">
+					<div className="pagination-controls">
+						<button
+							className="pagination-nav pagination-nav--previous"
+							type="button"
+							onClick={onPrev}
+							disabled={currentPage === 1}
+							aria-label="Go to previous page"
+						>
+							<ChevronIcon direction="left" />
+							<span className="pagination-nav__label">Previous</span>
+						</button>
 
-					{/* Page numbers and the jump field are both jump affordances:
-					    without onGoToPage neither can do anything, so the row
-					    collapses to previous/next. */}
-					{onGoToPage && (
-						<>
-							<div className="pagination-pages" role="group" aria-label="Pages">
-								{getPaginationItems(currentPage, totalPages).map((item) => {
-									if (typeof item !== "number") {
+						{/* Page numbers and the jump field are both jump affordances:
+						without onGoToPage neither can do anything, so the row
+						collapses to previous/next. */}
+						{onGoToPage && (
+							<>
+								<div className="pagination-pages" role="group" aria-label="Pages">
+									{getPaginationItems(currentPage, totalPages).map((item) => {
+										if (typeof item !== "number") {
+											return (
+												<span
+													key={item}
+													className="pagination-ellipsis"
+													aria-hidden="true"
+												>
+													•••
+												</span>
+											);
+										}
+
+										const isCurrentPage = item === currentPage;
+
 										return (
-											<span
+											<button
 												key={item}
-												className="pagination-ellipsis"
-												aria-hidden="true"
+												className={`pagination-page${
+													isCurrentPage ? " pagination-page--current" : ""
+												}`}
+												type="button"
+												onClick={() => goToPage(item)}
+												// aria-disabled rather than disabled: the current
+												// page stays focusable so screen-reader users can
+												// reach it and hear aria-current.
+												aria-disabled={isCurrentPage || undefined}
+												aria-current={isCurrentPage ? "page" : undefined}
+												aria-label={
+													isCurrentPage
+														? `Page ${item}, current page`
+														: `Go to page ${item}`
+												}
 											>
-												•••
-											</span>
+												{item}
+											</button>
 										);
-									}
+									})}
+								</div>
 
-									const isCurrentPage = item === currentPage;
+								{/* Primary control below --bp-xs, where the number row is
+								hidden. A bounded number field rather than one <option>
+								per page: a 500-page closet shouldn't mean 500 nodes. */}
+								<form
+									className="pagination-jump"
+									onSubmit={handleJumpSubmit}
+									// Range checking happens in commitJump, not via the
+									// browser: a native constraint violation (out-of-range
+									// max) silently blocks the submit event before our
+									// handler ever runs, leaving a bad value on screen.
+									noValidate
+								>
+									<label className="pagination-jump__label" htmlFor={jumpInputId}>
+										Page
+									</label>
 
-									return (
-										<button
-											key={item}
-											className={`pagination-page${
-												isCurrentPage ? " pagination-page--current" : ""
-											}`}
-											type="button"
-											onClick={() => goToPage(item)}
-											// aria-disabled rather than disabled: the current
-											// page stays focusable so screen-reader users can
-											// reach it and hear aria-current.
-											aria-disabled={isCurrentPage || undefined}
-											aria-current={isCurrentPage ? "page" : undefined}
-											aria-label={
-												isCurrentPage
-													? `Page ${item}, current page`
-													: `Go to page ${item}`
-											}
-										>
-											{item}
-										</button>
-									);
-								})}
-							</div>
+									<input
+										id={jumpInputId}
+										className="pagination-jump__input"
+										type="number"
+										inputMode="numeric"
+										min={1}
+										max={totalPages}
+										step={1}
+										value={jumpDraft}
+										onChange={(event) => setJumpDraft(event.target.value)}
+										onBlur={commitJump}
+									/>
 
-							{/* Primary control below --bp-xs, where the number row is
-							    hidden. A bounded number field rather than one <option>
-							    per page: a 500-page closet shouldn't mean 500 nodes. */}
-							<form
-								className="pagination-jump"
-								onSubmit={handleJumpSubmit}
-								// Range checking happens in commitJump, not via the
-								// browser: a native constraint violation (out-of-range
-								// max) silently blocks the submit event before our
-								// handler ever runs, leaving a bad value on screen.
-								noValidate
-							>
-								<label className="pagination-jump__label" htmlFor={jumpInputId}>
-									Page
-								</label>
+									<span className="pagination-jump__total">of {totalPages}</span>
 
-								<input
-									id={jumpInputId}
-									className="pagination-jump__input"
-									type="number"
-									inputMode="numeric"
-									min={1}
-									max={totalPages}
-									step={1}
-									value={jumpDraft}
-									onChange={(event) => setJumpDraft(event.target.value)}
-									onBlur={commitJump}
-								/>
+									{/* Invisible submit control: jsdom (and some browsers) only
+									treat Enter in a lone text input as an implicit submit
+									when a submit control is present in the form. */}
+									<button type="submit" className="pagination-jump__submit">
+										Go
+									</button>
+								</form>
+							</>
+						)}
 
-								<span className="pagination-jump__total">of {totalPages}</span>
-
-								{/* Invisible submit control: jsdom (and some browsers) only
-								    treat Enter in a lone text input as an implicit submit
-								    when a submit control is present in the form. */}
-								<button type="submit" className="pagination-jump__submit">
-									Go
-								</button>
-							</form>
-						</>
-					)}
-
-					<button
-						className="pagination-nav pagination-nav--next"
-						type="button"
-						onClick={onNext}
-						disabled={currentPage === totalPages}
-						aria-label="Go to next page"
-					>
-						<span className="pagination-nav__label">Next</span>
-						<span aria-hidden="true">→</span>
-					</button>
+						<button
+							className="pagination-nav pagination-nav--next"
+							type="button"
+							onClick={onNext}
+							disabled={currentPage === totalPages}
+							aria-label="Go to next page"
+						>
+							<span className="pagination-nav__label">Next</span>
+							<ChevronIcon direction="right" />
+						</button>
+					</div>
 				</div>
 			)}
 		</nav>

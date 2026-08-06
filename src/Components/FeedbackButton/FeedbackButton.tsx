@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { MessageSquare } from "lucide-react";
 import { useSupabaseAuthContext } from "../../context/SupabaseAuthContext";
+import { showFeedbackButton } from "../../config/features";
 import FeedbackPanel from "./FeedbackPanel";
 import "./FeedbackButton.css";
 
 /**
  * Floating "Feedback" affordance for the founding-members beta. Opens the
  * shared FeedbackPanel (also reachable from the profile page). Only shown to
- * signed-in users — the feedback table's RLS requires an authenticated author.
+ * signed-in users — the feedback table's RLS requires an authenticated author
+ * — and only when gated on with `showFeedbackButton()` (see config/features.ts).
  */
 export default function FeedbackButton() {
 	const { user } = useSupabaseAuthContext();
 	const [open, setOpen] = useState(false);
 
-	if (!user) return null;
+	if (!user || !showFeedbackButton()) return null;
 
 	return (
 		<div className="feedback">

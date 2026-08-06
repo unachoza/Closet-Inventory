@@ -99,12 +99,19 @@ isn't on the 3-day launch plan, it goes here — not into the branch.
     disproportionately on iOS Safari, including versions below 16.4 — see
     the existing old-Safari CSS constraints (range-syntax media queries and
     `color-mix()` both need fallbacks).
-16. **Safari default UI cleanup.** Native `<select>` arrows and other UA-default
-    controls look wrong against the design system. Needs
-    `appearance: none` + custom chevron on selects, and an audit of any other
-    control rendering with Safari defaults.
-    *Candidate for promotion into launch — it's visible on the exact browser
-    most testers will use.*
+16. ~~**Safari default UI cleanup.**~~ Promoted into launch and done
+    2026-08-06 (PR #200): `appearance: none` + a matching `currentColor` SVG
+    chevron added to all 6 `<select>` usages (`PurchasedField` month/year,
+    `EditItemView` condition/status/location, `SearchSortBar` sort). Widened
+    in the same pass to the same root problem in a different form — raw
+    Unicode arrow/caret glyphs (▼▶▲↕←→), which render inconsistently across
+    platforms just like native select chevrons — fixed in the Gmail
+    skipped-items toggle, the Fiber Comparison sort caret, and
+    `PaginationControls`'s prev/next buttons. Not touched: `<input
+    type="date">`'s native picker chrome (3 usages) — a materially bigger
+    lift than a CSS fix, and inline typographic arrows in prose/CTA text
+    (e.g. "Open Your Fabrics →"), a different risk category since they
+    render in the surrounding font rather than as an isolated control glyph.
 17. **Emoji → Noun Project icons.** No emoji in the UI. Swap every one for an
     icon from the Noun Project library already licensed for this project.
     Needs: an inventory of current emoji use, a shared `<Icon>` component, and

@@ -16,6 +16,12 @@
 	font-weight: 500;
 	line-height: 1.5;
 	text-align: center;
+	padding: 6px;
+	background: rgba(255, 255, 255, 0.15);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-radius: 3px;
+	box-shadow: 0 0 10px rgb(242 242 242 / 71%);
 }
 
 .pagination-count strong {
@@ -30,23 +36,34 @@
  * a mobile affordance and is pulled out of the flow here — the numbered
  * buttons already do the same job, and duplicating them cost a whole column.
  */
-.pagination-controls {
-	display: grid;
-	grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr);
-	align-items: center;
-	gap: 1rem;
-
-	width: min(100%, 72rem);
-	margin-top: 1rem;
-	padding: 0.85rem 1rem;
+ /*
+  * Owns the glass surface (background/border/blur) so it spans the full
+  * viewport width edge-to-edge; .pagination-controls below is a pure content
+  * wrapper capped at 72rem and centered inside this container. Previously the
+  * surface styling lived on the inner element, so the glass background never
+  * rendered past ~72rem even though this container was already 100vw wide.
+  */
+ .pagination-controls-container{
+	width: 100vw;
+	display: flex;
+	justify-content: center;
 
 	color: var(--text-primary);
 	background: var(--bg-surface-glass);
-	border: 1px solid var(--border-hairline);
-	border-radius: var(--border-radius-ty);
+	border-top: 1px solid var(--border-hairline);
 
 	backdrop-filter: var(--effect-blur-glass);
 	-webkit-backdrop-filter: var(--effect-blur-glass);
+ }
+
+.pagination-controls {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	width: min(100%, 72rem);
+	margin-top: 1rem;
+	padding: 0.85rem 1rem;
+	justify-content: center;
 }
 
 /* ── Previous / next ──────────────────────────────────────────────────────── */
@@ -189,7 +206,7 @@
 .pagination-jump__label,
 .pagination-jump__total {
 	color: var(--text-muted);
-	font-size: 0.8rem;
+	font-size: 0.9rem;
 	font-weight: 500;
 	white-space: nowrap;
 }
@@ -260,24 +277,24 @@
 @media (--bp-md) {
 	/*
 	 * Pagination sits outside .items-overview as a full-width sibling.
-	 * Keep the navigation reachable while the user scrolls.
+	 * Keep the navigation reachable while the user scrolls. Sticky now lives
+	 * on the container (the full-width glass surface) rather than the inner
+	 * content wrapper, so the whole surface pins together instead of only
+	 * the centered ≤72rem box sticking while its background stays static.
 	 */
-	.pagination-controls {
+	.pagination-controls-container {
 		position: sticky;
 		bottom: 0;
 		z-index: 5;
+	}
 
+	.pagination-controls {
 		grid-template-columns: auto 1fr auto;
 		gap: 0.75rem;
 
 		width: 100%;
 		margin: 0;
 		padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
-
-		border-right: 0;
-		border-bottom: 0;
-		border-left: 0;
-		border-radius: 0;
 	}
 }
 
@@ -289,6 +306,7 @@
 
 	.pagination-controls {
 		gap: 0.6rem;
+		justify-content: space-between;
 	}
 
 	.pagination-nav {

@@ -423,7 +423,27 @@ const InteractiveGuide = () => {
 											aria-sort={sortKey === key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
 										>
 											{label}
-											<span className="sort-caret">{sortKey === key ? (sortDir === "asc" ? "▲" : "▼") : "↕"}</span>
+											{/* Unicode ▲/▼/↕ glyphs render inconsistently across platforms
+											    (odd weight/baseline on iOS Safari especially) — a plain SVG,
+											    rotated per state, renders identically everywhere. */}
+											<svg
+												className="sort-caret"
+												width="9"
+												height="9"
+												viewBox="0 0 10 10"
+												fill="none"
+												aria-hidden="true"
+												style={sortKey === key && sortDir === "desc" ? { transform: "rotate(180deg)" } : undefined}
+											>
+												{sortKey === key ? (
+													<path d="M1.5 7L5 3L8.5 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+												) : (
+													<>
+														<path d="M2 4.5L5 1.5L8 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+														<path d="M2 5.5L5 8.5L8 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+													</>
+												)}
+											</svg>
 										</th>
 									))}
 								</tr>

@@ -30,8 +30,17 @@ export default function ImportAccountGate({ children }: { children: ReactNode })
 		if (!isLoading && !isAuthenticated) track("import_gate_shown");
 	}, [isLoading, isAuthenticated]);
 
-	// Say nothing until auth resolves, so a signed-in user never sees the gate flash.
-	if (isLoading) return null;
+	// Don't show the WRONG content (the sign-in gate) while auth resolves, so a
+	// signed-in user never sees it flash — but don't show nothing either, since
+	// a cold-start tap on this tab used to render a blank screen and read as
+	// broken. This loading state is neither the gate nor the real content.
+	if (isLoading) {
+		return (
+			<div className="import-gate__loading" role="status" aria-label="Checking your account">
+				Checking your account…
+			</div>
+		);
+	}
 	if (isAuthenticated) return <>{children}</>;
 
 	return (

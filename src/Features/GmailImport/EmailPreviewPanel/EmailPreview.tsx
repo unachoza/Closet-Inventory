@@ -184,7 +184,20 @@ export default function EmailPreview({ email, onImportProduct, onImportAllProduc
 					onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setShowSkipped(!showSkipped)}
 				>
 					<div className="gmail-skipped-toggle">
-						<span className="gmail-skipped-chevron">{showSkipped ? "▼" : "▶"}</span>
+						{/* Unicode ▼/▶ glyphs render inconsistently across platforms (odd
+						    weight/baseline on iOS Safari in particular, same class of issue
+						    as native <select> arrows) — a plain SVG chevron, rotated via
+						    CSS instead of swapped per-state, renders identically everywhere. */}
+						<svg
+							className="gmail-skipped-chevron"
+							width="10"
+							height="10"
+							viewBox="0 0 10 10"
+							fill="none"
+							aria-hidden="true"
+						>
+							<path d="M2.5 1.5L7 5L2.5 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+						</svg>
 						{skippedProducts.length} item{skippedProducts.length !== 1 ? "s" : ""} skipped — not clothing
 					</div>
 					{showSkipped && (
