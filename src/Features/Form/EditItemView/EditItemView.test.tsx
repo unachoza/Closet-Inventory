@@ -129,6 +129,21 @@ describe("EditItemView", () => {
 		expect(mockAddFullItem).toHaveBeenCalledWith(expect.objectContaining({ condition: "good", purchaseDate: "2024-03-15T00:00:00.000Z" }));
 	});
 
+	// Normalized 2026-08-06: a single (non-batch) Gmail import now returns to
+	// the email list, matching batch mode, instead of dumping to the closet —
+	// see the doc comment in handleSubmit for why. Regular item edits (not
+	// create mode) are untouched — see "has a close icon" above, still
+	// asserting "carousel".
+	it("returns to the email list, not the closet, after a single-item Gmail import", async () => {
+		render(<EditItemView item={mockItem} setView={mockSetView} mode="create" />);
+
+		fireEvent.click(screen.getByText("Add to Closet"));
+
+		expect(mockAddFullItem).toHaveBeenCalled();
+		await vi.waitFor(() => expect(mockSetView).toHaveBeenCalledWith("gmail"));
+		expect(mockSetView).not.toHaveBeenCalledWith("carousel");
+	});
+
 	it("hands the in-progress draft up when returning to the email (E3-bug.8)", () => {
 		const onReturnToEmail = vi.fn();
 		render(<EditItemView item={mockItem} mode="create" setView={mockSetView} onReturnToEmail={onReturnToEmail} />);

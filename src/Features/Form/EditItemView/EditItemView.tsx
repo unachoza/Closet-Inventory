@@ -242,6 +242,19 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				setTimeout(() => onItemAdded());
 				return;
 			}
+
+			// Normalized 2026-08-06: a single-item Gmail import now returns to
+			// the email list, same as batch mode, instead of dumping straight to
+			// the closet. `isCreateMode` only ever comes from a Gmail import
+			// (App.tsx's editMode is "create" only inside
+			// handleGmailImport/handleGmailImportAll) — never from the manual-add
+			// wizard, which is a different component entirely. Consistency was
+			// the immediate goal; it also means the Reveal's guard (App.tsx)
+			// only ever gets a chance to intercept a navigation AWAY from Gmail,
+			// never fires seconds after a single import before she's seen
+			// anything else.
+			setTimeout(() => setView("gmail"));
+			return;
 		} else {
 			updateItem(item.id, {
 				...formData,
