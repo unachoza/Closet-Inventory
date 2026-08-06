@@ -139,3 +139,32 @@ not a forward-looking plan anymore:
 `useClosetFabrics.ts`, and `retentionLifecycle.ts` were the "build phase"
 items called out here — `useClosetFabrics.ts` has since shipped (Day 7,
 above); the rest are sequenced in `POST_BETA_BACKLOG.md`.
+
+
+feat: retention keystone — retentionLifecycle scheduler, createdAt, Day 0 Reveal
+
+- retentionLifecycle.ts + useRetentionLifecycle.ts: generalizes
+  demoLifecycle.ts's show-once pattern into a { day0, day2_3, day14, day30 }
+  persisted map, so every retention horizon shares one scheduler instead of
+  reinventing show-once bookkeeping
+- createdAt on ClothingItem: DB column already existed and was read then
+  discarded (supabaseClosetRepository.rowToItem) -- now mapped through;
+  localClosetRepository.add() stamps it for local-only items, same pattern
+  as updatedAt. No migration needed.
+- Day 0 Reveal: full-screen one-time card (WhatsChangedScreen precedent)
+  showing piece count, brand count, closet value (flags incomplete totals
+  with '+' rather than presenting an undercount as exact), and the imported
+  date range. Trigger is idle-based via a new generic useIdleTimer hook,
+  wired into GmailImport (2.5 min idle, only armed after a search actually
+  returns results) rather than the existing import_finished event, which
+  fires once per session rather than once ever.
+- fix: FabricProfileCard used fabrics.length instead of resolvableCount,
+  contradicting its own 'same rule as Care tab' doc comment (regression
+  test included, confirmed failing on the old code)
+- 33 new tests across retentionLifecycle, useIdleTimer, revealStats,
+  RevealScreen, and the useReveal integration hook
+- fix: RevealScreen's date-range formatting used the browser's local
+  timezone on a UTC midnight timestamp, silently shifting the displayed
+  month back one for anyone west of UTC -- caught by a test, fixed by
+  formatting in UTC
+- docs: mark backlog items 12-14 done in POST_BETA_BACKLOG.md
