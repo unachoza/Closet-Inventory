@@ -19,8 +19,14 @@ type NavGuard = () => boolean;
  * "swallow this navigation attempt entirely," not "hold it to resume
  * later": both of the Reveal's own actions (see closet / continue hunting)
  * have fixed destinations, so there's nothing to resume.
+ *
+ * Takes the resolved destination `ViewType` so the guard can distinguish a
+ * real "leaving Gmail" navigation from an in-flow step like "edit" (e.g. a
+ * second import while still on the email list) — see Bug A: without this,
+ * the guard couldn't tell the two apart and silently dropped the second
+ * import's navigation.
  */
-type RevealGuard = () => boolean;
+type RevealGuard = (next: ViewType) => boolean;
 
 interface ViewContextType {
 	view: ViewType;
@@ -45,6 +51,10 @@ interface ViewProviderProps {
 export function ViewProvider({ children, initialView = "carousel" }: ViewProviderProps) {
 	const [view, setViewState] = useState<ViewType>(initialView);
 	const [previousView, setPreviousView] = useState<ViewType | null>(null);
+	// Mirrors `view` synchronously (state updates are async) so setView can
+	// resolve a function-form action to a concrete ViewType for the reveal
+	// guard without invoking the updater a second time inside applyView.
+	const viewRef = useRef<ViewType>(initialView);
 
 	// Held in a ref so registering/clearing a guard never re-renders consumers.
 	const navGuardRef = useRef<NavGuard | null>(null);
@@ -63,12 +73,12 @@ export function ViewProvider({ children, initialView = "carousel" }: ViewProvide
 
 	// Immutable transition: remember where we came from, then move. Supports
 	// both a plain value (setView("form")) and the updater form.
-	const applyView = useCallback((action: SetStateAction<ViewType>) => {
+	const applyView = useCallback((next: ViewType) => {
 		setViewState((current) => {
-			const next = typeof action === "function" ? (action as (prev: ViewType) => ViewType)(current) : action;
 			setPreviousView(current);
 			return next;
 		});
+		viewRef.current = next;
 	}, []);
 
 	// Any navigation surface (bottom nav, drawer, deep link) routes through here;
@@ -83,10 +93,14 @@ export function ViewProvider({ children, initialView = "carousel" }: ViewProvide
 				setPendingAction(() => action);
 				return;
 			}
-			if (revealGuardRef.current?.()) {
+			// Resolve once here — the updater form (if ever used) must not run a
+			// second time inside applyView, or a function-form caller would see
+			// its updater invoked twice.
+			const next = typeof action === "function" ? (action as (prev: ViewType) => ViewType)(viewRef.current) : action;
+			if (revealGuardRef.current?.(next)) {
 				return;
 			}
-			applyView(action);
+			applyView(next);
 		},
 		[applyView],
 	);
@@ -94,7 +108,10 @@ export function ViewProvider({ children, initialView = "carousel" }: ViewProvide
 	const confirmDiscard = useCallback(() => {
 		navGuardRef.current = null;
 		setPendingAction((pending: SetStateAction<ViewType> | null) => {
-			if (pending !== null) applyView(pending);
+			if (pending !== null) {
+				const next = typeof pending === "function" ? (pending as (prev: ViewType) => ViewType)(viewRef.current) : pending;
+				applyView(next);
+			}
 			return null;
 		});
 	}, [applyView]);

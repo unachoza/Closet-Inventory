@@ -10,11 +10,15 @@ const DAY0 = "day0" as const;
  * to show it with.
  *
  * `handleTrigger` has two callers in App.tsx: the reveal-guard registered
- * with ViewContext (the primary signal — she's tried to leave the Gmail
- * flow having imported something) and a short idle fallback inside
- * GmailImport.tsx for someone who lingers there without navigating. Either
- * way, gating on `hasShown`/`markShown` here means the Reveal still only
- * ever fires once, even if both callers somehow fired.
+ * with ViewContext (leaving Gmail having imported something) and the
+ * manual-add 3-item threshold. Both share the single `day0` horizon — the
+ * Reveal is a once-ever payoff regardless of which acquisition path earned
+ * it, so whichever fires first wins and the other becomes a no-op via
+ * `hasShown`/`markShown`.
+ *
+ * `source` records which path triggered it, so the stats (and RevealScreen's
+ * copy) can be scoped to items from that same source rather than mixing
+ * Gmail imports and manual adds together.
  *
  * Returns whether it actually armed (true) or was a no-op because it's
  * already been shown (false) — the reveal-guard needs this synchronously,
@@ -23,17 +27,22 @@ const DAY0 = "day0" as const;
 export function useReveal(closet: ClothingItem[]) {
 	const { hasShown, markShown } = useRetentionLifecycle();
 	const [show, setShow] = useState(false);
+	const [source, setSource] = useState<"gmail" | "manual">("gmail");
 
-	const handleTrigger = useCallback((): boolean => {
-		if (hasShown(DAY0)) return false;
-		markShown(DAY0);
-		setShow(true);
-		return true;
-	}, [hasShown, markShown]);
+	const handleTrigger = useCallback(
+		(triggerSource: "gmail" | "manual"): boolean => {
+			if (hasShown(DAY0)) return false;
+			markShown(DAY0);
+			setSource(triggerSource);
+			setShow(true);
+			return true;
+		},
+		[hasShown, markShown],
+	);
 
 	const dismiss = useCallback(() => setShow(false), []);
 
-	const stats = useMemo(() => computeRevealStats(closet), [closet]);
+	const stats = useMemo(() => computeRevealStats(closet, source), [closet, source]);
 
-	return { show, stats, handleTrigger, dismiss };
+	return { show, stats, source, handleTrigger, dismiss };
 }

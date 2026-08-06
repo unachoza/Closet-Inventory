@@ -20,6 +20,10 @@ import { useToast } from "../../Components/Toast/Toast";
 export interface FormProps {
 	setView: Dispatch<SetStateAction<ViewType>>;
 	initialData?: Partial<ItemFormData>;
+	/** Day 0 Reveal — manual-add path. Fires once a manual add actually
+	 *  succeeds, so the parent can count qualifying adds toward the
+	 *  3-item threshold (see App.tsx). */
+	onManualItemAdded?: () => void;
 }
 
 const BRAND_OPTIONS_KEY = "my_brands_key";
@@ -31,7 +35,7 @@ const STEP_BASICS = 3;
 const STEP_DETAILS = 4;
 const TOTAL_STEPS = 4;
 
-const MultiStepForm = ({ setView, initialData }: FormProps) => {
+const MultiStepForm = ({ setView, initialData, onManualItemAdded }: FormProps) => {
 	const [step, setStep] = useState(STEP_PHOTO);
 	const [formData, setFormData] = useState<ItemFormData>({
 		...formItem,
@@ -134,8 +138,9 @@ const MultiStepForm = ({ setView, initialData }: FormProps) => {
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 
-		addItem({ ...formData, name: displayName });
+		addItem({ ...formData, name: displayName, source: "manual" });
 		showToast(`${formData.category} added to your closet!`);
+		onManualItemAdded?.();
 
 		setNavGuard(null);
 		setFormData(formItem);

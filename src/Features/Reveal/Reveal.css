@@ -48,3 +48,27 @@
 	font-size: 13px;
 	color: var(--text-muted);
 }
+
+/* Entrance transition — the Reveal used to appear as an abrupt full-tree
+   swap (App.tsx's early return). This softens the takeover moment with a
+   slide-up-from-bottom + fade, without touching the swap itself. */
+@keyframes reveal-slide-up {
+	from {
+		opacity: 0;
+		transform: translateY(24px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.reveal-step--slide-up {
+	animation: reveal-slide-up 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal-step--slide-up {
+		animation: none;
+	}
+}

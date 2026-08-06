@@ -55,10 +55,19 @@ vi.mock("./Features/SearchCloset/EntireClosetView/EntireClosetView", () => ({
 
 // Mimics EditItemView's real, now-normalized post-submit destination
 // (setView("gmail")) via a button, instead of driving the real form fields.
+// Also fires `onGmailItemAdded` — the real component's add-time signal that
+// the reveal-guard's `hasImportedThisGmailSession` flag now depends on
+// (moved off the click-time trigger to fix Bug B).
 vi.mock("./Features/Form/EditItemView/EditItemView", () => ({
-	default: ({ setView }: { setView: Dispatch<SetStateAction<ViewType>> }) => (
+	default: ({ setView, onGmailItemAdded }: { setView: Dispatch<SetStateAction<ViewType>>; onGmailItemAdded?: () => void }) => (
 		<div data-testid="view-edit">
-			<button type="button" onClick={() => setView("gmail")}>
+			<button
+				type="button"
+				onClick={() => {
+					onGmailItemAdded?.();
+					setView("gmail");
+				}}
+			>
 				Simulate Add To Closet
 			</button>
 		</div>
@@ -181,5 +190,18 @@ describe("Day 0 Reveal — reveal-guard interception", () => {
 
 		expect(await screen.findByText(/your closet, imported/i)).toBeInTheDocument();
 		expect(screen.queryByTestId("view-form")).not.toBeInTheDocument();
+	});
+
+	// Bug A regression: a second import started while still on the email list
+	// must land on the edit screen, not be swallowed by the reveal-guard —
+	// "edit" is deliberately absent from the destination allowlist.
+	it("does not swallow a second import's navigation to edit after the first import", async () => {
+		render(<App />);
+		await importOneItem();
+
+		fireEvent.click(await screen.findByRole("button", { name: /simulate import/i }));
+
+		expect(await screen.findByTestId("view-edit")).toBeInTheDocument();
+		expect(screen.queryByText(/your closet, imported/i)).not.toBeInTheDocument();
 	});
 });

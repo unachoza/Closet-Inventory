@@ -102,6 +102,11 @@ export type ClothingItem = {
 	 *  Supabase items read it straight from the DB's own `created_at` column. */
 	createdAt?: string;
 
+	// ── acquisition source (Day 0 Reveal, stats filtering) ────────────────────
+	/** How this item entered the closet — 'gmail' for email imports, 'manual'
+	 *  for hand-added items. Session-only (not persisted to Supabase yet). */
+	source?: "gmail" | "manual";
+
 	// ── demo-seed marker (BUG-2) ──────────────────────────────────────────────
 	// True only for the starter closet (MY_CLOSET_DATA). Demo items are shown
 	// locally so a new closet isn't empty, but must NEVER be pushed to the cloud

@@ -7,12 +7,15 @@ import "./Reveal.css";
 
 export interface RevealScreenProps {
 	stats: RevealStats;
+	/** Which acquisition path earned this Reveal — drives copy: "imported
+	 *  from email receipts" is only true for 'gmail'. */
+	source: "gmail" | "manual";
 	/** "See your closet" — the primary CTA, always lands on Closet regardless
 	 *  of which of the 6 exit points triggered the Reveal. */
 	onGoToCloset: () => void;
-	/** "Continue hunting for online purchase receipts" — cancels whatever
-	 *  navigation triggered the Reveal and leaves her exactly where she was
-	 *  (the Gmail email list), rather than resuming that original attempt. */
+	/** Secondary action — cancels whatever navigation triggered the Reveal
+	 *  (Gmail: "Keep Searching Emails", stays on the email list) or is a
+	 *  fixed destination (manual: "Add another item", back to the wizard). */
 	onContinueHunting: () => void;
 }
 
@@ -51,7 +54,7 @@ function formatValue(stats: RevealStats): string | null {
  * button she picks, the navigation attempt that triggered this is dropped —
  * neither button "resumes" it, both go to a fixed destination.
  */
-export default function RevealScreen({ stats, onGoToCloset, onContinueHunting }: RevealScreenProps) {
+export default function RevealScreen({ stats, source, onGoToCloset, onContinueHunting }: RevealScreenProps) {
 	// StrictMode double-mounts effects; guard so "shown" fires once per actual
 	// appearance, matching WhatsChangedScreen/InstallStep's pattern.
 	const trackedShown = useRef(false);
@@ -81,20 +84,25 @@ export default function RevealScreen({ stats, onGoToCloset, onContinueHunting }:
 		onContinueHunting();
 	};
 
+	const eyebrow = source === "gmail" ? "Your closet, imported" : "Your closet, growing";
+	const skipLabel = source === "gmail" ? "Keep Searching Emails" : "Add another item";
+
 	return (
 		<OnboardingShell
 			cta={{ label: "See your closet", onClick: handleGoToCloset }}
-			skip={{ label: "Keep Searching Emails", onClick: handleContinueHunting }}
+			skip={{ label: skipLabel, onClick: handleContinueHunting }}
 		>
-			<div className="onb-step reveal-step">
-				<p className="reveal-step__eyebrow">Your closet, imported</p>
+			<div className="onb-step reveal-step reveal-step--slide-up">
+				<p className="reveal-step__eyebrow">{eyebrow}</p>
 				<p className="reveal-step__stat">{stats.pieceCount}</p>
 				<p className="reveal-step__label">piece{stats.pieceCount === 1 ? "" : "s"} tracked</p>
 				<p className="reveal-step__line">
 					{stats.brandCount} brand{stats.brandCount === 1 ? "" : "s"}
 					{valueLine ? `. ${valueLine}` : ""}.
 				</p>
-				{dateRangeLine && <p className="reveal-step__range">Imported from email receipts between{dateRangeLine}.</p>}
+				{dateRangeLine && source === "gmail" && (
+					<p className="reveal-step__range">Imported from email receipts between {dateRangeLine}.</p>
+				)}
 			</div>
 		</OnboardingShell>
 	);

@@ -28,9 +28,15 @@ export interface RevealStats {
  * Aggregates the stats the Day 0 Reveal needs, from the closet alone — no
  * new data source. Always excludes `isDemo` items, same rule as every other
  * closet-wide stat in the app (useClosetFabrics, useClosetFilters).
+ *
+ * `source` narrows to items that actually came from that acquisition path
+ * (Gmail import vs. manual add) — otherwise the Gmail Reveal would count a
+ * manually-added item toward "imported from email receipts" and vice versa.
+ * Undefined counts everything (used nowhere currently, kept for callers that
+ * don't care).
  */
-export function computeRevealStats(closet: ClothingItem[]): RevealStats {
-	const ownItems = closet.filter((item) => !item.isDemo);
+export function computeRevealStats(closet: ClothingItem[], source?: "gmail" | "manual"): RevealStats {
+	const ownItems = closet.filter((item) => !item.isDemo && (source === undefined || item.source === source));
 
 	const brands = new Set(
 		ownItems.map((item) => item.brand?.trim()).filter((brand): brand is string => Boolean(brand)),

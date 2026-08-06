@@ -83,11 +83,29 @@ export interface EditItemViewProps {
 	onReturnToEmail?: (draft: Partial<ClothingItem>) => void;
 	onSkipItem?: () => void;
 	onItemAdded?: () => void;
+	/**
+	 * Day 0 Reveal — add-time signal, distinct from `onItemAdded` (which is
+	 * batch-only and drives queue advancement). Fires unconditionally, once,
+	 * whenever a create-mode add actually succeeds — single or batch alike —
+	 * so the Reveal guard has an accurate "an import really landed" flag
+	 * instead of one set on click (Bug B).
+	 */
+	onGmailItemAdded?: () => void;
 	queuePosition?: number;
 	queueTotal?: number;
 }
 
-const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipItem, onItemAdded, queuePosition, queueTotal }: EditItemViewProps) => {
+const EditItemView = ({
+	item,
+	mode = "edit",
+	setView,
+	onReturnToEmail,
+	onSkipItem,
+	onItemAdded,
+	onGmailItemAdded,
+	queuePosition,
+	queueTotal,
+}: EditItemViewProps) => {
 	const isCreateMode = mode === "create";
 	const isInBatchMode = queuePosition !== undefined && queueTotal !== undefined;
 
@@ -234,9 +252,12 @@ const EditItemView = ({ item, mode = "edit", setView, onReturnToEmail, onSkipIte
 				material: normalizeMaterial(formData.material),
 				condition: formData.condition ?? "new",
 				notes: finalNotesArray, // Injected parsed string[]
+				// Preserve the source marker stamped by the import path (App.tsx).
+				source: item.source,
 			} as ClothingItem);
 
 			showToast(`${displayName} added to your closet!`);
+			onGmailItemAdded?.();
 
 			if (isInBatchMode && onItemAdded) {
 				setTimeout(() => onItemAdded());

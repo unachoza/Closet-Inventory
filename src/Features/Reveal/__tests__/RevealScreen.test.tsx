@@ -15,8 +15,18 @@ const baseStats: RevealStats = {
 	dateRange: { earliest: "2024-05-15T00:00:00.000Z", latest: "2026-06-01T00:00:00.000Z" },
 };
 
-function renderScreen(stats: RevealStats, overrides: { onGoToCloset?: () => void; onContinueHunting?: () => void } = {}) {
-	return render(<RevealScreen stats={stats} onGoToCloset={overrides.onGoToCloset ?? vi.fn()} onContinueHunting={overrides.onContinueHunting ?? vi.fn()} />);
+function renderScreen(
+	stats: RevealStats,
+	overrides: { onGoToCloset?: () => void; onContinueHunting?: () => void; source?: "gmail" | "manual" } = {},
+) {
+	return render(
+		<RevealScreen
+			stats={stats}
+			source={overrides.source ?? "gmail"}
+			onGoToCloset={overrides.onGoToCloset ?? vi.fn()}
+			onContinueHunting={overrides.onContinueHunting ?? vi.fn()}
+		/>,
+	);
 }
 
 describe("RevealScreen", () => {
